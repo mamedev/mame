@@ -259,10 +259,11 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_SCREEN_UPDATE_DRIVER(rgum_state, screen_update_royalgum)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 24000000/16)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", 24000000/16));   /* unknown clock & type, hand tuned to get ~50 fps (?) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pa_callback().set_ioport("IN0");

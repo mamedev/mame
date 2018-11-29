@@ -12,40 +12,59 @@
 #pragma once
 
 #include "cpu/mips/mips3.h"
+#include "machine/ds1386.h"
+#include "machine/eepromser.h"
+#include "machine/hal2.h"
 #include "machine/ioc2.h"
 #include "machine/wd33c93.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 class hpc3_device : public device_t
 {
 public:
-	template <typename T, typename U, typename V, typename W, typename X>
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner
-		, T &&cpu_tag, U &&scsi_tag, V &&ioc2_tag, W &&ldac_tag, X &&rdac_tag)
+	template <typename T, typename U>
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&scsi_tag)
 		: hpc3_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_wd33c93.set_tag(std::forward<U>(scsi_tag));
-		m_ioc2.set_tag(std::forward<V>(ioc2_tag));
-		m_ldac.set_tag(std::forward<W>(ldac_tag));
-		m_rdac.set_tag(std::forward<X>(rdac_tag));
 	}
 
-	template <typename T, typename U, typename V, typename W, typename X, typename Y>
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner
-		, T &&cpu_tag, U &&scsi_tag, V &&scsi2_tag, W &&ioc2_tag, X &&ldac_tag, Y &&rdac_tag)
-		: hpc3_device(mconfig, tag, owner
-			, std::forward<T>(cpu_tag), std::forward<U>(scsi_tag), std::forward<W>(ioc2_tag), std::forward<X>(ldac_tag), std::forward<Y>(rdac_tag))
+	template <typename T, typename U, typename V>
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&scsi_tag, V &&scsi2_tag)
+		: hpc3_device(mconfig, tag, owner, std::forward<T>(cpu_tag), std::forward<U>(scsi_tag))
 	{
 		m_wd33c93_2.set_tag(std::forward<V>(scsi2_tag));
 	}
 
 	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void map(address_map &map);
+
+	void raise_local_irq(int channel, uint32_t mask) { m_ioc2->raise_local_irq(channel, mask); }
+	void lower_local_irq(int channel, uint32_t mask) { m_ioc2->lower_local_irq(channel, mask); }
+
+	DECLARE_WRITE_LINE_MEMBER(scsi0_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
+	DECLARE_WRITE_LINE_MEMBER(scsi1_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	DECLARE_READ32_MEMBER(enet_r);
+	DECLARE_WRITE32_MEMBER(enet_w);
 	DECLARE_READ32_MEMBER(hd_enet_r);
 	DECLARE_WRITE32_MEMBER(hd_enet_w);
 	template <uint32_t index> DECLARE_READ32_MEMBER(hd_r);
 	template <uint32_t index> DECLARE_WRITE32_MEMBER(hd_w);
+	DECLARE_READ32_MEMBER(eeprom_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(pbus4_r);
 	DECLARE_WRITE32_MEMBER(pbus4_w);
 	DECLARE_READ32_MEMBER(pbusdma_r);
@@ -57,16 +76,6 @@ public:
 	DECLARE_WRITE32_MEMBER(dma_config_w);
 	DECLARE_READ32_MEMBER(pio_config_r);
 	DECLARE_WRITE32_MEMBER(pio_config_w);
-
-	DECLARE_WRITE_LINE_MEMBER(scsi0_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
-	DECLARE_WRITE_LINE_MEMBER(scsi1_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
-
-protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void do_pbus_dma(uint32_t channel);
 
@@ -125,13 +134,16 @@ protected:
 	required_device<mips3_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
 	optional_device<wd33c93_device> m_wd33c93_2;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<ds1386_device> m_rtc;
 	required_device<ioc2_device> m_ioc2;
+	required_device<hal2_device> m_hal2;
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
-	required_shared_ptr<uint32_t> m_mainram;
 
 	uint32_t m_enetr_nbdp;
 	uint32_t m_enetr_cbp;
+	uint32_t m_cpu_aux_ctrl;
 
 	struct scsi_dma_t
 	{
@@ -151,10 +163,8 @@ protected:
 	uint32_t m_pio_config[10];
 
 	address_space *m_cpu_space;
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
 DECLARE_DEVICE_TYPE(SGI_HPC3, hpc3_device)
 
-#endif // MAME_MACHINE_HAL2_H
+#endif // MAME_MACHINE_HPC3_H

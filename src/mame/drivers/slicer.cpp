@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/wd_fdc.h"
 #include "machine/mc68681.h"

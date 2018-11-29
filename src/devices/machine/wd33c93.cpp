@@ -16,15 +16,15 @@
 #include "emu.h"
 #include "wd33c93.h"
 
-#define LOG_READS		(1 << 0)
-#define LOG_WRITES		(1 << 1)
-#define LOG_COMMANDS	(1 << 2)
-#define LOG_ERRORS		(1 << 3)
-#define LOG_MISC		(1 << 4)
-#define LOG_REGS		(LOG_READS | LOG_WRITES)
-#define LOG_ALL			(LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC)
+#define LOG_READS       (1 << 0)
+#define LOG_WRITES      (1 << 1)
+#define LOG_COMMANDS    (1 << 2)
+#define LOG_ERRORS      (1 << 3)
+#define LOG_MISC        (1 << 4)
+#define LOG_REGS        (LOG_READS | LOG_WRITES)
+#define LOG_ALL         (LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 

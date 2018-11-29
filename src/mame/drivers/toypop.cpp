@@ -219,47 +219,26 @@ void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 		int x;// = (count % 32);
 		int y; //= count / 32;
 
-		if (!flip)
+		if (count < 64)
 		{
-			if (count < 64)
-			{
-				x = 34 + xoffs;
-				y = yoffs - 2;
-			}
-			else if (count >= 32*30)
-			{
-				x = xoffs - 30;
-				y = yoffs - 2;
-			}
-			else
-			{
-				x = 2 + yoffs;
-				y = xoffs - 2;
-			}
+			x = 34 + xoffs;
+			y = yoffs - 2;
+		}
+		else if (count >= 32*30)
+		{
+			x = xoffs - 30;
+			y = yoffs - 2;
 		}
 		else
 		{
-			if (count < 64)
-			{
-				x = 1 - xoffs;
-				y = 29 - yoffs;
-			}
-			else if (count >= 32*30)
-			{
-				x = 65 - xoffs;
-				y = 29 - yoffs;
-			}
-			else
-			{
-				x = 33 - yoffs;
-				y = 29 - xoffs;
-			}
+			x = 2 + yoffs;
+			y = xoffs - 2;
 		}
 
 		uint16_t tile = m_fgvram[count];
 		uint8_t color = (m_fgattr[count] & 0x3f) + (m_pal_bank << 6);
 
-		gfx_0->transpen(bitmap, cliprect, tile, color, flip, flip, x*8, y*8, 0);
+		gfx_0->transpen(bitmap, cliprect, tile, color, flip, flip, (flip ? 35-x : x)*8, (flip ? 27-y : y)*8, 0);
 	}
 }
 

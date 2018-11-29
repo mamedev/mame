@@ -503,10 +503,10 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
-	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
-	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
-	MCFG_SNK68_SPR_NO_PARTIAL
+	SNK68_SPR(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag(m_gfxdecode);
+	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback), this);
+	m_sprites->set_no_partial();
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -311,16 +311,16 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(gradius3_state, tile_callback)
-	MCFG_K052109_CHARRAM(true)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(gradius3_state::tile_callback), this);
+	m_k052109->set_char_ram(true);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(gradius3_state, sprite_callback)
-	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_GRADIUS3)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(gradius3_state::sprite_callback), this);
+	m_k051960->set_plane_order(K051960_PLANEORDER_GRADIUS3);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -328,9 +328,7 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, gradius3_state, volume_callback))

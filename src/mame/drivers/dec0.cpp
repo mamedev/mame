@@ -350,11 +350,11 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 	switch (offset << 1)
 	{
 		case 0: /* Playfield & Sprite priority */
-			dec0_priority_w(space, 0, data, mem_mask);
+			priority_w(space, 0, data, mem_mask);
 			break;
 
 		case 2: /* DMA flag */
-			dec0_update_sprites_w(space, 0, 0, mem_mask);
+			m_spriteram->copy();
 			break;
 
 		case 4: /* 6502 sound cpu */
@@ -399,7 +399,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 			break;
 
 		case 12: /* DMA flag */
-			//dec0_update_sprites_w(space, 0, 0, mem_mask);
+			//m_spriteram->copy();
 			break;
 #if 0
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
@@ -625,7 +625,7 @@ void dec0_state::slyspy_map(address_map &map)
 	map(0x308000, 0x3087ff).ram().share("spriteram");   /* Sprites */
 	map(0x310000, 0x3107ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x314002, 0x314003).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x314002, 0x314003).w(FUNC(dec0_state::priority_w));
 	map(0x314008, 0x31400f).r(FUNC(dec0_state::slyspy_controls_r));
 	map(0x31c000, 0x31c00f).r(FUNC(dec0_state::slyspy_protection_r)).nopw();
 }
@@ -637,7 +637,7 @@ void dec0_state::midres_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("ram");
 	map(0x120000, 0x1207ff).ram().share("spriteram");
 	map(0x140000, 0x1407ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x160000, 0x160001).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x160000, 0x160001).w(FUNC(dec0_state::priority_w));
 	map(0x180000, 0x18000f).r(FUNC(dec0_state::midres_controls_r));
 	map(0x180008, 0x18000f).nopw(); /* ?? watchdog ?? */
 	map(0x1a0001, 0x1a0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -665,7 +665,7 @@ void dec0_state::midres_map(address_map &map)
 void dec0_state::midresb_map(address_map &map)
 {
 	midres_map(map);
-	map(0x160010, 0x160011).w(FUNC(dec0_state::dec0_priority_w));
+	map(0x160010, 0x160011).w(FUNC(dec0_state::priority_w));
 	map(0x180000, 0x18000f).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x180012, 0x180013).noprw();
 	map(0x180014, 0x180015).w(FUNC(dec0_state::midres_sound_w));
@@ -814,7 +814,7 @@ void dec0_automat_state::automat_map(address_map &map)
 
 	// video regs are moved to here..
 	map(0x400000, 0x400007).w(FUNC(dec0_automat_state::automat_scroll_w));
-	map(0x400008, 0x400009).w(FUNC(dec0_automat_state::dec0_priority_w));
+	map(0x400008, 0x400009).w(FUNC(dec0_automat_state::priority_w));
 
 	map(0x500000, 0x500001).nopw(); // ???
 
@@ -1516,8 +1516,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,4),
 	4,      /* 4 bits per pixel  */
 	{ RGN_FRAC(0,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
@@ -1527,10 +1527,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -1540,9 +1538,8 @@ static const gfx_layout automat_spritelayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
-	{ 16*8+7, 16*8+6,16*8+5,16*8+4,16*8+3,16*8+2,16*8+1,16*8+0,7,6,5,4,3,2,1,0},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8+7,-1), STEP8(7,-1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -1611,6 +1608,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(dec0_state::dec0_base)
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_REFRESH_RATE(57.41)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
@@ -1746,6 +1745,8 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
@@ -1820,6 +1821,8 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)

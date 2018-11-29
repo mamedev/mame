@@ -13,10 +13,12 @@
 #pragma once
 
 #include "fdc.h"
+#include "imagedev/floppy.h"
 #include "machine/i8271.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"
 #include "formats/fsd_dsk.h"
+#include "formats/pc_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,7 +37,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -45,11 +46,9 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(side_w);
 
-	required_memory_region m_dfs_rom;
 	required_device<i8271_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -66,7 +65,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -79,12 +77,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	required_memory_region m_dfs_rom;
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
-	int m_drive_control;
 	int m_fdc_ie;
 };
 

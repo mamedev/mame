@@ -599,9 +599,9 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFX_REGION(1)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfx_region(1);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -303,25 +303,23 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_SCREEN_TAG("screen")
-	MCFG_K052109_CB(blockhl_state, tile_callback)
-	MCFG_K052109_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_screen_tag("screen");
+	m_k052109->set_tile_callback(FUNC(blockhl_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(blockhl_state, sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(blockhl_state::sprite_callback), this);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
 MACHINE_CONFIG_END
 
 

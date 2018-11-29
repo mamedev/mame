@@ -221,25 +221,25 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(aliens_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(aliens_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(aliens_state, sprite_callback)
-	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(aliens_state::sprite_callback), this);
+	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state,aliens_snd_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  /* verified on pcb */
+	ymsnd.port_write_handler().set(FUNC(aliens_state::aliens_snd_bankswitch_w));
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
 
 	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state, volume_callback))

@@ -77,6 +77,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -454,12 +455,13 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(amust_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amust_state, hsync_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amust_state, vsync_w))
+	h46505_device &crtc(H46505(config, "crtc", XTAL(14'318'181) / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(amust_state::crtc_update_row), this);
+	crtc.out_hsync_callback().set(FUNC(amust_state::hsync_w));
+	crtc.out_vsync_callback().set(FUNC(amust_state::vsync_w));
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->drq_wr_callback().set(FUNC(amust_state::drq_w));

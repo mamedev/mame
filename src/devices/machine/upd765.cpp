@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "upd765.h"
+#include "imagedev/floppy.h"
 #include "debugger.h"
 
 #define LOG_WARN    (1U << 1)   // Show warnings

@@ -617,12 +617,13 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(nyny_state, crtc_update_row)
-	MCFG_MC6845_END_UPDATE_CB(nyny_state, crtc_end_update)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic48_1", ttl74123_device, a_w))
+	H46505(config, m_mc6845, CRTC_CLOCK);
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(nyny_state::crtc_update_row), this);
+	m_mc6845->set_end_update_callback(FUNC(nyny_state::crtc_end_update), this);
+	m_mc6845->out_de_callback().set(m_ic48_1, FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */
 	TTL74123(config, m_ic48_1, 0);

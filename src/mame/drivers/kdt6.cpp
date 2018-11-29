@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
@@ -630,11 +631,12 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	config.set_default_layout(layout_kdt6);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(13'516'800) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(kdt6_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc2", z80ctc_device, trg2))
+	MC6845(config, m_crtc, XTAL(13'516'800) / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(kdt6_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set("ctc2", FUNC(z80ctc_device::trg2));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

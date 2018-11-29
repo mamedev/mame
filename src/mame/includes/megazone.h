@@ -5,6 +5,10 @@
     Megazone
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MEGAZONE_H
+#define MAME_INCLUDES_MEGAZONE_H
+
+#pragma once
 
 #include "sound/flt_rc.h"
 #include "emupal.h"
@@ -12,8 +16,8 @@
 class megazone_state : public driver_device
 {
 public:
-	megazone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	megazone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scrolly(*this, "scrolly"),
 		m_scrollx(*this, "scrollx"),
 		m_videoram(*this, "videoram"),
@@ -77,3 +81,5 @@ private:
 	void megazone_sound_io_map(address_map &map);
 	void megazone_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MEGAZONE_H

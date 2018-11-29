@@ -12,17 +12,6 @@
 
 typedef device_delegate<void (int, uint16_t*, uint16_t*, uint16_t*, uint16_t*)> segaic16_video_pagelatch_delegate;
 
-#define MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB( _class, _method) \
-	downcast<segaic16_video_device &>(*device).set_pagelatch_cb(segaic16_video_pagelatch_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
-
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -107,7 +96,7 @@ public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_pagelatch_cb(segaic16_video_pagelatch_delegate newtilecb) { m_pagelatch_cb = newtilecb; }
+	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb = segaic16_video_pagelatch_delegate(std::forward<T>(args)...); }
 
 	uint8_t m_display_enable;
 	optional_shared_ptr<uint16_t> m_tileram;

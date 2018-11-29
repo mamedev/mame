@@ -871,10 +871,11 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // no NMI mask?
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // no NMI mask?
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amaticmg)
 
@@ -907,8 +908,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
+	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
@@ -928,8 +928,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
+	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")

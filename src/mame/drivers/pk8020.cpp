@@ -16,7 +16,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "imagedev/flopdrv.h"
 #include "formats/pk8020_dsk.h"
 #include "machine/ram.h"
 #include "screen.h"

@@ -69,6 +69,7 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_maincpu(*this, "maincpu"),
+		m_sprite_xhigh_ignore_hack(true),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
@@ -92,7 +93,7 @@ public:
 		m_lowbus(*this, "lowbus"),
 		m_sound(*this, "xavix_sound")
 	{ }
-	
+
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
@@ -112,6 +113,7 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction);
 	required_ioport m_in0;
 	required_ioport m_in1;
+	required_device<xavix_device> m_maincpu;
 
 private:
 
@@ -142,8 +144,8 @@ private:
 
 	/* this is just a quick memory system bypass for video reads etc. because going through the
 	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
-	   enable the video before actually setting up the source registers! 
-   
+	   enable the video before actually setting up the source registers!
+
 	   this will need modifying if any games have RAM instead of ROM (which I think is possible
 	   with SuperXaviX at least)
 	*/
@@ -345,7 +347,8 @@ private:
 	DECLARE_WRITE8_MEMBER(colmix_l_w);
 	DECLARE_WRITE8_MEMBER(bmp_palram_sh_w);
 	DECLARE_WRITE8_MEMBER(bmp_palram_l_w);
-
+	DECLARE_WRITE8_MEMBER(spriteram_w);
+	bool m_sprite_xhigh_ignore_hack;
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
@@ -403,9 +406,8 @@ private:
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
-	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	
+
 	void update_irqs();
 	uint8_t m_irqsource;
 
@@ -482,6 +484,7 @@ private:
 	void draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int line);
+	void decode_inline_header(int &flipx, int &flipy, int &test, int& pal, int debug_packets);
 
 	bitmap_ind16 m_zbuffer;
 
@@ -511,7 +514,9 @@ class xavix_i2c_state : public xavix_state
 public:
 	xavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag),
-		m_i2cmem(*this, "i2cmem")
+		m_i2cmem(*this, "i2cmem"),
+		hackaddress1(-1),
+		hackaddress2(-1)
 	{ }
 
 	void xavix_i2c_24lc04(machine_config &config);
@@ -520,11 +525,21 @@ public:
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
 
+	void init_epo_efdx()
+	{
+		init_xavix();
+		hackaddress1 = 0x958a;
+		hackaddress2 = 0x8524;
+	}
 protected:
 	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+
+private:
+	int hackaddress1;
+	int hackaddress2;
 };
 
 class xavix_i2c_lotr_state : public xavix_i2c_state

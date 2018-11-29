@@ -1,5 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+#ifndef MAME_INCLUDES_40LOVE_H
+#define MAME_INCLUDES_40LOVE_H
+
+#pragma once
 
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
@@ -114,3 +118,5 @@ private:
 	uint8_t       m_snd_ctrl2;
 	uint8_t       m_snd_ctrl3;
 };
+
+#endif // MAME_INCLUDES_40LOVE_H

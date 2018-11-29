@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -522,11 +522,11 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) // 4MHz
-	MCFG_SOUND_ROUTE(0, "filter1_l", 0.50)
-	MCFG_SOUND_ROUTE(0, "filter1_r", 0.50)
-	MCFG_SOUND_ROUTE(1, "filter2_l", 0.50)
-	MCFG_SOUND_ROUTE(1, "filter2_r", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'000'000)/8)); // 4MHz
+	ymsnd.add_route(0, "filter1_l", 0.50);
+	ymsnd.add_route(0, "filter1_r", 0.50);
+	ymsnd.add_route(1, "filter2_l", 0.50);
+	ymsnd.add_route(1, "filter2_r", 0.50);
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_APAN_CB(xexex_state, ym_set_mixing)

@@ -161,6 +161,7 @@
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"

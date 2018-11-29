@@ -37,6 +37,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
@@ -564,10 +565,11 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
-	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL(2'000'000)));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);   /* ? */
+	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row), this);
 
 	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
@@ -585,11 +587,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601a)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
 
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
-	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601a_update_row)
+	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(pyl601_state::pyl601a_update_row), this);
 MACHINE_CONFIG_END
 
 /* ROM definition */

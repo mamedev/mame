@@ -120,8 +120,7 @@ void blmbycar_state::common_map(address_map &map)
 	map(0x108000, 0x10bfff).writeonly();                                               // ???
 	map(0x10c000, 0x10c003).writeonly().share("scroll_1");              // Scroll 1
 	map(0x10c004, 0x10c007).writeonly().share("scroll_0");              // Scroll 0
-	map(0x200000, 0x2005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x4000); // Palette
-	map(0x200600, 0x203fff).ram().mirror(0x4000);
+	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x4000); // Palette
 	map(0x440000, 0x441fff).ram();
 	map(0x444000, 0x445fff).writeonly().share("spriteram");// Sprites (size?)
 	map(0x700000, 0x700001).portr("DSW");
@@ -189,7 +188,7 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0010, "Pot Wheel" ) // Preliminary
 	PORT_DIPSETTING(      0x0008, "Opt Wheel" ) // Preliminary
-//  PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )   // Time goes to 0 rally fast!
+	PORT_DIPSETTING(      0x0000, "invalid, breaks game" )   // Time goes to 0 rally fast!
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -337,7 +336,7 @@ static const gfx_layout layout_16x16x4 =
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
 static GFXDECODE_START( gfx_blmbycar )
-	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 64*8 ) // [0] Layers + Sprites
 GFXDECODE_END
 
 
@@ -386,8 +385,12 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blmbycar)
 
-	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+
+	BLMBYCAR_SPRITES(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag("gfxdecode");
+	m_sprites->set_screen_tag("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

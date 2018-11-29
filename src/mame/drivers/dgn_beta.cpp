@@ -52,7 +52,7 @@ documentation still exists.
 
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 
 /*
@@ -385,11 +385,12 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", 12.288_MHz_XTAL / 16)    //XTAL is guessed
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, dgn_beta_state, dgnbeta_vsync_changed))
+	HD6845(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(16); /*?*/
+	m_mc6845->set_update_row_callback(FUNC(dgn_beta_state::crtc_update_row), this);
+	m_mc6845->out_vsync_callback().set(FUNC(dgn_beta_state::dgnbeta_vsync_changed));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K,384K,512K,640K,768K");

@@ -2434,10 +2434,10 @@ MACHINE_CONFIG_START(model2_state::model2_timers)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2_state::model2_screen)
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(*this, model2_state, horizontal_sync_w))
-	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(*this, model2_state, vertical_sync_w))
+	S24TILE(config, m_tiles, 0, 0x3fff);
+	m_tiles->set_palette(m_palette);
+	m_tiles->xhout_write_callback().set(FUNC(model2_state::horizontal_sync_w));
+	m_tiles->xvout_write_callback().set(FUNC(model2_state::vertical_sync_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

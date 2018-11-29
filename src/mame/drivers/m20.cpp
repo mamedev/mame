@@ -43,6 +43,7 @@ E I1     Vectored interrupt error
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -814,10 +815,11 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8) /* hand tuned to get ~50 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_UPDATE_ROW_CB(m20_state, update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK/8)); /* hand tuned to get ~50 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(16);
+	crtc.set_update_row_callback(FUNC(m20_state::update_row), this);
 
 	I8255A(config, m_i8255, 0);
 

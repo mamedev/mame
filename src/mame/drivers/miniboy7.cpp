@@ -539,11 +539,12 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 12) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(miniboy7_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("pia0", pia6821_device, ca1_w))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 12)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(miniboy7_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set("pia0", FUNC(pia6821_device::ca1_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

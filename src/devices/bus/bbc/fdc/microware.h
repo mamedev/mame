@@ -15,6 +15,7 @@
 #pragma once
 
 #include "fdc.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"
 #include "formats/fsd_dsk.h"
@@ -36,7 +37,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -48,11 +48,8 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 
-	required_memory_region m_dfs_rom;
 	required_device<wd2793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;

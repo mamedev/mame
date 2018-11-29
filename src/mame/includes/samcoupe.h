@@ -15,6 +15,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/msm6242.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

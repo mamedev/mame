@@ -424,10 +424,11 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_PALETTE_ADD(m_palette, 0x10)
 	MCFG_PALETTE_INIT_OWNER(othello_state, othello)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */)   /* H46505 @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(TILE_WIDTH)
-	MCFG_MC6845_UPDATE_ROW_CB(othello_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 1000000 /* ? MHz */));   /* H46505 @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(TILE_WIDTH);
+	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -416,9 +416,9 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000)/9));
+	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

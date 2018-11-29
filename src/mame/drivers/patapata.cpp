@@ -313,9 +313,9 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 ROM_START( patapata )

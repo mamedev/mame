@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 
-	MCFG_CEDAR_MAGNET_SOUND_ADD("cedtop")
+	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
 	MCFG_CEDAR_MAGNET_PLANE_ADD("cedplane0")
 	MCFG_CEDAR_MAGNET_PLANE_ADD("cedplane1")
 	MCFG_CEDAR_MAGNET_SPRITE_ADD("cedsprite")

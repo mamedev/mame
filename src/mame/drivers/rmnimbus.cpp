@@ -14,7 +14,7 @@
 #include "machine/rmnkbd.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "bus/isa/fdc.h"
 #include "bus/rs232/rs232.h"

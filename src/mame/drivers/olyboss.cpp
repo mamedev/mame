@@ -36,6 +36,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "video/upd3301.h"
 #include "machine/i8257.h"

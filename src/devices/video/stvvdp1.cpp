@@ -1074,7 +1074,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 					break;
 				// TODO: Pro Yakyuu Team mo Tsukurou (during team creation, on PR girl select)
 				//case 6:
-				//	break;
+				//  break;
 				case 7: /* Gouraud-shading + half-transparent */
 					// Lupin the 3rd Pyramid no Kenja enemy shadows
 					// Death Crimson lives indicators

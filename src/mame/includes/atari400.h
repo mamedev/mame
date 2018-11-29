@@ -14,6 +14,8 @@
 #ifndef MAME_INCLUDES_ATARI400_H
 #define MAME_INCLUDES_ATARI400_H
 
+#pragma once
+
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 #include "sound/pokey.h"

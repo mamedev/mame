@@ -19,7 +19,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
 #include "formats/apridisk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/74153.h"
@@ -385,11 +385,12 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("ic30", HD6845, "screen", 15_MHz_XTAL / 10)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(10)
-	MCFG_MC6845_UPDATE_ROW_CB(apricot_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, apricot_state, apricot_hd6845_de))
+	HD6845(config, m_crtc, 15_MHz_XTAL / 10);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(10);
+	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(apricot_state::apricot_hd6845_de));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

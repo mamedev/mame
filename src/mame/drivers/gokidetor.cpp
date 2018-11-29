@@ -143,9 +143,9 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("soundcpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag("soundcpu");
 
 	SPEAKER(config, "mono").front_center();
 

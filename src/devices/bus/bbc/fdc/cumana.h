@@ -12,6 +12,7 @@
 #pragma once
 
 #include "fdc.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"
 #include "formats/fsd_dsk.h"
@@ -37,7 +38,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
@@ -49,8 +49,6 @@ protected:
 	bool m_invert;
 
 private:
-	required_memory_region m_dfs_rom;
-
 	int m_drive_control;
 	int m_fdc_ie;
 };

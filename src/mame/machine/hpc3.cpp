@@ -9,15 +9,16 @@
 #include "emu.h"
 #include "machine/hpc3.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_PBUS_DMA	(1 << 1)
-#define LOG_SCSI		(1 << 2)
-#define LOG_SCSI_DMA	(1 << 3)
-#define LOG_ETHERNET	(1 << 4)
-#define LOG_PBUS4		(1 << 5)
-#define LOG_CHAIN		(1 << 6)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_PBUS_DMA    (1 << 1)
+#define LOG_SCSI        (1 << 2)
+#define LOG_SCSI_DMA    (1 << 3)
+#define LOG_ETHERNET    (1 << 4)
+#define LOG_PBUS4       (1 << 5)
+#define LOG_CHAIN       (1 << 6)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_ETHERNET | LOG_PBUS4 | LOG_CHAIN)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_HPC3, hpc3_device, "hpc3", "SGI HPC3")
@@ -27,10 +28,12 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_wd33c93(*this, finder_base::DUMMY_TAG)
 	, m_wd33c93_2(*this, finder_base::DUMMY_TAG)
-	, m_ioc2(*this, finder_base::DUMMY_TAG)
-	, m_ldac(*this, finder_base::DUMMY_TAG)
-	, m_rdac(*this, finder_base::DUMMY_TAG)
-	, m_mainram(*this, ":mainram")
+	, m_eeprom(*this, "eeprom")
+	, m_rtc(*this, "rtc")
+	, m_ioc2(*this, "ioc2")
+	, m_hal2(*this, "hal2")
+	, m_ldac(*this, "ldac")
+	, m_rdac(*this, "rdac")
 {
 }
 
@@ -38,6 +41,7 @@ void hpc3_device::device_start()
 {
 	save_item(NAME(m_enetr_nbdp));
 	save_item(NAME(m_enetr_cbp));
+	save_item(NAME(m_cpu_aux_ctrl));
 	save_item(NAME(m_pio_config));
 
 	for (uint32_t i = 0; i < 2; i++)
@@ -73,6 +77,7 @@ void hpc3_device::device_reset()
 {
 	m_enetr_nbdp = 0x80000000;
 	m_enetr_cbp = 0x80000000;
+	m_cpu_aux_ctrl = 0;
 
 	memset(m_scsi_dma, 0, sizeof(scsi_dma_t) * 2);
 
@@ -92,6 +97,49 @@ void hpc3_device::device_reset()
 	}
 
 	m_cpu_space = &m_maincpu->space(AS_PROGRAM);
+}
+
+void hpc3_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0);
+	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
+	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+
+	voltage_regulator_device &vreg = VOLTAGE_REGULATOR(config, "vref");
+	vreg.set_output(5.0);
+	vreg.add_route(0, "ldac",  1.0, DAC_VREF_POS_INPUT);
+	vreg.add_route(0, "rdac",  1.0, DAC_VREF_POS_INPUT);
+	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vreg.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+
+	SGI_HAL2(config, m_hal2);
+	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
+
+	DS1386_8K(config, m_rtc, 32768);
+
+	EEPROM_93C56_16BIT(config, m_eeprom);
+}
+
+void hpc3_device::map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).rw(FUNC(hpc3_device::pbusdma_r), FUNC(hpc3_device::pbusdma_w));
+	map(0x00010000, 0x0001ffff).rw(FUNC(hpc3_device::hd_enet_r), FUNC(hpc3_device::hd_enet_w));
+	map(0x00030008, 0x0003000b).rw(FUNC(hpc3_device::eeprom_r), FUNC(hpc3_device::eeprom_w));
+	map(0x00040000, 0x00047fff).rw(FUNC(hpc3_device::hd_r<0>), FUNC(hpc3_device::hd_w<0>));
+	map(0x00048000, 0x0004ffff).rw(FUNC(hpc3_device::hd_r<1>), FUNC(hpc3_device::hd_w<1>));
+	map(0x00054000, 0x000544ff).rw(FUNC(hpc3_device::enet_r), FUNC(hpc3_device::enet_w));
+	map(0x00058000, 0x000583ff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
+	map(0x00058400, 0x000587ff).ram(); // hack
+	map(0x00059000, 0x000593ff).rw(FUNC(hpc3_device::pbus4_r), FUNC(hpc3_device::pbus4_w));
+	map(0x00059800, 0x00059bff).rw(m_ioc2, FUNC(ioc2_device::read), FUNC(ioc2_device::write));
+	map(0x0005c000, 0x0005cfff).rw(FUNC(hpc3_device::dma_config_r), FUNC(hpc3_device::dma_config_w));
+	map(0x0005d000, 0x0005dfff).rw(FUNC(hpc3_device::pio_config_r), FUNC(hpc3_device::pio_config_w));
+	map(0x00060000, 0x000604ff).rw(m_rtc, FUNC(ds1386_device::data_r), FUNC(ds1386_device::data_w)).umask32(0x000000ff);
 }
 
 void hpc3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -161,6 +209,29 @@ void hpc3_device::do_pbus_dma(uint32_t channel)
 	}
 }
 
+READ32_MEMBER(hpc3_device::enet_r)
+{
+	switch (offset)
+	{
+		case 0x000/4:
+			logerror("%s: HPC3: enet_r: Read MAC Address bytes 0-3, 0x80675309 & %08x\n", machine().describe_context(), mem_mask);
+			return 0x80675309;
+		default:
+			logerror("%s: HPC3: enet_r: Read Unknown Register %08x & %08x\n", machine().describe_context(), 0x1fbd4000 + (offset << 2), mem_mask);
+			return 0;
+	}
+}
+
+WRITE32_MEMBER(hpc3_device::enet_w)
+{
+	switch (offset)
+	{
+		default:
+			logerror("%s: HPC3: enet_w: Write Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd4000 + (offset << 2), data, mem_mask);
+			break;
+	}
+}
+
 READ32_MEMBER(hpc3_device::hd_enet_r)
 {
 	switch (offset)
@@ -217,6 +288,9 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 template<uint32_t index>
 READ32_MEMBER(hpc3_device::hd_r)
 {
+	if (index && !m_wd33c93_2)
+		return 0;
+
 	switch (offset)
 	{
 	case 0x0000/4:
@@ -248,6 +322,9 @@ READ32_MEMBER(hpc3_device::hd_r)
 template<uint32_t index>
 WRITE32_MEMBER(hpc3_device::hd_w)
 {
+	if (index && !m_wd33c93_2)
+		return;
+
 	switch (offset)
 	{
 	case 0x0000:
@@ -271,10 +348,10 @@ WRITE32_MEMBER(hpc3_device::hd_w)
 	}
 }
 
-template DECLARE_READ32_MEMBER(hpc3_device::hd_r<0>);
-template DECLARE_READ32_MEMBER(hpc3_device::hd_r<1>);
-template DECLARE_WRITE32_MEMBER(hpc3_device::hd_w<0>);
-template DECLARE_WRITE32_MEMBER(hpc3_device::hd_w<1>);
+template READ32_MEMBER(hpc3_device::hd_r<0>);
+template READ32_MEMBER(hpc3_device::hd_r<1>);
+template WRITE32_MEMBER(hpc3_device::hd_w<0>);
+template WRITE32_MEMBER(hpc3_device::hd_w<1>);
 
 READ32_MEMBER(hpc3_device::pbus4_r)
 {
@@ -282,19 +359,19 @@ READ32_MEMBER(hpc3_device::pbus4_r)
 	switch (offset)
 	{
 	case 0x0000/4:
-		ret = m_ioc2->get_local0_int_status();
+		ret = m_ioc2->get_local_int_status(0);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Status Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0004/4:
-		ret = m_ioc2->get_local0_int_mask();
+		ret = m_ioc2->get_local_int_mask(0);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0008/4:
-		ret = m_ioc2->get_local1_int_status();
+		ret = m_ioc2->get_local_int_status(1);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Status Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x000c/4:
-		ret = m_ioc2->get_local1_int_mask();
+		ret = m_ioc2->get_local_int_mask(1);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0010/4:
@@ -302,11 +379,11 @@ READ32_MEMBER(hpc3_device::pbus4_r)
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mappable Interrupt Status: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0014/4:
-		ret = m_ioc2->get_map0_int_mask();
+		ret = m_ioc2->get_map_int_mask(0);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0018/4:
-		ret = m_ioc2->get_map1_int_mask();
+		ret = m_ioc2->get_map_int_mask(1);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		break;
 	case 0x0030/4:
@@ -337,19 +414,19 @@ WRITE32_MEMBER(hpc3_device::pbus4_w)
 	switch (offset)
 	{
 	case 0x0004/4:
-		m_ioc2->set_local0_int_mask(data);
+		m_ioc2->set_local_int_mask(0, data);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x000c/4:
-		m_ioc2->set_local1_int_mask(data);
+		m_ioc2->set_local_int_mask(1, data);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x0014/4:
-		m_ioc2->set_map0_int_mask(data);
+		m_ioc2->set_map_int_mask(0, data);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x0018/4:
-		m_ioc2->set_map1_int_mask(data);
+		m_ioc2->set_map_int_mask(1, data);
 		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x0020/4:
@@ -743,11 +820,11 @@ WRITE_LINE_MEMBER(hpc3_device::scsi0_irq)
 		if (m_wd33c93->get_dma_count() && m_scsi_dma[0].m_active)
 			scsi_dma(0);
 
-		m_ioc2->raise_local0_irq(ioc2_device::INT3_LOCAL0_SCSI0);
+		m_ioc2->raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
 	}
 	else
 	{
-		m_ioc2->lower_local0_irq(ioc2_device::INT3_LOCAL0_SCSI0);
+		m_ioc2->lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
 	}
 }
 
@@ -758,10 +835,27 @@ WRITE_LINE_MEMBER(hpc3_device::scsi1_irq)
 		if (m_wd33c93_2->get_dma_count() && m_scsi_dma[1].m_active)
 			scsi_dma(1);
 
-		m_ioc2->raise_local0_irq(ioc2_device::INT3_LOCAL0_SCSI1);
+		m_ioc2->raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
 	}
 	else
 	{
-		m_ioc2->lower_local0_irq(ioc2_device::INT3_LOCAL0_SCSI1);
+		m_ioc2->lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
 	}
+}
+
+READ32_MEMBER(hpc3_device::eeprom_r)
+{
+	// Disabled - we don't have a dump from real hardware, and IRIX 5.x freaks out with default contents.
+	uint32_t ret = (m_cpu_aux_ctrl & ~0x10);// | m_eeprom->do_read() << 4;
+	logerror("%s: HPC Serial EEPROM Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+	return ret;
+}
+
+WRITE32_MEMBER(hpc3_device::eeprom_w)
+{
+	m_cpu_aux_ctrl = data;
+	logerror("%s: HPC Serial EEPROM Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	m_eeprom->di_write(BIT(data, 3));
+	m_eeprom->cs_write(BIT(data, 1));
+	m_eeprom->clk_write(BIT(data, 2));
 }

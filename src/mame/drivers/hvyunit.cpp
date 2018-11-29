@@ -665,8 +665,8 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

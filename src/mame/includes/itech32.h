@@ -6,6 +6,10 @@
     (32-bit blitter variant)
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_ITECH32_H
+#define MAME_INCLUDES_ITECH32_H
+
+#pragma once
 
 #include "machine/6522via.h"
 #include "machine/nvram.h"
@@ -15,18 +19,18 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define VIDEO_CLOCK     XTAL(8'000'000)           /* video (pixel) clock */
-#define CPU_CLOCK       XTAL(12'000'000)          /* clock for 68000-based systems */
-#define CPU020_CLOCK    XTAL(25'000'000)          /* clock for 68EC020-based systems */
-#define SOUND_CLOCK     XTAL(16'000'000)          /* clock for sound board */
-#define TMS_CLOCK       XTAL(40'000'000)          /* TMS320C31 clocks on drivedge */
+#define VIDEO_CLOCK     XTAL(8'000'000)           // video (pixel) clock
+#define CPU_CLOCK       XTAL(12'000'000)          // clock for 68000-based systems
+#define CPU020_CLOCK    XTAL(25'000'000)          // clock for 68EC020-based systems
+#define SOUND_CLOCK     XTAL(16'000'000)          // clock for sound board
+#define TMS_CLOCK       XTAL(40'000'000)          // TMS320C31 clocks on drivedge
 
 
 class itech32_state : public driver_device
 {
 public:
-	itech32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	itech32_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_via(*this, "via6522_0"),
@@ -203,8 +207,8 @@ protected:
 class drivedge_state : public itech32_state
 {
 public:
-	drivedge_state(const machine_config &mconfig, device_type type, const char *tag)
-		: itech32_state(mconfig, type, tag),
+	drivedge_state(const machine_config &mconfig, device_type type, const char *tag) :
+		itech32_state(mconfig, type, tag),
 		m_dsp1(*this, "dsp1"),
 		m_dsp2(*this, "dsp2"),
 		m_zbuf_control(*this, "zctl"),
@@ -265,3 +269,5 @@ protected:
 
 	uint8_t m_tms_spinning[2];
 };
+
+#endif // MAME_INCLUDES_ITECH32_H

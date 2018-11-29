@@ -5,9 +5,10 @@
  * includes/sorcerer.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_SORCERER_H
 #define MAME_INCLUDES_SORCERER_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
@@ -17,7 +18,7 @@
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "formats/sorc_dsk.h"
 #include "formats/sorc_cas.h"
 #include "machine/micropolis.h"
@@ -30,14 +31,14 @@
 
 struct cass_data_t {
 	struct {
-		int length;     /* time cassette level is at input.level */
-		int level;      /* cassette level */
-		int bit;        /* bit being read */
+		int length;     // time cassette level is at input.level
+		int level;      // cassette level
+		int bit;        // bit being read
 	} input;
 	struct {
-		int length;     /* time cassette level is at output.level */
-		int level;      /* cassette level */
-		int bit;        /* bit to output */
+		int length;     // time cassette level is at output.level
+		int level;      // cassette level
+		int bit;        // bit to output
 	} output;
 };
 

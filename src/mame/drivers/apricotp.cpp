@@ -27,6 +27,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/m6800/m6801.h"
 #include "formats/apridisk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/apricotkb.h"
 #include "machine/pic8259.h"
@@ -597,10 +598,11 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fp_state, update_row)
+	MC6845(config, m_crtc, 4000000);
+	m_crtc->set_screen(SCREEN_CRT_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(fp_state::update_row), this);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

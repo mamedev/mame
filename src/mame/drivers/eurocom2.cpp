@@ -33,6 +33,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "formats/ppg_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"

@@ -2,15 +2,15 @@
 // copyright-holders:David Haywood
 
 /*
-	Motion Football simulation for XaviX based games
-	EA Sports Madden Football
-	Play TV Football
+    Motion Football simulation for XaviX based games
+    EA Sports Madden Football
+    Play TV Football
 
-	seems to register a pulse when you move it, and another when it stops moving
-	game uses current timer register (without interrupt) to measure time between pulses 
-	to get 'throw' value
+    seems to register a pulse when you move it, and another when it stops moving
+    game uses current timer register (without interrupt) to measure time between pulses
+    to get 'throw' value
 
-	need to verify with code and work out how best to handle this
+    need to verify with code and work out how best to handle this
 */
 
 #include "emu.h"

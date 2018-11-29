@@ -12,6 +12,7 @@
 
 #include "cpu/i86/i186.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/mm58167.h"

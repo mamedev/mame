@@ -1225,13 +1225,13 @@ void hyperstone_device::generate_cmpb(drcuml_block &block, compiler_state &compi
 	}
 	else
 	{
-		UML_ADD(block, I2, I2, src_code);
+		UML_ADD(block, I2, I2, dst_code);
 		UML_AND(block, I2, I2, 0x3f);
 		UML_LOAD(block, I1, (void *)m_core->local_regs, I2, SIZE_DWORD, SCALE_x4);
 	}
 
 	UML_TEST(block, I1, I0);
-	UML_SETc(block, uml::COND_NZ, I0);
+	UML_SETc(block, uml::COND_Z, I0);
 	UML_ROLINS(block, DRC_SR, I0, Z_SHIFT, Z_MASK);
 }
 

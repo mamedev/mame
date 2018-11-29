@@ -413,11 +413,11 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_XTAL/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, boogwing_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_XTAL/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(boogwing_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_XTAL/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)

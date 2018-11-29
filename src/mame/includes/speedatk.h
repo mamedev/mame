@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Pierpaolo Prazzoli
+#ifndef MAME_INCLUDES_SPEEDATK_H
+#define MAME_INCLUDES_SPEEDATK_H
+
+#pragma once
 
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -7,14 +11,15 @@
 class speedatk_state : public driver_device
 {
 public:
-	speedatk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	speedatk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram") { }
+		m_colorram(*this, "colorram")
+	{ }
 
 	void speedatk(machine_config &config);
 
@@ -53,3 +58,5 @@ private:
 	void speedatk_io(address_map &map);
 	void speedatk_mem(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SPEEDATK_H

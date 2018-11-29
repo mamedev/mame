@@ -148,7 +148,7 @@ public:
 	// interrupts
 	virtual void s100_int_w(int state) { }
 	virtual void s100_nmi_w(int state) { }
-	virtual uint8_t s100_sinta_r(offs_t offset) { return 0; }
+	virtual uint8_t s100_sinta_r(offs_t offset) { return 0xff; }
 
 	// vectored interrupts
 	virtual void s100_vi0_w(int state) { }
@@ -161,11 +161,11 @@ public:
 	virtual void s100_vi7_w(int state) { }
 
 	// memory access
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0; }
+	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) { }
 
 	// I/O access
-	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0; }
+	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) { }
 
 	// configuration access

@@ -253,22 +253,19 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
-	MCFG_TC0080VCO_GFX_REGION(0)
-	MCFG_TC0080VCO_TX_REGION(1)
-	MCFG_TC0080VCO_OFFSETS(1, 1)
-	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
-	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	TC0080VCO(config, m_tc0080vco, 0);
+	m_tc0080vco->set_gfx_region(0);
+	m_tc0080vco->set_tx_region(1);
+	m_tc0080vco->set_offsets(1, 1);
+	m_tc0080vco->set_bgflip_yoffs(-2);
+	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 2000000)); /* ?? MHz */
 	ymsnd.port_a_read_callback().set_ioport("DSWA");
 	ymsnd.port_b_read_callback().set_ioport("DSWB");
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 ROM_START( parentj )

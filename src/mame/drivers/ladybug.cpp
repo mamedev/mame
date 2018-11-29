@@ -741,8 +741,8 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
 
-	MCFG_DEVICE_ADD("video", LADYBUG_VIDEO, 4000000)
-	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
+	LADYBUG_VIDEO(config, m_video, 4000000);
+	m_video->set_gfxdecode_tag("gfxdecode");
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // L5 on video board or H3 on single board
 	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flipscreen_w)); // no other outputs used
@@ -791,10 +791,10 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32+1)
 	MCFG_PALETTE_INIT_OWNER(sraider_state,sraider)
 
-	MCFG_DEVICE_ADD("video", LADYBUG_VIDEO, 4000000)
-	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
+	LADYBUG_VIDEO(config, m_video, 4000000);
+	m_video->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

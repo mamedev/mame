@@ -1,6 +1,5 @@
 3do.cpp
 4004clk.cpp
-4d20.cpp
 4dpi.cpp
 68ksbc.cpp
 a2600.cpp
@@ -209,6 +208,7 @@ emate.cpp
 emma2.cpp
 enmirage.cpp
 ep64.cpp
+epic14e.cpp
 esprit.cpp
 esq1.cpp
 esq5505.cpp
@@ -226,6 +226,7 @@ exelv.cpp
 exp85.cpp
 facit4440.cpp
 falco5220.cpp
+falcots.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -316,6 +317,7 @@ icatel.cpp
 icebox.cpp
 ie15.cpp
 if800.cpp
+ikt5a.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -334,6 +336,7 @@ iq151.cpp
 iqunlim.cpp
 iris3130.cpp
 irisha.cpp
+iris_power.cpp
 is48x.cpp
 isbc.cpp
 isbc8010.cpp
@@ -476,6 +479,8 @@ nanos.cpp
 nascom1.cpp
 nc.cpp
 ncd17c.cpp
+ncdmips.cpp
+ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
@@ -603,6 +608,7 @@ pyl601.cpp
 ql.cpp
 qtsbc.cpp
 qvt70.cpp
+qvt102.cpp
 qvt103.cpp
 qvt201.cpp
 qvt6800.cpp
@@ -657,6 +663,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+shine.cpp
 si5500.cpp
 sitcom.cpp
 sk1.cpp

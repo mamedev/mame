@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/com8116.h"
@@ -53,7 +53,7 @@ public:
 		, m_io_baud(*this, "BAUD")
 		, m_io_config(*this, "CONFIG")
 		, m_io_keyboard(*this, "LINE%u", 0)
-		{ }
+	{ }
 
 	void sys80(machine_config &config);
 	void trs80(machine_config &config);

@@ -976,10 +976,11 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bml3_state, crtc_update_row)
+	H46505(config, m_crtc, CPU_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row), this);
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.

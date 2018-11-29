@@ -479,10 +479,11 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(hitpoker_state, screen_update_hitpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2)  /* hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hitpoker_state, hitpoker_irq))
+	h46505_device &crtc(H46505(config, "crtc", CRTC_CLOCK/2));  /* hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set(FUNC(hitpoker_state::hitpoker_irq));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)

@@ -5,10 +5,12 @@
  * includes/pcw.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PCW_H
 #define MAME_INCLUDES_PCW_H
 
+#pragma once
+
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -32,14 +34,14 @@ class pcw_state : public driver_device
 {
 public:
 	pcw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_fdc(*this, "upd765"),
-			m_floppy(*this, "upd765:%u", 0U),
-			m_ram(*this, RAM_TAG),
-			m_beeper(*this, "beeper"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, "upd765")
+		, m_floppy(*this, "upd765:%u", 0U)
+		, m_ram(*this, RAM_TAG)
+		, m_beeper(*this, "beeper")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 	{ }
 
 	int m_boot;

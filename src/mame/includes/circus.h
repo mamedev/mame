@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
+#ifndef MAME_INCLUDES_CIRCUS_H
+#define MAME_INCLUDES_CIRCUS_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "sound/discrete.h"
@@ -9,14 +13,15 @@
 class circus_state : public driver_device
 {
 public:
-	circus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	circus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -77,3 +82,5 @@ extern const char *const circus_sample_names[];
 extern const char *const crash_sample_names[];
 extern const char *const ripcord_sample_names[];
 extern const char *const robotbwl_sample_names[];
+
+#endif // MAME_INCLUDES_CIRCUS_H

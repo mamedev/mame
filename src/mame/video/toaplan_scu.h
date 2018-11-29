@@ -38,12 +38,5 @@ private:
 
 DECLARE_DEVICE_TYPE(TOAPLAN_SCU, toaplan_scu_device)
 
-#define MCFG_TOAPLAN_SCU_SET_XOFFSETS(_xoffs, _xoffs_flipped ) \
-	downcast<toaplan_scu_device &>(*device).set_xoffsets(_xoffs, _xoffs_flipped);
-
-#define MCFG_TOAPLAN_SCU_ADD(_tag, _palette_tag, _xoffs, _xoffs_flipped ) \
-	MCFG_DEVICE_ADD(_tag, TOAPLAN_SCU, 0) \
-	MCFG_GFX_PALETTE(_palette_tag) \
-	downcast<toaplan_scu_device &>(*device).set_xoffsets(_xoffs, _xoffs_flipped);
 
 #endif // MAME_VIDEO_TOAPLAN_SCU_H

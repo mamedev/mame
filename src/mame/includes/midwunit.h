@@ -5,6 +5,10 @@
     Driver for Midway Wolf-unit games.
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MIDWUNIT_H
+#define MAME_INCLUDES_MIDWUNIT_H
+
+#pragma once
 
 #include "machine/midwayic.h"
 
@@ -12,13 +16,13 @@ class midwunit_state : public midtunit_state
 {
 public:
 	midwunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: midtunit_state(mconfig, type, tag),
-			m_midway_serial_pic(*this, "serial_security_sim"),
-			m_midway_serial_pic_emu(*this, "serial_security"),
-			m_nvram(*this, "nvram"),
-			m_mainram(*this, "mainram"),
-			m_ports(*this, { { "IN0", "IN1", "DSW", "IN2" } })
-			{ }
+		: midtunit_state(mconfig, type, tag)
+		, m_midway_serial_pic(*this, "serial_security_sim")
+		, m_midway_serial_pic_emu(*this, "serial_security")
+		, m_nvram(*this, "nvram")
+		, m_mainram(*this, "mainram")
+		, m_ports(*this, { { "IN0", "IN1", "DSW", "IN2" } })
+	{ }
 
 	void wunit(machine_config &config);
 	void wunit_picemu(machine_config &config);
@@ -69,3 +73,5 @@ private:
 	void init_mk3_common();
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MIDWUNIT_H

@@ -40,6 +40,7 @@ I/O ports: These ranges are what is guessed
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"

@@ -43,6 +43,7 @@ private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
+	DECLARE_WRITE_LINE_MEMBER(cols_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void cit220p_mem_map(address_map &map);
@@ -58,18 +59,33 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<scn2674_device> m_avdc;
 	required_region_ptr<u8> m_chargen;
+
+	bool m_132_cols;
 };
 
 
 void cit220_state::machine_start()
 {
 	subdevice<i8251_device>("usart")->write_cts(0);
+
+	m_132_cols = false;
+	save_item(NAME(m_132_cols));
 }
 
 
 WRITE_LINE_MEMBER(cit220_state::sod_w)
 {
 	// probably asserts PBREQ on SCN2674 to access memory at Exxx
+}
+
+WRITE_LINE_MEMBER(cit220_state::cols_w)
+{
+	if (!state != m_132_cols)
+	{
+		m_132_cols = !state;
+		m_avdc->set_character_width(m_132_cols ? 9 : 10);
+		m_avdc->set_unscaled_clock(m_132_cols ? 22'096'000 / 9 : 14'916'000 / 10);
+	}
 }
 
 void cit220_state::cit220p_mem_map(address_map &map)
@@ -109,6 +125,17 @@ void cit220_state::vp122_io_map(address_map &map)
 
 SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 {
+	u16 dots = m_chargen[charcode << 4 | linecount] << 2;
+	const int width = m_132_cols ? 9 : 10;
+
+	if (BIT(dots, 2))
+		dots |= 3;
+
+	for (int i = 0; i < width; i++)
+	{
+		bitmap.pix32(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
+		dots <<= 1;
+	}
 }
 
 void cit220_state::char_map(address_map &map)
@@ -149,7 +176,7 @@ void cit220_state::cit220p(machine_config &config)
 
 	SCN2674(config, m_avdc, 22'096'000 / 9);
 	m_avdc->intr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
-	m_avdc->set_character_width(9); // 10 in 80-column mode
+	m_avdc->set_character_width(9); // 10 in 80-column modes
 	m_avdc->set_display_callback(FUNC(cit220_state::draw_character));
 	m_avdc->set_addrmap(0, &cit220_state::char_map);
 	m_avdc->set_addrmap(1, &cit220_state::attr_map);
@@ -159,6 +186,7 @@ void cit220_state::cit220p(machine_config &config)
 	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
 	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3); // 9600 baud?
 	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
+	duart.outport_cb().append(FUNC(cit220_state::cols_w)).bit(7);
 
 	I8251(config, "usart", 4'000'000);
 
@@ -192,7 +220,7 @@ void cit220_state::vp122(machine_config &config)
 	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
 	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
-	// OP7 = 0 for 80-column modes, 1 for 132-column modes
+	duart.outport_cb().append(FUNC(cit220_state::cols_w)).bit(7);
 
 	I8251(config, "usart", 8_MHz_XTAL / 2);
 
@@ -234,5 +262,5 @@ ROM_START( vp122 )
 	ROM_LOAD( "223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62) )
 ROM_END
 
-COMP( 1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_IS_SKELETON )
-COMP( 1985, vp122, 0, 0, vp122, cit220p, cit220_state, empty_init, "ADDS", "Viewpoint 122", MACHINE_IS_SKELETON )
+COMP(1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1985, vp122, 0, 0, vp122, cit220p, cit220_state, empty_init, "ADDS", "Viewpoint 122", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

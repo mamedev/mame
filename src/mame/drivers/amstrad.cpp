@@ -936,13 +936,14 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
 
-	MCFG_MC6845_ADD("mc6845", HD6845, nullptr, 16_MHz_XTAL / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_vsync_changed))
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE("exp", cpc_expansion_slot_device, cursor_w))
+	HD6845(config, m_crtc, 16_MHz_XTAL / 16);
+	m_crtc->set_screen(nullptr);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(16);
+	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_de_changed));
+	m_crtc->out_hsync_callback().set(FUNC(amstrad_state::amstrad_hsync_changed));
+	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_vsync_changed));
+	m_crtc->out_cur_callback().set("exp", FUNC(cpc_expansion_slot_device::cursor_w));
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -1058,12 +1059,13 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, 40_MHz_XTAL / 40)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_plus_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_vsync_changed))
+	AMS40489(config, m_crtc, 40_MHz_XTAL / 40);
+	m_crtc->set_screen(nullptr);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(16);
+	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_plus_de_changed));
+	m_crtc->out_hsync_callback().set(FUNC(amstrad_state::amstrad_plus_hsync_changed));
+	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_plus_vsync_changed));
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -1136,12 +1138,13 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, 40_MHz_XTAL / 40)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_plus_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_vsync_changed))
+	AMS40489(config, m_crtc, 40_MHz_XTAL / 40);
+	m_crtc->set_screen(nullptr);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(16);
+	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_plus_de_changed));
+	m_crtc->out_hsync_callback().set(FUNC(amstrad_state::amstrad_plus_hsync_changed));
+	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_plus_vsync_changed));
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 

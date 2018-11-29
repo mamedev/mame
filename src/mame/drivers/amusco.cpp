@@ -585,12 +585,14 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_PALETTE_ADD("palette",8*8)
 	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_ADDR_CHANGED_CB(amusco_state, crtc_addr)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(m_pic, pic8259_device, ir1_w)) // IRQ1 sets 0x918 bit 3
-	MCFG_MC6845_UPDATE_ROW_CB(amusco_state, update_row)
+	R6545_1(config, m_crtc, CRTC_CLOCK); /* guess */
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_on_update_addr_change_callback(FUNC(amusco_state::crtc_addr), this);
+	m_crtc->out_de_callback().set(m_pic, FUNC(pic8259_device::ir1_w)); // IRQ1 sets 0x918 bit 3
+	m_crtc->set_update_row_callback(FUNC(amusco_state::update_row), this);
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

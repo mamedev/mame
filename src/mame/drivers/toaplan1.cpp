@@ -1936,7 +1936,9 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_rallybik_state, screen_vblank_rallybik))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(31, 15);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallybik)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))

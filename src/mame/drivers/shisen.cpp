@@ -252,10 +252,10 @@ MACHINE_CONFIG_START(shisen_state::shisen)
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "lspeaker", 0.5);
+	ymsnd.add_route(1, "rspeaker", 0.5);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

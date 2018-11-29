@@ -35,6 +35,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/74123.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -591,12 +592,13 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_PALETTE_ADD("palette", 40)
 	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excali64)
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 16_MHz_XTAL / 16) // 1MHz for lowres; 2MHz for highres
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(excali64_state, update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, excali64_state, crtc_hs))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, excali64_state, crtc_vs))
+	MC6845(config, m_crtc, 16_MHz_XTAL / 16); // 1MHz for lowres; 2MHz for highres
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(excali64_state::update_row), this);
+	m_crtc->out_hsync_callback().set(FUNC(excali64_state::crtc_hs));
+	m_crtc->out_vsync_callback().set(FUNC(excali64_state::crtc_vs));
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )

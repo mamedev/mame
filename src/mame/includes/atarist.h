@@ -13,6 +13,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "imagedev/floppy.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"

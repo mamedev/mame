@@ -33,6 +33,37 @@ TIMER_CALLBACK_MEMBER(bbc_state::reset_timer_cb)
 
 WRITE8_MEMBER(bbc_state::bbc_romsel_w)
 {
+	if (m_swramtype == 0)
+	{
+		/* no sideways expansion board fitted so address only the 4 on board ROM sockets */
+		m_swrbank = (data & 0x03) | 0x0c;
+	}
+	else
+	{
+		/* expansion board fitted so address all 16 ROM sockets */
+		m_swrbank = data & 0x0f;
+	}
+}
+
+READ8_MEMBER(bbc_state::bbc_paged_r)
+{
+	uint8_t data;
+	std::string region_tag;
+
+	if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(GENERIC_ROM_REGION_TAG).c_str()))
+	{
+		data = m_rom[m_swrbank]->read_rom(space, offset);
+	}
+	else
+	{
+		data = m_region_swr->base()[offset + (m_swrbank << 14)];
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER(bbc_state::bbc_paged_w)
+{
 	static const unsigned short swramtype[4][16] = {
 		// TODO: move sideways ROM/RAM boards to slot devices
 		{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }, // 0: none
@@ -41,27 +72,9 @@ WRITE8_MEMBER(bbc_state::bbc_romsel_w)
 		{ 0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1 }, // 3: 128K (banks 8 to 15) for Acorn sideways ram FE30 bank latch
 	};
 
-	if (m_swramtype == 0)
+	if (swramtype[m_swramtype][m_swrbank])
 	{
-		/* no sideways expansion board fitted so address only the 4 on board ROM sockets */
-		m_swrbank = (data & 0x03) | 0x0c;
-		m_swrbank_ram = false;
-	}
-	else
-	{
-		/* expansion board fitted so address all 16 ROM sockets and check if RAM fitted */
-		m_swrbank = data & 0x0f;
-		m_swrbank_ram = swramtype[m_swramtype][m_swrbank] ? true : false;
-	}
-
-	m_bank4->set_entry(m_swrbank);
-}
-
-WRITE8_MEMBER(bbc_state::bbc_bank4_w)
-{
-	if (m_swrbank_ram)
-	{
-		m_region_swr->base()[(m_swrbank << 14) + offset] = data;
+		m_region_swr->base()[offset + (m_swrbank << 14)] = data;
 	}
 }
 
@@ -108,9 +121,6 @@ READ8_MEMBER(bbc_state::bbcbp_fetch_r)
 
 WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
 {
-	/* the BBC Model B+ 128K has extra RAM mapped in replacing the ROM banks 0,1,c and d. */
-	static const unsigned short swram_banks[16] = { 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
-
 	/* the BBC Model B+ addresses all 16 ROM sockets and extra 12K of RAM at 0x8000 and 20K of shadow RAM at 0x3000 */
 	switch (offset & 0x07)
 	{
@@ -118,28 +128,6 @@ WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
 		m_paged_ram = BIT(data, 7);
 
 		m_swrbank = data & 0x0f;
-		if (m_ram->size() == 128 * 1024)
-		{
-			m_swrbank_ram = swram_banks[m_swrbank] ? true : false;
-		}
-		else
-		{
-			m_swrbank_ram = false;
-		}
-
-		if (m_paged_ram)
-		{
-			/* if paged RAM then set 0x8000 to 0xafff to read from the RAM 8000 to 0xafff */
-			m_bank4->set_entry(0x10);
-		}
-		else
-		{
-			/* if paged ROM then set the ROM to be read from 0x8000 to 0xafff */
-			m_bank4->set_entry(m_swrbank);
-		}
-
-		/* set the ROM to be read from 0xb000 to 0xbfff */
-		m_bank5->set_entry(m_swrbank);
 		break;
 
 	case 0x04:
@@ -150,23 +138,42 @@ WRITE8_MEMBER(bbc_state::bbcbp_romsel_w)
 	}
 }
 
-WRITE8_MEMBER(bbc_state::bbcbp_bank4_w)
+READ8_MEMBER(bbc_state::bbcbp_paged_r)
 {
-	if (m_paged_ram)
+	uint8_t data;
+	std::string region_tag;
+
+	if (m_paged_ram && offset < 0x3000)
+	{
+		data = m_ram->pointer()[offset + 0x8000];
+	}
+	else
+	{
+		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(GENERIC_ROM_REGION_TAG).c_str()))
+		{
+			data = m_rom[m_swrbank]->read_rom(space, offset);
+		}
+		else
+		{
+			data = m_region_swr->base()[offset + (m_swrbank << 14)];
+		}
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER(bbc_state::bbcbp_paged_w)
+{
+	/* the BBC Model B+ 128K has extra RAM mapped in replacing the ROM banks 0,1,c and d. */
+	static const unsigned short swram_banks[16] = { 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
+
+	if (m_paged_ram && offset < 0x3000)
 	{
 		m_ram->pointer()[offset + 0x8000] = data;
 	}
-	else if (m_swrbank_ram)
+	else if (m_ram->size() == 128 * 1024 && swram_banks[m_swrbank])
 	{
 		m_region_swr->base()[offset + (m_swrbank << 14)] = data;
-	}
-}
-
-WRITE8_MEMBER(bbc_state::bbcbp_bank5_w)
-{
-	if (m_swrbank_ram)
-	{
-		m_region_swr->base()[offset + (m_swrbank << 14) + 0x3000] = data;
 	}
 }
 
@@ -239,16 +246,6 @@ WRITE8_MEMBER(bbc_state::bbcm_acccon_w)
 	/* Bit IRR causes Interrupt Request. */
 	m_irqs->in_w<6>(m_acccon_irr);
 
-	/* Bit Y causes 8K of RAM (HAZEL) to be overlayed on the MOS VDU drivers. */
-	if (m_acccon_y)
-	{
-		m_bank6->set_base(m_ram->pointer() + 0x9000);
-	}
-	else
-	{
-		m_bank6->set_base(m_region_mos->base());
-	}
-
 	/* Bit D causes the CRT controller to display the contents of LYNNE. */
 	setvideoshadow(m_acccon_d);
 
@@ -272,51 +269,61 @@ WRITE8_MEMBER(bbc_state::bbcm_romsel_w)
 {
 	m_paged_ram = (data & 0x80) >> 7;
 	m_swrbank = data & 0x0f;
-
-	if ((!m_lk19_ic37_paged_rom && (m_swrbank == 4 || m_swrbank == 5)) || (!m_lk18_ic41_paged_rom && (m_swrbank == 6 || m_swrbank == 7)))
-	{
-		/* links are set for RAM so make read/write */
-		m_swrbank_ram = true;
-	}
-	else
-	{
-		/* links are set for ROM so make read-only */
-		m_swrbank_ram = false;
-	}
-
-	if (m_paged_ram)
-	{
-		m_bank4->set_entry(0x10);
-		m_bank5->set_entry(m_swrbank);
-	}
-	else
-	{
-		m_bank4->set_entry(m_swrbank);
-		m_bank5->set_entry(m_swrbank);
-	}
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_bank4_w)
+READ8_MEMBER(bbc_state::bbcm_paged_r)
 {
-	if (m_paged_ram)
+	uint8_t data;
+	std::string region_tag;
+
+	if (m_paged_ram && offset < 0x1000)
+	{
+		data = m_ram->pointer()[offset + 0x8000];
+	}
+	else
+	{
+		if (m_rom[m_swrbank] && memregion(region_tag.assign(m_rom[m_swrbank]->tag()).append(GENERIC_ROM_REGION_TAG).c_str()))
+		{
+			data = m_rom[m_swrbank]->read_rom(space, offset);
+		}
+		else
+		{
+			data = m_region_swr->base()[offset + (m_swrbank << 14)];
+		}
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER(bbc_state::bbcm_paged_w)
+{
+	if (m_paged_ram && offset < 0x1000)
 	{
 		m_ram->pointer()[offset + 0x8000] = data;
 	}
-	else if (m_swrbank_ram)
+	else if ((!m_lk19_ic37_paged_rom && (m_swrbank == 4 || m_swrbank == 5)) || (!m_lk18_ic41_paged_rom && (m_swrbank == 6 || m_swrbank == 7)))
 	{
 		m_region_swr->base()[offset + (m_swrbank << 14)] = data;
 	}
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_bank5_w)
+READ8_MEMBER(bbc_state::bbcm_hazel_r)
 {
-	if (m_swrbank_ram)
+	uint8_t data;
+
+	if (m_acccon_y)
 	{
-		m_region_swr->base()[offset + (m_swrbank << 14) + 0x1000] = data;
+		data = m_ram->pointer()[offset + 0x9000];
 	}
+	else
+	{
+		data = m_region_mos->base()[offset];
+	}
+
+	return data;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_bank6_w)
+WRITE8_MEMBER(bbc_state::bbcm_hazel_w)
 {
 	if (m_acccon_y)
 	{
@@ -1155,7 +1162,7 @@ image_init_result bbc_state::load_rom16(device_image_interface &image, generic_s
 	uint32_t size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
-	if (size != 0x2000 && size != 0x4000)
+	if (size > 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "ROM socket accepts 16K/8K only");
 		return image_init_result::FAIL;
@@ -1165,7 +1172,7 @@ image_init_result bbc_state::load_rom16(device_image_interface &image, generic_s
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 	uint8_t *crt = slot->get_rom_base();
-	if (size == 0x2000)
+	if (size <= 0x2000)
 	{
 		/* mirror 8K ROMs */
 		memcpy(crt + 0x2000, crt, 0x2000);
@@ -1179,7 +1186,7 @@ image_init_result bbc_state::load_rom32(device_image_interface &image, generic_s
 	uint32_t size = slot->common_get_size("rom");
 
 	// socket accepts 32K,16K and 8K ROM only
-	if (size != 0x8000 && size != 0x4000 && size != 0x2000)
+	if (size > 0x8000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "ROM socket accepts 32K/16K/8K only");
 		return image_init_result::FAIL;
@@ -1189,14 +1196,14 @@ image_init_result bbc_state::load_rom32(device_image_interface &image, generic_s
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 	uint8_t *crt = slot->get_rom_base();
-	if (size == 0x2000)
+	if (size <= 0x2000)
 	{
 		/* mirror 8K ROMs */
 		memcpy(crt + 0x2000, crt, 0x2000);
 		memcpy(crt + 0x4000, crt, 0x2000);
 		memcpy(crt + 0x6000, crt, 0x2000);
 	}
-	else if (size == 0x4000)
+	else if (size <= 0x4000)
 	{
 		/* mirror 16K ROMs */
 		memcpy(crt + 0x4000, crt, 0x4000);
@@ -1317,34 +1324,106 @@ void bbc_state::init_cfa()
 
 
 /**************************************
-   Setup pointers for rom/cartridge slots
+   Helpers for ROM management
 ***************************************/
 
-void bbc_state::setup_banks(memory_bank *membank, uint32_t shift)
+std::string bbc_state::get_rom_name(uint8_t* header)
+{
+	std::string title = "";
+	/* check for valid copyright */
+	uint8_t offset = header[7];
+	if (header[offset + 0] == 0 && header[offset + 1] == '(' && header[offset + 2] == 'C' && header[offset + 3] == ')')
+	{
+		/* extract ROM title from header*/
+		for (int pos = 9; pos < header[7]; pos++)
+			title.append(1, header[pos] == 0x00 ? 0x20 : header[pos]);
+	}
+	return title;
+}
+
+void bbc_state::insert_device_rom(memory_region *rom)
+{
+	std::string region_tag;
+
+	if (rom == nullptr) return;
+
+	/* check whether ROM already present */
+	for (int bank = 15; bank >= 0; bank--)
+	{
+		/* compare first 1K of bank with what we want to insert */
+		if (!memcmp(rom->base(), m_region_swr->base() + (bank * 0x4000), 0x400))
+		{
+			osd_printf_verbose("Found '%s' in romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+			return;
+		}
+	}
+
+	/* iterate over romslots until an empty socket is found */
+	for (int bank = 15; bank >= 0; bank--)
+	{
+		/* if bank has socket and is empty */
+		if (m_rom[bank] && !memregion(region_tag.assign(m_rom[bank]->tag()).append(GENERIC_ROM_REGION_TAG).c_str()))
+		{
+			uint8_t *swr = m_region_swr->base() + (bank * 0x4000);
+			switch (rom->bytes())
+			{
+			case 0x8000:
+				/* 32K (or 2x16K) ROM, check whether ROM exists in this and next bank */
+				if (swr[0x0006] == 0xff && swr[0x4006] == 0xff)
+				{
+					memcpy(m_region_swr->base() + (bank * 0x4000), rom->base(), 0x8000);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base() + 0x4000).c_str(), bank + 1);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+					return;
+				}
+				break;
+			case 0x4000:
+			case 0x2000:
+				/* 16/8K ROM, check whether ROM exists in this bank */
+				if (swr[0x0006] == 0xff)
+				{
+					memcpy(m_region_swr->base() + (bank * 0x4000), rom->base(), 0x4000);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+					return;
+				}
+				break;
+			}
+		}
+	}
+
+	/* unable to insert ROM */
+	fatalerror("Unable to insert '%s'. Add a sideways ROM board for more sockets.\n", get_rom_name(rom->base()).c_str());
+}
+
+void bbc_state::setup_device_roms()
 {
 	std::string region_tag;
 	memory_region *rom_region;
+	device_t* exp_device;
+	device_t* ext_device;
+
+	/* insert ROM for FDC devices (BBC Model B only), always place into romslot 12 */
+	if (m_fdc && (exp_device = dynamic_cast<device_t*>(m_fdc->get_card_device())))
+	{
+		if (exp_device->memregion("dfs_rom"))
+		{
+			memcpy(m_region_swr->base() + 0x30000, exp_device->memregion("dfs_rom")->base(), exp_device->memregion("dfs_rom")->bytes());
+		}
+	}
 
 	/* configure romslots */
 	for (int i = 0; i < 16; i++)
 	{
-		membank->configure_entry(i, m_region_swr->base() + (i * 0x4000) + shift);
-		/* TODO: expansion devices currently use machine().root_device(), add method to slot interfaces to return pointer to memregion("rom") */
-		//if (m_fdc->rom_region[i])
-		//{
-		//  membank->configure_entry(i, m_fdc->rom_region[i] + shift);
-		//}
-		/* romslots populated by user override expansion devices */
 		if (m_rom[i] && (rom_region = memregion(region_tag.assign(m_rom[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		{
 			switch (rom_region->bytes())
 			{
 			case 0x4000: /* 16K socket */
-				membank->configure_entry(i, rom_region->base() + shift);
+				memcpy(m_region_swr->base() + (i * 0x4000), rom_region->base(), rom_region->bytes());
 				break;
 			case 0x8000: /* 32K socket */
-				membank->configure_entry(i++, rom_region->base() + shift);
-				membank->configure_entry(i, rom_region->base() + shift + 0x4000);
+				memcpy(m_region_swr->base() + (i * 0x4000), rom_region->base(), rom_region->bytes());
+				i++;
 				break;
 			}
 		}
@@ -1355,9 +1434,94 @@ void bbc_state::setup_banks(memory_bank *membank, uint32_t shift)
 	{
 		if (m_cart[i] && (rom_region = memregion(region_tag.assign(m_cart[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		{
-			membank->configure_entry(i * 2, rom_region->base() + shift);
-			membank->configure_entry(i * 2 + 1, rom_region->base() + shift + 0x4000);
+			memcpy(m_region_swr->base() + (i * 0x8000), rom_region->base(), rom_region->bytes());
 		}
+	}
+
+	/* insert ROM(s) for Expansion port devices (Compact only), with additional Mertec slots */
+	if (m_exp && (ext_device = dynamic_cast<device_t*>(m_exp->get_card_device())))
+	{
+		/* only the Mertec device has ext_rom region and should be placed in romslots 0,1 */
+		if (ext_device->memregion("ext_rom"))
+		{
+			memcpy(m_region_swr->base(), ext_device->memregion("ext_rom")->base(), ext_device->memregion("ext_rom")->bytes());
+		}
+
+		bbc_analogue_slot_device* analogue_port = ext_device->subdevice<bbc_analogue_slot_device>("analogue");
+		if (analogue_port && (exp_device = dynamic_cast<device_t*>(analogue_port->get_card_device())))
+		{
+			insert_device_rom(exp_device->memregion("exp_rom"));
+		}
+
+		bbc_userport_slot_device* user_port = ext_device->subdevice<bbc_userport_slot_device>("userport");
+		if (user_port && (exp_device = dynamic_cast<device_t*>(user_port->get_card_device())))
+		{
+			insert_device_rom(exp_device->memregion("exp_rom"));
+		}
+
+		bbc_1mhzbus_slot_device* exp_port = ext_device->subdevice<bbc_1mhzbus_slot_device>("2mhzbus");
+		while (exp_port != nullptr)
+		{
+			if ((exp_device = dynamic_cast<device_t*>(exp_port->get_card_device())))
+			{
+				insert_device_rom(exp_device->memregion("exp_rom"));
+				exp_port = exp_device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus");
+			}
+			else
+			{
+				exp_port = nullptr;
+			}
+		}
+	}
+
+	/* insert ROM(s) for 1MHz bus devices, with pass-through */
+	if (m_1mhzbus)
+	{
+		bbc_1mhzbus_slot_device* exp_port = m_1mhzbus;
+		while (exp_port != nullptr)
+		{
+			if ((exp_device = dynamic_cast<device_t*>(exp_port->get_card_device())))
+			{
+				insert_device_rom(exp_device->memregion("exp_rom"));
+				exp_port = exp_device->subdevice<bbc_1mhzbus_slot_device>("1mhzbus");
+			}
+			else
+			{
+				exp_port = nullptr;
+			}
+		}
+	}
+
+	/* insert ROM(s) for Tube devices */
+	if (m_tube && (exp_device = dynamic_cast<device_t*>(m_tube->get_card_device())))
+	{
+		insert_device_rom(exp_device->memregion("exp_rom"));
+	}
+	if (m_intube && (exp_device = dynamic_cast<device_t*>(m_intube->get_card_device())))
+	{
+		insert_device_rom(exp_device->memregion("exp_rom"));
+	}
+	if (m_extube && (exp_device = dynamic_cast<device_t*>(m_extube->get_card_device())))
+	{
+		insert_device_rom(exp_device->memregion("exp_rom"));
+	}
+
+	/* insert ROM(s) for Userport devices */
+	if (m_userport && (exp_device = dynamic_cast<device_t*>(m_userport->get_card_device())))
+	{
+		insert_device_rom(exp_device->memregion("exp_rom"));
+	}
+
+	/* insert ROM(s) for Analogue port devices */
+	if (m_analog && (exp_device = dynamic_cast<device_t*>(m_analog->get_card_device())))
+	{
+		insert_device_rom(exp_device->memregion("exp_rom"));
+	}
+
+	/* list all inserted ROMs */
+	for (int i = 15; i >= 0; i--)
+	{
+		osd_printf_info("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)).c_str());
 	}
 }
 
@@ -1368,12 +1532,12 @@ void bbc_state::setup_banks(memory_bank *membank, uint32_t shift)
 
 void bbc_state::machine_start()
 {
-	setup_banks(m_bank4, 0x0000);
+	setup_device_roms();
 }
 
 void bbc_state::machine_reset()
 {
-	m_swramtype = (m_bbcconfig.read_safe(0) & 0x0c) >> 2;
+	m_swramtype = (m_bbcconfig.read_safe(0) & 0x38) >> 3;
 	/* bank 1 regular lower RAM from 0000 to 3fff */
 	m_bank1->set_base(m_ram->pointer());
 	/* bank 3 regular higher RAM from 4000 to 7fff */
@@ -1388,9 +1552,11 @@ void bbc_state::machine_reset()
 		m_bank3->set_base(m_ram->pointer() + 0x4000);
 	}
 
-	m_bank4->set_entry(0);
-	/* bank 7 OS ROM from c000 to ffff */
-	m_bank6->set_base(m_region_mos->base());
+	/* install econet hardware */
+	if (m_bbcconfig.read_safe(0) & 0x04)
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8_delegate(FUNC(mc6854_device::write), m_adlc.target()));
+	else
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8_delegate(FUNC(bbc_state::bbc_fe_r), this));
 
 	/* power-on reset timer, should produce "boo...beep" startup sound before sn76496 is initialised */
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -1400,11 +1566,7 @@ void bbc_state::machine_reset()
 
 void bbcbp_state::machine_start()
 {
-	bbc_state::machine_start();
-
-	/* additional bank for paged ram */
-	m_bank4->configure_entry(16, m_ram->pointer() + 0x8000);
-	setup_banks(m_bank5, 0x3000);
+	setup_device_roms();
 }
 
 void bbcbp_state::machine_reset()
@@ -1413,20 +1575,12 @@ void bbcbp_state::machine_reset()
 	m_bank1->set_base(m_ram->pointer());
 	/* bank 2 screen/shadow RAM from 3000 to 7fff */
 	m_bank2->set_base(m_ram->pointer() + 0x3000);
-	m_bank4->set_entry(0);
-	m_bank5->set_entry(0);
-	/* bank 6 OS ROM from c000 to ffff */
-	m_bank6->set_base(m_region_mos->base());
 }
 
 
 void bbcm_state::machine_start()
 {
-	bbc_state::machine_start();
-
-	/* additional bank for paged ram */
-	m_bank4->configure_entry(16, m_ram->pointer() + 0x8000);
-	setup_banks(m_bank5, 0x1000);
+	setup_device_roms();
 
 	output().set_value("power_led", 0);
 }
@@ -1437,10 +1591,6 @@ void bbcm_state::machine_reset()
 	m_bank1->set_base(m_ram->pointer());
 	/* bank 2 screen/shadow RAM from 3000 to 7fff */
 	m_bank2->set_base(m_ram->pointer() + 0x3000);
-	m_bank4->set_entry(0);
-	m_bank5->set_entry(0);
-	/* bank 6 OS ROM from c000 to ffff */
-	m_bank6->set_base(m_region_mos->base());
 
 	m_bankdev->set_bank(0);
 }

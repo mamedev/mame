@@ -5,6 +5,10 @@
     Gottlieb Exterminator hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_EXTERM_H
+#define MAME_INCLUDES_EXTERM_H
+
+#pragma once
 
 #include "cpu/tms34010/tms34010.h"
 #include "machine/gen_latch.h"
@@ -15,8 +19,8 @@
 class exterm_state : public driver_device
 {
 public:
-	exterm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	exterm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audioslave(*this, "audioslave"),
@@ -27,7 +31,8 @@ public:
 		m_master_videoram(*this, "master_videoram"),
 		m_slave_videoram(*this, "slave_videoram"),
 		m_dial(*this, "DIAL%u", 0U),
-		m_input(*this, "P%u", 1U)   { }
+		m_input(*this, "P%u", 1U)
+	{ }
 
 	void exterm(machine_config &config);
 
@@ -75,3 +80,5 @@ private:
 	void sound_master_map(address_map &map);
 	void sound_slave_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_EXTERM_H

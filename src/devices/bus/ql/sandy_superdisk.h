@@ -14,6 +14,7 @@
 #include "exp.h"
 #include "bus/centronics/ctronics.h"
 #include "formats/ql_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
 

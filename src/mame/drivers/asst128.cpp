@@ -6,6 +6,7 @@
 #include "cpu/i86/i86.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "imagedev/floppy.h"
 #include "machine/pc_fdc.h"
 
 #include "formats/asst128_dsk.h"

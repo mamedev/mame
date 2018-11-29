@@ -696,11 +696,12 @@ MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_6845)
 	MCFG_DEVICE_MODIFY("maincpu" ) // guess
 	MCFG_DEVICE_IO_MAP(fastinvaders_6845_io)
 
-	MCFG_MC6845_ADD("6845", MC6845, "screen", 11500000/16) /* confirmed */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fastinvaders_state,vsync))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, fastinvaders_state,hsync))
+	MC6845(config, m_crtc6845, 11500000/16); /* confirmed */
+	m_crtc6845->set_screen("screen");
+	m_crtc6845->set_show_border_area(false);
+	m_crtc6845->set_char_width(16);
+	m_crtc6845->out_vsync_callback().set(FUNC(fastinvaders_state::vsync));
+	m_crtc6845->out_hsync_callback().set(FUNC(fastinvaders_state::hsync));
 MACHINE_CONFIG_END
 
 

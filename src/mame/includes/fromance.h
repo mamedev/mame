@@ -26,11 +26,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_palette(*this, "palette"),
 		m_gga(*this, "gga"),
-		m_videoram(*this, "videoram"),
 		m_spr_old(*this, "vsystem_spr_old"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram"),
 		m_sublatch(*this, "sublatch"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen")
 	{ }
 
@@ -48,6 +48,8 @@ protected:
 	optional_shared_ptr<uint8_t> m_spriteram;
 	required_device<palette_device> m_palette;
 	required_device<vsystem_gga_device> m_gga;
+	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE8_MEMBER(fromance_gfxreg_w);
 	DECLARE_READ8_MEMBER(fromance_videoram_r);
@@ -73,8 +75,6 @@ protected:
 private:
 	/* memory pointers (used by pipedrm) */
 	optional_shared_ptr<uint8_t> m_videoram;
-
-	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -116,7 +116,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
 	optional_device<generic_latch_8_device> m_sublatch;
 	optional_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	void fromance_main_map(address_map &map);
 	void fromance_sub_io_map(address_map &map);

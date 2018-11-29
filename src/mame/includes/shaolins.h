@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
+#ifndef MAME_INCLUDES_SHAOLINS_H
+#define MAME_INCLUDES_SHAOLINS_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "emupal.h"
@@ -7,14 +11,15 @@
 class shaolins_state : public driver_device
 {
 public:
-	shaolins_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shaolins_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram")   { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void shaolins(machine_config &config);
 
@@ -48,3 +53,5 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void shaolins_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SHAOLINS_H

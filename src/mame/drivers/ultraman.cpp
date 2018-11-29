@@ -204,10 +204,10 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(ultraman_state, sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback), this);
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -230,9 +230,7 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 24000000/6)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 24000000/6).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

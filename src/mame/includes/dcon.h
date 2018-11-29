@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_DCON_H
+#define MAME_INCLUDES_DCON_H
+
+#pragma once
 
 #include "audio/seibu.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class dcon_state : public driver_device, protected seibu_sound_common
 {
 public:
-	dcon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dcon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -17,7 +21,8 @@ public:
 		m_fore_data(*this, "fore_data"),
 		m_mid_data(*this, "mid_data"),
 		m_textram(*this, "textram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void dcon(machine_config &config);
 	void sdgndmps(machine_config &config);
@@ -67,3 +72,5 @@ private:
 	void dcon_map(address_map &map);
 	void sdgndmps_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DCON_H

@@ -3,7 +3,7 @@
 
 <!-- Mini Flipper cabinet, used by Tecfri versions of Pinball Action -->
 <!-- based on Speed Ball layout, which used a similar cabinet -->
-  
+
 <!-- define elements -->
 
 	<element name="static_black">
@@ -188,7 +188,7 @@
 		<bezel name="digit13" element="digit">
 			<bounds left="280" top="-20" right="290" bottom="-8" />
 		</bezel>
-    
-    </view>
+
+	</view>
 
 </mamelayout>

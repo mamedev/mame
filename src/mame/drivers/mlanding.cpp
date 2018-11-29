@@ -967,8 +967,8 @@ void mlanding_state::mlanding(machine_config &config)
 	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
 	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag("maincpu");
-	ciu.set_slave_tag("audiocpu");
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 

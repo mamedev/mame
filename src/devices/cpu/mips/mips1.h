@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Patrick Mackinlay
 
 #ifndef MAME_CPU_MIPS_MIPS1_H
 #define MAME_CPU_MIPS_MIPS1_H

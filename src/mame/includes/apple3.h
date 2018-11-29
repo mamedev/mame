@@ -11,6 +11,8 @@
 #ifndef MAME_INCLUDES_APPLE3_H
 #define MAME_INCLUDES_APPLE3_H
 
+#pragma once
+
 #include "cpu/m6502/m6502.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -38,8 +40,8 @@
 class apple3_state : public driver_device
 {
 public:
-	apple3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apple3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_via(*this, "via6522_%u", 0),
@@ -124,6 +126,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(vbl_w);
 
 	// these need to be public for now
 	uint32_t m_flags;
@@ -153,6 +156,7 @@ private:
 	int m_c040_time;
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
+	bool m_charwrt;
 
 	emu_timer *m_scanstart, *m_scanend;
 

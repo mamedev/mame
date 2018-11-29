@@ -1998,10 +1998,10 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	GENERIC_LATCH_16(config, m_soundlatch2);
 
 	// TODO: all sound frequencies unverified (assume same as Mega System 1)
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 7000000/2)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, cischeat_state,sound_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 7000000/2));
+	ymsnd.irq_handler().set(FUNC(cischeat_state::sound_irq));
+	ymsnd.add_route(0, "lspeaker", 0.50);
+	ymsnd.add_route(1, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)

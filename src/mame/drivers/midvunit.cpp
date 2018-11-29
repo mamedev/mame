@@ -1135,9 +1135,9 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x3839);
 MACHINE_CONFIG_END
 
 

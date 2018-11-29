@@ -5,6 +5,10 @@
     IronHorse
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_IRONHORS_H
+#define MAME_INCLUDES_IRONHORS_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -15,8 +19,8 @@
 class ironhors_state : public driver_device
 {
 public:
-	ironhors_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ironhors_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -29,7 +33,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void farwest(machine_config &config);
 	void ironhors(machine_config &config);
@@ -92,3 +97,5 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(farwest_get_bg_tile_info);
 };
+
+#endif // MAME_INCLUDES_IRONHORS_H

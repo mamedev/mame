@@ -5,6 +5,10 @@
     SNK/Alpha 68000 based games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ALPHA68K_H
+#define MAME_INCLUDES_ALPHA68K_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
@@ -26,7 +30,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_color_proms(*this, "color_proms"),
 		m_in(*this, "IN%u", 0U),
-		m_audiobank(*this, "audiobank") { }
+		m_audiobank(*this, "audiobank")
+	{ }
 
 	void tnextspc(machine_config &config);
 	void alpha68k_II(machine_config &config);
@@ -170,3 +175,5 @@ enum
 	ALPHA68K_JONGBOU,           // used in kyros_alpha_trigger_r & kyros_draw_sprites
 	ALPHA68K_KYROS          // used in kyros_draw_sprites
 };
+
+#endif // MAME_INCLUDES_ALPHA68K_H

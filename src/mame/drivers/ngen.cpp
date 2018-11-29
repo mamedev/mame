@@ -65,6 +65,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
 #include "machine/clock.h"
@@ -994,11 +995,11 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, nullptr, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(9)
-	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	MC6845(config, m_crtc, 19980000 / 9);  // divisor unknown -- /9 gives 60Hz output, so likely correct
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(9);
+	m_crtc->set_update_row_callback(FUNC(ngen_state::crtc_update_row), this);
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
@@ -1108,11 +1109,11 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, nullptr, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(9)
-	MCFG_MC6845_UPDATE_ROW_CB(ngen386_state, crtc_update_row)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	MC6845(config, m_crtc, 19980000 / 9);  // divisor unknown -- /9 gives 60Hz output, so likely correct
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(9);
+	m_crtc->set_update_row_callback(FUNC(ngen386_state::crtc_update_row), this);
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz

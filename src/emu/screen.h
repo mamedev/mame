@@ -258,6 +258,7 @@ public:
 
 	template<class Object> devcb_base &set_screen_vblank(Object &&object) { return m_screen_vblank.set_callback(std::forward<Object>(object)); }
 	auto screen_vblank() { return m_screen_vblank.bind(); }
+	auto scanline() { m_video_attributes |= VIDEO_UPDATE_SCANLINE; return m_scanline_cb.bind(); }
 	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_video_attributes(u32 flags) { m_video_attributes = flags; }
 	void set_color(rgb_t color) { m_color = color; }
@@ -355,6 +356,7 @@ private:
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	devcb_write_line    m_screen_vblank;            // screen vblank line callback
+	devcb_write32       m_scanline_cb;              // screen scanline callback
 	optional_device<device_palette_interface> m_palette;      // our palette
 	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in

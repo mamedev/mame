@@ -889,7 +889,6 @@ WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
 	offset += (m_scroll[0x76/2] & 0xf) * 0x40000/2;
 	COMBINE_DATA(&m_eaglshot_gfxram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset / (16*8/2));
-	m_gfxdecode->gfx(1)->mark_dirty(offset / (16*8/2));
 }
 
 
@@ -1835,9 +1834,9 @@ static INPUT_PORTS_START( mslider )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "DSW1:8" ) /* Manual lists this dip as "Unused" */
 
 	PORT_MODIFY("DSW2") // IN1 - $210004
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION( "DSW2:1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION( "DSW2:1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ) ) // service mode calls this OFF
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) // and this ON, TODO: check if it's an error in the video code, or a mistake in the game
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION( "DSW2:2" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
@@ -2399,23 +2398,8 @@ static const gfx_layout layout_16x8x8 =
 	16*8*2
 };
 
-static const gfx_layout layout_16x8x6 =
-{
-	16,8,
-	RGN_FRAC(1,4),
-	6,
-	{
-		RGN_FRAC(2,4)+8, RGN_FRAC(2,4)+0,
-		RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+0,
-		RGN_FRAC(0,4)+8, RGN_FRAC(0,4)+0    },
-	{   STEP8(0,1), STEP8(16,1) },
-	{   STEP8(0,16*2)   },
-	16*8*2
-};
-
 static GFXDECODE_START( gfx_ssv )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8, 0, 0x8000/64 ) // [0] Sprites (256 colors)
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6, 0, 0x8000/64 ) // [1] Sprites (64 colors)
 GFXDECODE_END
 
 static const gfx_layout layout_16x8x8_ram =
@@ -2429,20 +2413,8 @@ static const gfx_layout layout_16x8x8_ram =
 	16*8*8
 };
 
-static const gfx_layout layout_16x8x6_ram =
-{
-	16,8,
-	0x40000 * 16 / (16 * 8),
-	6,
-	{   2,3,4,5,6,7     },
-	{   STEP16(0,8)     },
-	{   STEP8(0,16*8)   },
-	16*8*8
-};
-
 static GFXDECODE_START( gfx_eaglshot )
 	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from RAM)
-	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x6_ram, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from RAM)
 GFXDECODE_END
 
 static const gfx_layout layout_16x16x8 =
@@ -2458,7 +2430,6 @@ static const gfx_layout layout_16x16x8 =
 
 static GFXDECODE_START( gfx_gdfs )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8,   0, 0x8000/64  ) // [0] Sprites (256 colors)
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6,   0, 0x8000/64  ) // [1] Sprites (64 colors)
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,  0, 0x8000/256 ) // [3] Tilemap
 GFXDECODE_END
 
@@ -2620,8 +2591,8 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_gdfs)
 
-	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
-	MCFG_ST0020_SPRITES_PALETTE("palette")
+	ST0020_SPRITES(config, m_gdfs_st0020, 0);
+	m_gdfs_st0020->set_palette(m_palette);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gdfs)
 	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
@@ -4770,13 +4741,13 @@ GAME( 1993,  survartsj, survarts, survarts, survarts, ssv_state, init_survarts, 
 
 GAME( 1994,  drifto94,  0,        drifto94, drifto94, ssv_state, init_drifto94, ROT0,   "Visco",              "Drift Out '94 - The Hard Order (Japan)",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, ssv_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf",                                                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, ssv_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf (US)",                                                   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1995,  hypreact,  0,        hypreact, hypreact, ssv_state, init_hypreact, ROT0,   "Sammy",              "Mahjong Hyper Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, init_twineag2, ROT270, "Seta",               "Twin Eagle II - The Rescue Mission",                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, init_gdfs,     ROT0,   "Banpresto",          "Mobil Suit Gundam Final Shooting (Japan)",                               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, init_gdfs,     ROT0,   "Banpresto",          "Mobile Suit Gundam Final Shooting (Japan)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // title screen spells the title "Mobil" but standardized spelling is "Mobile" it also lists the company name as "Banprest" instead of "Banpresto"
 
 // Ultra X Weapon: "developed by Seta" in ending screen
 GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, init_ultrax,   ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup

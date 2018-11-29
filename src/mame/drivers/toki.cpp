@@ -504,8 +504,7 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	MCFG_DEVICE_OPCODES_MAP(toki_audio_opcodes_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_ROM("audiocpu")
+	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
@@ -532,16 +531,17 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // verified on pcb
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag(m_audiocpu_rom);
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(toki_state::jujuba)
 	toki(config);
-	MCFG_DEVICE_REMOVE("sei80bu")
+	config.device_remove("sei80bu");
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(jujuba_audio_map)

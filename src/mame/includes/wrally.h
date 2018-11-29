@@ -7,6 +7,7 @@
 
 #include "machine/74259.h"
 #include "emupal.h"
+#include "video/gaelco_wrally_sprites.h"
 
 class wrally_state : public driver_device
 {
@@ -17,12 +18,13 @@ public:
 		m_outlatch(*this, "outlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_sprites(*this, "sprites"),
 		m_okibank(*this, "okibank"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
 		m_shareram(*this, "shareram"),
-		m_pant{ nullptr, nullptr }
+		m_tilemap{ nullptr, nullptr }
 	{
 	}
 
@@ -49,12 +51,11 @@ private:
 	void oki_map(address_map &map);
 	void wrally_map(address_map &map);
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<gaelco_wrally_sprites_device> m_sprites;
 	required_memory_bank m_okibank;
 
 	required_shared_ptr<uint16_t> m_videoram;
@@ -62,7 +63,7 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_shareram;
 
-	tilemap_t *m_pant[2];
+	tilemap_t *m_tilemap[2];
 };
 
 #endif // MAME_INCLUDES_WRALLY_H

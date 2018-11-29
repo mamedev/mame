@@ -53,15 +53,10 @@ public:
 
 	// configuration
 	template <class Object> devcb_base &set_lightgun1_callback(Object &&cb) { return m_lightgun1_cb.set_callback(std::forward<Object>(cb)); }
-
 	template <class Object> devcb_base &set_lightgun2_callback(Object &&cb) { return m_lightgun2_cb.set_callback(std::forward<Object>(cb)); }
-
 	template <class Object> devcb_base &set_lightgun_irq_callback(Object &&cb) { return m_lightgun_irq_cb.set_callback(std::forward<Object>(cb)); }
-
 	template <class Object> devcb_base &set_raster1_irq_callback(Object &&cb) { return m_raster1_irq_cb.set_callback(std::forward<Object>(cb)); }
-
 	template <class Object> devcb_base &set_raster2_irq_callback(Object &&cb) { return m_raster2_irq_cb.set_callback(std::forward<Object>(cb)); }
-
 	template <class Object> devcb_base &set_vblank_irq_callback(Object &&cb) { return m_vblank_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// configuration

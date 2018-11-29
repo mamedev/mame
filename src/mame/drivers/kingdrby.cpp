@@ -1005,9 +1005,10 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32)  /* 53.333 Hz. guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	SPEAKER(config, "mono").front_center();
 

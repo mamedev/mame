@@ -1442,6 +1442,7 @@ Notes:
                Animal Basket                         VM2001F01  -
                Block Pong-Pong                       VM2001F01  -
                WaiWai Drive                          VM2001F01  -
+               Faster Than Speed 837-14681           315-6248   -         (not dumped, known to exists)
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
@@ -2921,7 +2922,8 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
+	POWERVR2(config, m_powervr2, 0);
+	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -3041,11 +3043,13 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2_base)
-	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(*this, dc_state, pvr_irq))
+void naomi2_state::naomi2_base(machine_config &config)
+{
+	POWERVR2(config, m_powervr2_slave, 0);
+	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	// TODO: ELAN device
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(naomi2_state::naomi2gd)
 	naomigd(config);

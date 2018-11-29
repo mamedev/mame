@@ -300,10 +300,10 @@ INPUT_PORTS_END
 
 
 /*************************************
-*
-*  Graphics layouts
-*
-*************************************/
+ *
+ *  Graphics layouts
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -384,10 +384,10 @@ GFXDECODE_END
 
 
 /*************************************
-*
-*  Machine drivers
-*
-*************************************/
+ *
+ *  Machine drivers
+ *
+ *************************************/
 
 void m52_state::machine_reset()
 {
@@ -443,10 +443,10 @@ MACHINE_CONFIG_END
 
 
 /*************************************
-*
-*  ROM definitions
-*
-*************************************/
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START(mpatrol)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -624,10 +624,10 @@ ROM_END
 
 
 /*************************************
-*
-*  Game drivers
-*
-*************************************/
+ *
+ *  Game drivers
+ *
+ *************************************/
 
 GAME(1982, mpatrol,  0,       m52,     mpatrol,  m52_state,         empty_init, ROT0, "Irem",                    "Moon Patrol", MACHINE_SUPPORTS_SAVE)
 GAME(1982, mpatrolw, mpatrol, m52,     mpatrolw, m52_state,         empty_init, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", MACHINE_SUPPORTS_SAVE) // USA

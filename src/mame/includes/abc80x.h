@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_ABC800_H
 #define MAME_INCLUDES_ABC800_H
+
+#pragma once
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"

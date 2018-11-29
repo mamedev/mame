@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /*************************************************************************
 
-    xtal.h
+    xtal.cpp
 
     Documentation and consistent naming for known existing crystals.
 
@@ -110,6 +110,7 @@ const double XTAL::known_xtals[] = {
 	  5'626'000, /* 5.626_MHz_XTAL         RCA CDP1869 PAL dot clock */
 	  5'670'000, /* 5.67_MHz_XTAL          RCA CDP1869 NTSC dot clock */
 	  5'714'300, /* 5.7143_MHz_XTAL        Cidelsa Destroyer, TeleVideo serial keyboards */
+	  5'856'000, /* 5.856_MHz_XTAL         HP 3478A Multimeter */
 	  5'911'000, /* 5.911_MHz_XTAL         Philips Videopac Plus G7400 */
 	  5'990'400, /* 5.9904_MHz_XTAL        Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	  6'000'000, /* 6_MHz_XTAL             American Poker II, Taito SJ System */
@@ -201,6 +202,7 @@ const double XTAL::known_xtals[] = {
 	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */
 	 15'000'000, /* 15_MHz_XTAL            Sinclair QL, Amusco Poker */
 	 15'148'800, /* 15.1488_MHz_XTAL       Zentec 9002/9003 */
+	 15'206'400, /* 15.2064_MHz_XTAL       Falco TS-1 */
 	 15'288'000, /* 15.288_MHz_XTAL        DEC VT220 80-column display clock */
 	 15'300'720, /* 15.30072_MHz_XTAL      Microterm 420 */
 	 15'360'000, /* 15.36_MHz_XTAL         Visual 1050 */
@@ -222,6 +224,7 @@ const double XTAL::known_xtals[] = {
 	 16'670'000, /* 16.67_MHz_XTAL         - */
 	 16'777'216, /* 16.777216_MHz_XTAL     Nintendo Game Boy Advance */
 	 16'934'400, /* 16.9344_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
+	 17'010'000, /* 17.01_MHz_XTAL         Epic 14E */
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
 	 17'350'000, /* 17.35_MHz_XTAL         ITT Courier 1700 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
@@ -378,6 +381,7 @@ const double XTAL::known_xtals[] = {
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
+	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */
 	200'000'000  /* 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.) */
 };
 

@@ -172,10 +172,10 @@ MACHINE_CONFIG_START(wpc_flip1_state::wpc_flip1)
 	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_flip1_state,wpc_dmdbank_w))
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
-	MCFG_WPC_ROM_REGION("sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_flip1_state,wpcsnd_reply_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WPCSND(config, m_wpcsnd);
+	m_wpcsnd->set_romregion("sound1");
+	m_wpcsnd->reply_callback().set(FUNC(wpc_flip1_state::wpcsnd_reply_w));
+	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_native_aspect();

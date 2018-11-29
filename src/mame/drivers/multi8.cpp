@@ -594,10 +594,11 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(3'579'545)/2)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(multi8_state, crtc_update_row)
+	H46505(config, m_crtc, XTAL(3'579'545)/2);    /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(multi8_state::crtc_update_row), this);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(multi8_state::porta_r));

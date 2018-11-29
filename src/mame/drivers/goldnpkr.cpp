@@ -4341,10 +4341,11 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 68B45 or 6845s @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 68B45 or 6845s @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -4729,10 +4730,11 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)

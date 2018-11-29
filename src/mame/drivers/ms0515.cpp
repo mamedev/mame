@@ -29,6 +29,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"

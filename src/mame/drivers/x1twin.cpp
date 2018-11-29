@@ -465,9 +465,10 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
 
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)

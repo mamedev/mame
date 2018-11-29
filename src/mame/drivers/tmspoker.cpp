@@ -582,9 +582,10 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/4)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 MACHINE_CONFIG_END
 

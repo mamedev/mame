@@ -57,10 +57,5 @@ private:
 
 DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)
 
-#define MCFG_TAITO_ZOOM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TAITO_ZOOM, 0)
-
-#define MCFG_TAITO_ZOOM_USE_FLASH \
-	downcast<taito_zoom_device *>(device)->set_use_flash();
 
 #endif // MAME_AUDIO_TAITO_ZM_H

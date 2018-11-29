@@ -530,7 +530,7 @@ ROM_START( atetrisb3 )
 
 	// 8749 (10 MHz OSC) emulates POKEYs
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) BAD_DUMP )
+	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) ) // dumped via normal methods and confirmed good via decap
 	ROM_FILL( 0x06e2, 1, 0x96 ) // patch illegal opcode
 
 	// currently unused

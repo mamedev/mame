@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, Peter Ferrie
+#ifndef MAME_INCLUDES_FUNWORLD_H
+#define MAME_INCLUDES_FUNWORLD_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -100,3 +104,4 @@ protected:
 	virtual void machine_reset() override;
 };
 
+#endif // MAME_INCLUDES_FUNWORLD_H

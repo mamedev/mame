@@ -19,6 +19,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
 #include "machine/bankdev.h"

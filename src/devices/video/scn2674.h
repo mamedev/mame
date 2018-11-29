@@ -50,7 +50,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

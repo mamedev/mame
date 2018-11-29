@@ -554,8 +554,8 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

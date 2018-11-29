@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
@@ -429,9 +430,9 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 
 	Z80SIO2(config, "sio", 4000000);
 
-	MCFG_DEVICE_ADD("crtc", HD6845, XTAL(64'000'000)/64) // clock unknown
-	MCFG_MC6845_CHAR_WIDTH(32) // ??
-	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
+	crtc.set_char_width(32);   /* ? */
+	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
 
 	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
 MACHINE_CONFIG_END

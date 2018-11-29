@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	m_soundlatch[0]->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
- 
+
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
