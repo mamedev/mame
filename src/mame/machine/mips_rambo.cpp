@@ -36,6 +36,7 @@ mips_rambo_device::mips_rambo_device(const machine_config &mconfig, const char *
 	, m_irq_out_state(0)
 	, m_buzzer_out_state(0)
 {
+	(void)m_irq_out_state;
 }
 
 void mips_rambo_device::map(address_map &map)
