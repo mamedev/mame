@@ -10,36 +10,51 @@
         * Chicken Shift
         * Gimme a Break
         * Goalie Ghost
-        * Grudge Match
+        * Gimme A Break (7/7/85)
+        * Grudge Match (v00.90, Italy, location test?)
+        * Grudge Match (v00.80, prototype)
         * Hat Trick
-        * Mini Golf
-        * Name that Tune
-        * Night Stocker
+        * Mini Golf (11/25/85)
+        * Mini Golf (10/8/85)
+        * Name That Tune (set 1)
+        * Name That Tune (3/23/86)
+        * Night Stocker (10/6/86)
+        * Night Stocker (8/27/86)
         * Off the Wall
-        * Rescue Raider
+        * Rescue Raider (5/11/87) (non-cartridge)
+        * Rescue Raider (stand-alone)
         * Sente Diagnostic Cartridge
-        * Shrike Avenger
+        * Shrike Avenger (prototype)
         * Snacks'n Jaxson
         * Snake Pit
+        * Snake Pit (9/14/84)
         * Spiker
-        * Stocker
-        * Stompin'
-        * Street Football
-        * Toggle
-        * Trivial Pursuit (Genus I)
-        * Trivial Pursuit (Genus II)
-        * Trivial Pursuit (All Sports Edition)
-        * Trivial Pursuit (Young Player's Edition)
-        * Trivial Pursuit (Baby Boomer Series)
-        * Trivial Pursuit (Spanish)
+        * Spiker (5/5/86)
+        * Spiker (6/9/86)
+        * Stocker (3/19/85)
+        * Stompin' (4/4/86)
+        * Street Football (11/12/86)
+        * Team Hat Trick
+        * Toggle (prototype)
+        * Trivial Pursuit (Think Tank - Genus Edition) (set 1)
+        * Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)
+        * Trivial Pursuit (Genus II Edition)
+        * Trivial Pursuit (All Star Sports Edition)
+        * Trivial Pursuit (Young Players Edition)
+        * Trivial Pursuit (Baby Boomer Edition) (3/20/85)
+        * Trivial Pursuit (Volumen III, Spanish, Maibesa license)
+        * Trivial Pursuit (Volumen II, Spanish, Maibesa license)
+        * Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)
 
     Looking for ROMs for these:
         * Euro Stocker
+        * Trivial Pursuit (Volumen I, Spanish, Maibesa)
+        * Trivial Pursuit (Volumen V, Spanish, Maibesa) [probably running on Maibesa hardware]
 
     Known bugs:
         * CEM3394 emulation is not perfect
         * Shrike Avenger doesn't work properly
-        * unktp set runs on different hardware which isn't emulated yet
+        * triviaes4 set runs on different hardware (from Maibesa) which isn't emulated yet
 
     Other:
         * Some of the cartridge types are unknown
@@ -317,15 +332,15 @@ void balsente_state::cpu2_io_map(address_map &map)
 }
 
 
-// TODO: banking
-void balsente_state::cpu2_unktp_map(address_map &map)
+// TODO: banking (Trivial hardware from Maibesa)
+void balsente_state::cpu2_triviamb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x1fff).ram();
 }
 
-// TODO: hookup 2x Z80CTC, 2x AY8910A, 1x M5205
-void balsente_state::cpu2_unktp_io_map(address_map &map)
+// TODO: hookup 2x Z80CTC, 2x AY8910A, 1x M5205 (Trivial hardware from Maibesa)
+void balsente_state::cpu2_triviamb_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 }
@@ -1444,13 +1459,14 @@ void balsente_state::rescraid(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_smudge_map);
 }
 
-void balsente_state::unktp(machine_config &config)
+/*  Trivial hardware from Maibesa */
+void balsente_state::triviamb(machine_config &config)
 {
 	balsente(config);
 
 	// sound PCB has: 2x Z80CTC, 2x AY8910A, 1x M5205, 1x 8MHz XTAL (divisor unknown for every device)
-	m_audiocpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu2_unktp_map);
-	m_audiocpu->set_addrmap(AS_IO, &balsente_state::cpu2_unktp_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu2_triviamb_map);
+	m_audiocpu->set_addrmap(AS_IO, &balsente_state::cpu2_triviamb_io_map);
 
 	Z80CTC(config, "ctc1", 8_MHz_XTAL / 2);
 	Z80CTC(config, "ctc2", 8_MHz_XTAL / 2);
@@ -1475,8 +1491,8 @@ void balsente_state::unktp(machine_config &config)
  *************************************/
 
 #define MOTHERBOARD_PALS \
-	ROM_REGION( 0x00001, "motherbrd_pals", 0) /* Motherboard PAL's */ \
-	ROM_LOAD( "u01508001100b.u20f", 0x00000, 0x00001, NO_DUMP ) /* PAL16L8 */
+	ROM_REGION( 0x00104, "motherbrd_pals", 0) /* Motherboard PAL's */ \
+	ROM_LOAD( "u01508001100b.u20f", 0x00000, 0x00104, CRC(2d2e2102) SHA1(de094f9955d6085f1714f1aa7c71e1f047e96c5f) ) /* PAL16L8, dumped from Board 007-8001-01-0C Rev C1 */
 
 #define SOUNDBOARD_ROMS \
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for Z80 */ \
@@ -2332,7 +2348,24 @@ ROM_START( shrike )
 	MOTHERBOARD_PALS
 ROM_END
 
-ROM_START( unktp ) // 2PCB set: main PCB marked 87111801 and MAB-016, sound PCB marked COM
+
+/* Trivial Pursuit running on Maibesa PCB MAB-016 connected to a separate sound board (BSU) using a 14-pin connector with this pinout:
+-Pin  1 : GND
+-Pin  2 : S0
+-Pin  3 : S1
+-Pin  4 : S2
+-Pin  5 : S3
+-Pin  6 : S4
+-Pin  7 : S5
+-Pin  8 : S6
+-Pin  9 : S7
+-Pin 10 : STROBE
+-Pin 11 : CHANNEL A
+-Pin 12 : CHANNEL B
+-Pin 13 : key (unused)
+-Pin 14 : GND  
+*/
+ROM_START( triviaes4 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // all 27256, ROM loading order probably wrong
 	ROM_LOAD( "tpe-35-volumen 4.ic35",  0x20000, 0x08000, CRC(8233c9af) SHA1(1853cbff5ff9b0bed4c12717ef705f6ee9679622) )
 	ROM_LOAD( "tpe-43-volumen 4.ic43",  0x18000, 0x08000, CRC(b404b163) SHA1(de30b47d08765a953b01cc3a6bdd95938af6b3d8) )
@@ -2551,12 +2584,12 @@ GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_trivia
 GAME( 1984, triviag2,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes,  ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes,  ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen III, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Genus Edition?
 GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,    ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 007-8001-01-0C Rev C1 */
-GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Edicion Jovenes Carrozas?, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Edicion Jovenes Carrozas not present on title screen, but red background supposedly means this
+GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen II, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // "Jovenes Carrozas" Edition?
 
 /* Board: 006-8030-01-0A Rev A */
 GAME( 1986, nametune2, nametune, balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
@@ -2578,4 +2611,5 @@ GAME( 1986, shrike,    0,        shrike,   shrike,   balsente_state, init_shrike
 GAME( 1987, rescraida, rescraid, rescraid, rescraid, balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teamht,    0,        balsente, teamht,   balsente_state, init_teamht,    ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, unktp,     0,        balsente, triviaes, balsente_state, init_triviaes2, ROT0, "bootleg?",     "unknown Trivial Pursuit bootleg", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
+/* Trivial Pursuit running on Maibesa hardware (with Bally/Sente license) */
+GAME( 1988, triviaes4, 0,        balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
