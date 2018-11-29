@@ -3316,7 +3316,7 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	scsp1.add_route(1, "rspeaker", 1.0);
 
 	scsp_device &scsp2(SCSP(config, "scsp2", 22579000)); // 22.579 MHz XTAL
-	scsp1.set_addrmap(0, &coolridr_state::scsp2_map);
+	scsp2.set_addrmap(0, &coolridr_state::scsp2_map);
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
