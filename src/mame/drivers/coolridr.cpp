@@ -375,8 +375,7 @@ public:
 	bitmap_ind16 m_bg_bitmap;
 	bitmap_ind16 m_bg_bitmap2;
 
-	bitmap_ind16 m_screen1_bitmap;
-	bitmap_ind16 m_screen2_bitmap;
+	bitmap_ind16 m_screen_bitmap[2];
 	uint8_t an_mux_data;
 	uint8_t sound_data, sound_fifo;
 
@@ -566,8 +565,8 @@ void coolridr_state::video_start()
 	m_screen->register_screen_bitmap(m_bg_bitmap);
 	m_screen->register_screen_bitmap(m_bg_bitmap2);
 
-	m_screen->register_screen_bitmap(m_screen1_bitmap);
-	m_screen->register_screen_bitmap(m_screen2_bitmap);
+	m_screen->register_screen_bitmap(m_screen_bitmap[0]);
+	m_screen->register_screen_bitmap(m_screen_bitmap[1]);
 
 	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, h1_tile_layout, m_h1_pcg.get(), 0, 8, 0));
 }
@@ -898,30 +897,14 @@ uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_in
 		m_fadedpals[i] = (r<<10|g<<5|b);
 	}
 
-	if (which==0)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int y=0;y<384;y++)
-		{
-			uint16_t* linesrc = &m_screen1_bitmap.pix16(y);
-			uint16_t* linedest = &bitmap.pix16(y);
+		uint16_t* linesrc = &m_screen_bitmap[which].pix16(y);
+		uint16_t* linedest = &bitmap.pix16(y);
 
-			for (int x=0;x<496;x++)
-			{
-				linedest[x] = m_fadedpals[linesrc[x]];
-			}
-		}
-	}
-	else
-	{
-		for (int y=0;y<384;y++)
+		for (int x = cliprect.left(); x<= cliprect.right(); x++)
 		{
-			uint16_t* linesrc = &m_screen2_bitmap.pix16(y);
-			uint16_t* linedest = &bitmap.pix16(y);
-
-			for (int x=0;x<496;x++)
-			{
-				linedest[x] = m_fadedpals[linesrc[x]];
-			}
+			linedest[x] = m_fadedpals[linesrc[x]];
 		}
 	}
 
@@ -2543,7 +2526,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
 
 				// copy our old buffer to the actual screen
-				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
+				copybitmap(m_screen_bitmap[0], m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
 
 
 
@@ -2591,7 +2574,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
 
 				// copy our old buffer to the actual screen
-				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
+				copybitmap(m_screen_bitmap[1], m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
 
 
 
@@ -3277,14 +3260,14 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 #define MAIN_CLOCK XTAL(28'636'363)
 
 MACHINE_CONFIG_START(coolridr_state::coolridr)
-	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
+	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 MHz
 	MCFG_DEVICE_PROGRAM_MAP(system_h1_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
+	MCFG_DEVICE_ADD("soundcpu", M68000, 22579000/2) // 22.579 MHz XTAL / 2 = 11.2895 MHz
 	MCFG_DEVICE_PROGRAM_MAP(system_h1_sound_map)
 
-	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
+	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 MHz
 	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "screen", 0, 1)
 
@@ -3325,18 +3308,18 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("scsp1", SCSP)
-	MCFG_DEVICE_ADDRESS_MAP(0, scsp1_map)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, coolridr_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp1_to_sh1_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	scsp_device &scsp1(SCSP(config, "scsp1", 22579000)); // 22.579 MHz XTAL
+	scsp1.set_addrmap(0, &coolridr_state::scsp1_map);
+	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
+	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
+	scsp1.add_route(0, "lspeaker", 1.0);
+	scsp1.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("scsp2", SCSP)
-	MCFG_DEVICE_ADDRESS_MAP(0, scsp2_map)
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp2_to_sh1_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	scsp_device &scsp2(SCSP(config, "scsp2", 22579000)); // 22.579 MHz XTAL
+	scsp1.set_addrmap(0, &coolridr_state::scsp2_map);
+	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
+	scsp2.add_route(0, "lspeaker", 1.0);
+	scsp2.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coolridr_state::aquastge)
