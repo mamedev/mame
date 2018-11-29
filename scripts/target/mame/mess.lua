@@ -2503,6 +2503,8 @@ createMESSProjects(_target, _subtarget, "mips")
 files {
 	MAME_DIR .. "src/mame/drivers/mips.cpp",
 	MAME_DIR .. "src/mame/includes/mips.h",
+	MAME_DIR .. "src/mame/machine/mips_rambo.h",
+	MAME_DIR .. "src/mame/machine/mips_rambo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mit")

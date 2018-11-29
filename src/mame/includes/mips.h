@@ -25,6 +25,7 @@
 // i/o devices (rx3230)
 #include "machine/timekpr.h"
 #include "machine/ncr5390.h"
+#include "machine/mips_rambo.h"
 
 // busses and connectors
 #include "machine/nscsi_bus.h"
@@ -143,6 +144,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
+		, m_rambo(*this, "rambo")
 		, m_scsibus(*this, "scsi")
 		, m_scsi(*this, "scsi:7:ncr53c94")
 		, m_net(*this, "net")
@@ -152,6 +154,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_kbdc(*this, "kbdc")
 		, m_kbd(*this, "kbd")
+		, m_buzzer(*this, "buzzer")
 		, m_screen(*this, "screen")
 		, m_ramdac(*this, "ramdac")
 		, m_vram(*this, "vram")
@@ -176,12 +179,18 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
+	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
+	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+
+	template <u8 Source> WRITE_LINE_MEMBER(irq_w);
+
 private:
 	// processors and memory
 	required_device<r3000a_device> m_cpu;
 	required_device<ram_device> m_ram;
 
 	// i/o devices
+	required_device<mips_rambo_device> m_rambo;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c94_device> m_scsi;
 	required_device<am7990_device> m_net;
@@ -191,11 +200,37 @@ private:
 	required_device<i82072_device> m_fdc;
 	required_device<at_keyboard_controller_device> m_kbdc;
 	required_device<pc_kbdc_slot_device> m_kbd;
+	required_device<speaker_sound_device> m_buzzer;
 
 	// optional colour video board
 	optional_device<screen_device> m_screen;
 	optional_device<bt459_device> m_ramdac;
 	optional_device<ram_device> m_vram;
+
+	enum int_reg_mask : u8
+	{
+		INT_SLOT = 0x01, // expansion slot
+		INT_KBD  = 0x02, // keyboard controller
+		INT_SCC  = 0x04, // serial controller
+		INT_SCSI = 0x08, // scsi controller
+		INT_NET  = 0x10, // ethernet controller
+		INT_DRS  = 0x20, // data rate select
+		INT_DSR  = 0x40, // data set ready
+		INT_CEB  = 0x80, // modem call indicator
+
+		INT_CLR  = 0xff,
+	};
+
+	enum gfx_reg_mask : u8
+	{
+		GFX_H_BLANK   = 0x10,
+		GFX_V_BLANK   = 0x20,
+		GFX_COLOR_RSV = 0xce, // reserved
+	};
+
+	u8 m_int_reg;
+	int m_int0_state;
+	int m_int1_state;
 };
 
 #endif // MAME_INCLUDES_MIPS_H
