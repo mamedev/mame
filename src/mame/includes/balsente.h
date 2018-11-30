@@ -67,7 +67,7 @@ public:
 	void shrike(machine_config &config);
 	void rescraid(machine_config &config);
 	void balsente(machine_config &config);
-	void unktp(machine_config &config);
+	void triviamb(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
 	void init_otwalls();
 	void init_triviaes();
@@ -164,8 +164,8 @@ private:
 	void cpu1_smudge_map(address_map &map);
 	void cpu2_io_map(address_map &map);
 	void cpu2_map(address_map &map);
-	void cpu2_unktp_io_map(address_map &map);
-	void cpu2_unktp_map(address_map &map);
+	void cpu2_triviamb_io_map(address_map &map);
+	void cpu2_triviamb_map(address_map &map);
 	void shrike68k_map(address_map &map);
 
 	required_device<timer_device> m_scanline_timer;
