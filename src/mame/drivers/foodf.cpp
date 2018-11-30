@@ -156,7 +156,7 @@ void foodf_state::machine_start()
 
 	save_item(NAME(m_scanline_int_state));
 	save_item(NAME(m_video_int_state));
-	save_item(NAME(m_playfield_flip));
+
 	m_leds.resolve();
 }
 
