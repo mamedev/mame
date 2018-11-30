@@ -175,6 +175,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scorpion_digitalker_control_w);
 	DECLARE_WRITE8_MEMBER(kingball_dac_w);
 	DECLARE_WRITE8_MEMBER(moonwar_port_select_w);
+	void init_fourplay();
+	void init_videight();
 	void init_galaxian();
 	void init_nolock();
 	void init_azurian();
@@ -345,6 +347,8 @@ public:
 	void skybase(machine_config &config);
 	void kong(machine_config &config);
 	void scorpnmc(machine_config &config);
+	void fourplay(machine_config &config);
+	void videight(machine_config &config);
 
 protected:
 	void amigo2_map(address_map &map);
@@ -481,11 +485,6 @@ protected:
 	void videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void fourplay_map(address_map &map);
 	void videight_map(address_map &map);
-public:
-	void fourplay(machine_config &config);
-	void videight(machine_config &config);
-	void init_fourplay();
-	void init_videight();
 };
 
 #endif // MAME_INCLUDES_GALAXIAN_H
