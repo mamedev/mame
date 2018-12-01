@@ -291,6 +291,19 @@ void scsp_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_post_load - called after loading a saved state
+//-------------------------------------------------
+
+void scsp_device::device_post_load()
+{
+	for (int slot = 0; slot < 32; slot++)
+		Compute_LFO(&m_Slots[slot]);
+
+	m_stream->set_output_gain(0,MVOL() / 15.0);
+	m_stream->set_output_gain(1,MVOL() / 15.0);
+}
+
+//-------------------------------------------------
 //  device_clock_changed - called if the clock
 //  changes
 //-------------------------------------------------
@@ -298,11 +311,6 @@ void scsp_device::device_start()
 void scsp_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / 512);
-	for (int slot = 0; slot < 32; slot++)
-		Compute_LFO(&m_Slots[slot]);
-
-	m_stream->set_output_gain(0,MVOL() / 15.0);
-	m_stream->set_output_gain(1,MVOL() / 15.0);
 }
 
 void scsp_device::rom_bank_updated()
