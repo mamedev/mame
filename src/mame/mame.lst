@@ -21236,6 +21236,7 @@ mhavoc                          // 136025           (c) 1983
 mhavoc2                         // 136025           (c) 1983
 mhavocp                         // 136025           (c) 1983
 mhavocrv                        // (hack)
+mhavocpex						// The Promised End - CAX 2018 BETA
 
 @source:mice.cpp
 mice_6502                       // (c) 1981 Microtek International, Inc.

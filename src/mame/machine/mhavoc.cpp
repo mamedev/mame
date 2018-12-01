@@ -89,7 +89,13 @@ void mhavoc_state::machine_reset()
 
 	membank("bank1")->configure_entry(0, m_zram0);
 	membank("bank1")->configure_entry(1, m_zram1);
-	membank("bank2")->configure_entries(0, 4, memregion("alpha")->base() + 0x10000, 0x2000);
+	
+	int rom_page_count = 4;
+	if (m_expanded_paged_rom)
+	{
+		rom_page_count = 8;
+	}
+	membank("bank2")->configure_entries(0, rom_page_count, memregion("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
 	mhavoc_ram_banksel_w(space, 0, 0);
@@ -190,13 +196,17 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_ram_banksel_w)
 	membank("bank1")->set_entry(data & 1);
 }
 
-
 WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
 {
-	membank("bank2")->set_entry(data & 3);
+	if (!m_expanded_paged_rom)
+	{
+		membank("bank2")->set_entry(data & 3);
+	}
+	else{
+		//need to do some switcharoo here for the chip bits
+		membank("bank2")->set_entry((data & 1) | ((data & 2)<<1) | ((data & 4)>>1));
+	}
 }
-
-
 
 /*************************************
  *
@@ -327,6 +337,13 @@ void mhavoc_state::init_mhavocrv()
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	m_gamma->space(AS_PROGRAM).install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),this));
-	m_gamma->space(AS_PROGRAM).install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),this));
+	//m_gamma->space(AS_PROGRAM).install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),this));
+	//m_gamma->space(AS_PROGRAM).install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),this));
+}
+
+void mhavoc_state::init_mhavocpe()
+{
+	init_mhavocrv();
+	/* set flag for expansion of ROM banking */
+	m_expanded_paged_rom = true;
 }

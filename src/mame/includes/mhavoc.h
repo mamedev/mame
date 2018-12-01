@@ -38,8 +38,10 @@ public:
 	void alphaone(machine_config &config);
 	void mhavoc(machine_config &config);
 	void mhavocrv(machine_config &config);
+	void mhavocpe(machine_config &config);
 
 	void init_mhavocrv();
+	void init_mhavocpe();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tms5220_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mhavoc_bit67_r);
@@ -70,9 +72,11 @@ private:
 
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
+	
 	void alpha_map(address_map &map);
 	void alphaone_map(address_map &map);
 	void gamma_map(address_map &map);
+	void gammape_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -96,4 +100,5 @@ private:
 	uint8_t m_gamma_irq_clock;
 	uint8_t m_has_gamma_cpu;
 	uint8_t m_speech_write_buffer;
+	bool m_expanded_paged_rom;
 };
