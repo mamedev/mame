@@ -1359,6 +1359,8 @@ void balsente_state::triviamb(machine_config &config)
 	Z80CTC(config, "ctc1", 8_MHz_XTAL / 2);
 	Z80CTC(config, "ctc2", 8_MHz_XTAL / 2);
 
+	SPEAKER(config, "mono").front_center();
+
 	AY8910(config, "ay1", 8_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.90);
 	AY8910(config, "ay2", 8_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.90);
 
