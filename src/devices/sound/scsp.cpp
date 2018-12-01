@@ -286,7 +286,6 @@ void scsp_device::device_start()
 	save_item(NAME(m_DSP.EXTS));
 	save_item(NAME(m_DSP.EFREG));
 	save_item(NAME(m_DSP.Stopped));
-	save_item(NAME(m_DSP.Updated));
 	save_item(NAME(m_DSP.LastStep));
 }
 
