@@ -13056,6 +13056,9 @@ nmsengen                        // (c) 1991 Video System (Japan)
 fruitpc                         // ???
 gogostrk                        //
 
+@source:fs3216.cpp
+fs3216                          //
+
 @source:ft68m.cpp
 ft68m                           //
 
