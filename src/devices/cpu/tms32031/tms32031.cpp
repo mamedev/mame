@@ -96,6 +96,7 @@ DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "Texas Instruments TMS
 // TODO: expand to cover all the standard internal peripherals
 void tms3203x_device::common_3203x(address_map &map)
 {
+	map(0x000000, 0x000fff).r(FUNC(tms3203x_device::bootrom_r));
 	map(0x808064, 0x808064).rw(FUNC(tms3203x_device::primary_bus_control_r), FUNC(tms3203x_device::primary_bus_control_w));
 }
 
@@ -353,15 +354,20 @@ const tiny_rom_entry *tms3203x_device::device_rom_region() const
 	}
 }
 
+READ32_MEMBER(tms3203x_device::bootrom_r)
+{
+	if (m_mcbl_mode)
+		return m_bootrom[offset];
+
+	return m_cache->read_dword(offset);
+}
+
 //-------------------------------------------------
 //  ROPCODE - fetch an opcode
 //-------------------------------------------------
 
 inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 {
-	if (m_mcbl_mode && pc < 0x1000)
-		return m_bootrom[pc];
-
 	return m_cache->read_dword(pc);
 }
 
@@ -372,9 +378,6 @@ inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 
 inline uint32_t tms3203x_device::RMEM(offs_t addr)
 {
-	if (m_mcbl_mode && addr < 0x1000)
-		return m_bootrom[addr];
-
 	return m_program->read_dword(addr);
 }
 

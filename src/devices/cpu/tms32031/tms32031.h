@@ -190,6 +190,9 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	// internal memory handlers
+	DECLARE_READ32_MEMBER(bootrom_r);
+
 	// internal peripheral device handlers
 	DECLARE_READ32_MEMBER(primary_bus_control_r) { return m_primary_bus_control; }
 	DECLARE_WRITE32_MEMBER(primary_bus_control_w);
