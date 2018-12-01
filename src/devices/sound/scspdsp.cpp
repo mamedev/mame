@@ -62,7 +62,7 @@ void SCSPDSP::Init()
 {
 	std::memset(this, 0, sizeof(*this));
 	RBL = 0x8000;
-	Stopped = 1;
+	Stopped = true;
 }
 
 void SCSPDSP::Step()
@@ -325,7 +325,7 @@ void SCSPDSP::SetSample(int32_t sample, int SEL, int MXL)
 
 void SCSPDSP::Start()
 {
-	Stopped = 0;
+	Stopped = false;
 	int i;
 	for (i = 127; i >= 0; --i)
 	{

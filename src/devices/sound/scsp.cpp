@@ -214,6 +214,80 @@ void scsp_device::device_start()
 
 	// Stereo output with EXTS0,1 Input (External digital audio output)
 	m_stream = machine().sound().stream_alloc(*this, 2, 2, clock() / 512);
+
+	for (int slot = 0; slot < 32; slot++)
+	{
+		for (int i = 0; i < 0x10; i++)
+			save_item(NAME(m_Slots[slot].udata.data[i]), (i << 8) | slot);
+
+		save_item(NAME(m_Slots[slot].Backwards), slot);
+		save_item(NAME(m_Slots[slot].active), slot);
+		save_item(NAME(m_Slots[slot].cur_addr), slot);
+		save_item(NAME(m_Slots[slot].nxt_addr), slot);
+		save_item(NAME(m_Slots[slot].step), slot);
+		save_item(NAME(m_Slots[slot].EG.volume), slot);
+		save_item(NAME(m_Slots[slot].EG.step), slot);
+		save_item(NAME(m_Slots[slot].EG.AR), slot);
+		save_item(NAME(m_Slots[slot].EG.D1R), slot);
+		save_item(NAME(m_Slots[slot].EG.D2R), slot);
+		save_item(NAME(m_Slots[slot].EG.RR), slot);
+		save_item(NAME(m_Slots[slot].EG.DL), slot);
+		save_item(NAME(m_Slots[slot].EG.EGHOLD), slot);
+		save_item(NAME(m_Slots[slot].EG.LPLINK), slot);
+		save_item(NAME(m_Slots[slot].PLFO.phase), slot);
+		save_item(NAME(m_Slots[slot].PLFO.phase_step), slot);
+		save_item(NAME(m_Slots[slot].ALFO.phase), slot);
+		save_item(NAME(m_Slots[slot].ALFO.phase_step), slot);
+	}
+
+	for (int i = 0; i < 0x30/2; i++)
+	{
+		save_item(NAME(m_udata.data[i]), i);
+	}
+
+	save_item(NAME(m_RINGBUF));
+	save_item(NAME(m_BUFPTR));
+#if SCSP_FM_DELAY
+	save_item(NAME(m_DELAYBUF));
+	save_item(NAME(m_DELAYPTR));
+#endif
+
+	save_item(NAME(m_IrqTimA));
+	save_item(NAME(m_IrqTimBC));
+	save_item(NAME(m_IrqMidi));
+
+	save_item(NAME(m_MidiOutW));
+	save_item(NAME(m_MidiOutR));
+	save_item(NAME(m_MidiStack));
+	save_item(NAME(m_MidiW));
+	save_item(NAME(m_MidiR));
+
+	save_item(NAME(m_TimPris));
+	save_item(NAME(m_TimCnt));
+
+	save_item(NAME(m_dma.dmea));
+	save_item(NAME(m_dma.drga));
+	save_item(NAME(m_dma.dtlg));
+	save_item(NAME(m_dma.dgate));
+	save_item(NAME(m_dma.ddir));
+
+	save_item(NAME(m_mcieb));
+	save_item(NAME(m_mcipd));
+
+	save_item(NAME(m_DSP.RBP));
+	save_item(NAME(m_DSP.RBL));
+	save_item(NAME(m_DSP.COEF));
+	save_item(NAME(m_DSP.MADRS));
+	save_item(NAME(m_DSP.MPRO));
+	save_item(NAME(m_DSP.TEMP));
+	save_item(NAME(m_DSP.MEMS));
+	save_item(NAME(m_DSP.DEC));
+	save_item(NAME(m_DSP.MIXS));
+	save_item(NAME(m_DSP.EXTS));
+	save_item(NAME(m_DSP.EFREG));
+	save_item(NAME(m_DSP.Stopped));
+	save_item(NAME(m_DSP.Updated));
+	save_item(NAME(m_DSP.LastStep));
 }
 
 //-------------------------------------------------
@@ -224,6 +298,11 @@ void scsp_device::device_start()
 void scsp_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / 512);
+	for (int slot = 0; slot < 32; slot++)
+		Compute_LFO(&m_Slots[slot]);
+
+	m_stream->set_output_gain(0,MVOL() / 15.0);
+	m_stream->set_output_gain(1,MVOL() / 15.0);
 }
 
 void scsp_device::rom_bank_updated()
