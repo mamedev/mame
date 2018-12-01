@@ -229,8 +229,8 @@ Psikyo PS5V2 hardware readme
 
 Dragon Blaze, Psikyo, 2000
 Gunbarich, Psikyo, 2001
-Tetris The Grand Master 2 , Psikyo, 2000
-Tetris The Grand Master 2+, Psikyo, 2000
+Tetris The Grand Master 2, Arika / Psikyo, 2000
+Tetris The Grand Master 2+, Arika / Psikyo, 2000
 Mahjong G-Taste, Psikyo, 2002
 
 PCB Layout
@@ -310,33 +310,17 @@ static GFXDECODE_START( gfx_psikyosh )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
+WRITE8_MEMBER(psikyosh_state::eeprom_w)
 {
-	if (ACCESSING_BITS_24_31)
-	{
-		m_eeprom->di_write((data & 0x20000000) ? 1 : 0);
-		m_eeprom->cs_write((data & 0x80000000) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->clk_write((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x20) ? 1 : 0);
+	m_eeprom->cs_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
-		return;
-	}
-
-	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
+	if (data & ~0xe0)
+		logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-READ32_MEMBER(psikyosh_state::psh_eeprom_r)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		return ioport("JP4")->read();
-	}
-
-	logerror("Unk EEPROM read mask %x\n", mem_mask);
-
-	return 0;
-}
-
-INTERRUPT_GEN_MEMBER(psikyosh_state::psikyosh_interrupt)
+INTERRUPT_GEN_MEMBER(psikyosh_state::interrupt)
 {
 	device.execute().set_input_line(4, ASSERT_LINE);
 }
@@ -352,14 +336,15 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
 }
 
 
-WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
+WRITE32_MEMBER(psikyosh_state::vidregs_w)
 {
-	COMBINE_DATA(&m_vidregs[offset]);
+	uint32_t const old = m_vidregs[offset];
+	data = COMBINE_DATA(&m_vidregs[offset]);
 
 	if (offset == 4) /* Configure bank for gfx test */
 	{
-		if (ACCESSING_BITS_0_15)    // Bank
-			membank("gfxbank")->set_entry(m_vidregs[offset] & 0xfff);
+		if ((old ^ data) & 0xfff)    // Bank
+			m_gfxrombank->set_entry(data & 0xfff);
 	}
 }
 
@@ -416,10 +401,11 @@ P1KEY11  29|30  P2KEY11
     GND  55|56  GND
 */
 
-	uint32_t controls = ioport("CONTROLLER")->read();
-	uint32_t value = ioport("INPUTS")->read();
+	uint32_t const controls = m_controller_io->read();
+	uint32_t value = m_inputs->read();
 
-	if(controls) {
+	if (controls)
+	{
 		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
 		// Since the game can't accept conflicting inputs e.g. PL1 Up and 'A' or 'B' we have to
 		// make the user choose the input method. Especially since in test mode both sets are usable.
@@ -462,18 +448,19 @@ P1KEY11  29|30  P2KEY11
 			KEY11 | KEY6, // Ron
 			KEY1 | KEY3   // Start
 		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
-		uint32_t keys = ioport("MAHJONG")->read();
+		uint32_t keys = m_mahjong_io->read();
 		uint32_t which_key = 0x1;
 		int count = 0;
 
 		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
-		int start_depressed = ~value & 0x01000000;
+		uint32_t const start_depressed = ~value & 0x01000000;
 		keys |= start_depressed ? 1 << (ARRAY_LENGTH(key_codes) - 1) : 0; // and bung it in at the end
 
 		value |= 0xFFFF0000; // set top word
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
-			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes))) {
+			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes)))
+			{
 				value &= ~((uint32_t)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
 			}
@@ -493,12 +480,11 @@ void psikyosh_state::ps3v1_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
 	map(0x02000000, 0x020fffff).rom().region("maincpu", 0x100000); // data ROM
 // video chip
-	map(0x03000000, 0x03003fff).ram().share("spriteram"); // video banks0-7 (sprites and sprite list)
-	map(0x03004000, 0x0300ffff).ram().share("bgram"); // video banks 7-0x1f (backgrounds and other effects)
+	map(0x03000000, 0x0300ffff).ram().share("spriteram"); // sprite and backgrounds are share this area (video banks 0-1f)
 	map(0x03040000, 0x03044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // palette..
 	map(0x03050000, 0x030501ff).ram().share("zoomram"); // sprite zoom lookup table
 	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0305ffe0, 0x0305ffff).ram().w(FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); //  video registers
+	map(0x0305ffe0, 0x0305ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs"); //  video registers
 	map(0x03060000, 0x0307ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx) (Mirrored?)
@@ -506,7 +492,8 @@ void psikyosh_state::ps3v1_map(address_map &map)
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // inputs/eeprom
 	map(0x05800000, 0x05800003).portr("INPUTS");
-	map(0x05800004, 0x05800007).rw(FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
+	map(0x05800004, 0x05800007).portr("JP4");
+	map(0x05800004, 0x05800004).w(FUNC(psikyosh_state::eeprom_w));
 // ram
 	map(0x06000000, 0x060fffff).ram().share("ram"); // main RAM (1 meg)
 }
@@ -518,21 +505,29 @@ void psikyosh_state::ps5_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
 // inputs/eeprom
 	map(0x03000000, 0x03000003).portr("INPUTS");
-	map(0x03000004, 0x03000007).rw(FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
+	map(0x03000004, 0x03000007).portr("JP4");
+	map(0x03000004, 0x03000004).w(FUNC(psikyosh_state::eeprom_w));
 // sound chip
 	map(0x03100000, 0x03100007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // video chip
-	map(0x04000000, 0x04003fff).ram().share("spriteram"); // video banks0-7 (sprites and sprite list)
-	map(0x04004000, 0x0400ffff).ram().share("bgram"); // video banks 7-0x1f (backgrounds and other effects)
+	map(0x04000000, 0x0400ffff).ram().share("spriteram"); // sprite and backgrounds are share this area (video banks 0-1f)
 	map(0x04040000, 0x04044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x04050000, 0x040501ff).ram().share("zoomram"); // sprite zoom lookup table
 	map(0x0405ffdc, 0x0405ffdf).nopr().w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0405ffe0, 0x0405ffff).ram().w(FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); // video registers
+	map(0x0405ffe0, 0x0405ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs"); // video registers
 	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	map(0x05000000, 0x0507ffff).rom().region("maincpu", 0x100000); // data ROM
 // ram
 	map(0x06000000, 0x060fffff).ram().share("ram");
+}
+
+// mahjong
+void psikyosh_state::ps5_mahjong_map(address_map &map)
+{
+	ps5_map(map);
+	/* needs to install mahjong controls too (can select joystick in test mode tho) */
+	map(0x03000000, 0x03000003).r(FUNC(psikyosh_state::mjgtaste_input_r));
 }
 
 
@@ -773,66 +768,69 @@ INPUT_PORTS_END
 
 void psikyosh_state::machine_start()
 {
-	membank("gfxbank")->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);
+	m_gfxrombank->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);
 }
 
 
-MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
-
+void psikyosh_state::psikyo3v1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(ps3v1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
+	SH2(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps3v1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(psikyosh_state::interrupt));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	EEPROM_93C56_8BIT(config, "eeprom").default_value(0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32) /* If using alpha */
+	BUFFERED_SPRITERAM32(config, m_spriteram); /* If using alpha */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram32_device, vblank_copy_rising))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0, 40*8-1, 0, 28*8-1);
+	m_screen->set_screen_update(FUNC(psikyosh_state::screen_update));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram32_device::vblank_copy_rising));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyosh)
-	MCFG_PALETTE_ADD("palette", 0x5000/4)
-	MCFG_PALETTE_FORMAT(RGBX)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyosh);
+	PALETTE(config, m_palette, 0x5000/4).set_format(PALETTE_FORMAT_RGBX);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ymf278b_device &ymf(YMF278B(config, "ymf", MASTER_CLOCK/2));
+	ymf.irq_handler().set_inputline(m_maincpu, 12);
+	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(psikyosh_state::psikyo5)
+void psikyosh_state::psikyo5(machine_config &config)
+{
 	psikyo3v1(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps5_map);
+}
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ps5_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(psikyosh_state::psikyo5_240)
+void psikyosh_state::psikyo5_mahjong(machine_config &config)
+{
 	psikyo3v1(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps5_mahjong_map);
+}
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ps5_map)
+void psikyosh_state::psikyo5_240(machine_config &config)
+{
+	psikyo3v1(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps5_map);
 
 	/* Measured Hsync 16.165 KHz, Vsync 61.68 Hz */
 	/* Ideally this would be driven off the video register. However, it doesn't changeat runtime and MAME will pick a better screen resolution if it knows upfront */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 443, 0, 40*8, 262, 0, 30*8)
-MACHINE_CONFIG_END
+	m_screen->set_raw(MASTER_CLOCK/8, 443, 0, 40*8, 262, 0, 30*8);
+}
 
 
 /* PS3 */
@@ -1238,7 +1236,7 @@ ROM_END
 void psikyosh_state::init_ps3()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x03004000, 0x0300ffff, 0, &m_bgram[0]);
+	m_maincpu->sh2drc_add_fastram(0x03000000, 0x0300ffff, 0, &m_spriteram->live()[0]);
 	m_maincpu->sh2drc_add_fastram(0x03050000, 0x030501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
@@ -1246,37 +1244,30 @@ void psikyosh_state::init_ps3()
 void psikyosh_state::init_ps5()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x04004000, 0x0400ffff, 0, &m_bgram[0]);
+	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0400ffff, 0, &m_spriteram->live()[0]);
 	m_maincpu->sh2drc_add_fastram(0x04050000, 0x040501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
-}
-
-void psikyosh_state::init_mjgtaste()
-{
-	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
-	init_ps5();
 }
 
 
 //    YEAR  NAME       PARENT    MACHINE      INPUT     STATE           INIT      MONITOR COMPANY   FULLNAME FLAGS */
 
 /* ps3-v1 */
-GAME( 1997, soldivid,  0,        psikyo3v1,   soldivid, psikyosh_state, init_ps3,      ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, soldividk, soldivid, psikyo3v1,   soldividk,psikyosh_state, init_ps3,      ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, s1945ii,   0,        psikyo3v1,   s1945ii,  psikyosh_state, init_ps3,      ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, daraku,    0,        psikyo3v1,   daraku,   psikyosh_state, init_ps3,      ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbomber,   0,        psikyo3v1,   sbomberb, psikyosh_state, init_ps3,      ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbombera,  sbomber,  psikyo3v1,   sbomberb, psikyosh_state, init_ps3,      ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldivid,  0,        psikyo3v1,       soldivid, psikyosh_state, init_ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldividk, soldivid, psikyo3v1,       soldividk,psikyosh_state, init_ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, s1945ii,   0,        psikyo3v1,       s1945ii,  psikyosh_state, init_ps3, ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, daraku,    0,        psikyo3v1,       daraku,   psikyosh_state, init_ps3, ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbomber,   0,        psikyo3v1,       sbomberb, psikyosh_state, init_ps3, ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbombera,  sbomber,  psikyo3v1,       sbomberb, psikyosh_state, init_ps3, ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
 
 /* ps5 */
-GAME( 1998, gunbird2,  0,        psikyo5,     gunbird2, psikyosh_state, init_ps5,      ROT270, "Psikyo", "Gunbird 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, gunbird2a, gunbird2, psikyo5,     gunbird2, psikyosh_state, init_ps5,      ROT270, "Psikyo", "Gunbird 2 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, s1945iii,  0,        psikyo5,     s1945iii, psikyosh_state, init_ps5,      ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2,  0,        psikyo5,         gunbird2, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbird 2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2a, gunbird2, psikyo5,         gunbird2, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbird 2 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, s1945iii,  0,        psikyo5,         s1945iii, psikyosh_state, init_ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 /* ps5v2 */
-GAME( 2000, dragnblz,  0,        psikyo5,     dragnblz, psikyosh_state, init_ps5,      ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2,      0,        psikyo5_240, tgm2,     psikyosh_state, init_ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2p,     tgm2,     psikyo5_240, tgm2,     psikyosh_state, init_ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gnbarich,  0,        psikyo5,     gnbarich, psikyosh_state, init_ps5,      ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, mjgtaste,  0,        psikyo5,     mjgtaste, psikyosh_state, init_mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dragnblz,  0,        psikyo5,         dragnblz, psikyosh_state, init_ps5, ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2,      0,        psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2p,     tgm2,     psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gnbarich,  0,        psikyo5,         gnbarich, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mjgtaste,  0,        psikyo5_mahjong, mjgtaste, psikyosh_state, init_ps5, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )
