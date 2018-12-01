@@ -13,11 +13,9 @@
 #pragma once
 
 #include "machine/6850acia.h"
-#include "machine/pit8253.h"
 #include "machine/timer.h"
 #include "machine/x2212.h"
 #include "machine/74259.h"
-#include "sound/cem3394.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -45,9 +43,6 @@ public:
 	balsente_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_scanline_timer(*this, "scan_timer")
-		, m_pit(*this, "pit")
-		, m_counter_0_timer(*this, "8253_0_timer")
-		, m_cem_device(*this, "cem%u", 1U)
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
 		, m_shrike_io(*this, "shrike_io")
@@ -60,7 +55,6 @@ public:
 		, m_outlatch(*this, "outlatch")
 		, m_novram(*this, "nov%u", 0U)
 		, m_acia(*this, "acia")
-		, m_audiouart(*this, "audiouart")
 		, m_generic_paletteram_8(*this, "paletteram")
 	{ }
 
@@ -111,14 +105,8 @@ private:
 	DECLARE_READ8_MEMBER(novram_8bit_r);
 	DECLARE_WRITE8_MEMBER(novram_8bit_w);
 	DECLARE_WRITE8_MEMBER(acia_w);
-	DECLARE_WRITE_LINE_MEMBER(uint_propagate_w);
 	DECLARE_READ8_MEMBER(adc_data_r);
 	DECLARE_WRITE8_MEMBER(adc_select_w);
-	DECLARE_READ8_MEMBER(counter_state_r);
-	DECLARE_WRITE8_MEMBER(counter_control_w);
-	DECLARE_WRITE8_MEMBER(chip_select_w);
-	DECLARE_WRITE8_MEMBER(dac_data_w);
-	DECLARE_WRITE8_MEMBER(register_addr_w);
 	DECLARE_WRITE8_MEMBER(spiker_expand_w);
 	DECLARE_READ8_MEMBER(spiker_expand_r);
 	DECLARE_READ8_MEMBER(grudge_steering_r);
@@ -128,9 +116,7 @@ private:
 	DECLARE_READ16_MEMBER(shrike_io_68k_r);
 	DECLARE_READ8_MEMBER(teamht_extra_r);
 	DECLARE_WRITE8_MEMBER(teamht_multiplex_select_w);
-	DECLARE_WRITE_LINE_MEMBER(counter_0_set_out);
 
-	void update_counter_0_timer();
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(palette_select_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
@@ -144,32 +130,21 @@ private:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(adc_finished);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(clock_counter_0_ff);
 	void draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *sprite);
 	void poly17_init();
-	DECLARE_WRITE_LINE_MEMBER(set_counter_0_ff);
 	void update_grudge_steering();
 	void expand_roms(uint8_t cd_rom_mask);
 	inline void config_shooter_adc(uint8_t shooter, uint8_t adc_shift);
-	inline void noise_gen_chip(int chip, int count, short *buffer);
-	CEM3394_EXT_INPUT(noise_gen_0);
-	CEM3394_EXT_INPUT(noise_gen_1);
-	CEM3394_EXT_INPUT(noise_gen_2);
-	CEM3394_EXT_INPUT(noise_gen_3);
-	CEM3394_EXT_INPUT(noise_gen_4);
-	CEM3394_EXT_INPUT(noise_gen_5);
 
 	void cpu1_base_map(address_map &map);
 	void cpu1_map(address_map &map);
 	void cpu1_smudge_map(address_map &map);
-	void cpu2_io_map(address_map &map);
-	void cpu2_map(address_map &map);
 	void cpu2_triviamb_io_map(address_map &map);
 	void cpu2_triviamb_map(address_map &map);
 	void shrike68k_map(address_map &map);
 
 	required_device<timer_device> m_scanline_timer;
-	required_device<pit8253_device> m_pit;
+
 
 	/* global data */
 	uint8_t m_shooter;
@@ -177,32 +152,12 @@ private:
 	uint8_t m_shooter_y;
 	uint8_t m_adc_shift;
 
-	/* manually clocked counter 0 states */
-	uint8_t m_counter_control;
-	bool m_counter_0_ff;
-	bool m_counter_0_out;
-	required_device<timer_device> m_counter_0_timer;
-	bool m_counter_0_timer_active;
-
 	/* random number generator states */
-	uint8_t m_poly17[POLY17_SIZE + 1];
 	uint8_t m_rand17[POLY17_SIZE + 1];
 
 	/* ADC I/O states */
 	int8_t m_analog_input_data[4];
 	uint8_t m_adc_value;
-
-	/* CEM3394 DAC control states */
-	uint16_t m_dac_value;
-	uint8_t m_dac_register;
-	uint8_t m_chip_select;
-
-	/* sound CPU 6850 states */
-	bool m_uint;
-
-	/* noise generator states */
-	uint32_t m_noise_position[6];
-	required_device_array<cem3394_device, 6> m_cem_device;
 
 	/* game-specific states */
 	uint8_t m_nstocker_bits;
@@ -226,14 +181,13 @@ private:
 	optional_shared_ptr<uint16_t> m_shrike_io;
 	optional_shared_ptr<uint16_t> m_shrike_shared;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_68k;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ls259_device> m_outlatch;
 	required_device_array<x2212_device, 2> m_novram;
 	required_device<acia6850_device> m_acia;
-	required_device<acia6850_device> m_audiouart;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
 
