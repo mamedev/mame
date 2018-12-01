@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -81,7 +82,7 @@ void blstroid_state::main_map(address_map &map)
 	map(0x801804, 0x801805).mirror(0x0383f8).portr("DIAL1");
 	map(0x801c00, 0x801c01).mirror(0x0383fc).portr("IN0");
 	map(0x801c02, 0x801c03).mirror(0x0383fc).portr("IN1");
-	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x803000, 0x8033ff).mirror(0x038c00).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x804000, 0x804fff).mirror(0x038000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x805000, 0x805fff).mirror(0x038000).ram().share("mob");

@@ -28,6 +28,7 @@
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -46,8 +47,8 @@ void klax_state::update_interrupts()
 void klax_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(m_p1->read() & 0x800))
-		scanline_int_gen(*m_maincpu);
+	if ((scanline & 32) == 0 && !m_screen->vblank() && !(m_p1->read() & 0x800))
+		scanline_int_write_line(1);
 }
 
 
@@ -89,7 +90,7 @@ void klax_state::klax_map(address_map &map)
 	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x360000, 0x360001).w(FUNC(klax_state::interrupt_ack_w));
-	map(0x3e0000, 0x3e07ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0x3e0000, 0x3e07ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3f0000, 0x3f0f7f).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
 	map(0x3f1000, 0x3f1fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");
@@ -107,7 +108,7 @@ void klax_state::klax2bl_map(address_map &map)
 	map(0x260006, 0x260007).w(FUNC(klax_state::interrupt_ack_w));
 //  AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // no OKI here
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x3e0000, 0x3e07ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0x3e0000, 0x3e07ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3f0000, 0x3f0f7f).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x3f0f80, 0x3f0fff).ram().share("mob:slip");
 	map(0x3f1000, 0x3f1fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16_ext)).share("playfield_ext");

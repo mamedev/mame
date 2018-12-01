@@ -75,6 +75,7 @@
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/atarimo.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -97,7 +98,7 @@ void sparkz_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		scanline_int_gen(*m_maincpu);
+		scanline_int_write_line(1);
 }
 
 

@@ -129,6 +129,7 @@
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -300,7 +301,7 @@ void gauntlet_state::main_map(address_map &map)
 	map(0x905000, 0x905f7f).mirror(0x2c8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(FUNC(gauntlet_state::gauntlet_yscroll_w)).share("yscroll");
 	map(0x905f80, 0x905fff).mirror(0x2c8000).ram().share("mob:slip");
-	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x930000, 0x930001).mirror(0x2cfffe).w(FUNC(gauntlet_state::gauntlet_xscroll_w)).share("xscroll");
 }
 

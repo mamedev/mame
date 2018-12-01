@@ -23,6 +23,7 @@
 #include "includes/atarig42.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -334,7 +335,7 @@ void atarig42_state::main_map(address_map &map)
 	map(0xf60000, 0xf60001).r(m_asic65, FUNC(asic65_device::read));
 	map(0xf80000, 0xf80003).w(m_asic65, FUNC(asic65_device::data_w));
 	map(0xfa0000, 0xfa0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0xfc0000, 0xfc0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfc0000, 0xfc0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
 	map(0xff2000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");

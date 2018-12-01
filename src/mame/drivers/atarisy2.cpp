@@ -183,7 +183,7 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (m_interrupt_enable & 4)
-				scanline_int_gen(*m_maincpu);
+				scanline_int_write_line(1);
 	}
 }
 
@@ -736,7 +736,7 @@ void atarisy2_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x11ff).mirror(0x0200).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x1000, 0x11ff).mirror(0x0200).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x1400, 0x1400).mirror(0x007e).r("adc", FUNC(adc0808_device::data_r));
 	map(0x1400, 0x1403).mirror(0x007c).w(FUNC(atarisy2_state::bankselect_w));
 	map(0x1480, 0x148f).mirror(0x0070).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
