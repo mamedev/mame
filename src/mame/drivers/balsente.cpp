@@ -278,7 +278,7 @@ void balsente_state::cpu1_smudge_map(address_map &map)
 void balsente_state::cpu2_triviamb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x1fff).ram();
+	map(0x8000, 0x9fff).ram();
 }
 
 // TODO: hookup 2x Z80CTC, 2x AY8910A, 1x M5205 (Trivial hardware from Maibesa)
@@ -1367,7 +1367,7 @@ void balsente_state::triviamb(machine_config &config)
 	MSM5205(config, "msm", 384000).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	m_acia->txd_handler().set_nop();
-	config.device_remove("audiovb");
+	config.device_remove("audio6vb");
 }
 
 /*************************************
@@ -2418,4 +2418,4 @@ GAME( 1987, rescraida, rescraid, rescraid, rescraid, balsente_state, init_rescra
 GAME( 1985, teamht,    0,        balsente, teamht,   balsente_state, init_teamht,    ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
 
 /* Trivial Pursuit running on Maibesa hardware (with Bally/Sente license) */
-GAME( 1988, triviaes4, 0,        balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
+GAME( 1988, triviaes4, 0,        triviamb, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
