@@ -348,10 +348,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				if (clip.min_y < cliprect.min_y)    clip.min_y = cliprect.min_y;
 				if (clip.max_y > cliprect.max_y)    clip.max_y = cliprect.max_y;
 
-				if (!is_16x16)
-					continue;
-
-				for (int realline = clip.min_y; realline < clip.max_y; realline++)
+				for (int realline = clip.min_y; realline <= clip.max_y; realline++)
 				{
 					int sourceline = (realline - scrolly - m_yoffset) & 0x1ff;
 
@@ -362,7 +359,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						int code, attr, flipx, flipy, color;
 						get_tile(buffered_spriteram16, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color); // yes the tilemap in RAM is flipped?!
 
-						int line = is_16x16 ? (sourceline & 0x1f) : (sourceline & 0x0f);
+						int line = is_16x16 ? (sourceline & 0x0f) : (sourceline & 0x07);
 
 						int ty = (line >> 3) & 1;
 						line &= 0x7;
@@ -384,6 +381,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			}
 			else
 			{
+
 				// "normal" sprite
 				int sx = s2[0];
 				int sy = s2[1];
@@ -409,10 +407,12 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
 
 				int firstline = sy;
-				int endline = sy + (sizey + 1) * 8;
+				int endline = (sy + (sizey + 1) * 8)-1;
 
-				//for (int realline = cliprect.min_y; realline < cliprect.max_y; realline++)
-				for (int realline = firstline; realline < endline; realline++)
+				if (firstline < cliprect.min_y)	firstline = cliprect.min_y;
+				if (endline > cliprect.max_y) endline = cliprect.max_y;
+
+				for (int realline = firstline; realline <= endline; realline++)
 				{
 					int line = realline - firstline;
 					int y = (line >> 3);
@@ -425,6 +425,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					}
 				}
 			}
+
 		}
 		if (s1[0] & 0x8000) break;  // end of list marker
 	}   // sprite list
