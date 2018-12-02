@@ -2307,4 +2307,4 @@ GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, e
 GAME( 1999, play2000a,   play2000,  play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump
 
 // Gym exercise bike
-GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,    ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", 0 ) // there are other machines in the Cardioline series, without TV displays
+GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,    ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // there are other machines in the Cardioline series, without TV displays
