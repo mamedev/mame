@@ -111,6 +111,16 @@
 
 ***************************************************************************/
 
+/***************************************************************************
+  
+  NON-BUGS
+
+  grdians : After the fire rowscroll effect in the intro there is a small artifact
+            left scrolling at the top of the screen when the next image is displayed
+			See 4:24 in https://www.youtube.com/watch?v=cvHGFEsB_cM
+   
+***************************************************************************/
+
 WRITE16_MEMBER(seta2_state::vregs_w)
 {
 	/* 02/04 = horizontal display start/end
@@ -152,16 +162,46 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n",m_maincpu->pc(),data);
 		break;
 
+	case 0x26: // something display list related? buffering control?
+		break;
+
 	case 0x3c: // Raster IRQ related
-		//logerror("%s: Register 3c write (raster enable?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
+		//logerror("%s: Register 3c write (raster enable?) current vpos is %d  :   %04X (%04x)\n",machine().describe_context(),m_screen->vpos(), data, mem_mask);
 		COMBINE_DATA(&m_rasterenabled);
-		if (m_rasterenabled & 1) m_raster_timer->adjust(m_screen->time_until_pos((m_rasterposition&0x1ff)+0x80, 0), 0);
+
+		if (m_rasterenabled & 1)
+		{
+			int hpos = 0;
+			int vpos = m_rasterposition;
+
+			// in the vblank it specifies line 0, the first raster interrupt then specifies line 0 again before the subsequent ones use the real line numbers?
+			if (m_rasterposition == m_screen->vpos()) hpos = m_screen->hpos() + 0x100;
+			//logerror("setting raster to %d %d\n", vpos, hpos);
+			m_raster_timer->adjust(m_screen->time_until_pos(vpos, hpos), 0);
+		}
 		break;
 
 	case 0x3e: // Raster IRQ related
 		//logerror("%s: Register 3e write (raster position?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
 		COMBINE_DATA(&m_rasterposition);
 		break;
+	}
+}
+
+WRITE16_MEMBER(seta2_state::spriteram_w)
+{
+	COMBINE_DATA(&m_spriteram[offset]);
+
+	if (use_experimental_rasters())
+	{
+		// there must be some kind of mirroring / buffering or DMA copy operation because the raster interrupt in grdians writes
+		// the scroll offsets (in sprite format like the list at 0x4000, as word 3) here, instead of in the actual table at 0x4000
+		// maybe the hardware builds a reformatted sprite list at 0x0000 when the sprite buffer command is triggered??
+		if (offset < 0x1000 / 2)
+		{
+			offset += 0x4000 / 2;
+			COMBINE_DATA(&m_spriteram[offset]);
+		}
 	}
 }
 
@@ -249,15 +289,22 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Sprites list
+	uint16_t *spriteram;
 
-	// When debugging, use m_spriteram here, and run mame -update_in_pause, i.e.:
-//  uint16_t *buffered_spriteram16 = m_spriteram;
-	uint16_t *buffered_spriteram16 = m_buffered_spriteram.get();
-	uint16_t *s1 = buffered_spriteram16 + 0x3000 / 2;
-	uint16_t *end = &buffered_spriteram16[m_spriteram.bytes() / 2];
+	if (use_experimental_rasters())
+	{
+		// can't be entirely buffered? uses raster interrupt effects on them, but something strange going on anyway, see other notes
+		spriteram = m_spriteram;
+	}
+	else
+	{
+		spriteram = m_buffered_spriteram.get();
+	}
+	uint16_t *s1 = spriteram + 0x3000 / 2;
+	uint16_t *end = &spriteram[m_spriteram.bytes() / 2];
 
 	//  for ( ; s1 < end; s1+=4 )
-	for (; s1 < buffered_spriteram16 + 0x4000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
+	for (; s1 < spriteram + 0x4000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
 		int num = s1[0];
 		int xoffs = s1[1];
@@ -265,7 +312,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sprite = s1[3];
 
 		// Single-sprite address
-		uint16_t *s2 = &buffered_spriteram16[(sprite & 0x7fff) * 4];
+		uint16_t *s2 = &spriteram[(sprite & 0x7fff) * 4];
 
 		// Single-sprite size
 		int global_sizex = xoffs & 0xfc00;
@@ -342,7 +389,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					for (int x = 0; x < 0x40; x++)
 					{
 						int code, attr, flipx, flipy, color;
-						get_tile(buffered_spriteram16, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color); // yes the tilemap in RAM is flipped?!
+						get_tile(spriteram, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color); // yes the tilemap in RAM is flipped?!
 
 						int line = is_16x16 ? (sourceline & 0x0f) : (sourceline & 0x07);
 
@@ -420,8 +467,20 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 {
+	if (m_tmp68301)
+	{
+		m_tmp68301->external_interrupt_1();
+		logerror("external int (vpos is %d)\n", m_screen->vpos());
 
+		if (use_experimental_rasters())
+		{
+			// TODO:  +m_screen->visible_area().min_y is a hack due to incorrect screen offsets (see weirdness in defined visible areas, needs an overall screen offset from somewhere instead!)
+			m_screen->update_partial(m_screen->vpos() - 1 + m_screen->visible_area().min_y);
+		}
+	}
 }
+
+
 
 /***************************************************************************
 

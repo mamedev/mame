@@ -93,6 +93,8 @@ protected:
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 
+	DECLARE_WRITE16_MEMBER(spriteram_w);
+
 	DECLARE_VIDEO_START(xoffset);
 	DECLARE_VIDEO_START(xoffset1);
 
@@ -154,6 +156,9 @@ private:
 	uint16_t m_rasterenabled;
 	TIMER_CALLBACK_MEMBER(raster_timer_done);
 	emu_timer *m_raster_timer;
+
+	// for grdians, very glitchy right now
+	bool use_experimental_rasters() { return false; }
 
 };
 
