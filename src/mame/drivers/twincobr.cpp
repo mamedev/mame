@@ -708,8 +708,6 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(twincobr_state,toaplan0)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 

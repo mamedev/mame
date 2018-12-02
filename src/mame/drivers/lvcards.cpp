@@ -83,59 +83,63 @@ TODO:
 #include "speaker.h"
 
 
-MACHINE_START_MEMBER(lvcards_state,lvpoker)
+void lvpoker_state::machine_start()
 {
+	lvcards_state::machine_start();
+
 	save_item(NAME(m_payout));
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_result));
 }
 
-MACHINE_RESET_MEMBER(lvcards_state,lvpoker)
+void lvpoker_state::machine_reset()
 {
+	lvcards_state::machine_reset();
+
 	m_payout = 0;
 	m_pulse = 0;
 	m_result = 0;
 }
 
-WRITE8_MEMBER(lvcards_state::control_port_2_w)
+WRITE8_MEMBER(lvpoker_state::control_port_2_w)
 {
 	switch (data)
 	{
-		case 0x60:
+	case 0x60:
 		m_payout = 1;
 		break;
-		case 0xc0:
+	case 0xc0:
 		m_payout = 1;
 		break;
-		default:
+	default:
 		m_payout = 0;
 		break;
 	}
 }
 
-WRITE8_MEMBER(lvcards_state::control_port_2a_w)
+WRITE8_MEMBER(lvpoker_state::control_port_2a_w)
 {
 	switch (data)
 	{
-		case 0x60:
+	case 0x60:
 		m_payout = 1;
 		break;
-		case 0x80:
+	case 0x80:
 		m_payout = 1;
 		break;
-		default:
+	default:
 		m_payout = 0;
 		break;
 	}
 }
 
-READ8_MEMBER(lvcards_state::payout_r)
+READ8_MEMBER(lvpoker_state::payout_r)
 {
 	m_result = ioport("IN2")->read();
 
 	if (m_payout)
 	{
-		if ( m_pulse < 3 )
+		if (m_pulse < 3)
 		{
 			m_result = m_result | 0x40;
 			m_pulse++;
@@ -148,23 +152,23 @@ READ8_MEMBER(lvcards_state::payout_r)
 	return m_result;
 }
 
-void lvcards_state::ponttehk_map(address_map &map)
+void lvpoker_state::ponttehk_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x8000, 0x83ff).ram().w(FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(lvpoker_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(lvpoker_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(FUNC(lvcards_state::payout_r)).w(FUNC(lvcards_state::control_port_2a_w));//AM_WRITENOP // ???
+	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2a_w));//AM_WRITENOP // ???
 }
 
 void lvcards_state::lvcards_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw();
 	map(0xa002, 0xa002).portr("IN2").nopw();
@@ -178,15 +182,15 @@ void lvcards_state::lvcards_io_map(address_map &map)
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
-void lvcards_state::lvpoker_map(address_map &map)
+void lvpoker_state::lvpoker_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(lvpoker_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(lvpoker_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(FUNC(lvcards_state::payout_r)).w(FUNC(lvcards_state::control_port_2_w));
+	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2_w));
 	map(0xc000, 0xdfff).rom();
 }
 
@@ -484,25 +488,22 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(lvcards_state::lvpoker)
+MACHINE_CONFIG_START(lvpoker_state::lvpoker)
 	lvcards(config);
 
 	// basic machine hardware
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(lvpoker_map)
-	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
-	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(lvcards_state::ponttehk)
+MACHINE_CONFIG_START(lvpoker_state::ponttehk)
 	lvcards(config);
 
 	// basic machine hardware
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
-	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware
 	MCFG_DEVICE_REMOVE("palette")
@@ -571,5 +572,5 @@ ROM_START( ponttehk )
 ROM_END
 
 GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Cards",       0 )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
-GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvcards_state, empty_init, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
+GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvpoker_state, empty_init, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )
