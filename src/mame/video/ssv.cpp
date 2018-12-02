@@ -149,17 +149,27 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 
 	if (realline >= cliprect.min_y && realline <= cliprect.max_y)
 	{
+		struct drawmodes
+		{
+			int gfx_mask;
+			int gfx_shift;
+		};
+
 		// comments at top suggest that each bit of 'gfx' enables 2 bitplanes, but ultrax case disagrees, also that would require 4 bits to cover all cases, and we only have 3
-		static constexpr uint8_t BPP_MASK_TABLE[8] = {
-				0x3f,   // 0: ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
-				0xff,   // 1: unverified case, mimic old driver behavior of only using lowest bit
-				0x3f,   // 2: unverified case, mimic old driver behavior of only using lowest bit
-				0xff,   // 3: unverified case, mimic old driver behavior of only using lowest bit
-				0x0f,   // 4: eagle shot 4bpp birdie text (there is probably a case for the other 4bpp? but that's only used for Japanese text and the supported set isn't Japanese)
-				0xff,   // 5: unverified case, mimic old driver behavior of only using lowest bit
-				0x3f,   // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking
-				0xff }; // 7: common 8bpp case
-		const uint8_t gfxbppmask = BPP_MASK_TABLE[gfx & 0x07];
+		// see also seta2.cpp where the same logic is used
+		static constexpr drawmodes BPP_MASK_TABLE[8] = {
+			{ 0x3f,0 },   // 0: ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
+			{ 0xff,0 },   // 1: unverified case, mimic old driver behavior of only using lowest bit
+			{ 0x3f,0 },   // 2: unverified case, mimic old driver behavior of only using lowest bit
+			{ 0xff,0 },   // 3: unverified case, mimic old driver behavior of only using lowest bit
+			{ 0x0f,0 },   // 4: eagle shot 4bpp birdie text
+			{ 0xf0,4 },   // 5: eagle shot 4bpp Japanese text
+			{ 0x3f,0 },   // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking
+			{ 0xff,0 }	  // 7: common 8bpp case
+		}; 
+
+		const uint8_t gfxbppmask = BPP_MASK_TABLE[gfx & 0x07].gfx_mask;
+		const uint8_t gfxshift = BPP_MASK_TABLE[gfx & 0x07].gfx_shift;
 
 		uint16_t *dest = &bitmap.pix16(realline);
 
@@ -170,7 +180,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		int column = 0;
 		for (int sx = x0; sx != x1; sx += dx)
 		{
-			const uint8_t pen = source[column] & gfxbppmask;
+			const uint8_t pen = (source[column] & gfxbppmask) >> gfxshift;
 
 			if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
 			{
