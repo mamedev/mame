@@ -1127,7 +1127,7 @@ inline int32_t scsp_device::UpdateSlot(SCSP_SLOT *slot)
 		return 0;
 	}
 
-	int32_t sample;
+	int32_t sample = 0; // NB: Shouldn't be necessary, but GCC 8.2.1 claims otherwise.
 	int step = slot->step;
 	uint32_t addr1, addr2, addr_select;                                   // current and next sample addresses
 	uint32_t *addr[2]      = {&addr1, &addr2};                          // used for linear interpolation
