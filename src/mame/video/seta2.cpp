@@ -392,12 +392,14 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
 
 				int firstline = sy;
-				int endline = (sy + (sizey + 1) * 8)-1;
+				int endline = (sy + (sizey + 1) * 8) - 1;
 
-				if (firstline < cliprect.min_y)	firstline = cliprect.min_y;
+				int realfirstline = firstline;
+
+				if (firstline < cliprect.min_y)	realfirstline = cliprect.min_y;
 				if (endline > cliprect.max_y) endline = cliprect.max_y;
 
-				for (int realline = firstline; realline <= endline; realline++)
+				for (int realline = realfirstline; realline <= endline; realline++)
 				{
 					int line = realline - firstline;
 					int y = (line >> 3);
@@ -409,8 +411,9 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, realline, line, opaque);
 					}
 				}
-			}
 
+
+			}
 		}
 		if (s1[0] & 0x8000) break;  // end of list marker
 	}   // sprite list
