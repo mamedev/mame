@@ -1546,7 +1546,7 @@ void scsp_device::LFO_Init()
 		else
 		{
 			a = 0;
-			p =- 128;
+			p -= 128;
 		}
 		m_ALFO_SQR[i] = a;
 		m_PLFO_SQR[i] = p;
@@ -1582,7 +1582,7 @@ void scsp_device::LFO_Init()
 		{
 			m_PSCALES[s][i+128] = CENTS(((limit * (float) i) / 128.0f));
 		}
-		limit =- ASCALE[s];
+		limit -= ASCALE[s];
 		for (int i = 0; i < 256; ++i)
 		{
 			m_ASCALES[s][i] = DB(((limit * (float) i) / 256.0f));
