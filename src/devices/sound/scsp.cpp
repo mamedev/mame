@@ -1513,7 +1513,7 @@ READ16_MEMBER( scsp_device::midi_out_r )
 #define CENTS(v) LFIX(powf(2.0f, v / 1200.0f))
 
 
-static const float LFOFreq[32] = 
+static const float LFOFreq[32] =
 {
 	0.17f,0.19f,0.23f,0.27f,0.34f,0.39f,0.45f,0.55f,0.68f,0.78f,0.92f,1.10f,1.39f,1.60f,1.87f,2.27f,
 	2.87f,3.31f,3.92f,4.79f,6.15f,7.18f,8.60f,10.8f,14.4f,17.2f,21.5f,28.7f,43.1f,57.4f,86.1f,172.3f
@@ -1546,7 +1546,7 @@ void scsp_device::LFO_Init()
 		else
 		{
 			a = 0;
-			p -= 128;
+			p = -128;
 		}
 		m_ALFO_SQR[i] = a;
 		m_PLFO_SQR[i] = p;
