@@ -93,7 +93,6 @@ protected:
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 
-	DECLARE_VIDEO_START(yoffset);
 	DECLARE_VIDEO_START(xoffset);
 	DECLARE_VIDEO_START(xoffset1);
 
@@ -141,7 +140,6 @@ protected:
 	output_finder<11> m_lamps;
 
 	int m_xoffset;
-	int m_yoffset;
 	int m_keyboard_row;
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 

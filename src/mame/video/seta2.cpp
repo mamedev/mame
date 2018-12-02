@@ -325,7 +325,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				if (clip.max_x > cliprect.max_x)    clip.max_x = cliprect.max_x;
 
 				// sprite clipping region (y)
-				clip.min_y = ((sy + yoffs) & 0x1ff) - m_yoffset;
+				clip.min_y = ((sy + yoffs) & 0x1ff);
 				clip.max_y = clip.min_y + height * 0x10 - 1;
 
 				if (clip.min_y > cliprect.max_y)    continue;
@@ -335,7 +335,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 				for (int realline = clip.min_y; realline <= clip.max_y; realline++)
 				{
-					int sourceline = (realline - scrolly - m_yoffset) & 0x1ff;
+					int sourceline = (realline - scrolly) & 0x1ff;
 
 					int y = sourceline >> (is_16x16 ? 4 : 3);
 
@@ -387,7 +387,6 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				sx = (sx & 0x1ff) - (sx & 0x200);
 
 				sy &= 0x1ff;
-				sy -= m_yoffset;
 
 				int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
 
@@ -441,7 +440,6 @@ void seta2_state::video_start()
 	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 
 	m_xoffset = 0;
-	m_yoffset = 0;
 
 	m_realtilenumber = std::make_unique<uint32_t[]>(0x80000);
 
@@ -466,13 +464,6 @@ VIDEO_START_MEMBER(seta2_state,xoffset1)
 	video_start();
 
 	m_xoffset = 0x1;
-}
-
-VIDEO_START_MEMBER(seta2_state,yoffset)
-{
-	video_start();
-
-	m_yoffset = 0x10;
 }
 
 uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
