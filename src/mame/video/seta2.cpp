@@ -355,10 +355,10 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 							int dst_x = (px + (flipx ? is_16x16 - tx : tx) * 8) & 0x3ff;
 							dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
 
-							if ((dst_x >= cliprect.min_x - 8) && (dst_x <= cliprect.max_x))
+							if ((dst_x >= clip.min_x - 8) && (dst_x <= clip.max_x))
 							{
 								int realcode = code ^ tx ^ ((flipy ? is_16x16 - ty : ty) << 1);
-								drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, dst_x, use_shadow, realline, line, opaque);
+								drawgfx_line(bitmap, clip, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, dst_x, use_shadow, realline, line, opaque);
 							}
 						}
 					}
@@ -366,7 +366,6 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			}
 			else
 			{
-
 				// "normal" sprite
 				int sx = s2[0];
 				int sy = s2[1];
