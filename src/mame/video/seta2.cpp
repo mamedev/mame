@@ -151,9 +151,19 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	case 0x30:  // BLANK SCREEN (pzlbowl, myangel)
 		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n",m_maincpu->pc(),data);
 		break;
+
+	case 0x3c: // Raster IRQ related
+		//logerror("%s: Register 3c write (raster enable?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
+		COMBINE_DATA(&m_rasterenabled);
+		if (m_rasterenabled & 1) m_raster_timer->adjust(m_screen->time_until_pos((m_rasterposition&0x1ff)+0x80, 0), 0);
+		break;
+
+	case 0x3e: // Raster IRQ related
+		//logerror("%s: Register 3e write (raster position?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
+		COMBINE_DATA(&m_rasterposition);
+		break;
 	}
 }
-
 
 /***************************************************************************
 
@@ -163,60 +173,35 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 
 ***************************************************************************/
 
-
 inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int use_shadow, int realline, int line, int opaque)
 {
-	const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
-
-	// Color depth
-	int shadow = 0;
-	int gfx_mask = 0xff;
-	int gfx_shift = 0;
-
-	switch (which_gfx & 0x0700)
+	struct drawmodes
 	{
-	case 0x0700:            // 8bpp tiles (76543210)
-		shadow = 8;   // ?
-		gfx_mask = 0xff;
-		gfx_shift = 0;
-		break;
-	case 0x0600:            // 6bpp tiles (--543210) (myangel sliding blocks test)
-		shadow = 5;   // staraudi
-		gfx_mask = 0x3f;
-		gfx_shift = 0;
-		break;
-	case 0x0500:            // 4bpp tiles (3210----)
-		shadow = 4;   // ?
-		gfx_mask = 0xf0;
-		gfx_shift = 4;
-		break;
-	case 0x0400:            // 4bpp tiles (----3210)
-		shadow = 3;   // reelquak
-		gfx_mask = 0x0f;
-		gfx_shift = 0;
-		break;
-	case 0x0300:            // ??? (staraudi question bubble: pen %00011000 with shadow on!)
-		gfx_mask = 0xff; // unknown
-		gfx_shift = 0;
-		break;
-	case 0x0200:            // 3bpp tiles?  (-----210) (myangel "Graduate Tests")
-		shadow = 3;   // ?
-		gfx_mask = 0x07;
-		gfx_shift = 0;
-		break;
-	case 0x0100:            // 2bpp tiles??? (--10----) (myangel2 question bubble, myangel endgame)
-		shadow = 2;   // myangel2
-		gfx_mask = 0x30;
-		gfx_shift = 4;
-		break;
-	case 0x0000:            // no idea!
-		shadow = 4;   // ?
-		gfx_mask = 0xff;
-		gfx_shift = 0;
-		break;
-	}
+		int gfx_mask;
+		int gfx_shift;
+		int shadow;
+	};
+
+	// this is the same logic as ssv.cpp, although this has more known cases, but also some bugs with the handling
+	static constexpr drawmodes BPP_MASK_TABLE[8] = {
+		{ 0xff, 0, 4 }, // 0: ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
+		{ 0x30, 4, 2 }, // 1: unverified case, mimic old driver behavior of only using lowest bit  (myangel2 question bubble, myangel endgame)
+		{ 0x07, 0, 3 }, // 2: unverified case, mimic old driver behavior of only using lowest bit  (myangel "Graduate Tests")
+		{ 0xff, 0, 0 }, // 3: unverified case, mimic old driver behavior of only using lowest bit  (staraudi question bubble: pen %00011000 with shadow on!)
+		{ 0x0f, 0, 3 }, // 4: eagle shot 4bpp birdie text
+		{ 0xf0, 4, 4 }, // 5: eagle shot 4bpp japanese text
+		{ 0x3f, 0, 5 }, // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking  ) (myangel sliding blocks test)
+		{ 0xff, 0, 8 }, // 7: common 8bpp case
+	};
+
+	int shadow = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].shadow;
+	int gfx_mask = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].gfx_mask;
+	int gfx_shift = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].gfx_shift;
+
 	if (!use_shadow)
 		shadow = 0;
+
+	const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
 
 
 	uint16_t* dest = &bitmap.pix16(realline);
@@ -432,6 +417,11 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
+TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
+{
+
+}
+
 /***************************************************************************
 
 
@@ -450,12 +440,15 @@ void seta2_state::video_start()
 	m_xoffset = 0;
 	m_yoffset = 0;
 
+	m_realtilenumber = std::make_unique<uint32_t[]>(0x80000);
 
 	m_spritegfx = m_gfxdecode->gfx(0);
 	for (int i = 0; i < 0x80000; i++)
 	{
 		m_realtilenumber[i] = i % m_spritegfx->elements();
 	}
+
+	m_raster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta2_state::raster_timer_done), this));
 }
 
 VIDEO_START_MEMBER(seta2_state,xoffset)
