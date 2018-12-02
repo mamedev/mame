@@ -96,7 +96,6 @@ DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "Texas Instruments TMS
 // TODO: expand to cover all the standard internal peripherals
 void tms3203x_device::common_3203x(address_map &map)
 {
-	map(0x000000, 0x000fff).r(FUNC(tms3203x_device::bootrom_r));
 	map(0x808064, 0x808064).rw(FUNC(tms3203x_device::primary_bus_control_r), FUNC(tms3203x_device::primary_bus_control_w));
 }
 
@@ -354,14 +353,6 @@ const tiny_rom_entry *tms3203x_device::device_rom_region() const
 	}
 }
 
-READ32_MEMBER(tms3203x_device::bootrom_r)
-{
-	if (m_mcbl_mode)
-		return m_bootrom[offset];
-
-	return m_cache->read_dword(offset);
-}
-
 //-------------------------------------------------
 //  ROPCODE - fetch an opcode
 //-------------------------------------------------
@@ -409,7 +400,8 @@ void tms3203x_device::device_start()
 	m_holda_cb.resolve_safe();
 
 	// set up the internal boot loader ROM
-	m_bootrom = reinterpret_cast<uint32_t*>(memregion(shortname())->base());
+	if (m_mcbl_mode)
+		m_program->install_rom(0x000000, 0x000fff, memregion(shortname())->base());
 
 	// save state
 	save_item(NAME(m_pc));
@@ -747,7 +739,15 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	if (inputnum == TMS3203X_MCBL)
 	{
 		// switch between microcomputer/boot loader and microprocessor modes
+		bool old_mode = m_mcbl_mode;
 		m_mcbl_mode = (state == ASSERT_LINE);
+		if (m_mcbl_mode != old_mode)
+		{
+			if (m_mcbl_mode)
+				m_program->install_rom(0x000000, 0x000fff, memregion(shortname())->base());
+			else
+				m_program->unmap_read(0x000000, 0x000fff);
+		}
 		return;
 	}
 
