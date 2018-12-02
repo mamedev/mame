@@ -173,7 +173,6 @@ private:
 	TIMER_CALLBACK_MEMBER( timerC_cb );
 	int Get_AR(int base, int R);
 	int Get_DR(int base, int R);
-	int Get_RR(int base, int R);
 	void Compute_EG(SCSP_SLOT *slot);
 	int EG_Update(SCSP_SLOT *slot);
 	uint32_t Step(SCSP_SLOT *slot);
