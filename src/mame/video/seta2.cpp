@@ -100,6 +100,7 @@
     1e                                  Zoom Y? high bits *
 
     26                                  1->0 during INT0, before writing sprites
+	                                    (probably creates a custom format sprite list at 0x0000 by processing the list at 0x3000)
 
     30          fedc ba98 7654 321-
                 ---- ---- ---- ---0     Disable video
@@ -124,45 +125,54 @@
 WRITE16_MEMBER(seta2_state::vregs_w)
 {
 	/* 02/04 = horizontal display start/end
-	           mj4simai = 0065/01E5 (0180 visible area)
-	           myangel =  005D/01D5 (0178 visible area)
-	           pzlbowl =  0058/01D8 (0180 visible area)
-	           penbros =  0065/01A5 (0140 visible area)
-	           grdians =  0059/0188 (012f visible area)
+			   mj4simai = 0065/01E5 (0180 visible area)
+			   myangel =  005D/01D5 (0178 visible area)
+			   pzlbowl =  0058/01D8 (0180 visible area)
+			   penbros =  0065/01A5 (0140 visible area)
+			   grdians =  0059/0188 (012f visible area)
 	   06    = horizontal total?
-	           mj4simai = 0204
-	           myangel =  0200
-	           pzlbowl =  0204
-	           penbros =  01c0
-	           grdians =  019a
+			   mj4simai = 0204
+			   myangel =  0200
+			   pzlbowl =  0204
+			   penbros =  01c0
+			   grdians =  019a
 	*/
 
 	uint16_t olddata = m_vregs[offset];
 
 	COMBINE_DATA(&m_vregs[offset]);
-	if ( m_vregs[offset] != olddata )
-		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",m_maincpu->pc(),offset*2,data);
+	if (m_vregs[offset] != olddata)
+		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
 
-	switch( offset*2 )
+	switch (offset * 2)
 	{
+	case 0x1a:
+		logerror("%s: Register 1a write (vertical offset?) %04X (%04x)\n", machine().describe_context(), data, mem_mask);
+		break;
+
 	case 0x1c:  // FLIP SCREEN (myangel)    <- this is actually zoom
-		flip_screen_set(data & 1 );
-		if (data & ~1)  logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",m_maincpu->pc(),data);
+		flip_screen_set(data & 1);
+		if (data & ~1)  logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 	case 0x2a:  // FLIP X (pzlbowl)
-		flip_screen_x_set(data & 1 );
-		if (data & ~1)  logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",m_maincpu->pc(),data);
+		flip_screen_x_set(data & 1);
+		if (data & ~1)  logerror("CPU #0 PC %06X: flipx unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 	case 0x2c:  // FLIP Y (pzlbowl)
-		flip_screen_y_set(data & 1 );
-		if (data & ~1)  logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",m_maincpu->pc(),data);
+		flip_screen_y_set(data & 1);
+		if (data & ~1)  logerror("CPU #0 PC %06X: flipy unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 
 	case 0x30:  // BLANK SCREEN (pzlbowl, myangel)
-		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n",m_maincpu->pc(),data);
+		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 
 	case 0x26: // something display list related? buffering control?
+		if (data)
+		{
+			// Buffer sprites by 1 frame
+			memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
+		}
 		break;
 
 	case 0x3c: // Raster IRQ related
@@ -290,21 +300,21 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Sprites list
 	uint16_t *spriteram;
+	uint16_t *bufspriteram;
+	int global_yoffset = (m_vregs[0x1a/2] & 0x7ff);
+	if (global_yoffset & 0x400)
+		global_yoffset -= 0x800;
 
-	if (use_experimental_rasters())
-	{
-		// can't be entirely buffered? uses raster interrupt effects on them, but something strange going on anyway, see other notes
-		spriteram = m_spriteram;
-	}
-	else
-	{
-		spriteram = m_buffered_spriteram.get();
-	}
-	uint16_t *s1 = spriteram + 0x3000 / 2;
-	uint16_t *end = &spriteram[m_spriteram.bytes() / 2];
+	global_yoffset += 1;
+
+	spriteram = m_spriteram; // floating tilemaps aren't buffered?
+	bufspriteram = m_buffered_spriteram.get(); // lists are buffered?
+
+	uint16_t *s1 = bufspriteram + 0x3000 / 2;
+	uint16_t *end = &bufspriteram[m_spriteram.bytes() / 2];
 
 	//  for ( ; s1 < end; s1+=4 )
-	for (; s1 < spriteram + 0x4000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
+	for (; s1 < bufspriteram + 0x4000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
 		int num = s1[0];
 		int xoffs = s1[1];
@@ -312,7 +322,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sprite = s1[3];
 
 		// Single-sprite address
-		uint16_t *s2 = &spriteram[(sprite & 0x7fff) * 4];
+		uint16_t *s2 = &bufspriteram[(sprite & 0x7fff) * 4];
 
 		// Single-sprite size
 		int global_sizex = xoffs & 0xfc00;
@@ -346,7 +356,11 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				int local_sizex = sx & 0xfc00;
 				int local_sizey = sy & 0xfc00;
 				sx &= 0x3ff;
+				sy += global_yoffset;
 				sy &= 0x1ff;
+
+				if (sy & 0x100)
+					sy -= 0x200;
 
 				int width = use_global_size ? global_sizex : local_sizex;
 				int height = use_global_size ? global_sizey : local_sizey;
@@ -360,6 +374,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				scrollx &= 0x3ff;
 				scrolly &= 0x1ff;
 
+				scrolly += global_yoffset;
+
 				rectangle clip;
 				// sprite clipping region (x)
 				clip.min_x = (sx + xoffs) & 0x3ff;
@@ -372,7 +388,11 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				if (clip.max_x > cliprect.max_x)    clip.max_x = cliprect.max_x;
 
 				// sprite clipping region (y)
-				clip.min_y = ((sy + yoffs) & 0x1ff);
+
+				int basey = (sy + yoffs) & 0x1ff;
+				if (basey & 0x100) basey -= 0x200;
+
+				clip.min_y = basey;
 				clip.max_y = clip.min_y + height * 0x10 - 1;
 
 				if (clip.min_y > cliprect.max_y)    continue;
@@ -389,7 +409,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					for (int x = 0; x < 0x40; x++)
 					{
 						int code, attr, flipx, flipy, color;
-						get_tile(spriteram, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color); // yes the tilemap in RAM is flipped?!
+						// tilemap data is NOT buffered? (and yes the tilemap in RAM is flipped?!)
+						get_tile(spriteram, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color);
 
 						int line = is_16x16 ? (sourceline & 0x0f) : (sourceline & 0x07);
 
@@ -432,7 +453,13 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 				sx = (sx & 0x1ff) - (sx & 0x200);
 
+				sy += global_yoffset;
+
 				sy &= 0x1ff;
+
+				if (sy & 0x100)
+					sy -= 0x200;
+
 
 				int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
 
@@ -547,8 +574,8 @@ WRITE_LINE_MEMBER(seta2_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
-		// Buffer sprites by 1 frame
-		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
+		// Buffer sprites by 1 frame, moved to video register 0x26, improves grdians intro there
+		//memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 	}
 }
 
