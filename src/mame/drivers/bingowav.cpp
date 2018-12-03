@@ -119,10 +119,10 @@ MACHINE_CONFIG_START(bingowav_state::bingowav)
 	tmp68301_device &tmp68301(TMP68301(config, "maintmp", 0)); // wrong
 	tmp68301.set_cputag(m_maincpu);
 
-	te7750_device &mainioh(TE7750(config, "mainioh", 0));
+	te7750_device &mainioh(TE7750(config, "mainioh"));
 	mainioh.ios_cb().set_constant(5);
 
-	te7750_device &mainiol(TE7750(config, "mainiol", 0));
+	te7750_device &mainiol(TE7750(config, "mainiol"));
 	mainiol.ios_cb().set_constant(4);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
