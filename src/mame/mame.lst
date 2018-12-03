@@ -12937,6 +12937,9 @@ hotmindff                       // (c) Playmark
 @source:fk1.cpp
 fk1                             //
 
+@source:flashbeats.cpp
+flsbeats                        // 1998 Sega
+
 @source:flicker.cpp
 flicker                         //
 
