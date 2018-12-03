@@ -2260,6 +2260,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp2620.cpp",
 	MAME_DIR .. "src/mame/drivers/hp700.cpp",
 	MAME_DIR .. "src/mame/drivers/hp2640.cpp",
+	MAME_DIR .. "src/mame/drivers/hp95lx.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9825.cpp",
 }
 
