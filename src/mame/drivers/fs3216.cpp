@@ -10,9 +10,10 @@
 //#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/8x300/8x300.h"
+//#include "imagedev/floppy.h"
 //#include "machine/com8116.h"
-//#include "machine/upd765.h"
-//#include "machine/x2212.h"
+#include "machine/upd765.h"
+#include "machine/x2212.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
@@ -26,16 +27,28 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")
+		, m_fdc(*this, "fdc")
+		, m_earom(*this, "earom")
 	{
 	}
 
 	void fs3216(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
 
 	DECLARE_READ8_MEMBER(ctc_r);
 	DECLARE_WRITE8_MEMBER(ctc_w);
+	void floppy_select_w(u8 data);
+	u8 floppy_status_r();
+	void fdc_reset_w(u16 data);
+	u8 fdc_ram_r(offs_t offset);
+	void fdc_ram_w(offs_t offset, u8 data);
+	u16 earom_recall_r();
+	u16 earom_store_r();
 
 	void main_map(address_map &map);
 	void wdcpu_prog_map(address_map &map);
@@ -43,7 +56,18 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
+	required_device<upd765a_device> m_fdc;
+	required_device<x2212_device> m_earom;
+
+	std::unique_ptr<u8[]> m_fdc_ram;
 };
+
+
+void fs3216_state::machine_start()
+{
+	m_fdc_ram = make_unique_clear<u8[]>(0x400);
+	save_pointer(NAME(m_fdc_ram), 0x400);
+}
 
 
 MC6845_UPDATE_ROW(fs3216_state::update_row)
@@ -61,6 +85,50 @@ WRITE8_MEMBER(fs3216_state::ctc_w)
 	m_ctc->write(space, offset >> 1, data);
 }
 
+u16 fs3216_state::earom_recall_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_earom->recall(1);
+		m_earom->recall(0);
+	}
+	return 0xffff;
+}
+
+u16 fs3216_state::earom_store_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_earom->store(1);
+		m_earom->store(0);
+	}
+	return 0xffff;
+}
+
+void fs3216_state::floppy_select_w(u8 data)
+{
+}
+
+u8 fs3216_state::floppy_status_r()
+{
+	return 0xff;
+}
+
+void fs3216_state::fdc_reset_w(u16 data)
+{
+	m_fdc->soft_reset();
+}
+
+u8 fs3216_state::fdc_ram_r(offs_t offset)
+{
+	return m_fdc_ram[offset];
+}
+
+void fs3216_state::fdc_ram_w(offs_t offset, u8 data)
+{
+	m_fdc_ram[offset] = data;
+}
+
 
 void fs3216_state::main_map(address_map &map)
 {
@@ -72,6 +140,14 @@ void fs3216_state::main_map(address_map &map)
 	map(0x394711, 0x394711).rw("dart", FUNC(z80dart_device::db_r), FUNC(z80dart_device::db_w));
 	map(0x394719, 0x394719).rw("dart", FUNC(z80dart_device::cb_r), FUNC(z80dart_device::cb_w));
 	map(0x780000, 0x783fff).rom().region("bios", 0);
+	map(0x792000, 0x792003).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x792041, 0x792041).w(FUNC(fs3216_state::floppy_select_w));
+	map(0x792051, 0x792051).r(FUNC(fs3216_state::floppy_status_r));
+	map(0x7f6000, 0x7f6001).w(FUNC(fs3216_state::fdc_reset_w));
+	map(0x7f6800, 0x7f6fff).rw(FUNC(fs3216_state::fdc_ram_r), FUNC(fs3216_state::fdc_ram_w)).umask16(0x00ff);
+	map(0x7f7000, 0x7f7001).r(FUNC(fs3216_state::earom_recall_r));
+	map(0x7f7200, 0x7f7201).r(FUNC(fs3216_state::earom_store_r));
+	map(0x7f7400, 0x7f75ff).rw(m_earom, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	map(0x800000, 0x803fff).rom().region("bios", 0);
 }
 
@@ -99,6 +175,10 @@ void fs3216_state::fs3216(machine_config &config)
 	m_ctc->zc_callback<1>().set("dart", FUNC(z80dart_device::rxtxcb_w));
 
 	Z80DART(config, "dart", 44.2368_MHz_XTAL / 8); // Z8470BPS
+
+	UPD765A(config, m_fdc, true, false);
+
+	X2212(config, m_earom);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 14.58_MHz_XTAL / 10)); // HD46505RP; clock unknown
 	crtc.set_char_width(10); // unknown
