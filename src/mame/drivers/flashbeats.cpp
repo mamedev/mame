@@ -21,6 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/315_5296.h"
+#include "machine/te7750.h"
 #include "sound/scsp.h"
 #include "screen.h"
 #include "speaker.h"
@@ -114,6 +115,7 @@ void flashbeats_state::flashbeats_map(address_map &map)
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 	map(0x200000, 0x20ffff).ram();
 	map(0x400000, 0x40007f).rw(m_315_5296, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0xff00);
+	map(0x600000, 0x60001f).rw("telio", FUNC(te7752_device::read), FUNC(te7752_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa0ffff).ram();
 	map(0xa10000, 0xa10fff).ram();
 }
@@ -148,6 +150,15 @@ void flashbeats_state::flashbeats(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	SEGA_315_5296(config, m_315_5296, 8_MHz_XTAL);
+
+	te7752_device &te7752(TE7752(config, "telio"));
+	te7752.ios_cb().set_constant(1);
+	//te7752.out_port2_cb().set(FUNC(flashbeats_state::te7752_port2_w));
+	//te7752.out_port3_cb().set(FUNC(flashbeats_state::te7752_port3_w));
+	//te7752.out_port4_cb().set(FUNC(flashbeats_state::te7752_port4_w));
+	//te7752.out_port5_cb().set(FUNC(flashbeats_state::te7752_port5_w));
+	//te7752.out_port6_cb().set(FUNC(flashbeats_state::te7752_port6_w));
+	//te7752.out_port7_cb().set(FUNC(flashbeats_state::te7752_port7_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
