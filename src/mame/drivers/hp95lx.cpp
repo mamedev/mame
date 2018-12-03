@@ -416,6 +416,7 @@ WRITE8_MEMBER(hp95lx_state::f300_w)
 {
 	address_map_bank_device *mapper;
 	const char *mapname;
+	mapper = m_bankdev_e000; // appease GCC 'may be used uninitialized'
 
 	LOG("%s: IO %04x <- %02x\n", machine().describe_context(), 0xf300 + offset, data);
 
