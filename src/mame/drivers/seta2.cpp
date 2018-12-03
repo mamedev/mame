@@ -82,7 +82,7 @@ grdians:
   has the shadow bit set, and has become invisible after implementing it.
 
 penbros/ablast:
-- Zooming is used briefly.
+- Zooming is used briefly (between scenes, stage exit, stage introduction)
 
 deerhunt,wschamp:
 - offset tilemap sprite during demo. In deerhunt intro, the hunter should zoom
@@ -94,18 +94,12 @@ wschampb:
   original release? Is that why the next bug fix release is v1.01? IE: such a
   a minor increase in the version number.
 
-trophyh:
-- mame hangs for around 15 seconds every now and then, at scene changes.
-  This is probably due to a couple of frames with an odd or corrupt sprites list,
-  taking a long time to render.
-
 funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
 
 reelquak:
 - Needs an x offset for tilemap sprites.
-- There are one frame glitches in the reels scroll.
 
 ***************************************************************************/
 
@@ -2400,7 +2394,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity

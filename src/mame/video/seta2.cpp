@@ -17,7 +17,7 @@
     Offset:     Bits:                   Value:
 
         0.w     f--- ---- ---- ----     Last sprite
-                -e-- ---- ---- ----     ?
+                -e-- ---- ---- ----     ? (ignore global offsets, zooming etc. used on frame of map in grdians)
                 --d- ---- ---- ----     Opaque
                 ---c ---- ---- ----     0 = Each sprite specifies its size, 1 = Use the global size (following words)
                 ---- b--- ---- ----     Shadow
@@ -99,6 +99,7 @@
     1c                                  Zoom Y? low bits
     1e                                  Zoom Y? high bits *
 
+	24                                  1->0 in funcube3 and staraudi
     26                                  1->0 during INT0, before writing sprites
 	                                    (probably creates a custom format sprite list at 0x0000 by processing the list at 0x3000)
 
@@ -167,6 +168,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n", m_maincpu->pc(), data);
 		break;
 
+	case 0x24: // funcube3 and staraudi write here instead, why? mirror or different meaning?
 	case 0x26: // something display list related? buffering control?
 		if (data)
 		{
