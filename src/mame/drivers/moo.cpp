@@ -528,10 +528,10 @@ MACHINE_CONFIG_START(moo_state::moo)
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(moo_state, tile_callback)
@@ -583,10 +583,10 @@ MACHINE_CONFIG_START(moo_state::moobl)
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(moo_state, tile_callback)
@@ -614,8 +614,7 @@ MACHINE_CONFIG_START(moo_state::bucky)
 
 	MCFG_K054000_ADD("k054000")
 
-	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 23)
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 23);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

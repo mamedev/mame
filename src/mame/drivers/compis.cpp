@@ -770,8 +770,8 @@ MACHINE_CONFIG_START(compis_state::compis)
 	m_uart->rxrdy_handler().set(I80130_TAG, FUNC(i80130_device::ir2_w));
 	m_uart->txrdy_handler().set(I80186_TAG, FUNC(i80186_cpu_device::int1_w));
 
-	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
-	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	compis_keyboard_device &kb(COMPIS_KEYBOARD(config, COMPIS_KEYBOARD_TAG, 0));
+	kb.out_tx_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
 	I8274(config, m_mpsc, 15.36_MHz_XTAL/4);
 	m_mpsc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));

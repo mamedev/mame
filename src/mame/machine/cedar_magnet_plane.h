@@ -11,10 +11,6 @@
 
 DECLARE_DEVICE_TYPE(CEDAR_MAGNET_PLANE, cedar_magnet_plane_device)
 
-#define MCFG_CEDAR_MAGNET_PLANE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CEDAR_MAGNET_PLANE, 0)
-
-
 class cedar_magnet_plane_device : public device_t, public cedar_magnet_board_interface
 {
 public:

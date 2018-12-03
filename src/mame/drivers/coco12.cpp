@@ -508,15 +508,16 @@ MACHINE_CONFIG_START(coco12_state::cocoh)
 	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco12_state::cocoe)
+void coco12_state::cocoe(machine_config &config)
+{
 	coco(config);
 	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdc"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	MCFG_COCO_VHD_ADD(VHD0_TAG)
-	MCFG_COCO_VHD_ADD(VHD1_TAG)
-MACHINE_CONFIG_END
+	COCO_VHD(config, m_vhd_0, 0);
+	COCO_VHD(config, m_vhd_1, 0);
+}
 
 MACHINE_CONFIG_START(coco12_state::cocoeh)
 	cocoe(config);
@@ -525,15 +526,16 @@ MACHINE_CONFIG_START(coco12_state::cocoeh)
 	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco12_state::coco2)
+void coco12_state::coco2(machine_config &config)
+{
 	coco(config);
 	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	MCFG_COCO_VHD_ADD(VHD0_TAG)
-	MCFG_COCO_VHD_ADD(VHD1_TAG)
-MACHINE_CONFIG_END
+	COCO_VHD(config, m_vhd_0, 0);
+	COCO_VHD(config, m_vhd_1, 0);
+}
 
 MACHINE_CONFIG_START(coco12_state::coco2h)
 	coco2(config);

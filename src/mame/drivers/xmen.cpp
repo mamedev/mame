@@ -329,10 +329,10 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	m_k052109->set_palette("palette");
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_palette("palette");
 
 	MCFG_K053251_ADD("k053251")
 
@@ -392,11 +392,11 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	m_k052109->set_palette("palette");
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_SET_SCREEN("screen")
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_screen(m_screen);
+	m_k053246->set_palette("palette");
 
 	MCFG_K053251_ADD("k053251")
 

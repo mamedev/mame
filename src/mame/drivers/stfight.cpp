@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(stfight_state::cshooter)
 	MCFG_DEVICE_PROGRAM_MAP(cshooter_cpu1_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
+	AIRRAID_VIDEO(config, "airraid_vid", 0);
 MACHINE_CONFIG_END
 
 

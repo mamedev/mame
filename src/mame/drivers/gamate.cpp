@@ -180,7 +180,7 @@ MACHINE_CONFIG_START(gamate_state::gamate)
 	MCFG_DEVICE_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
 	MCFG_DEVICE_PROGRAM_MAP(gamate_mem)
 
-	MCFG_GAMATE_VIDEO_ADD("video")
+	GAMATE_VIDEO(config, "video", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left(); // Stereo headphone output

@@ -1157,16 +1157,16 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[0]->set_wrap(1);
+	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
-	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DECOCASS_TAPE_ADD("cassette")
+	DECOCASS_TAPE(config, m_cassette, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

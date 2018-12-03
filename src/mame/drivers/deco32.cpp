@@ -1868,9 +1868,10 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	DECO_IRQ(config, m_deco_irq, 0);
+	m_deco_irq->set_screen_tag(m_screen);
+	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
+	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -2075,9 +2076,10 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	DECO_IRQ(config, m_deco_irq, 0);
+	m_deco_irq->set_screen_tag(m_screen);
+	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
+	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2174,8 +2176,7 @@ MACHINE_CONFIG_START(dragngun_state::lockloadu)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(lockloadu_sound_map)
 
-	MCFG_DEVICE_MODIFY("irq")
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
 	MCFG_DEVICE_MODIFY("tilegen2")
 	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
@@ -2201,12 +2202,13 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_LIGHTGUN1_CB(IOPORT("LIGHT0_Y"))
-	MCFG_DECO_IRQ_LIGHTGUN2_CB(IOPORT("LIGHT1_Y"))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	DECO_IRQ(config, m_deco_irq, 0);
+	m_deco_irq->set_screen_tag(m_screen);
+	m_deco_irq->lightgun1_callback().set_ioport("LIGHT0_Y");
+	m_deco_irq->lightgun2_callback().set_ioport("LIGHT1_Y");
+	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
+	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
+	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 

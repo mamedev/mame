@@ -3324,14 +3324,14 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_DEVICE_ADD(m_dmadac[1], DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
+	M48T58(config, "m48t58", 0);
 
-	MCFG_DEVICE_ADD("k001604", K001604, 0)     // on the LAN board in Racing Jam DX
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)  // correct?
-	MCFG_K001604_ROZ_OFFSET(0)  // correct?
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
+	m_k001604->set_layer_size(0);
+	m_k001604->set_roz_size(1);
+	m_k001604->set_txt_mem_offset(0);  // correct?
+	m_k001604->set_roz_mem_offset(0);  // correct?
+	m_k001604->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD(m_jvs_host, COBRA_JVS_HOST, 4000000)
 	MCFG_JVS_DEVICE_ADD(m_jvs1, COBRA_JVS, "cobra_jvs_host")

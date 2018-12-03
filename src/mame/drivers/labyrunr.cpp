@@ -189,9 +189,10 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(labyrunr_state, labyrunr)
 
-	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K051733_ADD("k051733")
+	K007121(config, m_k007121, 0);
+	m_k007121->set_palette_tag(m_palette);
+
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

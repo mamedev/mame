@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DMV_KEYBOARD_ADD("keyboard")
+	DMV_KEYBOARD(config, m_keyboard, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

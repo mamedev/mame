@@ -209,20 +209,20 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 	m_k051960->set_screen_tag("screen");
 	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(8, 0)
-	MCFG_K051316_CB(ultraman_state, zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette("palette");
+	m_k051316[0]->set_offsets(8, 0);
+	m_k051316[0]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(8, 0)
-	MCFG_K051316_CB(ultraman_state, zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette("palette");
+	m_k051316[1]->set_offsets(8, 0);
+	m_k051316[1]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_2), this);
 
-	MCFG_DEVICE_ADD("k051316_3", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(8, 0)
-	MCFG_K051316_CB(ultraman_state, zoom_callback_3)
+	K051316(config, m_k051316[2], 0);
+	m_k051316[2]->set_palette("palette");
+	m_k051316[2]->set_offsets(8, 0);
+	m_k051316[2]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_3), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

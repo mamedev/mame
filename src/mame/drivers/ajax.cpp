@@ -208,10 +208,10 @@ MACHINE_CONFIG_START(ajax_state::ajax)
 	m_k051960->set_sprite_callback(FUNC(ajax_state::sprite_callback), this);
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(7)
-	MCFG_K051316_CB(ajax_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_bpp(7);
+	m_k051316->set_zoom_callback(FUNC(ajax_state::zoom_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

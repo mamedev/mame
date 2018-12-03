@@ -256,15 +256,15 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_K007342_ADD("k007342")
-	MCFG_K007342_GFXNUM(0)
-	MCFG_K007342_CALLBACK_OWNER(battlnts_state, battlnts_tile_callback)
-	MCFG_K007342_GFXDECODE("gfxdecode")
+	K007342(config, m_k007342, 0);
+	m_k007342->set_gfxnum(0);
+	m_k007342->set_tile_callback(FUNC(battlnts_state::battlnts_tile_callback), this);
+	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_K007420_ADD("k007420")
-	MCFG_K007420_BANK_LIMIT(0x3ff)
-	MCFG_K007420_CALLBACK_OWNER(battlnts_state, battlnts_sprite_callback)
-	MCFG_K007420_PALETTE("palette")
+	K007420(config, m_k007420, 0);
+	m_k007420->set_bank_limit(0x3ff);
+	m_k007420->set_sprite_callback(FUNC(battlnts_state::battlnts_sprite_callback), this);
+	m_k007420->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

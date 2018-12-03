@@ -358,10 +358,10 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 	m_k052109->set_palette("palette");
 	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(simpsons_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(simpsons_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, 23);
+	m_k053246->set_palette("palette");
 
 	MCFG_K053251_ADD("k053251")
 

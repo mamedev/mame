@@ -805,11 +805,11 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
-	MCFG_CEDAR_MAGNET_PLANE_ADD("cedplane0")
-	MCFG_CEDAR_MAGNET_PLANE_ADD("cedplane1")
-	MCFG_CEDAR_MAGNET_SPRITE_ADD("cedsprite")
+	CEDAR_MAGNET_PLANE(config, m_cedplane0, 0);
+	CEDAR_MAGNET_PLANE(config, m_cedplane1, 0);
+	CEDAR_MAGNET_SPRITE(config, m_cedsprite, 0);
 
-	MCFG_CEDAR_MAGNET_FLOP_ADD("flop")
+	CEDAR_MAGNET_FLOP(config, "flop", 0);
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END

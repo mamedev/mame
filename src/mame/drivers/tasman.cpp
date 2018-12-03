@@ -672,12 +672,12 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(kongambl_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -48+1, -23)
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -48+1, -23);
+	m_k055673->set_palette(m_palette);
 
 #if CUSTOM_DRAW
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)

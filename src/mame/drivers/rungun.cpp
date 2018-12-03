@@ -428,11 +428,11 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_OFFSETS(34, 9)
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(rungun_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -8, 15)
-	MCFG_K055673_PALETTE("palette")
-	MCFG_K055673_SET_SCREEN("screen")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_RNG, -8, -15);
+	m_k055673->set_palette(m_palette);
+	m_k055673->set_screen(m_screen);
 
 	K053252(config, m_k053252, 16000000/2);
 	m_k053252->set_offsets(9*8, 24);
