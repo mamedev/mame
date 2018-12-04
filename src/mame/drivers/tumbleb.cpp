@@ -2239,7 +2239,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tumbleb_state::magipur)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(magipur_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
@@ -2270,9 +2270,9 @@ MACHINE_CONFIG_START(tumbleb_state::magipur)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 0.10);
+	YM2151(config, "ymsnd", XTAL(4'000'000)).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
