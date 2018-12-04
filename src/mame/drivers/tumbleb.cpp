@@ -2019,37 +2019,6 @@ static GFXDECODE_START( gfx_fncywld )
 	GFXDECODE_ENTRY( "sprgfx",  0, tlayout,     0x000, 0x40 )  /* Sprites 16x16 */
 GFXDECODE_END
 
-static const gfx_layout mp_tcharlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ RGN_FRAC(1,2)+0, 0, RGN_FRAC(1,2)+8, 8  },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
-static const gfx_layout mp_tlayout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ RGN_FRAC(1,2)+0, 0, RGN_FRAC(1,2)+8, 8  },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8
-};
-
-static GFXDECODE_START( gfx_magipur )
-	GFXDECODE_ENTRY( "tilegfx", 0, mp_tcharlayout, 0x400, 0x40 )  /* Characters 8x8 */
-	GFXDECODE_ENTRY( "tilegfx", 0, mp_tlayout,     0x400, 0x40 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "tilegfx", 0, mp_tlayout,     0x200, 0x40 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "sprgfx", 0, mp_tlayout,      0x000, 0x40 )  /* Sprites 16x16 */
-GFXDECODE_END
-
 /******************************************************************************/
 
 
@@ -2261,7 +2230,7 @@ MACHINE_CONFIG_START(tumbleb_state::magipur)
 	MCFG_DECO_SPRITE_TRANSPEN(15)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magipur)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fncywld)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -2636,12 +2605,16 @@ ROM_START( magipur )
 	ROM_LOAD16_BYTE( "3-27c040.bin", 0x000001, 0x080000, CRC(ee4b16da) SHA1(82391ed4d21d3944ca482be00ab7c0838cf190ff) )
 
 	ROM_REGION( 0x100000, "sprgfx", 0  )
-	ROM_LOAD16_BYTE( "4-27c040.bin",  0x00000, 0x80000, CRC(e460a77d) SHA1(bde15705750e002bd576098700161b0944984401) )
-	ROM_LOAD16_BYTE( "5-27c040.bin",  0x00001, 0x80000, CRC(79c53627) SHA1(9e2673b3becf0508f630f3bd8ff5fc30520b120b))
+	ROM_LOAD16_BYTE( "4-27c040.bin",  0x80000, 0x40000, CRC(e460a77d) SHA1(bde15705750e002bd576098700161b0944984401) )
+	ROM_CONTINUE(0x80001, 0x40000)
+	ROM_LOAD16_BYTE( "5-27c040.bin",  0x00000, 0x40000, CRC(79c53627) SHA1(9e2673b3becf0508f630f3bd8ff5fc30520b120b) )
+	ROM_CONTINUE(0x00001, 0x40000)
 
 	ROM_REGION( 0x100000, "tilegfx", 0 )
-	ROM_LOAD16_BYTE( "6-27c040.bin", 0x00000, 0x80000, CRC(b25b5872) SHA1(88a6a110073060c3b7b2987cc41d23c4ca412b43) )
-	ROM_LOAD16_BYTE( "7-27c040.bin", 0x00001, 0x80000, CRC(d3c3a672) SHA1(5bbd67a953e1d47d05006a4ef4aa7a23e807f11b) )
+	ROM_LOAD16_BYTE( "6-27c040.bin", 0x00001, 0x40000, CRC(b25b5872) SHA1(88a6a110073060c3b7b2987cc41d23c4ca412b43) )
+	ROM_CONTINUE(0x00000, 0x40000)
+	ROM_LOAD16_BYTE( "7-27c040.bin", 0x80001, 0x40000, CRC(d3c3a672) SHA1(5bbd67a953e1d47d05006a4ef4aa7a23e807f11b) )
+	ROM_CONTINUE(0x80000, 0x40000)
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "1-27c020.bin", 0x000000, 0x040000, CRC(84dcf771) SHA1(f8a693a11b14608a582a90b7fd7d3be92e46a0e1) )
