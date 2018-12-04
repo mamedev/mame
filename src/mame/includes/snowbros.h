@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Mike Coates
+#ifndef MAME_INCLUDES_SNOWBROS_H
+#define MAME_INCLUDES_SNOWBROS_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -21,7 +25,7 @@ public:
 		m_pandora(*this, "pandora"),
 		m_hyperpac_ram(*this, "hyperpac_ram"),
 		m_bootleg_spriteram16(*this, "spriteram16b")
-		{ }
+	{ }
 
 	void _4in1(machine_config &config);
 	void semiprot(machine_config &config);
@@ -108,3 +112,5 @@ private:
 	void wintbob_map(address_map &map);
 	void yutnori_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SNOWBROS_H

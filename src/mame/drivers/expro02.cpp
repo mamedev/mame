@@ -944,10 +944,7 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	m_kaneko_spr->set_offsets(0, -0x40);
 	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
-
-
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	/* arm watchdog */
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
@@ -968,7 +965,7 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(fantasia_map)
 
-	MCFG_DEVICE_REMOVE("calc1_mcu")
+	config.device_remove("calc1_mcu");
 
 	// these values might not be correct, behavior differs from original boards
 	m_view2_0->set_invert_flip(1);

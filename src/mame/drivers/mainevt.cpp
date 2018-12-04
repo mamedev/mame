@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 	m_k051960->set_screen_tag("screen");
 	m_k051960->set_sprite_callback(FUNC(mainevt_state::dv_sprite_callback), this);
 
-	MCFG_K051733_ADD("k051733")
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

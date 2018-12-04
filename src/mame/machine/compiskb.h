@@ -14,17 +14,6 @@
 #include "sound/spkrdev.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	downcast<compis_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
-
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -37,7 +26,7 @@ public:
 	// construction/destruction
 	compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_tx_handler(Object &&cb) { return m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
+	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 

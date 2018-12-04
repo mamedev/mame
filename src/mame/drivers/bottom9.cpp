@@ -335,9 +335,9 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	m_k051960->set_screen_tag("screen");
 	m_k051960->set_sprite_callback(FUNC(bottom9_state::sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_CB(bottom9_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_zoom_callback(FUNC(bottom9_state::zoom_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

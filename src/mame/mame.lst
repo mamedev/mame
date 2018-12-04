@@ -12937,6 +12937,9 @@ hotmindff                       // (c) Playmark
 @source:fk1.cpp
 fk1                             //
 
+@source:flashbeats.cpp
+flsbeats                        // 1998 Sega
+
 @source:flicker.cpp
 flicker                         //
 
@@ -13055,6 +13058,9 @@ nmsengen                        // (c) 1991 Video System (Japan)
 @source:fruitpc.cpp
 fruitpc                         // ???
 gogostrk                        //
+
+@source:fs3216.cpp
+fs3216                          //
 
 @source:ft68m.cpp
 ft68m                           //
@@ -13217,6 +13223,7 @@ maniacsq                        // (c) 1996 - Ref 940411
 maniacsqa                       // (c) 1996 - Ref 940411
 maniacsqu                       // (c) 1996 - Ref 940411 - (unprotected)
 maniacsqs                       // (c) 1996 - Ref 960419/1
+saltcrdi						// (c) 1997 - Ref 970410
 snowboar                        // (c) 1996 - Ref 960419/1
 snowboara                       // (c) 1996 - Ref 960419/1
 touchgo                         // (c) 1995 - Ref 950906
@@ -15338,6 +15345,9 @@ hp64k                           //
 @source:hp700.cpp
 hp700_70                        //
 hp700_92                        //
+
+@source:hp95lx.cpp
+hp95lx                          //
 
 @source:hp9825.cpp
 hp9825b                         // HP 9825B
@@ -29866,6 +29876,7 @@ nc150                           // 1992 NC150
 nc200                           // 1993 NC200
 
 @source:ncd17c.cpp
+ncd16                           // 1989 Network Computing Devices
 ncd17c                          // 1990 Network Computing Devices
 ncd19                           // 1990 Network Computing Devices
 
@@ -31671,6 +31682,7 @@ pex2121p                        // (c) 1995 IGT - International Game Technology
 pex2121pa                       // (c) 1995 IGT - International Game Technology
 pex2127p                        // (c) 1995 IGT - International Game Technology
 pex2134p                        // (c) 1995 IGT - International Game Technology
+pex2143p                        // (c) 1995 IGT - International Game Technology
 pex2149p                        // (c) 1995 IGT - International Game Technology
 pex2150p                        // (c) 1995 IGT - International Game Technology
 pex2152p                        // (c) 1995 IGT - International Game Technology
@@ -35817,6 +35829,7 @@ cairblad                        // (c) 1999 Sammy
 drifto94                        // (c) 1994 Visco
 dynagear                        // (c) 1993 Sammy
 eaglshot                        // (c) 1994 Sammy
+eaglshotj                       // (c) 1994 Sammy
 gdfs                            // (c) 1995 Banpresto
 hypreac2                        // (c) 1997 Sammy
 hypreact                        // (c) 1995 Sammy

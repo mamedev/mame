@@ -275,8 +275,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanica)
 	MCFG_DEVICE_PROGRAM_MAP(galpanica_map)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	/* arm watchdog */
 	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */

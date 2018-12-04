@@ -93,7 +93,6 @@ protected:
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 
-	DECLARE_VIDEO_START(yoffset);
 	DECLARE_VIDEO_START(xoffset);
 	DECLARE_VIDEO_START(xoffset1);
 
@@ -141,9 +140,20 @@ protected:
 	output_finder<11> m_lamps;
 
 	int m_xoffset;
-	int m_yoffset;
 	int m_keyboard_row;
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
+
+private:
+	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int shadow, int realline, int line, int opaque);
+	inline void get_tile(uint16_t* spriteram, int is_16x16, int x, int y, int page, int& code, int& attr, int& flipx, int& flipy, int& color);
+
+	std::unique_ptr<uint32_t[]> m_realtilenumber;
+	gfx_element *m_spritegfx;
+
+	uint16_t m_rasterposition;
+	uint16_t m_rasterenabled;
+	TIMER_CALLBACK_MEMBER(raster_timer_done);
+	emu_timer *m_raster_timer;
 
 };
 

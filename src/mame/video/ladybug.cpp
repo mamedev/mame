@@ -273,7 +273,7 @@ void zerohour_stars_device::device_reset()
 ***************************************************************************/
 
 void ladybug_base_state::palette_init_common(palette_device &palette, const uint8_t *color_prom,
-								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1)
+								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1) const
 {
 	static const int resistances[2] = { 470, 220 };
 	double rweights[2], gweights[2], bweights[2];

@@ -357,21 +357,21 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(overdriv_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx1", NORMAL_PLANE_ORDER, 77, 22)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback), this);
+	m_k053246->set_config("gfx1", NORMAL_PLANE_ORDER, 77, 22);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(14, -1)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(overdriv_state, zoom_callback_1)
+	K051316(config, m_k051316_1, 0);
+	m_k051316_1->set_palette("palette");
+	m_k051316_1->set_offsets(14, -1);
+	m_k051316_1->set_wrap(1);
+	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(15, 1)
-	MCFG_K051316_CB(overdriv_state, zoom_callback_2)
+	K051316(config, m_k051316_2, 0);
+	m_k051316_2->set_palette("palette");
+	m_k051316_2->set_offsets(15, 1);
+	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2), this);
 
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)

@@ -438,8 +438,6 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 

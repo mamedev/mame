@@ -3212,6 +3212,34 @@ ROM_START( eaglshot )
 	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 ROM_END
 
+ROM_START( eaglshotj )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* V60 Code */
+	ROM_LOAD16_BYTE( "sammygolf.u18",  0x000000, 0x080000, CRC(b6d6869c) SHA1(7528751fad783e9b0fd217d2fac2ab408814a583) ) // handwritten labels on prg ROMs, other ROMS had no labels.
+	ROM_LOAD16_BYTE( "sammygolf.u20",  0x000001, 0x080000, CRC(c8872e48) SHA1(c8e1e712d5fa380f8fc1447502f21d2ae592811a) )
+
+	ROM_REGION16_LE( 0xe00000, "gfxdata", ROMREGION_ERASEFF ) /* Sprites - Read by the CPU */
+	ROM_LOAD( "si003-01.u13", 0x0000000, 0x200000, CRC(d7df0d52) SHA1(d7b79a186f4272334c2297666c52f32c05787c29) )
+	ROM_LOAD( "si003-02.u12", 0x0200000, 0x200000, CRC(92b4d50d) SHA1(9dc2f2961b088824d8370ac83dff796345fe4158) )
+	ROM_LOAD( "si003-03.u11", 0x0400000, 0x200000, CRC(6ede4012) SHA1(6663990c6ee8e500cb8c51ad2102761ee0b3351d) )
+	ROM_LOAD( "si003-04.u10", 0x0600000, 0x200000, CRC(4c65d1a1) SHA1(165f16d08813d2c989ddce4bb23b3a3652003bd5) )
+	ROM_LOAD( "si003-05.u30", 0x0800000, 0x200000, CRC(daf52d56) SHA1(108419ef7d3716a3890b0d8bcbfddc1585daaae8) )
+	ROM_LOAD( "si003-06.u31", 0x0a00000, 0x200000, CRC(449f9ae5) SHA1(b3e664eb88d14d1e25a0cfc8dcccc8270ca778c9) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
+	ROM_LOAD16_WORD_SWAP( "si003-07.u23", 0x000000, 0x200000, CRC(81679fd6) SHA1(ca3b07a87781278b5c7c85951728bbe5dfcbe042) )
+	ROM_LOAD16_WORD_SWAP( "si003-08.u24", 0x200000, 0x200000, CRC(d0122ba2) SHA1(96230fb690cf144cd873f7d51c0304736a698316) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 ) /* Samples */
+	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
+	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
+	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+ROM_END
+
+
 
 /***************************************************************************
 
@@ -4742,6 +4770,7 @@ GAME( 1993,  survartsj, survarts, survarts, survarts, ssv_state, init_survarts, 
 GAME( 1994,  drifto94,  0,        drifto94, drifto94, ssv_state, init_drifto94, ROT0,   "Visco",              "Drift Out '94 - The Hard Order (Japan)",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, ssv_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf (US)",                                                   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  eaglshotj, eaglshot, eaglshot, eaglshot, ssv_state, init_eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf (Japan, bootleg?)",                                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // from a bootleg ROM board with no proper Seta / Sammy markings, possibly original ROM tho?
 
 GAME( 1995,  hypreact,  0,        hypreact, hypreact, ssv_state, init_hypreact, ROT0,   "Sammy",              "Mahjong Hyper Reaction (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 

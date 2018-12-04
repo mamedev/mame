@@ -499,8 +499,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	m_view2->set_offset(0x5b, 0, 256, 224);
 	m_view2->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_gfxdecode_tag("gfxdecode");

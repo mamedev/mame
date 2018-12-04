@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(aleck64_state::aleck64)
 	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_N64_PERIPHS_ADD("rcp");
+	N64PERIPH(config, "rcp", 0);
 MACHINE_CONFIG_END
 
 uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -56,10 +56,10 @@
 
     Row case:
 
-        0.w     fedc ba-- ---- ----     Number of columns
+        0.w     fedc ba-- ---- ----     Number of columns (local)
                 ---- --98 7654 3210     X
 
-        2.w     fedc ba-- ---- ----     Number of rows - 1
+        2.w     fedc ba-- ---- ----     Number of rows - 1 (local)
                 ---- --98 7654 3210     Y
 
         4.w     f--- ---- ---- ----     Tile size: 8x8 (0) or 16x16 (1)
@@ -151,9 +151,19 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	case 0x30:  // BLANK SCREEN (pzlbowl, myangel)
 		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n",m_maincpu->pc(),data);
 		break;
+
+	case 0x3c: // Raster IRQ related
+		//logerror("%s: Register 3c write (raster enable?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
+		COMBINE_DATA(&m_rasterenabled);
+		if (m_rasterenabled & 1) m_raster_timer->adjust(m_screen->time_until_pos((m_rasterposition&0x1ff)+0x80, 0), 0);
+		break;
+
+	case 0x3e: // Raster IRQ related
+		//logerror("%s: Register 3e write (raster position?) %04X (%04x)\n",machine().describe_context(),data, mem_mask);
+		COMBINE_DATA(&m_rasterposition);
+		break;
 	}
 }
-
 
 /***************************************************************************
 
@@ -163,75 +173,96 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 
 ***************************************************************************/
 
-static void seta_drawgfx(   bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
-							uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,
-							int shadow_depth, bool opaque)
+inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int use_shadow, int realline, int line, int opaque)
 {
-	const uint8_t *addr, *source;
-	uint8_t pen;
-	uint16_t *dest;
-	int sx, x1, dx;
-	int sy, y1, dy;
-
-	addr    =   gfx->get_data(code  % gfx->elements());
-	color   =   gfx->granularity() * (color % gfx->colors());
-
-	if ( flipx )    {   x1 = x0-1;              x0 += gfx->width()-1;       dx = -1;    }
-	else            {   x1 = x0 + gfx->width();                         dx =  1;    }
-
-	if ( flipy )    {   y1 = y0-1;              y0 += gfx->height()-1;  dy = -1;    }
-	else            {   y1 = y0 + gfx->height();                            dy =  1;    }
-
-#define SETA_DRAWGFX(SETPIXELCOLOR)                                             \
-	for ( sy = y0; sy != y1; sy += dy )                                         \
-	{                                                                           \
-		if ( sy >= cliprect.min_y && sy <= cliprect.max_y )                 \
-		{                                                                       \
-			source  =   addr;                                                   \
-			dest    =   &bitmap.pix16(sy);                          \
-																				\
-			for ( sx = x0; sx != x1; sx += dx )                                 \
-			{                                                                   \
-				pen = *source++;                                                \
-																				\
-				if ( (pen || opaque) && sx >= cliprect.min_x && sx <= cliprect.max_x )  \
-					SETPIXELCOLOR                                               \
-			}                                                                   \
-		}                                                                       \
-																				\
-		addr    +=  gfx->rowbytes();                                            \
-	}
-
-	if (shadow_depth)
+	struct drawmodes
 	{
-		int pen_shift = 15 - shadow_depth;
-		int pen_mask  = (1 << pen_shift) - 1;
-		SETA_DRAWGFX( { dest[sx] = ((dest[sx] & pen_mask) | (pen << pen_shift)) & 0x7fff; } )
-	}
-	else
+		int gfx_mask;
+		int gfx_shift;
+		int shadow;
+	};
+
+	// this is the same logic as ssv.cpp, although this has more known cases, but also some bugs with the handling
+	static constexpr drawmodes BPP_MASK_TABLE[8] = {
+		{ 0xff, 0, 4 }, // 0: ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
+		{ 0x30, 4, 2 }, // 1: unverified case, mimic old driver behavior of only using lowest bit  (myangel2 question bubble, myangel endgame)
+		{ 0x07, 0, 3 }, // 2: unverified case, mimic old driver behavior of only using lowest bit  (myangel "Graduate Tests")
+		{ 0xff, 0, 0 }, // 3: unverified case, mimic old driver behavior of only using lowest bit  (staraudi question bubble: pen %00011000 with shadow on!)
+		{ 0x0f, 0, 3 }, // 4: eagle shot 4bpp birdie text
+		{ 0xf0, 4, 4 }, // 5: eagle shot 4bpp japanese text
+		{ 0x3f, 0, 5 }, // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking  ) (myangel sliding blocks test)
+		{ 0xff, 0, 8 }, // 7: common 8bpp case
+	};
+
+	int shadow = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].shadow;
+	int gfx_mask = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].gfx_mask;
+	int gfx_shift = BPP_MASK_TABLE[(which_gfx & 0x0700)>>8].gfx_shift;
+
+	if (!use_shadow)
+		shadow = 0;
+
+	const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
+
+
+	uint16_t* dest = &bitmap.pix16(realline);
+
+	const int x0 = flipx ? (base_sx + 8 - 1) : (base_sx);
+	const int x1 = flipx ? (base_sx - 1) : (x0 + 8);
+	const int dx = flipx ? (-1) : (1);
+
+	int column = 0;
+	for (int sx = x0; sx != x1; sx += dx)
 	{
-		SETA_DRAWGFX( { dest[sx] = (color + pen) & 0x7fff; } )
+		uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
+
+		if (sx >= cliprect.min_x && sx <= cliprect.max_x)
+		{
+			if (pen || opaque)
+			{
+				if (!shadow)
+				{
+					dest[sx] = (realcolor + pen) & 0x7fff;
+				}
+				else
+				{
+					int pen_shift = 15 - shadow;
+					int pen_mask = (1 << pen_shift) - 1;
+					dest[sx] = ((dest[sx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
+				}					
+			}
+		}
 	}
 }
 
-void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int y, int page, int& code, int& attr, int& flipx, int& flipy, int& color)
+{
+	uint16_t *s3 = &spriteram[2 * ((page * 0x2000 / 4) + ((y & 0x1f) << 6) + (x & 0x03f))];
+	attr = s3[0];
+	code = s3[1] + ((attr & 0x0007) << 16);
+	flipx = (attr & 0x0010);
+	flipy = (attr & 0x0008);
+	color = (attr & 0xffe0) >> 5;
+	if (is_16x16)
+		code &= ~3;
+}
+
+void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Sprites list
 
 	// When debugging, use m_spriteram here, and run mame -update_in_pause, i.e.:
 //  uint16_t *buffered_spriteram16 = m_spriteram;
 	uint16_t *buffered_spriteram16 = m_buffered_spriteram.get();
-	uint16_t *s1  = buffered_spriteram16 + 0x3000/2;
-	uint16_t *end = &buffered_spriteram16[m_spriteram.bytes()/2];
+	uint16_t *s1 = buffered_spriteram16 + 0x3000 / 2;
+	uint16_t *end = &buffered_spriteram16[m_spriteram.bytes() / 2];
 
-//  for ( ; s1 < end; s1+=4 )
-	for ( ; s1 < buffered_spriteram16 + 0x4000/2; s1+=4 )   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
+	//  for ( ; s1 < end; s1+=4 )
+	for (; s1 < buffered_spriteram16 + 0x4000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
-		gfx_element *gfx;
-		int num     = s1[0];
-		int xoffs   = s1[1];
-		int yoffs   = s1[2];
-		int sprite  = s1[3];
+		int num = s1[0];
+		int xoffs = s1[1];
+		int yoffs = s1[2];
+		int sprite = s1[3];
 
 		// Single-sprite address
 		uint16_t *s2 = &buffered_spriteram16[(sprite & 0x7fff) * 4];
@@ -240,92 +271,49 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		int global_sizex = xoffs & 0xfc00;
 		int global_sizey = yoffs & 0xfc00;
 
-		bool opaque         =   num & 0x2000;
-		int use_global_size =   num & 0x1000;
-		int use_shadow      =   num & 0x0800;
-
+		bool opaque = num & 0x2000;
+		int use_global_size = num & 0x1000;
+		int use_shadow = num & 0x0800;
+		int which_gfx = num & 0x0700;
 		xoffs &= 0x3ff;
 		yoffs &= 0x3ff;
-
-		// Color depth
-		int shadow_depth;
-		switch (num & 0x0700)
-		{
-			default:
-				popmessage("unknown gfxset %x",(num & 0x0700)>>8);
-				shadow_depth = 0;
-				gfx = m_gfxdecode->gfx(machine().rand()&3);
-				break;
-			case 0x0700:            // 8bpp tiles (76543210)
-				shadow_depth = 8;   // ?
-				gfx = m_gfxdecode->gfx(3);
-				break;
-			case 0x0600:            // 6bpp tiles (--543210) (myangel sliding blocks test)
-				shadow_depth = 5;   // staraudi
-				gfx = m_gfxdecode->gfx(2);
-				break;
-			case 0x0500:            // 4bpp tiles (3210----)
-				shadow_depth = 4;   // ?
-				gfx = m_gfxdecode->gfx(1);
-				break;
-			case 0x0400:            // 4bpp tiles (----3210)
-				shadow_depth = 3;   // reelquak
-				gfx = m_gfxdecode->gfx(0);
-				break;
-//          case 0x0300:            // ??? (staraudi question bubble: pen %00011000 with shadow on!)
-//              unknown
-			case 0x0200:            // 3bpp tiles?  (-----210) (myangel "Graduate Tests")
-				shadow_depth = 3;   // ?
-				gfx = m_gfxdecode->gfx(4);
-				break;
-			case 0x0100:            // 2bpp tiles??? (--10----) (myangel2 question bubble, myangel endgame)
-				shadow_depth = 2;   // myangel2
-				gfx = m_gfxdecode->gfx(5);
-				break;
-			case 0x0000:            // no idea!
-				shadow_depth = 4;   // ?
-				gfx = m_gfxdecode->gfx(0);
-				break;
-		}
-		if (!use_shadow)
-			shadow_depth = 0;
 
 		// Number of single-sprites
 		num = (num & 0x00ff) + 1;
 
-		for( ; num > 0; num--,s2+=4 )
+		for (; num > 0; num--, s2 += 4)
 		{
 			if (s2 >= end)  break;
 
-// "tilemap" sprite
-
 			if (sprite & 0x8000)
 			{
-				rectangle clip;
-				int dx, x, y;
-				int flipx;
-				int flipy;
-				int sx       = s2[0];
-				int sy       = s2[1];
-				int scrollx  = s2[2];
-				int scrolly  = s2[3];
-				int tilesize = (scrollx & 0x8000) >> 15;
-				int page     = (scrollx & 0x7c00) >> 10;
+				// "floating tilemap" sprite
+				// the 'floating tilemap sprites' are just a window into the tilemap, the position of the sprite does not change the scroll values
 
-				int width    = use_global_size ? global_sizex : sx;
-				int height   = use_global_size ? global_sizey : sy;
-				height = ((height & 0xfc00) >> 10) + 1;
-				width  = ((width  & 0xfc00) >> 10)/* + 1*/; // reelquak reels
-				if (!width)
-					continue;
-
+				int sx = s2[0];
+				int sy = s2[1];
+				int scrollx = s2[2];
+				int scrolly = s2[3];
+				int is_16x16 = (scrollx & 0x8000) >> 15;
+				int page = (scrollx & 0x7c00) >> 10;
+				int local_sizex = sx & 0xfc00;
+				int local_sizey = sy & 0xfc00;
 				sx &= 0x3ff;
 				sy &= 0x1ff;
+
+				int width = use_global_size ? global_sizex : local_sizex;
+				int height = use_global_size ? global_sizey : local_sizey;
+
+				height = ((height & 0xfc00) >> 10) + 1;
+				width = ((width & 0xfc00) >> 10)/* + 1*/; // reelquak reels
+				if (!width)
+					continue;
 
 				scrollx += m_xoffset;
 				scrollx &= 0x3ff;
 				scrolly &= 0x1ff;
 
+				rectangle clip;
 				// sprite clipping region (x)
 				clip.min_x = (sx + xoffs) & 0x3ff;
 				clip.min_x = (clip.min_x & 0x1ff) - (clip.min_x & 0x200);
@@ -337,7 +325,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				if (clip.max_x > cliprect.max_x)    clip.max_x = cliprect.max_x;
 
 				// sprite clipping region (y)
-				clip.min_y = ((sy + yoffs) & 0x1ff) - m_yoffset;
+				clip.min_y = ((sy + yoffs) & 0x1ff);
 				clip.max_y = clip.min_y + height * 0x10 - 1;
 
 				if (clip.min_y > cliprect.max_y)    continue;
@@ -345,68 +333,52 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				if (clip.min_y < cliprect.min_y)    clip.min_y = cliprect.min_y;
 				if (clip.max_y > cliprect.max_y)    clip.max_y = cliprect.max_y;
 
-				dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
-
-				// Draw the rows
-				for (y = 0; y < (0x40 >> tilesize); y++)
+				for (int realline = clip.min_y; realline <= clip.max_y; realline++)
 				{
-					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - m_yoffset;
+					int sourceline = (realline - scrolly) & 0x1ff;
 
-					for (x = 0; x < 0x40; x++)
+					int y = sourceline >> (is_16x16 ? 4 : 3);
+
+					for (int x = 0; x < 0x40; x++)
 					{
-						int px = ((dx + x * (8 << tilesize) + 0x10) & 0x3ff) - 0x10;
-						int tx, ty;
-						int attr, code, color;
-						uint16_t *s3;
+						int code, attr, flipx, flipy, color;
+						get_tile(buffered_spriteram16, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color); // yes the tilemap in RAM is flipped?!
 
-						s3  =   &buffered_spriteram16[2 * ((page * 0x2000/4) + ((y & 0x1f) << 6) + (x & 0x03f))];
+						int line = is_16x16 ? (sourceline & 0x0f) : (sourceline & 0x07);
 
-						attr  = s3[0];
-						code  = s3[1] + ((attr & 0x0007) << 16);
-						flipx = (attr & 0x0010);
-						flipy = (attr & 0x0008);
-						color = (attr & 0xffe0) >> 5;
-
-						if (tilesize) code &= ~3;
-
-						for (ty = 0; ty <= tilesize; ty++)
+						int ty = (line >> 3) & 1;
+						line &= 0x7;
+						for (int tx = 0; tx <= is_16x16; tx++)
 						{
-							for (tx = 0; tx <= tilesize; tx++)
+							int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
+							int px = ((dx + x * (8 << is_16x16) + 0x10) & 0x3ff) - 0x10;
+							int dst_x = (px + (flipx ? is_16x16 - tx : tx) * 8) & 0x3ff;
+							dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
+
+							if ((dst_x >= clip.min_x - 8) && (dst_x <= clip.max_x))
 							{
-								int dst_x = (px + (flipx ? tilesize-tx : tx) * 8) & 0x3ff;
-								int dst_y = (py + (flipy ? tilesize-ty : ty) * 8) & 0x1ff;
-
-								dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
-
-								seta_drawgfx(bitmap, clip, gfx,
-										code ^ tx ^ (ty<<1),
-										color,
-										flipx, flipy,
-										dst_x, dst_y,
-										shadow_depth, opaque );
+								int realcode = code ^ tx ^ ((flipy ? is_16x16 - ty : ty) << 1);
+								drawgfx_line(bitmap, clip, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, dst_x, use_shadow, realline, line, opaque);
 							}
 						}
-
 					}
 				}
 			}
 			else
-// "normal" sprite
 			{
-				int sx    = s2[0];
-				int sy    = s2[1];
-				int attr  = s2[2];
-				int code  = s2[3] + ((attr & 0x0007) << 16);
+				// "normal" sprite
+				int sx = s2[0];
+				int sy = s2[1];
+				int attr = s2[2];
+				int code = s2[3] + ((attr & 0x0007) << 16);
 				int flipx = (attr & 0x0010);
 				int flipy = (attr & 0x0008);
 				int color = (attr & 0xffe0) >> 5;
 
 				int sizex = use_global_size ? global_sizex : sx;
 				int sizey = use_global_size ? global_sizey : sy;
-				int x,y;
-				sizex = (1 << ((sizex & 0x0c00)>> 10))-1;
-				sizey = (1 << ((sizey & 0x0c00)>> 10))-1;
-
+				sizex = (1 << ((sizex & 0x0c00) >> 10)) - 1;
+				sizey = (1 << ((sizey & 0x0c00) >> 10)) - 1;
 
 				sx += xoffs;
 				sy += yoffs;
@@ -414,29 +386,42 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				sx = (sx & 0x1ff) - (sx & 0x200);
 
 				sy &= 0x1ff;
-				sy -= m_yoffset;
 
-				code &= ~((sizex+1) * (sizey+1) - 1);   // see myangel, myangel2 and grdians
+				int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
 
-				for (y = 0; y <= sizey; y++)
+				int firstline = sy;
+				int endline = (sy + (sizey + 1) * 8) - 1;
+
+				int realfirstline = firstline;
+
+				if (firstline < cliprect.min_y)	realfirstline = cliprect.min_y;
+				if (endline > cliprect.max_y) endline = cliprect.max_y;
+
+				for (int realline = realfirstline; realline <= endline; realline++)
 				{
-					for (x = 0; x <= sizex; x++)
+					int line = realline - firstline;
+					int y = (line >> 3);
+					line &= 0x7;
+
+					for (int x = 0; x <= sizex; x++)
 					{
-						seta_drawgfx(bitmap, cliprect, gfx,
-								code++,
-								color,
-								flipx, flipy,
-								sx + (flipx ? sizex-x : x) * 8, sy + (flipy ? sizey-y : y) * 8,
-								shadow_depth, opaque );
+						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
+						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, realline, line, opaque);
 					}
 				}
+
+
 			}
 		}
-
 		if (s1[0] & 0x8000) break;  // end of list marker
 	}   // sprite list
 }
 
+
+TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
+{
+
+}
 
 /***************************************************************************
 
@@ -454,7 +439,16 @@ void seta2_state::video_start()
 	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 
 	m_xoffset = 0;
-	m_yoffset = 0;
+
+	m_realtilenumber = std::make_unique<uint32_t[]>(0x80000);
+
+	m_spritegfx = m_gfxdecode->gfx(0);
+	for (int i = 0; i < 0x80000; i++)
+	{
+		m_realtilenumber[i] = i % m_spritegfx->elements();
+	}
+
+	m_raster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta2_state::raster_timer_done), this));
 }
 
 VIDEO_START_MEMBER(seta2_state,xoffset)
@@ -469,13 +463,6 @@ VIDEO_START_MEMBER(seta2_state,xoffset1)
 	video_start();
 
 	m_xoffset = 0x1;
-}
-
-VIDEO_START_MEMBER(seta2_state,yoffset)
-{
-	video_start();
-
-	m_yoffset = 0x10;
 }
 
 uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

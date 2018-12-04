@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

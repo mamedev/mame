@@ -351,19 +351,19 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(7, 0)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_offsets(7, 0);
+	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_LAYER_MASK(0xc0)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_bpp(8);
+	m_k051316[1]->set_layermask(0xc0);
+	m_k051316[1]->set_wrap(1);
+	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2), this);
 
-	MCFG_K051733_ADD("k051733")
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

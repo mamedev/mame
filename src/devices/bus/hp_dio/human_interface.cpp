@@ -146,12 +146,13 @@ void human_interface_device::device_reset()
 	m_rtc->write_w(CLEAR_LINE);
 	m_rtc->read_w(CLEAR_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
+	m_iocpu->reset();
 }
 
 WRITE_LINE_MEMBER(human_interface_device::reset_in)
 {
 	if (state)
-		reset();
+		device_reset();
 }
 
 void human_interface_device::update_gpib_irq()
@@ -199,7 +200,7 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 
 	switch (offset) {
 	case 0:
-		reset();
+		device_reset();
 		break;
 
 	case 1:

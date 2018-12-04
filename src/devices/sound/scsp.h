@@ -20,6 +20,8 @@ class scsp_device : public device_t,
 	public device_rom_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP incorrections, etc
+
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 22'579'200);
 
 	auto irq_cb() { return m_irq_cb.bind(); }
@@ -36,6 +38,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
 	virtual void rom_bank_updated() override;
@@ -170,7 +173,6 @@ private:
 	TIMER_CALLBACK_MEMBER( timerC_cb );
 	int Get_AR(int base, int R);
 	int Get_DR(int base, int R);
-	int Get_RR(int base, int R);
 	void Compute_EG(SCSP_SLOT *slot);
 	int EG_Update(SCSP_SLOT *slot);
 	uint32_t Step(SCSP_SLOT *slot);

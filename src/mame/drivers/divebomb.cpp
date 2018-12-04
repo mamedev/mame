@@ -415,19 +415,19 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	GENERIC_LATCH_8(config, m_roz2fg_latch);
 	m_roz2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_bpp(8);
+	m_k051316[0]->set_wrap(0);
+	m_k051316[0]->set_offsets(-88, -16);
+	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_bpp(8);
+	m_k051316[1]->set_wrap(0);
+	m_k051316[1]->set_offsets(-88, -16);
+	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2), this);
 
 	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
 	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)

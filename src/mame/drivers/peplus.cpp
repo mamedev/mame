@@ -194,6 +194,9 @@ A Note about Best Bet Products.
    Sign Poker, Curved Straight, Relay Pair, Best Bet Royals, Double Action Pairs, Red Coats are Coming, Waden n'
    Jokers and Million Coin Poker.
 
+ Best Bet Products with mid hand payouts: Starting at byte 0x3470 in the game DATA ROM is the number of hands with
+   a mid hand payout. This is followed by a table of payouts followed by a table of corresponding hands.
+
 ***********************************************************************************/
 
 #include "emu.h"
@@ -7363,14 +7366,14 @@ Overall average for the 4 of a Kind bonus is 173.35 credits
 	ROM_LOAD( "pp0816_a5f-a7k.u68",   0x00000, 0x10000, CRC(a1e21b56) SHA1(aa0a730b2ed48612c3b20831b1aa698a45f557c0) ) /* Game Version: A5F, Library Version: A7K */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2283.u72",  0x00000, 0x8000, NO_DUMP ) /* CG2283 set needed for Treasure Chest bonus round graphics */
+	ROM_LOAD( "mro-cg2283.u72",  0x00000, 0x8000, NO_DUMP ) /* CG2283+CAP2283 are the PSR verified graphics for the PP0816 A5F-A7K build */
 	ROM_LOAD( "mgo-cg2283.u73",  0x08000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mbo-cg2283.u74",  0x10000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mxo-cg2283.u75",  0x18000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /* WRONG CG set!! MAX Bet 4K "BONUS" graphics is missing and */
-	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) ) /* all treasure chest graphics missing for bonus & attract screens */
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
-	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
+	ROM_LOAD( "mro-cg-chest.u72",  0x00000, 0x8000, BAD_DUMP CRC(e2e5b9b2) SHA1(cf2f7b469f0671b7c51041f2cd7c5a80fc7817a2) ) /* WRONG CG set!! Hand crafted graphics for illustration ONLY!!! */
+	ROM_LOAD( "mgo-cg-chest.u73",  0x08000, 0x8000, BAD_DUMP CRC(56e09f16) SHA1(467afda6700dfaefa92ad95062cbf98aeab00fba) ) /* WRONG CG set!! Hand crafted graphics for illustration ONLY!!! */
+	ROM_LOAD( "mbo-cg-chest.u74",  0x10000, 0x8000, BAD_DUMP CRC(2b2ec4a3) SHA1(10b1765704c6c7a919744173a623bb65513eb798) ) /* WRONG CG set!! Hand crafted graphics for illustration ONLY!!! */
+	ROM_LOAD( "mxo-cg-chest.u75",  0x18000, 0x8000, BAD_DUMP CRC(8df02817) SHA1(fcd2519a93a3e723791ea3e1ad0351fb1e670f36) ) /* WRONG CG set!! Hand crafted graphics for illustration ONLY!!! */
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap2283.u50", 0x0000, 0x0100, NO_DUMP ) /* Should be CAP2283 */
@@ -11652,6 +11655,40 @@ Also compatible with:
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
+ROM_START( pex2143p ) /* Superboard : Joker's Revenge (X002143P+XP000043) - PSR Verified */
+/*
+                                            w/J     w/oJ
+PayTable   Js+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
+----------------------------------------------------------------
+  P760A     1    1   2   3    5   7  15  50 100 200 400    800
+  % Range: 93.5-95.5%  Optimum: 97.5%  Hit Frequency: 44.2%
+
+Bonus "Dealt" payouts per Coin In are:
+ Dealt Royal Flush with Joker - 1600
+ Dealt Royal Flush w/o Joker  - 3200
+
+Designed and co-created by Best Bet Products
+
+Also compatible with:
+ XP000031 + CG2244 + CAPX1321
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xp000043.u67",   0x00000, 0x10000, CRC(630756ee) SHA1(b5582bdd0172ad926d4a7636c27afa3a0fbc0fd1) ) /*  8/5/96  L96/1960 */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x002143p.u66",   0x00000, 0x10000, CRC(7af2cc1f) SHA1(47f2942a9d3d2a7a0b0c54e839c52a33c660d536) ) /* Joker's Revenge - 4/15/96  L96/0976 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) )
+	ROM_LOAD( "mgo-cg2244.u78",  0x08000, 0x8000, CRC(b2de0a7a) SHA1(34f0ef951560f6f71e14c822baa4ccb1028b5028) )
+	ROM_LOAD( "mbo-cg2244.u79",  0x10000, 0x8000, CRC(d2c12418) SHA1(dfb1aebaac23ff6e2cf556f228dbdb7c272a1b30) )
+	ROM_LOAD( "mxo-cg2244.u80",  0x18000, 0x8000, CRC(8dc10a99) SHA1(92edb31f44e52609ed1ba2a53577048d424c6238) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
+ROM_END
+
 ROM_START( pex2149p ) /* Superboard : Triple Bonus Poker (X002149P+XP000038) - $1 Denominations Only - PSR Verified */
 /*
                                       5-K 2-4
@@ -14740,6 +14777,7 @@ GAMEL( 1995, pex2121p,  0,        peplus, peplus_poker,  peplus_state, init_pepl
 GAMEL( 1995, pex2121pa, pex2121p, peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002121P+XP000037) Standard Draw Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex2127p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002127P+XP000043) Double Bonus Poker featuring 'Your Property' Royals", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex2134p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002134P+XP000043) Faces 'n' Deuces Double Bonus Poker", MACHINE_SUPPORTS_SAVE, layout_pe_poker )
+GAMEL( 1995, pex2143p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002143P+XP000043) Joker's Revenge Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex2149p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002149P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex2150p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002150P+XP000038) Triple Bonus Poker",  MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 GAMEL( 1995, pex2152p,  0,        peplus, peplus_poker,  peplus_state, init_peplussb, ROT0, "IGT - International Game Technology", "Player's Edge Plus (X002152P+XP000043) Blackjack Poker",     MACHINE_SUPPORTS_SAVE, layout_pe_poker )

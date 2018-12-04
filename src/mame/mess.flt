@@ -245,6 +245,7 @@ force68k.cpp
 fp1100.cpp
 fp200.cpp
 fp6000.cpp
+fs3216.cpp
 ft68m.cpp
 galaxy.cpp
 galeb.cpp
@@ -296,6 +297,7 @@ hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp95lx.cpp
 hp9825.cpp
 hp9845.cpp
 hp9k.cpp

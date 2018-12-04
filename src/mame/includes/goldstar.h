@@ -221,6 +221,7 @@ public:
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
+	void init_luckylad();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);

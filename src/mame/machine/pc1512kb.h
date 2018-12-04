@@ -24,19 +24,6 @@
 #define PC1512_KEYBOARD_TAG "kb"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(_write) \
-	downcast<pc1512_keyboard_device &>(*device).set_clock_wr_callback(DEVCB_##_write);
-
-#define MCFG_PC1512_KEYBOARD_DATA_CALLBACK(_write) \
-	downcast<pc1512_keyboard_device &>(*device).set_data_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -49,8 +36,8 @@ public:
 	// construction/destruction
 	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_clock_wr_callback(Object &&cb) { return m_write_clock.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_data_wr_callback(Object &&cb) { return m_write_data.set_callback(std::forward<Object>(cb)); }
+	auto clock_wr_callback() { return m_write_clock.bind(); }
+	auto data_wr_callback() { return m_write_data.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 	DECLARE_WRITE_LINE_MEMBER( clock_w );

@@ -2869,7 +2869,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	rs232c.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 	rs232c.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 
-	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
+	FMT_ICMEM(config, m_icmemcard, 0);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("6M").set_extra_options("2M,4M,8M,16M,32M,64M,96M");

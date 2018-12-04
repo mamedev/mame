@@ -348,10 +348,10 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(giclassicsvr_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_PS, -60, 24);
+	m_k055673->set_palette(m_palette);
 
 	K053252(config, "k053252a", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
 	K053252(config, "k053252b", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO

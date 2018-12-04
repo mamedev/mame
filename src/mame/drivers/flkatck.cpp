@@ -239,8 +239,8 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 
-	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
+	K007121(config, m_k007121, 0);
+	m_k007121->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

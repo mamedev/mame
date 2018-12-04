@@ -481,22 +481,22 @@ void djboy_state::machine_reset()
 
 MACHINE_CONFIG_START(djboy_state::djboy)
 
-	MCFG_DEVICE_ADD("mastercpu", Z80, 6000000)
+	MCFG_DEVICE_ADD("mastercpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
 	MCFG_DEVICE_PROGRAM_MAP(mastercpu_am)
 	MCFG_DEVICE_IO_MAP(mastercpu_port_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", djboy_state, djboy_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("slavecpu", Z80, 6000000)
+	MCFG_DEVICE_ADD("slavecpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
 	MCFG_DEVICE_PROGRAM_MAP(slavecpu_am)
 	MCFG_DEVICE_IO_MAP(slavecpu_port_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 6000000)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
 	MCFG_DEVICE_PROGRAM_MAP(soundcpu_am)
 	MCFG_DEVICE_IO_MAP(soundcpu_port_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("beast", I80C51, 6000000)
+	MCFG_DEVICE_ADD("beast", I80C51, 12_MHz_XTAL / 2) // 6.000MHz, verified
 	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, djboy_state, beast_p0_r))
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, djboy_state, beast_p0_w))
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, djboy_state, beast_p1_r))
@@ -535,15 +535,15 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL / 4) // 3.000MHz, verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_DEVICE_ADD("oki_l", OKIM6295, 12000000 / 8, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki_l", OKIM6295, 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW) // 1.500MHz, verified
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("oki_r", OKIM6295, 12000000 / 8, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki_r", OKIM6295, 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW) // 1.500MHz, verified
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -569,7 +569,7 @@ ROM_START( djboy )
 	ROM_LOAD( "bs001.1f", 0x080000, 0x80000, CRC(fdf36e6b) SHA1(a8762458dfd5201304247c113ceb85e96e33d423) )
 	ROM_LOAD( "bs002.1d", 0x100000, 0x80000, CRC(c52fee7f) SHA1(bd33117f7a57899fd4ec0a77413107edd9c44629) )
 	ROM_LOAD( "bs003.1k", 0x180000, 0x80000, CRC(ed89acb4) SHA1(611af362606b73cd2cf501678b463db52dcf69c4) )
-	ROM_LOAD( "bs07.1b",  0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
+	ROM_LOAD( "bs07s.1b", 0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* background */
 	ROM_LOAD( "bs004.1s", 0x000000, 0x80000, CRC(2f1392c3) SHA1(1bc3030b3612766a02133eef0b4d20013c0495a4) )
@@ -599,7 +599,7 @@ ROM_START( djboya )
 	ROM_LOAD( "bs001.1f", 0x080000, 0x80000, CRC(fdf36e6b) SHA1(a8762458dfd5201304247c113ceb85e96e33d423) )
 	ROM_LOAD( "bs002.1d", 0x100000, 0x80000, CRC(c52fee7f) SHA1(bd33117f7a57899fd4ec0a77413107edd9c44629) )
 	ROM_LOAD( "bs003.1k", 0x180000, 0x80000, CRC(ed89acb4) SHA1(611af362606b73cd2cf501678b463db52dcf69c4) )
-	ROM_LOAD( "bs07.1b",  0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
+	ROM_LOAD( "bs07s.1b", 0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* background */
 	ROM_LOAD( "bs004.1s", 0x000000, 0x80000, CRC(2f1392c3) SHA1(1bc3030b3612766a02133eef0b4d20013c0495a4) )
