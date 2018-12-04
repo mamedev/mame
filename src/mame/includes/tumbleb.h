@@ -38,6 +38,7 @@ public:
 	void cookbib(machine_config &config);
 	void metlsavr(machine_config &config);
 	void fncywld(machine_config &config);
+	void magipur(machine_config &config);
 	void suprtrio(machine_config &config);
 	void htchctch(machine_config &config);
 	void sdfight(machine_config &config);
@@ -57,6 +58,7 @@ public:
 	void init_tumbleb2();
 	void init_chokchok();
 	void init_fncywld();
+	void init_magipur();
 	void init_carket();
 
 private:
@@ -159,7 +161,9 @@ private:
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();
 
+	void unico_base_map(address_map &map);
 	void fncywld_main_map(address_map &map);
+	void magipur_main_map(address_map &map);
 	void htchctch_main_map(address_map &map);
 	void jumpkids_main_map(address_map &map);
 	void jumpkids_sound_map(address_map &map);
