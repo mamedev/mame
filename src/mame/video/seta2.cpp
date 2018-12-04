@@ -185,9 +185,6 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 			for (int i = 0; i < 0x1000 / 2; i += 4)
 			{
 				uint16_t num = m_private_spriteram[i + 0] = m_spriteram[(0x3000 / 2) + i + 0];
-
-				if (m_private_spriteram[i + 0] & 0x8000) break;  // end of list marker
-
 				m_private_spriteram[i + 1] = m_spriteram[(0x3000 / 2) + i + 1];
 				m_private_spriteram[i + 2] = m_spriteram[(0x3000 / 2) + i + 2];
 
@@ -210,6 +207,17 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 					}
 				}
 
+				if (m_private_spriteram[i + 0] & 0x8000) // end of list marker, mj4simai must draw the sprite this covers for the company logo, title screen etc.
+				{
+					// HACK: however penbros has a dummy sprite entry there which points to 0x0000 as the tile source, and causes garbage with the rearranged format,
+					// so change it to something that's invalid where we can filter it later.  This strongly indicates that the current approach is incorrect however.
+					if (sprite == 0x00)
+					{
+						m_private_spriteram[i + 3] |= 0x4000;
+					}
+
+					break;  
+				}
 			}
 
 		}
@@ -343,8 +351,6 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		int num = s1[0];
 
-		if (s1[0] & 0x8000) break;  // end of list marker
-
 		int xoffs = s1[1];
 		int yoffs = s1[2];
 		int sprite = s1[3];
@@ -367,155 +373,158 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		// Number of single-sprites
 		num = (num & 0x00ff) + 1;
 
-		for (; num > 0; num--, s2 += 4)
+		// all sprites, except invalid ones should have a pointer <0x3000 in the reformatted list
+		if ((sprite&0x7fff) < 0x3000 / 2 / 4)
 		{
-			if (s2 >= end)  break;
-
-			if (sprite & 0x8000)
+			for (; num > 0; num--, s2 += 4)
 			{
-				// "floating tilemap" sprite
-				// the 'floating tilemap sprites' are just a window into the tilemap, the position of the sprite does not change the scroll values
+				if (s2 >= end)  break;
 
-				int sx = s2[0];
-				int sy = s2[1];
-				int scrollx = s2[2];
-				int scrolly = s2[3];
-				int is_16x16 = (scrollx & 0x8000) >> 15;
-				int page = (scrollx & 0x7c00) >> 10;
-				int local_sizex = sx & 0xfc00;
-				int local_sizey = sy & 0xfc00;
-				sx &= 0x3ff;
-				sy += global_yoffset;
-				sy &= 0x1ff;
-
-				if (sy & 0x100)
-					sy -= 0x200;
-
-				int width = use_global_size ? global_sizex : local_sizex;
-				int height = use_global_size ? global_sizey : local_sizey;
-
-				height = ((height & 0xfc00) >> 10) + 1;
-				width = ((width & 0xfc00) >> 10)/* + 1*/; // reelquak reels
-				if (!width)
-					continue;
-
-				scrollx += m_xoffset;
-				scrollx &= 0x3ff;
-				scrolly &= 0x1ff;
-
-				scrolly += global_yoffset;
-
-				rectangle clip;
-				// sprite clipping region (x)
-				clip.min_x = (sx + xoffs) & 0x3ff;
-				clip.min_x = (clip.min_x & 0x1ff) - (clip.min_x & 0x200);
-				clip.max_x = clip.min_x + width * 0x10 - 1;
-
-				if (clip.min_x > cliprect.max_x)    continue;
-				if (clip.max_x < cliprect.min_x)    continue;
-				if (clip.min_x < cliprect.min_x)    clip.min_x = cliprect.min_x;
-				if (clip.max_x > cliprect.max_x)    clip.max_x = cliprect.max_x;
-
-				// sprite clipping region (y)
-
-				int basey = (sy + yoffs) & 0x1ff;
-				if (basey & 0x100) basey -= 0x200;
-
-				clip.min_y = basey;
-				clip.max_y = clip.min_y + height * 0x10 - 1;
-
-				if (clip.min_y > cliprect.max_y)    continue;
-				if (clip.max_y < cliprect.min_y)    continue;
-				if (clip.min_y < cliprect.min_y)    clip.min_y = cliprect.min_y;
-				if (clip.max_y > cliprect.max_y)    clip.max_y = cliprect.max_y;
-
-				for (int realline = clip.min_y; realline <= clip.max_y; realline++)
+				if (sprite & 0x8000)
 				{
-					int sourceline = (realline - scrolly) & 0x1ff;
+					// "floating tilemap" sprite
+					// the 'floating tilemap sprites' are just a window into the tilemap, the position of the sprite does not change the scroll values
 
-					int y = sourceline >> (is_16x16 ? 4 : 3);
+					int sx = s2[0];
+					int sy = s2[1];
+					int scrollx = s2[2];
+					int scrolly = s2[3];
+					int is_16x16 = (scrollx & 0x8000) >> 15;
+					int page = (scrollx & 0x7c00) >> 10;
+					int local_sizex = sx & 0xfc00;
+					int local_sizey = sy & 0xfc00;
+					sx &= 0x3ff;
+					sy += global_yoffset;
+					sy &= 0x1ff;
 
-					for (int x = 0; x < 0x40; x++)
+					if (sy & 0x100)
+						sy -= 0x200;
+
+					int width = use_global_size ? global_sizex : local_sizex;
+					int height = use_global_size ? global_sizey : local_sizey;
+
+					height = ((height & 0xfc00) >> 10) + 1;
+					width = ((width & 0xfc00) >> 10)/* + 1*/; // reelquak reels
+					if (!width)
+						continue;
+
+					scrollx += m_xoffset;
+					scrollx &= 0x3ff;
+					scrolly &= 0x1ff;
+
+					scrolly += global_yoffset;
+
+					rectangle clip;
+					// sprite clipping region (x)
+					clip.min_x = (sx + xoffs) & 0x3ff;
+					clip.min_x = (clip.min_x & 0x1ff) - (clip.min_x & 0x200);
+					clip.max_x = clip.min_x + width * 0x10 - 1;
+
+					if (clip.min_x > cliprect.max_x)    continue;
+					if (clip.max_x < cliprect.min_x)    continue;
+					if (clip.min_x < cliprect.min_x)    clip.min_x = cliprect.min_x;
+					if (clip.max_x > cliprect.max_x)    clip.max_x = cliprect.max_x;
+
+					// sprite clipping region (y)
+
+					int basey = (sy + yoffs) & 0x1ff;
+					if (basey & 0x100) basey -= 0x200;
+
+					clip.min_y = basey;
+					clip.max_y = clip.min_y + height * 0x10 - 1;
+
+					if (clip.min_y > cliprect.max_y)    continue;
+					if (clip.max_y < cliprect.min_y)    continue;
+					if (clip.min_y < cliprect.min_y)    clip.min_y = cliprect.min_y;
+					if (clip.max_y > cliprect.max_y)    clip.max_y = cliprect.max_y;
+
+					for (int realline = clip.min_y; realline <= clip.max_y; realline++)
 					{
-						int code, attr, flipx, flipy, color;
-						// tilemap data is NOT buffered? (and yes the tilemap in RAM is flipped?!)
-						get_tile(spriteram, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color);
+						int sourceline = (realline - scrolly) & 0x1ff;
 
-						int line = is_16x16 ? (sourceline & 0x0f) : (sourceline & 0x07);
+						int y = sourceline >> (is_16x16 ? 4 : 3);
 
-						int ty = (line >> 3) & 1;
-						line &= 0x7;
-						for (int tx = 0; tx <= is_16x16; tx++)
+						for (int x = 0; x < 0x40; x++)
 						{
-							int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
-							int px = ((dx + x * (8 << is_16x16) + 0x10) & 0x3ff) - 0x10;
-							int dst_x = (px + (flipx ? is_16x16 - tx : tx) * 8) & 0x3ff;
-							dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
+							int code, attr, flipx, flipy, color;
+							// tilemap data is NOT buffered? (and yes the tilemap in RAM is flipped?!)
+							get_tile(spriteram, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color);
 
-							if ((dst_x >= clip.min_x - 8) && (dst_x <= clip.max_x))
+							int line = is_16x16 ? (sourceline & 0x0f) : (sourceline & 0x07);
+
+							int ty = (line >> 3) & 1;
+							line &= 0x7;
+							for (int tx = 0; tx <= is_16x16; tx++)
 							{
-								int realcode = code ^ tx ^ ((flipy ? is_16x16 - ty : ty) << 1);
-								drawgfx_line(bitmap, clip, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, dst_x, use_shadow, realline, line, opaque);
+								int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
+								int px = ((dx + x * (8 << is_16x16) + 0x10) & 0x3ff) - 0x10;
+								int dst_x = (px + (flipx ? is_16x16 - tx : tx) * 8) & 0x3ff;
+								dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
+
+								if ((dst_x >= clip.min_x - 8) && (dst_x <= clip.max_x))
+								{
+									int realcode = code ^ tx ^ ((flipy ? is_16x16 - ty : ty) << 1);
+									drawgfx_line(bitmap, clip, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, dst_x, use_shadow, realline, line, opaque);
+								}
 							}
 						}
 					}
 				}
-			}
-			else
-			{
-				// "normal" sprite
-				int sx = s2[0];
-				int sy = s2[1];
-				int attr = s2[2];
-				int code = s2[3] + ((attr & 0x0007) << 16);
-				int flipx = (attr & 0x0010);
-				int flipy = (attr & 0x0008);
-				int color = (attr & 0xffe0) >> 5;
-
-				int sizex = use_global_size ? global_sizex : sx;
-				int sizey = use_global_size ? global_sizey : sy;
-				sizex = (1 << ((sizex & 0x0c00) >> 10)) - 1;
-				sizey = (1 << ((sizey & 0x0c00) >> 10)) - 1;
-
-				sx += xoffs;
-				sy += yoffs;
-
-				sx = (sx & 0x1ff) - (sx & 0x200);
-
-				sy += global_yoffset;
-
-				sy &= 0x1ff;
-
-				if (sy & 0x100)
-					sy -= 0x200;
-
-
-				int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
-
-				int firstline = sy;
-				int endline = (sy + (sizey + 1) * 8) - 1;
-
-				int realfirstline = firstline;
-
-				if (firstline < cliprect.min_y)	realfirstline = cliprect.min_y;
-				if (endline > cliprect.max_y) endline = cliprect.max_y;
-
-				for (int realline = realfirstline; realline <= endline; realline++)
+				else
 				{
-					int line = realline - firstline;
-					int y = (line >> 3);
-					line &= 0x7;
+					// "normal" sprite
+					int sx = s2[0];
+					int sy = s2[1];
+					int attr = s2[2];
+					int code = s2[3] + ((attr & 0x0007) << 16);
+					int flipx = (attr & 0x0010);
+					int flipy = (attr & 0x0008);
+					int color = (attr & 0xffe0) >> 5;
 
-					for (int x = 0; x <= sizex; x++)
+					int sizex = use_global_size ? global_sizex : sx;
+					int sizey = use_global_size ? global_sizey : sy;
+					sizex = (1 << ((sizex & 0x0c00) >> 10)) - 1;
+					sizey = (1 << ((sizey & 0x0c00) >> 10)) - 1;
+
+					sx += xoffs;
+					sy += yoffs;
+
+					sx = (sx & 0x1ff) - (sx & 0x200);
+
+					sy += global_yoffset;
+
+					sy &= 0x1ff;
+
+					if (sy & 0x100)
+						sy -= 0x200;
+
+
+					int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
+
+					int firstline = sy;
+					int endline = (sy + (sizey + 1) * 8) - 1;
+
+					int realfirstline = firstline;
+
+					if (firstline < cliprect.min_y)	realfirstline = cliprect.min_y;
+					if (endline > cliprect.max_y) endline = cliprect.max_y;
+
+					for (int realline = realfirstline; realline <= endline; realline++)
 					{
-						int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
-						drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, realline, line, opaque);
+						int line = realline - firstline;
+						int y = (line >> 3);
+						line &= 0x7;
+
+						for (int x = 0; x <= sizex; x++)
+						{
+							int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
+							drawgfx_line(bitmap, cliprect, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, sx + x * 8, use_shadow, realline, line, opaque);
+						}
 					}
 				}
-
-
 			}
 		}
+		if (s1[0] & 0x8000) break;  // end of list marker
 	}   // sprite list
 }
 
