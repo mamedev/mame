@@ -82,7 +82,7 @@ grdians:
   has the shadow bit set, and has become invisible after implementing it.
 
 penbros/ablast:
-- Zooming is used briefly.
+- Zooming is used briefly (between scenes, stage exit, stage introduction)
 
 deerhunt,wschamp:
 - offset tilemap sprite during demo. In deerhunt intro, the hunter should zoom
@@ -94,18 +94,12 @@ wschampb:
   original release? Is that why the next bug fix release is v1.01? IE: such a
   a minor increase in the version number.
 
-trophyh:
-- mame hangs for around 15 seconds every now and then, at scene changes.
-  This is probably due to a couple of frames with an odd or corrupt sprites list,
-  taking a long time to render.
-
 funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
 
 reelquak:
 - Needs an x offset for tilemap sprites.
-- There are one frame glitches in the reels scroll.
 
 ***************************************************************************/
 
@@ -200,7 +194,7 @@ void seta2_state::grdians_map(address_map &map)
 	map(0x70000c, 0x70000d).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(seta2_state::spriteram_w)).share("spriteram");    // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
 	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
@@ -2394,12 +2388,13 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(0x200, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
@@ -2426,7 +2421,7 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x000, 0x0e0-1)
 MACHINE_CONFIG_END
 
 
@@ -2437,7 +2432,7 @@ MACHINE_CONFIG_START(seta2_state::grdians)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
+	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x00, 0x00 + 0xe8 -1)
 MACHINE_CONFIG_END
 
 
@@ -2448,7 +2443,7 @@ MACHINE_CONFIG_START(seta2_state::myangel)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x10, 0x100-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2459,7 +2454,7 @@ MACHINE_CONFIG_START(seta2_state::myangel2)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x10, 0x100-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2470,7 +2465,7 @@ MACHINE_CONFIG_START(seta2_state::pzlbowl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2481,7 +2476,7 @@ MACHINE_CONFIG_START(seta2_state::penbros)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x00, 0xe0-1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::ablastb)
@@ -2505,7 +2500,7 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x00, 0xf0-1)
 
 	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset)
 MACHINE_CONFIG_END
@@ -2523,7 +2518,7 @@ MACHINE_CONFIG_START(seta2_state::samshoot)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2538,7 +2533,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x00, 0x0f0-1)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_seta2)
 MACHINE_CONFIG_END
@@ -2558,7 +2553,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0xff, 0x1ef-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0x00, 0xf0-1)
 	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset1)
 MACHINE_CONFIG_END
 
@@ -2614,7 +2609,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
@@ -2643,7 +2638,7 @@ MACHINE_CONFIG_START(funcube_state::funcube2)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2651,7 +2646,7 @@ MACHINE_CONFIG_START(funcube_state::funcube3)
 	funcube2(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2669,7 +2664,7 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
