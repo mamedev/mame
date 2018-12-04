@@ -3183,8 +3183,8 @@ void coolridr_state::machine_start()
 	m_decode[0].current_object = 0;
 	m_decode[1].current_object = 0;
 
-	save_state(NAME(m_sound_data));
-	save_state(NAME(m_sound_fifo));
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_sound_fifo));
 }
 
 void coolridr_state::machine_reset()
