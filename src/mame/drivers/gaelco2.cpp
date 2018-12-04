@@ -18,8 +18,8 @@
     Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
     Maniac Square  | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
-	Cardioline     | 1997 | GAE1 501  | 970410   | IO board MCU (not really protection)
-	Bang!          | 1998 | CG-1V 388 | 980921/1 | No
+    Cardioline     | 1997 | GAE1 501  | 970410   | IO board MCU (not really protection)
+    Bang!          | 1998 | CG-1V 388 | 980921/1 | No
     Play 2000      | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
 
     Notes:
@@ -413,10 +413,32 @@ ROM_END
 
 static INPUT_PORTS_START( saltcrdi ) // dipswitches are on the REVERSE side of the PCB (!)
 	PORT_START("IN0")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // pedal
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // green
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) // red
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("DSW")
+	PORT_SERVICE_DIPLOC(0x01, IP_ACTIVE_LOW, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x60, "Catalan" ) // ?
+	PORT_DIPSETTING(    0x80, DEF_STR( Spanish ) ) // double?
+	PORT_DIPSETTING(    0xa0, "Portuguese" ) // ?
+	PORT_DIPSETTING(    0xc0, DEF_STR( French ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( Spanish ) ) // triple?
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COIN")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -431,10 +453,8 @@ void gaelco2_state::saltcrdi_map(address_map &map)
 	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");
 	map(0x218004, 0x218009).ram().share("vregs");
 	map(0x300000, 0x300001).portr("IN0");
-	map(0x300002, 0x300003).portr("IN1");
-	map(0x30004a, 0x30004b).nopw();
+	map(0x310000, 0x310001).portr("DSW");
 	map(0x320000, 0x320001).portr("COIN");
-	map(0x500000, 0x500001).w(FUNC(gaelco2_state::alighunt_coin_w));
 	map(0xfe0000, 0xfe7fff).ram();
 	map(0xfe8000, 0xfeffff).ram().share("shareram");
 }
@@ -494,7 +514,7 @@ ROM_START( saltcrdi ) // REF 970410
 	ROM_REGION( 0x1000, "iomcu", 0 ) // on IO board
 	ROM_LOAD( "st62t15c6",   0x0000, 0x1000, NO_DUMP ) // size?
 
-	ROM_REGION( 0x100, "pals", 0 ) 
+	ROM_REGION( 0x100, "pals", 0 )
 	ROM_LOAD( "6.pal16l8.u12",   0x0000, 0x100, NO_DUMP ) // size?
 ROM_END
 
