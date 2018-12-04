@@ -175,35 +175,41 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 			// Buffer sprites by 1 frame
 			//memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 
-			// copy the base spritelist to a private (non-CPU visible buffer)
-			// copy the indexed sprites to 0 in spriteram, adjusting pointers in base sprite list as appropriate
+			/* copy the base spritelist to a private (non-CPU visible buffer)
+			   copy the indexed sprites to 0 in spriteram, adjusting pointers in base sprite list as appropriate
+			   this at least gets the sprite data in the right place for the grdians raster effect to write the
+			   changed scroll values to the correct sprites, but is still nothing more than a guess
+			*/
 			int current_sprite_entry = 0;
 
 			for (int i = 0; i < 0x1000 / 2; i += 4)
 			{
 				uint16_t num = m_private_spriteram[i + 0] = m_spriteram[(0x3000 / 2) + i + 0];
+
+				if (m_private_spriteram[i + 0] & 0x8000) break;  // end of list marker
+
 				m_private_spriteram[i + 1] = m_spriteram[(0x3000 / 2) + i + 1];
 				m_private_spriteram[i + 2] = m_spriteram[(0x3000 / 2) + i + 2];
 
 				int sprite = m_spriteram[(0x3000 / 2) + i + 3];
 				m_private_spriteram[i + 3] = ((current_sprite_entry / 4) & 0x7fff) | (sprite & 0x8000);
 
-				uint16_t list2addr = (sprite & 0x7fff) * 4;
+				int list2addr = (sprite & 0x7fff) * 4;
 
 				num &=0xff;
-				for (int j = 0; j < num + 1; j++)
+
+				for (int j = 0; j <= num; j++)
 				{
 					if (current_sprite_entry < 0x3000 / 2)
 					{
-						m_spriteram[current_sprite_entry + 0] = m_spriteram[((list2addr + 0) + j * 4) & 0x1ffff];
-						m_spriteram[current_sprite_entry + 1] = m_spriteram[((list2addr + 1) + j * 4) & 0x1ffff];
-						m_spriteram[current_sprite_entry + 2] = m_spriteram[((list2addr + 2) + j * 4) & 0x1ffff];
-						m_spriteram[current_sprite_entry + 3] = m_spriteram[((list2addr + 3) + j * 4) & 0x1ffff];
+						m_spriteram[current_sprite_entry + 0] = m_spriteram[(list2addr + (j * 4) + 0) & 0x1ffff];
+						m_spriteram[current_sprite_entry + 1] = m_spriteram[(list2addr + (j * 4) + 1) & 0x1ffff];
+						m_spriteram[current_sprite_entry + 2] = m_spriteram[(list2addr + (j * 4) + 2) & 0x1ffff];
+						m_spriteram[current_sprite_entry + 3] = m_spriteram[(list2addr + (j * 4) + 3) & 0x1ffff];
 						current_sprite_entry += 4;
 					}
 				}
 
-				if (m_private_spriteram[i + 0] & 0x8000) break;  // end of list marker
 			}
 
 		}
@@ -219,6 +225,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 			int vpos = m_rasterposition;
 
 			// in the vblank it specifies line 0, the first raster interrupt then specifies line 0 again before the subsequent ones use the real line numbers?
+			// It seems more likely the the raster IRQ stays asserted for the entire line, thus triggering a second interrupt unless the line number is changed?
 			if (m_rasterposition == m_screen->vpos()) hpos = m_screen->hpos() + 0x100;
 			//logerror("setting raster to %d %d\n", vpos, hpos);
 			m_raster_timer->adjust(m_screen->time_until_pos(vpos, hpos), 0);
@@ -335,6 +342,9 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	for (; s1 < m_private_spriteram + 0x1000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
 		int num = s1[0];
+
+		if (s1[0] & 0x8000) break;  // end of list marker
+
 		int xoffs = s1[1];
 		int yoffs = s1[2];
 		int sprite = s1[3];
@@ -506,7 +516,6 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 			}
 		}
-		if (s1[0] & 0x8000) break;  // end of list marker
 	}   // sprite list
 }
 
