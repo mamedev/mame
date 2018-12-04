@@ -327,7 +327,7 @@ INTERRUPT_GEN_MEMBER(psikyosh_state::interrupt)
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
 // bit 0 controls game speed on readback, mechanism is a little weird
-WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
+WRITE32_MEMBER(psikyosh_state::irqctrl_w)
 {
 	if (!(data & 0x00c00000))
 	{
@@ -483,7 +483,7 @@ void psikyosh_state::ps3v1_map(address_map &map)
 	map(0x03000000, 0x0300ffff).ram().share("spriteram"); // sprite and backgrounds are share this area (video banks 0-1f)
 	map(0x03040000, 0x03044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // palette..
 	map(0x03050000, 0x030501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
+	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(FUNC(psikyosh_state::irqctrl_w)); // also writes to this address - might be vblank reads?
 	map(0x0305ffe0, 0x0305ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs"); //  video registers
 	map(0x03060000, 0x0307ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
@@ -513,7 +513,7 @@ void psikyosh_state::ps5_map(address_map &map)
 	map(0x04000000, 0x0400ffff).ram().share("spriteram"); // sprite and backgrounds are share this area (video banks 0-1f)
 	map(0x04040000, 0x04044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x04050000, 0x040501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0405ffdc, 0x0405ffdf).nopr().w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
+	map(0x0405ffdc, 0x0405ffdf).nopr().w(FUNC(psikyosh_state::irqctrl_w)); // also writes to this address - might be vblank reads?
 	map(0x0405ffe0, 0x0405ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs"); // video registers
 	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping

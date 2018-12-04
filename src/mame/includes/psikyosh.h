@@ -15,18 +15,7 @@
 #define MASTER_CLOCK 57272700   // main oscillator frequency
 
 /* Psikyo PS6406B */
-#define FLIPSCREEN (((m_vidregs[3] & 0x0000c000) == 0x0000c000) ? 1:0)
-#define DISPLAY_DISABLE (((m_vidregs[2] & 0x0000000f) == 0x00000006) ? 1:0)
-#define BG_LARGE(n) (((m_vidregs[7] << (4*n)) & 0x00001000 ) ? 1:0)
-#define BG_DEPTH_8BPP(n) (((m_vidregs[7] << (4*n)) & 0x00004000 ) ? 1:0)
-#define BG_LAYER_ENABLE(n) (((m_vidregs[7] << (4*n)) & 0x00008000 ) ? 1:0)
 
-#define BG_TYPE(n) (((m_vidregs[6] << (8*n)) & 0x7f000000 ) >> 24)
-#define BG_LINE(n) (((m_vidregs[6] << (8*n)) & 0x80000000 ) ? 1:0)
-
-#define BG_TRANSPEN rgb_t(0x00,0xff,0x00,0xff) // used for representing transparency in temporary bitmaps
-
-#define SPRITE_PRI(n) (((m_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
 
 class psikyosh_state : public driver_device
@@ -84,7 +73,18 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
+	bool const FLIPSCREEN() { return ((m_vidregs[3] & 0x0000c000) == 0x0000c000); } // currently ignored
+
+	bool const BG_LARGE(uint8_t const n)        { return ((m_vidregs[7] << (4 * n)) & 0x00001000); }
+	bool const BG_DEPTH_8BPP(uint8_t const n)   { return ((m_vidregs[7] << (4 * n)) & 0x00004000); }
+	bool const BG_LAYER_ENABLE(uint8_t const n) { return ((m_vidregs[7] << (4 * n)) & 0x00008000); }
+
+	uint8_t const BG_TYPE(uint8_t const n) { return ((m_vidregs[6] << (8 * n)) & 0x7f000000) >> 24; }
+	bool const BG_LINE(uint8_t const n)    { return ((m_vidregs[6] << (8 * n)) & 0x80000000); }
+
+	uint8_t const SPRITE_PRI(uint8_t const n) { return ((m_vidregs[2] << (4 * n)) & 0xf0000000) >> 28; }
+
+	DECLARE_WRITE32_MEMBER(irqctrl_w);
 	DECLARE_WRITE32_MEMBER(vidregs_w);
 	DECLARE_READ32_MEMBER(mjgtaste_input_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
@@ -100,8 +100,8 @@ private:
 	void draw_bglayerscroll(uint8_t const layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
 	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
-	void psikyosh_prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	void psikyosh_postlineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
+	void prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void postlineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri);
 	void psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	uint32_t const code, uint16_t const color, uint8_t const flipx, uint8_t const flipy, int16_t const offsx, int16_t const offsy,
 	int16_t const alpha, uint32_t const zoomx, uint32_t const zoomy, uint8_t const wide, uint8_t const high, uint16_t const z);

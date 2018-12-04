@@ -68,6 +68,8 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 #include "drawgfxm.h"
 #include "includes/psikyosh.h"
 
+static constexpr uint32_t BG_TRANSPEN = 0x00ff00ff; // used for representing transparency in temporary bitmaps
+
 //#define DEBUG_KEYS
 //#define DEBUG_MESSAGE
 
@@ -1004,7 +1006,7 @@ void psikyosh_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 }
 
 
-void psikyosh_state::psikyosh_prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void psikyosh_state::prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
@@ -1029,7 +1031,7 @@ void psikyosh_state::psikyosh_prelineblend(bitmap_rgb32 &bitmap, const rectangle
 }
 
 
-void psikyosh_state::psikyosh_postlineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri)
+void psikyosh_state::postlineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t const req_pri)
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	uint32_t *dstline;
@@ -1131,7 +1133,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 
 	m_z_bitmap.fill(0, cliprect); /* z-buffer */
 
-	psikyosh_prelineblend(bitmap, cliprect); // fills screen
+	prelineblend(bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)
 	{
 		if (!pri_debug || machine().input().code_pressed(pri_keys[i]))
@@ -1142,7 +1144,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 			if (backgrounds)
 				draw_background(bitmap, cliprect, i);
 
-			psikyosh_postlineblend(bitmap, cliprect, i); // assume this has highest priority at same priority level
+			postlineblend(bitmap, cliprect, i); // assume this has highest priority at same priority level
 		}
 	}
 	return 0;
