@@ -368,8 +368,8 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 280, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_TOMCAT, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_TOMCAT(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

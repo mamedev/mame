@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
+	SLAPSTIC(config, m_slapstic_device, 118, true);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 

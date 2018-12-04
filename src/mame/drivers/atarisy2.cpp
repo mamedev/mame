@@ -1254,44 +1254,49 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarisy2_state::paperboy)
+void atarisy2_state::paperboy(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 105, false);
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::_720)
+void atarisy2_state::_720(machine_config &config)
+{
 	atarisy2(config);
 	/* without the default EEPROM, 720 hangs at startup due to communication
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 107, false);
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::ssprint)
+void atarisy2_state::ssprint(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, false)
+	SLAPSTIC(config, m_slapstic, 108, false);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("tms")
-MACHINE_CONFIG_END
+	config.device_remove("tms");
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::csprint)
+void atarisy2_state::csprint(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, false)
+	SLAPSTIC(config, m_slapstic, 109, false);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("tms")
-MACHINE_CONFIG_END
+	config.device_remove("tms");
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::apb)
+void atarisy2_state::apb(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 110, false);
+}
 
 
 /*************************************

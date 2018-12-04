@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(moo_state::bucky)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bucky_map)
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 23);
 

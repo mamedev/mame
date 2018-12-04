@@ -946,9 +946,9 @@ MACHINE_CONFIG_START(ql_state::ql)
 	m_zx8302->out_raw2_callback().set(FUNC(ql_state::zx8302_raw2_w));
 	m_zx8302->in_raw2_callback().set(FUNC(ql_state::zx8302_raw2_r));
 
-	MCFG_MICRODRIVE_ADD(MDV_1)
-	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE(MDV_2, microdrive_image_device, comms_in_w))
-	MCFG_MICRODRIVE_ADD(MDV_2)
+	MICRODRIVE(config, m_mdv1, 0);
+	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
+	MICRODRIVE(config, m_mdv2, 0);
 
 	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
 	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE

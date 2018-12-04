@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 

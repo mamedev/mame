@@ -373,7 +373,8 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	m_k051316_2->set_offsets(15, 1);
 	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
+
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
 	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
 

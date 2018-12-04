@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -37, 20);
 	m_k053246->set_palette(m_palette);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

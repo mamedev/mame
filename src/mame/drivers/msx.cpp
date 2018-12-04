@@ -3288,7 +3288,7 @@ MACHINE_CONFIG_START(msx_state::hb10)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 2, 0)
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 0, 3, 1)  /* 16KB? RAM */
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx1_cartlist(config);
 MACHINE_CONFIG_END
@@ -4624,7 +4624,7 @@ MACHINE_CONFIG_START(msx2_state::canonv25)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000) // EXT
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000) // 64KB Mapper RAM
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_64kb_vram(config);
 
@@ -4654,7 +4654,7 @@ MACHINE_CONFIG_START(msx2_state::canonv30)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0xc000) // DISK
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000) // 64KB?? Mapper RAM
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_2_35_dd_drive(config);
@@ -4686,7 +4686,7 @@ MACHINE_CONFIG_START(msx2_state::canonv30f)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 1, 1, 1, "maincpu", 0xc000) // DISK
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 128KB Mapper RAM
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_2_35_dd_drive(config);
@@ -4719,7 +4719,7 @@ MACHINE_CONFIG_START(msx2_state::cpc300)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -4778,7 +4778,7 @@ MACHINE_CONFIG_START(msx2_state::cpc330k)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -4847,7 +4847,7 @@ MACHINE_CONFIG_START(msx2_state::cpc400s)
 	MCFG_MSX_LAYOUT_DISK2("disk", 2, 0, 1, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -4883,7 +4883,7 @@ MACHINE_CONFIG_START(msx2_state::cpc61)
 	MCFG_MSX_LAYOUT_ROM("ext", 0, 3, 0, 2, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot1", 1, 0)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -4919,7 +4919,7 @@ MACHINE_CONFIG_START(msx2_state::cpg120)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 2, 0, 1, 1, "maincpu", 0x10000)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot2", 3, 0)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_ym2413(config);
 
@@ -5020,7 +5020,7 @@ MACHINE_CONFIG_START(msx2_state::mbh70)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 128KB Mapper RAM
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -5057,7 +5057,7 @@ MACHINE_CONFIG_START(msx2_state::kmc5000)
 	MCFG_MSX_LAYOUT_ROM("kdr", 3, 1, 1, 2, "maincpu", 0x10000)
 	MCFG_MSX_LAYOUT_DISK3("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
@@ -5089,7 +5089,7 @@ MACHINE_CONFIG_START(msx2_state::mlg1)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 64KB or 128KB Mapper RAM ?
 	MCFG_MSX_LAYOUT_ROM("paint", 3, 3, 0, 2, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -5119,7 +5119,7 @@ MACHINE_CONFIG_START(msx2_state::mlg3)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 64KB or 128KB Mapper RAM?
 	//MCFG_MSX_LAYOUT_ROM("rs232c", 3, 3, 1, 1, "maincpu", 0x10000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -5152,7 +5152,7 @@ MACHINE_CONFIG_START(msx2_state::mlg10)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000) // 64KB or 128KB Mapper RAM?
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -5232,9 +5232,9 @@ MACHINE_CONFIG_START(msx2_state::fs4500)
 	MCFG_MSX_LAYOUT_ROM("kdr2", 3, 1, 3, 1, "maincpu", 0x3c000)
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
+	MSX_MATSUSHITA(config, "matsushita", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -5278,7 +5278,7 @@ MACHINE_CONFIG_START(msx2_state::fs4600)
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -5332,9 +5332,9 @@ MACHINE_CONFIG_START(msx2_state::fs4700)
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
+	MSX_MATSUSHITA(config, "matsushita", 0);
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -5378,7 +5378,7 @@ MACHINE_CONFIG_START(msx2_state::fs5000)
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -5425,9 +5425,9 @@ MACHINE_CONFIG_START(msx2_state::fs5500f1)
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
+	MSX_MATSUSHITA(config, "matsushita", 0);
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -5474,9 +5474,9 @@ MACHINE_CONFIG_START(msx2_state::fs5500f2)
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 3, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
+	MSX_MATSUSHITA(config, "matsushita", 0);
 
 	msx_mb8877a(config);
 	msx_2_35_dd_drive(config);
@@ -6337,7 +6337,7 @@ MACHINE_CONFIG_START(msx2_state::phc23)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_RAM("ram", 3, 2, 0, 4)  /* 64KB RAM */
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -6365,7 +6365,7 @@ MACHINE_CONFIG_START(msx2_state::phc55fd2)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -6403,7 +6403,7 @@ MACHINE_CONFIG_START(msx2_state::phc77)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("write", 3, 3, 1, 2, "maincpu", 0x10000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -6527,7 +6527,7 @@ MACHINE_CONFIG_START(msx2_state::hbf1xd)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 3, 0x10000)   /* 64KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -6708,7 +6708,7 @@ MACHINE_CONFIG_START(msx2_state::hbf700d)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 3, 0x40000)   /* 256KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -6769,7 +6769,7 @@ MACHINE_CONFIG_START(msx2_state::hbf700p)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 3, 0x40000)   /* 256KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -6901,7 +6901,7 @@ MACHINE_CONFIG_START(msx2_state::hbf9p)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -6927,7 +6927,7 @@ MACHINE_CONFIG_START(msx2_state::hbf9pr)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 0, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -6956,7 +6956,7 @@ MACHINE_CONFIG_START(msx2_state::hbf9s)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x20000)   /* 128KB Mapper RAM */
 	MCFG_MSX_RAMIO_SET_BITS(0x80)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -7061,7 +7061,7 @@ MACHINE_CONFIG_START(msx2_state::tpc310)
 	MCFG_MSX_LAYOUT_ROM("acc", 3, 1, 1, 2, "maincpu", 0x14000)
 	MCFG_MSX_LAYOUT_DISK2("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_mb8877a(config);
 	msx_1_35_dd_drive(config);
@@ -7203,7 +7203,7 @@ MACHINE_CONFIG_START(msx2_state::hx23i)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("word", 3, 3, 1, 2, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -7235,7 +7235,7 @@ MACHINE_CONFIG_START(msx2_state::hx33)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 2, 1, 2, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_64kb_vram(config);
 
@@ -7272,7 +7272,7 @@ MACHINE_CONFIG_START(msx2_state::hx34)
 	MCFG_MSX_LAYOUT_DISK6("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 1, 2, "maincpu", 0x10000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -7308,7 +7308,7 @@ MACHINE_CONFIG_START(msx2_state::hx34i)
 	MCFG_MSX_LAYOUT_DISK6("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 1, 2, "maincpu", 0x10000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793(config);
 	msx_1_35_dd_drive(config);
@@ -7342,7 +7342,7 @@ MACHINE_CONFIG_START(msx2_state::fstm1)
 	MCFG_MSX_LAYOUT_ROM("desk1", 3, 2, 1, 2, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("desk2", 3, 3, 1, 2, "maincpu", 0x14000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -7376,7 +7376,7 @@ MACHINE_CONFIG_START(msx2_state::victhc90)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 1, 0)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793_force_ready(config);
 	msx_1_35_dd_drive(config);
@@ -7414,7 +7414,7 @@ MACHINE_CONFIG_START(msx2_state::victhc95)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 1, 0)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -7453,7 +7453,7 @@ MACHINE_CONFIG_START(msx2_state::victhc95a)
 	MCFG_MSX_LAYOUT_CARTRIDGE("cartslot", 1, 0)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 0, 1, 1, "maincpu", 0xc000)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_wd2793_force_ready(config);
 	msx_2_35_dd_drive(config);
@@ -7950,8 +7950,8 @@ MACHINE_CONFIG_START(msx2_state::fsa1fx)
 	MCFG_MSX_LAYOUT_DISK3("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("cock", 3, 3, 1, 2, "maincpu", 0x18000)
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx2_state, turbo_w))
+	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
+	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
@@ -7996,8 +7996,8 @@ MACHINE_CONFIG_START(msx2_state::fsa1wsx)
 	MCFG_MSX_LAYOUT_DISK3("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_PANASONIC08("firm", 3, 3, 0, 4, "maincpu", 0x1c000)
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx2_state, turbo_w))
+	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
+	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
@@ -8044,8 +8044,8 @@ MACHINE_CONFIG_START(msx2_state::fsa1wx)
 	MCFG_MSX_LAYOUT_DISK3("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_PANASONIC08("firm", 3, 3, 0, 4, "maincpu", 0x1c000)
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx2_state, turbo_w))
+	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
+	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
@@ -8090,8 +8090,8 @@ MACHINE_CONFIG_START(msx2_state::fsa1wxa)
 	MCFG_MSX_LAYOUT_DISK3("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_PANASONIC08("firm", 3, 3, 0, 4, "maincpu", 0x1c000)
 
-	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx2_state, turbo_w))
+	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
+	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
@@ -8258,7 +8258,7 @@ MACHINE_CONFIG_START(msx2_state::hbf1xdj)
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_ym2413(config);
 
@@ -8305,7 +8305,7 @@ MACHINE_CONFIG_START(msx2_state::hbf1xv)
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
 
-	MCFG_MSX_S1985_ADD("s1985")
+	MSX_S1985(config, "s1985", 0);
 
 	msx_ym2413(config);
 

@@ -511,8 +511,8 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
 	m_rs232c->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(KB_TAG, MM1_KEYBOARD, 2500) // actual KBCLK is 6.144_MHz_XTAL/2/16
-	MCFG_MM1_KEYBOARD_KBST_CALLBACK(WRITELINE(I8212_TAG, i8212_device, stb_w))
+	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
+	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

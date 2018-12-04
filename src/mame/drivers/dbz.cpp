@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -87, 32); // or -52, 16?
 	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	MCFG_DEVICE_ADD("k053936_1", K053936, 0)
 	MCFG_K053936_WRAP(1)

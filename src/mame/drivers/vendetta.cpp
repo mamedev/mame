@@ -468,9 +468,9 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, 6);
 	m_k053246->set_palette(m_palette);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

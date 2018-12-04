@@ -1461,7 +1461,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_DEVICE_PROGRAM_MAP(driver_68k_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
+	SLAPSTIC(config, m_slapstic_device, 117, true);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -2085,8 +2085,7 @@ MACHINE_CONFIG_START(harddriv_new_state::racedriv_panorama_machine)
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, harddriv_new_state, tx_a))
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
-	MCFG_DEVICE_MODIFY("mainpcb:slapstic")
-	MCFG_SLAPSTIC_NUM(115)
+	subdevice<atari_slapstic_device>("mainpcb:slapstic")->set_chipnum(115);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60000))

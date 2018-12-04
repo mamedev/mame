@@ -549,30 +549,32 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet)
+void gauntlet_state::gauntlet(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 104, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 104, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gaunt2p)
+void gauntlet_state::gaunt2p(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 107, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet2)
+void gauntlet_state::gauntlet2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 106, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 106, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::vindctr2)
+void gauntlet_state::vindctr2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
-MACHINE_CONFIG_END
-
-
+	SLAPSTIC(config, m_slapstic_device, 118, true);
+}
 
 
 /*************************************

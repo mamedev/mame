@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	m_k053244->set_offsets(95, 0);
 	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback), this);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -1116,7 +1116,7 @@ MACHINE_CONFIG_START(mystwarr_state::gaiapols)
 
 	m_k053252->set_offsets(40, 16);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiapols)
 

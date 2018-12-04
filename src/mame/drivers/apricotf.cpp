@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
 
 	Z80SIO(config, m_sio, 2500000);
 	m_sio->out_int_callback().set("irqs", FUNC(input_merger_device::in_w<0>));

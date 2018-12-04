@@ -897,8 +897,8 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rohga)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
+	DECOCOMN(config, m_decocomn, 0);
+	m_decocomn->set_palette_tag(m_palette);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -989,8 +989,8 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wizdfire)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
+	DECOCOMN(config, m_decocomn, 0);
+	m_decocomn->set_palette_tag(m_palette);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1086,8 +1086,8 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wizdfire)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
+	DECOCOMN(config, m_decocomn, 0);
+	m_decocomn->set_palette_tag(m_palette);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1184,8 +1184,8 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_schmeisr)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
+	DECOCOMN(config, m_decocomn, 0);
+	m_decocomn->set_palette_tag(m_palette);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)

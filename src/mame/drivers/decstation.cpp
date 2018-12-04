@@ -393,10 +393,10 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 
 	SCC85C30(config, m_scc1, XTAL(14'745'600)/2);
 	m_scc1->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc1_irq_w));
-	m_scc1->out_txdb_callback().set("lk201", FUNC(lk201_device::rx_w));
+	m_scc1->out_txdb_callback().set(m_lk201, FUNC(lk201_device::rx_w));
 
-	MCFG_DEVICE_ADD("lk201", LK201, 0)
-	MCFG_LK201_TX_HANDLER(WRITELINE("scc1", z80scc_device, rxb_w))
+	LK201(config, m_lk201, 0);
+	m_lk201->tx_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc0, FUNC(z80scc_device::rxa_w));

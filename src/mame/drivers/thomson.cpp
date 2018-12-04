@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */
-	MCFG_TO7_IO_LINE_ADD("to7_io")
+	TO7_IO_LINE(config, "to7_io", 0);
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */

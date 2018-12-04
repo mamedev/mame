@@ -1152,7 +1152,7 @@ MACHINE_CONFIG_START(apollo_state::apollo)
 	MCFG_APOLLO_SIO_ADD(APOLLO_SIO_TAG, 3.6864_MHz_XTAL)
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio_irq_handler))
 	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
-	MCFG_APOLLO_SIO_A_TX_CALLBACK(WRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
+	MCFG_APOLLO_SIO_A_TX_CALLBACK(WRITELINE(m_keyboard, apollo_kbd_device, rx_w))
 
 #ifdef APOLLO_XXL
 	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE(APOLLO_STDIO_TAG, apollo_stdio_device, rx_w))

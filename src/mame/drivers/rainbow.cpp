@@ -3337,8 +3337,8 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_state::kbd_rxready_w));
 	m_kbd8251->txrdy_handler().set(FUNC(rainbow_state::kbd_txready_w));
 
-	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
-	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
+	LK201(config, m_lk201, 0);
+	m_lk201->tx_handler().set(m_kbd8251, FUNC(i8251_device::write_rxd));
 
 	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)
 	// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz

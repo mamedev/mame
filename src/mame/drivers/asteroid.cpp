@@ -760,8 +760,8 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 394, 1182)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("dvg", DVG, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	DVG(config, m_dvg, 0);
+	m_dvg->set_vector_tag("vector");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(asteroid_state::asteroid)

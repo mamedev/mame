@@ -2123,8 +2123,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
-	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
+	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
+	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2256,8 +2256,8 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
-	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
+	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
+	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
@@ -2302,7 +2302,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update)
 
-	MCFG_DECO_ACE_ADD("deco_ace")
+	DECO_ACE(config, m_deco_ace, 0);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2344,7 +2344,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_tattass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_deco_ace, gfx_tattass)
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("IN0");
@@ -2379,7 +2379,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update)
 
-	MCFG_DECO_ACE_ADD("deco_ace")
+	DECO_ACE(config, m_deco_ace, 0);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2421,7 +2421,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_nslasher)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_deco_ace, gfx_nslasher)
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("IN0");

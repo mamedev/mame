@@ -2303,7 +2303,7 @@ void towns_state::towns_io(address_map &map)
 	// RS-232C interface
 	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask32(0x00ff00ff);
 	// SCSI controller
-	map(0x0c30, 0x0c37).rw("fmscsi", FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask32(0x00ff00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
@@ -2362,7 +2362,7 @@ void towns_state::towns16_io(address_map &map)
 	// RS-232C interface
 	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask16(0x00ff);
 	// SCSI controller
-	map(0x0c30, 0x0c37).rw("fmscsi", FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask16(0x00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
@@ -2832,10 +2832,10 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
 
-	MCFG_FMSCSI_ADD("fmscsi")
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_FMSCSI_IRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_irq))
-	MCFG_FMSCSI_DRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_drq))
+	FMSCSI(config, m_scsi, 0);
+	m_scsi->set_scsi_port("scsi");
+	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
+	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
 	UPD71071(config, m_dma[0], 0);
 	m_dma[0]->set_cpu_tag("maincpu");

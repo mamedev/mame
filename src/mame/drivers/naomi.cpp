@@ -2958,7 +2958,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
-	MCFG_M3COMM_ADD("comm_board")
+	M3COMM(config, "comm_board", 0);
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

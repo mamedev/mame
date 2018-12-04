@@ -413,12 +413,12 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 
 	// serial connection to KM-035 keyboard
 	I8251(config, m_i8251kbd, 0);
-	m_i8251kbd->txd_handler().set("keyboard", FUNC(km035_device::write_rxd));
-	m_i8251kbd->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
+	m_i8251kbd->txd_handler().set(m_keyboard, FUNC(km035_device::write_rxd));
+	m_i8251kbd->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD("keyboard", KM035, 0)
-	MCFG_KM035_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
-	MCFG_KM035_RTS_HANDLER(WRITELINE("i8251kbd", i8251_device, write_cts))
+	KM035(config, m_keyboard, 0);
+	m_keyboard->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
+	m_keyboard->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// serial connection to printer
 	I8251(config, m_i8251prn, 0);
