@@ -22,8 +22,8 @@ class seta2_state : public driver_device
 public:
 	seta2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_sub(*this,"sub"),
+		m_maincpu(*this, "maincpu"),
+		m_sub(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -34,7 +34,7 @@ public:
 		m_flash(*this, "flash"),
 		m_dispenser(*this, "dispenser"),
 
-		m_x1_bank(*this,"x1_bank_%u", 1U),
+		m_x1_bank(*this, "x1_bank_%u", 1U),
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram", 0),
 		m_tileram(*this, "tileram", 0),
@@ -98,7 +98,7 @@ protected:
 	DECLARE_VIDEO_START(xoffset);
 	DECLARE_VIDEO_START(xoffset1);
 
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(seta2_interrupt);
 	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
@@ -132,7 +132,7 @@ protected:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intelfsh16_device> m_flash;
 	optional_device<ticket_dispenser_device> m_dispenser;
-
+	
 	optional_memory_bank_array<8> m_x1_bank;
 	optional_shared_ptr<uint16_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_spriteram;
@@ -145,6 +145,9 @@ protected:
 	int m_keyboard_row;
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
+	uint16_t m_private_spriteram[0x1000 / 2];
+
+
 private:
 	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int shadow, int realline, int line, int opaque);
 	inline void get_tile(uint16_t* spriteram, int is_16x16, int x, int y, int page, int& code, int& attr, int& flipx, int& flipy, int& color);
@@ -156,10 +159,6 @@ private:
 	uint16_t m_rasterenabled;
 	TIMER_CALLBACK_MEMBER(raster_timer_done);
 	emu_timer *m_raster_timer;
-
-	// for grdians, very glitchy right now
-	bool use_experimental_rasters() { return false; }
-
 };
 
 

@@ -173,7 +173,39 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 		if (data)
 		{
 			// Buffer sprites by 1 frame
-			memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
+			//memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
+
+			// copy the base spritelist to a private (non-CPU visible buffer)
+			// copy the indexed sprites to 0 in spriteram, adjusting pointers in base sprite list as appropriate
+			int current_sprite_entry = 0;
+
+			for (int i = 0; i < 0x1000 / 2; i += 4)
+			{
+				uint16_t num = m_private_spriteram[i + 0] = m_spriteram[(0x3000 / 2) + i + 0];
+				m_private_spriteram[i + 1] = m_spriteram[(0x3000 / 2) + i + 1];
+				m_private_spriteram[i + 2] = m_spriteram[(0x3000 / 2) + i + 2];
+
+				int sprite = m_spriteram[(0x3000 / 2) + i + 3];
+				m_private_spriteram[i + 3] = ((current_sprite_entry / 4) & 0x7fff) | (sprite & 0x8000);
+
+				uint16_t list2addr = (sprite & 0x7fff) * 4;
+
+				num &=0xff;
+				for (int j = 0; j < num + 1; j++)
+				{
+					if (current_sprite_entry < 0x3000 / 2)
+					{
+						m_spriteram[current_sprite_entry + 0] = m_spriteram[((list2addr + 0) + j * 4) & 0x1ffff];
+						m_spriteram[current_sprite_entry + 1] = m_spriteram[((list2addr + 1) + j * 4) & 0x1ffff];
+						m_spriteram[current_sprite_entry + 2] = m_spriteram[((list2addr + 2) + j * 4) & 0x1ffff];
+						m_spriteram[current_sprite_entry + 3] = m_spriteram[((list2addr + 3) + j * 4) & 0x1ffff];
+						current_sprite_entry += 4;
+					}
+				}
+
+				if (m_private_spriteram[i + 0] & 0x8000) break;  // end of list marker
+			}
+
 		}
 		break;
 
@@ -181,7 +213,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 		//logerror("%s: Register 3c write (raster enable?) current vpos is %d  :   %04X (%04x)\n",machine().describe_context(),m_screen->vpos(), data, mem_mask);
 		COMBINE_DATA(&m_rasterenabled);
 
-		if (m_rasterenabled & 1)
+		//if (m_rasterenabled & 1)
 		{
 			int hpos = 0;
 			int vpos = m_rasterposition;
@@ -203,18 +235,6 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 WRITE16_MEMBER(seta2_state::spriteram_w)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
-
-	if (use_experimental_rasters())
-	{
-		// there must be some kind of mirroring / buffering or DMA copy operation because the raster interrupt in grdians writes
-		// the scroll offsets (in sprite format like the list at 0x4000, as word 3) here, instead of in the actual table at 0x4000
-		// maybe the hardware builds a reformatted sprite list at 0x0000 when the sprite buffer command is triggered??
-		if (offset < 0x1000 / 2)
-		{
-			offset += 0x4000 / 2;
-			COMBINE_DATA(&m_spriteram[offset]);
-		}
-	}
 }
 
 /***************************************************************************
@@ -301,22 +321,18 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Sprites list
-	uint16_t *spriteram;
-	uint16_t *bufspriteram;
+	uint16_t *spriteram = m_spriteram;
 	int global_yoffset = (m_vregs[0x1a/2] & 0x7ff);
 	if (global_yoffset & 0x400)
 		global_yoffset -= 0x800;
 
 	global_yoffset += 1;
 
-	spriteram = m_spriteram; // floating tilemaps aren't buffered?
-	bufspriteram = m_buffered_spriteram.get(); // lists are buffered?
+	uint16_t *s1 = m_private_spriteram;
 
-	uint16_t *s1 = bufspriteram + 0x3000 / 2;
-	uint16_t *end = &bufspriteram[m_spriteram.bytes() / 2];
 
 	//  for ( ; s1 < end; s1+=4 )
-	for (; s1 < bufspriteram + 0x4000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
+	for (; s1 < m_private_spriteram + 0x1000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
 		int num = s1[0];
 		int xoffs = s1[1];
@@ -324,7 +340,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sprite = s1[3];
 
 		// Single-sprite address
-		uint16_t *s2 = &bufspriteram[(sprite & 0x7fff) * 4];
+		uint16_t *s2 = &spriteram[(sprite & 0x7fff) * 4];
+		uint16_t *end = &spriteram[m_spriteram.bytes() / 2];
 
 		// Single-sprite size
 		int global_sizex = xoffs & 0xfc00;
@@ -498,13 +515,11 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 {
 	if (m_tmp68301)
 	{
-		m_tmp68301->external_interrupt_1();
-		logerror("external int (vpos is %d)\n", m_screen->vpos());
-
-		if (use_experimental_rasters())
+		if (m_rasterenabled & 1)
 		{
-			// TODO:  +m_screen->visible_area().min_y is a hack due to incorrect screen offsets (see weirdness in defined visible areas, needs an overall screen offset from somewhere instead!)
-			m_screen->update_partial(m_screen->vpos() - 1 + m_screen->visible_area().min_y);
+			m_tmp68301->external_interrupt_1();
+			logerror("external int (vpos is %d)\n", m_screen->vpos());
+		    m_screen->update_partial(m_screen->vpos() - 1);
 		}
 	}
 }
@@ -537,6 +552,8 @@ void seta2_state::video_start()
 	}
 
 	m_raster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta2_state::raster_timer_done), this));
+
+	save_item(NAME(m_private_spriteram));
 }
 
 VIDEO_START_MEMBER(seta2_state,xoffset)
