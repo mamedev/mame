@@ -33375,6 +33375,10 @@ rt1715w                         //
 qwak                            // (proto)          (c) 1982
 runaway                         // (proto)          (c) 1982
 
+@source:rulechan.cpp
+rulechan                        // 1992 ElectroChance
+rulechab                        // 1992 ElectroChance
+
 @source:rungun.cpp
 rungun                          // GX247 (c) 1993 (World)
 runguna                         // GX247 (c) 1993 (World)
