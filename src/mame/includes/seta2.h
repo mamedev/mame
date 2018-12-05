@@ -140,7 +140,7 @@ protected:
 	int m_keyboard_row;
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
-	uint16_t m_private_spriteram[0x1000 / 2];
+	std::unique_ptr<uint16_t[]> m_private_spriteram;
 
 
 private:

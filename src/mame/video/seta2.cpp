@@ -348,11 +348,11 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	global_yoffset += 1;
 
-	uint16_t *s1 = m_private_spriteram;
+	uint16_t *s1 = m_private_spriteram.get();
 
 
 	//  for ( ; s1 < end; s1+=4 )
-	for (; s1 < m_private_spriteram + 0x1000 / 2; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
+	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
 	{
 		int num = s1[0];
 
@@ -563,6 +563,7 @@ void seta2_state::video_start()
 		m_gfxdecode->gfx(i)->set_granularity(16);
 
 	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
+	m_private_spriteram = make_unique_clear<uint16_t[]>(0x1000 / 2);
 
 	m_xoffset = 0;
 
@@ -576,7 +577,7 @@ void seta2_state::video_start()
 
 	m_raster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta2_state::raster_timer_done), this));
 
-	save_item(NAME(m_private_spriteram));
+	save_pointer(NAME(m_private_spriteram), 0x1000 / 2);
 }
 
 VIDEO_START_MEMBER(seta2_state,xoffset)
