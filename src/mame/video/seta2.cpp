@@ -247,6 +247,11 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	}
 }
 
+READ16_MEMBER(seta2_state::spriteram_r)
+{
+	return m_spriteram[offset];
+}
+
 WRITE16_MEMBER(seta2_state::spriteram_w)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
