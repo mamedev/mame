@@ -4,8 +4,8 @@
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Keyboard & GDC fixes by Cracyc (June - Nov. 2016), Baud rate generator by Shattered (July 2016)
-Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
+Portions (2013 - 2018) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
+Baud rate generator by AJR (2018) and Shattered (2016), keyboard & GDC fixes by Cracyc (June - Nov. 2016).
 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
 
@@ -24,7 +24,7 @@ PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DI
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF JANUARY 2017
+STATE AS OF DECEMBER 2018
 ------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
@@ -103,16 +103,15 @@ COLOR EMULATION (NEC 7220 + extra hardware)
    Palette takes 2 byte per palette entry. CLUT ("color map") is 32 byte long.
 ------------------------------------------------------------------------------------------------
 
-THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
-   The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
-   (DIP setting COLOR_MONITOR).
+DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (a bit of history)
+   (1) the standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
+   (2) an unofficial DIY cable enabled R-G-B graphics + seperate text
 
-   An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
-   -> AUTODETECT (DIP in emulation) snoops the color palette and sets the monitor accordingly.
-	
 EMULATION SPECIFIC
-   DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
-   (helps debugging semi broken programs, for example Doodle).
+   (1) COLOR_MONITOR reflects DEC's recommendation (R-M-B with VR241 above)
+   (2) DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
+       (also helps debugging semi broken programs, for example Doodle).
+   (3) AUTODETECT (DIP setting) snoops the color palette and chooses the correct 'wiring' 
 
 SCREEN 1 vs. SCREEN 2 IN EMULATION
    All GDC 7220 output is displayed on the right. Be it color or monochrome, Option Graphics output is on screen 2.
@@ -785,6 +784,7 @@ if(m_patidx == 0)   m_patidx = 7;
 // GDC RESET MACRO - used in  "machine_reset"  & GDC_EXTRA_REGISTER_w   !
 #define OPTION_GRFX_RESET                                   \
 lower_8088_irq(IRQ_GRF_INTR_L);                             \
+m_monitor_suggested = m_inp13->read();                      \
 m_GDC_INDIRECT_REGISTER = 0;                                \
 m_GDC_color_map_index = 0;                                  \
 for(int i=0; i <256; i++) { m_GDC_SCROLL_BUFFER[i] = i; };  \
@@ -2905,7 +2905,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 
 		for(int i = 0; i <= 3; i++)
 		{
-			if( BIT(ps,i ) ) // 1 written into 'ps' means don't touch (bits inversed)
+			if( BIT(ps,i ) ) // 1 means don't touch (bits already inversed)
 			{
 				uint16_t mem = m_video_ram[(offset & 0xffff) + (0x8000 * i)];   
 
@@ -2952,7 +2952,7 @@ READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 	switch(offset)
 	{
 		case 0:
-			data = m_GDC_MODE_REGISTER; // not sure 
+			data = m_GDC_MODE_REGISTER; // ?
 			break;
 
 		case 1:
@@ -3336,7 +3336,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
 	m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
-	m_comm_port->set_default_option("logitech_mouse"); 
+	m_comm_port->set_default_option("logitech_mouse");
 
 	printer.set_default_option("printer");
 
