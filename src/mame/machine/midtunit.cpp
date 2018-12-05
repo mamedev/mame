@@ -361,10 +361,6 @@ void midtunit_state::init_tunit_generic(int sound)
 
 	/* load sound ROMs and set up sound handlers */
 	m_chip_type = sound;
-
-
-	/* default graphics functionality */
-	m_gfx_rom_large = 0;
 }
 
 
@@ -463,7 +459,7 @@ void midtunit_state::init_mk2()
 {
 	/* common init */
 	init_tunit_generic(SOUND_DCS);
-	m_gfx_rom_large = 1;
+	m_video->set_gfx_rom_large(true);
 
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f20c60, 0x00f20c7f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),this));
@@ -483,7 +479,7 @@ void midtunit_state::init_mk2()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midtunit_state,midtunit)
+void midtunit_state::machine_reset()
 {
 	/* reset sound */
 	switch (m_chip_type)
