@@ -2905,7 +2905,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 
 		for(int i = 0; i <= 3; i++)
 		{
-			if( BIT(ps,i ) ) // 1 means don't touch (bits already inversed)
+			if( BIT(ps,i ) ) // 1 means don't touch (bits already inverted)
 			{
 				uint16_t mem = m_video_ram[(offset & 0xffff) + (0x8000 * i)];   
 
@@ -3001,7 +3001,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 	switch(offset)
 	{
 		case 0: // Mode register must be reloaded following any write to port 50 (software reset).
-			// 	      FIXME: "Any write to this port also resynchronizes the
+			// FIXME: "Any write to this port also resynchronizes the
 			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?)
 
 			if( data & 1 ) // PDF QV069 suggests 1 -> 0 -> 1. Most programs just set bit 0 (PACMAN).
