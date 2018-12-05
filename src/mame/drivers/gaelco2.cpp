@@ -463,7 +463,7 @@ MACHINE_CONFIG_START(gaelco2_state::saltcrdi)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
