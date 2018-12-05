@@ -167,16 +167,18 @@ public:
 	DECLARE_READ16_MEMBER(midwunit_control_r);
 
 protected:
+	midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	virtual void device_start() override;
 };
 
-class midxunit_video_device : public midtunit_video_device
+class midxunit_video_device : public midwunit_video_device
 {
 public:
 	// construction/destruction
 	template <typename T, typename U, typename V>
 	midxunit_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&palette_tag, V &&gfxrom_tag)
-		: midxunit_video_device(mconfig, tag, owner, (uint32_t)0)
+		: midwunit_video_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_palette.set_tag(std::forward<U>(palette_tag));

@@ -19,32 +19,32 @@
 	dest[i+7] = &midtunit_video_device::dma_draw<7, xflip, skip, scale, zero, nonzero>;
 
 #define TEMPLATED_DMA_DRAW_NONE(dest, i) \
-	dest[i*8+0] = &midtunit_video_device::dma_draw_none;	\
-	dest[i*8+1] = &midtunit_video_device::dma_draw_none;	\
-	dest[i*8+2] = &midtunit_video_device::dma_draw_none;	\
-	dest[i*8+3] = &midtunit_video_device::dma_draw_none;	\
-	dest[i*8+4] = &midtunit_video_device::dma_draw_none;	\
-	dest[i*8+5] = &midtunit_video_device::dma_draw_none;	\
-	dest[i*8+6] = &midtunit_video_device::dma_draw_none;	\
-	dest[i*8+7] = &midtunit_video_device::dma_draw_none;
+	dest[i+0] = &midtunit_video_device::dma_draw_none;	\
+	dest[i+1] = &midtunit_video_device::dma_draw_none;	\
+	dest[i+2] = &midtunit_video_device::dma_draw_none;	\
+	dest[i+3] = &midtunit_video_device::dma_draw_none;	\
+	dest[i+4] = &midtunit_video_device::dma_draw_none;	\
+	dest[i+5] = &midtunit_video_device::dma_draw_none;	\
+	dest[i+6] = &midtunit_video_device::dma_draw_none;	\
+	dest[i+7] = &midtunit_video_device::dma_draw_none;
 
-#define TEMPLATED_DMA_DRAW_P0(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_COPY,  PIXEL_SKIP)
-#define TEMPLATED_DMA_DRAW_P1(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_SKIP,  PIXEL_COPY)
-#define TEMPLATED_DMA_DRAW_C0(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_COLOR, PIXEL_SKIP)
-#define TEMPLATED_DMA_DRAW_C1(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_SKIP,  PIXEL_COLOR)
-#define TEMPLATED_DMA_DRAW_P0P1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_COPY,  PIXEL_COPY)
-#define TEMPLATED_DMA_DRAW_C0C1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_COLOR, PIXEL_COLOR)
-#define TEMPLATED_DMA_DRAW_C0P1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_COLOR, PIXEL_COPY)
-#define TEMPLATED_DMA_DRAW_P0C1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, false, skip, scale, PIXEL_COPY,  PIXEL_COLOR)
+#define TEMPLATED_DMA_DRAW_P0(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_COPY,  PIXEL_SKIP)
+#define TEMPLATED_DMA_DRAW_P1(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_SKIP,  PIXEL_COPY)
+#define TEMPLATED_DMA_DRAW_C0(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_COLOR, PIXEL_SKIP)
+#define TEMPLATED_DMA_DRAW_C1(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_SKIP,  PIXEL_COLOR)
+#define TEMPLATED_DMA_DRAW_P0P1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_COPY,  PIXEL_COPY)
+#define TEMPLATED_DMA_DRAW_C0C1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_COLOR, PIXEL_COLOR)
+#define TEMPLATED_DMA_DRAW_C0P1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_COLOR, PIXEL_COPY)
+#define TEMPLATED_DMA_DRAW_P0C1(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, false, skip, scale, PIXEL_COPY,  PIXEL_COLOR)
 
-#define TEMPLATED_DMA_DRAW_P0_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_COPY,  PIXEL_SKIP)
-#define TEMPLATED_DMA_DRAW_P1_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_SKIP,  PIXEL_COPY)
-#define TEMPLATED_DMA_DRAW_C0_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_COLOR, PIXEL_SKIP)
-#define TEMPLATED_DMA_DRAW_C1_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_SKIP,  PIXEL_COLOR)
-#define TEMPLATED_DMA_DRAW_P0P1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_COPY,  PIXEL_COPY)
-#define TEMPLATED_DMA_DRAW_C0C1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_COLOR, PIXEL_COLOR)
-#define TEMPLATED_DMA_DRAW_C0P1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_COLOR, PIXEL_COPY)
-#define TEMPLATED_DMA_DRAW_P0C1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i*8, true, skip, scale, PIXEL_COPY,  PIXEL_COLOR)
+#define TEMPLATED_DMA_DRAW_P0_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_COPY,  PIXEL_SKIP)
+#define TEMPLATED_DMA_DRAW_P1_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_SKIP,  PIXEL_COPY)
+#define TEMPLATED_DMA_DRAW_C0_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_COLOR, PIXEL_SKIP)
+#define TEMPLATED_DMA_DRAW_C1_XF(dest, i, skip, scale)   INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_SKIP,  PIXEL_COLOR)
+#define TEMPLATED_DMA_DRAW_P0P1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_COPY,  PIXEL_COPY)
+#define TEMPLATED_DMA_DRAW_C0C1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_COLOR, PIXEL_COLOR)
+#define TEMPLATED_DMA_DRAW_C0P1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_COLOR, PIXEL_COPY)
+#define TEMPLATED_DMA_DRAW_P0C1_XF(dest, i, skip, scale) INIT_TEMPLATED_DMA_DRAW(dest, i, true, skip, scale, PIXEL_COPY,  PIXEL_COLOR)
 
 #define INIT_TEMPLATED_DMA_DRAW_GROUP(dest, skip, scale) \
 	TEMPLATED_DMA_DRAW_NONE(dest, 0); 					\

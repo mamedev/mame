@@ -28,10 +28,10 @@ public:
 		m_video(*this, "video"),
 		m_dcs(*this, "dcs"),
 		m_palette(*this, "palette"),
+		m_gfxrom(*this, "gfxrom"),
 		m_cvsd_sound(*this, "cvsd"),
 		m_adpcm_sound(*this, "adpcm"),
-		m_nvram(*this, "nvram"),
-		m_gfxrom(*this, "gfxrom")
+		m_nvram(*this, "nvram")
 	{ }
 
 	void tunit_core(machine_config &config);
@@ -52,14 +52,13 @@ protected:
 	required_device<midtunit_video_device> m_video;
 	optional_device<dcs_audio_device> m_dcs;
 	required_device<palette_device> m_palette;
+	required_memory_region m_gfxrom;
 
 private:
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 
 	required_shared_ptr<uint16_t> m_nvram;
-
-	required_memory_region m_gfxrom;
 
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
