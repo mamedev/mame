@@ -4,8 +4,8 @@
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Keyboard & GDC fixes by Cracyc (June - Nov. 2016), Baud rate generator by Shattered (July 2016)
-Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
+Portions (2013 - 2018) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
+Baud rate generator by AJR (2018) and Shattered (2016), keyboard & GDC fixes by Cracyc (June - Nov. 2016).
 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
 
@@ -24,7 +24,7 @@ PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DI
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF JANUARY 2017
+STATE AS OF DECEMBER 2018
 ------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
@@ -103,17 +103,15 @@ COLOR EMULATION (NEC 7220 + extra hardware)
    Palette takes 2 byte per palette entry. CLUT ("color map") is 32 byte long.
 ------------------------------------------------------------------------------------------------
 
-THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
-   The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
-   (DIP setting COLOR_MONITOR).
-
-   An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
-   As DEC decided not to endorse R-G-B, many commercial programs show incorrect colors.
-   A patch from one of the archives corrects the GWBASIC palette problem when using 2 monitors [Bavarese].
+DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (a bit of history)
+   (1) the standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
+   (2) an unofficial DIY cable enabled R-G-B graphics + seperate text
 
 EMULATION SPECIFIC
-   DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
-   (helps debugging semi broken programs, for example Doodle).
+   (1) COLOR_MONITOR reflects DEC's recommendation (R-M-B with VR241 above)
+   (2) DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
+       (also helps debugging semi broken programs, for example Doodle).
+   (3) AUTODETECT (DIP setting) snoops the color palette and chooses the correct 'wiring' 
 
 SCREEN 1 vs. SCREEN 2 IN EMULATION
    All GDC 7220 output is displayed on the right. Be it color or monochrome, Option Graphics output is on screen 2.
@@ -145,16 +143,6 @@ UNKNOWN IMPLEMENTATION DETAILS:
 To obtain pixel exact graphics use 'Graphics Only' in Video Options and cmd.line switches -nowindow -aspect1 auto -nokeepaspect
 (Over-Under or Side-by-Side modes always distorted on my 1600 x 900 laptop)
 
-Programs with initialization / redraw / reentrance problems (invocation order after reset matters in emulation):
-
-- Canon (high resolution + vectors), Solitaire (SOLIT.EXE) and GDEMO (from GRPHCS.ARC, interactive graphics interpreter '85),
-  plus 'Monitor Aligment' (from the GDC test disk).             Sloppy programming or a bug related to a) to e)...?
-
- Quote from Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
-                    (the partial update system gets very confused because it expects both the screens to end at the same time
-                    and if that isn't the case large parts of one screen end up not updating at all)
-
-The following games work well: Tetris, Pacman, MasterMind (MMIND), (G)otelo (needs GSX),  Scram (uses scroll extensively).
 
 CURRENTY UNEMULATED
 -------------------
@@ -469,17 +457,18 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #define COMPLEMENT_MODE 16
 #define OVERLAY_MODE    32
 
-// MONITOR CONFIGURATION (DIP SWITCH!):
-#define MONO_MONITOR  0x01
-#define COLOR_MONITOR 0x02
-#define DUAL_MONITOR  0x03
-
 // ----------------------------------------------------------------------------------------------
 #define LK201_TAG   "lk201"
 #define FD1793_TAG  "fd1793x"
 
 #define INVALID_DRIVE 255
 #define MAX_FLOPPIES 4
+
+// Monitor configurations -> see DIP switches. New: auto-detect color palette (last option).
+static constexpr int MONO_MONITOR = 0x01;  // Tetris-M and Pacman-M need this setting (no auto-detection)
+static constexpr int COLOR_MONITOR = 0x02; // DEC recommendation. GWBASIC and most old libraries. Superseded by later development
+static constexpr int DUAL_MONITOR = 0x03;  // Debugging, AutoCad, 'newer' freeware. Green is missing with unpatched software (for technical reasons)
+static constexpr int AUTODETECT_MONITOR = 0x04;  // Snoop palette, then choose best output. 
 
 class rainbow_state : public driver_device
 {
@@ -718,10 +707,11 @@ private:
 	uint8_t  m_vpat, m_patmult, m_patcnt, m_patidx;
 
 	uint16_t m_GDC_WRITE_MASK;
-	bool m_color_map_changed;
-	bool m_ONBOARD_GRAPHICS_SELECTED;   // (internal switch, on board video to mono out)
 
+	bool m_ONBOARD_GRAPHICS_SELECTED;   // (internal switch, on board video to mono out)
 	bool m_SCREEN_BLANK;
+
+	uint8_t m_monitor_suggested;
 
 	int INT88, INTZ80;
 
@@ -773,7 +763,6 @@ private:
 
 	// FULL RANGE video levels for 100-B model, taken from page 46 of PDF
 	const uint8_t video_levels[16] = { 255, 217,  201,186, 171, 156, 140, 125, 110, 97, 79, 66, 54, 31, 18, 0 };
-	uint8_t m_PORT50;
 
 	const int comm_rates[16] = { 50,75,110,134,150,200,300,600,1200,1800,2000,2400,3600,4800,9600,19200 };
 };
@@ -795,10 +784,9 @@ if(m_patidx == 0)   m_patidx = 7;
 // GDC RESET MACRO - used in  "machine_reset"  & GDC_EXTRA_REGISTER_w   !
 #define OPTION_GRFX_RESET                                   \
 lower_8088_irq(IRQ_GRF_INTR_L);                             \
-m_PORT50 = 0;                                               \
+m_monitor_suggested = m_inp13->read();                      \
 m_GDC_INDIRECT_REGISTER = 0;                                \
 m_GDC_color_map_index = 0;                                  \
-m_color_map_changed = true;                                 \
 for(int i=0; i <256; i++) { m_GDC_SCROLL_BUFFER[i] = i; };  \
 m_GDC_scroll_index = 0;                                     \
 m_GDC_write_buffer_index = 0;                               \
@@ -807,7 +795,7 @@ m_GDC_ALU_PS_REGISTER = 0x0F;                               \
 m_GDC_FG_BG = 0xF0;                                         \
 m_GDC_MODE_REGISTER &= GDC_MODE_VECTOR | GDC_MODE_HIGHRES | GDC_MODE_ENABLE_WRITES | GDC_MODE_READONLY_SCROLL_MAP;\
 m_GDC_MODE_REGISTER |= GDC_MODE_ENABLE_VIDEO;               \
-printf("\n** OPTION GRFX. RESET **\n");
+logerror("\n** OPTION GRFX. RESET **\n");
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 {
@@ -817,7 +805,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 	uint16_t plane0, plane1, plane2, plane3;
 	uint8_t pen;
 
-	if(m_ONBOARD_GRAPHICS_SELECTED && (m_inp13->read() != DUAL_MONITOR) )
+	if(m_ONBOARD_GRAPHICS_SELECTED && (m_inp13->read() != DUAL_MONITOR) ) 
 	{
 		for(xi=0;xi<16;xi++) // blank screen when VT102 output active (..)
 		{
@@ -846,7 +834,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 		plane3 = m_video_ram[((address & 0x3fff) + 0x30000) >> 1];
 	}
 
-	bool mono = (m_inp13->read() == MONO_MONITOR) ? true : false; // 1 = MONO, 2 = COLOR, 3 = DUAL MONITOR
+	bool mono = (m_monitor_suggested == MONO_MONITOR) ? true : false; // 1 = MONO, 2 = COLOR, 3 = DUAL MONITOR; 4 = AUTO
 
 	for(xi=0;xi<16;xi++)
 	{
@@ -986,9 +974,8 @@ void rainbow_state::rainbow8088_io(address_map &map)
 	// * Color graphics option (NEC upd7220 GDC plus external hw.). See Programmer's Reference AA-AE36A-TV.
 	// Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 x 64 K video RAM.
 	// (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
-	map(0x50, 0x55).rw(FUNC(rainbow_state::GDC_EXTRA_REGISTER_r), FUNC(rainbow_state::GDC_EXTRA_REGISTER_w));
-	map(0x56, 0x57).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)); // 56 param, 57 command
-
+	map(0x50, 0x57).rw(FUNC(rainbow_state::GDC_EXTRA_REGISTER_r), FUNC(rainbow_state::GDC_EXTRA_REGISTER_w));
+	
 	// ===========================================================
 	// 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
 	// ===========================================================
@@ -1140,7 +1127,8 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
 	PORT_START("MONITOR CONFIGURATION") // GDC
-	PORT_DIPNAME(0x03, 0x03, "MONITOR CONFIGURATION")
+	PORT_DIPNAME(0x0F, 0x04, "MONITOR CONFIGURATION")
+	PORT_DIPSETTING(0x04, "AUTODETECT")
 	PORT_DIPSETTING(0x01, "MONO ONLY / 4 to 16 monochrome shades (single VR-201)")
 	PORT_DIPSETTING(0x02, "COLOR ONLY (single VR-241 with BCC-17 cable)")
 	PORT_DIPSETTING(0x03, "DUAL MONITOR (SCREEN 1: TEXT;  SCREEN 2: R-G-B)")
@@ -1201,7 +1189,7 @@ void rainbow_state::machine_reset()
 
 	if(END_OF_RAM > unmap_start)
 	{
-		printf("\nUnmapping from %x to %x",unmap_start, END_OF_RAM);
+		logerror("\nUnmapping from %x to %x",unmap_start, END_OF_RAM);
 		program.unmap_readwrite(unmap_start, END_OF_RAM);
 	}
 
@@ -1258,12 +1246,10 @@ void rainbow_state::machine_reset()
 
 	// *********** NEC 7220 DISPLAY CONTROLLER [ OPTIONAL ]
 	OPTION_GRFX_RESET
-
 	OPTION_RESET_PATTERNS
 
 	for(int i=0; i <32; i++) { m_GDC_COLOR_MAP[i] = 0x00; };
 	m_GDC_color_map_index = 0;
-	m_color_map_changed = true;
 	// *********** Z80
 
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -1344,13 +1330,20 @@ void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int para
 
 uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static int old_palette, old_monitor;
+	static int old_monitor;
 
-	int monitor_selected = m_inp13->read();
-	if(monitor_selected != old_monitor)
+	if((m_monitor_suggested < 1) || (m_monitor_suggested > 3))
+			m_monitor_suggested = COLOR_MONITOR;
+
+	if(m_monitor_suggested != old_monitor)
 	{
-		old_monitor = monitor_selected;
-		m_color_map_changed = true;
+		old_monitor = m_monitor_suggested;
+		if(m_monitor_suggested == 1)
+			popmessage("MONOCHROME MONITOR");
+		if(m_monitor_suggested == 2)
+			popmessage("COLOR MONITOR");
+		if(m_monitor_suggested == 3)
+			popmessage("DUAL MONITOR");
 	}
 
 	int palette_selected;
@@ -1359,16 +1352,11 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 	else
 		 palette_selected = m_inp9->read();
 
-	if(palette_selected != old_palette)
-	{
-		old_palette = palette_selected;
-		m_color_map_changed = true;
-	}
-
 	m_crtc->palette_select(palette_selected);
+        m_crtc->video_update(bitmap, cliprect); 
 
 	if(    m_SCREEN_BLANK                    ||
-		( (!m_ONBOARD_GRAPHICS_SELECTED) && (monitor_selected != DUAL_MONITOR) )   // blank screen 1, except when in DUAL_MONITOR mode
+		( (!m_ONBOARD_GRAPHICS_SELECTED) && (m_inp13->read() != DUAL_MONITOR) )   // dual monitor: never blank all
 	  )
 		m_crtc->video_blanking(bitmap, cliprect);
 	else
@@ -2370,7 +2358,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 		if ( fdc_ready && ((fdc_status & 0x40) == 0) && m_POWER_GOOD )
 			fdc_write_gate = 1; // "valid only when drive is selected" !
 	}
-
+	//logerror(" RDY:%x  WG:%d ",fdc_ready,fdc_write_gate);
 	int data = (
 		((fdc_step) ? 0x00 : 0x80) |
 		((fdc_write_gate) ? 0x00 : 0x40) |
@@ -2572,17 +2560,16 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 	else
 		lower_8088_irq(IRQ_GRF_INTR_L);
 
-	uint8_t red, green, blue, mono;
-	int xi;
+	uint8_t xi, red, green, blue, mono;
 
-	if(m_color_map_changed)
+	m_monitor_suggested = m_inp13->read();
+	if((m_monitor_suggested < 1) || (m_monitor_suggested > 3))
+			m_monitor_suggested = COLOR_MONITOR;
+
+	int mono_sum = 0;
+	int green_sum = 0;
+	for(xi=0;xi<16;xi++) // DELAYED LOAD OF PALETTE ...
 	{
-		m_color_map_changed = false;
-
-		int mono_sum = 0;
-		int green_sum = 0;
-		for(xi=0;xi<16;xi++) // DELAYED LOAD OF PALETTE ...
-		{
 						uint8_t colordata1  = m_GDC_COLOR_MAP[xi];
 						uint8_t colordata2 = m_GDC_COLOR_MAP[xi + 16];      // Does it matter if the palette is incomplete...?
 
@@ -2602,62 +2589,62 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 						green =(colordata1 & 0x0F);
 						green_sum += green;
 
-						switch( m_inp13->read())
+						switch( m_monitor_suggested )
 						{
 							case MONO_MONITOR:
 							{
-								switch( m_inp9->read()   ) //  - monochrome monitor (phosphor) type  (1,2,3)
+								switch(  m_inp9->read()   ) //  - monochrome monitor (phosphor) type  (1,2,3)
 								{
 								case 1: // BLACK & WHITE
-										mono  = uint8_t( ( 205.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-										m_palette2->set_pen_color(xi + 16, rgb_t( mono, mono, mono) );
+									m_palette2->set_pen_color(xi + 16, pal4bit(mono), pal4bit(mono), pal4bit(mono) ); 
 									break;
 
-								case 2: // SHADES OF GREEN
-										red   = uint8_t( ( 35.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) ); // 80 % = NORMAL *
-										green = uint8_t( (145.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-										blue  = uint8_t( ( 75.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-										m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) );
+								case 2: // GREEN SHADES. Hand picked value from vtvideo coarsly transformed into a RGB value: 
+									red   = uint8_t( ( 35.0f / 100.0f) *  ( video_levels[ mono ] / 2.55f) ); 
+									green = uint8_t( (145.0f / 100.0f) *  ( video_levels[ mono ] / 2.55f) );
+									blue  = uint8_t( ( 75.0f / 100.0f) *  ( video_levels[ mono ] / 2.55f) );
+									m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) ); 
 									break;
 
 								case 3: // AMBER. Assumption: "normal" value at 80 % is 213, 146, 82 (decimal)
-									red   = uint8_t( (213.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) ); // 80 % = NORMAL * is 3.19f (100 % would be 2.55f)
-									green = uint8_t( (146.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-									blue  = uint8_t( ( 82.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-									m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) );
+									red   = uint8_t( (213.0f / 100.0f) *  ( video_levels[ mono ] / 2.55f) );
+									green = uint8_t( (146.0f / 100.0f) *  ( video_levels[ mono ] / 2.55f) );
+									blue  = uint8_t( ( 82.0f / 100.0f) *  ( video_levels[ mono ] / 2.55f) );
+									m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) ); 
 									break;
 								}
 								break;
 							}
 
 							case COLOR_MONITOR:
-
 									if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO))
-										red = blue = 0; // Page 21 of PDF AA-AE36A (PDF) explains why
-									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
-									green = uint8_t( mono * 17 *  ( (255-video_levels[ mono ])  / 255.0f) ); // BCC-17 cable (red, mono -> green, blue)
-									blue  = uint8_t( blue  * 17 *  ( (255-video_levels[ blue ] )  / 255.0f) );
-									m_palette2->set_pen_color(xi, rgb_t( red, green, blue) );
+										red = blue = 0; // Page 21 of AA-AE36A (PDF) explains why
+
+									m_palette2->set_pen_color(xi, pal4bit( red ) , pal4bit( mono ) , pal4bit( blue )  ); 
 								break;
 
 							case DUAL_MONITOR:
-									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
-									green = uint8_t( green * 17 *  ( (255-video_levels[ green ])  / 255.0f) ); // true R-G-B (homebrew cable only)
-									blue  = uint8_t( blue  * 17 *  ( (255-video_levels[ blue ] )  / 255.0f) );
-									m_palette2->set_pen_color(xi, rgb_t( red, green, blue) );
+									m_palette2->set_pen_color(xi, pal4bit( red ), pal4bit( green ), pal4bit( blue ) ); 
 								break;
 						}
 
-		} // palette (loop)
+	} // palette (loop)
 
-		if(mono_sum == 0)
-		  if ( m_inp13->read() == COLOR_MONITOR)
-				printf(" [HINT: COLOR MONITOR (DIP SWITCH) WRONG! NO MONO PALETTE] ");
+	if( (green_sum >0) && (green_sum == mono_sum) ) // (R-G-B + M) palette (split cable). Examples: PACMAN, AutoCad
+	{		
+		if(m_monitor_suggested == MONO_MONITOR)
+			logerror("\n[HINT: COLOR PALETTE DETECTED - SUITABLE FOR DUAL MONITOR] ");
+		if(m_inp13->read() == AUTODETECT_MONITOR)
+			m_monitor_suggested = DUAL_MONITOR;
+	}
 
-		if(green_sum == 0)
-			 if ( m_inp13->read() == DUAL_MONITOR)
-				printf(" [HINT: DUAL MONITOR (DIP SWITCH) WRONG! NO GREEN PALETTE] ");
-	} // color map changed?
+	if((green_sum == 0) && (mono_sum > 0))  // No green = original DEC spec. Example: NLANDER. All older libaries use R-M-B.
+	{
+		if(m_inp13->read() == AUTODETECT_MONITOR)
+				m_monitor_suggested = COLOR_MONITOR;
+		if (m_monitor_suggested == DUAL_MONITOR)  
+			logerror("\n[HINT: SINGLE COLOR MONITOR ONLY!  GREEN MISSING => NO SPLIT CABLE]"); 
+	}
 
 } // 7220 vblank IRQ
 
@@ -2694,7 +2681,7 @@ READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + tab
 
 WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
 {
-	//    printf("%02x to diag port (PC=%x)\n", data, m_i8088->pc());
+	//    logerror("%02x to diag port (PC=%x)\n", data, m_i8088->pc());
 
 	// ZRESET from 8088 to Z80 - - HIGH at powerup!
 	if (!(data & 1))
@@ -2738,12 +2725,12 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 			{   printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
 				m_ONBOARD_GRAPHICS_SELECTED = true;
 			}
-			printf("DATA: %x (PC=%x)\n", data, m_i8088->pc());
+			logerror("DATA: %x (PC=%x)\n", data, m_i8088->pc());
 	}
 
 	// BIT 3: PARITY (1 enables parity test on memory board. Usually 64K per bank). -> ext_ram_w.
 	if(data & 0x08)
-		printf("\n*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w) ");
+		logerror("\n*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w) ");
 
 	// MISSING BITS (* not vital for normal operation, see diag.disk) -
 	// * BIT 4: DIAG LOOPBACK (0 at power-up; 1 directs RX50 and DC12 output to printer port)
@@ -2769,7 +2756,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	*/
 	if (data & 16)
 	{
-		printf("\nWARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) **** ");
+		logerror("\nWARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) **** ");
 	}
 
 	address_space &io = m_i8088->space(AS_IO);
@@ -2782,7 +2769,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		PRT  RCV DATA.......KBD TXD...........PRT RDATA
 		KBD  RCV DATA.......PRT TXD...........KBD RXD
 		*/
-		printf("\nWARNING: UNEMULATED PORT LOOPBACK (COMM, PRINTER, KEYBOARD ports) **** ");
+		logerror("\nWARNING: UNEMULATED PORT LOOPBACK (COMM, PRINTER, KEYBOARD ports) **** ");
 
 		io.unmap_readwrite(0x40, 0x43);  // unmap MPSC handlers to prevent CPU crashes ("INTERRUPTS OFF")
 	}
@@ -2791,7 +2778,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
 			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_new_device, cd_ba_w) );
-			printf("\n **** COMM HANDLER INSTALLED **** ");
+			logerror("\n **** COMM HANDLER INSTALLED **** ");
 			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}
 
@@ -2870,11 +2857,11 @@ READ16_MEMBER(rainbow_state::vram_r)
 		int readback_plane = 0;
 
 		if( !(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) ) // 0x10           // READBACK OPERATION - if ENABLE_WRITES NOT SET
-			readback_plane = (m_GDC_MODE_REGISTER & GDC_MODE_READBACK_PLANE_MASK) >> 2; // READBACK PLANE 00..02, mask in bits 2+3
+		   readback_plane = (m_GDC_MODE_REGISTER & GDC_MODE_READBACK_PLANE_MASK) >> 2; // READBACK PLANE 00..02, mask in bits 2+3
 
 		return m_video_ram[ (offset & 0x7fff)  + (0x8000 * readback_plane)];
 	}
-	return 0xffff;
+	return 0xffff; 
 }
 
 // NOTE: Rainbow has separate registers for fore and background.
@@ -2891,7 +2878,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 	if(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR) // VT240 : if(SELECT_VECTOR_PATTERN_REGISTER)
 	{
 		chr = bitswap<8>(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
-		chr |= (chr << 8);
+		chr |= (chr << 8); 
 		if(m_patcnt-- == 0)
 		{
 			m_patcnt = m_patmult;
@@ -2918,15 +2905,15 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 
 		for(int i = 0; i <= 3; i++)
 		{
-			if( BIT(ps,i ) )
+			if( BIT(ps,i ) ) // 1 means don't touch (bits already inverted)
 			{
-				uint16_t mem = m_video_ram[(offset & 0xffff) + (0x8000 * i)];   // VT240
+				uint16_t mem = m_video_ram[(offset & 0xffff) + (0x8000 * i)];   
 
 				uint16_t out = 0; // VT240 : uint8_t
 				for(int j = 0; j <= 15; j++)  // REPLACE MODE : one replaced by FG, zero by BG ( 16 instead of 8 bit on VT240 )
 						out |= BIT(chr, j) ? ((fore & 1) << j) : ((back & 1) << j);
 
-				switch (m_GDC_ALU_PS_REGISTER & ALU_PS_MODE_MASK)
+				switch ((m_GDC_ALU_PS_REGISTER) & ALU_PS_MODE_MASK)
 				{
 					case OVERLAY_MODE: // (OR)
 						out |= mem;
@@ -2941,9 +2928,9 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 				}
 
 				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : Text Mode and Write Mask Batch
-					out = (out & ~m_GDC_WRITE_MASK) | (mem & m_GDC_WRITE_MASK); // // M_MASK (1st use)
+					out = (out & ~m_GDC_WRITE_MASK) | (mem & m_GDC_WRITE_MASK);
 				else
-					out = (out & ~data) | (mem & data); // vector mode
+					out = (out & ~data) | (mem & data); 	
 
 				if(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) // 0x10
 					m_video_ram[(offset & 0xffff) + (0x8000 * i)] = out;
@@ -2954,37 +2941,45 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 
 		} // plane select (LOOP)
 		return;
-	}
+	} // if enable_writes
 }
 
 // (READ)
 // Read  scroll buffer (see GDC Diagnostic Disk, SCROLL BUFFER test)
 READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 {
-	uint8_t out = 0;
+	uint8_t data = 0;
 	switch(offset)
 	{
 		case 0:
-			out = m_PORT50;
+			data = m_GDC_MODE_REGISTER; // ?
 			break;
 
 		case 1:
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_SCROLL_MAP ) // 0x80
 			{
 				// Documentation says it is always incremented (read and write):
-				out = m_GDC_SCROLL_BUFFER[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )
+				data = m_GDC_SCROLL_BUFFER[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )
 				m_GDC_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
 				break;
 			}
 			else
-				printf("\n * UNEXPECTED CASE: READ REGISTER 50..55 with INDIRECT_REGISTER $%02x and OFFSET $%02x *", m_GDC_INDIRECT_REGISTER, offset);
+				logerror("\n * UNEXPECTED CASE: READ REGISTER 50..55 with INDIRECT_REGISTER $%02x and OFFSET $%02x *", m_GDC_INDIRECT_REGISTER, offset);
+			break;
+
+		case 6:
+			data = m_hgdc->read(space, offset & 0x00);
+			break;
+
+		case 7:
+			data = m_hgdc->read(space, offset & 0x01);
 			break;
 
 		default:
-			printf("\n * UNHANDLED CASE: READ REGISTER 50..55 with INDIRECT_REGISTER $%02x and OFFSET $%02x *", m_GDC_INDIRECT_REGISTER, offset);
+			logerror("\n * UNHANDLED CASE: READ REGISTER 50..55 with INDIRECT_REGISTER $%02x and OFFSET $%02x *", m_GDC_INDIRECT_REGISTER, offset);
 			break;
 	} // switch
-	return out;
+	return data;
 }
 
 WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
@@ -2997,7 +2992,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			if(last_message != 1)
 			{
 				popmessage("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN REBOOT.\n");
-				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , m_i8088->pc());
+				logerror("OFFSET: %x (PC=%x)\n", 0x50 +offset , m_i8088->pc());
 				last_message = 1;
 			}
 			return;
@@ -3017,7 +3012,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			}
 			break;
 
-		case 1: //  51h - DATA loaded into register previously written to 53h.
+		case 1: //  51h = DATA loaded into (a register previously addressed by a write to 53h)
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_WRITE_BUFFER) // 0x01
 			{
 				m_GDC_write_buffer_index = 0;                   // (writing to 51h  CLEARS  the index counter)
@@ -3030,7 +3025,6 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				if(m_GDC_color_map_index == 32)
 				{
 					m_GDC_color_map_index = 0; // 0...31  (CPU accesses 32 bytes
-					m_color_map_changed = true;
 
 					printf("\n * COLOR MAP FULLY LOADED *");
 					for(int zi =0; zi <16; zi++)
@@ -3063,81 +3057,88 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 			// -----------------PATTERN + MULTIPLIER USED IN VECTOR MODE ONLY!
 			// SEE PAGE 37 OF AA-AE36A (PDF).
-			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN_MULTIPLIER)
+			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN_MULTIPLIER) // 0x02
 			{
 				// On a Rainbow, 12 indicates a multiplier of 16-12 = 4 (example)
 				m_patmult = 16 - (data & 15); // 4 bit register  // VT240: "patmult_w"
 				break;
 			}
 
-			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN)
+			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN) // 0x04
 			{
 				// NOTE : Pattern Multiplier MUST BE LOADED before (!)
 				m_vpat = data;
 				break;
 			}
 
-			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_FG_BG) // 2 x 4
+			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_FG_BG) // 0x08 
 			{
 				m_GDC_FG_BG = data;  // Neither bitswap nor negated (and also not both)...
-				break; //  Next: prepare FG / BG and PLANE  in  ALU - PLANE_SELECT register.
+				break; //  Next: prepare FG / BG (4 bits each) + plane  in  ALU - PLANE_SELECT register.
 			}
 
-			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_ALU_PS)
+			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_ALU_PS) // 0x10
 			{
 				m_GDC_ALU_PS_REGISTER = ~data;  // Negated...
 				break;
 			}
 
-			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_MODE_REGISTER)
+			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_MODE_REGISTER) // 0x40
 			{
 				m_GDC_MODE_REGISTER =  data; // Neither bitswap nor negated (and also not both)...
 
-				if(last_message != 2)
+				if(data & GDC_MODE_HIGHRES) // 0x01
+				{	
+						if(last_message != 2)
+						{    
+							last_message = 2;
+							printf(" * HIGH RESOLUTION * ");
+						}
+				}
+				else
 				{
-					last_message = 2;
-
-					if(data & GDC_MODE_HIGHRES)
-						printf(" * HIGH RESOLUTION * ");
-					else
-						printf(" MEDIUM RESOLUTION ");
+						if(last_message != 3)
+						{    
+							last_message = 3;
+							printf(" MEDIUM RESOLUTION ");
+						}
 				}
 
-				if(last_mode != (data & GDC_MODE_VECTOR))
+				if(last_mode != (data & GDC_MODE_VECTOR)) // 0x02
 				{
 					last_mode = data & GDC_MODE_VECTOR;
 					if(data & GDC_MODE_VECTOR)
-						printf(" VECTOR MODE ");
+						logerror(" VECTOR MODE ");
 					else
-						printf(" WORD MODE ");
+						logerror(" WORD MODE ");
 				}
 
-				if(last_readback != (data & GDC_MODE_ENABLE_WRITES))
+				if(last_readback != (data & GDC_MODE_ENABLE_WRITES)) // 0x10
 				{
 					last_readback = data & GDC_MODE_ENABLE_WRITES;
 					if(data & GDC_MODE_ENABLE_WRITES) // 0x10
-						printf(" READBACK: OFF - ENABLE_WRITES ");
+						logerror(" READBACK: OFF - ENABLE_WRITES ");
 					else    // READBACK PLANE 00..02 - mask in bits 2+3:
-						printf(" READBACK MODE; plane = %02x ", m_GDC_MODE_REGISTER & GDC_MODE_READBACK_PLANE_MASK); // unsure if PLANE is set... already?!
+					    logerror(" READBACK MODE; plane = %02x ", m_GDC_MODE_REGISTER & GDC_MODE_READBACK_PLANE_MASK); // unsure if PLANE is set... already?!
 				}
 
 				if(last_scroll_index != m_GDC_scroll_index)
 				{
 					last_scroll_index = m_GDC_scroll_index;
 					if(data & GDC_MODE_READONLY_SCROLL_MAP) // 0x20
-					{   //printf(" SCROLL MAP READ_ONLY. Index : %02x ", m_GDC_scroll_index);
-					} else
-					{   printf(" SCROLL MAP IS WRITABLE. Index : %02x ", m_GDC_scroll_index);
-					}
+					   logerror(" SCROLL MAP READ_ONLY. Index : %02x ", m_GDC_scroll_index);
+					 else
+					   logerror(" SCROLL MAP IS WRITABLE. Index : %02x ", m_GDC_scroll_index);
 				}
 
 				if(!(data & GDC_MODE_ENABLE_VSYNC_IRQ)) // 0x40
 					lower_8088_irq(IRQ_GRF_INTR_L); // also clears the interrupt
 
+				// case 0x80 :  If this bit is a 1 red and blue outputs are enabled. If this bit is a 0 red and blue outputs are disabled (page 20 of AA-AE36A)
 				break;
 			} // GDC_SELECT_MODE_REGISTER
 
-			printf("\n* UNIMPLEMENTED CASE. MODE = %02x / m_GDC_INDIRECT_REGISTER = %02x\n",m_GDC_MODE_REGISTER, m_GDC_INDIRECT_REGISTER);
+			logerror("\n* UNIMPLEMENTED CASE. MODE = %02x / m_GDC_INDIRECT_REGISTER = %02x\n",m_GDC_MODE_REGISTER, m_GDC_INDIRECT_REGISTER);
 			break;
 
 		case 2:
@@ -3161,12 +3162,15 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				m_GDC_color_map_index = 0;                      // (also clears the index counter)
 			// NEXT: 32 BYTE COLOR MAP, LOADED TO $51
 
+			//if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_MODE_REGISTER) // 0x40
+			//		logerror(" *** SELECT MODE REGISTER");
+
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_SCROLL_MAP ) // 0x80
 			{
 				if(last_scroll_index != m_GDC_scroll_index)
 				{
 					last_scroll_index =  m_GDC_scroll_index;
-					printf(" *** SCROLL INDEX COUNTER RESET, old value = %d", m_GDC_scroll_index);
+					logerror(" *** SCROLL INDEX COUNTER RESET, old value = %d", m_GDC_scroll_index);
 				}
 				m_GDC_scroll_index = 0;                         // (also clears the index counter)
 			}  // NEXT: LOAD 256 BYTE SCROLL MAP INTO $51
@@ -3180,6 +3184,11 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			break;
 		case 5: // 55h   Write Mask HIGH
 			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
+			break;
+
+		case 6:
+		case 7:
+			m_hgdc->write(space, offset & 0x01, data);  
 			break;
 	} // switch
 
@@ -3336,7 +3345,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_kbd8251->dtr_handler().set(FUNC(rainbow_state::irq_hi_w));
 	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_state::kbd_rxready_w));
 	m_kbd8251->txrdy_handler().set(FUNC(rainbow_state::kbd_txready_w));
-
+	
 	LK201(config, m_lk201, 0);
 	m_lk201->tx_handler().set(m_kbd8251, FUNC(i8251_device::write_rxd));
 
