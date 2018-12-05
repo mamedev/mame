@@ -962,8 +962,8 @@ MACHINE_CONFIG_START(ql_state::ql)
 
 	MCFG_DEVICE_ADD("rom", QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_cards, nullptr)
 
-	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
-	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(*this, ql_state, qimi_extintl_w))
+	QIMI(config, m_qimi, 0);
+	m_qimi->extint_wr_callback().set(FUNC(ql_state::qimi_extintl_w));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")

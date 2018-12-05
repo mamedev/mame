@@ -603,24 +603,24 @@ MACHINE_CONFIG_START(z88_state::z88)
 	m_maincpu->set_addrmap(AS_IO, &z88_state::z88_io);
 
 	/* video hardware */
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT);
 	m_screen->set_visarea(0, (Z88_SCREEN_WIDTH - 1), 0, (Z88_SCREEN_HEIGHT - 1));
 	m_screen->set_palette(m_palette);
-	MCFG_SCREEN_UPDATE_DEVICE("blink", upd65031_device, screen_update)
+	m_screen->set_screen_update("blink", FUNC(upd65031_device::screen_update));
 
 	device = &PALETTE(config, m_palette, Z88_NUM_COLOURS);
 	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
 
-	device = &UPD65031(config, m_blink, XTAL(9'830'400));
+	UPD65031(config, m_blink, XTAL(9'830'400));
 	m_blink->kb_rd_callback().set(FUNC(z88_state::kb_r));
 	m_blink->int_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_blink->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_blink->spkr_wr_callback().set("speaker", FUNC(speaker_sound_device::level_w));
-	MCFG_UPD65031_SCR_UPDATE_CB(z88_state, lcd_update)
-	MCFG_UPD65031_MEM_UPDATE_CB(z88_state, bankswitch_update)
+	m_blink->set_screen_update_callback(FUNC(z88_state::lcd_update), this);
+	m_blink->set_memory_update_callback(FUNC(z88_state::bankswitch_update), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

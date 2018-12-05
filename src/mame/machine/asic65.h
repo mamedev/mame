@@ -22,10 +22,16 @@ enum {
 class asic65_device : public device_t
 {
 public:
+	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t type)
+		: asic65_device(mconfig, tag, owner, clock)
+	{
+		set_type(type);
+	}
+
 	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	void set_type(int type) { m_asic65_type = type; }
+	void set_type(uint8_t type) { m_asic65_type = type; }
 
 	void reset_line(int state);
 	DECLARE_WRITE16_MEMBER( data_w );
@@ -76,9 +82,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(ASIC65, asic65_device)
-
-#define MCFG_ASIC65_ADD(_tag, _type) \
-	MCFG_DEVICE_ADD(_tag, ASIC65, 0) \
-	downcast<asic65_device &>(*device).set_type(_type);
 
 #endif // MAME_MACHINE_ASIC65_H

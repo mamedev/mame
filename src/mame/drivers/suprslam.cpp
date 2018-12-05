@@ -305,9 +305,9 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-45, -21)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(-45, -21);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -2321,9 +2321,9 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(85, 0)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(85, 0);
 
 	K053251(config, m_k053251, 0);
 
@@ -2389,8 +2389,8 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::prmrsocr_sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_OFFSETS(85, 1)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_offsets(85, 1);
 
 	K053251(config, m_k053251, 0);
 

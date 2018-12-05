@@ -3622,7 +3622,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
@@ -3690,7 +3690,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
@@ -3771,7 +3771,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));

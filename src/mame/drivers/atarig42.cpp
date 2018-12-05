@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
 	m_adc->in_callback<1>().set_ioport("A2D1");
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
+	ASIC65(config, m_asic65, 0, ASIC65_ROMBASED);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarig42_0x400_state::atarig42_0x400)
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(atarig42_0x400_state::atarig42_0x400)
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_GUARDIANS)
+	ASIC65(config, m_asic65, 0, ASIC65_GUARDIANS);
 MACHINE_CONFIG_END
 
 

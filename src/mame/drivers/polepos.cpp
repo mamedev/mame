@@ -888,14 +888,14 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	n54xx.set_discrete("discrete");
 	n54xx.set_basenote(NODE_01);
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
-	MCFG_NAMCO_06XX_MAINCPU("maincpu")
-	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
-	MCFG_NAMCO_06XX_READ_1_CB(READ8("53xx", namco_53xx_device, read))
-	MCFG_NAMCO_06XX_READ_REQUEST_1_CB(WRITELINE("53xx", namco_53xx_device, read_request))
-	MCFG_NAMCO_06XX_WRITE_2_CB(WRITE8("52xx", namco_52xx_device, write))
-	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
+	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
+	n06xx.set_maincpu(m_maincpu);
+	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
+	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
+	n06xx.read_callback<1>().set("53xx", FUNC(namco_53xx_device::read));
+	n06xx.read_request_callback<1>().set("53xx", FUNC(namco_53xx_device::read_request));
+	n06xx.write_callback<2>().set("52xx", FUNC(namco_52xx_device::write));
+	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
@@ -1001,10 +1001,10 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	n51xx.set_screen_tag(m_screen);
 	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
-	MCFG_NAMCO_06XX_MAINCPU("maincpu")
-	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
+	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
+	n06xx.set_maincpu(m_maincpu);
+	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
+	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 

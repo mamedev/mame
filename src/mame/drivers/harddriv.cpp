@@ -1654,7 +1654,7 @@ MACHINE_CONFIG_START(harddriv_state::dsk)
 	EEPROM_2816(config, "dsk_30c"); // MK48Z02
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
+	ASIC65(config, m_asic65, 0, ASIC65_STANDARD);
 MACHINE_CONFIG_END
 
 
@@ -1667,7 +1667,7 @@ MACHINE_CONFIG_START(harddriv_state::dsk2)
 	MCFG_DEVICE_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
+	ASIC65(config, m_asic65, 0, ASIC65_STANDARD);
 MACHINE_CONFIG_END
 
 
@@ -1933,7 +1933,7 @@ MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 	config.device_remove("lspeaker");
 	config.device_remove("rspeaker");
 
-	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
+	ASIC65(config, m_asic65, 0, ASIC65_STEELTAL);         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();

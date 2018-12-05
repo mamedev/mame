@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	K053936(config, m_k053936, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

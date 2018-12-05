@@ -812,10 +812,10 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_PGM2_MEMCARD_ADD("memcard_p1")
-	MCFG_PGM2_MEMCARD_ADD("memcard_p2")
-	MCFG_PGM2_MEMCARD_ADD("memcard_p3")
-	MCFG_PGM2_MEMCARD_ADD("memcard_p4")
+	PGM2_MEMCARD(config, m_memcard[0], 0);
+	PGM2_MEMCARD(config, m_memcard[1], 0);
+	PGM2_MEMCARD(config, m_memcard[2], 0);
+	PGM2_MEMCARD(config, m_memcard[3], 0);
 MACHINE_CONFIG_END
 
 // not strictly needed as the video code supports changing on the fly, but makes recording easier etc.

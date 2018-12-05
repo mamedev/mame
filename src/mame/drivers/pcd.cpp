@@ -566,8 +566,8 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	m_rtc->set_epoch(1900);
 	m_rtc->set_24hrs(true);
 
-	MCFG_DEVICE_ADD("keyboard", PCD_KEYBOARD, 0)
-	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE(m_usart[1], mc2661_device, rx_w))
+	pcd_keyboard_device &keyboard(PCD_KEYBOARD(config, "keyboard", 0));
+	keyboard.out_tx_handler().set(m_usart[1], FUNC(mc2661_device::rx_w));
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
@@ -590,8 +590,7 @@ MACHINE_CONFIG_START(pcd_state::pcx)
 	pcx_video_device &video(PCX_VIDEO(config.replace(), "video", 0));
 	video.txd_handler().set("keyboard", FUNC(pcd_keyboard_device::t0_w));
 
-	MCFG_DEVICE_MODIFY("keyboard")
-	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE("video", pcx_video_device, rx_w))
+	subdevice<pcd_keyboard_device>("keyboard")->out_tx_handler().set("video", FUNC(pcx_video_device::rx_w));
 
 	m_usart[1]->txd_handler().set_nop();
 MACHINE_CONFIG_END

@@ -3669,10 +3669,10 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3765,10 +3765,10 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)

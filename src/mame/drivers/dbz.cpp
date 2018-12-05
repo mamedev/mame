@@ -366,13 +366,13 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 
 	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k053936_1", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-46, -16)
+	K053936(config, m_k053936_1, 0);
+	m_k053936_1->set_wrap(1);
+	m_k053936_1->set_offsets(-46, -16);
 
-	MCFG_DEVICE_ADD("k053936_2", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-46, -16)
+	K053936(config, m_k053936_2, 0);
+	m_k053936_2->set_wrap(1);
+	m_k053936_2->set_offsets(-46, -16);
 
 	K053252(config, m_k053252, 16000000/2);
 	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));

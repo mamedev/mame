@@ -703,24 +703,25 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 
+	
+	NAMCO_58XX(config, m_namco58xx, 0);
+	m_namco58xx->in_callback<0>().set_ioport("COINS");
+	m_namco58xx->in_callback<1>().set_ioport("P1_RIGHT");
+	m_namco58xx->in_callback<2>().set_ioport("P2_RIGHT");
+	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("58xx", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1_RIGHT"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2_RIGHT"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("56xx_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(*this, namcos16_state, dipA_h))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(*this, namcos16_state, dipB_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(*this, namcos16_state, dipB_h))
-	MCFG_NAMCO56XX_IN_3_CB(READ8(*this, namcos16_state, dipA_l))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, namcos16_state, flip))
+	NAMCO_56XX(config, m_namco56xx_1, 0);
+	m_namco56xx_1->in_callback<0>().set(FUNC(namcos16_state::dipA_h));
+	m_namco56xx_1->in_callback<1>().set(FUNC(namcos16_state::dipB_l));
+	m_namco56xx_1->in_callback<2>().set(FUNC(namcos16_state::dipB_h));
+	m_namco56xx_1->in_callback<3>().set(FUNC(namcos16_state::dipA_l));
+	m_namco56xx_1->out_callback<0>().set(FUNC(namcos16_state::flip));
 
-	MCFG_DEVICE_ADD("56xx_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2_LEFT"))
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("SERVICE"))
+	NAMCO_56XX(config, m_namco56xx_2, 0);
+	m_namco56xx_2->in_callback<1>().set_ioport("P1_LEFT");
+	m_namco56xx_2->in_callback<2>().set_ioport("P2_LEFT");
+	m_namco56xx_2->in_callback<3>().set_ioport("SERVICE");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK,384,0,288,264,0,224) // derived from Galaxian HW, 60.606060

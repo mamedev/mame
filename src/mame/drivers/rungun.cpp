@@ -425,8 +425,8 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_OFFSETS(34, 9)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_offsets(34, 9);
 
 	K055673(config, m_k055673, 0);
 	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback), this);
