@@ -4,8 +4,8 @@
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Portions (2013 - 2018) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
-Baud rate generator by AJR (2018) and Shattered (2016), keyboard & GDC fixes by Cracyc (June - Nov. 2016).
+Keyboard & GDC fixes by Cracyc (June - Nov. 2016), Baud rate generator by Shattered (July 2016)
+Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
 
@@ -24,8 +24,8 @@ PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DI
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF DECEMBER 2018
--------------------------
+STATE AS OF JANUARY 2017
+------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
 The public domain file RBCONVERT.ZIP documents how model 'A' differs from version B.
@@ -103,15 +103,16 @@ COLOR EMULATION (NEC 7220 + extra hardware)
    Palette takes 2 byte per palette entry. CLUT ("color map") is 32 byte long.
 ------------------------------------------------------------------------------------------------
 
-DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (a bit of history)
-   (1) the standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
-   (2) an unofficial DIY cable enabled R-G-B graphics + seperate text
+THE DEC 'R-M-B' COLOR CABLE VS. THE UNOFFICIAL 'R-G-B' MODE (A BIT OF HISTORY)
+   The standard DEC "color cable" connected the green gun of a VR241 to the mono output of the Rainbow
+   (DIP setting COLOR_MONITOR).
+
+   An unofficial DIY cable enabled R-G-B graphics + seperate text (emulated by DIP setting DUAL MONITOR).
+   -> AUTODETECT (DIP in emulation) snoops the color palette and sets the monitor accordingly.
 	
 EMULATION SPECIFIC
-   (1) COLOR_MONITOR reflects DEC's recommendation (R-M-B with VR241 above)
-   (2) DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
-       (also helps debugging semi broken programs, for example Doodle).
-   (3) AUTODETECT (DIP setting) snoops the color palette and chooses the correct 'wiring' 
+   DUAL MONITOR enables both screens, even if onboard graphics has been accidently shut off
+   (helps debugging semi broken programs, for example Doodle).
 
 SCREEN 1 vs. SCREEN 2 IN EMULATION
    All GDC 7220 output is displayed on the right. Be it color or monochrome, Option Graphics output is on screen 2.
@@ -1329,7 +1330,7 @@ void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int para
 
 uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static int old_palette, old_monitor;
+	static int old_monitor;
 
 	if((m_monitor_suggested < 1) || (m_monitor_suggested > 3))
 			m_monitor_suggested = COLOR_MONITOR;
@@ -1346,13 +1347,10 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 	}
 
 	int palette_selected;
-	if( m_ONBOARD_GRAPHICS_SELECTED && (m_inp13->read() == COLOR_MONITOR) )
+	if( m_ONBOARD_GRAPHICS_SELECTED && (monitor_selected == COLOR_MONITOR) )
 		 palette_selected = 2; // Color monitor; green text
 	else
 		 palette_selected = m_inp9->read();
-
-	if(palette_selected != old_palette)
-		old_palette = palette_selected;
 
 	m_crtc->palette_select(palette_selected);
     m_crtc->video_update(bitmap, cliprect); 
