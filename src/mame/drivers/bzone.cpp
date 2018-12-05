@@ -16,7 +16,7 @@
 
     Battlezone memory map (preliminary)
 
-    0000-04ff RAM
+    0000-03ff RAM
     0800      IN0
     0a00      IN1
     0c00      IN2
