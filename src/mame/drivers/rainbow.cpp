@@ -1353,7 +1353,7 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 		 palette_selected = m_inp9->read();
 
 	m_crtc->palette_select(palette_selected);
-    m_crtc->video_update(bitmap, cliprect); 
+        m_crtc->video_update(bitmap, cliprect); 
 
 	if(    m_SCREEN_BLANK                    ||
 		( (!m_ONBOARD_GRAPHICS_SELECTED) && (m_inp13->read() != DUAL_MONITOR) )   // dual monitor: never blank all
@@ -2861,7 +2861,7 @@ READ16_MEMBER(rainbow_state::vram_r)
 
 		return m_video_ram[ (offset & 0x7fff)  + (0x8000 * readback_plane)];
 	}
-	return  0xffff; 
+	return 0xffff; 
 }
 
 // NOTE: Rainbow has separate registers for fore and background.
