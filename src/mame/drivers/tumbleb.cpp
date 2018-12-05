@@ -1128,7 +1128,7 @@ static INPUT_PORTS_START( fncywld )
 	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )     // only seems to the title screen
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )     // changes the region disclaimer and title screen only, not story text
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )
@@ -1159,6 +1159,15 @@ static INPUT_PORTS_START( fncywld )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0100, "Freeze" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magipur )
+	PORT_INCLUDE(fncywld)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -3717,7 +3726,7 @@ GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, tumbleb_state, init_suprtr
 
 GAME( 1996, fncywld,  0,       fncywld,     fncywld, tumbleb_state,  init_fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , MACHINE_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
 
-GAME( 1996, magipur,  0,       magipur,     fncywld, tumbleb_state,  init_magipur,  ROT0, "Unico",   "Magic Purple" , MACHINE_SUPPORTS_SAVE )
+GAME( 1996, magipur,  0,       magipur,     magipur, tumbleb_state,  init_magipur,  ROT0, "Unico",   "Magic Purple" , MACHINE_SUPPORTS_SAVE )
 
 /* First Amusement / Mijin / SemiCom hardware (MCU protected) */
 GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, init_chokchok, ROT0, "First Amusement", "Metal Saver", MACHINE_SUPPORTS_SAVE )
