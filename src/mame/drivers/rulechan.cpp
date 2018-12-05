@@ -149,10 +149,9 @@
 
 #define CPU_CLOCK       XTAL(8'000'000)
 #define VID_CLOCK       XTAL(10'730'000)
-#define TMS_CLOCK       XTAL(1'750'000)
+#define TMS_CLOCK       (VID_CLOCK / 24)
 #define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
 
-#include <conio.h>
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
