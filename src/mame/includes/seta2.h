@@ -56,49 +56,44 @@ public:
 	void samshoot(machine_config &config);
 	void namcostr(machine_config &config);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-
-	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
-	DECLARE_READ16_MEMBER(spriteram16_word_r);
-	DECLARE_WRITE16_MEMBER(vregs_w);
-	DECLARE_READ32_MEMBER(oki_read);
-	DECLARE_WRITE32_MEMBER(oki_write);
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
-
 	void init_namcostr();
 
 protected:
 
-	DECLARE_WRITE16_MEMBER(grdians_lockout_w);
+	DECLARE_WRITE8_MEMBER(grdians_lockout_w);
 
 	DECLARE_READ16_MEMBER(mj4simai_p1_r);
 	DECLARE_READ16_MEMBER(mj4simai_p2_r);
-	DECLARE_WRITE16_MEMBER(mj4simai_keyboard_w);
 
 	DECLARE_READ16_MEMBER(pzlbowl_protection_r);
-	DECLARE_READ16_MEMBER(pzlbowl_coins_r);
-	DECLARE_WRITE16_MEMBER(pzlbowl_coin_counter_w);
+	DECLARE_READ8_MEMBER(pzlbowl_coins_r);
+	DECLARE_WRITE8_MEMBER(pzlbowl_coin_counter_w);
 
 	DECLARE_WRITE16_MEMBER(reelquak_leds_w);
-	DECLARE_WRITE16_MEMBER(reelquak_coin_w);
+	DECLARE_WRITE8_MEMBER(reelquak_coin_w);
 
-	DECLARE_WRITE16_MEMBER(samshoot_coin_w);
+	DECLARE_WRITE8_MEMBER(samshoot_coin_w);
 
-	DECLARE_WRITE16_MEMBER(telpacfl_lamp1_w);
-	DECLARE_WRITE16_MEMBER(telpacfl_lamp2_w);
-	DECLARE_WRITE16_MEMBER(telpacfl_lockout_w);
+	DECLARE_WRITE8_MEMBER(telpacfl_lamp1_w);
+	DECLARE_WRITE8_MEMBER(telpacfl_lamp2_w);
+	DECLARE_WRITE8_MEMBER(telpacfl_lockout_w);
 
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 
+	DECLARE_WRITE16_MEMBER(vregs_w);
+	DECLARE_READ16_MEMBER(spriteram_r);
 	DECLARE_WRITE16_MEMBER(spriteram_w);
 
 	DECLARE_VIDEO_START(xoffset);
 	DECLARE_VIDEO_START(xoffset1);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
 	INTERRUPT_GEN_MEMBER(seta2_interrupt);
 	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
@@ -145,7 +140,7 @@ protected:
 	int m_keyboard_row;
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
-	uint16_t m_private_spriteram[0x1000 / 2];
+	std::unique_ptr<uint16_t[]> m_private_spriteram;
 
 
 private:
@@ -179,7 +174,7 @@ class funcube_state : public seta2_state
 public:
 	funcube_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seta2_state(mconfig, type, tag)
-		, m_funcube_outputs(*this, "funcube_outputs")
+		, m_outputs(*this, "outputs")
 		, m_funcube_leds(*this, "funcube_leds")
 	{ }
 
@@ -195,14 +190,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(funcube_nvram_dword_r);
-	DECLARE_WRITE32_MEMBER(funcube_nvram_dword_w);
-	DECLARE_READ32_MEMBER(funcube_debug_r);
-	DECLARE_READ16_MEMBER(funcube_coins_r);
-	DECLARE_WRITE16_MEMBER(funcube_leds_w);
-	DECLARE_READ16_MEMBER(funcube_outputs_r);
-	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
-	DECLARE_READ16_MEMBER(funcube_battery_r);
+	DECLARE_READ32_MEMBER(nvram_r);
+	DECLARE_WRITE32_MEMBER(nvram_w);
+	DECLARE_READ32_MEMBER(debug_r);
+	DECLARE_READ16_MEMBER(coins_r);
+	DECLARE_WRITE16_MEMBER(leds_w);
+	DECLARE_READ16_MEMBER(outputs_r);
+	DECLARE_WRITE16_MEMBER(outputs_w);
+	DECLARE_READ16_MEMBER(battery_r);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
@@ -214,10 +209,10 @@ private:
 
 	void funcube_debug_outputs();
 
-	required_shared_ptr<uint16_t> m_funcube_outputs;
+	required_shared_ptr<uint16_t> m_outputs;
 	required_shared_ptr<uint16_t> m_funcube_leds;
-	uint64_t m_funcube_coin_start_cycles;
-	uint8_t m_funcube_hopper_motor;
+	uint64_t m_coin_start_cycles;
+	uint8_t m_hopper_motor;
 };
 
 
@@ -235,11 +230,11 @@ public:
 	void staraudi(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(staraudi_camera_w);
-	DECLARE_WRITE16_MEMBER(staraudi_lamps1_w);
-	DECLARE_WRITE16_MEMBER(staraudi_lamps2_w);
-	DECLARE_READ16_MEMBER(staraudi_tileram_r);
-	DECLARE_WRITE16_MEMBER(staraudi_tileram_w);
+	DECLARE_WRITE8_MEMBER(camera_w);
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_READ16_MEMBER(tileram_r);
+	DECLARE_WRITE16_MEMBER(tileram_w);
 
 	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -254,7 +249,7 @@ private:
 	required_device<upd4992_device> m_rtc;
 	required_shared_ptr<uint16_t> m_rgbram;
 
-	uint16_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;
+	uint8_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;
 };
 
 #endif // MAME_INCLUDES_SETA2_H
