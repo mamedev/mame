@@ -701,7 +701,7 @@ void tumbleb_state::magipur_main_map(address_map &map)
 	map(0x000000, 0x00ffff).ram().share("mainram");
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 
-	map(0x100010, 0x100011).nopw(); // TODO: could be some kind of banking, maybe game boots with ROM at 0 instead of copying vectors, then switches it with this
+	map(0x100010, 0x100011).nopw(); // TODO: what is this, fncywld doesn't write here, can't be related to the RAM/ROM arrangement as the writes happen well after boot
 
 	unico_base_map(map);
 }
