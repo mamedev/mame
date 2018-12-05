@@ -243,13 +243,13 @@ MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 	MCFG_DEVICE_IO_MAP(hc11_io_map)
 	MCFG_MC68HC11_CONFIG( 0, 0x100, 0x01 )  // And 512 bytes EEPROM? (68HC11A1)
 
-	MCFG_DEVICE_ADD("tms", TMS34010, 48000000)
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(48000000 / 8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(skeetsht_state, scanline_update)   /* scanline updater (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, skeetsht_state, tms_irq))
+	TMS34010(config, m_tms, 48000000);
+	m_tms->set_addrmap(AS_PROGRAM, &skeetsht_state::tms_program_map);
+	m_tms->set_halt_on_reset(true);
+	m_tms->set_pixel_clock(48000000 / 8);
+	m_tms->set_pixels_per_clock(1);
+	m_tms->set_scanline_rgb32_callback(FUNC(skeetsht_state::scanline_update));
+	m_tms->output_int().set(FUNC(skeetsht_state::tms_irq));
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 

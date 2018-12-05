@@ -103,41 +103,10 @@ enum
 #define TMS34010_WV         0x0800      /* Window Violation Interrupt */
 
 
-#define MCFG_TMS340X0_HALT_ON_RESET(_value) \
-	downcast<tms340x0_device &>(*device).set_halt_on_reset(_value);
-
-#define MCFG_TMS340X0_PIXEL_CLOCK(_value) \
-	downcast<tms340x0_device &>(*device).set_pixel_clock(_value);
-
-#define MCFG_TMS340X0_PIXELS_PER_CLOCK(_value) \
-	downcast<tms340x0_device &>(*device).set_pixels_per_clock(_value);
-
-
 #define TMS340X0_SCANLINE_IND16_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms340x0_device::display_params *params)
-
-#define MCFG_TMS340X0_SCANLINE_IND16_CB(_class, _method) \
-	downcast<tms340x0_device &>(*device).set_scanline_ind16_callback(tms340x0_device::scanline_ind16_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-
 #define TMS340X0_SCANLINE_RGB32_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms340x0_device::display_params *params)
-
-#define MCFG_TMS340X0_SCANLINE_RGB32_CB(_class, _method) \
-	downcast<tms340x0_device &>(*device).set_scanline_rgb32_callback(tms340x0_device::scanline_rgb32_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-
-#define MCFG_TMS340X0_OUTPUT_INT_CB(_devcb)
-
-
 #define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
-
-#define MCFG_TMS340X0_TO_SHIFTREG_CB(_class, _method) \
-	downcast<tms340x0_device &>(*device).set_to_shiftreg_callback(tms340x0_device::to_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-
 #define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
-
-#define MCFG_TMS340X0_FROM_SHIFTREG_CB(_class, _method) \
-	downcast<tms340x0_device &>(*device).set_from_shiftreg_callback(tms340x0_device::from_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class tms340x0_device : public cpu_device,

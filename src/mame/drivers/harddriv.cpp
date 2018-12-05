@@ -1475,16 +1475,16 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	m_adc8->in_callback<6>().set_ioport("8BADC.6");
 	m_adc8->in_callback<7>().set_ioport("8BADC.7");
 
-	MCFG_DEVICE_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(driver_gsp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_driver) /* scanline callback (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdgsp_irq_gen))
-	MCFG_TMS340X0_TO_SHIFTREG_CB(harddriv_state, hdgsp_write_to_shiftreg)
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(harddriv_state, hdgsp_read_from_shiftreg)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS34010(config, m_gsp, HARDDRIV_GSP_CLOCK);
+	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_gsp_map);
+	m_gsp->set_halt_on_reset(true);
+	m_gsp->set_pixel_clock(4000000);
+	m_gsp->set_pixels_per_clock(4);
+	m_gsp->set_scanline_ind16_callback(FUNC(harddriv_state::scanline_driver));
+	m_gsp->output_int().set(FUNC(harddriv_state::hdgsp_irq_gen));
+	m_gsp->set_shiftreg_in_callback(FUNC(harddriv_state::hdgsp_write_to_shiftreg));
+	m_gsp->set_shiftreg_out_callback(FUNC(harddriv_state::hdgsp_read_from_shiftreg));
+	m_gsp->set_screen("screen");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
@@ -1517,13 +1517,13 @@ MACHINE_CONFIG_START(harddriv_state::driver_msp)
 	driver_nomsp(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("msp", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS34010(config, m_msp, XTAL(50'000'000));
+	m_msp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_msp_map);
+	m_msp->set_halt_on_reset(true);
+	m_msp->set_pixel_clock(5000000);
+	m_msp->set_pixels_per_clock(2);
+	m_msp->output_int().set(FUNC(harddriv_state::hdmsp_irq_gen));
+    m_msp->set_screen("screen");
 
 	config.device_remove("slapstic");
 MACHINE_CONFIG_END
@@ -1538,11 +1538,10 @@ MACHINE_CONFIG_START(harddriv_state::multisync_nomsp)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multisync_68k_map)
 
-	MCFG_DEVICE_MODIFY("gsp")
-	MCFG_DEVICE_PROGRAM_MAP(multisync_gsp_map)
-	MCFG_TMS340X0_PIXEL_CLOCK(6000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_multisync) /* scanline callback (indexed16) */
+	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::multisync_gsp_map);
+	m_gsp->set_pixel_clock(6000000);
+	m_gsp->set_pixels_per_clock(2);
+	m_gsp->set_scanline_ind16_callback(FUNC(harddriv_state::scanline_multisync));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1551,21 +1550,21 @@ MACHINE_CONFIG_END
 
 
 /* Multisync board with MSP (used by Hard Drivin' compact) */
-MACHINE_CONFIG_START(harddriv_state::multisync_msp)
+void harddriv_state::multisync_msp(machine_config &config)
+{
+    multisync_nomsp(config);
 
-	multisync_nomsp(config);
+    /* basic machine hardware */
+    TMS34010(config, m_msp, XTAL(50'000'000));
+    m_msp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_msp_map);
+    m_msp->set_halt_on_reset(true);
+    m_msp->set_pixel_clock(5000000);
+    m_msp->set_pixels_per_clock(2);
+    m_msp->output_int().set(FUNC(harddriv_state::hdmsp_irq_gen));
+    m_msp->set_screen("screen");
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("msp", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
-	MCFG_VIDEO_SET_SCREEN("screen")
-
-	config.device_remove("slapstic");
-MACHINE_CONFIG_END
+    config.device_remove("slapstic");
+}
 
 
 /* Multisync II board (used by Hard Drivin's Airborne) */
@@ -1577,8 +1576,7 @@ MACHINE_CONFIG_START(harddriv_state::multisync2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multisync2_68k_map)
 
-	MCFG_DEVICE_MODIFY("gsp")
-	MCFG_DEVICE_PROGRAM_MAP(multisync2_gsp_map)
+	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::multisync2_gsp_map);
 
 	config.device_remove("slapstic");
 MACHINE_CONFIG_END
@@ -1861,8 +1859,7 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	multisync_nomsp(config);
 
 	/* basic machine hardware */        /* multisync board without MSP */
-	MCFG_DEVICE_MODIFY("gsp")
-	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
+	m_gsp->set_pixel_clock(5000000);
 	adsp(config);                       /* ADSP board */
 	config.device_remove("slapstic");
 

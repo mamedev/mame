@@ -716,14 +716,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(coolpool_state::amerdart)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(amerdart_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, amerdart_scanline) /* scanline callback (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::amerdart_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(XTAL(40'000'000)/12);
+	m_maincpu->set_pixels_per_clock(2);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(coolpool_state::amerdart_scanline));
+	m_maincpu->set_shiftreg_in_callback(FUNC(coolpool_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(coolpool_state::from_shiftreg));
 
 	MCFG_DEVICE_ADD("dsp", TMS32015, XTAL(40'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(amerdart_dsp_pgm_map)
@@ -757,14 +757,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(coolpool_state::coolpool)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(coolpool_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/6) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, coolpool_scanline) /* scanline callback (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(XTAL(40'000'000)/6);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(coolpool_state::coolpool_scanline));
+	m_maincpu->set_shiftreg_in_callback(FUNC(coolpool_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(coolpool_state::from_shiftreg));
 
 	tms32026_device& dsp(TMS32026(config, m_dsp, XTAL(40'000'000)));
 	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_dsp_pgm_map);
@@ -801,14 +801,12 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(coolpool_state::_9ballsht)
+void coolpool_state::_9ballsht(machine_config &config)
+{
 	coolpool(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nballsht_map)
-
-	subdevice<tms32026_device>("dsp")->set_addrmap(AS_IO, &coolpool_state::nballsht_dsp_io_map);
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::nballsht_map);
+	m_dsp->set_addrmap(AS_IO, &coolpool_state::nballsht_dsp_io_map);
+}
 
 
 
