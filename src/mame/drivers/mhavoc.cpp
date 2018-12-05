@@ -539,8 +539,8 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_MHAVOC, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

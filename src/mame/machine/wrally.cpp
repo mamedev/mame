@@ -17,7 +17,7 @@
 
 void wrally_state::machine_start()
 {
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 /***************************************************************************
@@ -43,7 +43,7 @@ WRITE16_MEMBER(wrally_state::vram_w)
 	data = gaelco_decrypt(space, offset, data, 0x1f, 0x522a);
 	COMBINE_DATA(&m_videoram[offset]);
 
-	m_pant[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+	m_tilemap[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
 }
 
 WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
@@ -51,11 +51,9 @@ WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
 	flip_screen_set(state);
 }
 
-WRITE16_MEMBER(wrally_state::okim6295_bankswitch_w)
+WRITE8_MEMBER(wrally_state::okim6295_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7){
-		membank("okibank")->set_entry(data & 0x0f);
-	}
+	m_okibank->set_entry(data & 0x0f);
 }
 
 WRITE_LINE_MEMBER(wrally_state::coin1_counter_w)

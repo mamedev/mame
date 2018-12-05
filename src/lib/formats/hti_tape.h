@@ -33,6 +33,12 @@ public:
 	// Tape length: 140 ft of usable tape + 72" of punched tape at either end
 	static constexpr tape_pos_t TAPE_LENGTH = (140 * 12 + 72 * 2) * ONE_INCH_POS;
 
+	// Length of 0 bits at slow tape speed: 1/(35200 Hz)
+	static constexpr tape_pos_t ZERO_BIT_LEN = 619;
+
+	// Length of 1 bits at slow tape speed: 1.75 times ZERO_BIT_LEN
+	static constexpr tape_pos_t ONE_BIT_LEN = 1083;
+
 	// Words stored on tape
 	typedef uint16_t tape_word_t;
 

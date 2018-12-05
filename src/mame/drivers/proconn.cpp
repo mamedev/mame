@@ -265,13 +265,14 @@ void proconn_state::machine_reset()
 	m_vfd->reset(); // reset display1
 }
 
-MACHINE_CONFIG_START(proconn_state::proconn)
+void proconn_state::proconn(machine_config &config)
+{
 	Z80(config, m_maincpu, 4000000); /* ?? Mhz */
 	m_maincpu->set_daisy_config(z80_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &proconn_state::proconn_map);
 	m_maincpu->set_addrmap(AS_IO, &proconn_state::proconn_portmap);
 
-	MCFG_S16LF01_ADD("vfd",0)
+	S16LF01(config, m_vfd);
 
 	Z80PIO(config, m_z80pio[0], 4000000); /* ?? Mhz */
 	m_z80pio[0]->out_int_callback().set(FUNC(proconn_state::pio_1_m_out_int_w));
@@ -329,13 +330,13 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 
 	config.set_default_layout(layout_proconn);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000) /* ?? Mhz */ // YM2149F on PC92?
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, proconn_state, meter_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+	AY8910(config, m_ay, 1000000); /* ?? Mhz */ // YM2149F on PC92?
+	m_ay->port_b_write_callback().set(FUNC(proconn_state::meter_w));
+	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+	METERS(config, m_meters, 0);
+	m_meters->set_number_meters(8);
+}
 
 
 

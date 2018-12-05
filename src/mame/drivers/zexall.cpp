@@ -158,14 +158,15 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(zexall_state::zexall)
+void zexall_state::zexall(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &zexall_state::mem_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+}
 
 
 /******************************************************************************

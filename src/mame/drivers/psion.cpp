@@ -199,7 +199,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
-		m_lcdc->write(space, offset & 0x01, data);
+		m_lcdc->write(offset & 0x01, data);
 		break;
 	default:
 		io_rw(space, offset);
@@ -211,7 +211,7 @@ READ8_MEMBER( psion_state::io_r )
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
-		return m_lcdc->read(space, offset & 0x01);
+		return m_lcdc->read(offset & 0x01);
 	default:
 		io_rw(space, offset);
 	}
@@ -600,8 +600,8 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
 	/* Datapack */
-	MCFG_PSION_DATAPACK_ADD("pack1")
-	MCFG_PSION_DATAPACK_ADD("pack2")
+	PSION_DATAPACK(config, m_pack1, 0);
+	PSION_DATAPACK(config, m_pack2, 0);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion2")

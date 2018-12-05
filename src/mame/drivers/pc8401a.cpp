@@ -591,9 +591,9 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
 
 	/* video hardware */
 	pc8401a_video(config);
@@ -631,9 +631,9 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
 
 	/* video hardware */
 	pc8500_video(config);

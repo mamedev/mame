@@ -789,7 +789,7 @@ WRITE8_MEMBER(fantasy_sound_device::sound_w)
 			m_custom->mute_channel(2);
 
 		/* BOMB */
-		m_discrete->write(space, FANTASY_BOMB_EN, data & 0x80);
+		m_discrete->write(FANTASY_BOMB_EN, data & 0x80);
 
 		m_last_port1 = data;
 		break;

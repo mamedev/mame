@@ -38,23 +38,29 @@ void prehisle_state::prehisle_map(address_map &map)
 	map(0x0a0000, 0x0a07ff).ram().share("spriteram");
 	map(0x0b0000, 0x0b3fff).ram().w(FUNC(prehisle_state::fg_vram_w)).share("fg_vram");
 	map(0x0d0000, 0x0d07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0e0000, 0x0e00ff).r(FUNC(prehisle_state::control_r));
-	map(0x0f0000, 0x0ff0ff).w(FUNC(prehisle_state::control_w));
-	map(0x0f0070, 0x0ff071).w(FUNC(prehisle_state::soundcmd_w));
+	map(0x0e0010, 0x0e0011).portr("P2");                     // Player 2
+	map(0x0e0020, 0x0e0021).portr("COIN");                   // Coins, Tilt, Service
+	map(0x0e0041, 0x0e0041).lr8("P1_r", [this]() -> u8 { return m_io_p1->read() ^ m_invert_controls; }); // Player 1
+	map(0x0e0042, 0x0e0043).portr("DSW0");                   // DIPs
+	map(0x0e0044, 0x0e0045).portr("DSW1");                   // DIPs + VBLANK
+	map(0x0f0000, 0x0f0001).w(FUNC(prehisle_state::fg_scrolly_w));
+	map(0x0f0010, 0x0f0011).w(FUNC(prehisle_state::fg_scrollx_w));
+	map(0x0f0020, 0x0f0021).w(FUNC(prehisle_state::bg_scrolly_w));
+	map(0x0f0030, 0x0f0031).w(FUNC(prehisle_state::bg_scrollx_w));
+	map(0x0f0046, 0x0f0047).lw16("invert_controls_w", [this](u16 data){ m_invert_controls = data ? 0xff : 0x00; });
+	map(0x0f0050, 0x0f0051).lw16("coin_counter_1_w", [this](u16 data){ machine().bookkeeping().coin_counter_w(0, data & 1); });
+	map(0x0f0052, 0x0f0053).lw16("coin_counter_2_w", [this](u16 data){ machine().bookkeeping().coin_counter_w(1, data & 1); });
+	map(0x0f0060, 0x0f0061).lw16("flip_screen_w", [this](u16 data){ flip_screen_set(data & 0x01); });
+	map(0x0f0070, 0x0f0071).w(FUNC(prehisle_state::soundcmd_w));
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(prehisle_state::D7759_write_port_0_w)
+WRITE8_MEMBER(prehisle_state::upd_port_w)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
-}
-
-WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
-{
-	m_upd7759->reset_w(BIT(data, 7));
 }
 
 void prehisle_state::prehisle_sound_map(address_map &map)
@@ -70,8 +76,8 @@ void prehisle_state::prehisle_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x40, 0x40).w(FUNC(prehisle_state::D7759_write_port_0_w));
-	map(0x80, 0x80).w(FUNC(prehisle_state::D7759_upd_reset_w));
+	map(0x40, 0x40).w(FUNC(prehisle_state::upd_port_w));
+	map(0x80, 0x80).lw8("upd_reset", [this](u8 data){ m_upd7759->reset_w(BIT(data, 7)); } );
 }
 
 /******************************************************************************/
@@ -156,59 +162,52 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	1024,
+	RGN_FRAC(1,1),
 	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	32*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
 	16,16,  /* 16*16 sprites */
-	0x800,
+	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0,4,8,12,16,20,24,28,
-		0+64*8,4+64*8,8+64*8,12+64*8,16+64*8,20+64*8,24+64*8,28+64*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8   /* every sprite takes 64 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,  /* 16*16 sprites */
-	5120,
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0,4,8,12,16,20,24,28,
-		0+64*8,4+64*8,8+64*8,12+64*8,16+64*8,20+64*8,24+64*8,28+64*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
 	128*8   /* every sprite takes 64 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_prehisle )
-	GFXDECODE_ENTRY( "chars",   0, charlayout,  0, 16 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 768, 16 )
 	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 512, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 256, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 256, 16 )
 GFXDECODE_END
+
+/******************************************************************************/
+
+void prehisle_state::machine_start()
+{
+	/* register for saving */
+	save_item(NAME(m_invert_controls));
+}
 
 /******************************************************************************/
 
 MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(prehisle_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", prehisle_state,  irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(18'000'000)/2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &prehisle_state::prehisle_map);
+	m_maincpu->set_vblank_int("screen", FUNC(prehisle_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(prehisle_sound_map)
-	MCFG_DEVICE_IO_MAP(prehisle_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(4'000'000));    /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &prehisle_state::prehisle_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &prehisle_state::prehisle_sound_io_map);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -216,18 +215,16 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a snk68.c with very similar hardware board is 59.16Hz.
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
+	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prehisle)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prehisle);
+	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_RRRRGGGGBBBBxxxx);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -304,7 +301,7 @@ ROM_START( prehislek )
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "chars", 0 )
-	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, BAD_DUMP CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) ) // not dumped, missing korean text
+	ROM_LOAD( "gt15k.b15",   0x000000, 0x08000, CRC(4cad1451) SHA1(5c81240e94f5a38af874b2ec7c65cb0f55d2ba8c) )
 
 	ROM_REGION( 0x040000, "bgtiles", 0 )
 	ROM_LOAD( "pi8914.b14", 0x000000, 0x40000, CRC(207d6187) SHA1(505dfd1424b894e7b898f91b89f021ddde433c48) )

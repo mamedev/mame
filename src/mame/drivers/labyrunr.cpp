@@ -189,27 +189,28 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(labyrunr_state, labyrunr)
 
-	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K051733_ADD("k051733")
+	K007121(config, m_k007121, 0);
+	m_k007121->set_palette_tag(m_palette);
+
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
+	ym1.port_a_read_callback().set_ioport("DSW1");
+	ym1.port_b_read_callback().set_ioport("DSW2");
+	ym1.add_route(0, "mono", 0.40);
+	ym1.add_route(1, "mono", 0.40);
+	ym1.add_route(2, "mono", 0.40);
+	ym1.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 3000000)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
+	ym2.port_b_read_callback().set_ioport("DSW3");
+	ym2.add_route(0, "mono", 0.40);
+	ym2.add_route(1, "mono", 0.40);
+	ym2.add_route(2, "mono", 0.40);
+	ym2.add_route(3, "mono", 0.80);
 MACHINE_CONFIG_END
 
 

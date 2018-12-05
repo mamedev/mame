@@ -7,17 +7,15 @@
 
 #pragma once
 
-class namco_c169roz_device : public device_t
+class namco_c169roz_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
 	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
 	void set_ram_words(uint32_t size) { m_ramsize = size; }
-	template <typename T> void set_maskregion_tag(T &&tag) { m_maskregion.set_tag(std::forward<T>(tag)); }
-	void set_gfxregion(int region) { m_gfx_region = region; }
+	void set_color_base(int color) { m_color_base = color; }
 
 	DECLARE_READ16_MEMBER( control_r );
 	DECLARE_WRITE16_MEMBER( control_w );
@@ -56,15 +54,14 @@ private:
 	tilemap_t *m_tilemap[ROZ_TILEMAP_COUNT];
 	uint16_t m_control[0x20/2];
 	std::vector<uint16_t> m_videoram;
-	int m_gfx_region;
-	uint8_t *m_mask;
+	int m_color_base;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 	uint32_t m_ramsize;
 
 	// per-game hacks
 	bool m_is_namcofl;
 
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_memory_region m_maskregion;
+	required_region_ptr<uint8_t> m_mask;
 };
 
 // device type definition

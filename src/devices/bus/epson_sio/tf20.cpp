@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "tf20.h"
+#include "imagedev/floppy.h"
 
 #define XTAL_CR1    XTAL(8'000'000)
 #define XTAL_CR2    XTAL(4'915'200)

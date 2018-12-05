@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000) / 5)     /* verified on pcb */

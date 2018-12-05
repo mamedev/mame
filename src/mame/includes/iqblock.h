@@ -1,18 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Ernesto Corvi
+#ifndef MAME_INCLUDES_IQBLOCK_H
+#define MAME_INCLUDES_IQBLOCK_H
+
+#pragma once
 
 #include "machine/timer.h"
 
 class iqblock_state : public driver_device
 {
 public:
-	iqblock_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	iqblock_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_rambase(*this, "rambase"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram") { }
+		m_fgvideoram(*this, "fgvideoram")
+	{ }
 
 	void iqblock(machine_config &config);
 
@@ -51,3 +56,5 @@ private:
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_IQBLOCK_H

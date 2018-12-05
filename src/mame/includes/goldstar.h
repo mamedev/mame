@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
+#ifndef MAME_INCLUDES_GOLDSTAR_H
+#define MAME_INCLUDES_GOLDSTAR_H
+
+#pragma once
 
 #include "machine/ds2401.h"
 #include "machine/i8255.h"
@@ -217,6 +221,7 @@ public:
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
+	void init_luckylad();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
@@ -377,3 +382,5 @@ private:
 
 	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };
+
+#endif // MAME_INCLUDES_GOLDSTAR_H

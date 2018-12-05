@@ -992,24 +992,24 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(1)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)
-	MCFG_K001604_ROZ_OFFSET(0)
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604_1, 0);
+	m_k001604_1->set_layer_size(1);
+	m_k001604_1->set_roz_size(1);
+	m_k001604_1->set_txt_mem_offset(0);
+	m_k001604_1->set_roz_mem_offset(0);
+	m_k001604_1->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
 
-	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
-	MCFG_K001006_GFX_REGION("gfx1")
-	MCFG_K001006_TEX_LAYOUT(1)
+	K001006(config, m_k001006_1, 0);
+	m_k001006_1->set_gfx_region("gfx1");
+	m_k001006_1->set_tex_layout(1);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	MCFG_DEVICE_ADD("k001006_2", K001006, 0)
-	MCFG_K001006_GFX_REGION("gfx1")
-	MCFG_K001006_TEX_LAYOUT(1)
+	K001006(config, m_k001006_2, 0);
+	m_k001006_2->set_gfx_region("gfx1");
+	m_k001006_2->set_tex_layout(1);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
@@ -1026,27 +1026,25 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gticlub_state::thunderh)
+void gticlub_state::thunderh(machine_config &config)
+{
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
 
 	m_k056230->set_thunderh_hack(true);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gticlub_state::slrasslt)
+void gticlub_state::slrasslt(machine_config &config)
+{
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
 
-	MCFG_DEVICE_REMOVE("k001604_1")
-	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(0)
-	MCFG_K001604_TXT_OFFSET(16384)
-	MCFG_K001604_ROZ_OFFSET(0)
-	MCFG_K001604_PALETTE("palette")
-MACHINE_CONFIG_END
+	m_k001604_1->set_layer_size(0);
+	m_k001604_1->set_roz_size(0);
+	m_k001604_1->set_txt_mem_offset(16384);
+}
 
 
 MACHINE_RESET_MEMBER(gticlub_state,hangplt)
@@ -1116,19 +1114,19 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_rscreen)
 
-	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)
-	MCFG_K001604_ROZ_OFFSET(16384)
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604_1, 0);
+	m_k001604_1->set_layer_size(0);
+	m_k001604_1->set_roz_size(1);
+	m_k001604_1->set_txt_mem_offset(0);
+	m_k001604_1->set_roz_mem_offset(16384);
+	m_k001604_1->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k001604_2", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)
-	MCFG_K001604_ROZ_OFFSET(16384)
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604_2, 0);
+	m_k001604_2->set_layer_size(0);
+	m_k001604_2->set_roz_size(1);
+	m_k001604_2->set_txt_mem_offset(0);
+	m_k001604_2->set_roz_mem_offset(16384);
+	m_k001604_2->set_palette(m_palette);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);

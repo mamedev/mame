@@ -5,6 +5,10 @@
     Lethal Enforcers
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LETHAL_H
+#define MAME_INCLUDES_LETHAL_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "sound/k054539.h"
@@ -18,15 +22,16 @@
 class lethal_state : public driver_device
 {
 public:
-	lethal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lethal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_bank4000(*this, "bank4000"),
 		m_k056832(*this, "k056832"),
 		m_k053244(*this, "k053244"),
 		m_k054321(*this, "k054321"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void lethalej(machine_config &config);
 	void lethalen(machine_config &config);
@@ -67,3 +72,5 @@ private:
 	void le_main(address_map &map);
 	void le_sound(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LETHAL_H

@@ -32,10 +32,10 @@ MACHINE_CONFIG_START(cpc_playcity_device::device_add_mconfig)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymz_1",YMZ294,XTAL(4'000'000))  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-	MCFG_DEVICE_ADD("ymz_2",YMZ294,XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	YMZ294(config, m_ymz1, XTAL(4'000'000));  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
+	m_ymz1->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	YMZ294(config, m_ymz2, XTAL(4'000'000));
+	m_ymz2->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)

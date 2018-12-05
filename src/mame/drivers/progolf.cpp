@@ -428,9 +428,9 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);
+	soundlatch.set_separate_acknowledge(true);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -445,18 +445,17 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_PALETTE_ADD("palette", 32*3)
 	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3000000/4) /* hand tuned to get ~57 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* hand tuned to get ~57 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	AY8910(config, "ay1", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	AY8910(config, "ay2", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(progolf_state::progolfa)

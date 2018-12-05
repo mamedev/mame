@@ -269,6 +269,7 @@ Namco System 21 Video Hardware
 #include "video/namcos21_3d.h"
 #include "sound/c140.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 
 // TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
 #define MCFG_SCREEN_RAW_PARAMS_NAMCO480I \
@@ -295,7 +296,7 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_audiobank(*this, "audiobank"),
-		m_mpDualPortRAM(*this,"mpdualportram"),
+		m_dpram(*this, "dpram"),
 		m_namcos21_3d(*this, "namcos21_3d"),
 		m_namcos21_dsp_c67(*this, "namcos21dsp_c67")
 	{ }
@@ -322,24 +323,24 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
-	required_shared_ptr<uint8_t> m_mpDualPortRAM;
+	required_shared_ptr<uint8_t> m_dpram;
 	required_device<namcos21_3d_device> m_namcos21_3d;
 	required_device<namcos21_dsp_c67_device> m_namcos21_dsp_c67;
 
 	uint16_t m_video_enable;
 
-	DECLARE_READ16_MEMBER(namcos21_video_enable_r);
-	DECLARE_WRITE16_MEMBER(namcos21_video_enable_w);
+	DECLARE_READ16_MEMBER(video_enable_r);
+	DECLARE_WRITE16_MEMBER(video_enable_w);
 
-	DECLARE_READ16_MEMBER(namcos2_68k_dualportram_word_r);
-	DECLARE_WRITE16_MEMBER(namcos2_68k_dualportram_word_w);
-	DECLARE_READ8_MEMBER(namcos2_dualportram_byte_r);
-	DECLARE_WRITE8_MEMBER(namcos2_dualportram_byte_w);
+	DECLARE_READ16_MEMBER(dpram_word_r);
+	DECLARE_WRITE16_MEMBER(dpram_word_w);
+	DECLARE_READ8_MEMBER(dpram_byte_r);
+	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 
-	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
-	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(eeprom_r);
 
-	DECLARE_WRITE8_MEMBER( namcos2_sound_bankselect_w );
+	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
 
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(system_reset_w);
@@ -351,10 +352,10 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(yield_hack);
 
-	DECLARE_MACHINE_START(namcos21);
-	DECLARE_MACHINE_RESET(namcos21);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void configure_c68_namcos21(machine_config &config);
 
@@ -366,7 +367,7 @@ private:
 };
 
 
-uint32_t namcos21_c67_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//uint8_t *videoram = m_gpu_videoram.get();
 	int pivot = 3;
@@ -390,17 +391,17 @@ uint32_t namcos21_c67_state::screen_update_namcos21(screen_device &screen, bitma
 	return 0;
 }
 
-READ16_MEMBER(namcos21_c67_state::namcos21_video_enable_r)
+READ16_MEMBER(namcos21_c67_state::video_enable_r)
 {
 	return m_video_enable;
 }
 
-WRITE16_MEMBER(namcos21_c67_state::namcos21_video_enable_w)
+WRITE16_MEMBER(namcos21_c67_state::video_enable_w)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
 	if( m_video_enable!=0 && m_video_enable!=0x40 )
 	{
-		logerror( "unexpected namcos21_video_enable_w=0x%x\n", m_video_enable );
+		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable );
 	}
 }
 
@@ -408,27 +409,27 @@ WRITE16_MEMBER(namcos21_c67_state::namcos21_video_enable_w)
 
 /* dual port ram memory handlers */
 
-READ16_MEMBER(namcos21_c67_state::namcos2_68k_dualportram_word_r)
+READ16_MEMBER(namcos21_c67_state::dpram_word_r)
 {
-	return m_mpDualPortRAM[offset];
+	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namcos21_c67_state::namcos2_68k_dualportram_word_w)
+WRITE16_MEMBER(namcos21_c67_state::dpram_word_w)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		m_mpDualPortRAM[offset] = data&0xff;
+		m_dpram[offset] = data&0xff;
 	}
 }
 
-READ8_MEMBER(namcos21_c67_state::namcos2_dualportram_byte_r)
+READ8_MEMBER(namcos21_c67_state::dpram_byte_r)
 {
-	return m_mpDualPortRAM[offset];
+	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namcos21_c67_state::namcos2_dualportram_byte_w)
+WRITE8_MEMBER(namcos21_c67_state::dpram_byte_w)
 {
-	m_mpDualPortRAM[offset] = data;
+	m_dpram[offset] = data;
 }
 
 /******************************************************************************/
@@ -448,10 +449,10 @@ void namcos21_c67_state::common_map(address_map &map)
 	map(0x720000, 0x720007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x740000, 0x74ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x750000, 0x75ffff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
-	map(0x760000, 0x760001).rw(FUNC(namcos21_c67_state::namcos21_video_enable_r), FUNC(namcos21_c67_state::namcos21_video_enable_w));
+	map(0x760000, 0x760001).rw(FUNC(namcos21_c67_state::video_enable_r), FUNC(namcos21_c67_state::video_enable_w));
 	map(0x800000, 0x8fffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
-	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_c67_state::namcos2_68k_dualportram_word_r), FUNC(namcos21_c67_state::namcos2_68k_dualportram_word_w));
+	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_c67_state::dpram_word_r), FUNC(namcos21_c67_state::dpram_word_w));
 	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 	map(0xc00000, 0xcfffff).rom().mirror(0x100000).region("edata", 0);
@@ -462,7 +463,7 @@ void namcos21_c67_state::master_map(address_map &map)
 	common_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* private work RAM */
-	map(0x180000, 0x183fff).rw(FUNC(namcos21_c67_state::namcos2_68k_eeprom_r), FUNC(namcos21_c67_state::namcos2_68k_eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos21_c67_state::eeprom_r), FUNC(namcos21_c67_state::eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 	map(0x200000, 0x20ffff).rw(m_namcos21_dsp_c67, FUNC(namcos21_dsp_c67_device::dspram16_r), FUNC(namcos21_dsp_c67_device::dspram16_hack_w));
 }
@@ -486,12 +487,12 @@ void namcos21_c67_state::sound_map(address_map &map)
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(FUNC(namcos21_c67_state::namcos2_dualportram_byte_r), FUNC(namcos21_c67_state::namcos2_dualportram_byte_w)).share("mpdualportram");
-	map(0x7800, 0x7fff).rw(FUNC(namcos21_c67_state::namcos2_dualportram_byte_r), FUNC(namcos21_c67_state::namcos2_dualportram_byte_w)); /* mirror */
+	map(0x7000, 0x77ff).rw(FUNC(namcos21_c67_state::dpram_byte_r), FUNC(namcos21_c67_state::dpram_byte_w)).share("dpram");
+	map(0x7800, 0x7fff).rw(FUNC(namcos21_c67_state::dpram_byte_r), FUNC(namcos21_c67_state::dpram_byte_w)); /* mirror */
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* amplifier enable on 1st write */
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
-	map(0xc000, 0xc001).w(FUNC(namcos21_c67_state::namcos2_sound_bankselect_w));
+	map(0xc000, 0xc001).w(FUNC(namcos21_c67_state::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
 	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
 }
@@ -519,8 +520,8 @@ void namcos21_c67_state::configure_c68_namcos21(machine_config &config)
 	m_c68->an5_in_cb().set_ioport("AN5");
 	m_c68->an6_in_cb().set_ioport("AN6");
 	m_c68->an7_in_cb().set_ioport("AN7");
-	m_c68->dp_in_callback().set(FUNC(namcos21_c67_state::namcos2_dualportram_byte_r));
-	m_c68->dp_out_callback().set(FUNC(namcos21_c67_state::namcos2_dualportram_byte_w));
+	m_c68->dp_in_callback().set(FUNC(namcos21_c67_state::dpram_byte_r));
+	m_c68->dp_out_callback().set(FUNC(namcos21_c67_state::dpram_byte_w));
 }
 
 /*************************************************************/
@@ -709,7 +710,7 @@ static GFXDECODE_START( gfx_namcos21 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER( namcos21_c67_state::namcos2_sound_bankselect_w )
+WRITE8_MEMBER( namcos21_c67_state::sound_bankselect_w )
 {
 	m_audiobank->set_entry(data>>4);
 }
@@ -750,22 +751,20 @@ void namcos21_c67_state::reset_all_subcpus(int state)
 	m_namcos21_dsp_c67->reset_dsps(state);
 }
 
-WRITE8_MEMBER(namcos21_c67_state::namcos2_68k_eeprom_w)
+WRITE8_MEMBER(namcos21_c67_state::eeprom_w)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER(namcos21_c67_state::namcos2_68k_eeprom_r)
+READ8_MEMBER(namcos21_c67_state::eeprom_r)
 {
 	return m_eeprom[offset];
 }
 
-MACHINE_RESET_MEMBER(namcos21_c67_state, namcos21)
+void namcos21_c67_state::machine_reset()
 {
-	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
-
 	/* Initialise the bank select in the sound CPU */
-	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
+	m_audiobank->set_entry(0); /* Page in bank 0 */
 
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 
@@ -775,7 +774,7 @@ MACHINE_RESET_MEMBER(namcos21_c67_state, namcos21)
 
 
 
-MACHINE_START_MEMBER(namcos21_c67_state,namcos21)
+void namcos21_c67_state::machine_start()
 {
 	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
@@ -783,8 +782,6 @@ MACHINE_START_MEMBER(namcos21_c67_state,namcos21)
 	uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
-
-	m_audiobank->set_entry(0);
 
 }
 
@@ -833,13 +830,11 @@ MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START_OVERRIDE(namcos21_c67_state,namcos21)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos21_c67_state,namcos21)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_c67_state, screen_update_namcos21)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos21_c67_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
@@ -855,9 +850,9 @@ MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 	MCFG_PALETTE_FORMAT(XBRG)
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
-	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
-	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_palxor(0xf); // reverse mapping
 	m_c355spr->set_gfxregion(0);
@@ -870,9 +865,7 @@ MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos21_c67_state::aircomb)

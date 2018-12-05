@@ -645,10 +645,10 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, hvyunit_state, mermaid_p3_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p3_w))
 
-	MCFG_GENERIC_LATCH_8_ADD("mermaidlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mermaid", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, m_mermaidlatch);
+	m_mermaidlatch->data_pending_callback().set_inputline(m_mermaid, INPUT_LINE_IRQ0);
 
-	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
+	GENERIC_LATCH_8(config, m_slavelatch);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -665,14 +665,14 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* 3MHz verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

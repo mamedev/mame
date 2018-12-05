@@ -19,6 +19,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
 #include "machine/bankdev.h"
@@ -398,10 +399,10 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	// TODO: RTC
 	//MCFG_DEVICE_ADD("rtc", TC8250, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxa_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("mpsc", upd7201_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxa_w));
+	rs232.dsr_handler().set("mpsc", FUNC(upd7201_new_device::dcda_w));
+	rs232.cts_handler().set("mpsc", FUNC(upd7201_new_device::ctsa_w));
 
 	MCFG_DEVICE_ADD("printer", CENTRONICS, centronics_devices, nullptr)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("printlatch", "printer")

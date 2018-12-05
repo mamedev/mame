@@ -577,7 +577,7 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 	jpeg_mem_src(&cinfo, jpg_buffer.get(), jpg_size);
 
 	// read JPEG header and start decompression
-	jpeg_read_header(&cinfo, true);
+	jpeg_read_header(&cinfo, TRUE);
 	jpeg_start_decompress(&cinfo);
 
 	// allocates the destination bitmap

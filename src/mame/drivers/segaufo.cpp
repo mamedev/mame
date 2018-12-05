@@ -806,13 +806,13 @@ MACHINE_CONFIG_START(ufo_state::newufo)
 	m_io2->out_pf_callback().set(FUNC(ufo_state::crane_xyz_w));
 	m_io2->out_pg_callback().set(FUNC(ufo_state::ufo_lamps_w));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, XTAL(16'000'000)/2) // uPD71054C, configuration is unknown
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ufo_state, pit_out0))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, ufo_state, pit_out1))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/2/256)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ufo_state, pit_out2))
+	pit8254_device &pit(PIT8254(config, "pit", XTAL(16'000'000)/2)); // uPD71054C, configuration is unknown
+	pit.set_clk<0>(XTAL(16'000'000)/2/256);
+	pit.out_handler<0>().set(FUNC(ufo_state::pit_out0));
+	pit.set_clk<1>(XTAL(16'000'000)/2/256);
+	pit.out_handler<1>().set(FUNC(ufo_state::pit_out1));
+	pit.set_clk<2>(XTAL(16'000'000)/2/256);
+	pit.out_handler<2>().set(FUNC(ufo_state::pit_out2));
 
 	/* no video! */
 

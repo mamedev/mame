@@ -368,8 +368,8 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 280, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_TOMCAT, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_TOMCAT(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -383,9 +383,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
 MACHINE_CONFIG_END
 
 ROM_START( tomcat )

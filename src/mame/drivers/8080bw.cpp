@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni, Lee Taylor, Valerio Verrando, Zsolt Vasvari, Aaron Giles, Jonathan Gevaryahu, hap, Robbbert
 // thanks-to:Michael Strutts, Marco Cassili
 /*****************************************************************************
 
@@ -207,6 +207,7 @@
 #include "gunchamp.lh"
 #include "shuttlei.lh"
 #include "spacecom.lh"
+#include "yosakdon.lh"
 
 
 /*******************************************************/
@@ -958,8 +959,7 @@ MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(4'000'000)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -2719,11 +2719,11 @@ READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 
 WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
 {
-		/* bit 0 goes high when first coin inserted
-		   bit 1 also goes high when subsequent coins are inserted
-		      These may be for indicator lamps under the start buttons.
-		   bit 2 goes high while player 2 is playing     */
-
+	/* bit 0 goes high when first coin inserted
+	   bit 1 also goes high when subsequent coins are inserted
+	      These may be for indicator lamps under the start buttons.
+	   bit 2 goes high while player 2 is playing
+	*/
 	m_flip_screen = BIT(data, 2) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }
 
@@ -5203,7 +5203,7 @@ GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_i
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,   lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Destination Earth (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAMEL( 1980,escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
+GAMEL(1980, escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 
 GAME( 1979, schaser,     0,        schaser,   schaser,   _8080bw_state,  empty_init,    ROT270, "Taito", "Space Chaser (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, schasera,    schaser,  schaser,   schaser,   _8080bw_state,  empty_init,    ROT270, "Taito", "Space Chaser (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -5259,8 +5259,8 @@ GAME( 1979, ozmawarsmr,  ozmawars, invaders,  ozmawars,  mw8080bw_state, empty_i
 GAME( 1979, spaceph,     ozmawars, invaders,  spaceph,   mw8080bw_state, empty_init,    ROT270, "bootleg? (Zilec Games)", "Space Phantoms (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, solfight,    ozmawars, invaders,  ozmawars,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Solar Fight (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, yosakdon,    0,        yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, yosakdona,   yosakdon, yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAMEL(1979, yosakdon,    0,        yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
+GAMEL(1979, yosakdona,   yosakdon, yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
 
 GAMEL(1979, shuttlei,    0,        shuttlei,  shuttlei,  _8080bw_state,  empty_init,    ROT270, "Omori Electric Co., Ltd.", "Shuttle Invader", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_shuttlei )
 

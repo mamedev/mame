@@ -27,6 +27,7 @@
 #include "includes/prof180x.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "screen.h"

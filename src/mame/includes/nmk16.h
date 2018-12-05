@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
 // thanks-to:Richard Bush
+#ifndef MAME_INCLUDES_NMK16_H
+#define MAME_INCLUDES_NMK16_H
 
-#include "machine/nmk112.h"
+#pragma once
+
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
 #include "machine/nmk004.h"
@@ -34,7 +37,8 @@ public:
 		m_okibank(*this, "okibank%u", 1U),
 		m_dsw_io(*this, "DSW%u", 1U),
 		m_in_io(*this, "IN%u", 0U),
-		m_sprdma_base(0x8000) { }
+		m_sprdma_base(0x8000)
+	{ }
 
 	void vandyke(machine_config &config);
 	void redhawkb(machine_config &config);
@@ -252,8 +256,8 @@ protected:
 class nmk16_tomagic_state : public nmk16_state
 {
 public:
-	nmk16_tomagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: nmk16_state(mconfig, type, tag)
+	nmk16_tomagic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nmk16_state(mconfig, type, tag)
 	{}
 
 	void tomagic(machine_config &config);
@@ -264,3 +268,5 @@ private:
 	void tomagic_sound_map(address_map &map);
 	void tomagic_sound_io_map(address_map &map);
 };
+
+#endif //MAME_INCLUDES_NMK16_H

@@ -146,7 +146,7 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 #include "emu.h"
 #include "cpu/i86/i86.h"
 //#include "bus/s100/s100.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
@@ -438,7 +438,7 @@ INPUT_CHANGED_MEMBER(z100_state::key_stroke)
 	{
 		/* TODO: table */
 		m_keyb_press = (uint8_t)(uintptr_t)(param) & 0xff;
-		//pic8259_ir6_w(m_picm, 1);
+		//m_picm->ir6_w(1);
 		m_keyb_status = 1;
 	}
 
@@ -676,10 +676,10 @@ static void z100_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 14.318181_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(z100_mem)
-	MCFG_DEVICE_IO_MAP(z100_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 14.318181_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z100_state::z100_mem);
+	m_maincpu->set_addrmap(AS_IO, &z100_state::z100_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -693,18 +693,19 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 14.318181_MHz_XTAL / 8)    /* unknown clock, hand tuned to get ~50/~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MC6845(config, m_crtc, 14.318181_MHz_XTAL / 8);    /* unknown clock, hand tuned to get ~50/~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, z100_state, get_slave_ack))
+	PIC8259(config, m_picm, 0);
+	m_picm->out_int_callback().set_inputline(m_maincpu, 0);
+	m_picm->in_sp_callback().set_constant(1);
+	m_picm->read_slave_ack_callback().set(FUNC(z100_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pics, 0);
+	m_pics->out_int_callback().set(m_picm, FUNC(pic8259_device::ir3_w));
+	m_pics->in_sp_callback().set_constant(0);
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->writepa_handler().set(FUNC(z100_state::video_pia_A_w));

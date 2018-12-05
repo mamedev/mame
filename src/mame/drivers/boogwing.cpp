@@ -354,12 +354,12 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248) // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_boogwing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_deco_ace, gfx_boogwing)
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
-	MCFG_DECO_ACE_ADD("deco_ace")
+	DECO_ACE(config, m_deco_ace, 0);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -413,11 +413,11 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_XTAL/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, boogwing_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_XTAL/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(boogwing_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_XTAL/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)

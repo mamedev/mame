@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /******************************************************************************
 
-        nc.c
+        nc.cpp
 
         NC100/NC150/NC200 Notepad computer
 
@@ -18,7 +18,7 @@
             NC100 I/O Specification by Cliff Lawson,
             NC100EM by Russell Marks
         NC200:
-            Dissassembly of the NC200 ROM + e-mail
+            Disassembly of the NC200 ROM + e-mail
             exchange with Russell Marks
 
 
@@ -26,7 +26,7 @@
 
         Hardware:
             - Z80 CPU, 6 MHz
-            - memory powered by lithium batterys!
+            - memory powered by lithium batteries!
             - 2 channel tone (programmable frequency beep's)
             - LCD screen
             - laptop/portable computer
@@ -99,6 +99,7 @@
 #include "includes/nc.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/mc146818.h"   // for NC200 real time clock
 #include "machine/rp5c01.h"     // for NC100 real time clock
 #include "formats/pc_dsk.h"     // for NC200 disk image
@@ -1443,8 +1444,8 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	m_uart->txrdy_handler().set(FUNC(nc100_state::nc100_txrdy_callback));
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", TC8521, 32.768_kHz_XTAL)
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, nc100_state, nc100_tc8521_alarm_callback))
+	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
 MACHINE_CONFIG_END
 
 static const floppy_format_type ibmpc_floppy_formats[] = {

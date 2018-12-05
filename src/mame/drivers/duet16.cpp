@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
 #include "machine/pit8253.h"
@@ -396,9 +397,9 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	kbusart.rxrdy_handler().set("kbint", FUNC(input_merger_device::in_w<0>));
 	kbusart.txrdy_handler().set("kbint", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, duet16_keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("kbusart", i8251_device, write_rxd))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", duet16_keyboard_devices, "keyboard"));
+	kbd.rxd_handler().set("kbusart", FUNC(i8251_device::write_rxd));
+	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir5_w)) // INT2
@@ -414,9 +415,9 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_DEVICE_ADD("crtc", H46505, 2000000)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(duet16_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 2000000));
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")

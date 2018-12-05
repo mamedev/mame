@@ -1,5 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+#ifndef MAME_INCLUDES_40LOVE_H
+#define MAME_INCLUDES_40LOVE_H
+
+#pragma once
 
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
@@ -75,7 +79,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
-	required_device<ay8910_device> m_ay;
+	required_device<ym2149_device> m_ay;
 	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -114,3 +118,5 @@ private:
 	uint8_t       m_snd_ctrl2;
 	uint8_t       m_snd_ctrl3;
 };
+
+#endif // MAME_INCLUDES_40LOVE_H

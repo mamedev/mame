@@ -222,19 +222,18 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "aysnd", MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "mono", 0.40); // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch2", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.20)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 16));
+	ymsnd.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ymsnd.port_b_read_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
+	ymsnd.add_route(2, "mono", 0.40);
+	ymsnd.add_route(3, "mono", 0.20);
 MACHINE_CONFIG_END
 
 

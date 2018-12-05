@@ -24,6 +24,7 @@
 #include "includes/atarig1.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -191,7 +192,7 @@ void atarig1_state::main_map(address_map &map)
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
-	map(0xfe8000, 0xfe89ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfe8000, 0xfe89ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
 	map(0xff2000, 0xff2001).w(FUNC(atarig1_state::mo_command_w)).share("mo_command");
@@ -430,9 +431,10 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 14)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_jsa->test_read_cb().set_ioport("IN0").bit(14);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

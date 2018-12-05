@@ -599,25 +599,25 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 4900000)
-	MCFG_DEVICE_PROGRAM_MAP(ibmpcjr_map)
-	MCFG_DEVICE_IO_MAP(ibmpcjr_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 4900000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjr_map);
+	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 /*
   On the PC Jr the input for clock 1 seems to be selectable
   based on bit 4(/5?) written to output port A0h. This is not
   supported yet.
  */
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_pic8259, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12)
-	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pcjr_state, out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(14'318'181)/12);
+	m_pit8253->set_clk<2>(XTAL(14'318'181)/12);
+	m_pit8253->out_handler<2>().set(FUNC(pcjr_state::out2_changed));
 
-	MCFG_DEVICE_ADD(m_pic8259, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, pcjr_state, pic8259_set_int_line))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set(FUNC(pcjr_state::pic8259_set_int_line));
 
 	i8255_device &ppi(I8255(config, "ppi8255"));
 	ppi.in_pa_callback().set_constant(0xff);
@@ -630,12 +630,12 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	uart.out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
 	uart.out_int_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD( "serport", RS232_PORT, pcjr_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ins8250", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_uart_device, cts_w))
+	rs232_port_device &serport(RS232_PORT(config, "serport", pcjr_com, nullptr));
+	serport.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
+	serport.dcd_handler().set("ins8250", FUNC(ins8250_uart_device::dcd_w));
+	serport.dsr_handler().set("ins8250", FUNC(ins8250_uart_device::dsr_w));
+	serport.ri_handler().set("ins8250", FUNC(ins8250_uart_device::ri_w));
+	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)

@@ -123,7 +123,7 @@ void jvh_state::init_jvh()
 void jvh_state::common(machine_config &config)
 {
 	// CPU TMS9980A; no line connections
-	TMS9980A(config, m_maincpu, 1000000);
+	TMS9980A(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jvh_state::jvh_map);
 
 	m6802_cpu_device &soundcpu(M6802(config, "soundcpu", XTAL(4'000'000)));

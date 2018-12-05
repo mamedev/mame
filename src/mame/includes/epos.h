@@ -5,6 +5,10 @@
     Epos games
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_EPOS_H
+#define MAME_INCLUDES_EPOS_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -18,7 +22,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_leds(*this, "led%u", 0U)
-		{ }
+	{ }
 
 	void epos(machine_config &config);
 	void dealer(machine_config &config);
@@ -61,3 +65,5 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
 };
+
+#endif // MAME_INCLUDES_EPOS_H

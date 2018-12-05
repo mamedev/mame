@@ -533,9 +533,8 @@ void st6228_device::execute_run()
 				const uint8_t rr = m_program->read_byte(m_pc+1);
 				const int8_t ee = (int8_t)m_program->read_byte(m_pc+2);
 				const uint8_t value = m_data->read_byte(rr);
-				if (BIT(value, b))
-					m_pc += 2;
-				else
+				m_pc += 2;
+				if (!BIT(value, b))
 					m_pc += ee;
 				break;
 			}
@@ -545,10 +544,9 @@ void st6228_device::execute_run()
 				const uint8_t rr = m_program->read_byte(m_pc+1);
 				const int8_t ee = (int8_t)m_program->read_byte(m_pc+2);
 				const uint8_t value = m_data->read_byte(rr);
+				m_pc += 2;
 				if (BIT(value, b))
 					m_pc += ee;
-				else
-					m_pc += 2;
 				break;
 			}
 			case 0x0b: case 0x2b: case 0x4b: case 0x6b: case 0x8b: case 0xab: case 0xcb: case 0xeb: // RES b,rr

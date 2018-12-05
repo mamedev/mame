@@ -343,40 +343,39 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(chqflag_state, sprite_callback)
-	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
-	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(*this, chqflag_state,background_brt_w))
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
+	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
+	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(7, 0)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_offsets(7, 0);
+	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_LAYER_MASK(0xc0)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_bpp(8);
+	m_k051316[1]->set_layermask(0xc0);
+	m_k051316[1]->set_wrap(1);
+	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2), this);
 
-	MCFG_K051733_ADD("k051733")
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ymsnd.add_route(0, "lspeaker", 1.00);
+	ymsnd.add_route(1, "rspeaker", 1.00);
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback0))

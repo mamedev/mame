@@ -12,7 +12,6 @@
 				<rom name="BAS4SYS.TD0" size="290709" crc="29278b64" sha1="967f0ad6d11dfd18777d7be3b1261eb059452755" offset="0"/>
 			</dataarea>
 		</part>
-
 		<part name="bas4driv" interface="floppy_3_5">
 			<feature name="part_id" value="Drivers Disc" />
 			<dataarea name="flop" size="139364">
@@ -628,6 +627,118 @@
 			<feature name="part_id" value="Drivers 10/10" />
 			<dataarea name="flop" size="604414">
 				<rom name="ITGD10.TD0" size="604414" crc="6bf05356" sha1="10255ee1312563afabaa61cfc4ab00c7914b7472" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="pascal325">
+		<description>Pascal 3.25</description>
+		<year>1991</year>
+		<publisher>Hewlett-Packard</publisher>
+		<part name="boot2" interface="floppy_3_5">
+			<feature name="part_id" value="BOOT2"/>
+			<dataarea name="flop" size="274764">
+				<rom name="325BOOT2.TD0" size="274764" crc="1c53a5b2" sha1="2b880132e58a891a79b851cb7583e052dad2f852" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="boot" interface="floppy_3_5">
+			<dataarea name="flop" size="273969">
+				<rom name="325BOOT.TD0" size="273969" crc="4173e244" sha1="e1044c2221c091ac003e5e816b8b8afac2daeb7d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="boot3" interface="floppy_3_5">
+			<feature name="part_id" value="BOOT3"/>
+			<dataarea name="flop" size="272775">
+				<rom name="325BOOT3.TD0" size="272775" crc="fcd82d93" sha1="8fa5c874553ef0c2f1f9c23fada6d2c7e27bbc37" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="sysvl" interface="floppy_3_5">
+			<feature name="part_id" value="System Volume"/>
+			<dataarea name="flop" size="27874">
+				<rom name="324SYSVL.TD0" size="27874" crc="3f42e38b" sha1="3f7637c2c046a043aaeb954e790af148c2d989e5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="acces" interface="floppy_3_5">
+			<feature name="part_id" value="Access"/>
+			<dataarea name="flop" size="264108">
+				<rom name="325ACCES.TD0" size="264108" crc="390e4585" sha1="22622204aeb489c6624af55ce1b23794457c3499" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="asm" interface="floppy_3_5">
+			<feature name="part_id" value="ASM"/>
+			<dataarea name="flop" size="222219">
+				<rom name="325ASM.TD0" size="222219" crc="e90d4aeb" sha1="cc7564b863844a5444da6fda2ee5a80d9dd88e34" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cmp20" interface="floppy_3_5">
+			<feature name="part_id" value="CMP20"/>
+			<dataarea name="flop" size="253613">
+				<rom name="325CMP20.TD0" size="253613" crc="eb4df435" sha1="53f6fbeb9ba34604d3a358a910e53175dfefe66f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="cmp" interface="floppy_3_5">
+			<feature name="part_id" value="CMP"/>
+			<dataarea name="flop" size="252157">
+				<rom name="325CMP.TD0" size="252157" crc="d85e8807" sha1="d7b67715826e9dd1c18b29253537b807f5cdcb8d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="confg" interface="floppy_3_5">
+			<feature name="part_id" value="CONFG"/>
+			<dataarea name="flop" size="257720">
+				<rom name="325CONFG.TD0" size="257720" crc="1b551808" sha1="31797023416aad85edab9da8c338008ff3db1dc2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="dglpg" interface="floppy_3_5">
+			<feature name="part_id" value="DGLPG"/>
+			<dataarea name="flop" size="188050">
+				<rom name="325DGLPG.TD0" size="188050" crc="e8ebf401" sha1="39d8e8fd4513470d2980c8fa580668d627684d70" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="doc" interface="floppy_3_5">
+			<feature name="part_id" value="DOC"/>
+			<dataarea name="flop" size="128449">
+				<rom name="325DOC.TD0" size="128449" crc="7299f6ef" sha1="a31f6fe7c7e70c0135e2e0bea259cec20307faec" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flt20" interface="floppy_3_5">
+			<feature name="part_id" value="FLT20"/>
+			<dataarea name="flop" size="230797">
+				<rom name="325FLT20.TD0" size="230797" crc="500ae82d" sha1="bffe5af80fb4da95dbe0238b46352fd2c335c04e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="fltlb" interface="floppy_3_5">
+			<feature name="part_id" value="FLTLB"/>
+			<dataarea name="flop" size="259254">
+				<rom name="325FLTLB.TD0" size="259254" crc="54326358" sha1="5e389aa063722974e5772fc5a9f69b73ecce4fcd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="graph" interface="floppy_3_5">
+			<feature name="part_id" value="GRAPH"/>
+			<dataarea name="flop" size="235639">
+				<rom name="325GRAPH.TD0" size="235639" crc="d8dec40f" sha1="21cae388459cf5ba9ea23a007934d547dd016c62" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="hfs1" interface="floppy_3_5">
+			<feature name="part_id" value="HFS1"/>
+			<dataarea name="flop" size="175088">
+				<rom name="325HFS1.TD0" size="175088" crc="da5c278a" sha1="fc7b5c0365453c407efc7b2f246c7473c4a759df" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="hfs2" interface="floppy_3_5">
+			<feature name="part_id" value="HFS2"/>
+			<dataarea name="flop" size="131732">
+				<rom name="325HFS2.TD0" size="131732" crc="f065decf" sha1="911c7cf2dec43956c7c936e8e6bdf679f5c62c7b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="hfs3" interface="floppy_3_5">
+			<feature name="part_id" value="HFS3"/>
+			<dataarea name="flop" size="145708">
+				<rom name="325HFS3.TD0" size="145708" crc="ac1059cd" sha1="8cfbb8e3ac5cd574dc329c29245a908546661770" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="lib" interface="floppy_3_5">
+			<feature name="part_id" value="LIB"/>
+			<dataarea name="flop" size="247907">
+				<rom name="325LIB.TD0" size="247907" crc="995dadaa" sha1="78d82a568f182cc67831666f96d5d9826a6373b4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

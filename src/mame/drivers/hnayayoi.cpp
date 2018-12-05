@@ -567,24 +567,24 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_DEVICE_ADD("crtc", HD6845, 20_MHz_XTAL / 8)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
-	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, hnayayoi_update_row)
+	hd6845_device &crtc(HD6845(config, "crtc", 20_MHz_XTAL / 8));
+	crtc.set_screen("screen");
+	crtc.set_char_width(4);
+	crtc.set_show_border_area(false);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
+	crtc.set_update_row_callback(FUNC(hnayayoi_state::hnayayoi_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 20000000/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, hnayayoi_state, irqhandler))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 20000000/8));
+	ymsnd.irq_handler().set(FUNC(hnayayoi_state::irqhandler));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
@@ -612,8 +612,7 @@ MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // ?
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, untoucha_update_row)
+	subdevice<hd6845_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row), this);
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
 MACHINE_CONFIG_END

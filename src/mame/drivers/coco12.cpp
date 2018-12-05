@@ -457,8 +457,8 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
 	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
-	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, XTAL(14'318'181), MAINCPU_TAG)
-	MCFG_SAM6883_RES_CALLBACK(READ8(*this, coco12_state, sam_read))
+	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
+	m_sam->res_rd_callback().set(FUNC(coco12_state::sam_read));
 
 	// Becker Port device
 	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
@@ -467,9 +467,9 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "printer")
-	MCFG_RS232_DCD_HANDLER(WRITELINE(PIA1_TAG, pia6821_device, ca1_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("printer", printer)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
+	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
+	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
 
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "pak"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_DEVICE_ADD(VDG_TAG, MC6847_NTSC, XTAL(14'318'181) / 4) // VClk output from MC6883
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, coco12_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, coco12_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(SAM_TAG, sam6883_device, display_read))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(m_sam, sam6883_device, display_read))
 
 	// sound hardware
 	coco_sound(config);
@@ -508,15 +508,16 @@ MACHINE_CONFIG_START(coco12_state::cocoh)
 	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco12_state::cocoe)
+void coco12_state::cocoe(machine_config &config)
+{
 	coco(config);
 	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdc"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	MCFG_COCO_VHD_ADD(VHD0_TAG)
-	MCFG_COCO_VHD_ADD(VHD1_TAG)
-MACHINE_CONFIG_END
+	COCO_VHD(config, m_vhd_0, 0);
+	COCO_VHD(config, m_vhd_1, 0);
+}
 
 MACHINE_CONFIG_START(coco12_state::cocoeh)
 	cocoe(config);
@@ -525,15 +526,16 @@ MACHINE_CONFIG_START(coco12_state::cocoeh)
 	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco12_state::coco2)
+void coco12_state::coco2(machine_config &config)
+{
 	coco(config);
 	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	MCFG_COCO_VHD_ADD(VHD0_TAG)
-	MCFG_COCO_VHD_ADD(VHD1_TAG)
-MACHINE_CONFIG_END
+	COCO_VHD(config, m_vhd_0, 0);
+	COCO_VHD(config, m_vhd_1, 0);
+}
 
 MACHINE_CONFIG_START(coco12_state::coco2h)
 	coco2(config);
@@ -548,7 +550,7 @@ MACHINE_CONFIG_START(coco12_state::coco2b)
 	MCFG_DEVICE_ADD(VDG_TAG, MC6847T1_NTSC, XTAL(14'318'181) / 4)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, coco12_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, coco12_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(SAM_TAG, sam6883_device, display_read))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(m_sam, sam6883_device, display_read))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::coco2bh)

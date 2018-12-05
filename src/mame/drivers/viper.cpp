@@ -600,20 +600,20 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 
 static inline uint64_t read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
 {
-	mem_mask = flipendian_int64(mem_mask);
+	mem_mask = swapendian_int64(mem_mask);
 	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
 		result = (uint64_t)(handler)(space, offset * 2, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
 		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return flipendian_int64(result);
+	return swapendian_int64(result);
 }
 
 
 static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	data = flipendian_int64(data);
-	mem_mask = flipendian_int64(mem_mask);
+	data = swapendian_int64(data);
+	mem_mask = swapendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
@@ -1050,7 +1050,7 @@ READ32_MEMBER(viper_state::epic_r)
 		}
 	}
 
-	return flipendian_int32(ret);
+	return swapendian_int32(ret);
 }
 
 WRITE32_MEMBER(viper_state::epic_w)
@@ -1058,7 +1058,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 	int reg;
 	reg = offset * 4;
 
-	data = flipendian_int32(data);
+	data = swapendian_int32(data);
 
 #if VIPER_DEBUG_EPIC_REGS
 	if (reg != 0x600b0)     // interrupt clearing is spammy

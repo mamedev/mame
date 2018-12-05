@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	m_s3c44b0->gpio_port_w_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_w));
 	m_s3c44b0->i2s_data_w_cb().set("dac", FUNC(dac_word_interface::data_w));
 
-	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
+	SMARTMEDIA(config, m_smartmedia, 0);
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")

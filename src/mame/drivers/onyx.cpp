@@ -64,7 +64,6 @@ public:
 	void subio(address_map &map);
 	void submem(address_map &map);
 private:
-	DECLARE_MACHINE_RESET(c8002);
 	void z8002_m1_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu; // z8002 or z80 depending on driver
@@ -78,10 +77,6 @@ private:
 static INPUT_PORTS_START( c8002 )
 INPUT_PORTS_END
 
-
-MACHINE_RESET_MEMBER(onyx_state, c8002)
-{
-}
 
 void onyx_state::c8002_mem(address_map &map)
 {
@@ -136,7 +131,8 @@ void onyx_state::subio(address_map &map)
 
 ****************************************************************************/
 
-MACHINE_CONFIG_START(onyx_state::c8002)
+void onyx_state::c8002(machine_config &config)
+{
 	/* basic machine hardware */
 	z8002_device& maincpu(Z8002(config, m_maincpu, XTAL(4'000'000)));
 	//maincpu.set_daisy_config(main_daisy_chain);
@@ -148,8 +144,6 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	//subcpu.set_daisy_config(sub_daisy_chain);
 	subcpu.set_addrmap(AS_PROGRAM, &onyx_state::submem);
 	subcpu.set_addrmap(AS_IO, &onyx_state::subio);
-
-	MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
 
 	clock_device &sio1_clock(CLOCK(config, "sio1_clock", 307200));
 	sio1_clock.signal_handler().set(m_sio[0], FUNC(z80sio_device::rxca_w));
@@ -172,10 +166,10 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	Z80SIO(config, m_sio[3], XTAL(16'000'000) /4);
 	Z80SIO(config, m_sio[4], XTAL(16'000'000) /4);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_sio[0], FUNC(z80sio_device::rxa_w));
+	rs232.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcda_w));
+	rs232.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsa_w));
 
 	Z80PIO(config, "pio1s", XTAL(16'000'000)/4);
 	//z80pio_device& pio1s(Z80PIO(config, "pio1s", XTAL(16'000'000)/4));
@@ -190,11 +184,11 @@ MACHINE_CONFIG_START(onyx_state::c8002)
 	sio1s.out_dtrb_callback().set("rs232s", FUNC(rs232_port_device::write_dtr));
 	sio1s.out_rtsb_callback().set("rs232s", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232s", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1s", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1s", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1s", z80sio_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232s(RS232_PORT(config, "rs232s", default_rs232_devices, "terminal"));
+	rs232s.rxd_handler().set("sio1s", FUNC(z80sio_device::rxb_w));
+	rs232s.dcd_handler().set("sio1s", FUNC(z80sio_device::dcdb_w));
+	rs232s.cts_handler().set("sio1s", FUNC(z80sio_device::ctsb_w));
+}
 
 /* ROM definition */
 ROM_START( c8002 )
@@ -250,18 +244,17 @@ void onyx_state::c5000_io(address_map &map)
 	map(0x10, 0x13).rw(m_sio[0], FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 }
 
-MACHINE_CONFIG_START(onyx_state::c5000)
+void onyx_state::c5000(machine_config &config)
+{
 	/* basic machine hardware */
 	z80_device& maincpu(Z80(config, m_maincpu, XTAL(16'000'000) / 4));
 	//maincpu.set_daisy_config(sub_daisy_chain);
 	maincpu.set_addrmap(AS_PROGRAM, &onyx_state::c5000_mem);
 	maincpu.set_addrmap(AS_IO, &onyx_state::c5000_io);
 
-	//MCFG_MACHINE_RESET_OVERRIDE(onyx_state, c8002)
-
-	MCFG_DEVICE_ADD("sio1_clock", CLOCK, 614400)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(m_sio[0], z80sio_device, rxtxcb_w))
-	//MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_sio[0] ,z80sio_device, txca_w))
+	clock_device &sio1_clock(CLOCK(config, "sio1_clock", 614400));
+	sio1_clock.signal_handler().set(m_sio[0], FUNC(z80sio_device::rxtxcb_w));
+	//sio1_clock.signal_handler().append(m_sio[0], FUNC(z80sio_device::txca_w));
 
 	/* peripheral hardware */
 	//Z80PIO(config, m_pio[0], XTAL(16'000'000)/4);
@@ -277,13 +270,13 @@ MACHINE_CONFIG_START(onyx_state::c5000)
 	m_sio[0]->out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_sio[0]->out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio[0], z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio[0], z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio[0], z80sio_device, ctsb_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_sio[0], FUNC(z80sio_device::rxb_w));
+	rs232.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcdb_w));
+	rs232.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsb_w));
 
-	//MCFG_DEVICE_ADD(m_sio[1]", Z80SIO, XTAL(16'000'000) /4)
-MACHINE_CONFIG_END
+	//Z80SIO(config, m_sio[1], XTAL(16'000'000) /4);
+}
 
 
 ROM_START( c5000 )

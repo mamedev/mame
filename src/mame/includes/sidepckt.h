@@ -5,6 +5,10 @@
     Data East Side Pocket hardware
 
 ******************************************************************************/
+#ifndef MAME_INCLUDES_SIDEPKT_H
+#define MAME_INCLUDES_SIDEPKT_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -12,8 +16,8 @@
 class sidepckt_state : public driver_device
 {
 public:
-	sidepckt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sidepckt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -70,3 +74,5 @@ private:
 	void sidepcktb_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SIDEPKT_H

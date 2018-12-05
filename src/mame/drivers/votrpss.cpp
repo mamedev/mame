@@ -254,10 +254,10 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("votrax", votrax_sc01_device, write))     // port A write
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay(AY8910(config, "ay", XTAL(8'000'000)/4)); /* 2.000 MHz, verified */
+	ay.port_b_read_callback().set_ioport("DSW1");
+	ay.port_a_write_callback().set("votrax", FUNC(votrax_sc01_device::write));
+	ay.add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720 kHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -271,10 +271,10 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	// when serial is chosen, and you select terminal, nothing shows (by design). You can only type commands in.
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(8_MHz_XTAL); // Timer 0: baud rate gen for 8251

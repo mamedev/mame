@@ -375,10 +375,9 @@ protected:
 	void memmap_no_vid(address_map &map);
 
 	optional_device<bfm_dm01_device> m_dm01;
-
-private:
 	optional_device_array<stepper_device, 6> m_reel;
 
+private:
 	int m_optic_pattern;
 	int m_reels;
 };
@@ -2293,7 +2292,7 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
 	config.set_default_layout(layout_sc2_vid);
 
-	MCFG_BFM_ADDER2_ADD("adder2")
+	BFM_ADDER2(config, "adder2", 0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd", UPD7759)
@@ -3771,18 +3770,18 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	/* video hardware */
 	config.set_default_layout(layout_sc2_vfd);
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<3>))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<4>))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<5>))
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[0]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[1]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[2]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[3]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[4]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[5]->optic_handler().set(FUNC(bfm_sc2_awp_state::reel_optic_cb<5>));
 
 	_8meters(config);
 MACHINE_CONFIG_END
@@ -3826,21 +3825,21 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 
 	/* video hardware */
 	config.set_default_layout(layout_sc2_dmd);
-	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
-	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, bfm_sc2_dmd_state, bfmdm01_busy))
+	BFM_DM01(config, m_dm01, 0);
+	m_dm01->busy_callback().set(FUNC(bfm_sc2_dmd_state::bfmdm01_busy));
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<3>))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<4>))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<5>))
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[0]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[1]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[2]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[3]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[4]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[5]->optic_handler().set(FUNC(bfm_sc2_dmd_state::reel_optic_cb<5>));
 
 	_8meters(config);
 MACHINE_CONFIG_END

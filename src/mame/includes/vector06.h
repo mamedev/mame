@@ -5,9 +5,10 @@
  * includes/vector06.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_VECTOR06_H
 #define MAME_INCLUDES_VECTOR06_H
+
+#pragma once
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -15,7 +16,7 @@
 #include "cpu/i8085/i8085.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -31,8 +32,8 @@
 class vector06_state : public driver_device
 {
 public:
-	vector06_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vector06_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),

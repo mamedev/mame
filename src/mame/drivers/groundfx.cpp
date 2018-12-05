@@ -274,22 +274,22 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_PALETTE_ADD("palette", 16384)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(2)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_OFFSETS(50, 8)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(2);
+	m_tc0100scn->set_tx_region(3);
+	m_tc0100scn->set_offsets(50, 8);
+	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn->set_palette_tag(m_palette);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(4)
-	MCFG_TC0480SCP_OFFSETS(0x24, 0)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(4);
+	m_tc0480scp->set_offsets(0x24, 0);
+	m_tc0480scp->set_offsets_tx(-1, 0);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
+	TAITO_EN(config, "taito_en", 0);
 MACHINE_CONFIG_END
 
 /***************************************************************************

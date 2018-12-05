@@ -132,6 +132,7 @@
 #include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/esq16_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/esqlcd.h"
 #include "machine/esqpanel.h"
 #include "machine/esqvfd.h"

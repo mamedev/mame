@@ -499,20 +499,20 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
-	m_mpsc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
-	m_mpsc->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
-	m_mpsc->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
+	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_rxdrqa_callback().set(FUNC(mm1_state::drq2_w));
 	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
+	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
+	m_rs232c->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(KB_TAG, MM1_KEYBOARD, 2500) // actual KBCLK is 6.144_MHz_XTAL/2/16
-	MCFG_MM1_KEYBOARD_KBST_CALLBACK(WRITELINE(I8212_TAG, i8212_device, stb_w))
+	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
+	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -526,24 +526,26 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( mm1m6 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1m6)
+void mm1_state::mm1m6(machine_config &config)
+{
 	mm1(config);
 	// video hardware
 	mm1m6_video(config);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( mm1m7 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1m7)
+void mm1_state::mm1m7(machine_config &config)
+{
 	mm1(config);
 	// video hardware
 	mm1m6_video(config);
 
 	// TODO hard disk
-MACHINE_CONFIG_END
+}
 
 
 

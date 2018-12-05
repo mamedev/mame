@@ -1279,4 +1279,151 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="solitaire">
+		<description>Solitaire</description>
+		<year>2015</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lee Weber (D3thAdd3r)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60754">
+				<rom name="solitaire.bin" size="60754" crc="d0454243" sha1="26132baab8693bb1d455c2e9768a727049d1d8f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buddha">
+		<description>Buddha</description>
+		<year>2014</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Pitfall Jones"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56276">
+				<rom name="buddha.bin" size="56276" crc="28c5160e" sha1="e4b66512a62ff1a7519f5a8d8ac43d689720a832" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockboy">
+		<description>Block Boy</description>
+		<year>2017</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lee Weber (D3thAdd3r)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="57850">
+				<rom name="blockboy.uze" size="57850" crc="bd149832" sha1="b85bc95c39d9b5aa643ba9e58d05163e9d07b444" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2048">
+		<description>2048</description>
+		<year>2014</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Hartmut Wendt (Harty123)"/>
+		<info name="version" value="1.0"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="33824">
+				<rom name="2048.bin" size="33824" crc="ce0ea527" sha1="ec7b18ce3cf758c764b0b6b9bf7293999899afc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="65536in1">
+		<description>65536-in-1</description>
+		<year>2016</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Flavio Zavan (Nebososo)"/>
+		<info name="version" value="1.0"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60974">
+				<rom name="65536in1.bin" size="60974" crc="6ee7d7d5" sha1="460e771c85e407f7bb78d1736efe4c5f76a333f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceage">
+		<description>Space Age</description>
+		<year>2013</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Pitfall Jones"/>
+		<info name="version" value="1.0"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="57094">
+				<rom name="spaceage.bin" size="57094" crc="c9434ebd" sha1="8a0056be6588c1926ec4d358a6c1a156161f8e8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uzekick">
+		<description>Uzekickers</description>
+		<year>2014</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Gosma"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="47868">
+				<rom name="uzekick.bin" size="47868" crc="4eae9cc5" sha1="310d72fa87568e319918da670747b113be4dc607" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xor">
+		<description>XOR</description>
+		<year>2013</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Pitfall Jones"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="59316">
+				<rom name="xor.bin" size="59316" crc="ec1826ee" sha1="f94ac5a1744734dc266e9b0959aef6011a9ef351" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vectgame">
+		<description>Vector Game</description>
+		<year>2013</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="CunningFellow"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="26770">
+				<rom name="vectgame.bin" size="26770" crc="abc2c57c" sha1="f7e13c41946f5fa897d75a916310099128c24673" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videopoker">
+		<description>Video Poker</description>
+		<year>????</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Roukan (Jim Croskell)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="43252">
+				<rom name="videopoker.bin" size="43252" crc="97957676" sha1="99ce588e0ca30887e5f271140811ce59da48d72a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wuergrtm_d">
+		<description>Wuergertime (Demo)</description>
+		<year>2012</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Jan Kandziora"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="49092">
+				<rom name="wuergertime-demo-20121208.bin" size="49092" crc="689c2d87" sha1="a8d0e72b1ffbe1db31f5b79d970655bb4c9b4769" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrgrtm_md" cloneof="wuergrtm_d">
+		<description>Wuergertime with Music (Demo)</description>
+		<year>2016</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Jan Kandziora and D3thAdd3r"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56234">
+				<rom name="wuergertime-demo-with-music-20161120.bin" size="56234" crc="7c6d32ad" sha1="0f84d9dabfe68f35488674e0c737f9bd58acf106" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

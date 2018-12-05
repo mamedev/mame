@@ -4,6 +4,10 @@
                 ToaPlan game hardware from 1988-1991
                 ------------------------------------
 ****************************************************************************/
+#ifndef MAME_INCLUDES_TOAPLAN1_H
+#define MAME_INCLUDES_TOAPLAN1_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "sound/3812intf.h"
@@ -14,8 +18,8 @@
 class toaplan1_state : public driver_device
 {
 public:
-	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgpaletteram(*this, "bgpalette"),
 		m_fgpaletteram(*this, "fgpalette"),
 		m_sharedram(*this, "sharedram"),
@@ -26,7 +30,8 @@ public:
 		m_dsp(*this, "dsp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void demonwld(machine_config &config);
 	void samesame(machine_config &config);
@@ -204,8 +209,8 @@ protected:
 class toaplan1_rallybik_state : public toaplan1_state
 {
 public:
-	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag)
-		: toaplan1_state(mconfig, type, tag),
+	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag) :
+		toaplan1_state(mconfig, type, tag),
 		m_spritegen(*this, "scu")
 	{
 	}
@@ -226,3 +231,5 @@ private:
 	void rallybik_main_map(address_map &map);
 	void rallybik_sound_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TOAPLAN1_H

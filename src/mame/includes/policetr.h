@@ -6,7 +6,7 @@
 
 **************************************************************************/
 
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "machine/eepromser.h"
 #include "sound/bsmt2000.h"
 #include "emupal.h"

@@ -694,13 +694,13 @@ WRITE_LINE_MEMBER(niyanpai_state::vblank_irq)
 MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 12288000/2) /* TMP68301, 6.144 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(niyanpai_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, niyanpai_state, tmp68301_parallel_port_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->out_parallel_callback().set(FUNC(niyanpai_state::tmp68301_parallel_port_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_PALETTE_ADD("palette", 256*3)
 
 	/* sound hardware */
-	MCFG_NICHISND_ADD("nichisnd")
+	NICHISND(config, "nichisnd", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(niyanpai_state::musobana)

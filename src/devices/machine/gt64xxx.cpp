@@ -673,7 +673,7 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 			break;
 	}
 
-	if (m_be) result =  flipendian_int32(result);
+	if (m_be) result =  swapendian_int32(result);
 
 	return result;
 }
@@ -681,8 +681,8 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 {
 	if (m_be) {
-		data = flipendian_int32(data);
-		mem_mask = flipendian_int32(mem_mask);
+		data = swapendian_int32(data);
+		mem_mask = swapendian_int32(mem_mask);
 	}
 
 	uint32_t oldata = m_reg[offset];

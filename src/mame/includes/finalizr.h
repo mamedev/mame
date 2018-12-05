@@ -5,6 +5,10 @@
     Konami Finalizer
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_FINALIZR_H
+#define MAME_INCLUDES_FINALIZR_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "emupal.h"
@@ -76,3 +80,5 @@ private:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FINALIZR_H

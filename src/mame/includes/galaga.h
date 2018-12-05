@@ -107,7 +107,7 @@ protected:
 		uint8_t col,set;
 	};
 
-	static struct star m_star_seed_tab[];
+	static star const s_star_seed_tab[];
 
 };
 

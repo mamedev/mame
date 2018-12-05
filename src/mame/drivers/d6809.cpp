@@ -101,6 +101,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/mos6551.h"
 #include "machine/upd765.h"
 #include "machine/terminal.h"

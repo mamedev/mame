@@ -12,6 +12,7 @@
 
 #include "cpu/i86/i186.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/mm58167.h"
@@ -540,8 +541,8 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(*this, rc759_state, i186_timer1_w))
 
 	// interrupt controller
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
 	// nvram
 	NVRAM(config, "nvram").set_custom_handler(FUNC(rc759_state::nvram_init));
@@ -554,7 +555,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 
 	// rtc
 	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir3_w))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(m_pic, pic8259_device, ir3_w))
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -564,7 +565,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_I82730_ADD("txt", "maincpu", 1250000)
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_I82730_UPDATE_ROW_CB(rc759_state, txt_update_row)
-	MCFG_I82730_SINT_HANDLER(WRITELINE("pic", pic8259_device, ir4_w))
+	MCFG_I82730_SINT_HANDLER(WRITELINE(m_pic, pic8259_device, ir4_w))
 
 	// keyboard
 	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)

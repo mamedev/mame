@@ -97,11 +97,12 @@ void cm1800_state::machine_reset()
 	m_uart->write_cs(0);
 }
 
-MACHINE_CONFIG_START(cm1800_state::cm1800)
+void cm1800_state::cm1800(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(2'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I8080(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cm1800_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cm1800_state::io_map);
 
 	/* video hardware */
 	AY51013(config, m_uart); // exact uart type is unknown
@@ -111,8 +112,8 @@ MACHINE_CONFIG_START(cm1800_state::cm1800)
 	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-MACHINE_CONFIG_END
+	RS232_PORT(config, "rs232", default_rs232_devices, "terminal");
+}
 
 /* ROM definition */
 ROM_START( cm1800 )

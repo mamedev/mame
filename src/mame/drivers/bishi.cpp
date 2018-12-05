@@ -471,10 +471,10 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	K054338(config, m_k054338, 0);
 	// FP 201404: any reason why this is not connected to the k055555 below?
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -31,6 +31,7 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 #include "softlist.h"
@@ -142,8 +143,8 @@ MACHINE_CONFIG_START(ht68k_state::ht68k)
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, ht68k_state, duart_txb))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, ht68k_state, duart_output))
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681", mc68681_device, rx_a_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	WD1770(config, m_fdc, 8_MHz_XTAL);
 

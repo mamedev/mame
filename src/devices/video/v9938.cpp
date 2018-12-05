@@ -73,7 +73,7 @@ enum
 
 #define EXPMEM_OFFSET 0x20000
 
-#define LONG_WIDTH (512 + 32)
+#define V9938_LONG_WIDTH (512 + 32)
 
 static const char *const v9938_modes[] = {
 	"TEXT 1", "MULTICOLOR", "GRAPHIC 1", "GRAPHIC 2", "GRAPHIC 3",
@@ -909,7 +909,7 @@ void v99x8_device::default_border(uint32_t *ln)
 	int i;
 
 	pen = pen16(m_cont_reg[7] & 0x0f);
-	i = LONG_WIDTH;
+	i = V9938_LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
@@ -919,7 +919,7 @@ void v99x8_device::graphic7_border(uint32_t *ln)
 	int i;
 
 	pen = pen256(m_cont_reg[7]);
-	i = LONG_WIDTH;
+	i = V9938_LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
@@ -931,7 +931,7 @@ void v99x8_device::graphic5_border(uint32_t *ln)
 
 	pen1 = pen16(m_cont_reg[7] & 0x03);
 	pen0 = pen16((m_cont_reg[7] >> 2) & 0x03);
-	i = LONG_WIDTH / 2;
+	i = V9938_LONG_WIDTH / 2;
 	while (i--) { *ln++ = pen0; *ln++ = pen1; }
 }
 

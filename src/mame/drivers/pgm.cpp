@@ -160,9 +160,9 @@ Notes:
 
       ROMs
       ----
-         PGM_M01S.U18 - 16MBit MASKROM (TSOP48)
-         PGM_P01S.U20 - 1MBit  MASKROM (DIP40, socketed, equivalent to 27C1024 EPROM)
-         PGM_T01S.U29 - 16MBit MASKROM (SOP44)
+         PGM_M01S.U18 - 16MBit mask ROM (TSOP48)
+         PGM_P01S.U20 - 1MBit  mask ROM (DIP40, socketed, equivalent to 27C1024 EPROM)
+         PGM_T01S.U29 - 16MBit mask ROM (SOP44)
 
       CUSTOM IC's
       -----------
@@ -544,9 +544,9 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, m_soundlatch3);
 
 	MCFG_ICS2115_ADD("ics", 0)
 	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
@@ -922,8 +922,8 @@ Notes:
       V-110X.U2    - AM27C4096 4MBit EPROM (DIP42, labelled "DRAGON II V-100C")
 
       PALs         - x3, labelled "CZ U3", "CZ U4", "CZ U6"
-      *1           - Unpopulated position for MX23C4100 SOP40 MASKROM
-      *2           - Unpopulated position for MX23C4100 DIP40 EPROM/MASKROM
+      *1           - Unpopulated position for MX23C4100 SOP40 mask ROM
+      *2           - Unpopulated position for MX23C4100 DIP40 EPROM/mask ROM
 
 
 IGS PCB NO-0135
@@ -941,7 +941,7 @@ IGS PCB NO-0135
   |--------------------||---------------------|
 
 Notes:
-      This PCB contains only SOP44 MASKROMS and 2 logic IC's
+      This PCB contains only SOP44 mask ROMS and 2 logic IC's
       Only U5 and U9 are populated
 
       glitch on select screen exists on real board.
@@ -1151,10 +1151,10 @@ IGS025 ASIC
 1x PAL
 2x 27C040 EPROMs (main 68k program)
 1x 27C512 EPROM (protection code?)
-1x 32MBit smt MASKROM (T0400)
+1x 32MBit smt mask ROM (T0400)
 
 Bottom board contains.....
-4x 32MBit smt MASKROMs (A0400, A0401, B0400, M0400)
+4x 32MBit smt mask ROMs (A0400, A0401, B0400, M0400)
 
 */
 
@@ -1987,7 +1987,7 @@ Notes:
       U5           - 27C4000 4MBit EPROM (DIP32, labelled "KB U5 V104")
       U6           - 27C4000 4MBit EPROM (DIP32, labelled "KB U6 V104")
       PALs         - x3, labelled "DH U8", "DH U1", "DH U7"
-      *            - Unpopulated position for DIP42 EPROM/MASKROM (labelled "P0300")
+      *            - Unpopulated position for DIP42 EPROM/mask ROM (labelled "P0300")
 
 
 IGS PCB NO-0178
@@ -2005,19 +2005,19 @@ IGS PCB NO-0178
   |--------------------||---------------------|
 
 Notes:
-      U1           - 32MBit MASKROM (SOP44, labelled "M0300")
-      U2           - 32MBit MASKROM (SOP44, labelled "A0307")
-      U3           - 16MBit MASKROM (DIP42, labelled "A0302")
-      U4           - 16MBit MASKROM (DIP42, labelled "A0304")
-      U5           - 16MBit MASKROM (DIP42, labelled "A0305")
-      U8           - 16MBit MASKROM (DIP42, labelled "B0301")
-      U9           - 32MBit MASKROM (SOP44, labelled "A0300")
-      U10          - 32MBit MASKROM (SOP44, labelled "A0301")
-      U11          - 32MBit MASKROM (SOP44, labelled "A0303")
-      U12          - 32MBit MASKROM (SOP44, labelled "A0306")
-      U13          - 32MBit MASKROM (SOP44, labelled "B0300")
-      U14          - 32MBit MASKROM (SOP44, labelled "B0302")
-      U15          - 32MBit MASKROM (SOP44, labelled "B0303")
+      U1           - 32MBit mask ROM (SOP44, labelled "M0300")
+      U2           - 32MBit mask ROM (SOP44, labelled "A0307")
+      U3           - 16MBit mask ROM (DIP42, labelled "A0302")
+      U4           - 16MBit mask ROM (DIP42, labelled "A0304")
+      U5           - 16MBit mask ROM (DIP42, labelled "A0305")
+      U8           - 16MBit mask ROM (DIP42, labelled "B0301")
+      U9           - 32MBit mask ROM (SOP44, labelled "A0300")
+      U10          - 32MBit mask ROM (SOP44, labelled "A0301")
+      U11          - 32MBit mask ROM (SOP44, labelled "A0303")
+      U12          - 32MBit mask ROM (SOP44, labelled "A0306")
+      U13          - 32MBit mask ROM (SOP44, labelled "B0300")
+      U14          - 32MBit mask ROM (SOP44, labelled "B0302")
+      U15          - 32MBit mask ROM (SOP44, labelled "B0303")
 
 */
 
@@ -2102,6 +2102,42 @@ ROM_START( killbld104 )
 	ROM_LOAD( "m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
 ROM_END
 
+ROM_START( killbld106 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_BYTE( "kb_u3_v106.u3",     0x100001, 0x080000, CRC(33b9111a) SHA1(26875a9e502af9a36d13077cb7b07f9d28773d72) )
+	ROM_LOAD16_BYTE( "kb_u6_v106.u6",     0x100000, 0x080000, CRC(1c957bd7) SHA1(2bb54915166b4a62148de043b2c2088d39b91f14) )
+	ROM_LOAD16_BYTE( "kb_u4_v106.u4",     0x200001, 0x080000, CRC(169bbaaf) SHA1(a1833d3fd024c43ba7642f13e83a5b7b66631136) )
+	ROM_LOAD16_BYTE( "kb_u5_v106.u5",     0x200000, 0x080000, CRC(df85abd4) SHA1(f9e37f76c7af8a8492bd1fd22d8b3fbda194ed03) )
+
+	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data */
+	ROM_LOAD( "kb_u2_v106.u2", 0x000000, 0x010000,  CRC(5df8cf51) SHA1(d82e281a43015da653fc37e97f52943e03a07112) )
+
+	ROM_REGION( 0x800000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t0300.u14",    0x180000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
+
+	ROM_REGION( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a0300.u9",   0x0000000, 0x0400000,  CRC(3f9455d3) SHA1(3718ce00ad93975383aafc14e5a74dc297b011a1) )
+	ROM_LOAD( "a0301.u10",  0x0400000, 0x0400000,  CRC(92776889) SHA1(6d677837fefff47bfd1c6166322f69f89989a5e2) )
+	ROM_LOAD( "a0303.u11",  0x0800000, 0x0400000,  CRC(33f5cc69) SHA1(9cacd5058d4bb25b77f71658bbbbd4b38d0a6b6a) )
+	ROM_LOAD( "a0306.u12",  0x0c00000, 0x0400000,  CRC(cc018a8e) SHA1(37752d46f238fb57c0ab5a4f96b1e013f2077347) )
+	ROM_LOAD( "a0307.u2",   0x1000000, 0x0400000,  CRC(bc772e39) SHA1(079cc42a190cb916f02b59bca8fa90e524acefe9) )
+//  ROM_LOAD( "a0302.u3",   0x1400000, 0x0200000,  CRC(a4810e38) SHA1(c31fe641feab2c93795fc35bf71d4f37af1056d4) ) // from lord of gun! unused..
+//  ROM_LOAD( "a0304.u4",   0x1600000, 0x0200000,  CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // from lord of gun! unused..
+//  ROM_LOAD( "a0305.u5",   0x1800000, 0x0200000,  CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) ) // from lord of gun! unused..
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b0300.u13",    0x0000000, 0x0400000, CRC(7f876981) SHA1(43555a200929ad5ecc42137fc9aeb42dc4f50d20) )
+	ROM_LOAD( "b0302.u14",    0x0400000, 0x0400000, CRC(eea9c502) SHA1(04b3972c7111ea59a3cceab6ad124080c4ce3520) )
+	ROM_LOAD( "b0303.u15",    0x0800000, 0x0200000, CRC(77a9652e) SHA1(2342f643d37945fbda224a5034c013796e5134ca) )
+//  ROM_LOAD( "b0301.u8",     0x0a00000, 0x0200000, CRC(400abe33) SHA1(20de1eb626424ea41bd55eb3cecd6b50be744ee0) ) // from lord of gun! unused..
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
+ROM_END
+
 
 
 
@@ -2133,7 +2169,7 @@ Notes:
       U1_V100MG.U1  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U1 V100MG')
       U2_V100MG.U2  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U2 V100MG')
       PAL           - Atmel ATF22V10B PAL (DIP24, labelled 'EA U4')
-      U3            - Unpopulated position for 32MBit MASKROM (DIP42)
+      U3            - Unpopulated position for 32MBit mask ROM (DIP42)
       U6, U7        - Unpopulated position for 74LS245 logic chip (x2)
 
 
@@ -2212,7 +2248,7 @@ Notes:
       V101.U2/3/4/5- MX27C4000 4MBit EPROM (DIP32)
       PALs         - x2, labelled "CW-2 U8", "CW-2 U7"
       6264         - 8K x8 SRAM
-      *1           - Unpopulated position for SOP44 MASKROM labelled "P0500"
+      *1           - Unpopulated position for SOP44 mask ROM labelled "P0500"
 
 
 IGS PCB NO-0135
@@ -4743,6 +4779,7 @@ GAME( 1997, drgw2hk,      drgw2,     pgm_012_025_drgw2,   pgm,       pgm_012_025
 //傲劍狂刀/Ào jiàn kuáng dāo (Taiwan; Traditional Chinese)
 GAME( 1998, killbld,      pgm,       pgm_022_025_killbld, killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 109, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 GAME( 1998, killbld104,   killbld,   pgm_022_025_killbld, killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 104)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, killbld106,   killbld,   pgm_022_025_killbld, killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 106)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 
 //中國龍3/Zhōngguó lóng 3 (China, Taiwan, Japan; Traditional chinese only in title screen)
 //東方之珠3/Dung1Fong1 Zi1 Zyu1 3 (Hong Kong)/dongbang jiju 3 (Korea)

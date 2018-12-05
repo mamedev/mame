@@ -878,8 +878,7 @@ MACHINE_CONFIG_START(artmagic_state::shtstar)
 
 	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 3686400/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	YM2149(config, "aysnd", 3686400/2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/*gun board cpu*/
 	MCFG_DEVICE_ADD("guncpu", I80C31, 6000000)

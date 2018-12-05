@@ -39,7 +39,7 @@ ROM_START( tube_casper )
 	ROM_LOAD16_BYTE("casper.ic9",  0x0000, 0x2000, CRC(4105cbf4) SHA1(a3efeb6fb144da55b47c718239967ed0af4fff72))
 	ROM_LOAD16_BYTE("casper.ic10", 0x0001, 0x2000, CRC(f25bc320) SHA1(297db56283bb3164c31c21331837213cea426837))
 
-	ROM_REGION(0x8000, "host_rom", 0)
+	ROM_REGION(0x8000, "exp_rom", 0)
 	ROM_LOAD("rom1.rom", 0x0000, 0x4000, CRC(602b6a36) SHA1(7b24746dbcacb8772468532e92832d5c7f6648fd))
 	ROM_LOAD("rom2.rom", 0x4000, 0x4000, CRC(7c9efb43) SHA1(4195ce1ed928178fd645a267872a5b4f325d078a))
 ROM_END
@@ -92,8 +92,7 @@ bbc_tube_casper_device::bbc_tube_casper_device(const machine_config &mconfig, co
 		m_m68000(*this, "m68000"),
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
-		m_casper_rom(*this, "casper_rom"),
-		m_host_rom(*this, "host_rom")
+		m_casper_rom(*this, "casper_rom")
 {
 }
 
@@ -103,17 +102,6 @@ bbc_tube_casper_device::bbc_tube_casper_device(const machine_config &mconfig, co
 
 void bbc_tube_casper_device::device_start()
 {
-	m_slot = dynamic_cast<bbc_tube_slot_device *>(owner());
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_tube_casper_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(13, memregion("host_rom")->base() + 0x0000);
-	machine().root_device().membank("bank4")->configure_entry(14, memregion("host_rom")->base() + 0x4000);
 }
 
 

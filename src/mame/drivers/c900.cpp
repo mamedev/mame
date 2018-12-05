@@ -112,9 +112,9 @@ MACHINE_CONFIG_START(c900_state::c900)
 	scc.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	//scc.out_int_callback().set("rs232", FUNC(c900_state::scc_int));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8030_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8030_device, ctsb_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("scc", FUNC(scc8030_device::rxb_w));
+	rs232.cts_handler().set("scc", FUNC(scc8030_device::ctsb_w));
 MACHINE_CONFIG_END
 
 ROM_START( c900 )

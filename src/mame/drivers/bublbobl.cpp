@@ -887,10 +887,10 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_main_to_sound);
+	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1002,10 +1002,10 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_main_to_sound);
+	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<0>))

@@ -999,19 +999,19 @@ MACHINE_CONFIG_START(leland_state::leland)
 	SPEAKER(config, "speaker").front_center();
 
 	// only one of the AY sockets is populated
-	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/6)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(1000, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, leland_state, leland_sound_port_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, leland_state, leland_sound_port_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910, 10000000/6);
+	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910->set_resistors_load(1000, 0, 0);
+	m_ay8910->port_a_read_callback().set(FUNC(leland_state::leland_sound_port_r));
+	m_ay8910->port_a_write_callback().set(FUNC(leland_state::leland_sound_port_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-//  MCFG_DEVICE_ADD("ay8912", AY8912, 10000000/6)
-//  MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-//  MCFG_AY8910_RES_LOADS(1000, 0, 0)
-//  MCFG_AY8910_PORT_A_READ_CB(READ8(*this, leland_state, leland_sound_port_r))
-//  MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, leland_state, leland_sound_port_w))
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+//  AY8912(config, m_ay8912, 10000000/6);
+//  m_ay8912->set_flags(AY8910_SINGLE_OUTPUT);
+//  m_ay8912->set_resistors_load(1000, 0, 0);
+//  m_ay8912->port_a_read_callback().set(FUNC(leland_state::leland_sound_port_r));
+//  m_ay8912->port_a_write_callback().set(FUNC(leland_state::leland_sound_port_w));
+//  m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD(m_dac[0], DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
 	MCFG_DEVICE_ADD(m_dac[1], DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)

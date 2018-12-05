@@ -19,6 +19,8 @@ The cpu speed could be adjusted by using a potentiometer, the range being
 We emulate the original version. Later enhancements included more RAM, speech
 synthesis and various attachments, however I have no information on these.
 
+2018-11-08 Obtained fresh dumps from the original designers.
+
 Pasting:
         0-F : as is
         + (inc) : ^
@@ -461,11 +463,14 @@ MACHINE_CONFIG_END
 ROM_START(tec1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "mon1", "MON1")
-	ROMX_LOAD("mon1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "mon1b", "MON1B")
-	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "mon2", "MON2")
-	ROMX_LOAD("mon2.rom",   0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(2))
+	ROMX_LOAD( "mon1.rom",   0x0000, 0x0800, CRC(5d379e6c) SHA1(5c810885a3f0d03c54aea74aaaa8fae8a2fd9ad4), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "mon1a", "MON1A")
+	ROMX_LOAD("mon1a.rom",   0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "mon1b", "MON1B")
+	//ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
+	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(6088811d) SHA1(2cec14a24fae769f22f6598b5a63fc79d90db394), ROM_BIOS(2))    // redump
+	ROM_SYSTEM_BIOS(3, "mon2", "MON2")
+	ROMX_LOAD("mon2.rom",    0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(3))
 ROM_END
 
 ROM_START(tecjmon)

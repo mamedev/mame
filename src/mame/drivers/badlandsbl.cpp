@@ -41,6 +41,7 @@
 
 #include "emu.h"
 #include "includes/badlands.h"
+#include "emupal.h"
 
 uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -257,9 +258,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(20'000'000)/8)  /* Divisor estimated */
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	YM2151(config, "ymsnd", XTAL(20'000'000)/8).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30); /* Divisor estimated */
 MACHINE_CONFIG_END
 
 

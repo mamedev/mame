@@ -4,7 +4,7 @@
     Sega Model 2: i960KB + (5x TGP) or (2x SHARC) or (2x TGPx4)
     System 24 tilemaps
     Custom Sega/Lockheed-Martin rasterization hardware
-    (68000 + YM3834 + 2x MultiPCM) or (68000 + SCSP)
+    (68000 + YM3438 + 2x MultiPCM) or (68000 + SCSP)
 
     Hardware and protection reverse-engineering and general assistance by ElSemi.
     MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
@@ -2434,10 +2434,10 @@ MACHINE_CONFIG_START(model2_state::model2_timers)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2_state::model2_screen)
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(*this, model2_state, horizontal_sync_w))
-	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(*this, model2_state, vertical_sync_w))
+	S24TILE(config, m_tiles, 0, 0x3fff);
+	m_tiles->set_palette(m_palette);
+	m_tiles->xhout_write_callback().set(FUNC(model2_state::horizontal_sync_w));
+	m_tiles->xvout_write_callback().set(FUNC(model2_state::vertical_sync_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -2449,17 +2449,17 @@ MACHINE_CONFIG_START(model2_state::model2_screen)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2_state::model2_scsp)
-	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 45158000/4) // SCSP Clock / 2
 	MCFG_DEVICE_PROGRAM_MAP(model2_snd)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("scsp", SCSP)
-	MCFG_DEVICE_ADDRESS_MAP(0, scsp_map)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	SCSP(config, m_scsp, 45158000/2); // 45.158MHz XTAL at Video board(Model 2A-CRX)
+	m_scsp->set_addrmap(0, &model2_state::scsp_map);
+	m_scsp->irq_cb().set(FUNC(model2_state::scsp_irq));
+	m_scsp->add_route(0, "lspeaker", 1.0);
+	m_scsp->add_route(1, "rspeaker", 1.0);
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 //  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));

@@ -41,6 +41,7 @@ X - Test off-board memory banks
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/z80dart.h"
 #include "machine/msm5832.h"
@@ -66,8 +67,10 @@ public:
 
 	void init_pulsar();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
@@ -186,7 +189,7 @@ static void pulsar_floppies(device_slot_interface &device)
 static INPUT_PORTS_START( pulsar )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( pulsar_state, pulsar )
+void pulsar_state::machine_reset()
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
@@ -209,14 +212,14 @@ void pulsar_state::init_pulsar()
 	membank("bankw1")->configure_entry(0, &main[0xf800]);
 }
 
-MACHINE_CONFIG_START(pulsar_state::pulsar)
+void pulsar_state::pulsar(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pulsar_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &pulsar_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
-	MCFG_MACHINE_RESET_OVERRIDE(pulsar_state, pulsar)
 
 	/* Devices */
 	i8255_device &ppi(I8255(config, "ppi"));
@@ -225,7 +228,7 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	ppi.in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));
 	ppi.out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, "rtc", 32.768_kHz_XTAL);
 
 	z80dart_device& dart(Z80DART(config, "dart", 4_MHz_XTAL));
 	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -233,10 +236,10 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	dart.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("dart", z80dart_device, ctsa_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("dart", FUNC(z80dart_device::rxa_w));
+	rs232.cts_handler().set("dart", FUNC(z80dart_device::ctsa_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL));
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
@@ -246,11 +249,9 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	brg.ft_handler().append("dart", FUNC(z80dart_device::rxcb_w));
 
 	FD1797(config, m_fdc, 4_MHz_XTAL / 2);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 /* ROM definition */
 ROM_START( pulsarlb )

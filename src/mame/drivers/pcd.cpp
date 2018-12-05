@@ -15,6 +15,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/omti5100.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/mc146818.h"
 #include "machine/mc2661.h"
 #include "machine/nvram.h"
@@ -508,13 +509,13 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(16_MHz_XTAL / 24)) // adjusted to pass post
 
-	MCFG_DEVICE_ADD(m_pic1, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
+	PIC8259(config, m_pic1, 0);
+	m_pic1->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	MCFG_DEVICE_ADD(m_pic2, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int1_w))
+	PIC8259(config, m_pic2, 0);
+	m_pic2->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
-	MCFG_DEVICE_ADD("video", PCD_VIDEO, 0)
+	PCD_VIDEO(config, "video", 0);
 
 	RAM(config, RAM_TAG).set_default_size("1M");
 
@@ -547,10 +548,10 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	m_usart[2]->txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir4_w));
 	m_usart[2]->txd_handler().set("rs232_2", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart[0], mc2661_device, rx_w))
-	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart[2], mc2661_device, rx_w))
+	rs232_port_device &rs232_1(RS232_PORT(config, "rs232_1", default_rs232_devices, nullptr));
+	rs232_1.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
+	rs232_port_device &rs232_2(RS232_PORT(config, "rs232_2", default_rs232_devices, nullptr));
+	rs232_2.rxd_handler().set(m_usart[2], FUNC(mc2661_device::rx_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -586,8 +587,8 @@ MACHINE_CONFIG_START(pcd_state::pcx)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(pcx_io)
 
-	MCFG_DEVICE_REPLACE("video", PCX_VIDEO, 0)
-	MCFG_PCX_VIDEO_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
+	pcx_video_device &video(PCX_VIDEO(config.replace(), "video", 0));
+	video.txd_handler().set("keyboard", FUNC(pcd_keyboard_device::t0_w));
 
 	MCFG_DEVICE_MODIFY("keyboard")
 	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE("video", pcx_video_device, rx_w))

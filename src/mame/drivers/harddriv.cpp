@@ -1461,7 +1461,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_DEVICE_PROGRAM_MAP(driver_68k_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
+	SLAPSTIC(config, m_slapstic_device, 117, true);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1496,8 +1496,8 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, harddriv_state, harddriv_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE ("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE ("duartn68681", mc68681_device, rx_a_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("duartn68681", FUNC(mc68681_device::rx_a_w));
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -1525,7 +1525,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_msp)
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1564,7 +1564,7 @@ MACHINE_CONFIG_START(harddriv_state::multisync_msp)
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1580,7 +1580,7 @@ MACHINE_CONFIG_START(harddriv_state::multisync2)
 	MCFG_DEVICE_MODIFY("gsp")
 	MCFG_DEVICE_PROGRAM_MAP(multisync2_gsp_map)
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1864,7 +1864,7 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("gsp")
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
 	adsp(config);                       /* ADSP board */
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1873,9 +1873,10 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* Steel Talons */
@@ -1927,22 +1928,23 @@ MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 
 	/* basic machine hardware */        /* multisync board with MSP */
 	ds3(config);                        /* DS III board */
-	MCFG_DEVICE_REMOVE("ds3sdsp")       /* DS III sound components are not present */
-	MCFG_DEVICE_REMOVE("ds3xdsp")
-	MCFG_DEVICE_REMOVE("ldac")
-	MCFG_DEVICE_REMOVE("rdac")
-	MCFG_DEVICE_REMOVE("vref")
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("ds3sdsp");       /* DS III sound components are not present */
+	config.device_remove("ds3xdsp");
+	config.device_remove("ldac");
+	config.device_remove("rdac");
+	config.device_remove("vref");
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 
 	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* Street Drivin' */
@@ -2083,8 +2085,7 @@ MACHINE_CONFIG_START(harddriv_new_state::racedriv_panorama_machine)
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, harddriv_new_state, tx_a))
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
-	MCFG_DEVICE_MODIFY("mainpcb:slapstic")
-	MCFG_SLAPSTIC_NUM(115)
+	subdevice<atari_slapstic_device>("mainpcb:slapstic")->set_chipnum(115);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60000))

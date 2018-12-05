@@ -1520,11 +1520,11 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	MCFG_DEVICE_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN3"))
+	ay8910_device &aysnd(AY8910(config, "aysnd", C_06B49P_CLKOUT_04)); /* 1.5 MHz. */
+	aysnd.port_a_read_callback().set_ioport("IN3");
 	/* port b read is a sort of status byte */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lucky74_state, ym2149_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)         /* not routed to audio hardware */
+	aysnd.port_b_write_callback().set(FUNC(lucky74_state::ym2149_portb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.00);         /* not routed to audio hardware */
 
 	MCFG_DEVICE_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, lucky74_state, lucky74_adpcm_int))  /* interrupt function */

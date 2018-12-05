@@ -41,6 +41,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
@@ -887,11 +888,13 @@ MACHINE_CONFIG_START(applix_state::applix)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 30_MHz_XTAL / 16) // MC6545 @ 1.875 MHz
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, applix_state, vsync_w))
+	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
+
 
 	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));

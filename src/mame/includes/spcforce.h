@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+#ifndef MAME_INCLUDES_SPCFORCE_H
+#define MAME_INCLUDES_SPCFORCE_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "sound/sn76496.h"
@@ -27,6 +31,9 @@ public:
 	void meteors(machine_config &config);
 	void spcforce(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(SN76496_latch_w);
 	DECLARE_READ8_MEMBER(SN76496_select_r);
@@ -50,8 +57,6 @@ private:
 	void spcforce_map(address_map &map);
 	void spcforce_sound_map(address_map &map);
 
-	virtual void machine_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
 	required_device<cpu_device> m_audiocpu;
@@ -73,3 +78,5 @@ private:
 	int m_sn3_ready;
 	uint8_t m_irq_mask;
 };
+
+#endif // MAME_INCLUDES_SPCFORCE_H

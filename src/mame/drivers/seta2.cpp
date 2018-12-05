@@ -82,22 +82,17 @@ grdians:
   has the shadow bit set, and has become invisible after implementing it.
 
 penbros/ablast:
-- Zooming is used briefly.
+- Zooming is used briefly (between scenes, stage exit, stage introduction)
 
 deerhunt,wschamp:
 - offset tilemap sprite during demo. In deerhunt intro, the hunter should zoom
   in to the deer. In wschamp intro the GPS unit should zoom to the high scores.
 
 wschampb:
-- dumps of the program roms matched the hand written checksum for each chip, but
-  the boot screen reports NG for both roms. - Is this correct and a bug from the
+- dumps of the program ROMs matched the hand written checksum for each chip, but
+  the boot screen reports NG for both ROMs. - Is this correct and a bug from the
   original release? Is that why the next bug fix release is v1.01? IE: such a
   a minor increase in the version number.
-
-trophyh:
-- mame hangs for around 15 seconds every now and then, at scene changes.
-  This is probably due to a couple of frames with an odd or corrupt sprites list,
-  taking a long time to render.
 
 funcube series:
 - Hacked to run, as they use a ColdFire CPU.
@@ -105,7 +100,6 @@ funcube series:
 
 reelquak:
 - Needs an x offset for tilemap sprites.
-- There are one frame glitches in the reels scroll.
 
 ***************************************************************************/
 
@@ -200,7 +194,7 @@ void seta2_state::grdians_map(address_map &map)
 	map(0x70000c, 0x70000d).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(seta2_state::spriteram_w)).share("spriteram");    // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
 	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
@@ -749,12 +743,6 @@ void seta2_state::telpacfl_map(address_map &map)
 
 // Touchscreen
 
-#define MCFG_FUNCUBE_TOUCHSCREEN_ADD( _tag, _clock ) \
-	MCFG_DEVICE_ADD( _tag, FUNCUBE_TOUCHSCREEN, _clock )
-
-#define MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(_devcb) \
-	downcast<funcube_touchscreen_device &>(*device).set_tx_cb(DEVCB_##_devcb);
-
 class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
 {
@@ -762,7 +750,7 @@ public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
-	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return m_tx_cb.set_callback(std::forward<Object>(cb)); }
+	auto tx_cb() { return m_tx_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -2351,130 +2339,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout layout_4bpp_lo =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{   RGN_FRAC(1,4)+8,RGN_FRAC(1,4)+0,
-		RGN_FRAC(0,4)+8,RGN_FRAC(0,4)+0     },
-	{   STEP8(0,1)      },
-	{   STEP8(0,8*2)    },
-	8*8*2
-};
-
-static const gfx_layout layout_4bpp_hi =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{   RGN_FRAC(3,4)+8,RGN_FRAC(3,4)+0,
-		RGN_FRAC(2,4)+8,RGN_FRAC(2,4)+0     },
-	{   STEP8(0,1)      },
-	{   STEP8(0,8*2)    },
-	8*8*2
-};
-
-static const gfx_layout layout_6bpp =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	6,
-	{
-		RGN_FRAC(2,4)+8,RGN_FRAC(2,4)+0,
-		RGN_FRAC(1,4)+8,RGN_FRAC(1,4)+0,
-		RGN_FRAC(0,4)+8,RGN_FRAC(0,4)+0     },
-	{   STEP8(0,1)      },
-	{   STEP8(0,8*2)    },
-	8*8*2
-};
-
-static const gfx_layout layout_8bpp =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	8,
-	{   RGN_FRAC(3,4)+8,RGN_FRAC(3,4)+0,
-		RGN_FRAC(2,4)+8,RGN_FRAC(2,4)+0,
-		RGN_FRAC(1,4)+8,RGN_FRAC(1,4)+0,
-		RGN_FRAC(0,4)+8,RGN_FRAC(0,4)+0     },
-	{   STEP8(0,1)      },
-	{   STEP8(0,8*2)    },
-	8*8*2
-};
-
-static const gfx_layout layout_3bpp_lo =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	3,
-	{                   RGN_FRAC(1,4)+0,
-		RGN_FRAC(0,4)+8,RGN_FRAC(0,4)+0     },
-	{   STEP8(0,1)      },
-	{   STEP8(0,8*2)    },
-	8*8*2
-};
-
-static const gfx_layout layout_2bpp_hi =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	2,
-	{   RGN_FRAC(2,4)+8,RGN_FRAC(2,4)+0 },
-	{   STEP8(0,1)      },
-	{   STEP8(0,8*2)    },
-	8*8*2
-};
-
-/*  Tiles are 8bpp, but the hardware is additionally able to discard
-    some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( gfx_seta2 )
-	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_lo, 0, 0x8000/16 )
-	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_hi, 0, 0x8000/16 )
-	GFXDECODE_ENTRY( "sprites", 0, layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, layout_8bpp,    0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, layout_3bpp_lo, 0, 0x8000/16 )   // 3bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, layout_2bpp_hi, 0, 0x8000/16 )   // 2bpp, but 4bpp color granularity
-GFXDECODE_END
-
-/***************************************************************************
-                               Funcube series
-***************************************************************************/
-
-static const gfx_layout funcube_layout_4bpp_lo =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-//  { STEP4(7*8, -8) },
-	{ STEP4(0*8, 8) },  // needed by funcube3 text
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-static const gfx_layout funcube_layout_4bpp_hi =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(4*8, -8) },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-static const gfx_layout funcube_layout_6bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	6,
-	{ STEP4(7*8, -8), STEP2(3*8, -8) },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
 static const gfx_layout funcube_layout_8bpp =
 {
 	8,8,
@@ -2486,76 +2350,12 @@ static const gfx_layout funcube_layout_8bpp =
 	8*8*8
 };
 
-static const gfx_layout funcube_layout_3bpp_lo =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	3,
-	{ 7*8,6*8,5*8 },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-static const gfx_layout funcube_layout_2bpp_hi =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ STEP2(5*8, -8) },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( gfx_funcube )
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_lo, 0, 0x8000/16 )
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi, 0, 0x8000/16 )
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
+static GFXDECODE_START( gfx_seta2 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_8bpp,    0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_3bpp_lo, 0, 0x8000/16 )   // 3bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_2bpp_hi, 0, 0x8000/16 )   // 2bpp, but 4bpp color granularity
 GFXDECODE_END
-
-/***************************************************************************
-                              Star Audition
-***************************************************************************/
-
-static const gfx_layout staraudi_layout_4bpp_lo =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 3*8, 2*8, 1*8, 0*8 },  // needed by staraudi
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-static const gfx_layout staraudi_layout_6bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	6,
-	{ 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },  // needed by staraudi
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-/*  Tiles are 8bpp, but the hardware is additionally able to discard
-    some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( gfx_staraudi )
-	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_4bpp_lo, 0, 0x8000/16 )
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi,  0, 0x8000/16 )
-	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_8bpp,     0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_3bpp_lo,  0, 0x8000/16 )   // 3bpp, but 4bpp color granularity
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_2bpp_hi,  0, 0x8000/16 )   // 2bpp, but 4bpp color granularity
-GFXDECODE_END
-
 
 /***************************************************************************
 
@@ -2575,25 +2375,26 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 }
 
 MACHINE_CONFIG_START(seta2_state::seta2)
-	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(mj4simai_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(0x200, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
@@ -2613,15 +2414,14 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gundamex_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, seta2_state, gundamex_eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, gundamex_eeprom_w))
+	m_tmp68301->in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
+	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x000, 0x0e0-1)
 MACHINE_CONFIG_END
 
 
@@ -2632,7 +2432,7 @@ MACHINE_CONFIG_START(seta2_state::grdians)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
+	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x00, 0x00 + 0xe8 -1)
 MACHINE_CONFIG_END
 
 
@@ -2644,8 +2444,6 @@ MACHINE_CONFIG_START(seta2_state::myangel)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
-
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2657,8 +2455,6 @@ MACHINE_CONFIG_START(seta2_state::myangel2)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
-
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2669,7 +2465,7 @@ MACHINE_CONFIG_START(seta2_state::pzlbowl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2680,7 +2476,7 @@ MACHINE_CONFIG_START(seta2_state::penbros)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x00, 0xe0-1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::ablastb)
@@ -2697,15 +2493,14 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(reelquak_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, reelquak_leds_w))
+	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x00, 0xf0-1)
 
 	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset)
 MACHINE_CONFIG_END
@@ -2717,14 +2512,13 @@ MACHINE_CONFIG_START(seta2_state::samshoot)
 	MCFG_DEVICE_PROGRAM_MAP(samshoot_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("DSW2"))
+	m_tmp68301->in_parallel_callback().set_ioport("DSW2");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2739,9 +2533,9 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x00, 0x0f0-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_staraudi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_seta2)
 MACHINE_CONFIG_END
 
 
@@ -2750,8 +2544,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(telpacfl_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
+	m_tmp68301->in_parallel_callback().set_ioport("KNOB");
 
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
@@ -2760,7 +2553,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0xff, 0x1ef-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0x00, 0xf0-1)
 	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset1)
 MACHINE_CONFIG_END
 
@@ -2805,8 +2598,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
-	MCFG_FUNCUBE_TOUCHSCREEN_ADD("touchscreen", 200)
-	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(WRITELINE(":sub:sci1", h8_sci_device, rx_w))
+	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2817,12 +2609,12 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2846,7 +2638,7 @@ MACHINE_CONFIG_START(funcube_state::funcube2)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2854,30 +2646,30 @@ MACHINE_CONFIG_START(funcube_state::funcube3)
 	funcube2(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::namcostr)
-	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(namcostr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
-	MCFG_TMP68301_CPU("maincpu")
+	TMP68301(config, m_tmp68301, 0);  // does this have a ticket dispenser?
+	m_tmp68301->set_cputag(m_maincpu);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3012,7 +2804,7 @@ SW4  - Single position slider switch
 
 U3  - Is a 27C4002 EPROM
 U49 - Is a 27C1001 EPROM
-U42, U43 & U47 are MASK ROMs read as 27C322
+U42, U43 & U47 are mask ROMs read as 27C322
 
 The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
@@ -3176,13 +2968,14 @@ PCB Number: P-FG01-1
   |            |DX |       3  50MHz 32MHz*                  |
   |            |102|       8                                |
 +-+            +---+                    M  M   +---+        |
-|              D D                      4  4   |DX |        |
+|       SW1*   D D                      4  4   |DX |        |
 |              S S                             |102|        |
 |              W W                             +---+        |
 |              2 1                                          |
 +-----------------------------------------------------------+
 
 U56 is unpopulated 93C45 EEPROM
+SW1 is unpopulated Reset push button
 CN4 - 96 pin connector (3 rows by 32 pins)
 * Denotes not populated.
 
@@ -3212,6 +3005,7 @@ There is known to exist an undumped version of Guardians on the
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz, 32.530MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         93C46 EEPROM
 
 Memory:
@@ -3250,7 +3044,7 @@ PCB Number: P0-113A  BP49KA
   |                    P P                     |      U21*     ||
 +-+  C                 A A       M M           +---------------+|
 |    N    DSW1         L L       3 3                            |
-|    1    DSW2                                                  |
+|    1    DSW2 SW1                                              |
 +---------------------------------------------------------------+
 
 U2 is KA2 001 001 EPROM
@@ -3307,21 +3101,18 @@ ROM_START( grdians ) /* P-FG01-1 */
 	ROM_LOAD16_BYTE( "u5.bin", 0x100001, 0x080000, CRC(9c164a3b) SHA1(6d688c7af9e7e8e8d54b2e4dfbf41f59c79242eb) )
 
 	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE)  // Sprites
-	ROM_LOAD( "u16.bin",  0x0000000, 0x400000, CRC(6a65f265) SHA1(6cad11f718f8bbcff464d41eb4717460769237ed) )
-	ROM_LOAD( "u20.bin",  0x0600000, 0x200000, CRC(a7226ab7) SHA1(408580dd35c568ffef1ebbd87359e3ec1f867020) )
-	ROM_CONTINUE(         0x0400000, 0x200000 )
-
-	ROM_LOAD( "u15.bin",  0x0800000, 0x400000, CRC(01672dcd) SHA1(f61f60e3343cc5b6ccee391ee529966a141566db) )
-	ROM_LOAD( "u19.bin",  0x0e00000, 0x200000, CRC(c0c998a0) SHA1(498fb1877527ed37412537f06a2c39ff0c60f146) )
-	ROM_CONTINUE(         0x0c00000, 0x200000 )
-
-	ROM_LOAD( "u18.bin",  0x1000000, 0x400000, CRC(967babf4) SHA1(42a6311576417c44aeaceb8ba6bb3cd7794e4882) )
-	ROM_LOAD( "u22.bin",  0x1600000, 0x200000, CRC(6239997a) SHA1(87b6d6f30f152f625f82fd858c1290176c7e156e) )
-	ROM_CONTINUE(         0x1400000, 0x200000 )
-
-	ROM_LOAD( "u17.bin",  0x1800000, 0x400000, CRC(0fad0629) SHA1(1bdc8e7c5e39e83d327f14a672ec81b049112da6) )
-	ROM_LOAD( "u21.bin",  0x1e00000, 0x200000, CRC(6f95e466) SHA1(28482fad16a3ac9302f152d81552e6f84a44f3e4) )
-	ROM_CONTINUE(         0x1c00000, 0x200000 )
+	ROM_LOAD64_WORD( "u16.bin",  0x0000000, 0x400000, CRC(6a65f265) SHA1(6cad11f718f8bbcff464d41eb4717460769237ed) )
+	ROM_LOAD64_WORD( "u15.bin",  0x0000002, 0x400000, CRC(01672dcd) SHA1(f61f60e3343cc5b6ccee391ee529966a141566db) )
+	ROM_LOAD64_WORD( "u18.bin",  0x0000004, 0x400000, CRC(967babf4) SHA1(42a6311576417c44aeaceb8ba6bb3cd7794e4882) )
+	ROM_LOAD64_WORD( "u17.bin",  0x0000006, 0x400000, CRC(0fad0629) SHA1(1bdc8e7c5e39e83d327f14a672ec81b049112da6) )
+	ROM_LOAD64_WORD( "u20.bin",  0x1800000, 0x200000, CRC(a7226ab7) SHA1(408580dd35c568ffef1ebbd87359e3ec1f867020) )
+	ROM_CONTINUE(                0x1000000, 0x200000 )
+	ROM_LOAD64_WORD( "u19.bin",  0x1800002, 0x200000, CRC(c0c998a0) SHA1(498fb1877527ed37412537f06a2c39ff0c60f146) )
+	ROM_CONTINUE(                0x1000002, 0x200000 )
+	ROM_LOAD64_WORD( "u22.bin",  0x1800004, 0x200000, CRC(6239997a) SHA1(87b6d6f30f152f625f82fd858c1290176c7e156e) )
+	ROM_CONTINUE(                0x1000004, 0x200000 )
+	ROM_LOAD64_WORD( "u21.bin",  0x1800006, 0x200000, CRC(6f95e466) SHA1(28482fad16a3ac9302f152d81552e6f84a44f3e4) )
+	ROM_CONTINUE(                0x1000006, 0x200000 )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "u32.bin", 0x000000, 0x100000, CRC(cf0f3017) SHA1(8376d3a674f71aec72f52c72758fbc53d9feb1a1) )
@@ -3339,6 +3130,7 @@ This game runs on Seta/Allumer hardware
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz, 32.530MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         93C46 EEPROM
 
 Memory:
@@ -3377,7 +3169,7 @@ PCB Number: P0-113A  BP49KA
   |                    P P                     |KA-001-006 U21||
 +-+  C                 A A       M M           +--------------+|
 |    N    DSW1         L L       3 3                           |
-|    1    DSW2                                                 |
+|    1    DSW2 SW1                                             |
 +--------------------------------------------------------------+
 
 U28 is KA-001-015 mask ROM (silkscreened SOUND ROM)
@@ -3397,17 +3189,17 @@ ROM_START( gundamex )
 	ROM_LOAD16_BYTE(      "ka_002_003.u5",  0x100001, 0x080000, CRC(946185aa) SHA1(524911c4c510d6c3e17a7ab42c7077c2fffbf06b) )
 	ROM_LOAD16_WORD_SWAP( "ka-001-005.u77", 0x500000, 0x080000, CRC(f01d3d00) SHA1(ff12834e99a76261d619f10d186f4b329fb9cb7a) )
 
-	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE)  // Sprites
-	ROM_LOAD( "ka-001-009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
-	ROM_LOAD( "ka-001-010.u18",  0x0200000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
-	ROM_LOAD( "ka-001-011.u20",  0x0400000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
-	ROM_LOAD( "ka-001-012.u15",  0x0800000, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
-	ROM_LOAD( "ka-001-013.u17",  0x0a00000, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
-	ROM_LOAD( "ka-001-014.u19",  0x0c00000, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
-	ROM_LOAD( "ka-001-006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
-	ROM_LOAD( "ka-001-007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
-	ROM_LOAD( "ka-001-008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
-	ROM_FILL(                  0x1800000, 0x600000, 0x00 ) // 6bpp instead of 8bpp
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE00)  // Sprites
+	ROM_LOAD64_WORD( "ka-001-009.u16",  0x0000000, 0x200000, CRC(997d8d93) SHA1(4cb4cdb7e8208af4b14483610d9d6aa5e13acd89) )
+	ROM_LOAD64_WORD( "ka-001-012.u15",  0x0000002, 0x200000, CRC(b789e4a8) SHA1(400b773f24d677a9d47466fdbbe68cb6efc1ad37) )
+	ROM_LOAD64_WORD( "ka-001-006.u21",  0x0000004, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
+	ROM_LOAD64_WORD( "ka-001-010.u18",  0x0800000, 0x200000, CRC(811b67ca) SHA1(c8cfae6f54c76d63bd625ff011c872ffb75fd2e2) )
+	ROM_LOAD64_WORD( "ka-001-013.u17",  0x0800002, 0x200000, CRC(d8a0201f) SHA1(fe8a2407c872adde8aec8e9340b00be4f00a2872) )
+	ROM_LOAD64_WORD( "ka-001-007.u22",  0x0800004, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
+	ROM_LOAD64_WORD( "ka-001-011.u20",  0x1000000, 0x200000, CRC(08a72700) SHA1(fb8003aa02dd249c30a757cb43b516260b41c1bf) )
+	ROM_LOAD64_WORD( "ka-001-014.u19",  0x1000002, 0x200000, CRC(7635e026) SHA1(116a3daab14a17faca85c4a956b356aaf0fc2276) )
+	ROM_LOAD64_WORD( "ka-001-008.u23",  0x1000004, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
+
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "ka-001-015.u28", 0x000000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
@@ -3438,14 +3230,13 @@ ROM_START( mj4simai )
 	ROM_LOAD16_BYTE( "hl.u4",       0x100000, 0x080000, CRC(226063b7) SHA1(1737baffc16ff7261f887911187ece96925fa6ff) )
 	ROM_LOAD16_BYTE( "hh.u5",       0x100001, 0x080000, CRC(23aaf8df) SHA1(b3d678afce4ddef32e48d690c6d07b723dd0c28f) )
 
-	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "cha-03.u16",  0x0000000, 0x400000, CRC(d367429a) SHA1(b32c215ef85c3d0a4c5550cef4f5c4c0e7030b7c) )
-	ROM_LOAD( "cha-04.u18",  0x0400000, 0x400000, CRC(7f2008c3) SHA1(e45d863540eb2381f5d7660d64cdfef87c890768) )
-	ROM_LOAD( "cha-05.u15",  0x0800000, 0x400000, CRC(e94ec40a) SHA1(2685dbc5680b5f76688c6b4fbe40ae682c525bfe) )
-	ROM_LOAD( "cha-06.u17",  0x0c00000, 0x400000, CRC(5cb0b3a9) SHA1(92fb82d45b4c46326d5796981f812e20a8ddb4f2) )
-	ROM_LOAD( "cha-01.u21",  0x1000000, 0x400000, CRC(35f47b37) SHA1(4a8eb088890272f2a069e2c3f00fadf6421f7b0e) )
-	ROM_LOAD( "cha-02.u22",  0x1400000, 0x400000, CRC(f6346860) SHA1(4eebd3fa315b97964fa39b88224f9de7622ba881) )
-	ROM_FILL(                0x1800000, 0x800000, 0x00 )   // 6bpp instead of 8bpp
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE00 )   // Sprites
+	ROM_LOAD64_WORD( "cha-03.u16",  0x0000000, 0x400000, CRC(d367429a) SHA1(b32c215ef85c3d0a4c5550cef4f5c4c0e7030b7c) )
+	ROM_LOAD64_WORD( "cha-05.u15",  0x0000002, 0x400000, CRC(e94ec40a) SHA1(2685dbc5680b5f76688c6b4fbe40ae682c525bfe) )
+	ROM_LOAD64_WORD( "cha-01.u21",  0x0000004, 0x400000, CRC(35f47b37) SHA1(4a8eb088890272f2a069e2c3f00fadf6421f7b0e) )
+	ROM_LOAD64_WORD( "cha-04.u18",  0x1000000, 0x400000, CRC(7f2008c3) SHA1(e45d863540eb2381f5d7660d64cdfef87c890768) )
+	ROM_LOAD64_WORD( "cha-06.u17",  0x1000002, 0x400000, CRC(5cb0b3a9) SHA1(92fb82d45b4c46326d5796981f812e20a8ddb4f2) )
+	ROM_LOAD64_WORD( "cha-02.u22",  0x1000004, 0x400000, CRC(f6346860) SHA1(4eebd3fa315b97964fa39b88224f9de7622ba881) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "cha-07.u32",  0x000000, 0x400000, CRC(817519ee) SHA1(ed09740cdbf61a328f7b50eb569cf498fb749416) )
@@ -3456,13 +3247,70 @@ ROM_END
 Kosodate Quiz My Angel (JPN Ver.)
 (c)1996 Namco
 
-Board:  KE (Namco) ; P0-125A (Seta)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz
+ Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
+        GAL 16V8 at U38
 
-CPU:    TMP68301 (68000 core)
-OSC:    50.0000MHz
-        32.5304MHz
+Memory:
+M1 are HM628128LFP-10L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9 (unpopulated)
+M4 are CXK58257AM-10L at U6, U7, U13 & U14
 
-Sound:  X1-010
+PCB Number:  namco KE / P0-125A
++-----------------------------------------------------------+
+|             +------+      U  U             CN4*           |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  | KQ1 CG0  U16 ||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|     +--------------+|
+  |  +-++-++-++-+            BT1*   |3|     | KQ1 CG2  U20 ||
++-+  | || || || |      M            |2|  M  +--------------+|
+|    |U||U||U||U| M M  4            | |  1  +--------------+|
+|J   |3||5||2||4| 3 3               +-+     | KQ1 CG1  U15 ||
+|A   | || || || | * *  M                    +--------------+|
+|M   +-++-++-++-+      4                    +--------------+|
+|M  C                                       | KQ1 CG3  U19 ||
+|A  N                                       +--------------+|
+|   1                                       +--------------+|
+|C  *                                       | KQ1 CG4  U18 ||
+|o                           +----------+   +--------------+|
+|n  C       +-------+        |          |   +--------------+|
+|n  N       |Toshiba|        |   NEC    |   | KQ1 CG6  U22 ||
+|e  2       |  TMP  |        |  DX-101  |   +--------------+|
+|c  *       | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   | KQ1 CG5  U17 ||
+|e  C     5                  +----------+   +--------------+|
+|r  N     6                                 +--------------+|
+|   3     *                                 | KQ1 CG7  U21 ||
++-+ * +---+    +---+       U                +--------------+|
+  |   |DX |  S |DX |       3  50MHz 32MHz*                  |
+  |   |102|  W |102|       8                                |
++-+   +---+  1 +---+                    M  M   +---+        |
+|              D D                      4  4   |DX |        |
+|              S S                             |102|        |
+|              W W                             +---+        |
+|              2 1                                          |
++-----------------------------------------------------------+
+
+U2 is KQ1 PRG E EPROM
+U3 is KQ1 PRG O EPROM
+U4 is KQ1 TBL E EPROM
+U5 is KQ1 TBL O EPROM
+U32 is KG SND mask ROM (silkscreened SOUND ROM)
+
+CN1 unpopulated 7 pin header
+CN2 unpopulated 5 pin header
+CN3 unpopulated 10 pin header
+BT1 is unpopulated battery
+U56 is unpopulated 93C45 EEPROM
+CN4 - 96 pin connector (3 rows by 32 pins)
+* Denotes not populated.
 
 ***************************************************************************/
 
@@ -3474,14 +3322,14 @@ ROM_START( myangel )
 	ROM_LOAD16_BYTE( "kq1-tblo.u5", 0x100001, 0x080000, CRC(760cab15) SHA1(fa7ea85ec2ebfaab3111b8631ea6ea3d794d449c) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "kq1-cg2.u20", 0x000000, 0x200000, CRC(80b4e8de) SHA1(c8685c4f4e3c0415ce0ec88e0288835e504cab00) )
-	ROM_LOAD( "kq1-cg0.u16", 0x200000, 0x200000, CRC(f8ae9a05) SHA1(4f3b41386a48a1608aa96b911e6b74ca775260fb) )
-	ROM_LOAD( "kq1-cg3.u19", 0x400000, 0x200000, CRC(9bdc35c9) SHA1(fd0a1eb3dd10705bce5462263667353632558b58) )
-	ROM_LOAD( "kq1-cg1.u15", 0x600000, 0x200000, CRC(23bd7ea4) SHA1(e925bbadc33fc2586bb18283cf989ab35f28c1e9) )
-	ROM_LOAD( "kq1-cg6.u22", 0x800000, 0x200000, CRC(b25acf12) SHA1(5cca35921f3b376c3cc36f5b009eb845db2e1897) )
-	ROM_LOAD( "kq1-cg4.u18", 0xa00000, 0x200000, CRC(dca7f8f2) SHA1(20595c7940a28d01bdc6610b67aaaeac61ba92e2) )
-	ROM_LOAD( "kq1-cg7.u21", 0xc00000, 0x200000, CRC(9f48382c) SHA1(80dfc33a55123b5d3cdb3ed97b43a527f0254d61) )
-	ROM_LOAD( "kq1-cg5.u17", 0xe00000, 0x200000, CRC(a4bc4516) SHA1(0eb11fa54d16bba1b96f9dd943a68949a3bb9a2f) )
+	ROM_LOAD64_WORD( "kq1-cg2.u20", 0x000000, 0x200000, CRC(80b4e8de) SHA1(c8685c4f4e3c0415ce0ec88e0288835e504cab00) )
+	ROM_LOAD64_WORD( "kq1-cg3.u19", 0x000002, 0x200000, CRC(9bdc35c9) SHA1(fd0a1eb3dd10705bce5462263667353632558b58) )
+	ROM_LOAD64_WORD( "kq1-cg6.u22", 0x000004, 0x200000, CRC(b25acf12) SHA1(5cca35921f3b376c3cc36f5b009eb845db2e1897) )
+	ROM_LOAD64_WORD( "kq1-cg7.u21", 0x000006, 0x200000, CRC(9f48382c) SHA1(80dfc33a55123b5d3cdb3ed97b43a527f0254d61) )
+	ROM_LOAD64_WORD( "kq1-cg0.u16", 0x800000, 0x200000, CRC(f8ae9a05) SHA1(4f3b41386a48a1608aa96b911e6b74ca775260fb) )
+	ROM_LOAD64_WORD( "kq1-cg1.u15", 0x800002, 0x200000, CRC(23bd7ea4) SHA1(e925bbadc33fc2586bb18283cf989ab35f28c1e9) )
+	ROM_LOAD64_WORD( "kq1-cg4.u18", 0x800004, 0x200000, CRC(dca7f8f2) SHA1(20595c7940a28d01bdc6610b67aaaeac61ba92e2) )
+	ROM_LOAD64_WORD( "kq1-cg5.u17", 0x800006, 0x200000, CRC(a4bc4516) SHA1(0eb11fa54d16bba1b96f9dd943a68949a3bb9a2f) )
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "kq1-snd.u32", 0x000000, 0x200000, CRC(8ca1b449) SHA1(f54096fb5400843af4879135c96760485b6cb319) )
@@ -3510,14 +3358,14 @@ ROM_START( myangel2 )
 	ROM_LOAD16_BYTE( "kqs1o-tb.u5", 0x100001, 0x080000, CRC(b6168737) SHA1(4c3de877c0c1dca1c43ac737a0bf231335237d3a) )
 
 	ROM_REGION( 0x1800000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "kqs1-cg4.u20", 0x0000000, 0x200000, CRC(d1802241) SHA1(52c45a13d46f7ee8043e85b99d07b1765ca93dcc) )
-	ROM_LOAD( "kqs1-cg0.u16", 0x0200000, 0x400000, CRC(c21a33a7) SHA1(bc6f479a8f4c716ba79a725f160ddeb95fdedbcb) )
-	ROM_LOAD( "kqs1-cg5.u19", 0x0600000, 0x200000, CRC(d86cf19c) SHA1(da5a5b576ce107433605b24d8b9dcd0abd46bcde) )
-	ROM_LOAD( "kqs1-cg1.u15", 0x0800000, 0x400000, CRC(dca799ba) SHA1(8379b11472c27b1945fe7fc274c7fedf756accba) )
-	ROM_LOAD( "kqs1-cg6.u22", 0x0c00000, 0x200000, CRC(3f08886b) SHA1(054546ae44ffa5d0973f4ead080fe720a340e144) )
-	ROM_LOAD( "kqs1-cg2.u18", 0x0e00000, 0x400000, CRC(f7f92c7e) SHA1(24a525a15fded0de6e382b346da6bd5e7b9eced5) )
-	ROM_LOAD( "kqs1-cg7.u21", 0x1200000, 0x200000, CRC(2c977904) SHA1(2589447f2471cdc414266b34aff552044c680d93) )
-	ROM_LOAD( "kqs1-cg3.u17", 0x1400000, 0x400000, CRC(de3b2191) SHA1(d7d6ea07b665cfd834747d3c0776b968ce03bc6a) )
+	ROM_LOAD64_WORD( "kqs1-cg4.u20", 0x0000000, 0x200000, CRC(d1802241) SHA1(52c45a13d46f7ee8043e85b99d07b1765ca93dcc) )
+	ROM_LOAD64_WORD( "kqs1-cg5.u19", 0x0000002, 0x200000, CRC(d86cf19c) SHA1(da5a5b576ce107433605b24d8b9dcd0abd46bcde) )
+	ROM_LOAD64_WORD( "kqs1-cg6.u22", 0x0000004, 0x200000, CRC(3f08886b) SHA1(054546ae44ffa5d0973f4ead080fe720a340e144) )
+	ROM_LOAD64_WORD( "kqs1-cg7.u21", 0x0000006, 0x200000, CRC(2c977904) SHA1(2589447f2471cdc414266b34aff552044c680d93) )
+	ROM_LOAD64_WORD( "kqs1-cg0.u16", 0x0800000, 0x400000, CRC(c21a33a7) SHA1(bc6f479a8f4c716ba79a725f160ddeb95fdedbcb) )
+	ROM_LOAD64_WORD( "kqs1-cg1.u15", 0x0800002, 0x400000, CRC(dca799ba) SHA1(8379b11472c27b1945fe7fc274c7fedf756accba) )
+	ROM_LOAD64_WORD( "kqs1-cg2.u18", 0x0800004, 0x400000, CRC(f7f92c7e) SHA1(24a525a15fded0de6e382b346da6bd5e7b9eced5) )
+	ROM_LOAD64_WORD( "kqs1-cg3.u17", 0x0800006, 0x400000, CRC(de3b2191) SHA1(d7d6ea07b665cfd834747d3c0776b968ce03bc6a) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "kqs1-snd.u32", 0x000000, 0x400000, CRC(792a6b49) SHA1(341b4e8f248b5032217733bada32e353c67e3888) )
@@ -3555,6 +3403,33 @@ ROM_START( namcostr )
 	ROM_LOAD( "ns1voi0.u40", 0x000000, 0x400000, BAD_DUMP CRC(fe5c2b16) SHA1(21e4423cc91e8833297d4588343237b8b3155196) )    // FIXED BITS (xxxxx1xxxxxxxxxx)
 ROM_END
 
+void seta2_state::init_namcostr()
+{
+	// attempt to patch a few of the stuck bits
+	uint16_t *cpurom = &memregion("maincpu")->as_u16(0);
+	for (offs_t addr = 0x00000; addr < 0x00100; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00100; addr < 0x00180; addr += 2)
+		if (!BIT(cpurom[addr / 2], 9))
+			cpurom[addr / 2] &= 0xfbff;
+	cpurom[0x00184 / 2] &= 0xfbff;
+	for (offs_t addr = 0x00204; addr < 0x002ae; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x002b0; addr < 0x0032c; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	cpurom[0x00332 / 2] &= 0xfbff;
+	for (offs_t addr = 0x00336; addr < 0x00344; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00348; addr < 0x00364; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00368; addr < 0x00370; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00374; addr < 0x003ae; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x003b0; addr < 0x00400; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+}
+
 /***************************************************************************
 
                             Puzzle De Bowling (Japan)
@@ -3567,6 +3442,7 @@ ROM_END
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
    OSC: 50MHz & 32.53047MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         Lattice ispLSI2032 - stamped "KUDEC"
 
 PCB Number: P0-142A
@@ -3635,10 +3511,10 @@ ROM_START( pzlbowl )
 	ROM_LOAD16_BYTE( "kup-u07.i03", 0x000001, 0x080000, CRC(a0423a04) SHA1(9539023c5c2f2bf72ee3fb6105443ffd3d61e2f8) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "kuc-u38.i00", 0x000000, 0x400000, CRC(3db24172) SHA1(89c39963e15c53b799994185d0c8b2e795478939) )
-	ROM_LOAD( "kuc-u39.i00", 0x400000, 0x400000, CRC(9b26619b) SHA1(ea7a0bf46641d15353217b01e761d1a148bee4e7) )
-	ROM_LOAD( "kuc-u40.i00", 0x800000, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
-	ROM_LOAD( "kuc-u41.i00", 0xc00000, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
+	ROM_LOAD64_WORD( "kuc-u38.i00", 0x000000, 0x400000, CRC(3db24172) SHA1(89c39963e15c53b799994185d0c8b2e795478939) )
+	ROM_LOAD64_WORD( "kuc-u39.i00", 0x000002, 0x400000, CRC(9b26619b) SHA1(ea7a0bf46641d15353217b01e761d1a148bee4e7) )
+	ROM_LOAD64_WORD( "kuc-u40.i00", 0x000004, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
+	ROM_LOAD64_WORD( "kuc-u41.i00", 0x000006, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "kus-u18.i00", 0x000000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
@@ -3655,6 +3531,7 @@ Penguin Brothers / 轟天雷 (A-Blast)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
    OSC: 50MHz, 32.53047MHz & 28MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         Lattice ispLSI2032
 
 PCB Number: P0-142A
@@ -3700,8 +3577,9 @@ Notes:  pzlbowl PCB with these extra parts:
         2x 62256 SRAM
         74HC00
 
-U50*  Unpopulated 93LC46BX EEPROM
-BAT1* Unpopulated CR2032 3Volt battery
+U50  Unpopulated 93LC46BX EEPROM
+BAT1 Unpopulated CR2032 3 Volt battery
+* Denotes not populated.
 
 Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
@@ -3719,11 +3597,11 @@ ROM_START( penbros ) // Genuine P0-142A PCB & original ROM labels
 	ROM_LOAD16_BYTE( "a-blast_jpn_u06.u06", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
 	ROM_LOAD16_BYTE( "a-blast_jpn_u07.u07", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
 
-	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "a-blast_jpn_u38.u38", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
-	ROM_LOAD( "a-blast_jpn_u39.u39", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
-	ROM_LOAD( "a-blast_jpn_u40.u40", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
-	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+	ROM_REGION( 0x1000000, "sprites", ROMREGION_ERASE00 )   // Sprites
+	ROM_LOAD64_WORD( "a-blast_jpn_u38.u38", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
+	ROM_LOAD64_WORD( "a-blast_jpn_u39.u39", 0x000002, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
+	ROM_LOAD64_WORD( "a-blast_jpn_u40.u40", 0x000004, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
+	// 6bpp instead of 8bpp
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "a-blast_jpn_u18.u18", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
@@ -3735,10 +3613,10 @@ ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
 	ROM_LOAD16_BYTE( "a-blast_twn_u07.u07", 0x000001, 0x080000, CRC(d4ddc16b) SHA1(63312ce9ec6dffb47aa6aed505f077f20713e5ac) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "a-blast_twn_u38.u38", 0x000000, 0x400000, CRC(090923da) SHA1(c1eaa8847fe183819af040d97d0e6d1cd9928991) )
-	ROM_LOAD( "a-blast_twn_u39.u39", 0x400000, 0x400000, CRC(6bb17d83) SHA1(b53d8cfc3833df937b92993f9eca17c805c5f58d) )
-	ROM_LOAD( "a-blast_twn_u40.u40", 0x800000, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
-	ROM_FILL(                        0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+	ROM_LOAD64_WORD( "a-blast_twn_u38.u38", 0x000000, 0x400000, CRC(090923da) SHA1(c1eaa8847fe183819af040d97d0e6d1cd9928991) )
+	ROM_LOAD64_WORD( "a-blast_twn_u39.u39", 0x000002, 0x400000, CRC(6bb17d83) SHA1(b53d8cfc3833df937b92993f9eca17c805c5f58d) )
+	ROM_LOAD64_WORD( "a-blast_twn_u40.u40", 0x000004, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
+	// 6bpp instead of 8bpp
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "a-blast_twn_u18.u18", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
@@ -3749,10 +3627,10 @@ ROM_START( ablastb ) // bootleg PCB with standard 68000 instead of TMP68301 and 
 	ROM_LOAD16_WORD_SWAP( "1.bin", 0x000000, 0x100000, CRC(4adbd826) SHA1(004e3d0d5cb44c00283bc02f6d727e023690226d) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "2.bin", 0x000000, 0x400000, CRC(090923da) SHA1(c1eaa8847fe183819af040d97d0e6d1cd9928991) )
-	ROM_LOAD( "3.bin", 0x400000, 0x400000, CRC(6bb17d83) SHA1(b53d8cfc3833df937b92993f9eca17c805c5f58d) )
-	ROM_LOAD( "4.bin", 0x800000, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
-	ROM_FILL(          0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
+	ROM_LOAD64_WORD( "2.bin", 0x000000, 0x400000, CRC(090923da) SHA1(c1eaa8847fe183819af040d97d0e6d1cd9928991) )
+	ROM_LOAD64_WORD( "3.bin", 0x000002, 0x400000, CRC(6bb17d83) SHA1(b53d8cfc3833df937b92993f9eca17c805c5f58d) )
+	ROM_LOAD64_WORD( "4.bin", 0x000004, 0x400000, CRC(db94847d) SHA1(fd2e29a45bb0acbd9e709256c7fc27bdd64a6634) )
+	// 6bpp instead of 8bpp
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples. ROM content matches the penbros' one, but there's no proper X1-010 on the PCB. Possibly one of the FPGAs acts as a substitute?
 	ROM_LOAD( "29f1610.bin", 0x000000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
@@ -3764,11 +3642,11 @@ Reel'N Quake!
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3805,9 +3683,9 @@ PCB Number: P-FG-02
 |r N      6                                                 |
 |  3      *                                        U21*     |
 +-+   +---+    +---+       U  50MHz 32MHz*                  |
-  |   |DX | S  |DX |       3                                |
-  |   |102| W  |102|       8                   +---+   28MHz|
-+-+   +---+ 1  +---+                    M  M   |DX |        |
+  |   |DX |  S |DX |       3                                |
+  |   |102|  W |102|       8                   +---+   28MHz|
++-+   +---+  1 +---+                    M  M   |DX |        |
 |              D D                      4  4   |102|        |
 |              S S                             +---+        |
 |              W W                                          |
@@ -3819,7 +3697,8 @@ CN2-1 - 3 Pin connector
 CN2-2 - 3 Pin connector
 CN3   - 10 Pin connector (used for extra buttons)
 
-* Denotes not populated. U56 is unpopulated 93C45 EEPROM
+U56 is unpopulated 93C45 EEPROM
+* Denotes not populated.
 
     U3-U5 silkscreened 27C4001
   U57-U58 silkscreened 23C8001E
@@ -3853,10 +3732,10 @@ ROM_START( reelquak )
 	ROM_LOAD16_BYTE( "rq_ver1.05.u3", 0x00001, 0x80000, CRC(8c78889e) SHA1(584ba123e9caafdbddc96a4d9b2b6f6994fa84b0) ) // Should be KF00x004, x = revision
 
 	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
-	ROM_LOAD( "kf-001-005_t42.u16", 0x000000, 0x200000, CRC(25e07d5c) SHA1(dd0818611f39be25dc6f0c737da4e79c6c0f9659) )
-	ROM_LOAD( "kf-001-006_t43.u15", 0x200000, 0x200000, CRC(67e2ecc4) SHA1(35cdaf7fcd29e0229da104baced41fa7620dba3d) )
-	ROM_LOAD( "kf-001-007_t44.u18", 0x400000, 0x200000, CRC(9daec83d) SHA1(07de144898deac5058d05466f29682d7840323b7) )
-	ROM_LOAD( "kf-001-008_t45.u17", 0x600000, 0x200000, CRC(f6ef6e41) SHA1(c3e838dd4dc340f44abdf45ec0b90de24f50dda9) )
+	ROM_LOAD64_WORD( "kf-001-005_t42.u16", 0x000000, 0x200000, CRC(25e07d5c) SHA1(dd0818611f39be25dc6f0c737da4e79c6c0f9659) )
+	ROM_LOAD64_WORD( "kf-001-006_t43.u15", 0x000002, 0x200000, CRC(67e2ecc4) SHA1(35cdaf7fcd29e0229da104baced41fa7620dba3d) )
+	ROM_LOAD64_WORD( "kf-001-007_t44.u18", 0x000004, 0x200000, CRC(9daec83d) SHA1(07de144898deac5058d05466f29682d7840323b7) )
+	ROM_LOAD64_WORD( "kf-001-008_t45.u17", 0x000006, 0x200000, CRC(f6ef6e41) SHA1(c3e838dd4dc340f44abdf45ec0b90de24f50dda9) )
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "kf-001-009_t46.u32", 0x000000, 0x200000, CRC(2a9641f9) SHA1(efb9df78f1877eddf29c4dae2461546adb9cea8f) )
@@ -3872,11 +3751,11 @@ Endless Riches
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3912,27 +3791,29 @@ PCB Number: P-FG-03
 |e C      5                  +----------+   +---------------+|
 |c N      6                                                  |
 |t 2      *                                        U21*      |
-|e  +---+    +---+       U  50MHz 28MHz                      |
-|r    |DX | S  |DX |       3                                 |
-|     |102| W  |102|       8                   +---+    OSC2*|
-|     +---+ 1  +---+                    M  M   |DX |         |
+|e    +---+    +---+       U  50MHz 28MHz                    |
+|r    |DX |  S |DX |       3                                 |
+|     |102|  W |102|       8                   +---+    OSC2*|
+|     +---+  1 +---+                    M  M   |DX |         |
 +-+            D D                      4  4   |102|         |
   |            S S                             +---+         |
 +-+            W W                                           |
 |              2 1                                           |
 +------------------------------------------------------------+
 
-CN1   - 7 Pin connector
-CN2   - 8 Pin connector
+CN1 - 7 Pin connector
+CN2 - 8 Pin connector
 
+U56 is unpopulated 93C45 EEPROM
+DSW2 is unpopulated
 * Denotes not populated.
-  U56 is unpopulated 93C45 EEPROM
-  DSW2 is unpopulated
 
     U3-U5 silkscreened 27C4001
   U57-U58 silkscreened 23C8001E
   U15-U22 silkscreened 23C32000
       U32 silkscreened 23C32000
+
+KFP is Program, KFC is Character Graphics and KFS is Sound
 
 Note:
   8-Liner version of P-FG-02 (see Reel'N Quake! above)
@@ -3947,13 +3828,13 @@ ROM_START( endrichs )
 	ROM_LOAD16_BYTE( "kfp_u03_c12.u3", 0x00001, 0x80000, CRC(2baee8d1) SHA1(f86920382c54a259adb1dee253859561746d215a) )
 
 	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
-	ROM_LOAD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
-	ROM_LOAD( "kfc-u15-c00.u15", 0x200000, 0x200000, CRC(98e4c36c) SHA1(651be122b78f225d38878ae90776f66989440590) )
-	ROM_LOAD( "kfc-u18-c00.u18", 0x400000, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
-	ROM_LOAD( "kfc-u17-c00.u17", 0x600000, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
+	ROM_LOAD64_WORD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
+	ROM_LOAD64_WORD( "kfc-u15-c00.u15", 0x000002, 0x200000, CRC(98e4c36c) SHA1(651be122b78f225d38878ae90776f66989440590) )
+	ROM_LOAD64_WORD( "kfc-u18-c00.u18", 0x000004, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
+	ROM_LOAD64_WORD( "kfc-u17-c00.u17", 0x000006, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) ) // Yes, it's actually "KFS" here
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
@@ -4196,7 +4077,7 @@ PCB Number: P0-145-1
 
 Differences from PCB B0-003A (or B0-003B):
 
-CN1 is populated - unknown use
+CN1 is 8 pin header - unknown use
 CN3 Female 3 row, 96 pin connection populated on the underside to connect to the P1-115A flash ROM PCB
 CN5 is labeled pins 1-4 and silkscreened GUN1
 CN6 is labeled pins 1-4 and silkscreened GUN2
@@ -4262,10 +4143,10 @@ ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks ve
 	ROM_LOAD16_BYTE( "as0907e05.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) ) /* checksum 5D89 printed on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
-	ROM_LOAD( "as0902m01.u39", 0x0800000, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
-	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
-	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD64_WORD( "as0902m01.u39", 0x0000002, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD64_WORD( "as0903m01.u40", 0x0000004, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD64_WORD( "as0904m01.u41", 0x0000006, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
@@ -4277,10 +4158,10 @@ ROM_START( deerhunta ) /* Deer Hunting USA V4.2 (xx/x/2000) */
 	ROM_LOAD16_BYTE( "as0907e04-v4_2.u07", 0x000001, 0x100000, CRC(83f02117) SHA1(70fc2291bc93af3902aae88688be6a8078f7a07e) ) /* checksum 595A printed on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
-	ROM_LOAD( "as0902m01.u39", 0x0800000, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
-	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
-	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD64_WORD( "as0902m01.u39", 0x0000002, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD64_WORD( "as0903m01.u40", 0x0000004, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD64_WORD( "as0904m01.u41", 0x0000006, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
@@ -4292,10 +4173,10 @@ ROM_START( deerhuntb ) /* Deer Hunting USA V4.0 (6/15/2000) */
 	ROM_LOAD16_BYTE( "as0907e04.u07", 0x000001, 0x100000, CRC(19973d08) SHA1(da1cc02ce480a62ccaf94d0af1246a340f054b43) ) /* checksum 4C78 printed on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
-	ROM_LOAD( "as0902m01.u39", 0x0800000, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
-	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
-	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD64_WORD( "as0902m01.u39", 0x0000002, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD64_WORD( "as0903m01.u40", 0x0000004, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD64_WORD( "as0904m01.u41", 0x0000006, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
@@ -4309,10 +4190,10 @@ ROM_START( deerhuntc ) /* These rom labels break label conventions but is correc
 	ROM_LOAD16_BYTE( "as0938e01.u07", 0x000001, 0x100000, CRC(c7657889) SHA1(4cc707c8abbc0862457375a9a910d3c338859193) ) /* SUM16 = 27D7 */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
-	ROM_LOAD( "as0902m01.u39", 0x0800000, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
-	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
-	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD64_WORD( "as0902m01.u39", 0x0000002, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD64_WORD( "as0903m01.u40", 0x0000004, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD64_WORD( "as0904m01.u41", 0x0000006, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
@@ -4324,10 +4205,10 @@ ROM_START( deerhuntd ) /* Deer Hunting USA V2.x - No version number is printed t
 	ROM_LOAD16_BYTE( "as0907e02.u07", 0x000001, 0x100000, CRC(9de2b901) SHA1(d271bc54c41e30c0d9962eedd22f3ef2b7b8c9e5) ) /* Verified with two different sets of chips */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
-	ROM_LOAD( "as0902m01.u39", 0x0800000, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
-	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
-	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD64_WORD( "as0902m01.u39", 0x0000002, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD64_WORD( "as0903m01.u40", 0x0000004, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD64_WORD( "as0904m01.u41", 0x0000006, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
@@ -4339,10 +4220,10 @@ ROM_START( deerhunte ) /* Deer Hunting USA V1.x - No version number is printed t
 	ROM_LOAD16_BYTE( "as0907e01.u07", 0x000001, 0x100000, CRC(ddeb0f97) SHA1(a2578071f3506d69057d2256685b969adc50d275) ) /* Verified with two different sets of chips */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
-	ROM_LOAD( "as0902m01.u39", 0x0800000, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
-	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
-	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
+	ROM_LOAD64_WORD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
+	ROM_LOAD64_WORD( "as0902m01.u39", 0x0000002, 0x800000, CRC(c7ca2128) SHA1(86be3a3ec2f86f61acfa3d4d261faea3c27dc378) )
+	ROM_LOAD64_WORD( "as0903m01.u40", 0x0000004, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
+	ROM_LOAD64_WORD( "as0904m01.u41", 0x0000006, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as0905m01.u18", 0x000000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
@@ -4354,10 +4235,10 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_LOAD16_BYTE( "asx907e01.u07", 0x000001, 0x100000, CRC(7c67b502) SHA1(6a0e8883a115dac4095d86897e7eca2a007a1c71) ) /* checksum AB40 printed on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "asx901m01.u38", 0x0000000, 0x800000, CRC(eabd3f44) SHA1(5a1ac986d11a8b019e18761cf4ea0a6f49fbdbfc) )
-	ROM_LOAD( "asx902m01.u39", 0x0800000, 0x800000, CRC(c32130c8) SHA1(70d56ebed1f51657aaee02f95ac51589733e6eb7) )
-	ROM_LOAD( "asx903m01.u40", 0x1000000, 0x800000, CRC(5f86c322) SHA1(5a72adb99eea176199f172384cb051e2b045ab94) )
-	ROM_LOAD( "asx904m01.u41", 0x1800000, 0x800000, CRC(c77e0b66) SHA1(0eba30e62e4bd38c198fa6cb69fb94d002ded77a) )
+	ROM_LOAD64_WORD( "asx901m01.u38", 0x0000000, 0x800000, CRC(eabd3f44) SHA1(5a1ac986d11a8b019e18761cf4ea0a6f49fbdbfc) )
+	ROM_LOAD64_WORD( "asx902m01.u39", 0x0000002, 0x800000, CRC(c32130c8) SHA1(70d56ebed1f51657aaee02f95ac51589733e6eb7) )
+	ROM_LOAD64_WORD( "asx903m01.u40", 0x0000004, 0x800000, CRC(5f86c322) SHA1(5a72adb99eea176199f172384cb051e2b045ab94) )
+	ROM_LOAD64_WORD( "asx904m01.u41", 0x0000006, 0x800000, CRC(c77e0b66) SHA1(0eba30e62e4bd38c198fa6cb69fb94d002ded77a) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "asx905m01.u18", 0x000000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
@@ -4369,10 +4250,10 @@ ROM_START( wschamp ) /* Wing Shooting Championship V2.00 (01/23/2002) */
 	ROM_LOAD16_BYTE( "as1007e03.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* also commonly labeled as: WSC U7 Ver. 2.00 A48F */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
-	ROM_LOAD( "as1002m01.u39", 0x0800000, 0x800000, CRC(16c2bb08) SHA1(63926464c8bd8db7d05905a953765e645942beb4) )
-	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
-	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
+	ROM_LOAD64_WORD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
+	ROM_LOAD64_WORD( "as1002m01.u39", 0x0000002, 0x800000, CRC(16c2bb08) SHA1(63926464c8bd8db7d05905a953765e645942beb4) )
+	ROM_LOAD64_WORD( "as1003m01.u40", 0x0000004, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
+	ROM_LOAD64_WORD( "as1004m01.u41", 0x0000006, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
@@ -4384,10 +4265,10 @@ ROM_START( wschampa ) /* Wing Shooting Championship V1.01 */
 	ROM_LOAD16_BYTE( "as1007e02.u07", 0x000001, 0x100000, CRC(78ede6d9) SHA1(e6d10f52cd4c6bf97288df44911f23bb64fc012c) ) /* checksum 615E printed on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
-	ROM_LOAD( "as1002m01.u39", 0x0800000, 0x800000, CRC(16c2bb08) SHA1(63926464c8bd8db7d05905a953765e645942beb4) )
-	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
-	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
+	ROM_LOAD64_WORD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
+	ROM_LOAD64_WORD( "as1002m01.u39", 0x0000002, 0x800000, CRC(16c2bb08) SHA1(63926464c8bd8db7d05905a953765e645942beb4) )
+	ROM_LOAD64_WORD( "as1003m01.u40", 0x0000004, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
+	ROM_LOAD64_WORD( "as1004m01.u41", 0x0000006, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
@@ -4399,25 +4280,25 @@ ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed ch
 	ROM_LOAD16_BYTE( "as10u7.u07", 0x000001, 0x100000, CRC(cf23be7d) SHA1(b9130757466ff0d41d261b1c2435d36d2452df54) ) /* checksum 1537 & 10/26 16:00 hand written on label */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
-	ROM_LOAD( "as1002m01.u39", 0x0800000, 0x800000, CRC(16c2bb08) SHA1(63926464c8bd8db7d05905a953765e645942beb4) )
-	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
-	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
+	ROM_LOAD64_WORD( "as1001m01.u38", 0x0000000, 0x800000, CRC(92595579) SHA1(75a7131aedb18b7103677340c3cca7c91aaca2bf) )
+	ROM_LOAD64_WORD( "as1002m01.u39", 0x0000002, 0x800000, CRC(16c2bb08) SHA1(63926464c8bd8db7d05905a953765e645942beb4) )
+	ROM_LOAD64_WORD( "as1003m01.u40", 0x0000004, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
+	ROM_LOAD64_WORD( "as1004m01.u41", 0x0000006, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
-ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all MASK ROMs */
+ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all mask ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* also commonly labeled as: Trophy U6 Ver. 1.00 D8DA */
 	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* also commonly labeled as: Trophy U7 Ver. 1.00 CEEF */
 
 	ROM_REGION( 0x2000000, "sprites", 0 )   // Sprites
-	ROM_LOAD( "as1101m01.u38", 0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) )
-	ROM_LOAD( "as1102m01.u39", 0x0800000, 0x800000, CRC(d186d271) SHA1(3c54438b35adfab8be91df0a633270d6db49beef) )
-	ROM_LOAD( "as1103m01.u40", 0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) )
-	ROM_LOAD( "as1104m01.u41", 0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) )
+	ROM_LOAD64_WORD( "as1101m01.u38", 0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) )
+	ROM_LOAD64_WORD( "as1102m01.u39", 0x0000002, 0x800000, CRC(d186d271) SHA1(3c54438b35adfab8be91df0a633270d6db49beef) )
+	ROM_LOAD64_WORD( "as1103m01.u40", 0x0000004, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) )
+	ROM_LOAD64_WORD( "as1104m01.u41", 0x0000006, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
@@ -4445,13 +4326,13 @@ ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9
 	ROM_LOAD( "lh28f016sat.u33", 0x1a00000, 0x200000, NO_DUMP )
 	ROM_LOAD( "lh28f016sat.u34", 0x1c00000, 0x200000, NO_DUMP )
 	ROM_LOAD( "lh28f016sat.u35", 0x1e00000, 0x200000, NO_DUMP )
-	ROM_LOAD( "as1101m01.u38",   0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) ) /* Load these in until the flash ROMs are dumped */
-	ROM_LOAD( "as1102m01.u39",   0x0800000, 0x800000, CRC(d186d271) SHA1(3c54438b35adfab8be91df0a633270d6db49beef) ) /* Load these in until the flash ROMs are dumped */
-	ROM_LOAD( "as1103m01.u40",   0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) ) /* Load these in until the flash ROMs are dumped */
-	ROM_LOAD( "as1104m01.u41",   0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD64_WORD( "as1101m01.u38",   0x0000000, 0x800000, CRC(855ed675) SHA1(84ce229a9feb6331413253a5aed10b362e8102e5) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD64_WORD( "as1102m01.u39",   0x0000002, 0x800000, CRC(d186d271) SHA1(3c54438b35adfab8be91df0a633270d6db49beef) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD64_WORD( "as1103m01.u40",   0x0000004, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) ) /* Load these in until the flash ROMs are dumped */
+	ROM_LOAD64_WORD( "as1104m01.u41",   0x0000006, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) ) /* Load these in until the flash ROMs are dumped */
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 MASK rom */
+	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 mask ROM */
 ROM_END
 
 /***************************************************************************
@@ -4459,21 +4340,77 @@ ROM_END
  TelePachi Fever Lion
  (C) 1996 Sunsoft
 
- PCB: Sunsoft 2MP1-E00 (P0-121A, serial 0503), similar to Reel'N Quake.
-
-   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP @ U1)
- Video: Allumer X1-020 9426HK003 (@ U9 - Same as DX-101?)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 9426HK003 (@ U9)
         NEC DX-102               (52 Pin PQFP @ U8)
         Allumer X1-007 505100    (SDIP42 @ U110 - Feeds RGB DACs)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
 Inputs: Allumer X1-004 546100    (SDIP52)
-   OSC: 50.0000 MHz (@ X1) & 32.5304 MHz (@ X2)
- Other: 8 Position Dipswitch x 2 (@ DSW1, DSW2)
-        Push Button
-        Battery (@ BT1)
+   OSC: 50.0000MHz (@ X1), 32.5304MHz (@ X2) & 32.768kHz (@ X3)
+ Other: 8 Position Dipswitch x 2
+        Ricoh RP5C62 RTC (@ U128)
+        3.6v Battery (@ BT1)
         93C46 EEPROM (@ U101)
-        Jamma Connector
-        GALs - labeled "KC-001C", "KC-002C" (@ U51, U52)
+        SW1 Push Button Reset
+
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  W2465K-70LL at U27
+M3 are HM62256BLSP-7
+M4 is LH5168D-80L
+
+PCB Number: P0-121A / Sunsoft 2MP1-E00 (serial 0503)
++--------------------------------------------------------------+
+|             +------+       +---++---+           CN3*         |
+| VOL         |Seta  |   M   |   ||   |        +--------------+|
+|             |X1-010|   2   | U || U |        |      U19*    ||
+|             +------+       | 1 || 1 |        +--------------+|
++-+           U52  U51  BT1  | 1 || 1 |        +--------------+|
+  |  +-++-+   +-++-+         | 2 || 1 |        |      U17*    ||
++-+  | || |   | || |         +---++---+   M M  +--------------+|
+|    |U||U| M |U||U| M M  32.768kHz       1 1  +--------------+|
+|J   |3||5| 3 |2||4| 3 4 RP5C62                | MP3 CG-1 U15 ||
+|A   | ||*|   | ||*|                           +--------------+|
+|M   +-++-+   +-++-+                           +--------------+|
+|M                                             |      U20*    ||
+|A                              +----------+   +--------------+|
+|                               |          |   +--------------+|
+|C                              | ALLUMER  |   |      U18*    ||
+|o                              | X1-020   |   +--------------+|
+|n          +-------+           |          |   +--------------+|
+|n          |Toshiba|           | 9426HK003|   | MP3 CG-0 U16 ||
+|e          |  TMP  |           +----------+   +--------------+|
+|c          | 68301 |                          +--------------+|
+|t          +-------+                          |      U23*    ||
+|e         93C46                               +--------------+|
+|r              D                              +--------------+|
+|               S                              |      U22*    ||
++-+         X   W  +---+     50MHz 32.5304MHz  +--------------+|
+  |         1   2  |DX |                       +--------------+|
+  |  C      |   D  |102|                       | MP3 CG-2 U21 ||
++-+  N C    0   S  +---+         M M           +--------------+|
+|    7 N    0   W        SW1     3 3                           |
+|      6    4   1                                 X1-007 R G B |
++--------------------------------------------------------------+
+
+U2 ST M27C4001 EPROM  MP3prgEVEN  U2 V1.0
+U3 ST M27C4001 EPROM  MP3 prgODD  U3 V1.0
+U4 unpopulated silkscreened 27C4001 TBL EVEN
+U5 unpopulated silkscreened 27C4001 TBL ODD
+U15 ST M27C160 EPROM  MP3 CG-1  U15 V1.0
+U16 ST M27C160 EPROM  MP3 CG-0  U16 V1.0
+U21 ST M27C160 EPROM  MP3 CG-2  U21 V1.0
+U51 GAL KC-001C
+U52 GAL KC-002C
+U111 ST M27C4001 EPROM  MP3 SOUND0  U111 V1.0
+U112 ST M27C4001 EPROM  MP3 SOUND1  U112 V1.0
+U17, U18, U19, U20, U22 & U23 silkscreened 23C16000
+* Denotes not populated.
+
+R, G & B are resistor packs
+CN3 - 96 pin connector (3 rows by 32 pins)
+CN6 - Dual row 10 pin header
+CN7 - 12 pin header
 
 ***************************************************************************/
 
@@ -4481,15 +4418,15 @@ ROM_START( telpacfl )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "mp3_prgeven__u2_v1.0.u2", 0x000000, 0x080000, CRC(9ab450c5) SHA1(57d9118df8a444e295cbda453a7c3238bd672ddd) )
 	ROM_LOAD16_BYTE( "mp3_prgodd__u3_v1.0.u3",  0x000001, 0x080000, CRC(2a324139) SHA1(1812a7a8a2c4e222a1e5c7cb6d39cf7bf7f037db) )
-	// Empty sockets: 27C4001 TBL EVEN (@ U4) & 27C4001 TBL ODD (@ U5)
 
 	ROM_REGION( 0x800000, "sprites", ROMREGION_ERASE00 )    // Sprites
-	ROM_LOAD( "mp3_cg-0__u16_v1.0.u16", 0x000000, 0x200000, CRC(9d8453ba) SHA1(d97240ce68d6e64527930e919710764a7b669cdf) )
-	ROM_LOAD( "mp3_cg-1__u15_v1.0.u15", 0x200000, 0x200000, CRC(8ab83f38) SHA1(5ebc682b80d0d97025a97824a899946712e7acd4) )
-	ROM_LOAD( "mp3_cg-2__u21_v1.0.u21", 0x400000, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
-	ROM_FILL (                          0x400000, 0x200000, 0 ) // wipe out the bad rom
-	// Empty sockets: 23C16000 (@ U17-20, U22-23)
+	ROM_LOAD64_WORD( "mp3_cg-0__u16_v1.0.u16", 0x000000, 0x200000, CRC(9d8453ba) SHA1(d97240ce68d6e64527930e919710764a7b669cdf) )
+	ROM_LOAD64_WORD( "mp3_cg-1__u15_v1.0.u15", 0x000002, 0x200000, CRC(8ab83f38) SHA1(5ebc682b80d0d97025a97824a899946712e7acd4) )
 
+	ROM_REGION( 0x800000, "unused", ROMREGION_ERASE00 )    // Sprites
+	// not decoding the bad ROM is better than loading corrupt gfx data
+	ROM_LOAD64_WORD( "mp3_cg-2__u21_v1.0.u21", 0x000004, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
+		
 	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x000000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
 	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x080000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )
@@ -4512,7 +4449,7 @@ GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",              MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
 GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
-GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )

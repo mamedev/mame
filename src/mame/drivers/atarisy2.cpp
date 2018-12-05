@@ -183,7 +183,7 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (m_interrupt_enable & 4)
-				scanline_int_gen(*m_maincpu);
+				scanline_int_write_line(1);
 	}
 }
 
@@ -736,7 +736,7 @@ void atarisy2_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x11ff).mirror(0x0200).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x1000, 0x11ff).mirror(0x0200).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x1400, 0x1400).mirror(0x007e).r("adc", FUNC(adc0808_device::data_r));
 	map(0x1400, 0x1403).mirror(0x007c).w(FUNC(atarisy2_state::bankselect_w));
 	map(0x1480, 0x148f).mirror(0x0070).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
@@ -1189,9 +1189,9 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
+	M6502(config, m_audiocpu, SOUND_CLOCK/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy2_state::sound_map);
+	m_audiocpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(MASTER_CLOCK/2/16/16/16/10));
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
@@ -1233,12 +1233,12 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu").int_callback().set_nop();
+	ATARI_SOUND_COMM(config, m_soundcomm, m_audiocpu).int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ym2151, SOUND_CLOCK/4);
+	m_ym2151->add_route(0, "lspeaker", 0.60);
+	m_ym2151->add_route(1, "rspeaker", 0.60);
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, SOUND_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
@@ -1254,44 +1254,49 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarisy2_state::paperboy)
+void atarisy2_state::paperboy(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 105, false);
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::_720)
+void atarisy2_state::_720(machine_config &config)
+{
 	atarisy2(config);
 	/* without the default EEPROM, 720 hangs at startup due to communication
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 107, false);
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::ssprint)
+void atarisy2_state::ssprint(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, false)
+	SLAPSTIC(config, m_slapstic, 108, false);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("tms")
-MACHINE_CONFIG_END
+	config.device_remove("tms");
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::csprint)
+void atarisy2_state::csprint(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, false)
+	SLAPSTIC(config, m_slapstic, 109, false);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("tms")
-MACHINE_CONFIG_END
+	config.device_remove("tms");
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::apb)
+void atarisy2_state::apb(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 110, false);
+}
 
 
 /*************************************

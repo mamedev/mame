@@ -1245,7 +1245,7 @@ READ8_MEMBER(dkong_state::dkong_tune_r)
 
 WRITE8_MEMBER(dkong_state::dkong_p1_w)
 {
-	m_discrete->write(space,DS_DAC,data);
+	m_discrete->write(DS_DAC,data);
 }
 
 
@@ -1378,7 +1378,7 @@ MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
 	vp1.read_cb<6>().set("tms", FUNC(m58817_device::status_r));
 
 	/* tms memory controller */
-	MCFG_DEVICE_ADD("m58819", M58819, 0)
+	M58819(config, "m58819", 0);
 
 	MCFG_DEVICE_ADD("tms", M58817, XTAL(640'000))
 	MCFG_TMS5110_M0_CB(WRITELINE("m58819", tms6100_device, m0_w))

@@ -257,12 +257,11 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	SPEAKER(config, "mono").front_center();
 
 	// verified to be YM2149s from PCB pic
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)  /* Verified */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bogeyman_state, colbank_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, m_ay1, 1500000);  /* Verified */
+	m_ay1->port_a_write_callback().set(FUNC(bogeyman_state::colbank_w));
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)  /* Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, m_ay2, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);  /* Verified */
 MACHINE_CONFIG_END
 
 /* ROMs */

@@ -79,7 +79,6 @@
 #include "includes/foodf.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
-#include "machine/atarigen.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "speaker.h"
@@ -127,7 +126,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 	   mystery yet */
 
 	/* INT 1 is on 32V */
-	scanline_int_gen(*m_maincpu);
+	m_scanline_int_state = true;
+	update_interrupts();
 
 	/* advance to the next interrupt */
 	scanline += 64;
@@ -139,9 +139,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 }
 
 
+WRITE_LINE_MEMBER(foodf_state::video_int_write_line)
+{
+	if (state)
+	{
+		m_video_int_state = true;
+		update_interrupts();
+	}
+}
+
+
 void foodf_state::machine_start()
 {
-	atarigen_state::machine_start();
+	m_scanline_int_state = false;
+	m_video_int_state = false;
+
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_video_int_state));
+
 	m_leds.resolve();
 }
 
@@ -165,10 +180,16 @@ WRITE8_MEMBER(foodf_state::digital_w)
 
 	m_nvram->store(data & 0x02);
 
-	if (!(data & 0x04))
-		scanline_int_ack_w(space,0,0);
-	if (!(data & 0x08))
-		video_int_ack_w(space,0,0);
+	if (!BIT(data, 2))
+	{
+		m_scanline_int_state = false;
+		update_interrupts();
+	}
+	if (!BIT(data, 3))
+	{
+		m_video_int_state = false;
+		update_interrupts();
+	}
 
 	m_leds[0] = BIT(data, 4);
 	m_leds[1] = BIT(data, 5);

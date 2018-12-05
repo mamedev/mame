@@ -321,16 +321,15 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[1], 1500000);
+	m_ay[1]->port_a_read_callback().set_ioport("IN1");
+	m_ay[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay3", AY8912, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[2], 1500000);
+	m_ay[2]->port_a_read_callback().set_ioport("IN0");
+	m_ay[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 ROM_START( promutrv )

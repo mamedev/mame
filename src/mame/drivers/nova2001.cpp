@@ -673,15 +673,15 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/6)); // 2 MHz verified on schematics
+	ay1.port_a_write_callback().set(FUNC(nova2001_state::nova2001_scroll_x_w));
+	ay1.port_b_write_callback().set(FUNC(nova2001_state::nova2001_scroll_y_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/6)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/6));
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::ninjakun)
@@ -717,15 +717,15 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/4)); // 3 MHz
+	ay1.port_a_read_callback().set_ioport("DSW1");
+	ay1.port_b_read_callback().set_ioport("DSW2");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/4) // 3 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/4)); // 3 MHz
+	ay2.port_a_write_callback().set(FUNC(nova2001_state::nova2001_scroll_x_w));
+	ay2.port_b_write_callback().set(FUNC(nova2001_state::nova2001_scroll_y_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.20);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::pkunwar)
@@ -754,15 +754,15 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/8)); // 1.5MHz (correct?)
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/8));
+	ay2.port_a_read_callback().set_ioport("IN2");
+	ay2.port_b_read_callback().set_ioport("DSW1");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::raiders5)
@@ -796,15 +796,15 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/8)); // 1.5MHz
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/8));
+	ay2.port_a_read_callback().set_ioport("IN2");
+	ay2.port_b_read_callback().set_ioport("DSW1");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 

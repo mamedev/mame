@@ -1092,18 +1092,18 @@ MACHINE_CONFIG_START(apollo_state::dn3500_19i)
 	dn3500(config);
 	/* video hardware 19" monochrome */
 	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn3500_15i)
 	dn3500(config);
 	/* video hardware is 15" monochrome or color */
 	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn3000)
@@ -1144,18 +1144,18 @@ MACHINE_CONFIG_START(apollo_state::dn3000_19i)
 	dn3000(config);
 	/* video hardware 19" monochrome */
 	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn3000_15i)
 	dn3000(config);
 	/* video hardware 15" monochrome */
 	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn5500)
@@ -1189,18 +1189,18 @@ MACHINE_CONFIG_START(apollo_state::dn5500_19i)
 	dn5500(config);
 	/* video hardware 19" monochrome */
 	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dn5500_15i)
 	dn5500(config);
 	/* video hardware 15" monochrome */
 	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
 MACHINE_CONFIG_END
 
 /***************************************************************************

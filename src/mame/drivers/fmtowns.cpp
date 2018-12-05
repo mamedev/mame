@@ -776,8 +776,6 @@ READ8_MEMBER(towns_state::towns_port60_r)
 
 WRITE8_MEMBER(towns_state::towns_port60_w)
 {
-	//device_t* dev = m_pic_master;
-
 	if(data & 0x80)
 	{
 		//towns_pic_irq(dev,0);
@@ -2305,7 +2303,7 @@ void towns_state::towns_io(address_map &map)
 	// RS-232C interface
 	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask32(0x00ff00ff);
 	// SCSI controller
-	map(0x0c30, 0x0c37).rw("fmscsi", FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask32(0x00ff00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
@@ -2364,7 +2362,7 @@ void towns_state::towns16_io(address_map &map)
 	// RS-232C interface
 	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask16(0x00ff);
 	// SCSI controller
-	map(0x0c30, 0x0c37).rw("fmscsi", FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask16(0x00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
@@ -2793,28 +2791,28 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "lspeaker", 0.50).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(307200)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, towns_state, towns_pit_out0_changed))
-	MCFG_PIT8253_CLK1(307200)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, towns_state, towns_pit_out1_changed))
-	MCFG_PIT8253_CLK2(307200)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, towns_state, pit_out2_changed))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(307200);
+	m_pit->out_handler<0>().set(FUNC(towns_state::towns_pit_out0_changed));
+	m_pit->set_clk<1>(307200);
+	m_pit->out_handler<1>().set(FUNC(towns_state::towns_pit_out1_changed));
+	m_pit->set_clk<2>(307200);
+	m_pit->out_handler<2>().set(FUNC(towns_state::pit_out2_changed));
 
-	MCFG_DEVICE_ADD("pit2", PIT8253, 0)
-	MCFG_PIT8253_CLK0(307200) // reserved
-	MCFG_PIT8253_CLK1(1228800) // RS-232
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, towns_state, pit2_out1_changed))
-	MCFG_PIT8253_CLK2(307200) // reserved
+	pit8253_device &pit2(PIT8253(config, "pit2", 0));
+	pit2.set_clk<0>(307200); // reserved
+	pit2.set_clk<1>(1228800); // RS-232
+	pit2.out_handler<1>().set(FUNC(towns_state::pit2_out1_changed));
+	pit2.set_clk<2>(307200); // reserved
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, towns_state, get_slave_ack))
+	PIC8259(config, m_pic_master, 0);
+	m_pic_master->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic_master->in_sp_callback().set_constant(1);
+	m_pic_master->read_slave_ack_callback().set(FUNC(towns_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic_slave, 0);
+	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir7_w));
+	m_pic_slave->in_sp_callback().set_constant(0);
 
 	MB8877(config, m_fdc, 8'000'000 / 4);  // clock unknown
 	m_fdc->intrq_wr_callback().set(FUNC(towns_state::mb8877a_irq_w));
@@ -2834,10 +2832,10 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
 
-	MCFG_FMSCSI_ADD("fmscsi")
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_FMSCSI_IRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_irq))
-	MCFG_FMSCSI_DRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_drq))
+	FMSCSI(config, m_scsi, 0);
+	m_scsi->set_scsi_port("scsi");
+	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
+	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
 
 	UPD71071(config, m_dma[0], 0);
 	m_dma[0]->set_cpu_tag("maincpu");
@@ -2866,12 +2864,12 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	m_i8251->rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
 	m_i8251->txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251",i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251",i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251",i8251_device, write_cts))
+	rs232_port_device &rs232c(RS232_PORT(config, "rs232c", default_rs232_devices, nullptr));
+	rs232c.rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
+	rs232c.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
+	rs232c.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 
-	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
+	FMT_ICMEM(config, m_icmemcard, 0);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("6M").set_extra_options("2M,4M,8M,16M,32M,64M,96M");

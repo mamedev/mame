@@ -55,7 +55,7 @@
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
@@ -339,7 +339,7 @@ WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
 void pc100_state::pc100_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
+	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
 //  AM_RANGE(0x04, 0x07) i8237?
 	map(0x08, 0x0b).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // upd765
 	map(0x10, 0x17).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255 #1
@@ -636,11 +636,11 @@ static void pc100_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(pc100_state::pc100)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(pc100_map)
-	MCFG_DEVICE_IO_MAP(pc100_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc100_state::pc100_map);
+	m_maincpu->set_addrmap(AS_IO, &pc100_state::pc100_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pc100_state::pc100_vblank_irq));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
@@ -657,15 +657,15 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	ppi2.out_pb_callback().set(FUNC(pc100_state::upper_mask_w));
 	ppi2.out_pc_callback().set(FUNC(pc100_state::crtc_bank_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0)) // ???
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic->in_sp_callback().set_constant(0); // ???
 
 	i8251_device &i8251(I8251(config, "uart8251", 0));
 	//i8251.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//i8251.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//i8251.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	i8251.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
+	i8251.rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pc100_state::irqnmi_w));

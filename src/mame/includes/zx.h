@@ -32,6 +32,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, "cassette"),
+		m_softlist(*this, "cass_list"),
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
@@ -90,9 +91,10 @@ private:
 		TIMER_ULA_HSYNC
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
+	required_device<software_list_device> m_softlist;
 	optional_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_gfx1;

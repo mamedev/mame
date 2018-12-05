@@ -1616,17 +1616,16 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(*this, galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(*this, galaga_state,out_1))
 
+	namco_52xx_device &n52xx(NAMCO_52XX(config, "52xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
+	n52xx.set_discrete("discrete");
+	n52xx.set_basenote(NODE_04);
+	n52xx.set_extclock(ATTOSECONDS_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(33), RES_K(10), CAP_U(0.0047))));
+	n52xx.romread_callback().set(FUNC(galaga_state::namco_52xx_rom_r));
+	n52xx.si_callback().set(FUNC(galaga_state::namco_52xx_si_r));
 
-	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
-	MCFG_NAMCO_52XX_DISCRETE("discrete")
-	MCFG_NAMCO_52XX_BASENODE(NODE_04)
-	MCFG_NAMCO_52XX_EXT_CLOCK(ATTOSECONDS_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(33), RES_K(10), CAP_U(0.0047))))
-	MCFG_NAMCO_52XX_ROMREAD_CB(READ8(*this, galaga_state,namco_52xx_rom_r))
-	MCFG_NAMCO_52XX_SI_CB(READ8(*this, galaga_state,namco_52xx_si_r))
-
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
-	MCFG_NAMCO_54XX_DISCRETE("discrete")
-	MCFG_NAMCO_54XX_BASENODE(NODE_01)
+	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
+	n54xx.set_discrete("discrete");
+	n54xx.set_basenote(NODE_01);
 
 	MCFG_NAMCO_06XX_ADD("06xx_0", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
@@ -1708,9 +1707,9 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(*this, galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(*this, galaga_state,out_1))
 
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
-	MCFG_NAMCO_54XX_DISCRETE("discrete")
-	MCFG_NAMCO_54XX_BASENODE(NODE_01)
+	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
+	n54xx.set_discrete("discrete");
+	n54xx.set_basenote(NODE_01);
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
@@ -1812,9 +1811,9 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(*this, galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(*this, galaga_state,out_1))
 
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
-	MCFG_NAMCO_54XX_DISCRETE("discrete")
-	MCFG_NAMCO_54XX_BASENODE(NODE_01)
+	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
+	n54xx.set_discrete("discrete");
+	n54xx.set_basenote(NODE_01);
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")

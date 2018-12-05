@@ -36,6 +36,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "video/upd3301.h"
 #include "machine/i8257.h"
@@ -511,8 +512,8 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 
 	/* devices */
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);

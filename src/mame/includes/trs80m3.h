@@ -12,7 +12,7 @@
 #include "machine/ram.h"
 #include "machine/bankdev.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/com8116.h"

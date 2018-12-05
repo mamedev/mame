@@ -650,11 +650,11 @@ MACHINE_CONFIG_START(tempest_state::tempest)
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 570)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_TEMPEST, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	AVG_TEMPEST(config, m_avg, 0);
+	m_avg->set_vector_tag("vector");
 
 	/* Drivers */
-	MCFG_MATHBOX_ADD("mathbox")
+	MATHBOX(config, m_mathbox, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

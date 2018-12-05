@@ -17,8 +17,11 @@
         * WWF Wrestlemania
         * Rampage World Tour
 
-    Known bugs:
+    TODO:
         * WWF has an unimplemented and not Y2K compatible real-time clock
+
+    BTANB:
+        * umk3 Scorpion's "Get Over Here" sample gets cut off, ROM dumps confirmed good
 
     NOTE: There is known to exist (currently not dumped) a Wrestlemania PCB with the following labels:
           Wrestlemania 1.0 U63 #8549    &    Wrestlemania 1.0 U54 #40C7
@@ -648,7 +651,7 @@ MACHINE_CONFIG_START(midwunit_state::wunit)
 	MCFG_VIDEO_START_OVERRIDE(midwunit_state,midwunit)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
+	DCS_AUDIO_8K(config, m_dcs, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midwunit_state::wunit_picsim)
@@ -1435,9 +1438,9 @@ GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk
 GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, init_umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, init_umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
 // Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
 GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )

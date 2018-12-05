@@ -24,6 +24,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"

@@ -146,17 +146,17 @@ public:
 	static constexpr auto CPU_CLK_PAL         = DOT_CLK_PAL / 2;
 	static constexpr auto CPU_CLK_NTSC        = DOT_CLK_NTSC / 2;
 
-	static constexpr unsigned CHAR_WIDTH          = 6;
+	static constexpr unsigned CH_WIDTH            = 6;
 
-	static constexpr unsigned HSYNC_START         = 56 * CHAR_WIDTH;
-	static constexpr unsigned HSYNC_END           = 60 * CHAR_WIDTH;
-	static constexpr unsigned HBLANK_START        = 54 * CHAR_WIDTH;
-	static constexpr unsigned HBLANK_END          =  5 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_START_PAL    =  9 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_START_NTSC   = 10 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_START        = 10 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_END          = 50 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_WIDTH        = 60 * CHAR_WIDTH;
+	static constexpr unsigned HSYNC_START         = 56 * CH_WIDTH;
+	static constexpr unsigned HSYNC_END           = 60 * CH_WIDTH;
+	static constexpr unsigned HBLANK_START        = 54 * CH_WIDTH;
+	static constexpr unsigned HBLANK_END          =  5 * CH_WIDTH;
+	static constexpr unsigned SCREEN_START_PAL    =  9 * CH_WIDTH;
+	static constexpr unsigned SCREEN_START_NTSC   = 10 * CH_WIDTH;
+	static constexpr unsigned SCREEN_START        = 10 * CH_WIDTH;
+	static constexpr unsigned SCREEN_END          = 50 * CH_WIDTH;
+	static constexpr unsigned SCREEN_WIDTH        = 60 * CH_WIDTH;
 
 	static constexpr unsigned TOTAL_SCANLINES_PAL             = 312;
 	static constexpr unsigned SCANLINE_VBLANK_START_PAL       = 304;

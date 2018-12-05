@@ -20,6 +20,8 @@ MIPS III/IV emulator.
 #include "cpu/drcuml.h"
 #include "ps2vu.h"
 
+#define ENABLE_O2_DPRINTF       (0)
+
 DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
 DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
 DECLARE_DEVICE_TYPE(R4400BE, r4400be_device)
@@ -344,7 +346,7 @@ protected:
 
 	virtual bool RBYTE(offs_t address, uint32_t *result);
 	virtual bool RHALF(offs_t address, uint32_t *result);
-	virtual bool RWORD(offs_t address, uint32_t *result);
+	virtual bool RWORD(offs_t address, uint32_t *result, bool insn = false);
 	virtual bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask);
 	virtual bool RDOUBLE(offs_t address, uint64_t *result);
 	virtual bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask);
@@ -399,6 +401,8 @@ protected:
 
 	/* core state */
 	internal_mips3_state *m_core;
+	uint8_t *m_dcache;
+	uint8_t *m_icache;
 
 	address_space_config m_program_config;
 	mips3_flavor    m_flavor;
@@ -466,13 +470,13 @@ protected:
 	uint32_t        m_debugger_temp;
 
 	/* core state */
-	drc_cache       m_cache;                    /* pointer to the DRC code cache */
+	drc_cache       m_drc_cache;                /* pointer to the DRC code cache */
 	std::unique_ptr<drcuml_state>      m_drcuml;/* DRC UML generator state */
 	std::unique_ptr<mips3_frontend>    m_drcfe; /* pointer to the DRC front-end state */
 	uint32_t        m_drcoptions;               /* configurable DRC options */
 
 												/* internal stuff */
-	uint8_t         m_cache_dirty;              /* true if we need to flush the cache */
+	uint8_t         m_drc_cache_dirty;          /* true if we need to flush the cache */
 
 												/* tables */
 	uint8_t         m_fpmode[4];                /* FPU mode table */
@@ -513,7 +517,10 @@ protected:
 
 	void generate_exception(int exception, int backup);
 	void generate_tlb_exception(int exception, offs_t address);
-	void check_irqs();
+	virtual void check_irqs();
+	virtual void handle_mult(uint32_t op);
+	virtual void handle_multu(uint32_t op);
+
 public:
 	void mips3com_update_cycle_counting();
 	void mips3com_asid_changed();
@@ -564,6 +571,7 @@ private:
 	virtual void handle_sdc2(uint32_t op);
 	virtual void handle_dmfc2(uint32_t op);
 	virtual void handle_dmtc2(uint32_t op);
+	virtual void handle_cache(uint32_t op) { /* Handle as a no-op in most implementations */ }
 
 	void lwl_be(uint32_t op);
 	void lwr_be(uint32_t op);
@@ -593,7 +601,8 @@ public:
 	void func_unimplemented();
 private:
 	/* internal compiler state */
-	struct compiler_state {
+	struct compiler_state
+	{
 		compiler_state &operator=(compiler_state &) = delete;
 
 		uint32_t         cycles;                     /* accumulated cycles */
@@ -636,6 +645,9 @@ private:
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 	void load_elf();
+#if ENABLE_O2_DPRINTF
+	void do_o2_dprintf(uint32_t fmt_addr, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t stack);
+#endif
 };
 
 
@@ -643,7 +655,7 @@ class r4000be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4000BE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_BIG, 32)
+		: mips3_device(mconfig, R4000BE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_BIG, 64)
 	{
 	}
 };
@@ -652,7 +664,7 @@ class r4000le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4000LE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_LITTLE, 32)
+		: mips3_device(mconfig, R4000LE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_LITTLE, 64)
 	{
 	}
 };
@@ -661,7 +673,7 @@ class r4400be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4400be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 32)
+		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 64)
 	{
 	}
 };
@@ -670,7 +682,7 @@ class r4400le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4400le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4400LE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_LITTLE, 32)
+		: mips3_device(mconfig, R4400LE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -679,7 +691,7 @@ class vr4300be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4300be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4300BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, VR4300BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32)
 	{
 	}
 };
@@ -688,7 +700,7 @@ class vr4300le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4300le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4300LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, VR4300LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32)
 	{
 	}
 };
@@ -697,7 +709,7 @@ class vr4310be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4310be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4310BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, VR4310BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG, 32)
 	{
 	}
 };
@@ -706,7 +718,7 @@ class vr4310le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr4310le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4310LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, VR4310LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE, 32)
 	{
 	}
 };
@@ -715,7 +727,7 @@ class r4600be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4600be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4600BE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, R4600BE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_BIG, 64)
 	{
 	}
 };
@@ -724,7 +736,7 @@ class r4600le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4600le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4600LE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, R4600LE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -733,7 +745,7 @@ class r4650be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4650be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4650BE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, R4650BE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
 };
@@ -742,7 +754,7 @@ class r4650le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4650le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4650LE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, R4650LE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -751,7 +763,7 @@ class r4700be_device : public mips3_device {
 public:
 	// construction/destruction
 	r4700be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4700BE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, R4700BE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
 };
@@ -760,7 +772,7 @@ class r4700le_device : public mips3_device {
 public:
 	// construction/destruction
 	r4700le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4700LE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, R4700LE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -769,7 +781,7 @@ class tx4925be_device : public mips3_device {
 public:
 	// construction/destruction
 	tx4925be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, TX4925BE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, TX4925BE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
 };
@@ -778,7 +790,7 @@ class tx4925le_device : public mips3_device {
 public:
 	// construction/destruction
 	tx4925le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, TX4925LE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, TX4925LE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -787,16 +799,19 @@ class r5000be_device : public mips3_device {
 public:
 	// construction/destruction
 	r5000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5000BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, R5000BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 64)
 	{
 	}
+
+protected:
+	void handle_cache(uint32_t op) override;
 };
 
 class r5000le_device : public mips3_device {
 public:
 	// construction/destruction
 	r5000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // FIXME: Should be 64 bits, Galileo blows up though
 	{
 	}
 };
@@ -805,7 +820,8 @@ class vr5500be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) {
+		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) // Should be 64 bits
+	{
 	}
 };
 
@@ -813,7 +829,7 @@ class vr5500le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -842,7 +858,7 @@ protected:
 
 	bool RBYTE(offs_t address, uint32_t *result) override;
 	bool RHALF(offs_t address, uint32_t *result) override;
-	bool RWORD(offs_t address, uint32_t *result) override;
+	bool RWORD(offs_t address, uint32_t *result, bool insn = false) override;
 	bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask) override;
 	bool RDOUBLE(offs_t address, uint64_t *result) override;
 	bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask) override;
@@ -868,6 +884,8 @@ protected:
 	void handle_extra_cop1(uint32_t op) override;
 	void handle_extra_cop2(uint32_t op) override;
 	void handle_idt(uint32_t op) override;
+	void handle_mult(uint32_t op) override;
+	void handle_multu(uint32_t op) override;
 	void handle_mmi0(uint32_t op);
 	void handle_mmi1(uint32_t op);
 	void handle_mmi2(uint32_t op);
@@ -877,6 +895,8 @@ protected:
 	void handle_dmfc2(uint32_t op) override;
 	void handle_dmtc2(uint32_t op) override;
 
+	void check_irqs() override;
+
 	required_device<sonyvu0_device> m_vu0;
 };
 
@@ -884,7 +904,7 @@ class qed5271be_device : public mips3_device {
 public:
 	// construction/destruction
 	qed5271be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, QED5271BE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, QED5271BE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
 };
@@ -893,7 +913,7 @@ class qed5271le_device : public mips3_device {
 public:
 	// construction/destruction
 	qed5271le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, QED5271LE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, QED5271LE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -902,7 +922,7 @@ class rm7000be_device : public mips3_device {
 public:
 	// construction/destruction
 	rm7000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, RM7000BE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_BIG, 32) // checkme
+		: mips3_device(mconfig, RM7000BE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
 };
@@ -911,7 +931,7 @@ class rm7000le_device : public mips3_device {
 public:
 	// construction/destruction
 	rm7000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // checkme
+		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };

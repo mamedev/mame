@@ -653,15 +653,15 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun2_state::sun2mbus)
@@ -706,17 +706,17 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
+	MM58167(config, "rtc", 32.768_kHz_XTAL);
 MACHINE_CONFIG_END
 
 /* ROM definition */

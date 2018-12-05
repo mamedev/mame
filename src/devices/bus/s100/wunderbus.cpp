@@ -87,54 +87,55 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_START(s100_wunderbus_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, s100_wunderbus_device, pic_int_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+void s100_wunderbus_device::device_add_mconfig(machine_config &config)
+{
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set(FUNC(s100_wunderbus_device::pic_int_w));
+	m_pic->in_sp_callback().set_constant(1);
 
 	INS8250(config, m_ace1, XTAL(18'432'000)/10);
 	m_ace1->out_tx_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_ace1->out_dtr_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_ace1->out_rts_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
-	m_ace1->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir3_w));
+	m_ace1->out_int_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	INS8250(config, m_ace2, XTAL(18'432'000)/10);
 	m_ace2->out_tx_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_ace2->out_dtr_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_ace2->out_rts_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
-	m_ace2->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir4_w));
+	m_ace2->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
 	INS8250(config, m_ace3, XTAL(18'432'000)/10);
 	m_ace3->out_tx_callback().set(RS232_C_TAG, FUNC(rs232_port_device::write_txd));
 	m_ace3->out_dtr_callback().set(RS232_C_TAG, FUNC(rs232_port_device::write_dtr));
 	m_ace3->out_rts_callback().set(RS232_C_TAG, FUNC(rs232_port_device::write_rts));
-	m_ace3->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir5_w));
+	m_ace3->out_int_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_ace1, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_ace1, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_ace1, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_ace1, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_ace1, ins8250_uart_device, cts_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set(m_ace1, FUNC(ins8250_uart_device::rx_w));
+	rs232a.dcd_handler().set(m_ace1, FUNC(ins8250_uart_device::dcd_w));
+	rs232a.dsr_handler().set(m_ace1, FUNC(ins8250_uart_device::dsr_w));
+	rs232a.ri_handler().set(m_ace1, FUNC(ins8250_uart_device::ri_w));
+	rs232a.cts_handler().set(m_ace1, FUNC(ins8250_uart_device::cts_w));
+	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_ace2, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_ace2, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_ace2, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_ace2, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_ace2, ins8250_uart_device, cts_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_ace2, FUNC(ins8250_uart_device::rx_w));
+	rs232b.dcd_handler().set(m_ace2, FUNC(ins8250_uart_device::dcd_w));
+	rs232b.dsr_handler().set(m_ace2, FUNC(ins8250_uart_device::dsr_w));
+	rs232b.ri_handler().set(m_ace2, FUNC(ins8250_uart_device::ri_w));
+	rs232b.cts_handler().set(m_ace2, FUNC(ins8250_uart_device::cts_w));
 
-	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_ace3, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_ace3, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_ace3, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_ace3, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_ace3, ins8250_uart_device, cts_w))
+	rs232_port_device &rs232c(RS232_PORT(config, RS232_C_TAG, default_rs232_devices, nullptr));
+	rs232c.rxd_handler().set(m_ace3, FUNC(ins8250_uart_device::rx_w));
+	rs232c.dcd_handler().set(m_ace3, FUNC(ins8250_uart_device::dcd_w));
+	rs232c.dsr_handler().set(m_ace3, FUNC(ins8250_uart_device::dsr_w));
+	rs232c.ri_handler().set(m_ace3, FUNC(ins8250_uart_device::ri_w));
+	rs232c.cts_handler().set(m_ace3, FUNC(ins8250_uart_device::cts_w));
 
 	UPD1990A(config, m_rtc);
 	m_rtc->tp_callback().set(FUNC(s100_wunderbus_device::rtc_tp_w));
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -302,9 +303,9 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 {
 	uint8_t address = (m_7c->read() & 0x3e) << 2;
-	if ((offset & 0xf8) != address) return 0;
+	if ((offset & 0xf8) != address) return 0xff;
 
-	uint8_t data = 0;
+	uint8_t data = 0xff;
 
 	if ((offset & 0x07) < 7)
 	{

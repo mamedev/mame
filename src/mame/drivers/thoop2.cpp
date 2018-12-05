@@ -75,12 +75,12 @@ Measurements from actual PCB:
 
 void thoop2_state::machine_start()
 {
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-WRITE8_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
+WRITE8_MEMBER(thoop2_state::oki_bankswitch_w)
 {
-	membank("okibank")->set_entry(data & 0x0f);
+	m_okibank->set_entry(data & 0x0f);
 }
 
 WRITE_LINE_MEMBER(thoop2_state::coin1_lockout_w)
@@ -139,7 +139,7 @@ void thoop2_state::thoop2_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000d, 0x70000d).w(FUNC(thoop2_state::OKIM6295_bankswitch_w));               /* OKI6295 bankswitch */
+	map(0x70000d, 0x70000d).w(FUNC(thoop2_state::oki_bankswitch_w));               /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                  /* OKI6295 data register */
 	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */
 	map(0xfe8000, 0xfeffff).ram().share("shareram");                     /* Work RAM (shared with D5002FP) */
@@ -237,30 +237,28 @@ INPUT_PORTS_END
 static const gfx_layout thoop2_tilelayout =
 {
 	8,8,                                    /* 8x8 tiles */
-	0x400000/16,                            /* number of tiles */
+	RGN_FRAC(1,2),                            /* number of tiles */
 	4,                                      /* 4 bpp */
-	{ 0*0x400000*8+8, 0*0x400000*8, 1*0x400000*8+8, 1*0x400000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
 static const gfx_layout thoop2_tilelayout_16 =
 {
 	16,16,                                  /* 16x16 tiles */
-	0x400000/64,                            /* number of tiles */
+	RGN_FRAC(1,2),                            /* number of tiles */
 	4,                                      /* 4 bpp */
-	{ 0*0x400000*8+8, 0*0x400000*8, 1*0x400000*8+8, 1*0x400000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+4, 16*16+5, 16*16+6, 16*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0 },
+	{ STEP8(0,1), STEP8(8*2*16,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
 
 static GFXDECODE_START( gfx_thoop2 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout, 0,        64 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout_16, 0, 64 )
 GFXDECODE_END
 

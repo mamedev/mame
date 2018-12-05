@@ -7,9 +7,6 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - fix problems with keyboard
-      - can't type the same character more than once
-      - shift key doesn't work
     - floppy support (but floppy images are unobtainable at current time)
     - cassette device;
     - beeper
@@ -19,12 +16,15 @@
     Reading fdc has been commented out, until the code can be modified to
     work with new upd765 (was causing a hang at boot).
 
+	Schematics: https://archive.org/details/Io19839/page/n331
+
 ***************************************************************************************************/
 
 #include "emu.h"
 #include "includes/pasopia.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
@@ -985,9 +985,10 @@ MACHINE_CONFIG_START(pasopia7_state::p7_raster)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, VDP_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 MACHINE_CONFIG_END
 
 
@@ -1006,9 +1007,10 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, LCD_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -1062,14 +1064,14 @@ void pasopia7_state::init_p7_raster()
 {
 	m_screen_type = 1;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
-	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
+	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 
 void pasopia7_state::init_p7_lcd()
 {
 	m_screen_type = 0;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
-	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
+	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 
 

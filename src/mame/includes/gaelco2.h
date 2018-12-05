@@ -33,6 +33,7 @@ public:
 	void maniacsq(machine_config &config);
 	void maniacsqs(machine_config &config);
 	void touchgo_d5002fp(machine_config &config);
+	void saltcrdi(machine_config &config);
 
 	void init_touchgo();
 	void init_snowboar();
@@ -82,6 +83,7 @@ private:
 	void play2000_map(address_map &map);
 	void snowboar_map(address_map &map);
 	void touchgo_map(address_map &map);
+	void saltcrdi_map(address_map &map);
 
 	uint32_t snowboard_latch;
 

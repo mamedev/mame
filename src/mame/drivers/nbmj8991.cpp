@@ -1350,8 +1350,7 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv1) // galkoku
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("fmsnd", YM3812, 25000000/10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
+	YM3812(config, "fmsnd", 25000000/10).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1388,7 +1387,7 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv2) // pstadium
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("fmsnd", YM3812, 25000000/6.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
@@ -1401,17 +1400,16 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv2) // pstadium
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv3)
+void nbmj8991_state::nbmjdrv3(machine_config &config)
+{
 	nbmjdrv1(config);
 
-	/* basic machine hardware */
-
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
-MACHINE_CONFIG_END
+	ay8910_device &fmsnd(AY8910(config.replace(), "fmsnd", 1250000));
+	fmsnd.port_a_read_callback().set_ioport("DSWA");
+	fmsnd.port_b_read_callback().set_ioport("DSWB");
+	fmsnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
+}
 
 
 // ---------------------------------------------------------------------

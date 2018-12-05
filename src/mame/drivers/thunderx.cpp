@@ -665,23 +665,21 @@ MACHINE_CONFIG_START(thunderx_state::scontra)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(thunderx_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(thunderx_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(thunderx_state, sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(thunderx_state::sprite_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);  /* verified on pcb */
 
 	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, thunderx_state, volume_callback))
@@ -720,8 +718,7 @@ MACHINE_CONFIG_START(thunderx_state::gbusters)
 	MCFG_DEVICE_PROGRAM_MAP(gbusters_map)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, thunderx_state, banking_callback))
 
-	MCFG_DEVICE_MODIFY("k052109")
-	MCFG_K052109_CB(thunderx_state, gbusters_tile_callback)
+	m_k052109->set_tile_callback(FUNC(thunderx_state::gbusters_tile_callback), this);
 MACHINE_CONFIG_END
 
 

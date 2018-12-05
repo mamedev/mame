@@ -9,6 +9,7 @@
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "bus/centronics/ctronics.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"

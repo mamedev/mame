@@ -1085,11 +1085,9 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.85)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.85)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 0.85).add_route(1, "rspeaker", 0.85);
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, wecleman_state, wecleman_volume_callback))
@@ -1159,22 +1157,22 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[0]->set_wrap(1);
+	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
-	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere

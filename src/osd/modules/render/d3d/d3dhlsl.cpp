@@ -25,6 +25,7 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
+#include <array>
 #include <utility>
 
 //============================================================
@@ -171,6 +172,8 @@ shaders::shaders() :
 	acc_t(0),
 	delta_t(0),
 	shadow_texture(nullptr),
+	lut_texture(nullptr),
+	ui_lut_texture(nullptr),
 	options(nullptr),
 	black_surface(nullptr),
 	black_texture(nullptr),
@@ -198,6 +201,7 @@ shaders::shaders() :
 	bloom_effect(nullptr),
 	downsample_effect(nullptr),
 	vector_effect(nullptr),
+	chroma_effect(nullptr),
 	curr_texture(nullptr),
 	curr_render_target(nullptr),
 	curr_poly(nullptr),
@@ -546,6 +550,12 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		get_vector(winoptions.screen_floor(), 3, options->floor, true);
 		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, true);
 		options->saturation = winoptions.screen_saturation();
+		options->chroma_mode = winoptions.screen_chroma_mode();
+		get_vector(winoptions.screen_chroma_a(), 2, options->chroma_a, true);
+		get_vector(winoptions.screen_chroma_b(), 2, options->chroma_b, true);
+		get_vector(winoptions.screen_chroma_c(), 2, options->chroma_c, true);
+		get_vector(winoptions.screen_chroma_conversion_gain(), 3, options->chroma_conversion_gain, true);
+		get_vector(winoptions.screen_chroma_y_gain(), 3, options->chroma_y_gain, true);
 		options->yiq_enable = winoptions.screen_yiq_enable();
 		options->yiq_jitter = winoptions.screen_yiq_jitter();
 		options->yiq_cc = winoptions.screen_yiq_cc();
@@ -574,6 +584,10 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		options->bloom_level6_weight = winoptions.screen_bloom_lvl6_weight();
 		options->bloom_level7_weight = winoptions.screen_bloom_lvl7_weight();
 		options->bloom_level8_weight = winoptions.screen_bloom_lvl8_weight();
+		strncpy(options->lut_texture, winoptions.screen_lut_texture(), sizeof(options->lut_texture));
+		options->lut_enable = winoptions.screen_lut_enable();
+		strncpy(options->ui_lut_texture, winoptions.ui_lut_texture(), sizeof(options->ui_lut_texture));
+		options->ui_lut_enable = winoptions.ui_lut_enable();
 
 		options->params_init = true;
 
@@ -728,6 +742,44 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
+	render_load_png(lut_bitmap, file, nullptr, options->lut_texture);
+	if (lut_bitmap.valid())
+	{
+		render_texinfo texture;
+
+		// fake in the basic data so it looks like it came from render.c
+		texture.base = lut_bitmap.raw_pixptr(0);
+		texture.rowpixels = lut_bitmap.rowpixels();
+		texture.width = lut_bitmap.width();
+		texture.height = lut_bitmap.height();
+		texture.palette = nullptr;
+		texture.seqid = 0;
+
+		// now create it (no prescale, no wrap)
+		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		lut_texture = tex.get();
+		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
+	}
+
+	render_load_png(ui_lut_bitmap, file, nullptr, options->ui_lut_texture);
+	if (ui_lut_bitmap.valid())
+	{
+		render_texinfo texture;
+
+		// fake in the basic data so it looks like it came from render.c
+		texture.base = ui_lut_bitmap.raw_pixptr(0);
+		texture.rowpixels = ui_lut_bitmap.rowpixels();
+		texture.width = ui_lut_bitmap.width();
+		texture.height = ui_lut_bitmap.height();
+		texture.palette = nullptr;
+		texture.seqid = 0;
+
+		// now create it (no prescale, no wrap)
+		auto tex = std::make_unique<texture_info>(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		ui_lut_texture = tex.get();
+		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
+	}
+
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
 
 	default_effect = new effect(this, d3d->get_device(), "primary.fx", fx_dir);
@@ -743,6 +795,7 @@ int shaders::create_resources()
 	bloom_effect = new effect(this, d3d->get_device(), "bloom.fx", fx_dir);
 	downsample_effect = new effect(this, d3d->get_device(), "downsample.fx", fx_dir);
 	vector_effect = new effect(this, d3d->get_device(), "vector.fx", fx_dir);
+	chroma_effect = new effect(this, d3d->get_device(), "chroma.fx", fx_dir);
 
 	if (!default_effect->is_valid() ||
 		!post_effect->is_valid() ||
@@ -756,14 +809,13 @@ int shaders::create_resources()
 		!ntsc_effect->is_valid() ||
 		!bloom_effect->is_valid() ||
 		!downsample_effect->is_valid() ||
-		!vector_effect->is_valid())
+		!vector_effect->is_valid() ||
+		!chroma_effect->is_valid())
 	{
 		return 1;
 	}
 
-	const int EFFECT_COUNT = 14;
-
-	effect *effects[EFFECT_COUNT] = {
+	std::array<effect*, 15> effects = {
 		default_effect,
 		post_effect,
 		distortion_effect,
@@ -777,10 +829,11 @@ int shaders::create_resources()
 		color_effect,
 		bloom_effect,
 		downsample_effect,
-		vector_effect
+		vector_effect,
+		chroma_effect
 	};
 
-	for (int i = 0; i < EFFECT_COUNT; i++)
+	for (int i = 0; i < effects.size(); i++)
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
@@ -824,15 +877,22 @@ int shaders::create_resources()
 
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
 
-	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
-
-		post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
+	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
 	post_effect->add_uniform("ShadowUV", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV);
 	post_effect->add_uniform("ShadowUVOffset", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV_OFFSET);
 	post_effect->add_uniform("ShadowDims", uniform::UT_VEC2, uniform::CU_POST_SHADOW_DIMS);
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
+	post_effect->add_uniform("ChomaMode", uniform::UT_INT, uniform::CU_CHROMA_MODE);
+	post_effect->add_uniform("ConversionGain", uniform::UT_VEC3, uniform::CU_CHROMA_CONVERSION_GAIN);
+
+	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
+
+	chroma_effect->add_uniform("YGain", uniform::UT_VEC3, uniform::CU_CHROMA_Y_GAIN);
+	chroma_effect->add_uniform("ChromaA", uniform::UT_VEC2, uniform::CU_CHROMA_A);
+	chroma_effect->add_uniform("ChromaB", uniform::UT_VEC2, uniform::CU_CHROMA_B);
+	chroma_effect->add_uniform("ChromaC", uniform::UT_VEC2, uniform::CU_CHROMA_C);
 
 	distortion_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
 	distortion_effect->add_uniform("DistortionAmount", uniform::UT_FLOAT, uniform::CU_POST_DISTORTION);
@@ -841,6 +901,9 @@ int shaders::create_resources()
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
+
+	default_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
+	default_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
 
 	return 0;
 }
@@ -880,6 +943,7 @@ void shaders::begin_draw()
 	bloom_effect->set_technique("DefaultTechnique");
 	downsample_effect->set_technique("DefaultTechnique");
 	vector_effect->set_technique("DefaultTechnique");
+	chroma_effect->set_technique("DefaultTechnique");
 
 	HRESULT result = d3d->get_device()->SetRenderTarget(0, backbuffer);
 	if (FAILED(result))
@@ -1180,13 +1244,13 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	float screen_offset[2] = { xoffset, yoffset };
 
 	rgb_t back_color_rgb = screen->has_palette()
-		? screen->palette().palette()->entry_color(0)
-		: rgb_t(0, 0, 0);
+			? screen->palette().palette()->entry_color(0)
+			: rgb_t(0, 0, 0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
 	float back_color[3] = {
-		float(back_color_rgb.r()) / 255.0f,
-		float(back_color_rgb.g()) / 255.0f,
-		float(back_color_rgb.b()) / 255.0f };
+			float(back_color_rgb.r()) / 255.0f,
+			float(back_color_rgb.g()) / 255.0f,
+			float(back_color_rgb.b()) / 255.0f };
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
@@ -1196,7 +1260,6 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
-	curr_effect->set_float("ScanlineOffset", curr_texture->get_cur_frame() == 0 ? 0.0f : options->scanline_jitter);
 	curr_effect->set_float("TimeMilliseconds", (float)machine->time().as_double() * 1000.0f);
 	curr_effect->set_float("HumBarAlpha", options->hum_bar_alpha);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
@@ -1204,6 +1267,18 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	next_index = rt->next_index(next_index);
 	blit(prepare_bloom ? rt->source_surface[next_index] : rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
+	return next_index;
+}
+
+int shaders::chroma_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
+{
+	int next_index = source_index;
+
+	curr_effect = chroma_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	next_index = rt->next_index(next_index);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 	return next_index;
 }
 
@@ -1224,9 +1299,9 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 	{
 		curr_effect->set_vector("TargetDims", 2, rt->bloom_dims[bloom_index]);
 		curr_effect->set_texture("DiffuseTexture",
-			bloom_index == 0
-				? rt->source_texture[next_index]
-				: rt->bloom_texture[bloom_index - 1]);
+				bloom_index == 0
+					? rt->source_texture[next_index]
+					: rt->bloom_texture[bloom_index - 1]);
 
 		blit(rt->bloom_surface[bloom_index], false, D3DPT_TRIANGLELIST, 0, 2);
 	}
@@ -1332,6 +1407,8 @@ int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_in
 	curr_effect->set_technique("VectorBufferTechnique");
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : lut_texture->get_finaltex());
+
 
 	// we need to clear the vector render target here
 	next_index = rt->next_index(next_index);
@@ -1351,6 +1428,7 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	curr_effect->set_technique("ScreenTechnique");
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
+	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : lut_texture->get_finaltex());
 
 	blit(backbuffer, false, poly->type(), vertnum, poly->count());
 
@@ -1381,6 +1459,8 @@ void shaders::ui_pass(poly_info *poly, int vertnum)
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_technique("UiTechnique");
+
+	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : ui_lut_texture->get_finaltex());
 
 	blit(nullptr, false, poly->type(), vertnum, poly->count());
 }
@@ -1429,17 +1509,19 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = deconverge_pass(rt, next_index, poly, vertnum);
 		next_index = scanline_pass(rt, next_index, poly, vertnum);
 		next_index = defocus_pass(rt, next_index, poly, vertnum);
-		next_index = phosphor_pass(rt, next_index, poly, vertnum);
+		//next_index = phosphor_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
-		int phosphor_index = next_index;
+		int old_index = next_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, true);
 		next_index = downsample_pass(rt, next_index, poly, vertnum);
 
 		// apply bloom textures
-		next_index = phosphor_index;
+		next_index = old_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
+		next_index = phosphor_pass(rt, next_index, poly, vertnum);
+		next_index = chroma_pass(rt, next_index, poly, vertnum);
 
 		next_index = distortion_pass(rt, next_index, poly, vertnum);
 
@@ -1508,17 +1590,19 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = vector_buffer_pass(rt, next_index, poly, vertnum);
 		next_index = deconverge_pass(rt, next_index, poly, vertnum);
 		next_index = defocus_pass(rt, next_index, poly, vertnum);
-		next_index = phosphor_pass(rt, next_index, poly, vertnum);
+		//next_index = phosphor_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
-		int phosphor_index = next_index;
+		int old_index = next_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, true);
 		next_index = downsample_pass(rt, next_index, poly, vertnum);
 
 		// apply bloom textures
-		next_index = phosphor_index;
+		next_index = old_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, false);
 		next_index = bloom_pass(rt, next_index, poly, vertnum);
+		next_index = phosphor_pass(rt, next_index, poly, vertnum);
+		next_index = chroma_pass(rt, next_index, poly, vertnum);
 
 		next_index = distortion_pass(rt, next_index, poly, vertnum);
 
@@ -1826,6 +1910,11 @@ void shaders::delete_resources()
 		delete ntsc_effect;
 		ntsc_effect = nullptr;
 	}
+	if (chroma_effect != nullptr)
+	{
+		delete chroma_effect;
+		chroma_effect = nullptr;
+	}
 
 	if (backbuffer != nullptr)
 	{
@@ -1845,6 +1934,8 @@ void shaders::delete_resources()
 	}
 
 	shadow_bitmap.reset();
+	lut_bitmap.reset();
+	ui_lut_bitmap.reset();
 }
 
 
@@ -1980,7 +2071,8 @@ hlsl_options shaders::last_options = { false };
 
 enum slider_option
 {
-	SLIDER_VECTOR_BEAM_SMOOTH = 0,
+	SLIDER_UI_LUT_ENABLE = 0,
+	SLIDER_VECTOR_BEAM_SMOOTH,
 	SLIDER_VECTOR_ATT_MAX,
 	SLIDER_VECTOR_ATT_LEN_MIN,
 	SLIDER_SHADOW_MASK_TILE_MODE,
@@ -2019,6 +2111,12 @@ enum slider_option
 	SLIDER_SCALE,
 	SLIDER_POWER,
 	SLIDER_FLOOR,
+	SLIDER_CHROMA_MODE,
+	SLIDER_CHROMA_A,
+	SLIDER_CHROMA_B,
+	SLIDER_CHROMA_C,
+	SLIDER_CHROMA_CONVERSION_GAIN,
+	SLIDER_Y_GAIN,
 	SLIDER_PHOSPHOR,
 	SLIDER_BLOOM_BLEND_MODE,
 	SLIDER_BLOOM_SCALE,
@@ -2043,7 +2141,8 @@ enum slider_option
 	SLIDER_NTSC_Y_VALUE,
 	SLIDER_NTSC_I_VALUE,
 	SLIDER_NTSC_Q_VALUE,
-	SLIDER_NTSC_SCAN_TIME
+	SLIDER_NTSC_SCAN_TIME,
+	SLIDER_LUT_ENABLE,
 };
 
 enum slider_screen_type
@@ -2058,6 +2157,7 @@ enum slider_screen_type
 
 slider_desc shaders::s_sliders[] =
 {
+	{ "3D LUT (UI/Artwork)",                0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_UI_LUT_ENABLE,           0,        "%s",    { "Off", "On" } },
 	{ "Vector Beam Smooth Amount",          0,     0,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_BEAM_SMOOTH,      0.01f,    "%1.2f", {} },
 	{ "Vector Attenuation Maximum",         0,    50,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_MAX,          0.01f,    "%1.2f", {} },
 	{ "Vector Attenuation Length Minimum",  1,   500,  1000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_VECTOR,        SLIDER_VECTOR_ATT_LEN_MIN,      0.001f,   "%1.3f", {} },
@@ -2097,6 +2197,12 @@ slider_desc shaders::s_sliders[] =
 	{ "Signal Scale,",                   -200,   100,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SCALE,                   0.01f,    "%2.2f", {} },
 	{ "Signal Exponent,",                -800,     0,   800, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.01f,    "%2.2f", {} },
 	{ "Signal Floor,",                      0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
+	{ "Color Mode,",                        1,     3,     3, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_CHROMA_MODE,             0,        "%s", { "", "Monochrome", "Dichrome", "Trichrome" } },
+	{ "Chroma Conversion Gain,",            0,     0, 10000,10, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_CHROMA_CONVERSION_GAIN,  0.0001f,  "%1.4f", {} },
+	{ "Phosphor A Chromaticity,",           0,     0,  1000,10, SLIDER_VEC2,     SLIDER_SCREEN_TYPE_ANY,           SLIDER_CHROMA_A,                0.001f,   "%1.3f", {} },
+	{ "Phosphor B Chromaticity,",           0,     0,  1000,10, SLIDER_VEC2,     SLIDER_SCREEN_TYPE_ANY,           SLIDER_CHROMA_B,                0.001f,   "%1.3f", {} },
+	{ "Phosphor C Chromaticity,",           0,     0,  1000,10, SLIDER_VEC2,     SLIDER_SCREEN_TYPE_ANY,           SLIDER_CHROMA_C,                0.001f,   "%1.3f", {} },
+	{ "Phosphor Gain,",                     0,     0, 10000,10, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_Y_GAIN,                  0.0001f,  "%1.4f", {} },
 	{ "Phosphor Persistence,",              0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
 	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
 	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
@@ -2122,6 +2228,7 @@ slider_desc shaders::s_sliders[] =
 	{ "NTSC I Signal Bandwidth (Hz)",       0,   120,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_I_VALUE,            0.01f,    "%1.4f", {} },
 	{ "NTSC Q Signal Bandwidth (Hz)",       0,    60,   600, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_Q_VALUE,            0.01f,    "%1.4f", {} },
 	{ "NTSC Scanline Duration (uSec)",      0,  5260, 10000, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD_OR_RASTER, SLIDER_NTSC_SCAN_TIME,          0.01f,    "%1.2f", {} },
+	{ "3D LUT (Screen)",                    0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_LUT_ENABLE,              0,        "%s",    { "Off", "On" } },
 	{ nullptr, 0, 0, 0, 0, 0, 0, -1, 0, nullptr, {} }
 };
 
@@ -2169,6 +2276,12 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_SCALE: return &(options->scale[index]);
 		case SLIDER_POWER: return &(options->power[index]);
 		case SLIDER_FLOOR: return &(options->floor[index]);
+		case SLIDER_CHROMA_MODE: return &(options->chroma_mode);
+		case SLIDER_CHROMA_A: return &(options->chroma_a[index]);
+		case SLIDER_CHROMA_B: return &(options->chroma_b[index]);
+		case SLIDER_CHROMA_C: return &(options->chroma_c[index]);
+		case SLIDER_CHROMA_CONVERSION_GAIN: return &(options->chroma_conversion_gain[index]);
+		case SLIDER_Y_GAIN: return &(options->chroma_y_gain[index]);
 		case SLIDER_PHOSPHOR: return &(options->phosphor[index]);
 		case SLIDER_BLOOM_BLEND_MODE: return &(options->bloom_blend_mode);
 		case SLIDER_BLOOM_SCALE: return &(options->bloom_scale);
@@ -2194,6 +2307,8 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_NTSC_I_VALUE: return &(options->yiq_i);
 		case SLIDER_NTSC_Q_VALUE: return &(options->yiq_q);
 		case SLIDER_NTSC_SCAN_TIME: return &(options->yiq_scan_time);
+		case SLIDER_LUT_ENABLE: return &(options->lut_enable);
+		case SLIDER_UI_LUT_ENABLE: return &(options->ui_lut_enable);
 	}
 	return nullptr;
 }
@@ -2458,6 +2573,24 @@ void uniform::update()
 			m_shader->set_vector("Defocus", 2, &options->defocus[0]);
 			break;
 
+		case CU_CHROMA_MODE:
+			m_shader->set_int("ChromaMode", options->chroma_mode);
+			break;
+		case CU_CHROMA_A:
+			m_shader->set_vector("ChromaA", 2, &options->chroma_a[0]);
+			break;
+		case CU_CHROMA_B:
+			m_shader->set_vector("ChromaB", 2, &options->chroma_b[0]);
+			break;
+		case CU_CHROMA_C:
+			m_shader->set_vector("ChromaC", 2, &options->chroma_c[0]);
+			break;
+		case CU_CHROMA_CONVERSION_GAIN:
+			m_shader->set_vector("ConversionGain", 3, &options->chroma_conversion_gain[0]);
+		case CU_CHROMA_Y_GAIN:
+			m_shader->set_vector("YGain", 3, &options->chroma_y_gain[0]);
+			break;
+
 		case CU_PHOSPHOR_LIFE:
 			m_shader->set_vector("Phosphor", 3, options->phosphor);
 			break;
@@ -2545,6 +2678,11 @@ void uniform::update()
 		case CU_POST_FLOOR:
 			m_shader->set_vector("Floor", 3, options->floor);
 			break;
+		case CU_LUT_ENABLE:
+			m_shader->set_bool("LutEnable", options->lut_enable ? true : false);
+			break;
+		case CU_UI_LUT_ENABLE:
+			m_shader->set_bool("UiLutEnable", options->ui_lut_enable ? true : false);
 	}
 }
 

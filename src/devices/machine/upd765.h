@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "imagedev/floppy.h"
 #include "fdc_pll.h"
+
+class floppy_image_device;
 
 /*
  * ready = true if the ready line is physically connected to the floppy drive

@@ -283,15 +283,16 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, m24_state, pa_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, m24_state, pb_w))
 
-	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
-	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(*this, m24_state, kbcin_w))
+	M24_KEYBOARD(config, m_keyboard, 0);
+	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
 
 	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // ?
 	MCFG_MM58274C_DAY1(1)   // ?
 
-	MCFG_DEVICE_ADD("z8000_apb", M24_Z8000, 0)
-	MCFG_M24_Z8000_HALT(WRITELINE(*this, m24_state, halt_i86_w))
+	M24_Z8000(config, m_z8000_apb, 0);
+	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));
+
 	subdevice<am9517a_device>("mb:dma8237")->out_hreq_callback().set(FUNC(m24_state::dma_hrq_w));
 	subdevice<pic8259_device>("mb:pic8259")->out_int_callback().set(FUNC(m24_state::int_w));
 

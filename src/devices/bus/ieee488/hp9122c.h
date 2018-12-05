@@ -118,7 +118,6 @@ private:
 	DECLARE_WRITE8_MEMBER(fdc_write);
 
 	void cpu_map(address_map &map);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_cpu;
 	required_device<i8291a_device> m_i8291a;
@@ -127,6 +126,8 @@ private:
 
 	required_ioport m_hpib_addr;
 	required_ioport m_testmode;
+
+	output_finder<3> m_leds;
 
 	void index_pulse_cb(floppy_image_device *floppy, int state);
 	int m_intsel;
@@ -145,6 +146,7 @@ private:
 	bool m_ds0;
 	bool m_ds1;
 
+	TIMER_CALLBACK_MEMBER(motor_timeout);
 	emu_timer *m_motor_timer;
 };
 

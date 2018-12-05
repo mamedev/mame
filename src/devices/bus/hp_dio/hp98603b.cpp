@@ -9,9 +9,12 @@
 #include "emu.h"
 #include "hp98603b.h"
 
-DEFINE_DEVICE_TYPE(HPDIO_98603B, dio16_98603b_device, "dio98603b", "HP98603 BASIC ROM card")
+DEFINE_DEVICE_TYPE_NS(HPDIO_98603B, bus::hp_dio, dio16_98603b_device, "dio98603b", "HP98603 BASIC ROM card")
 
 #define HP98603B_ROM_REGION    "98603b_rom"
+
+namespace bus {
+	namespace hp_dio {
 
 ROM_START(hp98603b)
 	ROM_REGION(0x100000, HP98603B_ROM_REGION, 0)
@@ -69,3 +72,6 @@ READ16_MEMBER(dio16_98603b_device::rom_r)
 WRITE16_MEMBER(dio16_98603b_device::rom_w)
 {
 }
+
+} // namespace bus::hp_dio
+} // namespace bus

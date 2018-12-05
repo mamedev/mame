@@ -210,7 +210,7 @@ ROM board (Operating System ROM PCA. Assembly# HP82991A or HP82995A)
 Notes:
       J1/J2 - 20 pin connector joining to 'Option ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 ROM board (Option ROM PCA)
@@ -229,7 +229,7 @@ Note this PCB plugs in upside-down on top of the Operating System ROM PCB
 Notes:
       J1/J2 - 20 pin connector joining to 'Operating System ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 Physical Memory Map
@@ -366,6 +366,7 @@ Software to look for
 #include "bus/hp_hil/hil_devices.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/hp_ipc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/mm58167.h"
 #include "machine/ram.h"
@@ -457,7 +458,7 @@ void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	m_bus_error = false;
 }
 
-void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+void hp_ipc_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if (m_bus_error)
 	{
@@ -468,7 +469,7 @@ void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask
 		address++;
 	}
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
@@ -562,14 +563,14 @@ WRITE16_MEMBER(hp_ipc_state::mem_w)
 
 READ16_MEMBER(hp_ipc_state::trap_r)
 {
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 0, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 
 	return 0xffff;
 }
 
 WRITE16_MEMBER(hp_ipc_state::trap_w)
 {
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 1, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
 }
 
 
@@ -754,22 +755,25 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_1))
 //  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_6))
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, 15.92_MHz_XTAL / 2)
-	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_2))
-	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_7))
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
+	hp_hil_mlc_device &mlc(HP_HIL_MLC(config, "mlc", XTAL(15'920'000)/2));
+	mlc.int_callback().set(FUNC(hp_ipc_state::irq_2));
+	mlc.nmi_callback().set(FUNC(hp_ipc_state::irq_7));
 
-	MCFG_DEVICE_ADD("hpib", TMS9914, 4_MHz_XTAL)
-	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))
-	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , host_dio_w))
-	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_eoi_w))
-	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_dav_w))
-	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_nrfd_w))
-	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ndac_w))
-	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ifc_w))
-	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_srq_w))
-	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_atn_w))
-	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ren_w))
+	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
+	HP_HIL_SLOT(config, "hil2", "mlc", hp_hil_devices, "hp_46060b");
+
+	tms9914_device &hpib(TMS9914(config, "hpib", 4_MHz_XTAL));
+	hpib.int_write_cb().set(FUNC(hp_ipc_state::irq_3));
+	hpib.dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	hpib.dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	hpib.eoi_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	hpib.dav_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	hpib.nrfd_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	hpib.ndac_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	hpib.ifc_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	hpib.srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib" , tms9914_device , eoi_w))
 	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib" , tms9914_device , dav_w))

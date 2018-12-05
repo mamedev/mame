@@ -13,6 +13,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "imagedev/floppy.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -331,10 +332,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void st(machine_config &config);
-	void ikbd_io_map(address_map &map);
 	void ikbd_map(address_map &map);
 	void st_map(address_map &map);
 protected:
+	void keyboard(machine_config &config);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;

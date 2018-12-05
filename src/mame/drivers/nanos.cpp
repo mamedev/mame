@@ -11,6 +11,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"

@@ -1,23 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
+#ifndef MAME_INCLUDES_PITNRUN_H
+#define MAME_INCLUDES_PITNRUN_H
+
+#pragma once
 
 #include "emupal.h"
 
 class pitnrun_state : public driver_device
 {
 public:
-	pitnrun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pitnrun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void pitnrun_mcu(machine_config &config);
 	void pitnrun(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -77,9 +87,6 @@ private:
 	TIMER_CALLBACK_MEMBER(mcu_data_real_r);
 	TIMER_CALLBACK_MEMBER(mcu_status_real_w);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pitnrun);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -90,3 +97,5 @@ private:
 	void pitnrun_sound_io_map(address_map &map);
 	void pitnrun_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PITNRUN_H

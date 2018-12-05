@@ -425,14 +425,14 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	m_mioc->xi_callback().set(FUNC(compucolor2_state::xi_r));
 	m_mioc->xo_callback().set(FUNC(compucolor2_state::xo_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd0", compucolor_floppy_port_devices, "floppy")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	COMPUCOLOR_FLOPPY_PORT(config, m_floppy0, compucolor_floppy_port_devices, "floppy");
+	m_floppy0->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	COMPUCOLOR_FLOPPY_PORT(config, m_floppy1, compucolor_floppy_port_devices, nullptr);
+	m_floppy1->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("8K,16K");

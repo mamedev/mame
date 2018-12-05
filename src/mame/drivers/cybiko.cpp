@@ -390,8 +390,8 @@ static DEVICE_INPUT_DEFAULTS_START( debug_serial ) // set up debug port to defau
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(cybiko_state::cybikov1_debug_serial)
-	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
+	auto &debug_serial(*subdevice<rs232_port_device>("debug_serial"));
+	debug_serial.rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
@@ -420,10 +420,10 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1_base)
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");
 
 	/* serial debug port */
-	MCFG_DEVICE_ADD ("debug_serial", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
+	rs232_port_device &debug_serial(RS232_PORT(config, "debug_serial", default_rs232_devices, nullptr));
+	debug_serial.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(debug_serial));
+	debug_serial.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(debug_serial));
+	debug_serial.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(debug_serial));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
@@ -473,8 +473,8 @@ MACHINE_CONFIG_START(cybiko_state::cybikov2)
 	m_ram->set_default_size("256K").set_extra_options("512K,1M");
 
 	/* serial debug port */
-	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
+	auto &debug_serial(*subdevice<rs232_port_device>("debug_serial"));
+	debug_serial.rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
@@ -494,8 +494,8 @@ MACHINE_CONFIG_START(cybiko_state::cybikoxt)
 	m_ram->set_default_size("2M");
 
 	/* serial debug port */
-	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
+	auto &debug_serial(*subdevice<rs232_port_device>("debug_serial"));
+	debug_serial.rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 

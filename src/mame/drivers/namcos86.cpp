@@ -495,20 +495,6 @@ void namcos86_state::wndrmomo_mcu_map(address_map &map)
 }
 
 
-READ8_MEMBER(namcos86_state::readFF)
-{
-	return 0xff;
-}
-
-void namcos86_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).portr("IN2");
-	map(M6801_PORT2, M6801_PORT2).r(FUNC(namcos86_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT1, M6801_PORT1).w(FUNC(namcos86_state::coin_w));
-	map(M6801_PORT2, M6801_PORT2).w(FUNC(namcos86_state::led_w));
-}
-
-
 /*******************************************************************/
 
 static INPUT_PORTS_START( hopmappy )
@@ -1072,10 +1058,13 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	MCFG_DEVICE_PROGRAM_MAP(hopmappy_cpu2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)    /* or compatible 6808 with extra instructions */
-	MCFG_DEVICE_PROGRAM_MAP(hopmappy_mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)   /* ??? */
+	hd63701_cpu_device &mcu(HD63701(config, "mcu", XTAL(49'152'000)/8));    /* or compatible 6808 with extra instructions */
+	mcu.set_addrmap(AS_PROGRAM, &namcos86_state::hopmappy_mcu_map);
+	mcu.in_p1_cb().set_ioport("IN2");
+	mcu.in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
+	mcu.out_p1_cb().set(FUNC(namcos86_state::coin_w));
+	mcu.out_p2_cb().set(FUNC(namcos86_state::led_w));
+	mcu.set_vblank_int("screen", FUNC(namcos86_state::irq0_line_hold));   /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000)) /* heavy interleaving needed to avoid hangs in rthunder */
 
@@ -1095,9 +1084,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "mono", 0.0)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
+	YM2151(config, "ymsnd", 3579580).add_route(0, "mono", 0.0).add_route(1, "mono", 0.60);   /* only right channel is connected */
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)

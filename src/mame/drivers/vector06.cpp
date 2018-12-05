@@ -217,17 +217,16 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1500000)
-	MCFG_PIT8253_CLK1(1500000)
-	MCFG_PIT8253_CLK2(1500000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, vector06_state, speaker_w))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(1500000);
+	m_pit8253->set_clk<1>(1500000);
+	m_pit8253->set_clk<2>(1500000);
+	m_pit8253->out_handler<0>().set(FUNC(vector06_state::speaker_w));
+	m_pit8253->out_handler<1>().set(FUNC(vector06_state::speaker_w));
+	m_pit8253->out_handler<2>().set(FUNC(vector06_state::speaker_w));
 
 	// optional
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1773400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay, 1773400).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /* ROM definition */

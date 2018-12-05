@@ -842,12 +842,12 @@ MACHINE_CONFIG_START(vega_state::vega)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, 1500000 )
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, vega_state, ay8910_pa_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, vega_state, ay8910_pb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, vega_state, ay8910_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, vega_state, ay8910_pb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910, 1500000);
+	m_ay8910->port_a_read_callback().set(FUNC(vega_state::ay8910_pa_r));
+	m_ay8910->port_b_read_callback().set(FUNC(vega_state::ay8910_pb_r));
+	m_ay8910->port_a_write_callback().set(FUNC(vega_state::ay8910_pa_w));
+	m_ay8910->port_b_write_callback().set(FUNC(vega_state::ay8910_pb_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 MACHINE_CONFIG_END
 

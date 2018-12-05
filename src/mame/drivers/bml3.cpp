@@ -949,18 +949,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-#if 0
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NOOP, // read A
-	DEVCB_NOOP, // read B
-	DEVCB_NOOP, // write A
-	DEVCB_NOOP  // write B
-};
-#endif
-
 static void bml3_cards(device_slot_interface &device)
 {
 	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
@@ -988,10 +976,11 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bml3_state, crtc_update_row)
+	H46505(config, m_crtc, CPU_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row), this);
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
@@ -1046,12 +1035,12 @@ MACHINE_CONFIG_START(bml3_state::bml3)
 #if 0
 	// TODO: slot device for sound card
 	// audio
-	MCFG_DEVICE_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	YM2203(config, m_ym2203, 2000000); //unknown clock / divider
+	m_ym2203->set_flags(AY8910_LEGACY_OUTPUT);
+	m_ym2203->add_route(0, "mono", 0.25);
+	m_ym2203->add_route(1, "mono", 0.25);
+	m_ym2203->add_route(2, "mono", 0.50);
+	m_ym2203->add_route(3, "mono", 0.50);
 #endif
 MACHINE_CONFIG_END
 

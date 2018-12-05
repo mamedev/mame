@@ -5,6 +5,11 @@
     Kitco Crowns Golf hardware
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_CRGOLF_H
+#define MAME_INCLUDES_CRGOLF_H
+
+#pragma once
+
 #include "sound/msm5205.h"
 #include "machine/bankdev.h"
 #include "emupal.h"
@@ -15,8 +20,8 @@
 class crgolf_state : public driver_device
 {
 public:
-	crgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	crgolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 
 		m_videoram_a(*this, "vrama"),
 		m_videoram_b(*this, "vramb"),
@@ -85,3 +90,5 @@ public:
 	void sound_map(address_map &map);
 	void vrambank_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CRGOLF_H

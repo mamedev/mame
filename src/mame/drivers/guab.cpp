@@ -48,6 +48,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"
 #include "formats/guab_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
@@ -534,10 +535,10 @@ MACHINE_CONFIG_START(guab_state::guab)
 	acia1.rts_handler().set("rs232_1", FUNC(rs232_port_device::write_rts));
 	acia1.irq_handler().set_inputline("maincpu", 4);
 
-	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", acia_1_rs232_defaults)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_1", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set("acia6850_1", FUNC(acia6850_device::write_cts));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(acia_1_rs232_defaults));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source? the ptm doesn't seem to output any common baud values
 	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));

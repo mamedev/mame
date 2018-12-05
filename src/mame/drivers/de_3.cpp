@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(de_3_state::de_3)
 
 	genpin_audio(config);
 
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 
 MACHINE_CONFIG_END
 

@@ -33,6 +33,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "formats/ppg_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -468,9 +469,9 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
 	FD1793(config, m_fdc, 2_MHz_XTAL / 2);
 //  m_fdc->intrq_wr_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);

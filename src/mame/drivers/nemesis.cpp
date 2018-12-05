@@ -1497,19 +1497,19 @@ MACHINE_CONFIG_START(nemesis_state::nemesis)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
 	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1566,19 +1566,19 @@ MACHINE_CONFIG_START(nemesis_state::gx400)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
 	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1637,19 +1637,19 @@ MACHINE_CONFIG_START(nemesis_state::konamigt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
 	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1706,19 +1706,19 @@ MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
 	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1769,7 +1769,7 @@ MACHINE_CONFIG_START(nemesis_state::salamand)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
 	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
@@ -1783,10 +1783,10 @@ MACHINE_CONFIG_START(nemesis_state::salamand)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.08)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.08)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2) // reversed according to MT #4565
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.2)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "rspeaker", 1.2); // reversed according to MT #4565
+	ymsnd.add_route(1, "lspeaker", 1.2);
 MACHINE_CONFIG_END
 
 
@@ -1821,7 +1821,7 @@ MACHINE_CONFIG_START(nemesis_state::blkpnthr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
@@ -1830,10 +1830,10 @@ MACHINE_CONFIG_START(nemesis_state::blkpnthr)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1868,7 +1868,7 @@ MACHINE_CONFIG_START(nemesis_state::citybomb)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
@@ -1919,7 +1919,7 @@ MACHINE_CONFIG_START(nemesis_state::nyanpani)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, nemesis_state, volume_callback))
@@ -1974,7 +1974,7 @@ MACHINE_CONFIG_START(nemesis_state::hcrash)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
 	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
@@ -1988,10 +1988,10 @@ MACHINE_CONFIG_START(nemesis_state::hcrash)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2735,19 +2735,19 @@ MACHINE_CONFIG_START(nemesis_state::bubsys)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
 	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

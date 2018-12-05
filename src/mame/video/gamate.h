@@ -10,9 +10,6 @@
 
 DECLARE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device)
 
-#define MCFG_GAMATE_VIDEO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GAMATE_VIDEO, 0)
-
 class gamate_video_device : public device_t,
 	public device_memory_interface
 {

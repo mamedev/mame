@@ -16,7 +16,7 @@ newoption {
 	description = "Choose GCC flavor",
 	allowed = {
 		{ "android-arm",   "Android - ARM"          },
-		{ "android-arm64", "Android - ARM64"          },
+		{ "android-arm64", "Android - ARM64"        },
 		{ "android-mips",  "Android - MIPS"         },
 		{ "android-mips64","Android - MIPS64"       },
 		{ "android-x86",   "Android - x86"          },

@@ -46,6 +46,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device, "bbc_opus3", "Opus Challenger 3-in-1")
+DEFINE_DEVICE_TYPE(BBC_OPUSA, bbc_opusa_device, "bbc_opusa", "Opus Challenger ADFS")
 
 
 //-------------------------------------------------
@@ -55,6 +56,8 @@ DEFINE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device, "bbc_opus3", "Opus Challenger 3-
 FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
+	FLOPPY_ACORN_ADFS_OLD_FORMAT,
+	FLOPPY_ACORN_DOS_FORMAT,
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_OPUS_DDOS_FORMAT,
 	FLOPPY_OPUS_DDCPM_FORMAT
@@ -67,7 +70,7 @@ void bbc_floppies(device_slot_interface &device)
 
 
 ROM_START( opus3 )
-	ROM_REGION(0x4000, "dfs_rom", 0)
+	ROM_REGION(0x4000, "exp_rom", 0)
 	ROM_DEFAULT_BIOS("ch103")
 	ROM_SYSTEM_BIOS(0, "ch100", "Challenger 1.00")
 	ROMX_LOAD("chal100.rom", 0x0000, 0x4000, CRC(740a8335) SHA1(f3c75c21bcd7d4a4dfff922fd287230dcdb91d0e), ROM_BIOS(0))
@@ -75,6 +78,13 @@ ROM_START( opus3 )
 	ROMX_LOAD("chal101.rom", 0x0000, 0x4000, CRC(2f64503d) SHA1(37ee3f20bed50555720703b279f62aab0ed28922), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "ch103", "Challenger 1.03")
 	ROMX_LOAD("chal103.rom", 0x0000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33), ROM_BIOS(2))
+ROM_END
+
+ROM_START( opusa )
+	ROM_REGION(0x8000, "exp_rom", 0)
+	ROM_DEFAULT_BIOS("ch200")
+	ROM_SYSTEM_BIOS(0, "ch200", "Challenger ADFS")
+	ROMX_LOAD("challenger adfs_dfs.rom", 0x0000, 0x8000, CRC(e922c19a) SHA1(b9f5c749412528e4f8e9cda9f13e10f8405bb195), ROM_BIOS(0))
 ROM_END
 
 //-------------------------------------------------
@@ -99,6 +109,11 @@ const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 	return ROM_NAME( opus3 );
 }
 
+const tiny_rom_entry *bbc_opusa_device::device_rom_region() const
+{
+	return ROM_NAME( opusa );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -107,15 +122,24 @@ const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 //  bbc_opus3_device - constructor
 //-------------------------------------------------
 
+bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_bbc_1mhzbus_interface(mconfig, *this)
+	, m_ramdisk(*this, "ramdisk")
+	, m_fdc(*this, "wd1770")
+	, m_floppy0(*this, "wd1770:0")
+	, m_floppy1(*this, "wd1770:1")
+	, m_ramdisk_page(0)
+{
+}
+
 bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_OPUS3, tag, owner, clock),
-		device_bbc_1mhzbus_interface(mconfig, *this),
-		m_dfs_rom(*this, "dfs_rom"),
-		m_ramdisk(*this, "ramdisk"),
-		m_fdc(*this, "wd1770"),
-		m_floppy0(*this, "wd1770:0"),
-		m_floppy1(*this, "wd1770:1"),
-		m_ramdisk_page(0)
+	: bbc_opus3_device(mconfig, BBC_OPUS3, tag, owner, clock)
+{
+}
+
+bbc_opusa_device::bbc_opusa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: bbc_opus3_device(mconfig, BBC_OPUSA, tag, owner, clock)
 {
 }
 
@@ -127,15 +151,9 @@ void bbc_opus3_device::device_start()
 {
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_opus3_device::device_reset()
+void bbc_opusa_device::device_start()
 {
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
 }
-
 
 //**************************************************************************
 //  IMPLEMENTATION

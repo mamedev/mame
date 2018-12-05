@@ -7,15 +7,13 @@
 
 #include "cpu/mcs48/mcs48.h"
 
-#define MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(_devcb) \
-	downcast<m24_keyboard_device &>(*device).set_out_data_handler(DEVCB_##_devcb);
 
 class m24_keyboard_device :  public device_t
 {
 public:
 	m24_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_data_handler(Object &&cb) { return m_out_data.set_callback(std::forward<Object>(cb)); }
+	auto out_data_handler() { return m_out_data.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(data_w);

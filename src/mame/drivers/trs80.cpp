@@ -586,10 +586,9 @@ MACHINE_CONFIG_START(trs80_state::ht1080z)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1'500'000) // guess of clock
-	//MCFG_AY8910_PORT_A_READ_CB(...)  // ports are some kind of expansion slot
-	//MCFG_AY8910_PORT_B_READ_CB(...)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
+	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
+	//ay1.port_b_read_callback(FUNC(trs80_state::...);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::lnw80)

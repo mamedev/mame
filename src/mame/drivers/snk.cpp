@@ -2644,6 +2644,11 @@ static INPUT_PORTS_START( ikarijpb )
 	// this is accomplished by hooking the joystick input to the rotary input, plus
 	// of course the code is patched to handle that.
 
+	// According to a SNK 40th Anniversary Collection screenshot, this bootleg
+	// came from Korea:
+	// "The idea for Guevara's use of tanks with a human torso poking out of the top
+	// came from a poorly-programmed Korean bootleg of Ikari."
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x21, 0x01, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x42, 0x02, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
@@ -3281,9 +3286,10 @@ static INPUT_PORTS_START( tdfever )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	// TODO: tdfever2 has different dip switches (at least allow continue seems ignored)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "2 Player Upright" )
 	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )
@@ -3642,17 +3648,14 @@ MACHINE_CONFIG_START(snk_state::marvins)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* verified on schematics */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);/* verified on schematics */
 
-	MCFG_DEVICE_ADD("wave", SNKWAVE, 8000000)   /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SNKWAVE(config, "wave", 8000000).add_route(ALL_OUTPUTS, "mono", 0.30);   /* verified on schematics */
 MACHINE_CONFIG_END
 
 
@@ -3717,13 +3720,11 @@ MACHINE_CONFIG_START(snk_state::jcross)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
 MACHINE_CONFIG_END
 
 
@@ -3800,7 +3801,7 @@ MACHINE_CONFIG_START(snk_state::tnk3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
@@ -3902,7 +3903,7 @@ MACHINE_CONFIG_START(snk_state::ikari)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
@@ -3960,7 +3961,7 @@ MACHINE_CONFIG_START(snk_state::bermudat)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
@@ -4065,7 +4066,7 @@ MACHINE_CONFIG_START(snk_state::tdfever)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, 4000000)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))

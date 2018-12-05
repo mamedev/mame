@@ -2208,10 +2208,11 @@ void pc9801_atapi_devices(device_slot_interface &device)
 	device.option_add("pc9801_cd", PC9801_CD);
 }
 
-MACHINE_CONFIG_START(pc9801_state::pc9801_keyboard)
-	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
-	MCFG_PC9801_KBD_IRQ_CALLBACK(WRITELINE("pic8259_master", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void pc9801_state::pc9801_keyboard(machine_config &config)
+{
+	PC9801_KBD(config, m_keyb, 53);
+	m_keyb->irq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
+}
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_mouse)
 	i8255_device &ppi_mouse(I8255(config, "ppi8255_mouse"));
@@ -2370,14 +2371,14 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	MCFG_SCREEN_UPDATE_DRIVER(pc9801_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pc9801_state, vrtc_irq))
 
-	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 21.0526_MHz_XTAL / 8)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
-	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
+	UPD7220(config, m_hgdc1, 21.0526_MHz_XTAL / 8);
+	m_hgdc1->set_addrmap(0, &pc9801_state::upd7220_1_map);
+	m_hgdc1->set_draw_text_callback(FUNC(pc9801_state::hgdc_draw_text), this);
+	m_hgdc1->vsync_wr_callback().set(m_hgdc2, FUNC(upd7220_device::ext_sync_w));
 
-	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 21.0526_MHz_XTAL / 8)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc2, 21.0526_MHz_XTAL / 8);
+	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_2_map);
+	m_hgdc2->set_display_pixels_callback(FUNC(pc9801_state::hgdc_display_pixels), this);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -2485,10 +2486,9 @@ MACHINE_CONFIG_START(pc9801_state::pc9821)
 	MCFG_DEVICE_IO_MAP(pc9821_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_MODIFY("pit8253")
-	MCFG_PIT8253_CLK0(MAIN_CLOCK_X2)
-	MCFG_PIT8253_CLK1(MAIN_CLOCK_X2)
-	MCFG_PIT8253_CLK2(MAIN_CLOCK_X2)
+	m_pit8253->set_clk<0>(MAIN_CLOCK_X2);
+	m_pit8253->set_clk<1>(MAIN_CLOCK_X2);
+	m_pit8253->set_clk<2>(MAIN_CLOCK_X2);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)

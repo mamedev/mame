@@ -223,14 +223,11 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

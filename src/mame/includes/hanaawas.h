@@ -5,18 +5,23 @@
     Hana Awase
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_HANAAWAS_H
+#define MAME_INCLUDES_HANAAWAS_H
+
+#pragma once
 
 #include "emupal.h"
 
 class hanaawas_state : public driver_device
 {
 public:
-	hanaawas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hanaawas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void hanaawas(machine_config &config);
 
@@ -50,3 +55,5 @@ private:
 	void hanaawas_map(address_map &map);
 	void io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HANAAWAS_H

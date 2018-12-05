@@ -2260,11 +2260,10 @@ MACHINE_CONFIG_START(wpc_95_state::wpc_95)
 	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
 	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)
 	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
-	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
-	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_95_state, scanline_irq))
+	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_95_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_WPC, 0)
+	DCS_AUDIO_WPC(config, dcs, 0);
 MACHINE_CONFIG_END
 
 /*-----------------

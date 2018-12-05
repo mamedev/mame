@@ -322,12 +322,12 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(gijoe_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -37, 20)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(gijoe_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -37, 20);
+	m_k053246->set_palette(m_palette);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -337,8 +337,8 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

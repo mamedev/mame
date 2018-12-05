@@ -17,6 +17,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"

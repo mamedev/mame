@@ -26,6 +26,7 @@
 #include "bus/wangpc/wangpc.h"
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
@@ -1342,8 +1343,8 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	INPUT_BUFFER(config, m_cent_data_in);
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCN2661_TAG, mc2661_device, rx_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));
 
 	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 

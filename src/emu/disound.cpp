@@ -162,6 +162,32 @@ sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int
 
 
 //-------------------------------------------------
+//  input_gain - return the gain on the given
+//  input index of the device
+//-------------------------------------------------
+
+float device_sound_interface::input_gain(int inputnum) const
+{
+	int stream_inputnum;
+	sound_stream *stream = input_to_stream_input(inputnum, stream_inputnum);
+	return (stream != nullptr) ? stream->input_gain(stream_inputnum) : 0.0f;
+}
+
+
+//-------------------------------------------------
+//  output_gain - return the gain on the given
+//  output index of the device
+//-------------------------------------------------
+
+float device_sound_interface::output_gain(int outputnum) const
+{
+	int stream_outputnum;
+	sound_stream *stream = output_to_stream_output(outputnum, stream_outputnum);
+	return (stream != nullptr) ? stream->output_gain(stream_outputnum) : 0.0f;
+}
+
+
+//-------------------------------------------------
 //  set_input_gain - set the gain on the given
 //  input index of the device
 //-------------------------------------------------

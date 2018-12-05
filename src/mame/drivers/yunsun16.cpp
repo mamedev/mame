@@ -105,7 +105,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsun16_state::sound_bank_w)
+WRITE8_MEMBER(shocking_state::sound_bank_w)
 {
 	m_okibank->set_entry(data & 3);
 }
@@ -132,8 +132,6 @@ void yunsun16_state::main_map(address_map &map)
 	map(0x80010c, 0x80010f).ram().share("scrollram_1"); // Scrolling
 	map(0x800114, 0x800117).ram().share("scrollram_0"); // Scrolling
 	map(0x800154, 0x800155).ram().share("priorityram"); // Priority
-	map(0x800181, 0x800181).w(FUNC(yunsun16_state::sound_bank_w));    // Sound
-	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0x8001fe, 0x8001ff).nopw();    // ? 0 (during int)
 	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x908000, 0x90bfff).ram().w(FUNC(yunsun16_state::vram_w<1>)).share("vram_1"); // Layer 1
@@ -142,28 +140,30 @@ void yunsun16_state::main_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();
 }
 
-
-WRITE16_MEMBER(yunsun16_state::magicbub_sound_command_w)
+void magicbub_state::main_map(address_map &map)
 {
-	if (ACCESSING_BITS_0_7)
+	yunsun16_state::main_map(map);
+	map(0x800189, 0x800189).w(FUNC(magicbub_state::magicbub_sound_command_w));
+}
+
+void shocking_state::main_map(address_map &map)
+{
+	yunsun16_state::main_map(map);
+	map(0x800181, 0x800181).w(FUNC(shocking_state::sound_bank_w));    // Sound
+	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
+}
+
+
+WRITE8_MEMBER(magicbub_state::magicbub_sound_command_w)
+{
+	// HACK: the game continuously sends this. It'll play the oki sample number 0 on each voice. That sample is 00000-00000.
+	if ((data & 0xff) != 0x3a)
 	{
-/*
-HACK: the game continuously sends this. It'll play the oki sample
-number 0 on each voice. That sample is 00000-00000.
-*/
-		if ((data & 0xff) != 0x3a)
-		{
-			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-		}
+		m_soundlatch->write(space, 0, data & 0xff);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
-void yunsun16_state::init_magicbub()
-{
-	m_maincpu->space(AS_PROGRAM).unmap_write(0x800180, 0x800181);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800188, 0x800189, write16_delegate(FUNC(yunsun16_state::magicbub_sound_command_w), this));
-}
 
 /***************************************************************************
 
@@ -173,13 +173,13 @@ void yunsun16_state::init_magicbub()
 
 ***************************************************************************/
 
-void yunsun16_state::sound_map(address_map &map)
+void magicbub_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram();
 }
 
-void yunsun16_state::sound_port_map(address_map &map)
+void magicbub_state::sound_port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x11).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
@@ -187,11 +187,11 @@ void yunsun16_state::sound_port_map(address_map &map)
 	map(0x1c, 0x1c).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));       // M6295
 }
 
-void yunsun16_state::oki_map(address_map &map)
+void shocking_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("okibank");
-	}
+}
 
 
 /***************************************************************************
@@ -572,32 +572,36 @@ void yunsun16_state::machine_start()
 {
 	save_item(NAME(m_sprites_scrolldx));
 	save_item(NAME(m_sprites_scrolldy));
-	if (m_okibank)
-	{
-		m_okibank->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
-	}
 }
 
 void yunsun16_state::machine_reset()
 {
 	m_sprites_scrolldx = -0x40;
 	m_sprites_scrolldy = -0x0f;
-	if (m_okibank)
-	{
-		m_okibank->set_entry(0);
-	}
+}
+
+void shocking_state::machine_start()
+{
+	yunsun16_state::machine_start();
+	m_okibank->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
+}
+
+void shocking_state::machine_reset()
+{
+	yunsun16_state::machine_reset();
+	m_okibank->set_entry(0);
 }
 
 /***************************************************************************
                                 Magic Bubble
 ***************************************************************************/
 
-MACHINE_CONFIG_START(yunsun16_state::magicbub)
+MACHINE_CONFIG_START(magicbub_state::magicbub)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magicbub_state,  irq2_line_hold)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -606,7 +610,7 @@ MACHINE_CONFIG_START(yunsun16_state::magicbub)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0) /* TODO: completely inaccurate */
-	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(magicbub_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
@@ -617,7 +621,7 @@ MACHINE_CONFIG_START(yunsun16_state::magicbub)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -634,17 +638,17 @@ MACHINE_CONFIG_END
                                 Shocking
 ***************************************************************************/
 
-MACHINE_CONFIG_START(yunsun16_state::shocking)
+MACHINE_CONFIG_START(shocking_state::shocking)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shocking_state,  irq2_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0) /* TODO: completely inaccurate */
-	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(shocking_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
@@ -1021,12 +1025,12 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 199?, magicbub,   0,        magicbub, magicbub, yunsun16_state, init_magicbub, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, yunsun16_state, init_magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbubb,  magicbub, shocking, magicbua, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paprazzi,   0,        shocking, paprazzi, yunsun16_state, empty_init,    ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shocking,   0,        shocking, shocking, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingk,  shocking, shocking, shocking, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingko, shocking, shocking, shocking, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkick,   0,        shocking, bombkick, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkicka,  bombkick, shocking, bombkick, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbub,   0,        magicbub, magicbub, magicbub_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, magicbub_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbubb,  magicbub, shocking, magicbua, shocking_state, empty_init, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paprazzi,   0,        shocking, paprazzi, shocking_state, empty_init, ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shocking,   0,        shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingk,  shocking, shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingko, shocking, shocking, shocking, shocking_state, empty_init, ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkick,   0,        shocking, bombkick, shocking_state, empty_init, ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkicka,  bombkick, shocking, bombkick, shocking_state, empty_init, ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

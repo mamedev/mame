@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -255,18 +256,20 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(cybstorm_state::cybstorm)
+void cybstorm_state::cybstorm(machine_config &config)
+{
 	round2(config);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_ATARI_JSA_TEST_PORT("9F0010", 22)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ATARI_JSA_IIIS(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("9F0010").bit(22);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+}
 
 
 

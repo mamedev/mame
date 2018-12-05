@@ -408,7 +408,7 @@ void compis_state::compis_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(MM58174A_TAG, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
 	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
@@ -753,12 +753,12 @@ MACHINE_CONFIG_START(compis_state::compis)
 	m_osp->delay().set(I80130_TAG, FUNC(i80130_device::ir7_w));
 	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_mpsc, i8274_device, rxtxcb_w))
-	MCFG_PIT8253_CLK1(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_CLK2(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<0>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
+	m_pit->set_clk<1>(15.36_MHz_XTAL/8);
+	m_pit->set_clk<2>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<2>().set(FUNC(compis_state::tmr5_w));
 
 	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
@@ -770,8 +770,8 @@ MACHINE_CONFIG_START(compis_state::compis)
 	m_uart->rxrdy_handler().set(I80130_TAG, FUNC(i80130_device::ir2_w));
 	m_uart->txrdy_handler().set(I80186_TAG, FUNC(i80186_cpu_device::int1_w));
 
-	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
-	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	compis_keyboard_device &kb(COMPIS_KEYBOARD(config, COMPIS_KEYBOARD_TAG, 0));
+	kb.out_tx_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
 	I8274(config, m_mpsc, 15.36_MHz_XTAL/4);
 	m_mpsc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -791,15 +791,15 @@ MACHINE_CONFIG_START(compis_state::compis)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))
