@@ -130,7 +130,8 @@ Final Furlong 2   Namco, 1998    Super System 23
 *Guitar Jam       Namco, 1999    Super System 23
 Crisis Zone       Namco, 1999    System 23 Evolution 2
 
-* - Guitar Jam is not dumped yet and the hardware type is not confirmed. It might not be on System 23 hardware.
+* - Guitar Jam is not dumped yet and the hardware type is not confirmed.
+    According to Bandai Namco's website it is indeed SS23, and includes an extra sound board with Zoom Corp. DSP.
 
 A System 23 unit is comprised of some of the following pieces....
 - V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out
