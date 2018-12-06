@@ -185,7 +185,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
     due to code at 0x000fe6 ('beq     $fea'). So I've marked it as "Unused".
 
 
-8) 'fncywrld'
+8) 'fncywld'
 
   - I'm not sure about the release date of this game :
       * on the title screen, it ALWAYS displays 1996
@@ -313,7 +313,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 
 #define TUMBLEP_HACK    0
-#define FNCYWLD_HACK    0
 
 
 
@@ -669,12 +668,8 @@ void tumbleb_state::tumblepopba_main_map(address_map &map)
 	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
 }
 
-void tumbleb_state::fncywld_main_map(address_map &map)
+void tumbleb_state::unico_base_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
-#if FNCYWLD_HACK
-	map(0x000000, 0x0fffff).writeonly();   /* To write levels modifications */
-#endif
 	map(0x100000, 0x100003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x100005, 0x100005).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -690,7 +685,25 @@ void tumbleb_state::fncywld_main_map(address_map &map)
 	map(0x340400, 0x34047f).nopw(); /* Unused col scroll */
 	map(0x342000, 0x3421ff).nopw();
 	map(0x342400, 0x34247f).nopw();
+}
+
+void tumbleb_state::fncywld_main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 	map(0xff0000, 0xffffff).ram();
+
+	unico_base_map(map);
+}
+
+
+void tumbleb_state::magipur_main_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("mainram");
+	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
+
+	map(0x100010, 0x100011).nopw(); // TODO: what is this, fncywld doesn't write here, can't be related to the RAM/ROM arrangement as the writes happen well after boot
+
+	unico_base_map(map);
 }
 
 
@@ -1115,7 +1128,7 @@ static INPUT_PORTS_START( fncywld )
 	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )     // only seems to the title screen
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) )     // changes the region disclaimer and title screen only, not story text
 	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Korean ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )
@@ -1135,19 +1148,10 @@ static INPUT_PORTS_START( fncywld )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-
-#if FNCYWLD_HACK
-	PORT_DIPNAME( 0x0800, 0x0800, "Remove Monsters" )
-#else
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unused ) )       // See notes
-#endif
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unused ) )       // See notes (is 'Remove Monsters' if code is patched to enable debug mode)
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-#if FNCYWLD_HACK
-	PORT_DIPNAME( 0x0400, 0x0400, "Edit Levels" )
-#else
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ) )       // See notes
-#endif
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ) )       // See notes (is 'Edit Levels' if code is patched to enable debug mode)
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unused ) )
@@ -1155,6 +1159,15 @@ static INPUT_PORTS_START( fncywld )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0100, "Freeze" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magipur )
+	PORT_INCLUDE(fncywld)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -2005,14 +2018,14 @@ static GFXDECODE_START( gfx_suprtrio )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout,        256, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, suprtrio_tlayout,   512, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, suprtrio_tlayout,   256, 16 )   /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "sprgfx", 0, tlayout,              0, 16 )   /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "sprgfx",  0, tlayout,            0, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_fncywld )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout, 0x400, 0x40 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     0x400, 0x40 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     0x200, 0x40 )  /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "sprgfx", 0, tlayout,     0x000, 0x40 )  /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "sprgfx",  0, tlayout,     0x000, 0x40 )  /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -2194,12 +2207,52 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", 32220000/9).add_route(ALL_OUTPUTS, "mono", 0.20);
+	YM2151(config, "ymsnd", 32220000/9).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+/// OSCs: 12MHz, 4MHz, 28.63636MHz, not the same PCB as fncywld
+MACHINE_CONFIG_START(tumbleb_state::magipur)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(magipur_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+
+	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
+	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60) // refresh rate not verified
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
+	MCFG_DECO_SPRITE_TRANSPEN(15)
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fncywld)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+
+	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	YM2151(config, "ymsnd", XTAL(4'000'000)).add_route(ALL_OUTPUTS, "mono", 0.10);
+
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
@@ -2553,6 +2606,27 @@ ROM_START( fncywld )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "00_fw01.bin", 0x000000, 0x040000, CRC(b395fe01) SHA1(ac7f2e21413658f8d2a1abf3a76b7817a4e050c9) )
+ROM_END
+
+ROM_START( magipur )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "2-27c040.bin", 0x000000, 0x080000, CRC(135c5de7) SHA1(95c75e9e69793f67df9378391ae45915ef9bbb89) )
+	ROM_LOAD16_BYTE( "3-27c040.bin", 0x000001, 0x080000, CRC(ee4b16da) SHA1(82391ed4d21d3944ca482be00ab7c0838cf190ff) )
+
+	ROM_REGION( 0x100000, "sprgfx", 0  )
+	ROM_LOAD16_BYTE( "4-27c040.bin",  0x80000, 0x40000, CRC(e460a77d) SHA1(bde15705750e002bd576098700161b0944984401) )
+	ROM_CONTINUE(0x80001, 0x40000)
+	ROM_LOAD16_BYTE( "5-27c040.bin",  0x00000, 0x40000, CRC(79c53627) SHA1(9e2673b3becf0508f630f3bd8ff5fc30520b120b) )
+	ROM_CONTINUE(0x00001, 0x40000)
+
+	ROM_REGION( 0x100000, "tilegfx", 0 )
+	ROM_LOAD16_BYTE( "6-27c040.bin", 0x00001, 0x40000, CRC(b25b5872) SHA1(88a6a110073060c3b7b2987cc41d23c4ca412b43) )
+	ROM_CONTINUE(0x00000, 0x40000)
+	ROM_LOAD16_BYTE( "7-27c040.bin", 0x80001, 0x40000, CRC(d3c3a672) SHA1(5bbd67a953e1d47d05006a4ef4aa7a23e807f11b) )
+	ROM_CONTINUE(0x80000, 0x40000)
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "1-27c020.bin", 0x000000, 0x040000, CRC(84dcf771) SHA1(f8a693a11b14608a582a90b7fd7d3be92e46a0e1) )
 ROM_END
 
 ROM_START( suprtrio )
@@ -3509,13 +3583,20 @@ void tumbleb_state::init_fncywld()
 {
 	tumblepb_gfx_rearrange(1);
 
-	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
 	   of the 2 first "Unused" Dip Switch (see notes above). */
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[0x0005fa/2] = 0x4e71;
-	RAM[0x00060a/2] = 0x4e71;
-	#endif
+	//uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
+	//RAM[0x0005fa/2] = 0x4e71;
+	//RAM[0x00060a/2] = 0x4e71;
+}
+
+void tumbleb_state::init_magipur()
+{
+	tumblepb_gfx_rearrange(1);
+
+	uint16_t *src = (uint16_t*)memregion( "maincpu" )->base();
+	// copy vector table? game expects RAM at 0, and ROM at f00000?!
+	memcpy(m_mainram, src, 0x80);
 }
 
 
@@ -3645,7 +3726,7 @@ GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, tumbleb_state, init_suprtr
 
 GAME( 1996, fncywld,  0,       fncywld,     fncywld, tumbleb_state,  init_fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , MACHINE_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
 
-// Unico - Magic Purple almost certainly goes here
+GAME( 1996, magipur,  0,       magipur,     magipur, tumbleb_state,  init_magipur,  ROT0, "Unico",   "Magic Purple" , MACHINE_SUPPORTS_SAVE )
 
 /* First Amusement / Mijin / SemiCom hardware (MCU protected) */
 GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, tumbleb_state, init_chokchok, ROT0, "First Amusement", "Metal Saver", MACHINE_SUPPORTS_SAVE )
