@@ -1,5 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+#ifndef MAME_INCLUDES_MSISAAC_H
+#define MAME_INCLUDES_MSISAAC_H
+
+#pragma once
 
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
@@ -13,8 +17,8 @@
 class msisaac_state : public driver_device
 {
 public:
-	msisaac_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	msisaac_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_videoram3(*this, "videoram3"),
@@ -26,9 +30,15 @@ public:
 		m_ta7630(*this, "ta7630"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void msisaac(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -92,12 +102,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void msisaac_map(address_map &map);
 	void msisaac_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MSISAAC_H

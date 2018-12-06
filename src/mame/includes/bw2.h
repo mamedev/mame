@@ -8,6 +8,7 @@
 #include "bus/bw2/exp.h"
 #include "cpu/z80/z80.h"
 #include "formats/bw2_dsk.h"
+#include "imagedev/floppy.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"

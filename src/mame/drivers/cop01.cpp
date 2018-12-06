@@ -497,8 +497,8 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(mightguy_audio_io_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
-	MCFG_NB1412M2_DAC_CB(WRITE8("dac", dac_byte_interface, data_w))
+	NB1412M2(config, m_prot, XTAL(8'000'000)/2); // divided by 2 maybe
+	m_prot->dac_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

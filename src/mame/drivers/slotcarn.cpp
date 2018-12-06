@@ -584,7 +584,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
 	aysnd.port_b_read_callback().set_ioport("DSW2");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);   
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

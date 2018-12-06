@@ -187,8 +187,7 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_ROM("maincpu")
+	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 

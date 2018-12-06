@@ -37,6 +37,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"

@@ -505,10 +505,10 @@ MACHINE_CONFIG_START(svision_state::svision_base)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(m_sound, SVISION_SND, 4000000, m_maincpu, m_bank1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SVISION_SOUND_IRQ_CALLBACK(WRITELINE(*this, svision_state, sound_irq_w));
+	SVISION_SND(config, m_sound, 4000000, m_maincpu, m_bank1);
+	m_sound->add_route(0, "lspeaker", 0.50);
+	m_sound->add_route(1, "rspeaker", 0.50);
+	m_sound->irq_cb().set(FUNC(svision_state::sound_irq_w));
 
 	MCFG_GENERIC_CARTSLOT_ADD(m_cart, generic_plain_slot, "svision_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ws,sv")

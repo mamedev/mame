@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	m_i8255_2->out_pa_callback().set(FUNC(segahang_state::sub_control_adc_w));
 	m_i8255_2->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
 
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// video hardware
@@ -794,11 +794,12 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(segahang_state::hangon_base)
+void segahang_state::hangon_base(machine_config &config)
+{
 	shared_base(config);
 	// video hardware
-	MCFG_DEVICE_ADD("sprites", SEGA_HANGON_SPRITES, 0)
-MACHINE_CONFIG_END
+	SEGA_HANGON_SPRITES(config, m_sprites, 0);
+}
 
 
 MACHINE_CONFIG_START(segahang_state::sharrier_base)
@@ -813,7 +814,7 @@ MACHINE_CONFIG_START(segahang_state::sharrier_base)
 	MCFG_DEVICE_CLOCK(MASTER_CLOCK_10MHz)
 
 	// video hardware
-	MCFG_DEVICE_ADD("sprites", SEGA_SHARRIER_SPRITES, 0)
+	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
 MACHINE_CONFIG_END
 
 
@@ -1079,9 +1080,9 @@ ROM_START( hangon )
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 
 	ROM_REGION( 0x300, "plds", 0 )
-	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) ) 
-	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) ) 
-	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) ) 
+	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) )
+	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) )
+	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -1139,9 +1140,9 @@ ROM_START( hangon1 )
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 
 	ROM_REGION( 0x300, "plds", 0 )
-	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) ) 
-	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) ) 
-	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) ) 
+	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) )
+	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) )
+	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -1205,9 +1206,9 @@ ROM_START( hangon2 )
 	ROM_LOAD( "epr-6844.ic119", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 
 	ROM_REGION( 0x300, "plds", 0 )
-	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) ) 
-	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) ) 
-	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) ) 
+	ROM_LOAD( "315-5118.bin", 0x000, 0x08f, CRC(51d448a2) SHA1(0a1018cc1d4c6dc87625d59539d257e01c9dc872) )
+	ROM_LOAD( "315-5119.bin", 0x100, 0x08f, CRC(a37f00e1) SHA1(129b10f6cb48e1a1fefd69009380516cf2c677b5) )
+	ROM_LOAD( "315-5120.bin", 0x200, 0x08f, CRC(ba5f92ec) SHA1(74e1fb137ac2ab6dbdad2e8111c27b836e2ff14b) )
 ROM_END
 
 //*************************************************************************************************************************

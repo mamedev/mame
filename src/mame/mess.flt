@@ -208,6 +208,7 @@ emate.cpp
 emma2.cpp
 enmirage.cpp
 ep64.cpp
+epic14e.cpp
 esprit.cpp
 esq1.cpp
 esq5505.cpp
@@ -244,6 +245,7 @@ force68k.cpp
 fp1100.cpp
 fp200.cpp
 fp6000.cpp
+fs3216.cpp
 ft68m.cpp
 galaxy.cpp
 galeb.cpp
@@ -290,10 +292,12 @@ hp16500.cpp
 hp2100.cpp
 hp2620.cpp
 hp2640.cpp
+hp3478a.cpp
 hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp95lx.cpp
 hp9825.cpp
 hp9845.cpp
 hp9k.cpp
@@ -316,6 +320,7 @@ icatel.cpp
 icebox.cpp
 ie15.cpp
 if800.cpp
+ikt5a.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -478,6 +483,7 @@ nascom1.cpp
 nc.cpp
 ncd17c.cpp
 ncdmips.cpp
+ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
@@ -660,6 +666,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+shine.cpp
 si5500.cpp
 sitcom.cpp
 sk1.cpp

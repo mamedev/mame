@@ -52,7 +52,6 @@
 #include "bus/centronics/dsjoy.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 
 #include "formats/fm7_cas.h"
 

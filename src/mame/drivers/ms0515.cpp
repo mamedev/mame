@@ -29,6 +29,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -568,9 +569,9 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_i8251kbd->rxrdy_handler().set(FUNC(ms0515_state::irq5_w));
 	m_i8251kbd->txd_handler().set("ms7004", FUNC(ms7004_device::write_rxd));
 
-	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_rxd))
-	MCFG_MS7004_RTS_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_cts))
+	MS7004(config, m_ms7004, 0);
+	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
+	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)

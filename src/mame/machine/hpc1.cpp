@@ -17,22 +17,22 @@
 #include "machine/hpc1.h"
 #include "speaker.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_READS		(1 << 1)
-#define LOG_WRITES		(1 << 2)
-#define LOG_INT			(1 << 3)
-#define LOG_EEPROM		(1 << 4)
-#define LOG_SCSI		(1 << 5)
-#define LOG_SCSI_DMA	(1 << 6)
-#define LOG_DUART0		(1 << 7)
-#define LOG_DUART1		(1 << 8)
-#define LOG_DUART2		(1 << 9)
-#define LOG_PIT			(1 << 10)
-#define LOG_REGS		(LOG_UNKNOWN | LOG_READS | LOG_WRITES)
-#define LOG_DUART		(LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
-#define LOG_ALL			(LOG_REGS | LOG_INT | LOG_EEPROM | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_READS       (1 << 1)
+#define LOG_WRITES      (1 << 2)
+#define LOG_INT         (1 << 3)
+#define LOG_EEPROM      (1 << 4)
+#define LOG_SCSI        (1 << 5)
+#define LOG_SCSI_DMA    (1 << 6)
+#define LOG_DUART0      (1 << 7)
+#define LOG_DUART1      (1 << 8)
+#define LOG_DUART2      (1 << 9)
+#define LOG_PIT         (1 << 10)
+#define LOG_REGS        (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
+#define LOG_DUART       (LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
+#define LOG_ALL         (LOG_REGS | LOG_INT | LOG_EEPROM | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT)
 
-#define VERBOSE			(LOG_UNKNOWN)
+#define VERBOSE         (LOG_UNKNOWN)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_HPC1, hpc1_device, "hpc1", "SGI HPC1")

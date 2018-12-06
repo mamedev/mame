@@ -43,7 +43,7 @@
 
 #pragma once
 
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "machine/upd765.h"

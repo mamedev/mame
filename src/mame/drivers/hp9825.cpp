@@ -29,6 +29,8 @@
 #include "cpu/hphybrid/hphybrid.h"
 #include "machine/timer.h"
 #include "machine/hp9825_tape.h"
+#include "machine/hp98x5_io_sys.h"
+#include "bus/hp9845_io/hp9845_io.h"
 #include "imagedev/bitbngr.h"
 #include "speaker.h"
 #include "sound/beep.h"
@@ -43,6 +45,8 @@ constexpr unsigned KDP_CLOCK = MAIN_CLOCK / 4;
 // Peripheral Addresses (PA)
 constexpr uint8_t KDP_PA = 0;
 constexpr uint8_t TAPE_PA = 1;
+constexpr uint8_t IO_SLOT_FIRST_PA = 2;
+constexpr uint8_t IO_SLOT_LAST_PA = 15;
 
 // KDP clocks to print 1 line of dots (~33 ms)
 // This value is semi-guessed.
@@ -77,6 +81,7 @@ public:
 	hp9825_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this , "cpu")
+		, m_io_sys(*this , "io_sys")
 		, m_cursor_timer(*this , "cursor_timer")
 		, m_tape(*this , "tape")
 		, m_io_key(*this , "KEY%u" , 0)
@@ -86,6 +91,7 @@ public:
 		, m_prt_timer(*this , "prt_timer")
 		, m_beeper(*this , "beeper")
 		, m_beep_timer(*this , "beep_timer")
+		, m_io_slot(*this, "slot%u", 0U)
 		, m_display(*this , "char_%u_%u" , 0U , 0U)
 		, m_run_light(*this , "run_light")
 	{
@@ -95,10 +101,12 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void device_reset() override;
 	virtual void machine_reset() override;
 
 private:
 	required_device<hp_09825_67907_cpu_device> m_cpu;
+	required_device<hp98x5_io_sys_device> m_io_sys;
 	required_device<timer_device> m_cursor_timer;
 	required_device<hp9825_tape_device> m_tape;
 	required_ioport_array<4> m_io_key;
@@ -108,6 +116,7 @@ private:
 	required_device<timer_device> m_prt_timer;
 	required_device<beep_device> m_beeper;
 	required_device<timer_device> m_beep_timer;
+	required_device_array<hp9845_io_slot_device , 3> m_io_slot;
 	output_finder<32 , 7> m_display;
 	output_finder<> m_run_light;
 
@@ -121,16 +130,12 @@ private:
 	bool m_key_pressed;
 	bool m_autorepeating;
 	unsigned m_autorepeat_cnt;
-	uint8_t m_irl_pending;
-	uint8_t m_irh_pending;
-	// FLG/STS handling
-	uint8_t m_pa;
-	uint16_t m_flg_status;
-	uint16_t m_sts_status;
 	// Printer
 	uint8_t m_printer_mem[ 16 ];
 	uint8_t m_printer_idx;
 	unsigned m_printer_line;    // 0: printer idle, 1..10: line being printed
+	// SC of slots
+	int m_slot_sc[ 3 ];
 
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
@@ -146,18 +151,15 @@ private:
 	void kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	void update_irq();
-	void set_irq(uint8_t sc , int state);
-
-	DECLARE_WRITE8_MEMBER(pa_w);
-	void update_flg_sts();
-	void set_sts(uint8_t sc , int state);
-	void set_flg(uint8_t sc , int state);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(prt_timer);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
+
+	// Slot handling
+	void set_irq_slot(unsigned slot , int state);
+	void set_sts_slot(unsigned slot , int state);
+	void set_flg_slot(unsigned slot , int state);
+	void set_dmar_slot(unsigned slot , int state);
 };
 
 void hp9825_state::machine_start()
@@ -169,8 +171,26 @@ void hp9825_state::machine_start()
 	save_item(NAME(m_display_mem));
 	save_item(NAME(m_display_idx));
 	save_item(NAME(m_scancode));
-	save_item(NAME(m_irl_pending));
-	save_item(NAME(m_irh_pending));
+}
+
+void hp9825_state::device_reset()
+{
+	// First, unmap every r/w handler in 1..12 select codes
+	for (unsigned sc = IO_SLOT_FIRST_PA; sc < (IO_SLOT_LAST_PA + 1); sc++) {
+		m_cpu->space(AS_IO).unmap_readwrite(sc * 4 , sc * 4 + 3);
+	}
+
+	// Then, set r/w handlers of all installed I/O cards
+	int sc;
+	read16_delegate rhandler;
+	write16_delegate whandler;
+	for (unsigned i = 0; i < 3; i++) {
+		if ((sc = m_io_slot[ i ]->get_rw_handlers(rhandler , whandler)) >= 0) {
+			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
+			m_cpu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+		}
+		m_slot_sc[ i ] = sc;
+	}
 }
 
 void hp9825_state::machine_reset()
@@ -185,12 +205,6 @@ void hp9825_state::machine_reset()
 	m_key_pressed = false;
 	m_autorepeating = false;
 	m_autorepeat_cnt = 0;
-	m_irl_pending = 0;
-	m_irh_pending = 0;
-	update_irq();
-	m_pa = 0;
-	m_flg_status = 0;
-	m_sts_status = 0;
 	m_printer_idx = 0;
 	m_printer_line = 0;
 	m_prt_timer->reset();
@@ -223,7 +237,7 @@ READ16_MEMBER(hp9825_state::kb_scancode_r)
 	if (m_shift_key->read()) {
 		BIT_SET(res , 7);
 	}
-	set_irq(KDP_PA , false);
+	m_io_sys->set_irq(KDP_PA , false);
 	return res;
 }
 
@@ -242,7 +256,7 @@ WRITE16_MEMBER(hp9825_state::disp_w)
 READ16_MEMBER(hp9825_state::kdp_status_r)
 {
 	uint16_t res = 8;
-	if (BIT(m_irl_pending, KDP_PA)) {
+	if (m_io_sys->is_irq_pending(KDP_PA)) {
 		BIT_SET(res , 4);
 	}
 	if (m_printer_line) {
@@ -504,7 +518,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::kb_scan)
 		if (max_seq_len) {
 			m_scancode = max_seq_idx;
 			m_key_pressed = true;
-			set_irq(KDP_PA , true);
+			m_io_sys->set_irq(KDP_PA , true);
 		}
 	}
 
@@ -518,7 +532,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::kb_scan)
 		}
 		if (m_autorepeating && BIT(~prev_cnt & m_autorepeat_cnt , 3)) {
 			// Repeat key every time bit 3 of autorepeat counter goes 0->1
-			set_irq(KDP_PA , true);
+			m_io_sys->set_irq(KDP_PA , true);
 		}
 	} else {
 		m_autorepeating = false;
@@ -537,79 +551,6 @@ void hp9825_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , uns
 			max_seq_idx = bit_no + idx_base;
 		}
 		pressed &= ~mask;
-	}
-}
-
-IRQ_CALLBACK_MEMBER(hp9825_state::irq_callback)
-{
-	if (irqline == HPHYBRID_IRL) {
-		return m_irl_pending;
-	} else {
-		return m_irh_pending;
-	}
-}
-
-void hp9825_state::update_irq()
-{
-	m_cpu->set_input_line(HPHYBRID_IRL , m_irl_pending != 0);
-	m_cpu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
-}
-
-void hp9825_state::set_irq(uint8_t sc , int state)
-{
-	unsigned bit_n = sc % 8;
-
-	if (sc < 8) {
-		if (state) {
-			BIT_SET(m_irl_pending, bit_n);
-		} else {
-			BIT_CLR(m_irl_pending, bit_n);
-		}
-	} else {
-		if (state) {
-			BIT_SET(m_irh_pending, bit_n);
-		} else {
-			BIT_CLR(m_irh_pending, bit_n);
-		}
-	}
-	update_irq();
-}
-
-WRITE8_MEMBER(hp9825_state::pa_w)
-{
-	m_pa = data;
-	update_flg_sts();
-}
-
-void hp9825_state::update_flg_sts()
-{
-	bool sts = BIT(m_sts_status , m_pa);
-	bool flg = BIT(m_flg_status , m_pa);
-	m_cpu->status_w(sts);
-	m_cpu->flag_w(flg);
-}
-
-void hp9825_state::set_sts(uint8_t sc , int state)
-{
-	if (state) {
-		BIT_SET(m_sts_status, sc);
-	} else {
-		BIT_CLR(m_sts_status, sc);
-	}
-	if (sc == m_pa) {
-		update_flg_sts();
-	}
-}
-
-void hp9825_state::set_flg(uint8_t sc , int state)
-{
-	if (state) {
-		BIT_SET(m_flg_status, sc);
-	} else {
-		BIT_CLR(m_flg_status, sc);
-	}
-	if (sc == m_pa) {
-		update_flg_sts();
 	}
 }
 
@@ -644,6 +585,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::beep_timer)
 	m_beeper->set_state(0);
 }
 
+void hp9825_state::set_irq_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_irq(uint8_t(sc) , state);
+}
+
+void hp9825_state::set_sts_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_sts(uint8_t(sc) , state);
+}
+
+void hp9825_state::set_flg_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_flg(uint8_t(sc) , state);
+}
+
+void hp9825_state::set_dmar_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_dmar(uint8_t(sc) , state);
+}
+
 MACHINE_CONFIG_START(hp9825_state::hp9825b)
 	HP_09825_67907(config , m_cpu , MAIN_CLOCK);
 	// Just guessing... settings borrowed from hp9845
@@ -651,8 +620,18 @@ MACHINE_CONFIG_START(hp9825_state::hp9825b)
 	m_cpu->set_relative_mode(false);
 	m_cpu->set_addrmap(AS_PROGRAM , &hp9825_state::cpu_mem_map);
 	m_cpu->set_addrmap(AS_IO , &hp9825_state::cpu_io_map);
-	m_cpu->set_irq_acknowledge_callback(FUNC(hp9825_state::irq_callback));
-	m_cpu->pa_changed_cb().set(FUNC(hp9825_state::pa_w));
+	m_cpu->set_irq_acknowledge_callback("io_sys" , FUNC(hp98x5_io_sys_device::irq_callback));
+	m_cpu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
+
+	// Needed when 98035 RTC module is connected or time advances at about 1/4 the correct speed (NP misses a lot of 1kHz interrupts)
+	MCFG_QUANTUM_TIME(attotime::from_hz(5000));
+
+	HP98X5_IO_SYS(config , m_io_sys , 0);
+	m_io_sys->irl().set([this](int state) { m_cpu->set_input_line(HPHYBRID_IRL , state); });
+	m_io_sys->irh().set([this](int state) { m_cpu->set_input_line(HPHYBRID_IRH , state); });
+	m_io_sys->sts().set(m_cpu , FUNC(hp_09825_67907_cpu_device::status_w));
+	m_io_sys->flg().set(m_cpu , FUNC(hp_09825_67907_cpu_device::flag_w));
+	m_io_sys->dmar().set(m_cpu , FUNC(hp_09825_67907_cpu_device::dmar_w));
 
 	TIMER(config , m_cursor_timer , 0).configure_generic(timer_device::expired_delegate(FUNC(hp9825_state::cursor_blink) , this));
 
@@ -661,9 +640,9 @@ MACHINE_CONFIG_START(hp9825_state::hp9825b)
 
 	// Tape drive
 	HP9825_TAPE(config , m_tape , 0);
-	m_tape->flg().set([this , sc = TAPE_PA](int state) { set_flg(sc , state); });
-	m_tape->sts().set([this , sc = TAPE_PA](int state) { set_sts(sc , state); });
-	m_tape->dmar().set(m_cpu , FUNC(hp_09825_67907_cpu_device::dmar_w));
+	m_tape->flg().set([this](int state) { m_io_sys->set_flg(TAPE_PA , state); });
+	m_tape->sts().set([this](int state) { m_io_sys->set_sts(TAPE_PA , state); });
+	m_tape->dmar().set([this](int state) { m_io_sys->set_dmar(TAPE_PA , state); });
 
 	// Printer
 	BITBANGER(config , m_prt_alpha_out , 0);
@@ -674,6 +653,16 @@ MACHINE_CONFIG_START(hp9825_state::hp9825b)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, BEEPER_FREQ).add_route(ALL_OUTPUTS, "mono", 1.00);
 	TIMER(config , m_beep_timer , 0).configure_generic(timer_device::expired_delegate(FUNC(hp9825_state::beep_timer) , this));
+
+	// I/O slots
+	for (unsigned slot = 0; slot < 3; slot++) {
+		auto& finder = m_io_slot[ slot ];
+		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder , 0) );
+		tmp.irq().set([this , slot](int state) { set_irq_slot(slot , state); });
+		tmp.sts().set([this , slot](int state) { set_sts_slot(slot , state); });
+		tmp.flg().set([this , slot](int state) { set_flg_slot(slot , state); });
+		tmp.dmar().set([this , slot](int state) { set_dmar_slot(slot , state); });
+	}
 
 	config.set_default_layout(layout_hp9825);
 MACHINE_CONFIG_END

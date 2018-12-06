@@ -1183,7 +1183,7 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// sound hardware
@@ -1211,7 +1211,7 @@ MACHINE_CONFIG_START(segaorun_state::outrundx)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
 
 	// video hardware
-	MCFG_DEVICE_ADD("sprites", SEGA_OUTRUN_SPRITES, 0)
+	SEGA_OUTRUN_SPRITES(config, m_sprites, 0);
 MACHINE_CONFIG_END
 
 void segaorun_state::outrun(machine_config &config)
@@ -1257,7 +1257,7 @@ MACHINE_CONFIG_START(segaorun_state::shangon)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_shangon)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)

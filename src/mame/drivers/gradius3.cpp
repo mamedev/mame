@@ -311,16 +311,16 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(gradius3_state, tile_callback)
-	MCFG_K052109_CHARRAM(true)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(gradius3_state::tile_callback), this);
+	m_k052109->set_char_ram(true);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(gradius3_state, sprite_callback)
-	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_GRADIUS3)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(gradius3_state::sprite_callback), this);
+	m_k051960->set_plane_order(K051960_PLANEORDER_GRADIUS3);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

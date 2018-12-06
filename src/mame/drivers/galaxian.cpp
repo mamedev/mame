@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert
+// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert, Robbbert
 /***************************************************************************
 
     Galaxian-derived hardware
@@ -2155,6 +2155,54 @@ void galaxian_state::mshuttle_portmap(address_map &map)
 	map(0x08, 0x08).w(FUNC(galaxian_state::mshuttle_ay8910_control_w));
 	map(0x09, 0x09).w(FUNC(galaxian_state::mshuttle_ay8910_data_w));
 	map(0x0c, 0x0c).r(FUNC(galaxian_state::mshuttle_ay8910_data_r));
+}
+
+void galaxian_state::fourplay_map(address_map &map)
+{
+	map(0x0000,0x3fff).bankr("bank1");
+	map(0x4000,0x47ff).ram();
+	map(0x5000,0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800,0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000,0x6000).portr("IN0");
+	map(0x6800,0x6800).portr("IN1");
+	map(0x7000,0x7000).portr("IN2");
+	map(0x7800,0x7fff).r("watchdog",FUNC(watchdog_timer_device::reset_r));
+	map(0x6000,0x6001).w(FUNC(galaxian_state::start_lamp_w));
+	map(0x6002,0x6002).nopw();  // AM_WRITE(coin_lock_w)
+	map(0x6003,0x6003).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x6004,0x6007).w("cust",FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x6800,0x6807).w("cust",FUNC(galaxian_sound_device::sound_w));
+	map(0x7001,0x7001).w(FUNC(galaxian_state::irq_enable_w));
+	map(0x7002,0x7003).w(FUNC(galaxian_state::fourplay_rombank_w));
+	map(0x7004,0x7004).w(FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7005,0x7005).nopw();  /* bit 3 of rombank select - always 0 */
+	map(0x7006,0x7006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007,0x7007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7008,0x7008).nopw();  /* bit 4 of rombank select - always 0 */
+	map(0x7800,0x7800).w("cust",FUNC(galaxian_sound_device::pitch_w));
+}
+
+void galaxian_state::videight_map(address_map &map)
+{
+	map(0x0000,0x3fff).bankr("bank1");
+	map(0x4000,0x47ff).ram();
+	map(0x5000,0x53ff).mirror(0x400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800,0x58ff).mirror(0x700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000,0x6000).portr("IN0");
+	map(0x6800,0x6800).portr("IN1");
+	map(0x7000,0x7000).portr("IN2");
+	map(0x7800,0x7fff).r("watchdog",FUNC(watchdog_timer_device::reset_r));
+	map(0x6000,0x6002).w(FUNC(galaxian_state::videight_gfxbank_w));
+	map(0x6003,0x6003).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x6004,0x6007).w("cust",FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x6800,0x6807).w("cust",FUNC(galaxian_sound_device::sound_w));
+	map(0x6808,0x68ff).nopw();
+	map(0x7001,0x7001).w(FUNC(galaxian_state::irq_enable_w));
+	map(0x7002,0x7005).w(FUNC(galaxian_state::videight_rombank_w));
+	map(0x7006,0x7006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007,0x7007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7008,0x7008).nopw();  /* bit 4 of rombank select - always 0 */
+	map(0x7800,0x7800).w("cust",FUNC(galaxian_sound_device::pitch_w));
 }
 
 
@@ -5871,6 +5919,11 @@ static GFXDECODE_START(gfx_tenspot)
 	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout_0x80, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
+static GFXDECODE_START(gfx_videight)
+	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8*32, GALAXIAN_XSCALE,1)
+	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 8*32, GALAXIAN_XSCALE,1)
+GFXDECODE_END
+
 
 /*************************************
  *
@@ -6683,6 +6736,31 @@ MACHINE_CONFIG_START(galaxian_state::moonwar)
 	MCFG_PALETTE_INIT_OWNER(galaxian_state,moonwar) // bullets are less yellow
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(galaxian_state::fourplay)
+	galaxian(config);
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fourplay_map)
+
+	/* video hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::videight)
+	galaxian(config);
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(videight_map)
+
+	/* video hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videight)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(8*32)
+MACHINE_CONFIG_END
+
 
 /*************************************
  *
@@ -7042,6 +7120,26 @@ void galaxian_state::init_victoryc()
 
 	decode_victoryc();
 }
+
+
+void galaxian_state::init_fourplay()
+{
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->set_entry(0);
+
+	/* video extensions */
+	common_init(NULL, NULL, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
+}
+
+void galaxian_state::init_videight()
+{
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->set_entry(0);
+
+	/* video extensions */
+	common_init(NULL, NULL, &galaxian_state::videight_extend_tile_info, &galaxian_state::videight_extend_sprite_info);
+}
+
 
 /*************************************
  *
@@ -9416,6 +9514,32 @@ ROM_START( tenspot )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
 	ROM_END
+
+
+ROM_START( fourplay )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "fourplay.bin", 0x10000, 0x10000, CRC(b42b2c2c) SHA1(f3b6f136b39e7a6adadecb9acf906fcfe649f398) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "graph1.bin",   0x0000, 0x1000, CRC(359c0c1f) SHA1(9e39baae4ab5763db236d0a49a6665d2e69cba11) )
+	ROM_LOAD( "graph2.bin",   0x1000, 0x1000, CRC(b22a51c9) SHA1(cccfbab0c92dba81e3451de72d1f1899226e30e2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+ROM_START( videight )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "videight.bin", 0x10000, 0x20000, CRC(0601db09) SHA1(0c9cd1afb0034946261219bf42b2f9b1ed5bdb17) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "v8g1.bin",     0x0000, 0x8000, CRC(af771e33) SHA1(cdc960c5f548e19da4eabdaf8b789ca8ffb6a29f) )
+	ROM_LOAD( "v8g2.bin",     0x8000, 0x8000, CRC(776c34e6) SHA1(de70a29f73469a58ab15acb95aaad1efeb4de08d) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "v8c.bin",      0x0000, 0x0100, CRC(b35a6ca8) SHA1(d9195215bf2482a1b02a019bb708a9981eb0bdf8) )
+ROM_END
+
 
 /*************************************
  *
@@ -12499,6 +12623,10 @@ GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     galaxian_state, init_
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    galaxian_state, init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
 
+// Multigames
+GAME( 2002, fourplay,    0,        fourplay,   galaxian,   galaxian_state, init_fourplay,   ROT90, "Macro", "Four Play", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, videight,    0,        videight,   warofbug,   galaxian_state, init_videight,   ROT90, "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
+
 
 
 /*************************************
@@ -12719,3 +12847,4 @@ GAME( 1982, losttombh,   losttomb, scobra,     losttomb,   galaxian_state, init_
 GAME( 1984, spdcoin,     0,        scobra,     spdcoin,    galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Speed Coin (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, superbon,    0,        scobra,     superbon,   galaxian_state, init_superbon,   ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+

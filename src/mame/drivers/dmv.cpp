@@ -13,6 +13,7 @@
 
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/dmv_keyb.h"
 #include "machine/pit8253.h"
@@ -787,7 +788,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DMV_KEYBOARD_ADD("keyboard")
+	DMV_KEYBOARD(config, m_keyboard, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

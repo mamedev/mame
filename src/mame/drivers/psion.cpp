@@ -600,8 +600,8 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
 	/* Datapack */
-	MCFG_PSION_DATAPACK_ADD("pack1")
-	MCFG_PSION_DATAPACK_ADD("pack2")
+	PSION_DATAPACK(config, m_pack1, 0);
+	PSION_DATAPACK(config, m_pack2, 0);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion2")

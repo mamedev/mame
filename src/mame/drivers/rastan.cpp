@@ -392,13 +392,13 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFX_REGION(1)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_gfx_region(1);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -417,9 +417,9 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	LS157(config, m_adpcm_sel, 0);
 	m_adpcm_sel->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 

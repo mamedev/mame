@@ -145,7 +145,7 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(const floppy_format_type *_formats)
+void floppy_connector::set_formats(const floppy_format_type _formats[])
 {
 	formats = _formats;
 }

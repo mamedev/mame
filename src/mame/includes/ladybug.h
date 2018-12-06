@@ -19,7 +19,11 @@ class ladybug_base_state : public driver_device
 protected:
 	using driver_device::driver_device;
 
-	void palette_init_common(palette_device &palette, const uint8_t *color_prom, int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1);
+	void palette_init_common(
+			palette_device &palette, const uint8_t *color_prom,
+			int r_bit0, int r_bit1,
+			int g_bit0, int g_bit1,
+			int b_bit0, int b_bit1) const;
 };
 
 

@@ -47,7 +47,7 @@
 void midtunit_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x003fffff).rw(FUNC(midtunit_state::midtunit_vram_r), FUNC(midtunit_state::midtunit_vram_w));
+	map(0x00000000, 0x003fffff).rw(m_video, FUNC(midtunit_video_device::midtunit_vram_r), FUNC(midtunit_video_device::midtunit_vram_w));
 	map(0x01000000, 0x013fffff).ram();
 	map(0x01400000, 0x0141ffff).rw(FUNC(midtunit_state::midtunit_cmos_r), FUNC(midtunit_state::midtunit_cmos_w)).share("nvram");
 	map(0x01480000, 0x014fffff).w(FUNC(midtunit_state::midtunit_cmos_enable_w));
@@ -56,14 +56,14 @@ void midtunit_state::main_map(address_map &map)
 	map(0x01600020, 0x0160002f).portr("IN2");
 	map(0x01600030, 0x0160003f).portr("DSW");
 	map(0x01800000, 0x0187ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x01a80000, 0x01a800ff).rw(FUNC(midtunit_state::midtunit_dma_r), FUNC(midtunit_state::midtunit_dma_w));
-	map(0x01b00000, 0x01b0001f).w(FUNC(midtunit_state::midtunit_control_w));
+	map(0x01a80000, 0x01a800ff).rw(m_video, FUNC(midtunit_video_device::midtunit_dma_r), FUNC(midtunit_video_device::midtunit_dma_w));
+	map(0x01b00000, 0x01b0001f).w(m_video, FUNC(midtunit_video_device::midtunit_control_w));
 /*  AM_RANGE(0x01c00060, 0x01c0007f) AM_WRITE(midtunit_cmos_enable_w) */
 	map(0x01d00000, 0x01d0001f).r(FUNC(midtunit_state::midtunit_sound_state_r));
 	map(0x01d01020, 0x01d0103f).rw(FUNC(midtunit_state::midtunit_sound_r), FUNC(midtunit_state::midtunit_sound_w));
 	map(0x01d81060, 0x01d8107f).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x01f00000, 0x01f0001f).w(FUNC(midtunit_state::midtunit_control_w));
-	map(0x02000000, 0x07ffffff).r(FUNC(midtunit_state::midtunit_gfxrom_r)).share("gfxrom");
+	map(0x01f00000, 0x01f0001f).w(m_video, FUNC(midtunit_video_device::midtunit_control_w));
+	map(0x02000000, 0x07ffffff).r(m_video, FUNC(midtunit_video_device::midtunit_gfxrom_r)).share("gfxrom");
 	map(0x1f800000, 0x1fffffff).rom().region("maincpu", 0); /* mirror used by MK */
 	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
@@ -591,53 +591,52 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midtunit_state::tunit_core)
+void midtunit_state::tunit_core(machine_config &config)
+{
+	MIDTUNIT_VIDEO(config, m_video, m_maincpu, m_palette, m_gfxrom);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(midtunit_state, scanline_update)       /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midtunit_state::main_map);
+	m_maincpu->set_halt_on_reset(false);	 /* halt on reset */
+	m_maincpu->set_pixel_clock(PIXEL_CLOCK); /* pixel clock */
+	m_maincpu->set_pixels_per_clock(2);		 /* pixels per clock */
+	m_maincpu->set_scanline_ind16_callback("video", FUNC(midtunit_video_device::scanline_update));	/* scanline updater (indexed16) */
+	m_maincpu->set_shiftreg_in_callback("video", FUNC(midtunit_video_device::to_shiftreg));			/* write to shiftreg function */
+	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));		/* read from shiftreg function */
 
-	MCFG_MACHINE_RESET_OVERRIDE(midtunit_state,midtunit)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// from TMS340 registers
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 506, 100, 500, 289, 20, 274)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(midtunit_state,midtunit)
-MACHINE_CONFIG_END
+	screen.set_raw(PIXEL_CLOCK * 2, 506, 100, 500, 289, 20, 274);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
+}
 
 
-MACHINE_CONFIG_START(midtunit_state::tunit_adpcm)
+void midtunit_state::tunit_adpcm(machine_config &config)
+{
 	tunit_core(config);
 
 	/* basic machine hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	WILLIAMS_ADPCM_SOUND(config, m_adpcm_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(midtunit_state::tunit_dcs)
+void midtunit_state::tunit_dcs(machine_config &config)
+{
 	tunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
-MACHINE_CONFIG_END
+	DCS_AUDIO_2K(config, m_dcs, 0);
+}
 
 
 

@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 
-	MCFG_K7659_KEYBOARD_ADD()
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

@@ -945,8 +945,8 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 
 	MCFG_TIMER_DRIVER_ADD("adsp_timer", gaelco3d_state, adsp_autobuffer_irq)
 
-	MCFG_DEVICE_ADD(m_serial, GAELCO_SERIAL, 0)
-	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(*this, gaelco3d_state, ser_irq))
+	GAELCO_SERIAL(config, m_serial, 0);
+	m_serial->irq_handler().set(FUNC(gaelco3d_state::ser_irq));
 
 	LS259(config, m_mainlatch); // IC5 on bottom board next to EEPROM
 	m_mainlatch->q_out_cb<0>().set(m_serial, FUNC(gaelco_serial_device::tr_w));

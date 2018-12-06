@@ -19,7 +19,7 @@
   VSync = 57.4434Hz
 
 TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
-	reference: https://youtu.be/6azneK6uUnA
+    reference: https://youtu.be/6azneK6uUnA
 
 ***************************************************************************/
 

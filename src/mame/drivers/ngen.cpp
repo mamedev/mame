@@ -65,6 +65,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
 #include "machine/clock.h"

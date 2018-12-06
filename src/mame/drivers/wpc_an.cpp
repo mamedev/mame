@@ -346,24 +346,26 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 	config.set_default_layout(layout_wpc_an);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an)
+void wpc_an_state::wpc_an(machine_config &config)
+{
 	wpc_an_base(config);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
-	MCFG_WPC_ROM_REGION("sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_an_state,wpcsnd_reply_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	WPCSND(config, m_wpcsnd);
+	m_wpcsnd->set_romregion("sound1");
+	m_wpcsnd->reply_callback().set(FUNC(wpc_an_state::wpcsnd_reply_w));
+	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
+void wpc_an_state::wpc_an_dd(machine_config &config)
+{
 	wpc_an_base(config);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("bg", S11C_BG)
-	MCFG_S11C_BG_ROM_REGION(":sound1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	S11C_BG(config, m_bg);
+	m_bg->set_romregion("sound1");
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /*-----------------
 /  Dr. Dude #2016

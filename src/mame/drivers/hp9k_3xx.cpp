@@ -342,11 +342,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 
 	add_dio16_bus(config);
 
-	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", false);
+	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
 	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
 	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
-	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
-	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98643", false);
+	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, "98644", false);
+	DIO16_SLOT(config, "sl5", 0, "diobus", dio16_cards, nullptr, false);
 
 MACHINE_CONFIG_END
 
@@ -363,7 +364,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98644", false);
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
 	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, "98265a", false);
-	DIO32_SLOT(config, "sl6", 0, "diobus", dio32_cards, nullptr, false);
+	DIO32_SLOT(config, "sl7", 0, "diobus", dio32_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
@@ -403,29 +404,40 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k360)
-	hp9k320(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 25000000)
+	hp9k300(config);
+
+	MCFG_DEVICE_ADD(m_maincpu, M68030, 25000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k360_map)
+
+	add_dio32_bus(config);
+
+	DIO32_SLOT(config, "sl0", 0, "diobus", dio32_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio32_cards, "98550", false);
+	DIO32_SLOT(config, "sl2", 0, "diobus", dio32_cards, "98644", false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98620", false);
+	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98265a", false);
+	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, nullptr, false);
+
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k370)
-	hp9k320(config);
+	hp9k360(config);
 
 	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 33000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k370_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k380)
-	hp9k320(config);
+	hp9k360(config);
 
 	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k380_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k382)
-	hp9k320(config);
+	hp9k360(config);
 
 	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k382_map)

@@ -1390,9 +1390,9 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(a7800_palette))
 	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800)
 
-	MCFG_DEVICE_ADD("maria", ATARI_MARIA, 0)
-	MCFG_MARIA_DMACPU("maincpu")
-	MCFG_MARIA_SCREEN("screen")
+	ATARI_MARIA(config, m_maria, 0);
+	m_maria->set_dmacpu_tag(m_maincpu);
+	m_maria->set_screen_tag(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

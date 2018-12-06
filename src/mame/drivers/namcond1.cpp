@@ -381,11 +381,11 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ygv608", YGV608, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
-	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	YGV608(config, m_ygv608, 0);
+	m_ygv608->set_palette("palette");
+	m_ygv608->vblank_callback().set(FUNC(namcond1_state::vblank_irq_w));
+	m_ygv608->raster_callback().set(FUNC(namcond1_state::raster_irq_w));
+	m_ygv608->set_screen("screen");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

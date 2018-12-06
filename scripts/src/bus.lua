@@ -920,6 +920,8 @@ if (BUSES["HPDIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98603b.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98620.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98620.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98643.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98643.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/human_interface.cpp",
@@ -996,6 +998,14 @@ if (BUSES["IEEE488"]~=null) then
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/ieee488/hp9122c.cpp", GEN_DIR .. "emu/layout/hp9122c.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "hp9122c"),
 	}
 end
 
@@ -3462,6 +3472,8 @@ if (BUSES["HP9845_IO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp9845_io/hp9845_io.cpp",
 		MAME_DIR .. "src/devices/bus/hp9845_io/hp9845_io.h",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98032.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98032.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98034.cpp",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98034.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp",

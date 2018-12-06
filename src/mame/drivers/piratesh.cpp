@@ -632,23 +632,22 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
 	MCFG_K053250PS_ADD("k053250", "palette", "screen", -16, 0)
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(piratesh_state, piratesh_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_PS, -60, 24);
+	m_k055673->set_palette("palette");
 
 	// ????
-	//MCFG_DEVICE_ADD("k053246", K053246, 0)
-	//MCFG_K053246_CB(moo_state, sprite_callback)
-	//MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	//MCFG_K053246_PALETTE("palette")
+	//K053246(config, m_k053246, 0);
+	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	//m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	//m_k053246->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

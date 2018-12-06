@@ -220,8 +220,8 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cchance)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
+	MCFG_PALETTE_INIT_OWNER(cchance_state, prompalette)
 
 	SPEAKER(config, "mono").front_center();
 

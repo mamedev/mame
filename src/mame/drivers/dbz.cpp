@@ -359,20 +359,20 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(dbz_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -87, 32) // or -52, 16?
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(dbz_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -87, 32); // or -52, 16?
+	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k053936_1", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-46, -16)
+	K053936(config, m_k053936_1, 0);
+	m_k053936_1->set_wrap(1);
+	m_k053936_1->set_offsets(-46, -16);
 
-	MCFG_DEVICE_ADD("k053936_2", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-46, -16)
+	K053936(config, m_k053936_2, 0);
+	m_k053936_2->set_wrap(1);
+	m_k053936_2->set_offsets(-46, -16);
 
 	K053252(config, m_k053252, 16000000/2);
 	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));

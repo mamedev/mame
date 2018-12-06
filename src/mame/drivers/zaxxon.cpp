@@ -1011,7 +1011,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
-	MCFG_DEVICE_REMOVE("ppi8255")
+	config.device_remove("ppi8255");
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,razmataz)
@@ -1020,7 +1020,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_SEGAUSBROM_ADD("usbsnd", "maincpu")
+	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::ixion)

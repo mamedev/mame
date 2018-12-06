@@ -417,6 +417,7 @@
 #include "bus/sbus/sbus.h"
 #include "bus/sbus/bwtwo.h"
 #include "cpu/sparc/sparc.h"
+#include "imagedev/floppy.h"
 #include "machine/am79c90.h"
 #include "machine/bankdev.h"
 #include "machine/ncr5390.h"

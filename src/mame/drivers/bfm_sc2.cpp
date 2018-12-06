@@ -2292,7 +2292,7 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
 	config.set_default_layout(layout_sc2_vid);
 
-	MCFG_BFM_ADDER2_ADD("adder2")
+	BFM_ADDER2(config, "adder2", 0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd", UPD7759)

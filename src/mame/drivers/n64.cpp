@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(n64_mess_state::n64)
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_N64_PERIPHS_ADD("rcp");
+	N64PERIPH(config, "rcp", 0);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "n64_cart")

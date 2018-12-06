@@ -51,6 +51,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/msm5832.h"
 #include "machine/timer.h"

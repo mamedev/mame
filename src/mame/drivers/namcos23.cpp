@@ -130,7 +130,8 @@ Final Furlong 2   Namco, 1998    Super System 23
 *Guitar Jam       Namco, 1999    Super System 23
 Crisis Zone       Namco, 1999    System 23 Evolution 2
 
-* - Guitar Jam is not dumped yet and the hardware type is not confirmed. It might not be on System 23 hardware.
+* - Guitar Jam is not dumped yet and the hardware type is not confirmed.
+    According to Bandai Namco's website it is indeed SS23, and includes an extra sound board with Zoom Corp. DSP.
 
 A System 23 unit is comprised of some of the following pieces....
 - V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out
@@ -3621,7 +3622,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
@@ -3689,7 +3690,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
@@ -3770,7 +3771,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));

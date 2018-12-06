@@ -149,6 +149,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/hphybrid/hphybrid.h"
+#include "imagedev/floppy.h"
 #include "machine/74123.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"

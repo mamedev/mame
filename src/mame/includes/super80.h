@@ -9,6 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
 #include "machine/timer.h"

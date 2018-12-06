@@ -48,6 +48,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"

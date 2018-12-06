@@ -271,15 +271,15 @@ MACHINE_CONFIG_START(rollerg_state::rollerg)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(-3, -1)
-	MCFG_K05324X_CB(rollerg_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette("palette");
+	m_k053244->set_offsets(-3, -1);
+	m_k053244->set_sprite_callback(FUNC(rollerg_state::sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(22, 1)
-	MCFG_K051316_CB(rollerg_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette("palette");
+	m_k051316->set_offsets(22, 1);
+	m_k051316->set_zoom_callback(FUNC(rollerg_state::zoom_callback), this);
 
 	K053252(config, m_k053252, 3000000*2);
 	m_k053252->int1_ack().set(FUNC(rollerg_state::rollerg_irq_ack_w));

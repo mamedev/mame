@@ -1,40 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
-/*****************************************************************************
-
-    AMD Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE)
-
-    TODO:
-        - Error handling
-
-******************************************************************************
-                            _____   _____
-                   Vss   1 |*    \_/     | 48  Vdd
-                  DAL7   2 |             | 47  DAL8
-                  DAL6   3 |             | 46  DAL9
-                  DAL5   4 |             | 45  DAL10
-                  DAL4   5 |             | 44  DAL11
-                  DAL3   6 |             | 43  DAL12
-                  DAL2   7 |             | 42  DAL13
-                  DAL1   8 |             | 41  DAL14
-                  DAL0   9 |             | 40  DAL15
-                  READ  10 |             | 39  A16
-                 /INTR  11 |             | 38  A17
-                 /DALI  12 |   Am79C90   | 37  A18
-                 /DALI  13 |             | 36  A19
-                  /DAS  14 |             | 35  A20
-             /BM0,BYTE  15 |             | 34  A21
-          /BM1,/BUSAKO  16 |             | 33  A22
-          /HOLD,/BUSRQ  17 |             | 32  A23
-               ALE,/AS  18 |             | 31  RX
-                 /HLDA  19 |             | 30  RENA
-                   /CS  20 |             | 29  TX
-                   ADR  21 |             | 28  CLSN
-                /READY  22 |             | 27  RCLK
-                /RESET  23 |             | 26  TENA
-                   Vss  24 |_____________| 25  TCLK
-
-**********************************************************************/
+// copyright-holders:Patrick Mackinlay
 
 #ifndef MAME_MACHINE_AM79C90_H
 #define MAME_MACHINE_AM79C90_H
@@ -76,6 +41,8 @@ protected:
 	void dma_in(u32 address, u8 *buf, int length);
 	void dma_out(u32 address, u8 *buf, int length);
 	void dump_bytes(u8 *buf, int length);
+
+	virtual int get_buf_length(u16 data) const = 0;
 
 	// constants and masks
 	static constexpr u32 FCS_RESIDUE = 0xdebb20e3;
@@ -196,6 +163,7 @@ private:
 
 	emu_timer *m_transmit_poll;
 	int m_intr_out_state;
+	bool m_idon;
 
 	// internal loopback buffer
 	u8 m_lb_buf[36];
@@ -206,12 +174,18 @@ class am7990_device : public am7990_device_base
 {
 public:
 	am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual int get_buf_length(u16 data) const override { return (data == 0xf000) ? 4096 : -s16(0xf000 | data); }
 };
 
 class am79c90_device : public am7990_device_base
 {
 public:
 	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual int get_buf_length(u16 data) const override { return data ? ((data == 0xf000) ? 4096 : -s16(0xf000 | data)) : 0; }
 };
 
 DECLARE_DEVICE_TYPE(AM7990, am7990_device)

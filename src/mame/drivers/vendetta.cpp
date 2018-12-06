@@ -459,18 +459,18 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(vendetta_state, vendetta_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(vendetta_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, 6)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, 6);
+	m_k053246->set_palette(m_palette);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -498,12 +498,11 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	MCFG_DEVICE_REMOVE("k054000")
 	MCFG_DEVICE_REMOVE("k052109")
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(vendetta_state, esckids_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback), this);
 
-	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 101, 6);
 
 	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
 MACHINE_CONFIG_END

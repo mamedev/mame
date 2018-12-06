@@ -1118,7 +1118,7 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_adder2)
 
 	config.set_default_layout(layout_sc1_vid);
 
-	MCFG_BFM_ADDER2_ADD("adder2")
+	BFM_ADDER2(config, "adder2", 0);
 MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////

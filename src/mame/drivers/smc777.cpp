@@ -21,7 +21,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"

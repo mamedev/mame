@@ -18,6 +18,7 @@
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/adc0844.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"

@@ -2208,10 +2208,11 @@ void pc9801_atapi_devices(device_slot_interface &device)
 	device.option_add("pc9801_cd", PC9801_CD);
 }
 
-MACHINE_CONFIG_START(pc9801_state::pc9801_keyboard)
-	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
-	MCFG_PC9801_KBD_IRQ_CALLBACK(WRITELINE("pic8259_master", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void pc9801_state::pc9801_keyboard(machine_config &config)
+{
+	PC9801_KBD(config, m_keyb, 53);
+	m_keyb->irq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
+}
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_mouse)
 	i8255_device &ppi_mouse(I8255(config, "ppi8255_mouse"));

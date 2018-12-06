@@ -41,6 +41,7 @@
 
 #include "emu.h"
 #include "includes/badlands.h"
+#include "emupal.h"
 
 uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

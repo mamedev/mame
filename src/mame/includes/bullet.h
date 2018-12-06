@@ -7,8 +7,9 @@
 
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/ram.h"
 #include "bus/scsi/scsi.h"
+#include "imagedev/floppy.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"

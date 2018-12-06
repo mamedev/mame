@@ -761,12 +761,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tickee_state::tickee)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tickee_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::tickee_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::scanline_update));
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -810,14 +810,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(rapidfir_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, rapidfir_scanline_update)       /* scanline callback (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(tickee_state, rapidfir_to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(tickee_state, rapidfir_from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, XTAL(50'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::rapidfir_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::rapidfir_scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(tickee_state::rapidfir_to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(tickee_state::rapidfir_from_shiftreg));
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,rapidfir)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -844,12 +844,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tickee_state::mouseatk)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mouseatk_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::mouseatk_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::scanline_update));
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

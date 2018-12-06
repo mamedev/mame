@@ -2922,7 +2922,8 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
+	POWERVR2(config, m_powervr2, 0);
+	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2957,7 +2958,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
-	MCFG_M3COMM_ADD("comm_board")
+	M3COMM(config, "comm_board", 0);
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -3042,11 +3043,13 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2_base)
-	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(*this, dc_state, pvr_irq))
+void naomi2_state::naomi2_base(machine_config &config)
+{
+	POWERVR2(config, m_powervr2_slave, 0);
+	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	// TODO: ELAN device
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(naomi2_state::naomi2gd)
 	naomigd(config);

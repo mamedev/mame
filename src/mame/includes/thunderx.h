@@ -8,7 +8,7 @@
 #ifndef MAME_INCLUDES_THUNDERX_H
 #define MAME_INCLUDES_THUNDERX_H
 
-#pragma ocne
+#pragma once
 
 #include "cpu/m6809/konami.h"
 #include "machine/bankdev.h"

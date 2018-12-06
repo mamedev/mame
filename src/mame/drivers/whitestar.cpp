@@ -120,7 +120,7 @@ MACHINE_CONFIG_START(whitestar_state::whitestar)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(whitestar_state, whitestar_firq_interrupt,  976) // value taken from PinMAME
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 
 	MCFG_DECODMD_TYPE2_ADD("decodmd",":dmdcpu")
 MACHINE_CONFIG_END

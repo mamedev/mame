@@ -305,14 +305,14 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_DEVICE_PROGRAM_MAP(hostmem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
 
-	MCFG_DEVICE_ADD("vgb", TMS34010, 40_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(vgbmem)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(40_MHz_XTAL / 8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, micro3d_state, tms_interrupt))
+	TMS34010(config, m_vgb, 40_MHz_XTAL);
+	m_vgb->set_addrmap(AS_PROGRAM, &micro3d_state::vgbmem);
+	m_vgb->set_halt_on_reset(false);
+	m_vgb->set_pixel_clock(40_MHz_XTAL / 8);
+	m_vgb->set_pixels_per_clock(4);
+	m_vgb->set_scanline_ind16_callback(FUNC(micro3d_state::scanline_update));
+	m_vgb->output_int().set(FUNC(micro3d_state::tms_interrupt));
+	m_vgb->set_screen("screen");
 
 	MCFG_DEVICE_ADD("drmath", AM29000, 32_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)

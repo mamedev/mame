@@ -26,6 +26,7 @@
 #include "bus/wangpc/wangpc.h"
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"

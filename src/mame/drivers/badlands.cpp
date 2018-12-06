@@ -165,7 +165,7 @@ Measurements -
 
 #include "emu.h"
 #include "includes/badlands.h"
-
+#include "emupal.h"
 
 
 /*************************************

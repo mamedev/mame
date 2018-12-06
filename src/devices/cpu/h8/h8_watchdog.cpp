@@ -67,9 +67,11 @@ void h8_watchdog_device::tcnt_update(uint64_t cur_time)
 
 READ16_MEMBER(h8_watchdog_device::wd_r)
 {
-	tcnt_update();
-
-	logerror("read\n");
+	if (!machine().side_effects_disabled())
+	{
+		tcnt_update();
+		logerror("read\n");
+	}
 	return 0;
 }
 
@@ -99,7 +101,8 @@ WRITE16_MEMBER(h8_watchdog_device::wd_w)
 
 READ16_MEMBER(h8_watchdog_device::rst_r)
 {
-	logerror("rst_r\n");
+	if (!machine().side_effects_disabled())
+		logerror("rst_r\n");
 	return 0;
 }
 

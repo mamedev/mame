@@ -14,7 +14,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"

@@ -690,7 +690,9 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(31, 15);
 
 	MCFG_DEVICE_ADD("spriteram16", BUFFERED_SPRITERAM16)
 
@@ -706,8 +708,6 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(twincobr_state,toaplan0)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -722,23 +722,23 @@ MACHINE_CONFIG_START(twincobr_state::twincobrw)
 	MCFG_DEVICE_CLOCK(XTAL(10'000'000)) /* The export versions have a dedicated OSC for the M68000 on the top right of the board */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(twincobr_state::fshark)
+void twincobr_state::fshark(machine_config &config)
+{
 	twincobr(config);
 	m_mainlatch->q_out_cb<6>().set_nop();
 	m_coinlatch->q_out_cb<0>().set(FUNC(twincobr_state::dsp_int_w));
 
-	MCFG_DEVICE_MODIFY("scu")
-	MCFG_TOAPLAN_SCU_SET_XOFFSETS(32, 14)
-MACHINE_CONFIG_END
+	m_spritegen->set_xoffsets(32, 14);
+}
 
 
-MACHINE_CONFIG_START(twincobr_state::fsharkbt)
+void twincobr_state::fsharkbt(machine_config &config)
+{
 	fshark(config);
 
-	MCFG_DEVICE_ADD("mcu", I8741, XTAL(28'000'000)/16)
+	I8741(config, "mcu", XTAL(28'000'000)/16).set_disable();  /* Internal program code is not dumped */
 	/* Program Map is internal to the CPU */
-	MCFG_DEVICE_DISABLE()       /* Internal program code is not dumped */
-MACHINE_CONFIG_END
+}
 
 
 

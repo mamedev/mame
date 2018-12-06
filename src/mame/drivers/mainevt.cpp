@@ -448,14 +448,14 @@ MACHINE_CONFIG_START(mainevt_state::mainevt)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(mainevt_state, mainevt_tile_callback)
+	K052109(config, m_k052109, 24_MHz_XTAL);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(mainevt_state::mainevt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
+	K051960(config, m_k051960, 24_MHz_XTAL);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(mainevt_state::mainevt_sprite_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -497,16 +497,16 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(mainevt_state, dv_tile_callback)
+	K052109(config, m_k052109, 24_MHz_XTAL);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(mainevt_state::dv_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(mainevt_state, dv_sprite_callback)
+	K051960(config, m_k051960, 24_MHz_XTAL);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(mainevt_state::dv_sprite_callback), this);
 
-	MCFG_K051733_ADD("k051733")
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

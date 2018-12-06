@@ -1326,9 +1326,9 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_DEVICE_ADD("bsprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("ysprites", SEGA_YBOARD_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_bsprites, 0);
+	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
 	MCFG_PALETTE_ADD("palette", 8192*3)
 

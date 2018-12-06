@@ -2,22 +2,22 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
-	SGI Octane workstation skeleton driver
+    SGI Octane workstation skeleton driver
 
-	To Do: Everything
+    To Do: Everything
 
-	Memory map:
-	1fc00000 - 1fc7ffff      Boot ROM
+    Memory map:
+    1fc00000 - 1fc7ffff      Boot ROM
 
 **********************************************************************/
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_ALL			(LOG_UNKNOWN)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_ALL         (LOG_UNKNOWN)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 class octane_state : public driver_device
@@ -48,7 +48,7 @@ INPUT_PORTS_END
 void octane_state::octane(machine_config &config)
 {
 	R5000BE(config, m_maincpu, 50000000*4); // NOTE: Wrong - should be R10000BE!
-	m_maincpu->set_icache_size(32768);		// Unknown CPU cache size
+	m_maincpu->set_icache_size(32768);      // Unknown CPU cache size
 	m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &octane_state::mem_map);
 }

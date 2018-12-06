@@ -41,6 +41,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
@@ -893,7 +894,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
- 
+
 
 	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));

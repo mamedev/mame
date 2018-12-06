@@ -402,9 +402,9 @@ MACHINE_CONFIG_START(megaphx_state::megaphx)
 	m_ppi->in_pc_callback().set(FUNC(megaphx_state::ppi_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
 
-	MCFG_INDER_VIDEO_ADD("inder_vid")
+	INDER_VIDEO(config, m_indervid, 0);
 
-	MCFG_INDER_AUDIO_ADD("inder_sb")
+	INDER_AUDIO(config, "inder_sb", 0);
 MACHINE_CONFIG_END
 
 void megaphx_state::init_megaphx()

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Graves, R. Belmont
+// copyright-holders:David Graves, R. Belmont, David Haywood
 /***************************************************************************
 
 Excellent System's ES-9209B Hardware
@@ -26,8 +26,7 @@ TODO
  - Modernize ES-8712 and hook up to MSM6585 and HCT157
  - Figure out which customs use D80010-D80077 and merge implementation with Aquarium
  - Is SW3 actually used?
- - Missing row scroll (column scroll?)
-   Reference video showing effect: https://www.youtube.com/watch?v=zBGjncVsSf4
+ - Power Flipper reference video: https://www.youtube.com/watch?v=zBGjncVsSf4 (seems to have been recorded with 'flipscreen' dipswitch on, because it causes a jumping glitch before the raster effect, same in MAME)
 
 BGMs (controlled by OKI MSM6585 sound chip)
   MSM6585: is an upgraded MSM5205 voice synth IC.
@@ -93,26 +92,19 @@ NOTE: Mask ROMs from Power Flipper Pinball Shooting have not been dumped, but as
                       INTERRUPTS
 ***********************************************************/
 
-void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(gcpinbal_state::scanline_cb)
 {
-	switch (id)
-	{
-	case TIMER_GCPINBAL_INTERRUPT1:
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in gcpinbal_state::device_timer");
-	}
+	
+	if (param>=16)
+		m_screen->update_partial(m_screen->vpos()-1);
+
+	if (param==240)
+		m_maincpu->set_input_line(1, HOLD_LINE); // V-blank
+	else if ((param>=16) && (param<240))
+		m_maincpu->set_input_line(4, HOLD_LINE); // H-blank? (or programmable, used for raster effects)
+
+	// IRQ level 3 is sound related, hooked up to MSM6585
 }
-
-INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
-{
-	/* Unsure of actual sequence */
-
-	m_int1_timer->adjust(m_maincpu->cycles_to_attotime(500));
-	device.execute().set_input_line(4, HOLD_LINE);
-}
-
 
 /***********************************************************
                           IOC
@@ -338,8 +330,6 @@ GFXDECODE_END
 
 void gcpinbal_state::machine_start()
 {
-	m_int1_timer = timer_alloc(TIMER_GCPINBAL_INTERRUPT1);
-
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_bg0_gfxset));
@@ -367,7 +357,8 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
+	
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gcpinbal_state, scanline_cb, "screen", 0, 1)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

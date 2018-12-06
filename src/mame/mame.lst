@@ -1044,6 +1044,9 @@ alien                           // (c) 2005 Capcom
 pingu                           // (c) 2006 The Pygos Group / Capcom
 dkbanana                        // (c) 2007 Capcom
 dkbanans                        // (c) 2007 Capcom
+dokodemo                        // (c) 2006 Capcom
+masmario                        // (c) 2005 Capcom
+wontame                         // (c) 2008 Capcom
 
 @source:aliens.cpp
 aliens                          // GX875 (c) 1990 (World)
@@ -2770,10 +2773,12 @@ toggle                          // (c) 1985
 trivia12                        // (c) 1984
 triviabb                        // (c) 1984
 triviaes                        // (c) 1984
+triviaes2                       // (c) 1984
 triviag1                        // (c) 1984
 triviag2                        // (c) 1984
 triviasp                        // (c) 1984
 triviayp                        // (c) 1984
+triviaes4                       // (c) 1988 (Maibesa hardware)
 
 @source:banctec.cpp
 banctec                         // BancTec ESeries panel
@@ -10269,6 +10274,7 @@ sf2rb                           // hack
 sf2rb2                          // hack
 sf2rb3                          // hack
 sf2red                          // hack
+sf2redp2                        // hack
 sf2rk                           // bootleg
 sf2rules                        // bootleg
 sf2stt                          // bootleg
@@ -11708,6 +11714,7 @@ rolcrusha                       // (c) 1999 SemiCom
 
 @source:drgnmst.cpp
 drgnmst                         // (c) 1994
+drgnmst2                        // (c) 1994
 
 @source:dribling.cpp
 dribling                        // (c) 1983 Model Racing
@@ -12392,6 +12399,9 @@ ep128                           // Enterprise 128
 ep64                            // Enterprise 64
 phc64                           // Hegener & Glaser Mephisto PHC 64
 
+@source:epic14e.cpp
+epic14e                         //
+
 @source:epos.cpp
 catapult                        // (c) 1982
 dealer                          // (c) 198?
@@ -12677,6 +12687,7 @@ falco5220e                      // 1987
 falco5220s                      // 1989
 
 @source:falcots.cpp
+ts1                             // 1980
 ts2624                          // 1982
 
 @source:famibox.cpp
@@ -12926,6 +12937,9 @@ hotmindff                       // (c) Playmark
 @source:fk1.cpp
 fk1                             //
 
+@source:flashbeats.cpp
+flsbeats                        // 1998 Sega
+
 @source:flicker.cpp
 flicker                         //
 
@@ -13044,6 +13058,9 @@ nmsengen                        // (c) 1991 Video System (Japan)
 @source:fruitpc.cpp
 fruitpc                         // ???
 gogostrk                        //
+
+@source:fs3216.cpp
+fs3216                          //
 
 @source:ft68m.cpp
 ft68m                           //
@@ -13206,6 +13223,7 @@ maniacsq                        // (c) 1996 - Ref 940411
 maniacsqa                       // (c) 1996 - Ref 940411
 maniacsqu                       // (c) 1996 - Ref 940411 - (unprotected)
 maniacsqs                       // (c) 1996 - Ref 960419/1
+saltcrdi						// (c) 1997 - Ref 970410
 snowboar                        // (c) 1996 - Ref 960419/1
 snowboara                       // (c) 1996 - Ref 960419/1
 touchgo                         // (c) 1995 - Ref 950906
@@ -13346,6 +13364,7 @@ froggers2                       // 834-0068 (c) 1981 Sega
 froggers3                       //
 froggrs                         //
 froggervd                       // Video Dens
+fourplay                        // multigame
 galap1                          // hack
 galap4                          // hack
 galapx                          // hack
@@ -13494,6 +13513,7 @@ uniwars                         // (c) Irem
 uniwarsa                        // (c) Karateco
 victoryc                        // (c) Comsoft
 victorycb                       // (c) Comsoft (bootleg)
+videight                        // multigame
 warofbug                        // (c) 1981 Armenia
 warofbugg                       // German Version
 warofbugu                       // (c) 1981 Armenia
@@ -14967,6 +14987,7 @@ uspbball                        // US Games
 @source:hh_sm510.cpp
 exospace                        // Elektronika
 gnw_boxing                      // Nintendo
+gnw_climber                     // Nintendo
 gnw_dkjr                        // Nintendo
 gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
@@ -14976,6 +14997,7 @@ gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
 gnw_mmouse                      // Nintendo
 gnw_mickdon                     // Nintendo
+gnw_opanic                      // Nintendo
 gnw_smb                         // Nintendo
 gnw_tfish                       // Nintendo
 kbilly                          // Konami
@@ -15301,6 +15323,9 @@ hp2622a                         //
 @source:hp2640.cpp
 hp2645                          //
 
+@source:hp3478a.cpp
+hp3478a                         //
+
 @source:hp48.cpp
 hp38g                           //
 hp39g                           //
@@ -15320,6 +15345,9 @@ hp64k                           //
 @source:hp700.cpp
 hp700_70                        //
 hp700_92                        //
+
+@source:hp95lx.cpp
+hp95lx                          //
 
 @source:hp9825.cpp
 hp9825b                         // HP 9825B
@@ -15560,6 +15588,9 @@ stellecu                        // (c) 1998
 farmer                          // TVG17 (c) 1985 Sun Electronics
 ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 
+@source:ikt5a.cpp
+ikt5a                           //
+
 @source:imds2.cpp
 imds2                           // Intellec MDS series-II
 
@@ -15585,6 +15616,7 @@ pinmoonl                        //
 @source:inderp.cpp
 centauri
 centauri2
+skatebrd
 topaz
 
 @source:indiana.cpp
@@ -17649,11 +17681,13 @@ kissp2                          //
 
 @source:klax.cpp
 klax                            // 136075           (c) 1989
-klax2                           // 136075           (c) 1989
-klax2bl                         // bootleg
-klax3                           // 136075           (c) 1989
-klaxd                           // 136075           (c) 1989 (Germany)
-klaxj                           // 136075           (c) 1989 (Japan)
+klax4                           // 136075           (c) 1989
+klax5                           // 136075           (c) 1989
+klax5bl                         // bootleg
+klax5bl2                        // bootleg
+klaxd2                          // 136075           (c) 1989 (Germany)
+klaxj3                          // 136075           (c) 1989 (Japan)
+klaxj4                          // 136075           (c) 1989 (Japan)
 
 @source:kncljoe.cpp
 bcrusher                        // bootleg
@@ -21469,6 +21503,8 @@ minivadr                        // D26 cabinet test board
 @source:mips.cpp
 rc2030                          // MIPS RC2030
 rs2030                          // MIPS RS2030
+rc3230                          // MIPS RC3230
+rs3230                          // MIPS RS3230
 
 @source:mirage.cpp
 mirage                          // (c) 1994 Mitchell
@@ -29840,11 +29876,15 @@ nc150                           // 1992 NC150
 nc200                           // 1993 NC200
 
 @source:ncd17c.cpp
+ncd16                           // 1989 Network Computing Devices
 ncd17c                          // 1990 Network Computing Devices
 ncd19                           // 1990 Network Computing Devices
 
 @source:ncdmips.cpp
 hmxpro                          // 1994 Network Computing Devices
+
+@source:ncdppc.cpp
+explorapro                      // 1995 Network Computing Devices
 
 @source:nds.cpp
 nds                             // 2004 Nintendo
@@ -31642,6 +31682,7 @@ pex2121p                        // (c) 1995 IGT - International Game Technology
 pex2121pa                       // (c) 1995 IGT - International Game Technology
 pex2127p                        // (c) 1995 IGT - International Game Technology
 pex2134p                        // (c) 1995 IGT - International Game Technology
+pex2143p                        // (c) 1995 IGT - International Game Technology
 pex2149p                        // (c) 1995 IGT - International Game Technology
 pex2150p                        // (c) 1995 IGT - International Game Technology
 pex2152p                        // (c) 1995 IGT - International Game Technology
@@ -33333,6 +33374,10 @@ rt1715w                         //
 @source:runaway.cpp
 qwak                            // (proto)          (c) 1982
 runaway                         // (proto)          (c) 1982
+
+@source:rulechan.cpp
+rulechan                        // 1992 ElectroChance
+rulechab                        // 1992 ElectroChance
 
 @source:rungun.cpp
 rungun                          // GX247 (c) 1993 (World)
@@ -35091,6 +35136,9 @@ kicker                          // GX477 (c) 1985
 shaolinb                        // bootleg
 shaolins                        // GX477 (c) 1985
 
+@source:shine.cpp
+shine                           // 1983 Shine/1
+
 @source:shisen.cpp
 matchit                         // (c) 1989 Tamtex
 shisen                          // (c) 1989 Tamtex
@@ -35785,6 +35833,7 @@ cairblad                        // (c) 1999 Sammy
 drifto94                        // (c) 1994 Visco
 dynagear                        // (c) 1993 Sammy
 eaglshot                        // (c) 1994 Sammy
+eaglshotj                       // (c) 1994 Sammy
 gdfs                            // (c) 1995 Banpresto
 hypreac2                        // (c) 1997 Sammy
 hypreact                        // (c) 1995 Sammy
@@ -37120,7 +37169,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 7951om                          //
 alcat258                        //
 feap90                          //
-ikt5a                           //
 itt9216                         //
 loewe715                        //
 loewed                          //
@@ -39907,10 +39955,11 @@ sfex2                           // Street Fighter EX 2 (USA 980526)
 sfex2a                          // Street Fighter EX 2 (ASIA 980312)
 sfex2h                          // Street Fighter EX 2 (HISPANIC 980312)
 sfex2j                          // Street Fighter EX 2 (JAPAN 980312)
-sfex2p                          // Street Fighter EX 2 Plus (USA 990611)
+sfex2p                          // Street Fighter EX 2 Plus (EURO 990611)
 sfex2pa                         // Street Fighter EX 2 Plus (ASIA 990611)
 sfex2ph                         // Street Fighter EX 2 Plus (HISPANIC 990611)
 sfex2pj                         // Street Fighter EX 2 Plus (JAPAN 990611)
+sfex2pu                         // Street Fighter EX 2 Plus (USA 990611)
 sfex2u1                         // Street Fighter EX 2 (USA 980312)
 sfexa                           // Street Fighter EX (ASIA 961219)
 sfexj                           // Street Fighter EX (JAPAN 961130)

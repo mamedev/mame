@@ -420,7 +420,9 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(32, 14);
 
 	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
 
@@ -435,8 +437,6 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -341,7 +341,7 @@ static const z80_daisy_config abc80_daisy_chain[] =
 
 
 //-------------------------------------------------
-//  ABC80_KEYBOARD_INTERFACE( kb_intf )
+//  ABC80_KEYBOARD_INTERFACE
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abc80_state::keydown_w )
@@ -522,8 +522,8 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("abc80_cass")
 
-	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0)
-	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(*this, abc80_state, keydown_w))
+	ABC80_KEYBOARD(config, m_kb, 0);
+	m_kb->keydown_wr_callback().set(FUNC(abc80_state::keydown_w));
 
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
 

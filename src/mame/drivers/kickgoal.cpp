@@ -202,7 +202,7 @@ void kickgoal_state::kickgoal_program_map(address_map &map)
 	map(0x900000, 0x90ffff).nopw(); // during startup
 	map(0x900000, 0x900005).w(FUNC(kickgoal_state::kickgoal_eeprom_w));
 	map(0x900006, 0x900007).r(FUNC(kickgoal_state::kickgoal_eeprom_r));
-	
+
 	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
 	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
 	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
@@ -361,7 +361,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
 	case 0x02: m_okibank->set_entry(1); break;
 	case 0x01: m_okibank->set_entry(3); break;
 	default: m_okibank->set_entry(2); break; // not used
-	}	
+	}
 }
 
 READ8_MEMBER(kickgoal_state::soundio_port_b_r)
@@ -422,11 +422,11 @@ WRITE16_MEMBER(kickgoal_state::to_pic_w)
 MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)  /* 4MHz ? */
 	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, kickgoal_state, soundio_port_a_w))
 	MCFG_PIC16C5x_READ_B_CB(READ8(*this, kickgoal_state, soundio_port_b_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, kickgoal_state, soundio_port_b_w))
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -504,7 +504,7 @@ MACHINE_CONFIG_END
 
 /* Rom Loading ***************************************************************/
 
-ROM_START( kickgoal )
+ROM_START( kickgoal ) /* PRO-3/B pcb */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "ic6",   0x000000, 0x40000, CRC(498ca792) SHA1(c638c3a1755870010c5961b58bcb02458ff4e238) )
 	ROM_LOAD16_BYTE( "ic5",   0x000001, 0x40000, CRC(d528740a) SHA1(d56a71004aabc839b0833a6bf383e5ef9d4948fa) )
@@ -525,7 +525,7 @@ ROM_START( kickgoal )
 	ROM_LOAD( "tch__3.tms27c040.ic13",        0x00000, 0x80000, CRC(51272b0b) SHA1(ba94385183a9d74bb1d5159d2908492bf500f31e) )
 ROM_END
 
-ROM_START( kickgoala )
+ROM_START( kickgoala ) /* PRO-3/B pcb */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "tch__2.mc27c2001.ic6",  0x000000, 0x40000, CRC(3ce2743a) SHA1(7998c476c8e630487213dd23ef4fec94a95497ca) )
 	ROM_LOAD16_BYTE( "tch__1.am27c020.ic5",   0x000001, 0x40000, CRC(d7d7f83c) SHA1(4ee66a379a0c7ecb15ee4923ac98ba28bfb1e4bd) )
@@ -547,7 +547,7 @@ ROM_START( kickgoala )
 ROM_END
 
 
-ROM_START( actionhw )
+ROM_START( actionhw ) /* PRO-3/B pcb */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "2.ic6",  0x000000, 0x80000, CRC(2b71d58c) SHA1(3e58531fa56d41a3c7944e3beab4850907564a89) )
 	ROM_LOAD16_BYTE( "1.ic5",  0x000001, 0x80000, CRC(136b9711) SHA1(553f9fdd99bb9ce2e1492d0755633075e59ba587) )

@@ -241,13 +241,13 @@ WRITE8_MEMBER(xavix_state::adc_7b80_w)
 
 WRITE8_MEMBER(xavix_state::adc_7b81_w)
 {
-//	m_irqsource &= ~0x04;
-//	update_irqs();
+//  m_irqsource &= ~0x04;
+//  update_irqs();
 
 	LOG("%s: adc_7b81_w %02x\n", machine().describe_context(), data);
 	m_adc_control = data;
 
-//	m_adc_timer->adjust(attotime::from_usec(200));
+//  m_adc_timer->adjust(attotime::from_usec(200));
 
 }
 
@@ -410,6 +410,13 @@ uint8_t xavix_i2c_state::read_io1(uint8_t direction)
 
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
+	// ignore these writes so that epo_edfx can send read requests to the ee-prom and doesn't just report an error
+	// TODO: check if these writes shouldn't be happening (the first is a direct write, the 2nd is from a port direction change)
+	//  or if the i2cmem code is oversensitive, or if something else is missing to reset the state
+	if (hackaddress1 != -1)
+		if ((m_maincpu->pc() == hackaddress1) || (m_maincpu->pc() == hackaddress2))
+			return;
+
 	if (direction & 0x08)
 	{
 		m_i2cmem->write_sda((data & 0x08) >> 3);
@@ -418,13 +425,13 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 	if (direction & 0x10)
 	{
 		m_i2cmem->write_scl((data & 0x10) >> 4);
-	}	
+	}
 }
 
 uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
 {
 	uint8_t ret = m_in1->read();
-	
+
 	// some kind of comms with the IR sensor?
 	ret ^= (machine().rand() & 0x02);
 	ret ^= (machine().rand() & 0x04);
@@ -614,7 +621,7 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 {
 	/* timer is actively used by
 	   ttv_lotr, ttv_sw, drgqst, has_wamg, rad_rh, eka_*, epo_efdx, rad_bass, rad_bb2
-	   
+
 	   gets turned on briefly during the bootup of rad_crdn, but then off again
 
 	   runs during rad_fb / rad_madf, but with IRQs turned off
@@ -644,7 +651,7 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 		// uint32_t freq = m_maincpu->unscaled_clock()/2;
 		// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
 		//m_freq_timer->adjust(attotime::from_usec(1000));
-		m_freq_timer->adjust(attotime::from_usec(50));	
+		m_freq_timer->adjust(attotime::from_usec(50));
 	}
 	else
 	{
@@ -712,7 +719,7 @@ TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 		m_timer_control |= 0x80;
 		update_irqs();
 	}
-	
+
 	//logerror("freq_timer_done\n");
 	// reload
 	//m_freq_timer->adjust(attotime::from_usec(50000));

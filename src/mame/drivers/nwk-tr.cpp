@@ -886,12 +886,12 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_DEVICE_ADD("k001604", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)  // correct?
-	MCFG_K001604_ROZ_OFFSET(0)  // correct?
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604, 0);
+	m_k001604->set_layer_size(0);
+	m_k001604->set_roz_size(1);
+	m_k001604->set_txt_mem_offset(0);  // correct?
+	m_k001604->set_roz_mem_offset(0);  // correct?
+	m_k001604->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -908,17 +908,12 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_KONPPC_CGBOARD_TYPE(NWKTR)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nwktr_state::thrilld)
+void nwktr_state::thrilld(machine_config &config)
+{
 	nwktr(config);
 
-	MCFG_DEVICE_REMOVE("k001604")
-	MCFG_DEVICE_ADD("k001604", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(1)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)  // correct?
-	MCFG_K001604_ROZ_OFFSET(0)  // correct?
-	MCFG_K001604_PALETTE("palette")
-MACHINE_CONFIG_END
+	m_k001604->set_layer_size(1);
+}
 
 /*****************************************************************************/
 

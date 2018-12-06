@@ -1461,7 +1461,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_DEVICE_PROGRAM_MAP(driver_68k_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
+	SLAPSTIC(config, m_slapstic_device, 117, true);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1475,16 +1475,16 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	m_adc8->in_callback<6>().set_ioport("8BADC.6");
 	m_adc8->in_callback<7>().set_ioport("8BADC.7");
 
-	MCFG_DEVICE_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(driver_gsp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_driver) /* scanline callback (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdgsp_irq_gen))
-	MCFG_TMS340X0_TO_SHIFTREG_CB(harddriv_state, hdgsp_write_to_shiftreg)
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(harddriv_state, hdgsp_read_from_shiftreg)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS34010(config, m_gsp, HARDDRIV_GSP_CLOCK);
+	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_gsp_map);
+	m_gsp->set_halt_on_reset(true);
+	m_gsp->set_pixel_clock(4000000);
+	m_gsp->set_pixels_per_clock(4);
+	m_gsp->set_scanline_ind16_callback(FUNC(harddriv_state::scanline_driver));
+	m_gsp->output_int().set(FUNC(harddriv_state::hdgsp_irq_gen));
+	m_gsp->set_shiftreg_in_callback(FUNC(harddriv_state::hdgsp_write_to_shiftreg));
+	m_gsp->set_shiftreg_out_callback(FUNC(harddriv_state::hdgsp_read_from_shiftreg));
+	m_gsp->set_screen("screen");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
@@ -1517,15 +1517,15 @@ MACHINE_CONFIG_START(harddriv_state::driver_msp)
 	driver_nomsp(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("msp", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS34010(config, m_msp, XTAL(50'000'000));
+	m_msp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_msp_map);
+	m_msp->set_halt_on_reset(true);
+	m_msp->set_pixel_clock(5000000);
+	m_msp->set_pixels_per_clock(2);
+	m_msp->output_int().set(FUNC(harddriv_state::hdmsp_irq_gen));
+    m_msp->set_screen("screen");
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1538,11 +1538,10 @@ MACHINE_CONFIG_START(harddriv_state::multisync_nomsp)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multisync_68k_map)
 
-	MCFG_DEVICE_MODIFY("gsp")
-	MCFG_DEVICE_PROGRAM_MAP(multisync_gsp_map)
-	MCFG_TMS340X0_PIXEL_CLOCK(6000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_multisync) /* scanline callback (indexed16) */
+	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::multisync_gsp_map);
+	m_gsp->set_pixel_clock(6000000);
+	m_gsp->set_pixels_per_clock(2);
+	m_gsp->set_scanline_ind16_callback(FUNC(harddriv_state::scanline_multisync));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1551,21 +1550,21 @@ MACHINE_CONFIG_END
 
 
 /* Multisync board with MSP (used by Hard Drivin' compact) */
-MACHINE_CONFIG_START(harddriv_state::multisync_msp)
+void harddriv_state::multisync_msp(machine_config &config)
+{
+    multisync_nomsp(config);
 
-	multisync_nomsp(config);
+    /* basic machine hardware */
+    TMS34010(config, m_msp, XTAL(50'000'000));
+    m_msp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_msp_map);
+    m_msp->set_halt_on_reset(true);
+    m_msp->set_pixel_clock(5000000);
+    m_msp->set_pixels_per_clock(2);
+    m_msp->output_int().set(FUNC(harddriv_state::hdmsp_irq_gen));
+    m_msp->set_screen("screen");
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("msp", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
-	MCFG_VIDEO_SET_SCREEN("screen")
-
-	MCFG_DEVICE_REMOVE("slapstic")
-MACHINE_CONFIG_END
+    config.device_remove("slapstic");
+}
 
 
 /* Multisync II board (used by Hard Drivin's Airborne) */
@@ -1577,10 +1576,9 @@ MACHINE_CONFIG_START(harddriv_state::multisync2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multisync2_68k_map)
 
-	MCFG_DEVICE_MODIFY("gsp")
-	MCFG_DEVICE_PROGRAM_MAP(multisync2_gsp_map)
+	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::multisync2_gsp_map);
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1656,7 +1654,7 @@ MACHINE_CONFIG_START(harddriv_state::dsk)
 	EEPROM_2816(config, "dsk_30c"); // MK48Z02
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
+	ASIC65(config, m_asic65, 0, ASIC65_STANDARD);
 MACHINE_CONFIG_END
 
 
@@ -1669,7 +1667,7 @@ MACHINE_CONFIG_START(harddriv_state::dsk2)
 	MCFG_DEVICE_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
+	ASIC65(config, m_asic65, 0, ASIC65_STANDARD);
 MACHINE_CONFIG_END
 
 
@@ -1861,10 +1859,9 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	multisync_nomsp(config);
 
 	/* basic machine hardware */        /* multisync board without MSP */
-	MCFG_DEVICE_MODIFY("gsp")
-	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
+	m_gsp->set_pixel_clock(5000000);
 	adsp(config);                       /* ADSP board */
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1873,9 +1870,10 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* Steel Talons */
@@ -1927,22 +1925,23 @@ MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 
 	/* basic machine hardware */        /* multisync board with MSP */
 	ds3(config);                        /* DS III board */
-	MCFG_DEVICE_REMOVE("ds3sdsp")       /* DS III sound components are not present */
-	MCFG_DEVICE_REMOVE("ds3xdsp")
-	MCFG_DEVICE_REMOVE("ldac")
-	MCFG_DEVICE_REMOVE("rdac")
-	MCFG_DEVICE_REMOVE("vref")
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("ds3sdsp");       /* DS III sound components are not present */
+	config.device_remove("ds3xdsp");
+	config.device_remove("ldac");
+	config.device_remove("rdac");
+	config.device_remove("vref");
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 
-	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
+	ASIC65(config, m_asic65, 0, ASIC65_STEELTAL);         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* Street Drivin' */
@@ -2083,8 +2082,7 @@ MACHINE_CONFIG_START(harddriv_new_state::racedriv_panorama_machine)
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, harddriv_new_state, tx_a))
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
-	MCFG_DEVICE_MODIFY("mainpcb:slapstic")
-	MCFG_SLAPSTIC_NUM(115)
+	subdevice<atari_slapstic_device>("mainpcb:slapstic")->set_chipnum(115);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
 //  MCFG_QUANTUM_TIME(attotime::from_hz(60000))

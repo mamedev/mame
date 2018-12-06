@@ -78,7 +78,7 @@ void catseye_device::device_reset()
 {
 	LOG("%s\n", __func__);
 
-	for(int i = 0; i < 2; i++) {
+	for (int i = 0; i < 2; i++) {
 		m_read_enable[i] = 0;
 		m_write_enable[i] = 0;
 		m_fb_enable[i] = 0;
@@ -197,16 +197,16 @@ void catseye_device::execute_rule(const bool src, const int rule, bool &dst) con
 	}
 }
 
-template<int idx>
+template<int Idx>
 void catseye_device::window_move()
 {
 
-	if (!m_fb_enable[idx])
+	if (!m_fb_enable[Idx])
 		return;
 
 	LOGMASKED(LOG_WMOVE, "%s%d: %3ux%3u -> %3ux%3u / %3ux%3u planemode %04x wrr %04x, trr %04x m_trrctl %04x acntr %04x\n",
-			__func__, idx, m_wmsourcex, m_wmsourcey, m_wmdestx,	m_wmdesty, m_wmwidth, m_wmheight, m_planemode[idx],
-			m_wrr[idx], m_trr[idx],	m_trrctl[idx], m_acntrl);
+			__func__, Idx, m_wmsourcex, m_wmsourcey, m_wmdestx, m_wmdesty, m_wmwidth, m_wmheight, m_planemode[Idx],
+			m_wrr[Idx], m_trr[Idx], m_trrctl[Idx], m_acntrl);
 
 	int line, endline, lineincr;
 
@@ -252,30 +252,30 @@ void catseye_device::window_move()
 
 			bool dst = false;
 
-			if (m_trrctl[idx] & 0x0100) {
-				bool bit = m_patterns[idx][(m_plane << 4) | (dy & 0xf)] & (1 << (dx & 0xf));
-				switch (m_trr[idx] >> 8) {
+			if (m_trrctl[Idx] & 0x0100) {
+				bool bit = m_patterns[Idx][(m_plane << 4) | (dy & 0xf)] & (1 << (dx & 0xf));
+				switch (m_trr[Idx] >> 8) {
 
 				case 0xf0:
 					dst = bit;
 					break;
 
 				default:
-					logerror("%s: unknown trr %02x\n", __func__, m_trr[idx] >> 8);
+					logerror("%s: unknown trr %02x\n", __func__, m_trr[Idx] >> 8);
 					break;
 				}
 			} else {
-				bool const src = get_vram_pixel_plane<idx>(sx, sy);
-				dst = get_vram_pixel<idx>(dx, dy);
-				execute_rule(src, m_wrr[idx] & 0x0f, dst);
+				bool const src = get_vram_pixel_plane<Idx>(sx, sy);
+				dst = get_vram_pixel<Idx>(dx, dy);
+				execute_rule(src, m_wrr[Idx] & 0x0f, dst);
 			}
-			modify_vram<idx>(dx, dy, dst);
+			modify_vram<Idx>(dx, dy, dst);
 		}
 	}
 }
 
 
-template<int idx>
+template<int Idx>
 void catseye_device::draw_pixel(int x, int y, int color)
 {
 	if ((m_misc & CATSEYE_MISC_ENABLE_CLIP) &&
@@ -286,16 +286,16 @@ void catseye_device::draw_pixel(int x, int y, int color)
 			return;
 
 	bool src = color & m_plane_mask_l;
-	bool dst = get_vram_pixel<idx>(x, y);
-	execute_rule(src, (m_prr[idx] >> 8) & 0x0f, dst);
-	modify_vram<idx>(x, y, dst);
+	bool dst = get_vram_pixel<Idx>(x, y);
+	execute_rule(src, (m_prr[Idx] >> 8) & 0x0f, dst);
+	modify_vram<Idx>(x, y, dst);
 	m_status |= CATSEYE_STATUS_UNCLIPPED;
 }
 
-template<int idx>
+template<int Idx>
 void catseye_device::draw_line()
 {
-	const int color = m_color[idx] >> 8;
+	const int color = m_color[Idx] >> 8;
 	int x1 = m_wmsourcex;
 	int y1 = m_wmsourcey;
 	int x2 = m_wmdestx;
@@ -304,7 +304,7 @@ void catseye_device::draw_line()
 	bool c1;
 
 	LOGMASKED(LOG_WMOVE, "%s%d %dx%d -> %dx%d, color %d\n",
-			__func__, idx, m_wmsourcex, m_wmsourcey, m_wmdestx, m_wmdesty, color);
+			__func__, Idx, m_wmsourcex, m_wmsourcey, m_wmdestx, m_wmdesty, color);
 
 	c1 = false;
 	incy = 1;
@@ -359,7 +359,7 @@ void catseye_device::draw_line()
 
 	if (c1) {
 		do {
-			draw_pixel<idx>(y, x, color);
+			draw_pixel<Idx>(y, x, color);
 
 			if (e > 0) {
 				y  += incy;
@@ -371,7 +371,7 @@ void catseye_device::draw_line()
 		} while (x <= x2);
 	} else {
 		do {
-			draw_pixel<idx>(x, y, color);
+			draw_pixel<Idx>(x, y, color);
 			if (e > 0) {
 				y += incy;
 				e += diago;
@@ -384,53 +384,53 @@ void catseye_device::draw_line()
 
 }
 
-template<int idx>
+template<int Idx>
 void catseye_device::trigger_wm()
 {
-	if (!m_fb_enable[idx])
+	if (!m_fb_enable[Idx])
 		return;
 
-	if ((m_vb[idx] & CATSEYE_VB_VECTOR) && (m_rugsc == 0x10))
-		draw_line<idx>();
+	if ((m_vb[Idx] & CATSEYE_VB_VECTOR) && (m_rugsc == 0x10))
+		draw_line<Idx>();
 	else if (m_rugsc == 0x90)
-		window_move<idx>();
+		window_move<Idx>();
 	else
-		logerror("%s: unsupported rugcmd: %04x vb %04x\n", __func__, m_rugsc, m_vb[idx]);
+		logerror("%s: unsupported rugcmd: %04x vb %04x\n", __func__, m_rugsc, m_vb[Idx]);
 }
 
-template<int idx>
+template<int Idx>
 u16 catseye_device::vram_r_bit(offs_t offset)
 {
 	u16 ret = 0;
 
 	offset &= ~0x7;
 
-	for(int i = 0; i < 16; i++)
-		ret |= get_vram_offset_plane<idx>(offset * 2 + 15 - i) ? (1 << i) : 0;
+	for (int i = 0; i < 16; i++)
+		ret |= get_vram_offset_plane<Idx>(offset * 2 + 15 - i) ? (1 << i) : 0;
 	return ret;
 }
 
-template<int idx>
+template<int Idx>
 u16 catseye_device::vram_r_word(offs_t offset, u16 mem_mask)
 {
 	u16 ret = 0;
 
 	if (mem_mask & m_plane_mask_l)
-		ret |= get_vram_offset<idx>(offset * 2 + 1);
+		ret |= get_vram_offset<Idx>(offset * 2 + 1);
 
 	if (mem_mask & m_plane_mask_h)
-		ret |= get_vram_offset<idx>(offset * 2) << 8;
+		ret |= get_vram_offset<Idx>(offset * 2) << 8;
 
 	return ret;
 }
 
-template<int idx>
+template<int Idx>
 u16 catseye_device::vram_r(offs_t offset, u16 mem_mask)
 {
 	if (m_acntrl & 0x100)
-		return vram_r_bit<idx>(offset);
+		return vram_r_bit<Idx>(offset);
 	else
-		return vram_r_word<idx>(offset, mem_mask);
+		return vram_r_word<Idx>(offset, mem_mask);
 }
 
 READ16_MEMBER(catseye_device::vram_r)
@@ -446,7 +446,7 @@ READ16_MEMBER(catseye_device::vram_r)
 	return ret;
 }
 
-template<int idx>
+template<int Idx>
 void catseye_device::vram_w_bit(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset &= ~0x7;
@@ -458,37 +458,37 @@ void catseye_device::vram_w_bit(offs_t offset, u16 data, u16 mem_mask)
 		if (!(mem_mask & bit))
 			continue;
 
-		bool dst = get_vram_offset<idx>(offset * 2 + 15 - i);
-		execute_rule(data & bit, (m_prr[idx] >> 8) & 0x0f, dst);
-		modify_vram_offset<idx>(offset * 2 + 15 - i, dst);
+		bool dst = get_vram_offset<Idx>(offset * 2 + 15 - i);
+		execute_rule(data & bit, (m_prr[Idx] >> 8) & 0x0f, dst);
+		modify_vram_offset<Idx>(offset * 2 + 15 - i, dst);
 	}
 }
 
-template<int idx>
+template<int Idx>
 void catseye_device::vram_w_word(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (mem_mask & m_plane_mask_l) {
 		const bool src = data & m_plane_mask_l;
-		bool dst = get_vram_offset<idx>(offset * 2 + 1);
-		execute_rule(src, (m_prr[idx] >> 8) & 0x0f, dst);
-		modify_vram_offset<idx>(offset * 2 + 1, dst);
+		bool dst = get_vram_offset<Idx>(offset * 2 + 1);
+		execute_rule(src, (m_prr[Idx] >> 8) & 0x0f, dst);
+		modify_vram_offset<Idx>(offset * 2 + 1, dst);
 	}
 
 	if (mem_mask & m_plane_mask_h) {
 		const bool src = data & m_plane_mask_h;
-		bool dst = get_vram_offset<idx>(offset * 2);
-		execute_rule(src, (m_prr[idx] >> 8) & 0x0f, dst);
-		modify_vram_offset<idx>(offset * 2, dst);
+		bool dst = get_vram_offset<Idx>(offset * 2);
+		execute_rule(src, (m_prr[Idx] >> 8) & 0x0f, dst);
+		modify_vram_offset<Idx>(offset * 2, dst);
 	}
 }
 
-template<int idx>
+template<int Idx>
 void catseye_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_acntrl & 0x100)
-		vram_w_bit<idx>(offset, data, mem_mask);
+		vram_w_bit<Idx>(offset, data, mem_mask);
 	else
-		vram_w_word<idx>(offset, data, mem_mask);
+		vram_w_word<Idx>(offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(catseye_device::vram_w)
@@ -878,6 +878,10 @@ READ16_MEMBER(catseye_device::ctrl_r)
 	}
 
 	switch(offset) {
+	case TOPCAT_REG_WMOVE_ACTIVE:
+		ret = 0;
+		break;
+
 	case TOPCAT_REG_ENABLE_BLINK_PLANES:
 		ret = m_blink_enable;
 		break;

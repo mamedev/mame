@@ -868,9 +868,9 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(TANDY2K_KEYBOARD_TAG, TANDY2K_KEYBOARD, 0)
-	MCFG_TANDY2000_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, tandy2k_state, kbdclk_w))
-	MCFG_TANDY2000_KEYBOARD_DATA_CALLBACK(WRITELINE(*this, tandy2k_state, kbddat_w))
+	TANDY2K_KEYBOARD(config, m_kb, 0);
+	m_kb->clock_wr_callback().set(FUNC(tandy2k_state::kbdclk_w));
+	m_kb->data_wr_callback().set(FUNC(tandy2k_state::kbddat_w));
 
 	// temporary until the tandy keyboard has a rom dump
 	MCFG_PC_KEYB_ADD(m_pc_keyboard, WRITELINE(I8259A_1_TAG, pic8259_device, ir0_w))

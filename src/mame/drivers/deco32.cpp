@@ -1868,9 +1868,10 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	DECO_IRQ(config, m_deco_irq, 0);
+	m_deco_irq->set_screen_tag(m_screen);
+	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
+	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -2075,9 +2076,10 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	DECO_IRQ(config, m_deco_irq, 0);
+	m_deco_irq->set_screen_tag(m_screen);
+	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
+	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2121,8 +2123,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
-	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
+	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
+	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2174,8 +2176,7 @@ MACHINE_CONFIG_START(dragngun_state::lockloadu)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(lockloadu_sound_map)
 
-	MCFG_DEVICE_MODIFY("irq")
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
 	MCFG_DEVICE_MODIFY("tilegen2")
 	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
@@ -2201,12 +2202,13 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_LIGHTGUN1_CB(IOPORT("LIGHT0_Y"))
-	MCFG_DECO_IRQ_LIGHTGUN2_CB(IOPORT("LIGHT1_Y"))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	DECO_IRQ(config, m_deco_irq, 0);
+	m_deco_irq->set_screen_tag(m_screen);
+	m_deco_irq->lightgun1_callback().set_ioport("LIGHT0_Y");
+	m_deco_irq->lightgun2_callback().set_ioport("LIGHT1_Y");
+	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
+	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
+	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
@@ -2254,8 +2256,8 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
-	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
+	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
+	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
@@ -2300,7 +2302,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update)
 
-	MCFG_DECO_ACE_ADD("deco_ace")
+	DECO_ACE(config, m_deco_ace, 0);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2342,7 +2344,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_tattass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_deco_ace, gfx_tattass)
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("IN0");
@@ -2352,7 +2354,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	m_ioprot->set_interface_scramble_interleave();
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nslasher_state::nslasher)
@@ -2377,7 +2379,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update)
 
-	MCFG_DECO_ACE_ADD("deco_ace")
+	DECO_ACE(config, m_deco_ace, 0);
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2419,7 +2421,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_nslasher)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_deco_ace, gfx_nslasher)
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("IN0");

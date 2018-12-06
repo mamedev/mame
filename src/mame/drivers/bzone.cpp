@@ -16,7 +16,7 @@
 
     Battlezone memory map (preliminary)
 
-    0000-04ff RAM
+    0000-03ff RAM
     0800      IN0
     0a00      IN1
     0c00      IN2
@@ -586,11 +586,11 @@ MACHINE_CONFIG_START(bzone_state::bzone_base)
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_BZONE, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_BZONE(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	/* Drivers */
-	MCFG_MATHBOX_ADD("mathbox")
+	MATHBOX(config, m_mathbox, 0);
 
 MACHINE_CONFIG_END
 

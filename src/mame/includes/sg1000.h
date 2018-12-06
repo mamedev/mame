@@ -6,6 +6,7 @@
 
 #include "cpu/z80/z80.h"
 #include "formats/sf7000_dsk.h"
+#include "imagedev/floppy.h"
 #include "imagedev/printer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"

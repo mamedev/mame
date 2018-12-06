@@ -430,23 +430,23 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, tile_callback<0> )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr_old[0]->set_gfx_region(1);
+	m_spr_old[0]->set_pritype(2);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old2", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, tile_callback<1> )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>), this);
+	m_spr_old[1]->set_gfx_region(2);
+	m_spr_old[1]->set_pritype(2);
+	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-58, -2)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(-58, -2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -522,16 +522,15 @@ MACHINE_CONFIG_START(f1gp2_state::f1gp2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp2_state, screen_update)
 
-	MCFG_DEVICE_REMOVE("gga")
-	MCFG_DEVICE_REMOVE("vsystem_spr_old1")
-	MCFG_DEVICE_REMOVE("vsystem_spr_old2")
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp2_state, tile_callback<0> )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	config.device_remove("gga");
+	config.device_remove("vsystem_spr_old1");
+	config.device_remove("vsystem_spr_old2");
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr->set_gfx_region(1);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_MODIFY("k053936")
-	MCFG_K053936_OFFSETS(-48, -21)
+	m_k053936->set_offsets(-48, -21);
 MACHINE_CONFIG_END
 
 

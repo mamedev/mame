@@ -12,6 +12,7 @@
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "machine/acs8600_ics.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "bus/rs232/rs232.h"
 

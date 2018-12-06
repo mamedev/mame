@@ -3682,8 +3682,8 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_blzntrnd)
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_OFFSETS(-77, -21)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_offsets(-77, -21);
 
 	/* sound hardware */
 	// HUM-002 PCB Configuration : Stereo output with second speaker connector
@@ -3706,8 +3706,7 @@ MACHINE_CONFIG_START(metro_state::gstrik2)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
-	MCFG_DEVICE_MODIFY("k053936")
-	MCFG_K053936_OFFSETS(-77, -19)
+	m_k053936->set_offsets(-77, -19);
 
 	m_vdp2->set_tmap_xoffsets(0,-8,0);
 

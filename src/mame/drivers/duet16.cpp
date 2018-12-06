@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
 #include "machine/pit8253.h"

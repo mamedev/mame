@@ -2248,6 +2248,8 @@ files {
 	MAME_DIR .. "src/mame/machine/hp9825_tape.h",
 	MAME_DIR .. "src/mame/machine/hp9845_printer.cpp",
 	MAME_DIR .. "src/mame/machine/hp9845_printer.h",
+	MAME_DIR .. "src/mame/machine/hp98x5_io_sys.cpp",
+	MAME_DIR .. "src/mame/machine/hp98x5_io_sys.h",
 	MAME_DIR .. "src/mame/video/hp48.cpp",
 	MAME_DIR .. "src/mame/drivers/hp49gp.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9845.cpp",
@@ -2260,6 +2262,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp2620.cpp",
 	MAME_DIR .. "src/mame/drivers/hp700.cpp",
 	MAME_DIR .. "src/mame/drivers/hp2640.cpp",
+	MAME_DIR .. "src/mame/drivers/hp95lx.cpp",
 	MAME_DIR .. "src/mame/drivers/hp9825.cpp",
 }
 
@@ -2503,6 +2506,8 @@ createMESSProjects(_target, _subtarget, "mips")
 files {
 	MAME_DIR .. "src/mame/drivers/mips.cpp",
 	MAME_DIR .. "src/mame/includes/mips.h",
+	MAME_DIR .. "src/mame/machine/mips_rambo.h",
+	MAME_DIR .. "src/mame/machine/mips_rambo.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mit")
@@ -2575,6 +2580,7 @@ createMESSProjects(_target, _subtarget, "ncd")
 files {
 	MAME_DIR .. "src/mame/drivers/ncd17c.cpp",
 	MAME_DIR .. "src/mame/drivers/ncdmips.cpp",
+	MAME_DIR .. "src/mame/drivers/ncdppc.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ne")
@@ -3735,6 +3741,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/eacc.cpp",
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
 	MAME_DIR .. "src/mame/drivers/emate.cpp",
+	MAME_DIR .. "src/mame/drivers/epic14e.cpp",
 	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
 	MAME_DIR .. "src/mame/includes/eti660.h",
@@ -3747,6 +3754,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",
 	MAME_DIR .. "src/mame/drivers/fk1.cpp",
+	MAME_DIR .. "src/mame/drivers/fs3216.cpp",
 	MAME_DIR .. "src/mame/drivers/ft68m.cpp",
 	MAME_DIR .. "src/mame/drivers/gameking.cpp",
 	MAME_DIR .. "src/mame/drivers/gimix.cpp",
@@ -3755,6 +3763,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/harriet.cpp",
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 	MAME_DIR .. "src/mame/drivers/hazl1420.cpp",
+	MAME_DIR .. "src/mame/drivers/hp3478a.cpp",
 	MAME_DIR .. "src/mame/drivers/hprot1.cpp",
 	MAME_DIR .. "src/mame/drivers/hpz80unk.cpp",
 	MAME_DIR .. "src/mame/drivers/ht68k.cpp",
@@ -3764,6 +3773,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",
 	MAME_DIR .. "src/mame/drivers/icebox.cpp",
 	MAME_DIR .. "src/mame/drivers/if800.cpp",
+	MAME_DIR .. "src/mame/drivers/ikt5a.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",
 	MAME_DIR .. "src/mame/drivers/is48x.cpp",
@@ -3847,6 +3857,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sh4robot.cpp",
 	MAME_DIR .. "src/mame/drivers/sansa_fuze.cpp",
 	MAME_DIR .. "src/mame/drivers/scopus.cpp",
+	MAME_DIR .. "src/mame/drivers/shine.cpp",
 	MAME_DIR .. "src/mame/drivers/si5500.cpp",
 	MAME_DIR .. "src/mame/drivers/softbox.cpp",
 	MAME_DIR .. "src/mame/includes/softbox.h",

@@ -9,16 +9,16 @@
 #include "emu.h"
 #include "machine/hpc3.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_PBUS_DMA	(1 << 1)
-#define LOG_SCSI		(1 << 2)
-#define LOG_SCSI_DMA	(1 << 3)
-#define LOG_ETHERNET	(1 << 4)
-#define LOG_PBUS4		(1 << 5)
-#define LOG_CHAIN		(1 << 6)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_ETHERNET | LOG_PBUS4 | LOG_CHAIN)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_PBUS_DMA    (1 << 1)
+#define LOG_SCSI        (1 << 2)
+#define LOG_SCSI_DMA    (1 << 3)
+#define LOG_ETHERNET    (1 << 4)
+#define LOG_PBUS4       (1 << 5)
+#define LOG_CHAIN       (1 << 6)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_PBUS_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_ETHERNET | LOG_PBUS4 | LOG_CHAIN)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_HPC3, hpc3_device, "hpc3", "SGI HPC3")

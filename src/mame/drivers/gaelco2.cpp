@@ -18,6 +18,7 @@
     Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
     Maniac Square  | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
+    Cardioline     | 1997 | GAE1 501  | 970410   | IO board MCU (not really protection)
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
     Play 2000      | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
 
@@ -405,6 +406,118 @@ ROM_START( maniacsqs ) // REF 960419/1
 	ROM_FILL(            0x01a0000, 0x0060000, 0x00 )         /* Empty */
 	ROM_FILL(            0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
+
+/*============================================================================
+                            Salter Cardioline
+  ============================================================================*/
+
+static INPUT_PORTS_START( saltcrdi ) // dipswitches are on the REVERSE side of the PCB (!)
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // pedal
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // green
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) // red
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_SERVICE_DIPLOC(0x01, IP_ACTIVE_LOW, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x60, "Catalan" ) // ?
+	PORT_DIPSETTING(    0x80, DEF_STR( Spanish ) ) // double?
+	PORT_DIPSETTING(    0xa0, "Portuguese" ) // ?
+	PORT_DIPSETTING(    0xc0, DEF_STR( French ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( Spanish ) ) // triple?
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COIN")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+// just a copy of maniac square for now
+void gaelco2_state::saltcrdi_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::gaelco2_vram_w)).share("spriteram");
+	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));
+	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::gaelco2_palette_w)).share("paletteram");
+	map(0x218004, 0x218009).ram().share("vregs");
+	map(0x300000, 0x300001).portr("IN0");
+	map(0x310000, 0x310001).portr("DSW");
+	map(0x320000, 0x320001).portr("COIN");
+	map(0xfe0000, 0xfe7fff).ram();
+	map(0xfe8000, 0xfeffff).ram().share("shareram");
+}
+
+// 34'000'000 XTAL for the video?
+MACHINE_CONFIG_START(gaelco2_state::saltcrdi)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(saltcrdi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+
+	/* video hardware */
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000) /* gfx_0x0040000 */
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0) /* unused? ROMs contain no sound data */
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0080000, 1 * 0x0080000, 0, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+ROM_START( saltcrdi ) // REF 970410
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "bi-n-21-27c512.u21",   0x000000, 0x010000, CRC(1d2e9a68) SHA1(b9bb4eeefe90850b648dc45689a08f3c28147856) )
+	ROM_LOAD16_BYTE( "bi-n-23-27c512.u23",   0x000001, 0x010000, CRC(5865351d) SHA1(a62b8ec88ef41d96b65a03ccaeadbec21803df34) )
+
+	ROM_REGION( 0x0280000, "gfx1", ROMREGION_ERASEFF ) /* GFX, no sound, machine has none? */
+	ROM_LOAD( "bi-40-bank0-27c1001.u40",   0x0000000, 0x0020000, CRC(56822524) SHA1(aae133e9fb85ba8995c095cc540aa35b65c27777) )
+	ROM_LOAD( "bi-39-bank0-27c1001.u39",   0x0080000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
+	ROM_LOAD( "bi-38-bank0-27c1001.u38",   0x0100000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
+	ROM_LOAD( "bi-37-bank0-27c1001.u37",   0x0180000, 0x0020000, CRC(779fca47) SHA1(fce95893a5bcf0c6f26c223491c95154f072c92b) )
+	ROM_FILL(                              0x0200000, 0x0020000, 0x00 )         /* to decode GFX as 5bpp */
+	ROM_LOAD( "bi-44-bank1-27c1001.u44",   0x0020000, 0x0020000, CRC(171d2f88) SHA1(e2b406dad78e3ab5bebb673ed03db5d27879283e) )
+	ROM_LOAD( "bi-43-bank1-27c1001.u43",   0x00a0000, 0x0020000, CRC(69b35d81) SHA1(d9657e3d592079071df019cd75d676fa4b1bcba9) )
+	ROM_LOAD( "bi-42-bank1-27c1001.u42",   0x0120000, 0x0020000, CRC(eaef0565) SHA1(4214b05f1df3062eaeea91505b61816725556ed5) )
+	ROM_LOAD( "bi-41-bank1-27c1001.u41",   0x01a0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
+	ROM_FILL(                              0x0220000, 0x0020000, 0x00 )         /* to decode GFX as 5bpp */
+
+	ROM_REGION( 0x1000, "iomcu", 0 ) // on IO board
+	ROM_LOAD( "st62t15c6",   0x0000, 0x1000, NO_DUMP ) // size?
+
+	ROM_REGION( 0x100, "pals", 0 )
+	ROM_LOAD( "6.pal16l8.u12",   0x0000, 0x100, NO_DUMP ) // size?
+ROM_END
+
 
 /*============================================================================
                             PLAY 2000
@@ -2212,3 +2325,6 @@ GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    i
 // 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
 GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1999, play2000a,   play2000,  play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump
+
+// Gym exercise bike
+GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,    ROT0, "Salter Fitness / Gaelco", "Pro Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING ) // there are other machines in the Cardioline series, without TV displays

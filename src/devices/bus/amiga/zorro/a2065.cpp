@@ -17,6 +17,7 @@
 //**************************************************************************
 
 #define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -33,8 +34,8 @@ void a2065_device::device_add_mconfig(machine_config &config)
 {
 	AM7990(config, m_lance);
 	m_lance->intr_out().set(FUNC(a2065_device::lance_irq_w));
-	m_lance->dma_in().set(FUNC(a2065_device::ram_r));
-	m_lance->dma_out().set(FUNC(a2065_device::ram_w));
+	m_lance->dma_in().set(FUNC(a2065_device::lance_ram_r));
+	m_lance->dma_out().set(FUNC(a2065_device::lance_ram_w));
 }
 
 
@@ -76,11 +77,8 @@ void a2065_device::device_start()
 
 void a2065_device::autoconfig_base_address(offs_t address)
 {
-	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
-
-	if (VERBOSE)
-		logerror("-> installing a2065\n");
+	LOG("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
+	LOG("-> installing a2065\n");
 
 	// stop responding to default autoconfig
 	m_slot->m_space->unmap_readwrite(0xe80000, 0xe8007f);
@@ -97,8 +95,8 @@ void a2065_device::autoconfig_base_address(offs_t address)
 
 	// install access to onboard ram (32k)
 	m_slot->m_space->install_readwrite_handler(address + 0x8000, address + 0x8000 + 0x7fff,
-		read16_delegate(FUNC(a2065_device::ram_r), this),
-		write16_delegate(FUNC(a2065_device::ram_w), this), 0xffff);
+		read16_delegate(FUNC(a2065_device::host_ram_r), this),
+		write16_delegate(FUNC(a2065_device::host_ram_w), this), 0xffff);
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -106,8 +104,7 @@ void a2065_device::autoconfig_base_address(offs_t address)
 
 WRITE_LINE_MEMBER( a2065_device::cfgin_w )
 {
-	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
+	LOG("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
 
 	if (state == 0)
 	{
@@ -117,7 +114,7 @@ WRITE_LINE_MEMBER( a2065_device::cfgin_w )
 
 		autoconfig_product(0x70);
 		autoconfig_manufacturer(0x0202);
-		autoconfig_serial(0x00000000); // last 3 bytes = last 3 bytes of mac address
+		autoconfig_serial(0x00123456); // last 3 bytes = last 3 bytes of mac address
 
 		autoconfig_link_into_memory(false);
 		autoconfig_rom_vector_valid(false);
@@ -132,16 +129,30 @@ WRITE_LINE_MEMBER( a2065_device::cfgin_w )
 	}
 }
 
-READ16_MEMBER( a2065_device::ram_r )
+READ16_MEMBER( a2065_device::host_ram_r )
 {
-	// logerror("read offset %04x\n", offset);
+	// logerror("host read offset %04x\n", offset);
 	return m_ram[offset & 0x3fff];
 }
 
-WRITE16_MEMBER( a2065_device::ram_w )
+WRITE16_MEMBER( a2065_device::host_ram_w )
 {
-	// logerror("write %04x = %04x\n", offset, data);
-	m_ram[offset & 0x3fff] = data;
+	// logerror("host write %04x = %04x\n", offset, data);
+	COMBINE_DATA(&m_ram[offset]);
+}
+
+READ16_MEMBER( a2065_device::lance_ram_r )
+{
+	offset = (offset >> 1) & 0x3fff;
+	// logerror("lance read offset %04x\n", offset);
+	return m_ram[offset];
+}
+
+WRITE16_MEMBER( a2065_device::lance_ram_w )
+{
+	offset = (offset >> 1) & 0x3fff;
+	// logerror("lance write %04x = %04x\n", offset, data);
+	COMBINE_DATA(&m_ram[offset]);
 }
 
 WRITE_LINE_MEMBER( a2065_device::lance_irq_w )

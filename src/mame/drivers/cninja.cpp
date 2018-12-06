@@ -801,10 +801,11 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -889,10 +890,11 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(stoneage_s_map)
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -989,10 +991,11 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(cninjabl_sound_map)
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1062,10 +1065,11 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1151,10 +1155,11 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

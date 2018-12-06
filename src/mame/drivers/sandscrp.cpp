@@ -494,23 +494,22 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0, 256, 224)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2);
+	m_view2->set_gfx_region(1);
+	m_view2->set_offset(0x5b, 0, 256, 224);
+	m_view2->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
- 
+
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_HIGH)

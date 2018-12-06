@@ -1731,7 +1731,7 @@ MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 	MCFG_DEVICE_PROGRAM_MAP(s12h8rwmap)
 	MCFG_DEVICE_IO_MAP(s12h8iomap)
 
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+	NAMCO_SETTINGS(config, m_settings, 0);
 
 	RTC4543(config, m_rtc, XTAL(32'768));
 	m_rtc->data_cb().set("sub:sci1", FUNC(h8_sci_device::rx_w));

@@ -1146,8 +1146,8 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1192,9 +1192,9 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
+	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1247,9 +1247,9 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
+	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

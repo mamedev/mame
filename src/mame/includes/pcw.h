@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "machine/timer.h"

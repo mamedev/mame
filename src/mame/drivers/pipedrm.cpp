@@ -607,15 +607,14 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
-
-	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_SET_OFFSETS(-13, -6)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(3)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old, 0);
+	m_spr_old->set_gfx_region(2);
+	m_spr_old->set_offsets(-13, -6);
+	m_spr_old->set_pritype(3);
+	m_spr_old->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,pipedrm)
 
@@ -662,9 +661,8 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 

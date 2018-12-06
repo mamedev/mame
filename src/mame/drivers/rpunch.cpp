@@ -484,8 +484,8 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2); // verified from rpunch schematics
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
@@ -535,8 +535,8 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2);
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 

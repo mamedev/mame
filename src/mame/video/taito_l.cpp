@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(taitol_state, taito_l)
+void taitol_state::video_start()
 {
 	m_buff_spriteram = make_unique_clear<u8[]>(SPRITERAM_SIZE);
 	int i;

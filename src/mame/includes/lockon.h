@@ -5,6 +5,10 @@
     Lock-On hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LOCKON_H
+#define MAME_INCLUDES_LOCKON_H
+
+#pragma once
 
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
@@ -152,3 +156,5 @@ private:
 	void sound_io(address_map &map);
 	void sound_prg(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LOCKON_H

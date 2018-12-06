@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_SPBACTN_H
+#define MAME_INCLUDES_SPBACTN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
@@ -10,8 +14,8 @@
 class spbactn_state : public driver_device
 {
 public:
-	spbactn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spbactn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -25,7 +29,7 @@ public:
 		m_spvideoram(*this, "spvideoram"),
 		m_extraram(*this, "extraram"),
 		m_extraram2(*this, "extraram2")
-		{ }
+	{ }
 
 	void spbactn(machine_config &config);
 	void spbactnp(machine_config &config);
@@ -92,3 +96,5 @@ private:
 	void spbactnp_extra_map(address_map &map);
 	void spbactnp_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SPBACTN_H

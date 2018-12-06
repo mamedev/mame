@@ -126,6 +126,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(vbl_w);
 
 	// these need to be public for now
 	uint32_t m_flags;
@@ -155,6 +156,7 @@ private:
 	int m_c040_time;
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
+	bool m_charwrt;
 
 	emu_timer *m_scanstart, *m_scanend;
 

@@ -44,7 +44,6 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "cpu/m6502/m6502.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 
 #include "machine/74259.h"
 #include "machine/bankdev.h"

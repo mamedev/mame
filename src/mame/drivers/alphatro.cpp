@@ -26,6 +26,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 #include "formats/dsk_dsk.h"
 #include "formats/td0_dsk.h"

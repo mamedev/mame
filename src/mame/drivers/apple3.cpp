@@ -73,6 +73,7 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(m_via[1], FUNC(via6522_device::write_cb1));
 	m_screen->screen_vblank().append(m_via[1], FUNC(via6522_device::write_cb2));
+	m_screen->screen_vblank().append(FUNC(apple3_state::vbl_w));
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(apple3_state, apple3 )

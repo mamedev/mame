@@ -40,6 +40,8 @@ public:
 private:
 	DECLARE_READ16_MEMBER(imr_r);
 	DECLARE_WRITE16_MEMBER(imr_w);
+	DECLARE_READ16_MEMBER(ipr_r);
+	DECLARE_WRITE16_MEMBER(ipr_w);
 	DECLARE_READ16_MEMBER(iisr_r);
 	DECLARE_WRITE16_MEMBER(iisr_w);
 	DECLARE_READ16_MEMBER(scr_r);
@@ -60,10 +62,10 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	TIMER_CALLBACK_MEMBER( timer_callback );
-	void update_timer( int i );
-	void update_irq_state(uint16_t cause);
-	void update_irq_serial(uint16_t cause, uint8_t type);
+	TIMER_CALLBACK_MEMBER(timer_callback);
+	void update_timer(int i);
+	void update_ipl();
+	uint8_t serial_interrupt_cause(int channel);
 
 	static constexpr uint16_t EXT_IRQ0 = 1 << 0;
 	static constexpr uint16_t EXT_IRQ1 = 1 << 1;
@@ -89,9 +91,10 @@ private:
 
 	emu_timer *m_tmp68301_timer[3];        // 3 Timers
 
-	uint16_t m_irq_vector[8];
+	uint8_t m_ipl; // internal interrupt level
 
 	uint16_t m_imr;
+	uint16_t m_ipr;
 	uint16_t m_iisr;
 	uint16_t m_scr;
 	uint16_t m_pdir;

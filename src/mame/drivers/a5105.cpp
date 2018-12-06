@@ -22,7 +22,7 @@ ToDo:
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"

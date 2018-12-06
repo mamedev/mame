@@ -617,9 +617,9 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
-	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
-	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
-	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_pow )
+	SNK68_SPR(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag(m_gfxdecode);
+	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_pow), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -635,11 +635,11 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(snk68_state::streetsm)
+void snk68_state::streetsm(machine_config &config)
+{
 	pow(config);
-	MCFG_DEVICE_MODIFY("sprites")
-	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
-MACHINE_CONFIG_END
+	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_notpow), this);
+}
 
 MACHINE_CONFIG_START(snk68_state::searchar)
 	streetsm(config);

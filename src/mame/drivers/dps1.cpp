@@ -15,6 +15,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/am9519.h"
 #include "machine/upd765.h"
 #include "machine/mc2661.h"

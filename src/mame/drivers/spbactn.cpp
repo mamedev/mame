@@ -435,8 +435,8 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
-	MCFG_TECMO_SPRITE_GFX_REGION(2)
+	TECMO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(8,10,4);
@@ -490,8 +490,8 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
-	MCFG_TECMO_SPRITE_GFX_REGION(2)
+	TECMO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(12,14,8);

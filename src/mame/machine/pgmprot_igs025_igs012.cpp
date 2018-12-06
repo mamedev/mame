@@ -139,8 +139,8 @@ MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(drgw2_mem)
 
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	//MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs012_callback )
+	IGS025(config, m_igs025, 0);
+	//m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs012_callback), this);
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_012_025_state,drgw2)
 MACHINE_CONFIG_END

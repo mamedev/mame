@@ -1378,7 +1378,6 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
-#include "machine/tmp68301.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
@@ -7860,9 +7859,9 @@ MACHINE_CONFIG_START(seta_state::tndrcade)
 	MCFG_DEVICE_PROGRAM_MAP(tndrcade_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, tndrcade_sub_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7915,9 +7914,9 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 	MCFG_DEVICE_PROGRAM_MAP(twineagl_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7961,9 +7960,9 @@ MACHINE_CONFIG_START(seta_state::downtown)
 	MCFG_DEVICE_PROGRAM_MAP(downtown_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8043,9 +8042,9 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8106,9 +8105,9 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8155,9 +8154,9 @@ MACHINE_CONFIG_START(seta_state::metafox)
 	MCFG_DEVICE_PROGRAM_MAP(metafox_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8195,9 +8194,9 @@ MACHINE_CONFIG_START(seta_state::atehate)
 	MCFG_DEVICE_PROGRAM_MAP(atehate_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8238,9 +8237,9 @@ MACHINE_CONFIG_START(seta_state::blandia)
 	MCFG_DEVICE_PROGRAM_MAP(blandia_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8276,9 +8275,9 @@ MACHINE_CONFIG_START(seta_state::blandiap)
 	MCFG_DEVICE_PROGRAM_MAP(blandiap_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8319,9 +8318,9 @@ MACHINE_CONFIG_START(seta_state::blockcar)
 	MCFG_DEVICE_PROGRAM_MAP(blockcar_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8393,9 +8392,9 @@ MACHINE_CONFIG_START(seta_state::daioh)
 	MCFG_DEVICE_PROGRAM_MAP(daioh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8430,9 +8429,9 @@ MACHINE_CONFIG_START(seta_state::daiohp)
 	MCFG_DEVICE_PROGRAM_MAP(daiohp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8472,9 +8471,9 @@ MACHINE_CONFIG_START(seta_state::drgnunit)
 	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8508,9 +8507,9 @@ MACHINE_CONFIG_START(seta_state::qzkklgy2)
 	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8564,9 +8563,9 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
@@ -8616,9 +8615,9 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8660,9 +8659,9 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8728,9 +8727,9 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
 #endif  // USE_uPD71054_TIMER
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8796,9 +8795,9 @@ MACHINE_CONFIG_START(seta_state::jjsquawk)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8831,9 +8830,9 @@ MACHINE_CONFIG_START(seta_state::jjsquawb)
 	MCFG_DEVICE_PROGRAM_MAP(jjsquawb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8876,9 +8875,9 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8914,9 +8913,9 @@ MACHINE_CONFIG_START(seta_state::orbs)
 	MCFG_DEVICE_PROGRAM_MAP(orbs_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8957,9 +8956,9 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state,keroppi)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9008,9 +9007,9 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	upd2.set_portx_tag("TRACK2_X");
 	upd2.set_porty_tag("TRACK2_Y");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9050,9 +9049,9 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -9102,9 +9101,9 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9145,9 +9144,9 @@ MACHINE_CONFIG_START(seta_state::msgundam)
 	pit.set_clk<0>(16000000/2/8);
 	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9184,9 +9183,9 @@ MACHINE_CONFIG_START(seta_state::oisipuzl)
 	MCFG_DEVICE_PROGRAM_MAP(oisipuzl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9224,9 +9223,9 @@ MACHINE_CONFIG_START(seta_state::triplfun)
 	MCFG_DEVICE_PROGRAM_MAP(triplfun_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9255,22 +9254,28 @@ MACHINE_CONFIG_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(seta_state::kiwame_vblank)
+{
+	if (state)
+		m_tmp68301->external_interrupt_0();
+}
+
 MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD(m_maincpu, M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
-	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
+
 	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
 	tmp68301.set_cputag(m_maincpu);
 	tmp68301.out_parallel_callback().set(FUNC(seta_state::kiwame_row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9280,6 +9285,7 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, kiwame_vblank))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
@@ -9311,9 +9317,9 @@ MACHINE_CONFIG_START(seta_state::rezon)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9351,9 +9357,9 @@ MACHINE_CONFIG_START(seta_state::thunderl)
 	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9426,9 +9432,9 @@ MACHINE_CONFIG_START(seta_state::wiggie)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wiggie_sound_map)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9467,9 +9473,9 @@ MACHINE_CONFIG_START(seta_state::wits)
 	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9504,9 +9510,9 @@ MACHINE_CONFIG_START(seta_state::umanclub)
 	MCFG_DEVICE_PROGRAM_MAP(umanclub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9545,9 +9551,9 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	MCFG_DEVICE_PROGRAM_MAP(utoukond_sound_map)
 	MCFG_DEVICE_IO_MAP(utoukond_sound_io_map)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9603,9 +9609,9 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
 #endif  // USE_uPD71054_TIMER
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9647,9 +9653,9 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -9705,9 +9711,9 @@ MACHINE_CONFIG_START(seta_state::pairlove)
 	MCFG_DEVICE_PROGRAM_MAP(pairlove_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9753,9 +9759,9 @@ MACHINE_CONFIG_START(seta_state::crazyfgt)
 	MCFG_DEVICE_PROGRAM_MAP(crazyfgt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, crazyfgt_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9823,9 +9829,9 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2.0)); // jockeyc: watchdog test error if over 2.5s
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 

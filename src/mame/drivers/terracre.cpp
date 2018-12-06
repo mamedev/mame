@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(amazon_state::amazon_1412m2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(amazon_1412m2_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(16'000'000)) // divided by 4 maybe
+	NB1412M2(config, m_prot, XTAL(16'000'000)); // divided by 4 maybe
 MACHINE_CONFIG_END
 
 

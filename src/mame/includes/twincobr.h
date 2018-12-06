@@ -42,6 +42,8 @@ public:
 	void init_twincobr();
 
 protected:
+	virtual void video_start() override;
+
 	optional_shared_ptr<uint8_t> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
@@ -121,7 +123,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_RESET(twincobr);
-	DECLARE_VIDEO_START(toaplan0);
 	uint32_t screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(twincobr_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);

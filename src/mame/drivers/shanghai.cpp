@@ -507,14 +507,14 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2203_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2203_device, write))
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline("audiocpu", 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym2203_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 
-	MCFG_DEVICE_ADD("adpcm", SEIBU_ADPCM, 8000) // actually MSM5205
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SEIBU_ADPCM(config, "adpcm", 8000).add_route(ALL_OUTPUTS, "mono", 0.80); // actually MSM5205
 MACHINE_CONFIG_END
 
 /***************************************************************************

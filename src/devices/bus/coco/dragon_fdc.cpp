@@ -69,7 +69,7 @@
 #include "dragon_fdc.h"
 
 #include "coco_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"

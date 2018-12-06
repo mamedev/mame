@@ -16,6 +16,7 @@
 #include "video/mc6845.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "bus/cpc/cpcexp.h"
 #include "bus/cpc/ddi1.h"

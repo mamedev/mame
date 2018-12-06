@@ -66,6 +66,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
+#include "imagedev/floppy.h"
 #include "machine/ins8250.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

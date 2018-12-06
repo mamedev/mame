@@ -14,9 +14,6 @@
 #include "diserial.h"
 
 
-#define MCFG_PCX_VIDEO_TXD_HANDLER(_devcb) \
-	downcast<pcx_video_device &>(*device).set_txd_handler(DEVCB_##_devcb);
-
 class pcdx_video_device : public device_t, public device_gfx_interface
 {
 public:
@@ -86,7 +83,7 @@ class pcx_video_device : public pcdx_video_device,
 {
 public:
 	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	auto txd_handler() { return m_txd_handler.bind(); }
 
 	virtual void map(address_map &map) override;
 	DECLARE_READ8_MEMBER(term_r);

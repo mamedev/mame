@@ -812,15 +812,15 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
-	MCFG_DEVICE_PROGRAM_MAP(tms_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(MASTER_CLOCK_40MHz/6) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(artmagic_state, scanline)              /* scanline update (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, artmagic_state, m68k_gen_int))
-	MCFG_TMS340X0_TO_SHIFTREG_CB(artmagic_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_tms, MASTER_CLOCK_40MHz);
+	m_tms->set_addrmap(AS_PROGRAM, &artmagic_state::tms_map);
+	m_tms->set_halt_on_reset(true);
+	m_tms->set_pixel_clock(MASTER_CLOCK_40MHz/6);
+	m_tms->set_pixels_per_clock(1);
+	m_tms->set_scanline_rgb32_callback(FUNC(artmagic_state::scanline));
+	m_tms->output_int().set(FUNC(artmagic_state::m68k_gen_int));
+	m_tms->set_shiftreg_in_callback(FUNC(artmagic_state::to_shiftreg));
+	m_tms->set_shiftreg_out_callback(FUNC(artmagic_state::from_shiftreg));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

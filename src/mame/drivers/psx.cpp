@@ -558,8 +558,8 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
 	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
 
-	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, "maincpu", "spu")
-	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
+	PSXCD(config, m_psxcd, m_maincpu, "spu");
+	m_psxcd->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin2));
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END
@@ -612,8 +612,8 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
 	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
 
-	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, "maincpu", "spu")
-	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
+	PSXCD(config, m_psxcd, m_maincpu, "spu");
+	m_psxcd->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin2));
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END

@@ -191,7 +191,7 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 		byte1 = get_next_byte();
 
 		// only the first byte matters when it comes to setting palette / flips, the rest are just ignored until we reach a 0x6 command, after which there is the tile data
-		if (first == 1) 
+		if (first == 1)
 		{
 			pal = (byte1 & 0xf0) >> 4;
 			int cmd = (byte1 & 0x0f);
@@ -208,7 +208,7 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 			case 0xe:
 
 			// this is just the end command, changes nothing, can be pointed at directly tho
-			case 0x6:  
+			case 0x6:
 				break;
 
 			// flip cases
@@ -344,7 +344,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 		if (tileregs[0x0] != 0x00)
 		{
 			//tile |= m_maincpu->read_full_data_sp((tileregs[0x0] << 8) + count);
-			tile |= read_full_data_sp_bypass((tileregs[0x0] << 8) + count);		
+			tile |= read_full_data_sp_bypass((tileregs[0x0] << 8) + count);
 		}
 
 		// only read the next byte if we're not in an 8-bit mode
@@ -433,9 +433,9 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 			tile += gfxbase;
 			set_data_address(tile, 0);
-			
+
 			decode_inline_header(flipx, flipy, test, pal, debug_packets);
-	
+
 			tile = get_current_address_byte();
 		}
 
@@ -638,7 +638,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 					tile = (tile * drawheight * drawwidth * bpp) / 8;
 					basereg = 0; // always uses segment register 0 in tile addressing mode?
 				}
-				else 
+				else
 				{
 					// 8-byte alignment Addressing Mode uses a fixed offset?
 					if (alt_addressing == 2)
