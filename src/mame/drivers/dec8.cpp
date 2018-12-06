@@ -1959,9 +1959,9 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2024,9 +2024,9 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2080,9 +2080,9 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(58);
@@ -2140,9 +2140,9 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(58);
@@ -2200,13 +2200,13 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(58);
@@ -2263,9 +2263,9 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2324,13 +2324,13 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_MXC06(config, m_spritegen_mxc, 0);
+	m_spritegen_mxc->set_gfx_region(1);
+	m_spritegen_mxc->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2430,17 +2430,17 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(3, 3, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(3, 3, 0);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
+	DECO_MXC06(config, m_spritegen_mxc, 0);
+	m_spritegen_mxc->set_gfx_region(1);
+	m_spritegen_mxc->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)

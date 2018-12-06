@@ -447,12 +447,11 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crospang)
 
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, 7)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, 7);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 
 	/* sound hardware */

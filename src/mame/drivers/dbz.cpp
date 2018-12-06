@@ -354,10 +354,10 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(dbz_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(dbz_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 1);
+	m_k056832->set_palette("palette");
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(dbz_state::sprite_callback), this);

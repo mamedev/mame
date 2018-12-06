@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
 	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, bfm_sc5_state, bfm_sc5_duart_input_r))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, bfm_sc5_state, bfm_sc5_duart_output_w))
 
-	MCFG_BFMBDA_ADD("vfd0",0)
+	BFM_BDA(config, m_vfd0, 60, 0);
 
 	config.set_default_layout(layout_bfm_sc5);
 

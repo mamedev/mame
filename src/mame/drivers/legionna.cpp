@@ -1208,10 +1208,10 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1263,10 +1263,10 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1319,10 +1319,10 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_DEVICE_IO_MAP(godzilla_sound_io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1377,10 +1377,10 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1433,10 +1433,10 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1490,10 +1490,10 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

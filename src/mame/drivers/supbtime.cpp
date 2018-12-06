@@ -370,9 +370,9 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

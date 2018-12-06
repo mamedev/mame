@@ -284,11 +284,11 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(1)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, -1) // aligned to 2nd instruction screen in attract
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(1);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, -1); // aligned to 2nd instruction screen in attract
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

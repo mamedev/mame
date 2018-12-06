@@ -516,10 +516,10 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(lethal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8LE, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8LE, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette(m_palette);

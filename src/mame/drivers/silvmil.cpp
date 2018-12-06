@@ -430,12 +430,11 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silvmil)
 
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, 7)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, 7);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -455,8 +454,7 @@ MACHINE_CONFIG_START(silvmil_state::puzzlove)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
 	MCFG_DEVICE_PROGRAM_MAP(silvmil_sound_map)
 
-	MCFG_DEVICE_MODIFY("spritegen")
-	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
+	m_sprgen->set_bootleg_type(1);
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Verified */

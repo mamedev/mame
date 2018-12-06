@@ -533,10 +533,10 @@ MACHINE_CONFIG_START(moo_state::moo)
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
 
@@ -588,10 +588,10 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
 	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
 

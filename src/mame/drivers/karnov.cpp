@@ -791,9 +791,9 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
@@ -868,9 +868,9 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 

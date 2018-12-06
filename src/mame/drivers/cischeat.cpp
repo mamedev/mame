@@ -1986,9 +1986,9 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x0e00/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 0x1600/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x3600/2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x0e00/2);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 0x1600/2);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x3600/2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2039,15 +2039,14 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_DEVICE_MODIFY("scroll0")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x1c00/2)
-	MCFG_MEGASYS1_TILEMAP_BITS_PER_COLOR_CODE(5)
-	MCFG_DEVICE_MODIFY("scroll1")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x2c00/2)
-	MCFG_MEGASYS1_TILEMAP_BITS_PER_COLOR_CODE(5)
-	MCFG_DEVICE_MODIFY("scroll2")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x6c00/2)
-	MCFG_MEGASYS1_TILEMAP_BITS_PER_COLOR_CODE(5)
+	m_tmap[0]->set_colorbase(0x1c00/2);
+	m_tmap[0]->set_bits_per_color_code(5);
+
+	m_tmap[1]->set_colorbase(0x2c00/2);
+	m_tmap[1]->set_bits_per_color_code(5);
+
+	m_tmap[2]->set_colorbase(0x6c00/2);
+	m_tmap[2]->set_bits_per_color_code(5);
 MACHINE_CONFIG_END
 
 
@@ -2076,12 +2075,11 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_DEVICE_MODIFY("scroll0")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x1e00/2)
-	MCFG_DEVICE_MODIFY("scroll1")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x2e00/2)
-	MCFG_DEVICE_MODIFY("scroll2")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x6e00/2)
+	m_tmap[0]->set_colorbase(0x1e00/2);
+
+	m_tmap[1]->set_colorbase(0x2e00/2);
+
+	m_tmap[2]->set_colorbase(0x6e00/2);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_f1gpstar)
@@ -2159,8 +2157,8 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x1e00/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x1e00/2);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2251,8 +2249,8 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x1e00/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x1e00/2);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
 	MCFG_TIMER_ADD_NONE("motor_left")

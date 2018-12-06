@@ -123,7 +123,7 @@ MACHINE_CONFIG_START(esqasr_state::asr)
 	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
+	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -157,7 +157,7 @@ MACHINE_CONFIG_START(esqasr_state::asrx)
 	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000)) // Actually ES5511
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
+	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

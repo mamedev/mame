@@ -1448,10 +1448,10 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -1526,10 +1526,10 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 

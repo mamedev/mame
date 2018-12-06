@@ -337,8 +337,8 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	m_gtia->set_region(GTIA_NTSC);
 	m_gtia->read_callback().set_ioport("console");
 
-	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
-	MCFG_ANTIC_GTIA("gtia")
+	ATARI_ANTIC(config, m_antic, 0);
+	m_antic->set_gtia_tag(m_gtia);
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.readpa_handler().set(FUNC(maxaflex_state::pia_pa_r));
@@ -349,9 +349,9 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_VISIBLE_AREA_ANTIC()
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	MCFG_SCREEN_VISIBLE_AREA(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y)
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
 	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

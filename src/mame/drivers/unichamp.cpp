@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 	//The CPU is really clocked this way:
 	//MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
 	//But since it is only running 7752/29868 th's of the time...
-	//TODO find a more accurate method? (the emulation will me the same though)
+	//TODO find a more accurate method? (the emulation will be the same though)
 	MCFG_DEVICE_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
 
 	MCFG_DEVICE_PROGRAM_MAP(unichamp_mem)
@@ -269,8 +269,10 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(*this, unichamp_state, unichamp_gicram_r) )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	GIC(config, m_gic, XTAL(3'579'545));
+	m_gic->set_screen("screen");
+	m_gic->ram_callback().set(FUNC(unichamp_state::unichamp_gicram_r));
+	m_gic->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "unichamp_cart")

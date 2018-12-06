@@ -466,10 +466,10 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(bishi_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	K054338(config, m_k054338, 0);
 	// FP 201404: any reason why this is not connected to the k055555 below?
@@ -486,13 +486,13 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(bishi_state::dobouchn)
+void bishi_state::dobouchn(machine_config &config)
+{
 	bishi(config);
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
-	MCFG_DEVICE_MODIFY("k056832")
-//  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
-MACHINE_CONFIG_END
+//  m_k056832->set_tile_callback(FUNC(bishi_state::dobouchn_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
+}
 
 // ROM definitions
 

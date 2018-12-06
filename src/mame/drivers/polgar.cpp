@@ -372,8 +372,8 @@ MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 	outlatch.q_out_cb<4>().set_output("led104");
 	outlatch.q_out_cb<5>().set_output("led105");
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mephisto_lcd);
 MACHINE_CONFIG_END
 
@@ -407,8 +407,8 @@ MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 
 	RAM(config, "ram").set_default_size("1M");
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mephisto_lcd);
 MACHINE_CONFIG_END
 
@@ -417,9 +417,8 @@ MACHINE_CONFIG_START(mephisto_milano_state::milano)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(milano_mem)
 
-	MCFG_DEVICE_REMOVE("board")
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_milano);
 MACHINE_CONFIG_END
 

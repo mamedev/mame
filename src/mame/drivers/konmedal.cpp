@@ -401,10 +401,10 @@ MACHINE_CONFIG_START(konmedal_state::tsukande)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -435,10 +435,10 @@ MACHINE_CONFIG_START(konmedal_state::ddboy)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

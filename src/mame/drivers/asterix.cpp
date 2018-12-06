@@ -285,10 +285,10 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(asterix_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(asterix_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 1);
+	m_k056832->set_palette("palette");
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette("palette");
