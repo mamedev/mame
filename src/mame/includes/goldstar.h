@@ -185,6 +185,7 @@ protected:
 	READ8_MEMBER(fixedval58_r) { return 0x58; }
 	READ8_MEMBER(fixedval68_r) { return 0x68; }
 	READ8_MEMBER(fixedval74_r) { return 0x74; }
+	READ8_MEMBER(fixedval7d_r) { return 0x7d; }
 	READ8_MEMBER(fixedval80_r) { return 0x80; }
 	READ8_MEMBER(fixedval82_r) { return 0x82; }
 	READ8_MEMBER(fixedval84_r) { return 0x84; }
