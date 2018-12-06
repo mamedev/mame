@@ -380,11 +380,11 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
 	/* TODO: hook up p0, p1, int */
-	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
-	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
-	MCFG_DEVICE_DATA_MAP(dsp_data_map)
-	MCFG_NECDSP_OUT_P0_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p0_w))
-	MCFG_NECDSP_OUT_P1_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p1_w))
+	UPD7725(config, m_dsp, 8000000); /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
+	m_dsp->set_addrmap(AS_PROGRAM, &tsispch_state::dsp_prg_map);
+	m_dsp->set_addrmap(AS_IO, &tsispch_state::dsp_data_map);
+	m_dsp->p0().set(FUNC(tsispch_state::dsp_to_8086_p0_w));
+	m_dsp->p1().set(FUNC(tsispch_state::dsp_to_8086_p1_w));
 
 	/* PIC 8259 */
 	PIC8259(config, m_pic, 0);
