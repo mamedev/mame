@@ -3652,15 +3652,15 @@ MACHINE_CONFIG_START(royalmah_state::mjderngr)
 	MCFG_PALETTE_INIT_OWNER(royalmah_state,mjderngr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(royalmah_state::janptr96)
+void royalmah_state::janptr96(machine_config &config)
+{
 	mjderngr(config);
-	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)    /* 8 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(janptr96_map)
-	MCFG_DEVICE_IO_MAP(janptr96_iomap)
-	MCFG_TMPZ84C015_IN_PA_CB(READ8(*this, royalmah_state, janptr96_dsw_r))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, royalmah_state, janptr96_dswsel_w))
+	tmpz84c015_device &maincpu(TMPZ84C015(config.replace(), "maincpu", XTAL(16'000'000)/2));    /* 8 MHz? */
+	maincpu.set_addrmap(AS_PROGRAM, &royalmah_state::janptr96_map);
+	maincpu.set_addrmap(AS_IO, &royalmah_state::janptr96_iomap);
+	maincpu.in_pa_callback().set(FUNC(royalmah_state::janptr96_dsw_r));
+	maincpu.out_pb_callback().set(FUNC(royalmah_state::janptr96_dswsel_w));
 	// internal CTC channels 0 & 1 have falling edge triggers
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
@@ -3669,7 +3669,7 @@ MACHINE_CONFIG_START(royalmah_state::janptr96)
 
 	/* devices */
 	MSM6242(config, m_rtc, 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)).invert();
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(royalmah_state::mjifb)

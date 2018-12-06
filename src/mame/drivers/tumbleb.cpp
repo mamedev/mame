@@ -2233,11 +2233,11 @@ MACHINE_CONFIG_START(tumbleb_state::magipur)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_TRANSPEN(15)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(3);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_transpen(15);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fncywld)
 	MCFG_PALETTE_ADD("palette", 0x800)

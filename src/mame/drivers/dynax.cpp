@@ -4775,9 +4775,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::mjelctrn)
 	hnoridur(config);
-	MCFG_DEVICE_REPLACE("maincpu", TMPZ84C015, XTAL(22'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(nanajign_mem_map)
-	MCFG_DEVICE_IO_MAP(mjelctrn_io_map)
+	TMPZ84C015(config.replace(), m_maincpu, XTAL(22'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::nanajign_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dynax_state::mjelctrn_io_map);
 
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(mjelctrn_banked_map)
@@ -4800,10 +4800,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::mjembase)
 	mjelctrn(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(mjembase_io_map)
-	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW1"))
-	MCFG_TMPZ84C015_IN_PB_CB(IOPORT("DSW2"))
+
+	tmpz84c015_device &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_IO, &dynax_state::mjembase_io_map);
+	maincpu.in_pa_callback().set_ioport("DSW1");
+	maincpu.in_pb_callback().set_ioport("DSW2");
 
 	// 13C
 	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::coincounter_0_w));
