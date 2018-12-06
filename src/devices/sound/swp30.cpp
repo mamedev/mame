@@ -16,109 +16,130 @@
   output.
 
   I/O wise, the chip has 8 generic audio serial inputs and 8 outputs
-  for external plugins, and two dac outputs.  The DAC output is
+  for external plugins, and two dac outputs.  The DAC outputs are
   stereo, and so is the first generic input.  It's unclear whether the
-  outputs and the other inputs are stereo.  The MU100 connects a stereo ADC to the fist input, and routes 
-
-  In practice the chip has the pin for a second DAC, so is
-  probably 4-channel capable on output.
-
-  The 
+  outputs and the other inputs are stereo.  The MU100 connects a
+  stereo ADC to the first input, and routes the third input and output
+  to the plugin boards, but not the left/right input clock, arguing
+  for mono.
 
 
-  The AWM2 manages 64 channels internally, and has inputs for 8
-  external sources, one at least being stereo (they probably all are).
+    Registers:
+
+  The chip interface presents 4096 16-bits registers in a 64x64 grid.
+  They all seem to be read/write.  Some of this grid is for
+  per-channel values for AWM2, but parts are isolated and renumbered
+  for MEG regisrers or for general control functions.
+
+  Names we'll use in th rest of the text:
+  - reg(y, x) is the register at address 2*(y*0x40 + x)
+  - ch<nn>  is reg(channel, xx) for a given AWG2 channel
+  - sy<nn>  is reg(nn/2, 0xe + (nn % 2))
+  - fp<nnn> is reg(nn/6, 0x21 + 2*(nn % 6))
+  - of<nn>  is reg(nn/2, 0x30 + (nn % 2))
+  - lfo<nn> is reg(nn/2, 0x3e + (nn % 2)) for nn = 0..17
+
+
+    AWM2:
+
+  The AWM2 is in charge of handling the individual channels.  It
+  manages reading the rom, decoding the samples, applying volume and
+  pitch envelopes and lfos and filtering the result.  Each channel is
+  then sent to the mixer for further processing.
+
   The sound data can be four formats (8 bits, 12 bits, 16 bits, and a
   8-bits log format with roughly 10 bits of dynamic).  The rom bus is
   25 bits address and 32 bits data wide.  It applies four filters to
   the sample data, two of fixed type (low pass then highpass) and two
   free 3-point FIR filters (used for yet another lowpass and
   highpass).  Envelopes are handled automatically, and the final
-  panned result is accumulated on four stereo accumulators which will
-  be passed to the MEG.  Two of the channels (that includes the
-  external ones) can also have their value sent to the MEG.
+  panned result is sent to the mixer.
+
+
+  ch00       fixed LPF frequency cutoff index
+  ch01       fixed LPF frequency cutoff index increment?
+  ch02       fixed HPF frequency cutoff
+  ch03       40ff at startup, 5010 always afterwards?
+  ch04       fixed LPF resonance level
+  ch05       unknown
+  ch06-09    envelope information, not understood yet
+  ch0a-0d    unknown, probably something to do with pitch eg
+  ch10       unknown
+  ch11       channel replay frequency, signed 4.10 fixed point, log2 scale, positive is higher resulting frequency
+  ch12-13    number of samples before the loop point
+  ch14-15    number of samples in the loop
+  ch16-17    bit 31-30 = sample format, bits 29-25 = loop samples decimal part, 24-0 = loop start address in rom
+  ch20,22,24 first FIR coefficients
+  ch26,28,2a second FIR coefficients
+  ch2c-2f    unknown
+  ch32       pan left/right, 2x8 bits of attenuation
+
+  sy02       internal register selector, msb = 0 or 6, lsb = channel
+  sy03       internal register read port, used for envelope/keyoff management, 6 seems to be current volume
+  sy0c-0f    keyon mask
+  sy10       write something to trigger a keyon according to the mask
 
 
 
 
-  The MEG is a DSP with 384 program steps.  Instructions are 64 bits
-  wide, and to each instruction is associated a 2.14 fixed point value
-  and, for every third instruction a 16-bit integer memory offset
-  value.  In addition 24 LFOs are available, and possibly more.  It is
-  connected to a dram of 262144 samples, theorically 18 bits but in
-  practice only the top 16 bits are connected.
+    MEG:
 
-  The chip interface presents 4096 16-bits registers in a 64x64 grid.
-  Some of this grid is for per-channel values for AWM2, but parts are
-  isolated and renumbered for MEG regisrers or for general control
-  functions.
+  The MEG is a DSP with 384 program steps connected to a 0x40000
+  samples ram.  Instructions are 64 bits wide, and to each instruction
+  is associated a 2.14 fixed point value, Every third instruction (pc
+  multiple of 3) can initiate a memory access to the reverb buffer
+  which will be completed two instructions later.  Each of those
+  instructions is associated to a 16-bits address offset value.
 
-  General register address: (64 * channel + slot) * 2 (16-bits values)
-  MEG fixed point constants (n=0-383) : channel = n/6, slot = 0x21 + 2*(n%6)
-  MEG integer constants (n=0-127): channel = n/2, slot = 0x30 + (n%2)
-  MEG LFOs (n=0..23): channel = n/2, slot = 0x3e + (n%2)
+  The DSP also sports 256 rotating registers (e.g. register 1 at run
+  <n> becomes register 0 at run <n+1>) and 64 fixed registers.  The
+  fixed registers are used to store the results of reading the samples
+  ram and also communicate with the mixer.
 
-  Control registers (n=0..127): channel = n/2, slot = 0x
+  Every 44100th of a second the 384 program steps are run once in
+  order (no branches) to compute everything.
 
-  Note that the LFOs may be 128 instead of 24, but the mu100 code only
-  reserves 24 values in its structures.  OTOH, the mu100 code never
-  uses channel >= 12 slot 3e-3f either.
-
-
-  AWM2 (per-channel) registers:
-  slot(s)  function
-  00       fixed LPF frequency cutoff index
-  01       fixed LPF frequency cutoff index increment?
-  02       fixed HPF frequency cutoff
-  03       40ff at startup, 5010 always afterwards?
-  04       fixed LPF resonane level
-  05       unknown
-  06-09    envelope information, not understood yet
-  0a-0d    unknown, probably something to do with vibrato
-  10       unknown
-  11       channel replay frequency, signed 4.10 fixed point, log2 scale, positive is higher resulting frequency
-  12-13    number of samples before the loop point
-  14-15    number of samples in the loop
-  16-17    bit 31-30 = sample format, bits 29-25 = loop samples decimal part, 24-0 = loop start address in rom
-  20,22,24 first FIR coefficients
-  26,28,2a second FIR coefficients
-  2c-2f    unknown
-  32       pan left/right, 2x8 bits of attenuation
-  33-34    attenuation levels to add to the four accumulators (dry, reverb, chorus, variation for the mu100)
-  35-37    routing, in particular for the taps.  Rather unclear
-
-  Slots e-f are system control, 21,23,25,27,29,2b MEG fixed point
-  registers, 30,31 MEG offset registers, 3e,3f MEG LFO registers.
-  38-3d are special, not per-channel.
-
-  Known system registers:
-  number   function
-  02       internal register selector, msb = 0 or 6, lsb = channel
-  03       internal register read port, used for envelope/keyoff management
-  0c-0f    keyon mask
-  10       write something to trigger a keyon
-  21       MEG program write address
-  22-25    MEG program opcode, writing to 25 triggers an auto-increment
-  30-3e    even slots only, MEG buffer mappings
-
-
-  The LFO registers internal counters are 22 bits wide.  The LSB of
-  the register gives the increment per sample, encoded in a special
-  3.5 format.
-  With scale = 3bits and v = 5bits, step = base[scale] + (v << shift[scale])
-  base  = { 0, 32, 64, 128, 256, 512,  1024, 2048 }
-  shift = { 0,  0,  1,   2,   3,   4,     5,    6 }
+  24 LFO registers are available (possibly more).  The LFO registers
+  internal counters are 22 bits wide.  The LSB of the register gives
+  the increment per sample, encoded in a special 3.5 format.
+  With scale = 3bits and v = 5bits,
+    step  = base[scale] + (v << shift[scale])
+    base  = { 0, 32, 64, 128, 256, 512,  1024, 2048 }
+    shift = { 0,  0,  1,   2,   3,   4,     5,    6 }
 
   The 21th bit of the counter inverts bits 20-0 on read, those are
   interpreted as a 0-1 value, giving a sawtooth wave.
 
-
   8 mappings can be setup, which allow to manage rotating buffers in
-  the MEG-attached ram easily by automating masking and offset adding.
-  The register format is: tttttsss oooooooo.  't' is not understood
+  the samples ram easily by automating masking and offset adding.  The
+  register format is: tttttsss oooooooo.  't' is not understood
   yet. 's' is the sub-buffer size, defined as 1 << (10+s).  The base
   offset is o << 10.  There are no alignment issues, e.g. you can have
   a buffer at 0x28000 which is 0x10000 samples long.
+
+  
+  fp<nnn>    fixed point 2.14 value associated with instruction nnn
+  of<nn>     16-bits offset associated with instruction 3*nn
+  lfo<nn>    LFO registers
+
+  sy21       MEG program write address
+  sy22-25    MEG program opcode, msb-first, writing to 25 triggers an auto-increment
+  sy30-3e    even slots only, MEG buffer mappings
+
+
+    Mixer:
+
+  The mixer gets the outputs of the AWM2, the MEG (for the previous
+  sample) and the external inputs, attenuates and sums them according
+  to its mapping instructions, and pushes the results to the MEG, the
+  DACs and the external outputs.  The attenuations are 8-bits values
+  is 4.4 floating point format (multiplies by (1-mant/2)*2**(-exp)).
+  The routing is indicated through triplets of 16-bits values.
+
+  ch33       dry (msb) and reverb (lsb) attenuation for an AWM2 channel
+  ch34       chorus (msb) and variation (lsb) atternuation
+  ch35-37    routing for an AWM2 channel
+
 
 
 */

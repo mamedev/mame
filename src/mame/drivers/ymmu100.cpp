@@ -164,6 +164,7 @@ public:
 	void mu100(machine_config &config);
 
 	int seq;
+	bool act;
 
 	void regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask);
 	void regs_s2_write_tap(offs_t address, u16 data, u16 mem_mask);
