@@ -16,6 +16,8 @@
 #include "cpu/tms34010/tms34010.h"
 #include "emupal.h"
 
+#define DEBUG_MIDTUNIT_BLITTER		(0)
+
 class midtunit_video_device : public device_t
 {
 public:
@@ -132,7 +134,6 @@ protected:
 		uint16_t      color;          /* current foreground color with palette */
 
 		uint8_t       yflip;          /* yflip? */
-		uint8_t       bpp;            /* bits per pixel */
 		uint8_t       preskip;        /* preskip scale */
 		uint8_t       postskip;       /* postskip scale */
 		int32_t       topclip;        /* top clipping scanline */
@@ -145,6 +146,25 @@ protected:
 		uint16_t      ystep;          /* 8.8 fixed number scale y factor */
 	};
 	dma_state	m_dma_state;
+
+#if DEBUG_MIDTUNIT_BLITTER
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	uint32_t debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void do_debug_blit();
+	void do_dma_debug_inputs();
+
+	required_device<palette_device> m_debug_palette;
+	std::unique_ptr<uint16_t[]> m_debug_videoram;
+	bool m_dma_debug;
+	bool m_doing_debug_dma;
+	dma_state m_debug_dma_state;
+	int32_t m_debug_dma_bpp;
+	int32_t m_debug_dma_mode;
+	int32_t m_debug_dma_command;
+#endif
 };
 
 class midwunit_video_device : public midtunit_video_device
@@ -170,6 +190,9 @@ protected:
 	midwunit_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override;
+#if DEBUG_MIDTUNIT_BLITTER
+	virtual void device_add_mconfig(machine_config &config) override;
+#endif
 };
 
 class midxunit_video_device : public midwunit_video_device

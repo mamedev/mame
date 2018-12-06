@@ -9,7 +9,9 @@
 
 #include "emu.h"
 #include "midtunit.h"
-#include "midtunit.hxx"
+#include "midtunit.ipp"
+#include "midtview.ipp"
+#include "screen.h"
 
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")
@@ -23,6 +25,9 @@ midtunit_video_device::midtunit_video_device(const machine_config &mconfig, devi
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_gfxrom(*this, finder_base::DUMMY_TAG)
+#if DEBUG_MIDTUNIT_BLITTER
+	, m_debug_palette(*this, "debugpalette")
+#endif
 {
 }
 
@@ -57,6 +62,10 @@ void midtunit_video_device::device_start()
 	/* allocate memory */
 	m_local_videoram = std::make_unique<uint16_t[]>(0x100000/2);
 
+#if DEBUG_MIDTUNIT_BLITTER
+	m_debug_videoram = std::make_unique<uint16_t[]>(0x100000/2);
+#endif
+
 	m_dma_timer = timer_alloc(TIMER_DMA);
 
 	/* reset all the globals */
@@ -87,7 +96,6 @@ void midwunit_video_device::device_start()
 	midtunit_video_device::device_start();
 	m_gfx_rom_large = true;
 }
-
 
 void midxunit_video_device::device_start()
 {
@@ -364,7 +372,11 @@ void midtunit_video_device::dma_draw()
 			width = (m_dma_state.width - m_dma_state.endskip) << 8;
 
 		/* determine destination pointer */
+#if DEBUG_MIDTUNIT_BLITTER
+		d = m_doing_debug_dma ? &m_debug_videoram[sy * 512] : &m_local_videoram[sy * 512];
+#else
 		d = &m_local_videoram[sy * 512];
+#endif
 
 		/* loop until we draw the entire width */
 		while (ix < width)
@@ -606,7 +618,6 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_dma_w)
 
 	/* fill in the rev 2 data */
 	m_dma_state.yflip = (command & 0x20) >> 5;
-	m_dma_state.bpp = bpp;
 	m_dma_state.preskip = (command >> 8) & 3;
 	m_dma_state.postskip = (command >> 10) & 3;
 	m_dma_state.xstep = m_dma_register[DMA_SCALE_X] ? m_dma_register[DMA_SCALE_X] : 0x100;

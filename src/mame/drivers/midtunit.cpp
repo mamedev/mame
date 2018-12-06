@@ -604,6 +604,7 @@ void midtunit_state::tunit_core(machine_config &config)
 	m_maincpu->set_scanline_ind16_callback("video", FUNC(midtunit_video_device::scanline_update));	/* scanline updater (indexed16) */
 	m_maincpu->set_shiftreg_in_callback("video", FUNC(midtunit_video_device::to_shiftreg));			/* write to shiftreg function */
 	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));		/* read from shiftreg function */
+	m_maincpu->set_screen("screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
