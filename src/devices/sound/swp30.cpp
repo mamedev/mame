@@ -539,15 +539,15 @@ void swp30_device::dry_rev_w(offs_t offset, u16 data)
 
 u16 swp30_device::cho_var_r(offs_t offset)
 {
-	return m_dry_rev[offset >> 6];
+	return m_cho_var[offset >> 6];
 }
 
 void swp30_device::cho_var_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	if(m_dry_rev[chan] != data)
+	if(m_cho_var[chan] != data)
 		logerror("snd chan %02x cho %02x var %02x\n", chan, data >> 8, data & 0xff);
-	m_dry_rev[chan] = data;
+	m_cho_var[chan] = data;
 }
 
 u16 swp30_device::freq_r(offs_t offset)
