@@ -39,7 +39,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
-	required_device<cpu_device> m_kbc;
+	required_device<tms7000_device> m_kbc;
 	required_device<m24_keyboard_device> m_keyboard;
 	optional_device<m24_z8000_device> m_z8000_apb;
 
@@ -278,10 +278,10 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
-	MCFG_DEVICE_ADD("kbc", TMS7000, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(kbc_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, m24_state, pa_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, m24_state, pb_w))
+	TMS7000(config, m_kbc, XTAL(4'000'000));
+	m_kbc->set_addrmap(AS_PROGRAM, &m24_state::kbc_map);
+	m_kbc->in_porta().set(FUNC(m24_state::pa_r));
+	m_kbc->out_portb().set(FUNC(m24_state::pb_w));
 
 	M24_KEYBOARD(config, m_keyboard, 0);
 	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
