@@ -725,11 +725,12 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	m_maincpu->set_shiftreg_in_callback(FUNC(coolpool_state::to_shiftreg));
 	m_maincpu->set_shiftreg_out_callback(FUNC(coolpool_state::from_shiftreg));
 
-	MCFG_DEVICE_ADD("dsp", TMS32015, XTAL(40'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(amerdart_dsp_pgm_map)
+	tms32015_device &dsp(TMS32015(config, m_dsp, XTAL(40'000'000)/2));
+	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::amerdart_dsp_pgm_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(amerdart_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, coolpool_state, amerdart_dsp_bio_line_r))
+	dsp.set_addrmap(AS_IO, &coolpool_state::amerdart_dsp_io_map);
+	dsp.bio().set(FUNC(coolpool_state::amerdart_dsp_bio_line_r));
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
 	GENERIC_LATCH_16(config, m_main2dsp);

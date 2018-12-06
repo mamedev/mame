@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* TODO: hook up p0, p1, int */
 	UPD7725(config, m_dsp, 8000000); /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
 	m_dsp->set_addrmap(AS_PROGRAM, &tsispch_state::dsp_prg_map);
-	m_dsp->set_addrmap(AS_IO, &tsispch_state::dsp_data_map);
+	m_dsp->set_addrmap(AS_DATA, &tsispch_state::dsp_data_map);
 	m_dsp->p0().set(FUNC(tsispch_state::dsp_to_8086_p0_w));
 	m_dsp->p1().set(FUNC(tsispch_state::dsp_to_8086_p1_w));
 

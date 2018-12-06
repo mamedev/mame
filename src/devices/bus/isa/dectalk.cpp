@@ -163,10 +163,10 @@ MACHINE_CONFIG_START(dectalk_isa_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(dectalk_cpu_map)
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE(*this, dectalk_isa_device, clock_w));
 
-	MCFG_DEVICE_ADD("dectalk_dsp", TMS32015, XTAL(20'000'000))
-	MCFG_DEVICE_IO_MAP(dectalk_dsp_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_isa_device, bio_line_r))
-	MCFG_DEVICE_PROGRAM_MAP(dectalk_dsp_map)
+	TMS32015(config, m_dsp, XTAL(20'000'000));
+	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_dsp_map);
+	m_dsp->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_dsp_io);
+	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 1.0) // unknown DAC

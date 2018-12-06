@@ -76,7 +76,6 @@ public:
 	exelv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_subcpu(*this, "subcpu"),
 			m_tms3556(*this, "tms3556"),
 			m_tms5220c(*this, "tms5220c"),
 			m_cart(*this, "cartslot")
@@ -87,7 +86,6 @@ public:
 
 private:
 	required_device<tms7000_device> m_maincpu;
-	required_device<tms7000_device> m_subcpu;
 	required_device<tms3556_device> m_tms3556;
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
@@ -494,13 +492,13 @@ MACHINE_CONFIG_START(exelv_state::exl100)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
-	TMS7041(config, m_subcpu, XTAL(4'915'200));
-	m_subcpu->in_porta().set(FUNC(exelv_state::tms7041_porta_r));
-	m_subcpu->out_portb().set(FUNC(exelv_state::tms7041_portb_w));
-	m_subcpu->in_portc().set(FUNC(exelv_state::tms7041_portc_r));
-	m_subcpu->out_portc().set(FUNC(exelv_state::tms7041_portc_w));
-	m_subcpu->in_portd().set(FUNC(exelv_state::tms7041_portd_r));
-	m_subcpu->out_portd().set(FUNC(exelv_state::tms7041_portd_w));
+	tms7041_device &subcpu(TMS7041(config, "tms7041", XTAL(4'915'200)));
+	subcpu.in_porta().set(FUNC(exelv_state::tms7041_porta_r));
+	subcpu.out_portb().set(FUNC(exelv_state::tms7041_portb_w));
+	subcpu.in_portc().set(FUNC(exelv_state::tms7041_portc_r));
+	subcpu.out_portc().set(FUNC(exelv_state::tms7041_portc_w));
+	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
+	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -550,13 +548,13 @@ MACHINE_CONFIG_START(exelv_state::exeltel)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
-	TMS7042(config, m_subcpu, XTAL(4'915'200));
-	m_subcpu->in_porta().set(FUNC(exelv_state::tms7041_porta_r));
-	m_subcpu->out_portb().set(FUNC(exelv_state::tms7041_portb_w));
-	m_subcpu->in_portc().set(FUNC(exelv_state::tms7041_portc_r));
-	m_subcpu->out_portc().set(FUNC(exelv_state::tms7041_portc_w));
-	m_subcpu->in_portd().set(FUNC(exelv_state::tms7041_portd_r));
-	m_subcpu->out_portd().set(FUNC(exelv_state::tms7041_portd_w));
+	tms7042_device &subcpu(TMS7042(config, "tms7042", XTAL(4'915'200)));
+	subcpu.in_porta().set(FUNC(exelv_state::tms7041_porta_r));
+	subcpu.out_portb().set(FUNC(exelv_state::tms7041_portb_w));
+	subcpu.in_portc().set(FUNC(exelv_state::tms7041_portc_r));
+	subcpu.out_portc().set(FUNC(exelv_state::tms7041_portc_w));
+	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
+	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

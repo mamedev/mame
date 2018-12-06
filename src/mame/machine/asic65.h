@@ -68,7 +68,7 @@ private:
 	uint8_t   m_last_bank;
 
 	/* ROM-based interface states */
-	required_device<cpu_device> m_ourcpu;
+	required_device<tms32010_device> m_ourcpu;
 	uint8_t   m_tfull;
 	uint8_t   m_68full;
 	uint8_t   m_cmd;

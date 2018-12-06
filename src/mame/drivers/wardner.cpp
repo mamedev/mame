@@ -141,9 +141,9 @@ out:
 class wardner_state : public twincobr_state
 {
 public:
-	wardner_state(const machine_config &mconfig, device_type type, const char *tag) :
-		twincobr_state(mconfig, type, tag),
-		m_membank(*this, "membank")
+	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
+		: twincobr_state(mconfig, type, tag)
+		, m_membank(*this, "membank")
 	{
 	}
 
@@ -160,8 +160,8 @@ private:
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 
-	void DSP_io_map(address_map &map);
-	void DSP_program_map(address_map &map);
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
 	void main_bank_map(address_map &map);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
@@ -242,14 +242,14 @@ void wardner_state::sound_io_map(address_map &map)
 
 /***************************** TMS32010 Memory Map **************************/
 
-void wardner_state::DSP_program_map(address_map &map)
+void wardner_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x5ff).rom();
 }
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-void wardner_state::DSP_io_map(address_map &map)
+void wardner_state::dsp_io_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(wardner_state::wardner_dsp_addrsel_w));
 	map(0x01, 0x01).rw(FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
@@ -392,11 +392,11 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(14'000'000))       /* 14MHz Crystal CLKin */
-	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
+	TMS32010(config, m_dsp, XTAL(14'000'000));       /* 14MHz Crystal CLKin */
+	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, wardner_state, twincobr_BIO_r))
+	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
 

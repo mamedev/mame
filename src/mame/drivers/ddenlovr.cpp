@@ -9844,7 +9844,7 @@ void ddenlovr_state::ultrchmp(machine_config &config)
 void ddenlovr_state::quizchq(machine_config &config)
 {
 	/* basic machine hardware */
-	tmpz84c015_device &maincpu(TMPZ84C015(config, "maincpu", XTAL(16'000'000)/2));  /* Verified */
+	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000)/2));  /* Verified */
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::quizchq_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::quizchq_portmap);
 	maincpu.in_pa_callback().set(FUNC(ddenlovr_state::rongrong_input_r));

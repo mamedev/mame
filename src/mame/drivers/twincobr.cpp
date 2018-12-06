@@ -383,7 +383,6 @@ Shark   Zame
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "speaker.h"
@@ -442,14 +441,14 @@ void twincobr_state::sound_io_map(address_map &map)
 
 /***************************** TMS32010 Memory Map **************************/
 
-void twincobr_state::DSP_program_map(address_map &map)
+void twincobr_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-void twincobr_state::DSP_io_map(address_map &map)
+void twincobr_state::dsp_io_map(address_map &map)
 {
 	map(0, 0).w(FUNC(twincobr_state::twincobr_dsp_addrsel_w));
 	map(1, 1).rw(FUNC(twincobr_state::twincobr_dsp_r), FUNC(twincobr_state::twincobr_dsp_w));
@@ -660,11 +659,11 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(28'000'000)/2)         /* 14MHz CLKin */
-	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
+	TMS32010(config, m_dsp, XTAL(28'000'000)/2);         /* 14MHz CLKin */
+	m_dsp->set_addrmap(AS_PROGRAM, &twincobr_state::dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, twincobr_state, twincobr_BIO_r))
+	m_dsp->set_addrmap(AS_IO, &twincobr_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(twincobr_state::twincobr_bio_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
