@@ -10070,7 +10070,7 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(20'000'000) / 2); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &kotbinyo_portmap);
+	m_maincpu->set_addrmap(AS_IO, &ddenlovr_state::kotbinyo_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10136,7 +10136,7 @@ void ddenlovr_state::mjchuuka(machine_config &config)
 	/* basic machine hardware */
 	tmpz84c015_device &tmpz(TMPZ84C015(config.replace(), m_maincpu, 8000000));
 	tmpz.set_addrmap(AS_PROGRAM, &ddenlovr_state::hanakanz_map);
-	tmpz.set_addrmap(AS_IO, &mjchuuka_portmap);
+	tmpz.set_addrmap(AS_IO, &ddenlovr_state::mjchuuka_portmap);
 	tmpz.out_pa_callback().set(FUNC(ddenlovr_state::hanakanz_rombank_w));
 	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::mjchuuka_oki_bank_w));
 
