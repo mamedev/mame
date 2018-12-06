@@ -10,8 +10,8 @@
 #include "emu.h"
 #include "midtunit.h"
 #include "midtunit.ipp"
-#include "midtview.ipp"
 #include "screen.h"
+#include "midtview.ipp"
 
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")
