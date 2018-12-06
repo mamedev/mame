@@ -13741,8 +13741,10 @@ ROM_START( fb2010 )
 	ROM_CONTINUE(0xd000, 0x1000)
 	ROM_CONTINUE(0xe000, 0x1000)
 	ROM_CONTINUE(0xf000, 0x1000)
+
 	ROM_REGION( 0x20000, "graphics", 0 )
-	ROM_LOAD( "gfx",  0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "high.bin", 0x00000, 0x10000, CRC(5950b5fb) SHA1(64441fdbd768e7765e20a33acd4002e69b868f09) )
+	ROM_LOAD( "low.bin",  0x10000, 0x10000, CRC(98b0454f) SHA1(91f7f4119a0cd591e68c87a9e716a8cd5233a4aa) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
@@ -16718,7 +16720,7 @@ GAMEL( 1996, nc96e,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb9
 GAMEL( 1996, nc96f,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, DK PCB)",               0,                 layout_nfb96 ) /* DK Sub-PCB */
 GAMEL( 2000, nc96txt,   nc96,     amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) /* ver. tc1.32axt C2 Sub-PCB */
 
-GAME(  2009, fb2010,    0,        amcoe2,   nfb96tx,   cmaster_state,  init_fb2010,   ROT0, "Amcoe",   "Fruit Bonus 2010",                                             MACHINE_NOT_WORKING ) // no gfx dumped
+GAME(  2009, fb2010,    0,        amcoe2,   nfb96tx,   cmaster_state,  init_fb2010,   ROT0, "Amcoe",   "Fruit Bonus 2010",                                             MACHINE_NOT_WORKING )  // GFX dumped. samples & bipolar prom missing.
 
 GAMEL( 1996, roypok96,  0,        amcoe2,   roypok96,  cmaster_state,  init_rp35,     ROT0, "Amcoe",   "Royal Poker '96 (set 1, v97-3.5)",                             0,                 layout_roypok96 )
 GAMEL( 1996, roypok96a, roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp36,     ROT0, "Amcoe",   "Royal Poker '96 (set 2, v98-3.6)",                             0,                 layout_roypok96 )
