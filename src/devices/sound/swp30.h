@@ -37,7 +37,7 @@ private:
 
 	u16 m_program_pfp[0x180], m_program_pint[0x80], m_program_plfo[0x80];
 
-	u16 m_volume[0x40], m_freq[0x40], m_pan[0x40], m_dry_rev[0x40];//, m_cho_var[0x40];
+	u16 m_volume[0x40], m_freq[0x40], m_pan[0x40], m_dry_rev[0x40], m_cho_var[0x40];
 	u16 m_envelope[0x40][3];
 	u16 m_lpf_cutoff[0x40], m_lpf_cutoff_inc[0x40], m_lpf_reso[0x40], m_hpf_cutoff[0x40];
 	s16 m_eq_filter[0x40][6];

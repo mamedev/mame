@@ -1066,8 +1066,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
+	TMS32031(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvunit_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1122,9 +1122,8 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	midvcommon(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(midvplus_map)
-	MCFG_TMS3203X_XF1_CB(WRITE8(*this, midvunit_state, midvplus_xf1_w))
+	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvplus_map);
+	m_maincpu->xf1().set(FUNC(midvunit_state::midvplus_xf1_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	config.device_remove("nvram");

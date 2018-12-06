@@ -147,6 +147,10 @@ public:
 	template <class Object> devcb_base &set_xf1_callback(Object &&cb) { return m_xf1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_iack_callback(Object &&cb) { return m_iack_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_cb.set_callback(std::forward<Object>(cb)); }
+	auto xf0() { return m_xf0_cb.bind(); }
+	auto xf1() { return m_xf1_cb.bind(); }
+	auto iack() { return m_iack_cb.bind(); }
+	auto holda() { return m_holda_cb.bind(); }
 
 	// public interfaces
 	static float fp_to_float(uint32_t floatdata);
