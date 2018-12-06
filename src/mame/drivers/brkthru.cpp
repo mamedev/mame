@@ -586,11 +586,13 @@ ROM_START( brkthrut )
 	ROM_LOAD( "11_de-0231-2_27156.h4", 0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) ) // Same as parent
 	ROM_LOAD( "12_de-0231-2_27156.h5", 0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) ) // Same as parent
 
-	ROM_REGION( 0x0300, "proms", 0 ) // Truly dumped on the Tecfri PCB
-	/* The original 82s129 bipolar PROM for R/G was replaced with one 82s147
-	   that has twice the size, and apparently the A04 line disconnected...
+	ROM_REGION( 0x0300, "proms", 0 ) // Truly dumped on the Tecfri PCB.
+	/*
+	   The original 82s129 bipolar PROM for R/G was replaced with one 82s147
+	   that has twice the size. Seems that A05 line was disconnected, and the
+	   rest of bigger addressing lines were displaced covering the hole...
 	*/
-	ROM_LOAD( "6309.c2", 0x0000, 0x0040, CRC(cd9709be) SHA1(1d9c451c771a7b38680e2179aa22289ea7cb2720) ) // Red and green component (82S147N)
+	ROM_LOAD( "6309.c2", 0x0000, 0x0040, CRC(cd9709be) SHA1(1d9c451c771a7b38680e2179aa22289ea7cb2720) ) // Red and Green component (82S147N)
 	ROM_CONTINUE(        0x0020, 0x0040 )
 	ROM_CONTINUE(        0x0040, 0x0040 )
 	ROM_CONTINUE(        0x0060, 0x0040 )
