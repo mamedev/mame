@@ -2,7 +2,8 @@
 // copyright-holders: Grull Osgo.
 /********************************************************************
 
-  Electrochance.
+  Super Ball
+
   6-player Electromechanical Roulette.
 
   Copyright 199x by Electro Chance.
@@ -12,9 +13,14 @@
 
   2 sets dumped:
 
+  - Super Ball (Version EC-3.50 N322),     1991.
+  - Super Ball (Version EC-3.50 N165),     1991.
+
+
 *********************************************************************
 
   PCB specs: Hardware not available
+
  
 *********************************************************************
 
@@ -51,6 +57,7 @@
              +5Vcc |27| GND
              +5Vcc |28| GND
 
+
   DIP Switches:
 
   .---------------------------------------+-----+-----+-----+-----+-----+-----+-----+-----.
@@ -61,7 +68,7 @@
   | (Full Reset)                 Si       | ON  |                                         |
   '---------------------------------------+-----+-----+-----------------------------------+
   | Repite                       No       |     | OFF |                                   |
-  |                              Si       |     | ON  |                                   |
+  | (repeat)                     Si       |     | ON  |                                   |
   +---------------------------------------+-----+-----+-----+-----------------------------+
   | Demo                         No       |     |     | OFF |                             |
   |                              Si       |     |     | ON  |                             |
@@ -70,22 +77,24 @@
   | (settings access)            Si       |                 | ON  |                       |
   +---------------------------------------+-----------------+-----+-----+-----------------+
   | Test plato                   No       |                       | OFF |                 |
-  |                              Si       |                       | ON  |                 |
+  | (wheel test)                 Si       |                       | ON  |                 |
   +---------------------------------------+-----------------------+-----+-----+-----------+
   | Inmovilizar                  No       |                             | OFF |           |
-  |                              Si       |                             | ON  |           |
+  | (freeze)                     Si       |                             | ON  |           |
   +---------------------------------------+-----------------------------+-----+-----+-----+
-  | Doble cero                   No       |                                   | OFF |     |
+  | Doble cero (double zero)     No       |                                   | OFF |     |
   | (Jackpot program)            Si       |                                   | ON  |     |
   +---------------------------------------+-----------------------------------+-----+-----+
   | Castellano                   No       |                                         | OFF |
-  |                              Si       |                                         | ON  |
+  | (spanish)                    Si       |                                         | ON  |
   +---------------------------------------+-----------------------------------------+-----+
-  
+
+
 *********************************************************************
 
   Game Initialization
   -------------------
+
   (You must enable "LAMPS" layout for this procedure)
   
   When the game runs by the very first time (no nvram yet), it will
@@ -95,23 +104,29 @@
   
   So, we must initialize the game following the next instructions:
   
-  1.- Toggle on "Operator Key" (turn to green).
+  1.- Toggle ON "Operator Key" (turn to green).
+
   2.- Press once "Page Key". It will show a green window titled 
       "CONTROL ADMINISTRATIVO" and a message with a security token. 
+
   3.- Press again "Page Key". It will bring up a new window where we
       must type a password. At this time, in the layout, under the
       roulette leds will appear the password we need (six numeric digits).
-  4.- Ingress the required paswword using the credits in (IN1....IN6)
+
+  4.- Enter the required paswword using the credits in (IN1....IN6)
       and credits out (OUT1...OUT6) buttons following the key assignment
 	  indications located under the password field.
 	  Use the "E" button to finish once all numbers were typed.
 	  Use the "B" button clear last digit typed, in case of mistake. 
-  5.- Once finished that, and the the game will reboot and will be
-      ready to play. Also, password showed on layout will dissapear.
 
-	  In case that, by unknown reason, the game asks for
+  5.- Once finished that, the game will reboot and will be ready
+      to play. Also, password showed on layout will dissapear.
+
+	  In case that (by unknown reason) the game asks for
 	  "CONTROL ADMINISTRATIVO" again, follow the instructions starting
-	  from step "1". After that we will can play again.
+	  from step "1". After that, we will can play again.
+
+
 *********************************************************************/
   
   
@@ -136,20 +151,22 @@
   get different kinds of reports, like accounting, statistics and 
   many other technical items. All this tasks are performed from a
   PC running a D.O.S. program provided by the maker and fortunately
-  still available. Even more, there is another stand alone D.O.S.
-  software provided by the maker, and also still available, to get
-  the passwords needed when hardware fails or administrative tasks
-  are required.
+  still available. Even more, there is another standalone D.O.S.
+  software provided by the manufacturer (also still available) to
+  get the passwords needed when hardware fails or administrative
+  tasks are required.
   
   Another interesting thing found on this game is that it can be 
   configured for a single or a double zero roulette, depending on
   what kind of roulette has attached.
-  
+
+ 
 *********************************************************************/
 
-#define CPU_CLOCK       XTAL(8'000'000)
-#define VID_CLOCK       XTAL(10'730'000)
-#define TMS_CLOCK       (VID_CLOCK / 24)
+
+#define CPU_CLOCK       XTAL(8'000'000)		// guess
+#define VID_CLOCK       XTAL(21'477'272)    // guess
+#define TMS_CLOCK       (CPU_CLOCK / 4)      // guess
 #define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
 
 #include "emu.h"
@@ -171,9 +188,10 @@
 #define SND_FLG 0xf009
 #define RAM_PSW 0xf078
 
-#define BALLIN  (m_ballin>=2)
-#define MOTORON (m_p32!=0xf0)
-#define LEDNOTNUM (m_led!=m_num)
+#define BALLIN  (m_ballin >= 2)
+#define MOTORON (m_p32 != 0xf0)
+#define LEDNOTNUM (m_led != m_num)
+
 
 class rulechan_state : public driver_device
 {
@@ -185,7 +203,6 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_aux(*this, "AUX")
 		, m_dsw(*this, "DSW")
-		, m_tty(*this, "TTY")
 		, m_keymx(*this, "IN%u", 0)
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
@@ -204,9 +221,6 @@ private:
 	DECLARE_READ8_MEMBER(port31_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
 	DECLARE_WRITE8_MEMBER(port32_w);
-	DECLARE_READ8_MEMBER(port40_r);
-	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_READ8_MEMBER(port41_r);
 	DECLARE_READ8_MEMBER(psg_portA_r);
 	DECLARE_READ8_MEMBER(psg_portB_r);
 
@@ -214,7 +228,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER( wheel_speed );
 
 	uint8_t m_sline;
-	uint8_t m_stat;
 	uint8_t m_p30;
 	uint8_t m_p31;
 	uint8_t m_p32;
@@ -228,7 +241,6 @@ private:
 	uint8_t d_spin;
 	uint8_t m_ballin;
 	uint8_t m_led;
-	uint32_t m_lastk=0;
 	uint8_t m_pass[6];
 	uint8_t m_sndsrt[10]= { 0x0a, 0x0e, 0x06, 0x0a, 0x0b, 0x48, 0x0c, 0x00, 0x0d, 0x01 };
 
@@ -237,7 +249,6 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_aux;
 	required_ioport m_dsw;
-	required_ioport m_tty;
 	required_ioport_array<6> m_keymx;
 
 	void main_io(address_map &map);
@@ -249,6 +260,7 @@ private:
 	output_finder<63> m_lamps;
 	output_finder<6> m_digits;
 };
+
 
 /* BCD to Seven Segment Decoder */
 
@@ -273,6 +285,7 @@ static uint8_t dec_7seg(int data)
 	return segment;
 }
 
+
 /**************************************
 *             Memory Map              *
 **************************************/
@@ -287,25 +300,24 @@ void rulechan_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x00, 0x00).rw(FUNC(rulechan_state::port0_r),FUNC(rulechan_state::port0_w));   /* Matrix scan line selector - Must be 0xf0 at power up */
-	map(0x01, 0x01).portw("EEPROMOUT");                                                /* eeprom ok */
-	map(0x02, 0x02).r(FUNC(rulechan_state::port2_r));                                  /* Matriz button read */
+	map(0x00, 0x00).rw(FUNC(rulechan_state::port0_r),FUNC(rulechan_state::port0_w));   // Matrix scan line selector - Must be 0xf0 at power-up.
+	map(0x01, 0x01).portw("EEPROMOUT");                                                // EEPROM ok.
+	map(0x02, 0x02).r(FUNC(rulechan_state::port2_r));                                  // Matrix button read.
 	map(0x03, 0x03).r(FUNC(rulechan_state::port3_r));
-	map(0x10, 0x11).w("ay8910", FUNC(ay8910_device::address_data_w));                  /* sound ok */
-	map(0x12, 0x12).r("ay8910", FUNC(ay8910_device::data_r));                          /* ports ok */
-	map(0x20, 0x23).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));  /* video ok */
-	map(0x30, 0x30).r(FUNC(rulechan_state::port30_r));                                 /* wheel control */ 
-	map(0x31, 0x31).rw(FUNC(rulechan_state::port31_r),FUNC(rulechan_state::port31_w)); /* wheel control - read: Must be 0x00 at power up*/
-	map(0x32, 0x32).w(FUNC(rulechan_state::port32_w));                                 /* wheel control */ 
-	map(0x40, 0x40).rw(FUNC(rulechan_state::port40_r),FUNC(rulechan_state::port40_w)); /* RS232 - tty console - Data       Unknown serial device */
-	map(0x41, 0x41).r(FUNC(rulechan_state::port41_r));                                 /* RS232 - tty console - Status     Unknown serial device */ 
-	map(0x42, 0x43).nopr().nopw();
-	map(0x60, 0x60).nopw();                                                            /* Watchdog */ 
+	map(0x10, 0x11).w("ay8910", FUNC(ay8910_device::address_data_w));                  // sound ok.
+	map(0x12, 0x12).r("ay8910", FUNC(ay8910_device::data_r));                          // ports ok.
+	map(0x20, 0x23).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));  // video ok.
+	map(0x30, 0x30).r(FUNC(rulechan_state::port30_r));                                 // wheel control.
+	map(0x31, 0x31).rw(FUNC(rulechan_state::port31_r),FUNC(rulechan_state::port31_w)); // wheel control - read: Must be 0x00 at power-up.
+	map(0x32, 0x32).w(FUNC(rulechan_state::port32_w));                                 // wheel control.
+	map(0x40, 0x43).nopr().nopw();
+	map(0x60, 0x60).nopw();                                                            // Watchdog. 
 }
 
-/****************
-* Read Handlers *
-****************/
+
+/**************************
+*      Read Handlers      *
+**************************/
 
 READ8_MEMBER(rulechan_state::port0_r)
 {
@@ -340,87 +352,18 @@ READ8_MEMBER(rulechan_state::port31_r)
 	return 0x00;
 }
 
-/**********************
-*     Port 40h        *
-* serial data port    *
-**********************/
-
-READ8_MEMBER(rulechan_state::port40_r)
-{
-	uint8_t retval;
-	uint32_t inp;
-	inp=m_tty->read();
-	switch (inp)
-	{
-		case 0x00000001:retval=0x31;break;
-		case 0x00000002:retval=0x32;break;
-		case 0x00000004:retval=0x33;break;
-		case 0x00000008:retval=0x34;break;
-		case 0x00000010:retval=0x35;break;
-		case 0x00000020:retval=0x36;break;
-		case 0x00000040:retval=0x37;break;
-		case 0x00000080:retval=0x38;break;
-		case 0x00000100:retval=0x39;break;
-		case 0x00000200:retval=0x30;break;
-		case 0x00000400:retval=0x0d;break;
-		case 0x00000800:retval=0x3a;break;
-		case 0x00001000:retval=0x08;break;
-		case 0x00002000:retval=0x20;break;
-		case 0x00004000:retval=0x52;break;
-		case 0x00008000:retval=0x53;break;
-		case 0x00010000:retval=0x54;break;
-		case 0x00020000:retval=0x56;break;
-		case 0x00040000:retval=0x4b;break;
-		case 0x00080000:retval=0x57;break;
-		case 0x00100000:retval=0x55;break;
-		case 0x00200000:retval=0x58;break;
-		case 0x00400000:retval=0x4e;break;
-		case 0x00800000:retval=0x59;break;
-		case 0x01000000:retval=0x5a;break;
-		case 0x02000000:retval=0x51;break;
-		case 0x04000000:retval=0x6c;break;
-		case 0x08000000:retval=0x48;break;
-		case 0x10000000:retval=0x49;break;
-		case 0x20000000:retval=0x4a;break;
-		case 0x40000000:retval=0x4f;break;
-		case 0x80000000:retval=0x70;break;
-		default: retval=0;
-	}
-	m_stat &= 0xf7; /* down rx enable */
-	m_stat|= 0x10;  /* up tx enable   */
-	if (inp) m_lastk = inp;
-	return retval;
-}
-
-/**********************
-*     Port 41h        *
-* serial port status  *
-*  bit 3 = rx ready   *
-*  bit 4 -  tx ready  *
-***********************/
-
-READ8_MEMBER(rulechan_state::port41_r) /* console port status- bit 3 = rx ready / bit 4 -  tx ready */
-{
-	uint32_t keys;
-	keys=m_tty->read();
-	if(!keys) { m_stat&=0xf7; m_lastk=0;}
-	else
-		if(keys == m_lastk) m_stat&=0xf7;
-		else m_stat|=0x08;
-	return m_stat;
-}
-
 READ8_MEMBER(rulechan_state::psg_portA_r)
 {
-	m_lamps[60] = (BIT(m_aux->read(), 3))?0:1; /* Show Operator Key via layout lamp */
-	m_lamps[61] = (BIT(m_aux->read(), 7))?0:1; /* Show Page     Key via layout lamp */
-	return m_aux->read();                      /* Operator Key read */
+	m_lamps[60] = (BIT(m_aux->read(), 3)) ? 0 : 1;    // Show Operator Key via layout lamp.
+	m_lamps[61] = (BIT(m_aux->read(), 7)) ? 0 : 1;    // Show Page Key via layout lamp.
+	return m_aux->read();                             // Operator Key read.
 }
 
 READ8_MEMBER(rulechan_state::psg_portB_r)
 {
-	return m_dsw->read();                      /* DipSw read */
+	return m_dsw->read();                   // DIP Switch read.
 }
+
 
 /***********************
 *    Write Handlers    *
@@ -428,8 +371,12 @@ READ8_MEMBER(rulechan_state::psg_portB_r)
 
 WRITE8_MEMBER(rulechan_state::port0_w)
 {
-	m_sline = data & 0x07;                     /* Matrix scan line selector */
-	if (m_sline>5) m_sline=0;
+	m_sline = data & 0x07;                 // Matrix scan line selector.
+
+	if (m_sline > 5)
+	{
+		m_sline = 0;
+	}
 }
 
 /****************************************
@@ -441,14 +388,21 @@ WRITE8_MEMBER(rulechan_state::port0_w)
 
 WRITE8_MEMBER(rulechan_state::port31_w)
 {
-	m_p31=data;
-	if( BIT(m_p31,4)) { m_p30|=0x20; m_ballin=0;}   /* Drop ball....ball in shooter */
-	if(BIT(m_p31,7))                                /* Shoot ball */
-		{ 
-			m_p30&=0xdf;                            /* ball out.... */
-			m_num = machine().rand() % 37;          /* sort winning number */
-			//logerror("shooting ball 2d\n", m_num);
-		}
+	m_p31 = data;
+
+	if(BIT(m_p31, 4))
+	{
+		m_p30 |= 0x20;
+		m_ballin = 0;      // Drop ball....ball in shooter.
+	}
+
+	if(BIT(m_p31, 7))                      // Shoot ball.
+	{ 
+		m_p30 &= 0xdf;                     // ball out....
+		m_num = machine().rand() % 37;     // sort winning number.
+
+		//logerror("shooting ball 2d\n", m_num);
+	}
 }
 
 /****************************************
@@ -460,18 +414,9 @@ WRITE8_MEMBER(rulechan_state::port31_w)
 
 WRITE8_MEMBER(rulechan_state::port32_w)
 {
-	m_p32=data;
+	m_p32 = data;
 }
 
-/**********************
-*     Port 40h        *
-* serial data port    *
-**********************/
-
-WRITE8_MEMBER(rulechan_state::port40_w)
-{
-	printf("%c",data);                          /* Serial data out - Console */
-}
 
 /************************************************
 *    Extra Sound - Roulette spinning ball       *
@@ -486,93 +431,107 @@ void rulechan_state::sound_off()
 
 void rulechan_state::sound_sort()
 {
-	for (int i=0;i<5;i++)
+	for (int i = 0; i < 5; i++)
 	{
-		m_maincpu->space(AS_IO).write_byte(0x10, m_sndsrt[(2*i)]);
-		m_maincpu->space(AS_IO).write_byte(0x11, m_sndsrt[(2*i)+1]);
+		m_maincpu->space(AS_IO).write_byte(0x10, m_sndsrt[(2 * i)]);
+		m_maincpu->space(AS_IO).write_byte(0x11, m_sndsrt[(2 * i) + 1]);
 	}
 	m_maincpu->space(AS_IO).write_byte(0x10, 0x07);  
 	m_maincpu->space(AS_IO).write_byte(0x11, m_maincpu->space(AS_PROGRAM).read_byte(SND_FLG) & 0xdf);
 	m_maincpu->space(AS_IO).write_byte(0x10, 0x0e); 
 }
 
+
 /***********************
 *    Wheel Simulation  *
 ***********************/
+
 TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 {
-	if(m_step==0)
+	if(m_step == 0)
 	{
-		if((BIT4) & (m_updn4==0))
+		if((BIT4) & (m_updn4 == 0))
 		{	
-			m_p30&=0xef;
-			m_updn4=1;
+			m_p30 &= 0xef;
+			m_updn4 = 1;
+
 			//logerror("1:port_p30:- Reset bit 4 pulse start -%2x cont_pasos:%2d\n",m_p30, m_step);
 			return;
 		}
 		
-		if((!BIT4) & (m_updn4==1))
+		if((!BIT4) & (m_updn4 == 1))
 		{	
-			m_p30|=0x10;
+			m_p30 |= 0x10;
 			
 			//logerror("2:port_p30:- Set bit 4 -%2x cont_pasos:%2d\n",m_p30, m_step);
 			return;
 		}		
 		
-		if((BIT4) & (m_updn4==1))
+		if((BIT4) & (m_updn4 == 1))
 		{	
-			m_updn4=0;
+			m_updn4 = 0;
 			m_step++;
+
 			//logerror("3:port_p30:-end mark for reset bit 4 -%2x cont_pasos:%2d\n",m_p30, m_step);
 			return;
 		}
 	}
 	else
 	{
-		
-		if(BIT3 & (m_updn3==0))
+		if(BIT3 & (m_updn3 == 0))
 		{
-			m_p30&=0xf7;
+			m_p30 &= 0xf7;
+
 			//logerror("4:port_p30:-reset bit 3 -%2x cont_pasos:%2d\n",m_p30, m_step);
 			return;
 		}
 		
-		if(!BIT3 & (m_updn3==0))
+		if(!BIT3 & (m_updn3 == 0))
 		{	
 			if(!BIT2)
 			{
-				m_p30|= 0x04;
+				m_p30 |= 0x04;
+
 				//logerror("5:port_p30:-set bit 2 -%2x cont_pasos:%2d\n",m_p30, m_step);
 				return;
 			}
 			else
 			{
-				if((m_step-1==m_num) & (m_updn2==0)) 
+				if((m_step - 1 == m_num) & (m_updn2 == 0)) 
 				{
-					if(!BIT5) /* ball in pocket? */
+					if(!BIT5)   // ball in pocket?...
 					{ 
-						m_p30&= 0xfb;
-						m_updn2=1;
+						m_p30 &= 0xfb;
+						m_updn2 = 1;
 						m_ballin++; 
 						logerror("Ball In Pocket m_num:%2x\n", m_num);
 						return;
 					}
 				}
 			}
-			m_updn2=0;
-			m_updn3=1;
+
+			m_updn2 = 0;
+			m_updn3 = 1;
 		}
-		if(!BIT3 & (m_updn3==1))
+		
+		if(!BIT3 & (m_updn3 == 1))
 		{
-			m_p30|=0x08;
-			m_updn3=0;
+			m_p30 |= 0x08;
+			m_updn3 = 0;
 			m_step++;
-			if (m_step==39){ m_step=0;m_p30|=0x1c;} 
+			
+			if (m_step == 39)
+			{
+				m_step = 0;
+				m_p30 |= 0x1c;
+			} 
+
 			//logerror("6:port_p30:-set bit 3 -%2x cont_pasos:%2d \n",m_p30, m_step);
 			return;
 		}
 	}
 }
+
 
 /***********************
 *    Ball Simulation   *
@@ -582,45 +541,78 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::ball_speed)
 {
 	if(MOTORON)
 	{	
-		if(d_spin==0)
+		if(d_spin == 0)
 		{
 			m_tspin++;
-			d_spin=m_spin;
-			if(BALLIN) m_tspin=37; /* braking ball once per number step */
-			if(m_tspin==37) { m_tspin=0; m_spin++; d_spin=m_spin;} /* braking ball once per round */
-			if( (!BALLIN) | (LEDNOTNUM & BALLIN ) )
+			d_spin = m_spin;
+
+			if(BALLIN)
 			{
-				m_led++;if(m_led==37) m_led=0;
-				for (int i=0;i<37;i++) m_lamps[i+20] = (m_led==i) ? 1:0; /* update roulette led lamps */
+				m_tspin = 37;   // breaking ball once per number step.
+			}
+			
+			if(m_tspin == 37)
+			{
+				m_tspin = 0;
+				m_spin++;
+				d_spin = m_spin;   // breaking ball once per round.
+			}
+			
+			if((!BALLIN) | (LEDNOTNUM & BALLIN ))
+			{
+				m_led++;
+				
+				if(m_led == 37)
+				{
+					m_led = 0;
+				}
+
+				for (int i = 0; i < 37; i++)
+				{
+					m_lamps[i + 20] = (m_led == i) ? 1 : 0;   // update roulette led lamps.
+				}
+
 				sound_sort();
 			}
 		}
 		else
 		{
-			d_spin--; /* burn cycles */
+			d_spin--;     // burn cycles...
 			sound_off();
 		}
 	}
 	else
 	{
-		for (int i=0;i<37;i++) m_lamps[i+20] = (m_num==i) ? 1:0;
+		for (int i = 0; i < 37; i++)
+		{
+			m_lamps[i + 20] = (m_num == i) ? 1 : 0;
+		}
+
 		m_spin=d_spin=m_tspin=m_ballin=0;
 	}
-/* Ball simulation finished */
+
+	/* END of Ball simulation */
 
 /* if needed, get pass and shows it on layout*/
-	m_pass[0]= m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW);
-	if((m_pass[0]<=0x39)& (m_pass[0]>=0x30)) 
+	m_pass[0] = m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW);
+
+	if((m_pass[0] <= 0x39) & (m_pass[0] >= 0x30)) 
 	{
-		for(int i=0;i<6;i++)
+		for(int i = 0; i < 6; i++)
 		{
-			m_pass[i]= m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW+i);
-			m_lamps[10+i] = dec_7seg(m_pass[i] - 0x30);
+			m_pass[i]= m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW + i);
+			m_lamps[10 + i] = dec_7seg(m_pass[i] - 0x30);
 		}
 	}
 	else
-		for(int i=0;i<6;i++) m_lamps[10+i] = dec_7seg(0xff);
+	{
+		for(int i = 0; i < 6; i++)
+		{
+			m_lamps[10 + i] = dec_7seg(0xff);
+		}
+	}
 }
+
 
 /**************************************
 *            Input Ports              *
@@ -695,54 +687,20 @@ static INPUT_PORTS_START( rulechan )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_TOGGLE            PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* bit 6 is EEPROM data */ 
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // bit 6 is EEPROM data. 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9)
-
-	PORT_START("TTY")
-	PORT_BIT( 0x000000001, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x000000002, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x000000004, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x000000008, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x000000010, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x000000020, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x000000040, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x000000080, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x000000100, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x000000200, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x000000400, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x000000800, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(":")  PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x000001000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x000002000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SP") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT( 0x000004000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x000008000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("S") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x000010000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("T") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x000020000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("V") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x000040000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("K") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x000080000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x000100000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("U") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x000200000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x000400000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("N") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x000800000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x001000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Z") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x002000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x004000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("l") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x008000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("H") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x010000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x020000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("J") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x040000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x080000000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("p") PORT_CODE(KEYCODE_RCONTROL)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Borrado Total" )  PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Repite" )         PORT_DIPLOCATION("DSW:2")
+	PORT_DIPNAME( 0x02, 0x00, "Repite" )         PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Demo" )           PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Acceso" )         PORT_DIPLOCATION("DSW:4")
+	PORT_DIPNAME( 0x08, 0x00, "Acceso" )         PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Test de Plato" )  PORT_DIPLOCATION("DSW:5")
@@ -754,15 +712,16 @@ static INPUT_PORTS_START( rulechan )
 	PORT_DIPNAME( 0x40, 0x40, "Doble Cero" )     PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Castellano" )     PORT_DIPLOCATION("DSW:8")
+	PORT_DIPNAME( 0x80, 0x00, "Castellano" )     PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)    /* bit 3 is data (active high) */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)   /* bit 4 is clock (active high) */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)    /* bit 5 is cs */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)    // bit 3 is data (active high).
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)   // bit 4 is clock (active high).
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)    // bit 5 is cs.
 
 INPUT_PORTS_END
+
 
 /**************************************
 *           Machine Driver            *
@@ -774,7 +733,7 @@ MACHINE_CONFIG_START(rulechan_state::rulechan)
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rulechan_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &rulechan_state::main_io);
-	m_maincpu->set_periodic_int(FUNC(rulechan_state::irq0_line_hold),  attotime::from_hz(120));
+	m_maincpu->set_periodic_int(FUNC(rulechan_state::irq0_line_hold), attotime::from_hz(120));
 
 	/* nvram */
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -794,12 +753,13 @@ MACHINE_CONFIG_START(rulechan_state::rulechan)
 	
 	/* sound hardware   */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay_re900(AY8910(config, "ay8910", TMS_CLOCK)); /* From TMS9128NL - Pin 37 (GROMCLK) */
+	ay8910_device &ay_re900(AY8910(config, "ay8910", TMS_CLOCK));
 	ay_re900.port_a_read_callback().set(FUNC(rulechan_state::psg_portA_r));
 	ay_re900.port_b_read_callback().set(FUNC(rulechan_state::psg_portB_r));
 	ay_re900.add_route(ALL_OUTPUTS, "mono", 0.5);
 	
 MACHINE_CONFIG_END
+
 
 /**************************************
 *              ROM Load               *
@@ -808,37 +768,39 @@ MACHINE_CONFIG_END
 ROM_START( rulechan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "eprom322", 0x00000, 0x10000, CRC(a78e106f) SHA1(23e25ca60296e8002df9b9cf16ad8fe8a1e6c93b) )
+
 	ROM_REGION(0x80, "eeprom", 0)
 	ROM_LOAD( "eeprom.322", 0x0000, 0x0080, CRC(ded905d2) SHA1(999e8e54a31a232092c4345434b93358226d1144) )
-	
 ROM_END
 
 ROM_START( rulechab )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "eprom165", 0x00000, 0x10000, CRC(1669f266) SHA1(14e70b91e260e3bc338870936954e09c182fe591) )
+
 	ROM_REGION(0x80, "eeprom", 0)
 	ROM_LOAD( "eeprom.165", 0x0000, 0x0080, CRC(042ac516) SHA1(a32d82acb438cceda0f03b58be6977eeb589836c) )
 ROM_END
 
+
 /************************
 *      Driver Init      *
 ************************/
+
 void rulechan_state::rulechan_init()
 {
-	m_p30=0x3c; 
-	m_p32=0Xf0; /* Motor off at startup */
-	m_step=0;
-	m_stat=0;
-	m_updn2=0;
-	m_updn3=0;
-	m_updn4=0;
+	m_p30 = 0x3c; 
+	m_p32 = 0xf0;  // Motor off at startup
+	m_step = 0;
+	m_updn2 = 0;
+	m_updn3 = 0;
+	m_updn4 = 0;
 }
+
 
 /**************************************
 *           Game Driver(s)            *
 **************************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        ROT      COMPANY          FULLNAME                FLAGS                  LAYOUT
-GAMEL(1991, rulechan, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N322)", MACHINE_SUPPORTS_SAVE, layout_rulechan)
-GAMEL(1991, rulechab, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N165)", MACHINE_SUPPORTS_SAVE, layout_rulechan)
-
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY          FULLNAME                            FLAGS                                                                   LAYOUT
+GAMEL(1991, rulechan, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N322)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK, layout_rulechan)
+GAMEL(1991, rulechab, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N165)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK, layout_rulechan)
