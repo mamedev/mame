@@ -3674,16 +3674,16 @@ void royalmah_state::janptr96(machine_config &config)
 
 MACHINE_CONFIG_START(royalmah_state::mjifb)
 	mjderngr(config);
-	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(mjifb_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjifb_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p4_w))
-	MCFG_TLCS90_PORT_P5_READ_CB(READ8(*this, royalmah_state, mjifb_p5_r))
-	MCFG_TLCS90_PORT_P6_READ_CB(READ8(*this, royalmah_state, mjifb_p6_r))
-	MCFG_TLCS90_PORT_P7_READ_CB(READ8(*this, royalmah_state, mjifb_p7_r))
-	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, royalmah_state, mjifb_p8_r))
-	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p8_w))
+	tmp90841_device &tmp(TMP90841(config.replace(), m_maincpu, 8000000));   /* ? */
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_state::mjifb_map);
+	tmp.port_read<3>().set(FUNC(royalmah_state::mjifb_p3_r));
+	tmp.port_write<3>().set(FUNC(royalmah_state::mjifb_p3_w));
+	tmp.port_write<4>().set(FUNC(royalmah_state::mjifb_p4_w));
+	tmp.port_read<5>().set(FUNC(royalmah_state::mjifb_p5_r));
+	tmp.port_read<6>().set(FUNC(royalmah_state::mjifb_p6_r));
+	tmp.port_read<7>().set(FUNC(royalmah_state::mjifb_p7_r));
+	tmp.port_read<8>().set(FUNC(royalmah_state::mjifb_p8_r));
+	tmp.port_write<8>().set(FUNC(royalmah_state::mjifb_p8_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3693,16 +3693,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjdejavu)
 	mjderngr(config);
-	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(mjdejavu_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjifb_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p4_w))
-	MCFG_TLCS90_PORT_P5_READ_CB(READ8(*this, royalmah_state, mjifb_p5_r))
-	MCFG_TLCS90_PORT_P6_READ_CB(READ8(*this, royalmah_state, mjifb_p6_r))
-	MCFG_TLCS90_PORT_P7_READ_CB(READ8(*this, royalmah_state, mjifb_p7_r))
-	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, royalmah_state, mjifb_p8_r))
-	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p8_w))
+	tmp90841_device &tmp(TMP90841(config.replace(), m_maincpu, 8000000));   /* ? */
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_state::mjdejavu_map);
+	tmp.port_read<3>().set(FUNC(royalmah_state::mjifb_p3_r));
+	tmp.port_write<3>().set(FUNC(royalmah_state::mjifb_p3_w));
+	tmp.port_write<4>().set(FUNC(royalmah_state::mjifb_p4_w));
+	tmp.port_read<5>().set(FUNC(royalmah_state::mjifb_p5_r));
+	tmp.port_read<6>().set(FUNC(royalmah_state::mjifb_p6_r));
+	tmp.port_read<7>().set(FUNC(royalmah_state::mjifb_p7_r));
+	tmp.port_read<8>().set(FUNC(royalmah_state::mjifb_p8_r));
+	tmp.port_write<8>().set(FUNC(royalmah_state::mjifb_p8_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3712,10 +3712,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjtensin)
 	mjderngr(config);
-	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(mjtensin_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjtensin_p3_r))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjtensin_p4_w))
+	tmp90841_device &tmp(TMP90841(config.replace(), m_maincpu, 12000000));  /* ? */
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_state::mjtensin_map);
+	tmp.port_read<3>().set(FUNC(royalmah_state::mjtensin_p3_r));
+	tmp.port_write<4>().set(FUNC(royalmah_state::mjtensin_p4_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3727,10 +3727,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::cafetime)
 	mjderngr(config);
-	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cafetime_map)
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, cafetime_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, cafetime_p4_w))
+	tmp90841_device &tmp(TMP90841(config.replace(), m_maincpu, 12000000));  /* ? */
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_state::cafetime_map);
+	tmp.port_write<3>().set(FUNC(royalmah_state::cafetime_p3_w));
+	tmp.port_write<4>().set(FUNC(royalmah_state::cafetime_p4_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3742,11 +3742,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjvegasa)
 	mjderngr(config);
-	MCFG_DEVICE_REPLACE("maincpu",TMP90841, XTAL(8'000'000)) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(mjvegasa_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjtensin_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, mjvegasa_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjvegasa_p4_w))
+	tmp90841_device &tmp(TMP90841(config.replace(), m_maincpu, XTAL(8'000'000))); /* ? */
+	tmp.set_addrmap(AS_PROGRAM, &royalmah_state::mjvegasa_map);
+	tmp.port_read<3>().set(FUNC(royalmah_state::mjtensin_p3_r));
+	tmp.port_write<3>().set(FUNC(royalmah_state::mjvegasa_p3_w));
+	tmp.port_write<4>().set(FUNC(royalmah_state::mjvegasa_p4_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)

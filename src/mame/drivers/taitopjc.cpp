@@ -117,7 +117,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_iocpu;
+	required_device<tmp95c063_device> m_iocpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_dsp;
 	required_device<tc0780fpa_device> m_tc0780fpa;
@@ -775,16 +775,16 @@ MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 	MCFG_DEVICE_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */
-	MCFG_DEVICE_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_TMP95C063_PORT5_READ(IOPORT("INPUTS1"))
-	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS2"))
-	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS3"))
-	MCFG_TMP95C063_AN0_READ(IOPORT("ANALOG1"))
-	MCFG_TMP95C063_AN1_READ(IOPORT("ANALOG2"))
-	MCFG_TMP95C063_AN2_READ(IOPORT("ANALOG3"))
-	MCFG_TMP95C063_AN3_READ(IOPORT("ANALOG4"))
-	MCFG_DEVICE_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
+	TMP95C063(config, m_iocpu, 25000000);
+	m_iocpu->port5_read().set_ioport("INPUTS1");
+	m_iocpu->portd_read().set_ioport("INPUTS2");
+	m_iocpu->porte_read().set_ioport("INPUTS3");
+	m_iocpu->an_read<0>().set_ioport("ANALOG1");
+	m_iocpu->an_read<1>().set_ioport("ANALOG2");
+	m_iocpu->an_read<2>().set_ioport("ANALOG3");
+	m_iocpu->an_read<3>().set_ioport("ANALOG4");
+	m_iocpu->set_addrmap(AS_PROGRAM, &taitopjc_state::tlcs900h_mem);
+	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::taitopjc_vbi));
 
 	/* TMS320C53 DSP */
 	MCFG_DEVICE_ADD("dsp", TMS32053, 40000000)

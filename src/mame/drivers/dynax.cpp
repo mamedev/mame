@@ -4853,16 +4853,16 @@ WRITE_LINE_MEMBER(dynax_state::tenkai_blitter_ack_w)
 MACHINE_CONFIG_START(dynax_state::tenkai)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",TMP91640, 21472700 / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tenkai_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, dynax_state, tenkai_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p4_w))
-	MCFG_TLCS90_PORT_P5_READ_CB(READ8(*this, dynax_state, tenkai_p5_r))
-	MCFG_TLCS90_PORT_P6_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p6_w))
-	MCFG_TLCS90_PORT_P7_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p7_w))
-	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, dynax_state, tenkai_p8_r))
-	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p8_w))
+	tmp91640_device &tmp(TMP91640(config, m_maincpu, 21472700 / 2));
+	tmp.set_addrmap(AS_PROGRAM, &dynax_state::tenkai_map);
+	tmp.port_read<3>().set(FUNC(dynax_state::tenkai_p3_r));
+	tmp.port_write<3>().set(FUNC(dynax_state::tenkai_p3_w));
+	tmp.port_write<4>().set(FUNC(dynax_state::tenkai_p4_w));
+	tmp.port_read<5>().set(FUNC(dynax_state::tenkai_p5_r));
+	tmp.port_write<6>().set(FUNC(dynax_state::tenkai_p6_w));
+	tmp.port_write<7>().set(FUNC(dynax_state::tenkai_p7_w));
+	tmp.port_read<8>().set(FUNC(dynax_state::tenkai_p8_r));
+	tmp.port_write<8>().set(FUNC(dynax_state::tenkai_p8_w));
 
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::tenkai_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
@@ -4933,9 +4933,9 @@ void dynax_state::mjreach(machine_config &config)
 MACHINE_CONFIG_START(dynax_state::gekisha)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",TMP90841, XTAL(10'000'000) )   // ?
-	MCFG_DEVICE_PROGRAM_MAP(gekisha_map)
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, dynax_state, gekisha_p4_w))
+	tmp90841_device &tmp(TMP90841(config, m_maincpu, XTAL(10'000'000)));   // ?
+	tmp.set_addrmap(AS_PROGRAM, &dynax_state::gekisha_map);
+	tmp.port_write<4>().set(FUNC(dynax_state::gekisha_p4_w));
 
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::gekisha_banked_map).set_data_width(8).set_addr_width(17).set_stride(0x8000);
 
