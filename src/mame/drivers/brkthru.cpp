@@ -49,6 +49,90 @@
     2008-07
     Dip locations verified with manual for brkthru (US conv. kit) and darwin
 
+Darwin 4078 PCB layout
+f205v
+
+Darwin 4078
+Data East, 1986
+----------
+|----------------------|
+| Fully boxed = socket |
+|----------------------|
+
+
+| separation = solder
+
+
+upper pcb - 3002A
+|-------------------------------------------------|
+|t                      |-------|                 |
+|o          |---------| |YM2203C|                 |
+|           |prom28s42| |-------|                 |
+|l          |---------| |YM3526                   |C
+|o                      |-----|                   |O
+|w   |-----|            |epr5 |                   |N
+|e   |epr8 |            |-----|                   |N
+|r   |-----|                                      |E
+|    |epr7 |            |HD68A09P                 |C
+|    |-----|                     |-----|          |T
+|t   |epr6 |                     |epr4 |          |O
+|o   |-----|                     |-----|          |R
+|                   |--------|   |epr3 |          |
+|l                  |HD6809EP|   |-----|          |
+|o                  |--------|   |epr2 |  dip 8x  |
+|w                               |-----|  dip 8x  |
+|e                               |epr1 |          |
+|r                               |-----|          |
+|-------------------------------------------------|
+Notes:
+
+      Chips:
+      HD68A09P : 3G1-UL-HD68A09P Japan (DIP40)
+      HD6809EP : 5M1-HD6809EP Japan (DIP40)
+       YM2203C : Yamaha YM2203C-5X-18-89-F (DIP40)
+        YM3526 : Yamaha YM3526-61-09-75-E (DIP40)
+
+      ROMs:
+    1,2,3,5,6,7,8 : Intel IP27256
+                4 : M27128Z-N
+             prom : TBP28S42N
+
+    Connectors:
+               2x flat cable to upper board
+               1x NON-JAMMA 22 contacts
+
+
+
+lower pcb - 3002B
+|-----------------------------------------------------|
+|t                   |-----|                          |
+|o          |------| |epr11|                          |
+|           |pal -a| |-----| |------|                 |
+|u          |------| |epr10| |pal -b|                 |
+|p                   |-----| |------| |------|        |
+|p                   |epr9 |          |pal -c|        |
+|e                   |-----|          |------|        |
+|r   |-----|                                          |
+|    |epr12|                                          |
+|    |-----|                                          |
+|t                                                    |
+|o                                                    |
+|                                                     |
+|u                                                    |
+|p                      12.0000MHz                    |
+|p                                                    |
+|e                                                    |
+|r                                                    |
+|-----------------------------------------------------|
+Notes:
+      ROMs:
+          9,10,11 : Intel IP27256
+               12 : TMS2764JL
+              pal : AmPAL16R4PC
+
+    Connectors:
+               2x flat cable to upper board
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -680,12 +764,19 @@ ROM_START( darwin )
 	ROM_LOAD( "darw_11.rom",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
 	ROM_LOAD( "darw_12.rom",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
+	// A PCB has been found with the first PROM substituted with a TBP28S42 (4b56a744) SHA1(5fdc336d90c8a289c146c66f241dd217fc11bf35), see brkthrut ROM loading for how they did it.
+	// With that in mind, there's a one byte difference at 0x55 (0xf0 instead of 0x70). It is unknown if it's bitrot or if it's intended.
+	ROM_REGION( 0x0200, "proms", 0 ) 
 	ROM_LOAD( "df.12",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) /* red and green component */
 	ROM_LOAD( "df.13",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) /* blue component */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "darw_08.rom",  0x8000, 0x8000, CRC(6b580d58) SHA1(a70aebc6b4a291b4adddbb41d092b2682fc2d421) )
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "1-pal16r4pc.bin",  0x000, 0x104, CRC(c859298c) SHA1(7db617fec6eecaf3f6043d7446bc1786bbc2b08c) )
+	ROM_LOAD( "2-pal16r4pc.bin",  0x200, 0x104, CRC(226629c3) SHA1(fd5704dfbb91a46665050b27b15bd22527a46a6e) )
+	ROM_LOAD( "3-pal16r4pc.bin",  0x400, 0x104, CRC(b3e980a0) SHA1(b1dbf01621d1053e641570fcac6618562d0721b4) )
 ROM_END
 
 
