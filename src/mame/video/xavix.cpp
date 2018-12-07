@@ -7,6 +7,8 @@
 // #define VERBOSE 1
 #include "logmacro.h"
 
+#include <cmath>
+
 inline void xavix_state::set_data_address(int address, int bit)
 {
 	m_tmp_dataaddress = address;
