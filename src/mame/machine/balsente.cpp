@@ -93,8 +93,9 @@ void balsente_state::machine_reset()
 	m_grudge_steering_result = 0;
 
 	/* point the banks to bank 0 */
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	m_bankab->set_entry(0);
+	m_bankcd->set_entry(0);
+	m_bankef->set_entry(0);
 	m_maincpu->reset();
 
 	/* start a timer to generate interrupts */
@@ -160,8 +161,9 @@ READ8_MEMBER(balsente_state::random_num_r)
 WRITE8_MEMBER(balsente_state::rombank_select_w)
 {
 	/* the bank number comes from bits 4-6 */
-	membank("bank1")->set_entry((data >> 4) & 7);
-	membank("bank2")->set_entry((data >> 4) & 7);
+	m_bankab->set_entry((data >> 4) & 7);
+	m_bankcd->set_entry((data >> 4) & 7);
+	m_bankef->set_entry(0);
 }
 
 
@@ -171,20 +173,22 @@ WRITE8_MEMBER(balsente_state::rombank2_select_w)
 	int bank = data & 7;
 
 	/* top bit controls which half of the ROMs to use (Name that Tune only) */
-	if (memregion("maincpu")->bytes() > 0x40000) bank |= (data >> 4) & 8;
+	if (memregion("maincpu")->bytes() > 0x20000) bank |= (data >> 4) & 8;
 
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)
 	{
-		membank("bank1")->set_entry(bank);
-		membank("bank2")->set_entry(6);
+		m_bankab->set_entry(bank);
+		m_bankcd->set_entry(6);
+		m_bankef->set_entry(0);
 	}
 
 	/* set both banks */
 	else
 	{
-		membank("bank1")->set_entry(bank);
-		membank("bank2")->set_entry(bank);
+		m_bankab->set_entry(bank);
+		m_bankcd->set_entry(bank);
+		m_bankef->set_entry(BIT(bank, 3));
 	}
 }
 
