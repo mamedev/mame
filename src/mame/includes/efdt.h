@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders: ElSemi, Roberto Fresca.
-
 #ifndef MAME_INCLUDES_EFDT_H
 #define MAME_INCLUDES_EFDT_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "emupal.h"
@@ -11,8 +12,8 @@
 class efdt_state : public driver_device
 {
 public:
-	efdt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	efdt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -22,6 +23,11 @@ public:
 	{ }
 
 	void efdt(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -51,7 +57,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_VIDEO_START(efdt);
 	DECLARE_PALETTE_INIT(efdt);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);

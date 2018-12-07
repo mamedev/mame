@@ -5,6 +5,10 @@
     Malzak
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MALZAK_H
+#define MAME_INCLUDES_MALZAK_H
+
+#pragma once
 
 #include "machine/s2636.h"
 #include "video/saa5050.h"
@@ -15,15 +19,16 @@ class malzak_state : public driver_device
 {
 public:
 	malzak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_s2636(*this, "s2636%u", 0U),
-			m_trom(*this, "saa5050"),
-			m_videoram(*this, "videoram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_mainbank(*this, "mainbank") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_s2636(*this, "s2636%u", 0U)
+		, m_trom(*this, "saa5050")
+		, m_videoram(*this, "videoram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_mainbank(*this, "mainbank")
+	{ }
 
 	void malzak(machine_config &config);
 	void malzak2(machine_config &config);
@@ -68,3 +73,5 @@ private:
 	void malzak_io_map(address_map &map);
 	void malzak_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MALZAK_H

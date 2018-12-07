@@ -29,6 +29,10 @@ public:
 
 	void init_dealer();
 
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
 	DECLARE_WRITE8_MEMBER(port_1_w);
@@ -37,7 +41,6 @@ private:
 	DECLARE_READ8_MEMBER(ay_porta_mpx_r);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(dealer_pal_w);
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(epos);
 	DECLARE_MACHINE_START(dealer);
 	DECLARE_PALETTE_INIT(epos);
@@ -47,8 +50,6 @@ private:
 	void dealer_map(address_map &map);
 	void epos_io_map(address_map &map);
 	void epos_map(address_map &map);
-
-	virtual void machine_start() override { m_leds.resolve(); }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;

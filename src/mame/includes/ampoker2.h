@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+#ifndef MAME_INCLUDES_AMPOKER2_H
+#define MAME_INCLUDES_AMPOKER2_H
+
+#pragma once
 
 #include "machine/watchdog.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class ampoker2_state : public driver_device
 {
 public:
-	ampoker2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ampoker2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
@@ -19,6 +23,13 @@ public:
 	void sigma2k(machine_config &config);
 	void ampoker2(machine_config &config);
 
+	void init_rabbitpk();
+
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_WRITE8_MEMBER(port31_w);
 	DECLARE_WRITE8_MEMBER(port32_w);
@@ -28,17 +39,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port36_w);
 	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
-	void init_rabbitpk();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
 	DECLARE_PALETTE_INIT(ampoker2);
 	DECLARE_VIDEO_START(sigma2k);
 
-protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-
-private:
 	void io_map(address_map &map);
 	void program_map(address_map &map);
 
@@ -51,3 +56,5 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<10> m_lamps;
 };
+
+#endif // MAME_INCLUDES_AMPOKER2_H
