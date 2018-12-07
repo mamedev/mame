@@ -61,6 +61,10 @@ public:
 	void shrike(machine_config &config);
 	void rescraid(machine_config &config);
 	void balsente(machine_config &config);
+	void teamht(machine_config &config);
+	void grudge(machine_config &config);
+	void balsent2(machine_config &config);
+	void spiker(machine_config &config);
 	void triviamb(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
 	void init_otwalls();
@@ -74,7 +78,6 @@ public:
 	void init_snakepit();
 	void init_spiker();
 	void init_hattrick();
-	void init_teamht();
 	void init_toggle();
 	void init_snakjack();
 	void init_grudge();
@@ -138,7 +141,13 @@ private:
 
 	void cpu1_base_map(address_map &map);
 	void cpu1_map(address_map &map);
+	void cpu1_teamht_map(address_map &map);
+	void cpu1_grudge_map(address_map &map);
+	void cpu1_1986_map(address_map &map);
+	void cpu1_spiker_map(address_map &map);
+	void cpu1_shrike_map(address_map &map);
 	void cpu1_smudge_map(address_map &map);
+	void cpu1_triviamb_map(address_map &map);
 	void cpu2_triviamb_io_map(address_map &map);
 	void cpu2_triviamb_map(address_map &map);
 	void shrike68k_map(address_map &map);
@@ -185,9 +194,9 @@ private:
 	optional_device<cpu_device> m_68k;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<ls259_device> m_outlatch;
+	optional_device<ls259_device> m_outlatch;
 	required_device_array<x2212_device, 2> m_novram;
-	required_device<acia6850_device> m_acia;
+	optional_device<acia6850_device> m_acia;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
 

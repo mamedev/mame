@@ -213,9 +213,11 @@ DIP locations verified for:
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "audio/sente6vb.h"
+#include "machine/6821pia.h"
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "video/mc6845.h"
 #include "speaker.h"
 
 #include "stocker.lh"
@@ -260,10 +262,66 @@ void balsente_state::cpu1_map(address_map &map)
 	map(0x9c00, 0x9cff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
 }
 
+void balsente_state::cpu1_teamht_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0x9404, 0x9404).r(FUNC(balsente_state::teamht_extra_r));
+	map(0x9000, 0x9007).w(FUNC(balsente_state::teamht_multiplex_select_w));
+}
+
+void balsente_state::cpu1_grudge_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0x9400, 0x9400).r(FUNC(balsente_state::grudge_steering_r));
+}
+
+void balsente_state::cpu1_1986_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0x9f00, 0x9f00).w(FUNC(balsente_state::rombank2_select_w));
+}
+
+void balsente_state::cpu1_spiker_map(address_map &map)
+{
+	cpu1_1986_map(map);
+	map(0x9f80, 0x9f8f).rw(FUNC(balsente_state::spiker_expand_r), FUNC(balsente_state::spiker_expand_w));
+}
+
+void balsente_state::cpu1_shrike_map(address_map &map)
+{
+	cpu1_map(map);
+	map(0x9e00, 0x9fff).rw(FUNC(balsente_state::shrike_shared_6809_r), FUNC(balsente_state::shrike_shared_6809_w));
+	map(0x9e01, 0x9e01).w(FUNC(balsente_state::shrike_sprite_select_w));
+}
+
 void balsente_state::cpu1_smudge_map(address_map &map)
 {
 	cpu1_base_map(map);
 	map(0x9b00, 0x9bff).rw(FUNC(balsente_state::novram_8bit_r), FUNC(balsente_state::novram_8bit_w));
+}
+
+void balsente_state::cpu1_triviamb_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0100, 0x0100).portr("SWH");
+	map(0x0101, 0x0101).portr("SWG");
+	map(0x0102, 0x0102).portr("IN0");
+	map(0x0103, 0x0103).portr("IN1");
+	map(0x0320, 0x0323).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0x0340, 0x0340).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0341, 0x0341).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x0360, 0x0360).w(FUNC(balsente_state::random_reset_w));
+	map(0x0380, 0x0380).r(FUNC(balsente_state::random_num_r));
+	map(0x03a0, 0x03a0).w(FUNC(balsente_state::rombank_select_w));
+	map(0x03c0, 0x03c0).w(FUNC(balsente_state::palette_select_w));
+	map(0x03e0, 0x03e0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram"); // probably wrong
+	map(0x8000, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram"); // probably wrong
+	map(0x8800, 0x8fff).ram().share("spriteram"); // probably wrong
+	map(0x8800, 0x88ff).rw("nov0", FUNC(x2212_device::read), FUNC(x2212_device::write));
+	map(0x8900, 0x89ff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
+	map(0xa000, 0xbfff).bankr("bank1"); // different banking?
+	map(0xc000, 0xffff).bankr("bank2"); // different banking?
 }
 
 
@@ -298,7 +356,7 @@ void balsente_state::cpu2_triviamb_io_map(address_map &map)
 void balsente_state::shrike68k_map(address_map &map)
 {
 	map(0x000000, 0x003fff).rom();
-	map(0x010000, 0x01001f).ram().share("shrike_io");
+	map(0x010000, 0x01001f).ram().share("shrike_io").rw(FUNC(balsente_state::shrike_io_68k_r), FUNC(balsente_state::shrike_io_68k_w));
 	map(0x018000, 0x018fff).ram().share("shrike_shared");
 }
 
@@ -1326,11 +1384,38 @@ void balsente_state::balsente(machine_config &config)
 }
 
 
+void balsente_state::teamht(machine_config &config)
+{
+	balsente(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_teamht_map);
+}
+
+
+void balsente_state::grudge(machine_config &config)
+{
+	balsente(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_grudge_map);
+}
+
+
+void balsente_state::balsent2(machine_config &config)
+{
+	balsente(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_1986_map);
+}
+
+
+void balsente_state::spiker(machine_config &config)
+{
+	balsente(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_spiker_map);
+}
+
+
 void balsente_state::shrike(machine_config &config)
 {
 	balsente(config);
-
-	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_shrike_map);
 
 	M68000(config, m_68k, 8000000);
 	m_68k->set_addrmap(AS_PROGRAM, &balsente_state::shrike68k_map);
@@ -1351,6 +1436,18 @@ void balsente_state::triviamb(machine_config &config)
 {
 	balsente(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_triviamb_map);
+	config.device_remove("outlatch");
+	config.device_remove("acia");
+	config.device_remove("audio6vb");
+
+	PIA6821(config, "pia");
+
+	mc6845_device &crtc(MC6845(config, "crtc", 20000000 / 16)); // specific type unknown
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+
 	// sound PCB has: 2x Z80CTC, 2x AY8910A, 1x M5205, 1x 8MHz XTAL (divisor unknown for every device)
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu2_triviamb_map);
@@ -1365,9 +1462,6 @@ void balsente_state::triviamb(machine_config &config)
 	AY8910(config, "ay2", 8_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	MSM5205(config, "msm", 384000).add_route(ALL_OUTPUTS, "mono", 0.90);
-
-	m_acia->txd_handler().set_nop();
-	config.device_remove("audio6vb");
 }
 
 /*************************************
@@ -2211,60 +2305,61 @@ void balsente_state::expand_roms(uint8_t cd_rom_mask)
 	/* ROM region must be 0x40000 total */
 
 	std::vector<uint8_t> temp(0x20000);
+
+	uint8_t *rom = memregion("maincpu")->base();
+	uint32_t len = memregion("maincpu")->bytes();
+
+	for (uint32_t base = 0x10000; base < len; base += 0x30000)
 	{
-		uint8_t *rom = memregion("maincpu")->base();
-		uint32_t len = memregion("maincpu")->bytes();
-		uint32_t base;
+		uint8_t *ab_base = &temp[0x00000];
+		uint8_t *cd_base = &temp[0x10000];
+		uint8_t *cd_common = &temp[0x1c000];
+		uint8_t *ef_common = &temp[0x1e000];
 
-		for (base = 0x10000; base < len; base += 0x30000)
+		for (uint32_t dest = 0x00000; dest < 0x20000; dest += 0x02000)
 		{
-			uint8_t *ab_base = &temp[0x00000];
-			uint8_t *cd_base = &temp[0x10000];
-			uint8_t *cd_common = &temp[0x1c000];
-			uint8_t *ef_common = &temp[0x1e000];
-			uint32_t dest;
-
-			for (dest = 0x00000; dest < 0x20000; dest += 0x02000)
-			{
-				if (cd_rom_mask & SWAP_HALVES)
-					memcpy(&temp[dest ^ 0x02000], &rom[base + dest], 0x02000);
-				else
-					memcpy(&temp[dest], &rom[base + dest], 0x02000);
-			}
-
-			memcpy(&rom[base + 0x2e000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x2c000], cd_common, 0x2000);
-			memcpy(&rom[base + 0x2a000], &ab_base[0xe000], 0x2000);
-
-			memcpy(&rom[base + 0x28000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x26000], cd_common, 0x2000);
-			memcpy(&rom[base + 0x24000], &ab_base[0xc000], 0x2000);
-
-			memcpy(&rom[base + 0x22000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x20000], (cd_rom_mask & 0x20) ? &cd_base[0xa000] : cd_common, 0x2000);
-			memcpy(&rom[base + 0x1e000], &ab_base[0xa000], 0x2000);
-
-			memcpy(&rom[base + 0x1c000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x1a000], (cd_rom_mask & 0x10) ? &cd_base[0x8000] : cd_common, 0x2000);
-			memcpy(&rom[base + 0x18000], &ab_base[0x8000], 0x2000);
-
-			memcpy(&rom[base + 0x16000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x14000], (cd_rom_mask & 0x08) ? &cd_base[0x6000] : cd_common, 0x2000);
-			memcpy(&rom[base + 0x12000], &ab_base[0x6000], 0x2000);
-
-			memcpy(&rom[base + 0x10000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x0e000], (cd_rom_mask & 0x04) ? &cd_base[0x4000] : cd_common, 0x2000);
-			memcpy(&rom[base + 0x0c000], &ab_base[0x4000], 0x2000);
-
-			memcpy(&rom[base + 0x0a000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x08000], (cd_rom_mask & 0x02) ? &cd_base[0x2000] : cd_common, 0x2000);
-			memcpy(&rom[base + 0x06000], &ab_base[0x2000], 0x2000);
-
-			memcpy(&rom[base + 0x04000], ef_common, 0x2000);
-			memcpy(&rom[base + 0x02000], (cd_rom_mask & 0x01) ? &cd_base[0x0000] : cd_common, 0x2000);
-			memcpy(&rom[base + 0x00000], &ab_base[0x0000], 0x2000);
+			if (cd_rom_mask & SWAP_HALVES)
+				memcpy(&temp[dest ^ 0x02000], &rom[base + dest], 0x02000);
+			else
+				memcpy(&temp[dest], &rom[base + dest], 0x02000);
 		}
+
+		memcpy(&rom[base + 0x2e000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x2c000], cd_common, 0x2000);
+		memcpy(&rom[base + 0x2a000], &ab_base[0xe000], 0x2000);
+
+		memcpy(&rom[base + 0x28000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x26000], cd_common, 0x2000);
+		memcpy(&rom[base + 0x24000], &ab_base[0xc000], 0x2000);
+
+		memcpy(&rom[base + 0x22000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x20000], (cd_rom_mask & 0x20) ? &cd_base[0xa000] : cd_common, 0x2000);
+		memcpy(&rom[base + 0x1e000], &ab_base[0xa000], 0x2000);
+
+		memcpy(&rom[base + 0x1c000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x1a000], (cd_rom_mask & 0x10) ? &cd_base[0x8000] : cd_common, 0x2000);
+		memcpy(&rom[base + 0x18000], &ab_base[0x8000], 0x2000);
+
+		memcpy(&rom[base + 0x16000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x14000], (cd_rom_mask & 0x08) ? &cd_base[0x6000] : cd_common, 0x2000);
+		memcpy(&rom[base + 0x12000], &ab_base[0x6000], 0x2000);
+
+		memcpy(&rom[base + 0x10000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x0e000], (cd_rom_mask & 0x04) ? &cd_base[0x4000] : cd_common, 0x2000);
+		memcpy(&rom[base + 0x0c000], &ab_base[0x4000], 0x2000);
+
+		memcpy(&rom[base + 0x0a000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x08000], (cd_rom_mask & 0x02) ? &cd_base[0x2000] : cd_common, 0x2000);
+		memcpy(&rom[base + 0x06000], &ab_base[0x2000], 0x2000);
+
+		memcpy(&rom[base + 0x04000], ef_common, 0x2000);
+		memcpy(&rom[base + 0x02000], (cd_rom_mask & 0x01) ? &cd_base[0x0000] : cd_common, 0x2000);
+		memcpy(&rom[base + 0x00000], &ab_base[0x0000], 0x2000);
 	}
+
+	int numbanks = (len > 0x40000) ? 16 : 8;
+	membank("bank1")->configure_entries(0, numbanks, &rom[0x10000], 0x6000);
+	membank("bank2")->configure_entries(0, numbanks, &rom[0x12000], 0x6000);
 }
 
 inline void balsente_state::config_shooter_adc(uint8_t shooter, uint8_t adc_shift)
@@ -2277,15 +2372,6 @@ void balsente_state::init_sentetst()  { expand_roms(EXPAND_ALL);  config_shooter
 void balsente_state::init_cshift()    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
 void balsente_state::init_gghost()    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
 void balsente_state::init_hattrick()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-void balsente_state::init_teamht()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	expand_roms(EXPAND_ALL);
-	config_shooter_adc(false, 0 /* noanalog */);
-	space.install_read_handler(0x9404, 0x9404, read8_delegate(FUNC(balsente_state::teamht_extra_r),this));
-	space.install_write_handler(0x9000, 0x9007, write8_delegate(FUNC(balsente_state::teamht_multiplex_select_w),this));
-
-}
 
 void balsente_state::init_otwalls()   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
 void balsente_state::init_snakepit()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
@@ -2305,53 +2391,14 @@ void balsente_state::init_gimeabrk()  { expand_roms(EXPAND_ALL);  config_shooter
 void balsente_state::init_minigolf()  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 2); }
 void balsente_state::init_minigolf2() { expand_roms(0x0c);        config_shooter_adc(false, 2); }
 void balsente_state::init_toggle()    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-void balsente_state::init_nametune()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
-	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */);
-}
-void balsente_state::init_nstocker()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
-	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(true, 1);
-}
-void balsente_state::init_sfootbal()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
-	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 0);
-}
-void balsente_state::init_spiker()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_handler(0x9f80, 0x9f8f, read8_delegate(FUNC(balsente_state::spiker_expand_r),this), write8_delegate(FUNC(balsente_state::spiker_expand_w),this));
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
-	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 1);
-}
-void balsente_state::init_stompin()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::rombank2_select_w),this));
-	expand_roms(0x0c | SWAP_HALVES); config_shooter_adc(false, 32);
-}
+void balsente_state::init_nametune()  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_nstocker()  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(true, 1); }
+void balsente_state::init_sfootbal()  { expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 0); }
+void balsente_state::init_spiker()    { expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 1); }
+void balsente_state::init_stompin()   { expand_roms(0x0c | SWAP_HALVES); config_shooter_adc(false, 32); }
 void balsente_state::init_rescraid()  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
-void balsente_state::init_grudge()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0x9400, 0x9400, read8_delegate(FUNC(balsente_state::grudge_steering_r),this));
-	expand_roms(EXPAND_NONE); config_shooter_adc(false, 0);
-}
-void balsente_state::init_shrike()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_handler(0x9e00, 0x9fff, read8_delegate(FUNC(balsente_state::shrike_shared_6809_r),this), write8_delegate(FUNC(balsente_state::shrike_shared_6809_w),this));
-	space.install_write_handler(0x9e01, 0x9e01, write8_delegate(FUNC(balsente_state::shrike_sprite_select_w),this));
-	m_68k->space(AS_PROGRAM).install_readwrite_handler(0x10000, 0x1001f, read16_delegate(FUNC(balsente_state::shrike_io_68k_r),this), write16_delegate(FUNC(balsente_state::shrike_io_68k_w),this));
-
-	expand_roms(EXPAND_ALL);  config_shooter_adc(false, 32);
-}
+void balsente_state::init_grudge()    { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0); }
+void balsente_state::init_shrike()    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 32); }
 
 
 
@@ -2382,8 +2429,8 @@ GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeab
 GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolf2, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviabb,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, grudge,    0,        balsente, grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
-GAME( 198?, grudgep,   grudge,   balsente, grudgep,  balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, grudge,    0,        grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
+GAME( 198?, grudgep,   grudge,   grudge,   grudgep,  balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
 GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_triviag1,  ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -2392,22 +2439,22 @@ GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_trivia
 GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes,  ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen III, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Genus Edition?
 GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,    ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune,  0,        balsent2, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 007-8001-01-0C Rev C1 */
 GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Volumen II, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // "Jovenes Carrozas" Edition?
 
 /* Board: 006-8030-01-0A Rev A */
-GAME( 1986, nametune2, nametune, balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune2, nametune, balsent2, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8027-01-0B Rev B */
-GAME( 1986, nstocker,  0,        balsente, nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nstocker2, nstocker, balsente, nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sfootbal,  0,        balsente, sfootbal, balsente_state, init_sfootbal,  ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker,    0,        balsente, spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker2,   spiker,   balsente, spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker3,   spiker,   balsente, spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stompin,   0,        balsente, stompin,  balsente_state, init_stompin,   ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstocker,  0,        balsent2, nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstocker2, nstocker, balsent2, nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sfootbal,  0,        balsent2, sfootbal, balsente_state, init_sfootbal,  ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker,    0,        spiker,   spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker2,   spiker,   spiker,   spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker3,   spiker,   spiker,   spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stompin,   0,        balsent2, stompin,  balsente_state, init_stompin,   ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
 GAME( 1987, rescraid,  0,        rescraid, rescraid, balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
@@ -2415,7 +2462,7 @@ GAME( 1987, rescraid,  0,        rescraid, rescraid, balsente_state, init_rescra
 /* Board: Unknown */
 GAME( 1986, shrike,    0,        shrike,   shrike,   balsente_state, init_shrike,    ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rescraida, rescraid, rescraid, rescraid, balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teamht,    0,        balsente, teamht,   balsente_state, init_teamht,    ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teamht,    0,        teamht,   teamht,   balsente_state, init_hattrick,  ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
 
 /* Trivial Pursuit running on Maibesa hardware (with Bally/Sente license) */
 GAME( 1988, triviaes4, 0,        triviamb, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)", "Trivial Pursuit (Volumen IV, Spanish, Maibesa hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games

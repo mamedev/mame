@@ -66,8 +66,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::interrupt_timer)
 
 void balsente_state::machine_start()
 {
-	m_acia->write_cts(0);
-	m_acia->write_dcd(0);
+	if (m_acia.found())
+	{
+		m_acia->write_cts(0);
+		m_acia->write_dcd(0);
+	}
 
 	save_item(NAME(m_nstocker_bits));
 	save_item(NAME(m_spiker_expand_color));
@@ -90,9 +93,6 @@ void balsente_state::machine_reset()
 	m_grudge_steering_result = 0;
 
 	/* point the banks to bank 0 */
-	int numbanks = (memregion("maincpu")->bytes() > 0x40000) ? 16 : 8;
-	membank("bank1")->configure_entries(0, numbanks, &memregion("maincpu")->base()[0x10000], 0x6000);
-	membank("bank2")->configure_entries(0, numbanks, &memregion("maincpu")->base()[0x12000], 0x6000);
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
 	m_maincpu->reset();
