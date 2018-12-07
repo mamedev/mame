@@ -163,9 +163,6 @@ public:
 
 	void mu100(machine_config &config);
 
-	int seq;
-	bool act;
-
 	void regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask);
 	void regs_s2_write_tap(offs_t address, u16 data, u16 mem_mask);
 	void regs_s3_write_tap(offs_t address, u16 data, u16 mem_mask);
@@ -183,9 +180,6 @@ public:
 	void prg_write_tap(offs_t address, u16 data, u16 mem_mask);
 
 	virtual void machine_reset() override {
-		timer_alloc()->adjust(attotime::from_double(5));
-		seq = 0;
-		act = false;
 		if(0)
 		m_maincpu->space(0).install_write_tap(0x214cb8, 0x214cbf, "prg select", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												   prg_write_tap(offset, data, mem_mask);
@@ -246,28 +240,6 @@ public:
 		m_maincpu->space(0).install_write_tap(0x214ca2+0x510, 0x214ca2+0x520-1, "regs s6", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												  regs_s6_write_tap(offset, data, mem_mask);
 											   });
-	}
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override {
-		static u8 xnote[8] = { 60, 62, 64, 65, 67, 69, 71, 72 };
-		static int note = 0;
-		act = true;
-		if(1) { seq = 42; return; }
-
-		switch(seq) {
-		case 0: push(0x90); logerror("swp30 midi keyon %d\n", note); timer.adjust(attotime::from_double(0.0005)); if(0) machine().debug_break(); break;
-		case 1: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); break;
-		case 2: push(0x25); timer.adjust(attotime::from_double(1.0)); break;
-		case 3: push(0x80); logerror("swp30 midi keyoff\n"); timer.adjust(attotime::from_double(0.0005)); if(0) machine().debug_break(); break;
-		case 4: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); ; if(note == 8) note = 0; break;
-		case 5: push(0x01); timer.adjust(attotime::from_double(0.05)); seq=0; return;
-		}
-		seq ++;
-	}
-
-	void push(u8 val) {
-		logerror("push %02x\n", val);
-		machine().root_device().subdevice<h8_sci_device>("maincpu:sci0")->force(val);
 	}
 
 protected:
@@ -430,8 +402,6 @@ void mu100_state::regs_int_write_tap(offs_t address, u16 data, u16 mem_mask)
 void mu100_state::voice_write_tap(offs_t address, u16 data, u16 mem_mask)
 {
 	offs_t pc = m_maincpu->pc();
-	if(!act)
-		return;
 	offs_t off = address - 0x20f03e;
 	int voice = off / 0x92;
 	int slot = off % 0x92;
@@ -449,8 +419,6 @@ void mu100_state::voice_write_tap(offs_t address, u16 data, u16 mem_mask)
 void mu100_state::chan_write_tap(offs_t address, u16 data, u16 mem_mask)
 {
 	offs_t pc = m_maincpu->pc();
-	if(!act)
-		return;
 	offs_t off = address - 0x20cb10;
 	int voice = off / 0x112;
 	int slot = off % 0x112;
@@ -724,13 +692,16 @@ void mu100_state::mu100(machine_config &config)
 	m_swp30->add_route(0, "lspeaker", 1.0);
 	m_swp30->add_route(1, "rspeaker", 1.0);
 
-	auto &mdin(MIDI_PORT(config, "mdin"));
-	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
+	midiin_slot(mdin_a);
+	mdin_a.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+
+	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
+	midiin_slot(mdin_b);
+	mdin_b.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-
 	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 }
 

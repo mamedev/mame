@@ -357,7 +357,8 @@ void swp30_device::keyon_w(u16)
 		u64 mask = u64(1) << i;
 		if((m_keyon_mask & mask) && !(m_active_mask & mask) && !(m_volume[i] & 0x8000)) {
 			m_sample_pos[i] = -s32(m_pre_size[i] << 8);
-			logerror("keyon %02x %08x %08x %08x vol %04x pan %04x\n", i, m_pre_size[i], m_post_size[i], m_address[i], m_volume[i], m_pan[i]);
+			if(0)
+				logerror("keyon %02x %08x %08x %08x vol %04x pan %04x\n", i, m_pre_size[i], m_post_size[i], m_address[i], m_volume[i], m_pan[i]);
 			m_active_mask |= mask;
 		}
 	}
@@ -390,7 +391,8 @@ template<int sel> void swp30_device::prg_w(u16 data)
 	m_program[m_program_address] = (m_program[m_program_address] & mask) | (u64(data) << shift);
 
 	if(sel == 3) {
-		logerror("program %03x %016x\n", m_program_address, m_program[m_program_address]);
+		if(0)
+			logerror("program %03x %016x\n", m_program_address, m_program[m_program_address]);
 		m_program_address ++;
 		if(m_program_address == 0x180)
 			m_program_address = 0;
@@ -406,7 +408,8 @@ template<int sel> u16 swp30_device::map_r()
 template<int sel> void swp30_device::map_w(u16 data)
 {
 	m_map[sel] = data;
-	logerror("map %d: type=%02x offset=%05x size=%05x\n", sel, data >> 11, (data & 0xff) << 10, 0x400 << ((data >> 8) & 7));
+	if(0)
+		logerror("map %d: type=%02x offset=%05x size=%05x\n", sel, data >> 11, (data & 0xff) << 10, 0x400 << ((data >> 8) & 7));
 }
 
 
@@ -420,7 +423,7 @@ void swp30_device::lpf_cutoff_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(m_lpf_cutoff[chan] != data && 0)
+	if(0 && m_lpf_cutoff[chan] != data)
 		logerror("chan %02x lpf cutoff %04x\n", chan, data);
 	m_lpf_cutoff[chan] = data;
 }
@@ -434,7 +437,7 @@ void swp30_device::lpf_cutoff_inc_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(m_lpf_cutoff_inc[chan] != data && 0)
+	if(0 && m_lpf_cutoff_inc[chan] != data)
 		logerror("chan %02x lpf cutoff increment %04x\n", chan, data);
 	m_lpf_cutoff_inc[chan] = data;
 }
@@ -448,7 +451,7 @@ void swp30_device::hpf_cutoff_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(m_hpf_cutoff[chan] != data)
+	if(0 && m_hpf_cutoff[chan] != data)
 		logerror("chan %02x hpf cutoff %04x\n", chan, data);
 	m_hpf_cutoff[chan] = data;
 }
@@ -462,7 +465,7 @@ void swp30_device::lpf_reso_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(m_lpf_reso[chan] != data)
+	if(0 && m_lpf_reso[chan] != data)
 		logerror("chan %02x lpf resonance %04x\n", chan, data);
 	m_lpf_reso[chan] = data;
 }
@@ -499,7 +502,7 @@ void swp30_device::volume_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(m_volume[chan] != data)
+	if(0 && m_volume[chan] != data)
 		logerror("snd chan %02x volume %02x %02x\n", chan, data >> 8, data & 0xff);
 	m_volume[chan] = data;
 	if(data & 0x8000) {
@@ -519,7 +522,7 @@ u16 swp30_device::pan_r(offs_t offset)
 void swp30_device::pan_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	if(m_pan[chan] != data)
+	if(0 && m_pan[chan] != data)
 		logerror("snd chan %02x pan l %02x r %02x\n", chan, data >> 8, data & 0xff);
 	m_pan[chan] = data;
 }
@@ -532,7 +535,7 @@ u16 swp30_device::dry_rev_r(offs_t offset)
 void swp30_device::dry_rev_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	if(m_dry_rev[chan] != data)
+	if(0 && m_dry_rev[chan] != data)
 		logerror("snd chan %02x dry %02x rev %02x\n", chan, data >> 8, data & 0xff);
 	m_dry_rev[chan] = data;
 }
@@ -545,7 +548,7 @@ u16 swp30_device::cho_var_r(offs_t offset)
 void swp30_device::cho_var_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	if(m_cho_var[chan] != data)
+	if(0 && m_cho_var[chan] != data)
 		logerror("snd chan %02x cho %02x var %02x\n", chan, data >> 8, data & 0xff);
 	m_cho_var[chan] = data;
 }
@@ -560,7 +563,7 @@ void swp30_device::freq_w(offs_t offset, u16 data)
 	u8 chan = offset >> 6;
 	//	delta is 4*256 per octave, positive means higher freq, e.g 4.10 format.
 	s16 v = data & 0x2000 ? data | 0xc000 : data;
-	if(m_freq[chan] != data)
+	if(0 && m_freq[chan] != data)
 		logerror("snd chan %02x freq %c%c %d.%03x\n", chan, data & 0x8000 ? '#' : '.', data & 0x4000 ? '#' : '.', v / 1024, (v < 0 ? -v : v) & 0x3ff);
 	m_freq[chan] = data;
 }
@@ -575,7 +578,7 @@ template<int sel> void swp30_device::envelope_w(offs_t offset, u16 data)
 	u8 chan = offset >> 6;
 	bool ch = m_envelope[chan][sel] != data;
 	m_envelope[chan][sel] = data;
-	if(ch)
+	if(0 && ch)
 		logerror("snd chan %02x envelopes %04x %04x %04x\n", chan, m_envelope[chan][0], m_envelope[chan][1], m_envelope[chan][2]);
 }
 
@@ -599,7 +602,8 @@ void swp30_device::pre_size_l_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
 	m_pre_size[chan] = (m_pre_size[chan] & 0xffff0000) | data;
-	logerror("snd chan %02x pre-size %02x %06x\n", chan, m_pre_size[chan] >> 24, m_pre_size[chan] & 0xffffff);
+	if(0)
+		logerror("snd chan %02x pre-size %02x %06x\n", chan, m_pre_size[chan] >> 24, m_pre_size[chan] & 0xffffff);
 }
 
 u16 swp30_device::post_size_h_r(offs_t offset)
@@ -622,7 +626,8 @@ void swp30_device::post_size_l_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
 	m_post_size[chan] = (m_post_size[chan] & 0xffff0000) | data;
-	logerror("snd chan %02x post-size %02x %06x\n", chan, m_post_size[chan] >> 24, m_post_size[chan] & 0xffffff);
+	if(0)
+		logerror("snd chan %02x post-size %02x %06x\n", chan, m_post_size[chan] >> 24, m_post_size[chan] & 0xffffff);
 }
 
 u16 swp30_device::address_h_r(offs_t offset)
@@ -644,10 +649,10 @@ void swp30_device::address_h_w(offs_t offset, u16 data)
 void swp30_device::address_l_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	// The address probably is 25 bits
 	static const char *const formats[4] = { "l16", "l12", "l8", "x8" };
 	m_address[chan] = (m_address[chan] & 0xffff0000) | data;
-	logerror("snd chan %02x format %s flags %02x address %06x\n", chan, formats[m_address[chan] >> 30], (m_address[chan] >> 24) & 0x3f, m_address[chan] & 0xffffff);
+	if(0)
+		logerror("snd chan %02x format %s flags %02x address %06x\n", chan, formats[m_address[chan] >> 30], (m_address[chan] >> 24) & 0x3f, m_address[chan] & 0xffffff);
 }
 
 
@@ -663,7 +668,8 @@ template<int sel> void swp30_device::prg_fp_w(offs_t offset, u16 data)
 {
 	offs_t adr = (offset >> 6)*6 + sel;
 	m_program_pfp[adr] = data;
-	logerror("prg_fp_w %03x, %04x\n", adr, data);
+	if(0)
+		logerror("prg_fp_w %03x, %04x\n", adr, data);
 }
 
 template<int sel> u16 swp30_device::prg_int_r(offs_t offset)
@@ -676,7 +682,8 @@ template<int sel> void swp30_device::prg_int_w(offs_t offset, u16 data)
 {
 	offs_t adr = (offset >> 6)*2 + sel;
 	m_program_pint[adr] = data;
-	logerror("prg_int_w %02x, %04x\n", adr, data);
+	if(0)
+		logerror("prg_int_w %02x, %04x\n", adr, data);
 }
 
 template<int sel> u16 swp30_device::prg_lfo_r(offs_t offset)
@@ -695,7 +702,8 @@ template<int sel> void swp30_device::prg_lfo_w(offs_t offset, u16 data)
 
 	int scale = (data >> 5) & 7;
 	int step = ((data & 31) << sh[scale]) + dt[scale];
-	logerror("prg_lfo_w %02x freq=%5.2f phase=%6.4f\n", adr, step * 44100.0/4194304, (data >> 8)/256.0);
+	if(0)
+		logerror("prg_lfo_w %02x freq=%5.2f phase=%6.4f\n", adr, step * 44100.0/4194304, (data >> 8)/256.0);
 }
 
 
@@ -706,7 +714,7 @@ static u16 rr[0x40*0x40];
 
 u16 swp30_device::snd_r(offs_t offset)
 {
-	if(1) {
+	if(0) {
 		int chan = (offset >> 6) & 0x3f;
 		int slot = offset & 0x3f;
 		std::string preg = "-";

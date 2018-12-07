@@ -37,8 +37,6 @@ public:
 	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
 	void set_external_clock_period(const attotime &_period);
 
-	void force(u8 data) { rdr = data; intc->internal_interrupt(rxi_int); }
-
 	DECLARE_WRITE8_MEMBER(smr_w);
 	DECLARE_READ8_MEMBER(smr_r);
 	DECLARE_WRITE8_MEMBER(brr_w);
