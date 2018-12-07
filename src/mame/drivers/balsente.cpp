@@ -317,7 +317,7 @@ void balsente_state::cpu1_triviamb_map(address_map &map)
 	map(0x03c0, 0x03c0).w(FUNC(balsente_state::palette_select_w));
 	map(0x03e0, 0x03e0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
-	map(0x8800, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram"); // probably wrong
+	map(0x8800, 0x8fff).ram().w(FUNC(balsente_state::paletteram_byte_w)).share("paletteram"); // probably wrong
 	map(0x8800, 0x88ff).rw("nov0", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0x8900, 0x89ff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0xa000, 0xbfff).bankr("bankab");
@@ -2283,7 +2283,7 @@ ROM_START( triviaes4 )
 	ROM_CONTINUE(                       0x1c000, 0x02000 )
 	ROM_LOAD( "tpe-60-volumen 4.ic60",  0x06000, 0x02000, CRC(0773a142) SHA1(5654ece65be7714b25970f08ba876b9766d8ebb5) )
 	ROM_CONTINUE(                       0x0e000, 0x02000 )
-	ROM_CONTINUE(                       0x06000, 0x02000 )
+	ROM_CONTINUE(                       0x16000, 0x02000 )
 	ROM_CONTINUE(                       0x1e000, 0x02000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // all 27256

@@ -126,6 +126,7 @@ private:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(palette_select_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
+	DECLARE_WRITE8_MEMBER(paletteram_byte_w);
 	DECLARE_WRITE8_MEMBER(shrike_sprite_select_w);
 
 	virtual void machine_start() override;
