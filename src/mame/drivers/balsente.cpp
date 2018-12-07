@@ -303,22 +303,21 @@ void balsente_state::cpu1_smudge_map(address_map &map)
 
 void balsente_state::cpu1_triviamb_map(address_map &map)
 {
-	map(0x0000, 0x00ff).ram();
+	map(0x0000, 0x00ff).ram().share("spriteram");
 	map(0x0100, 0x0100).portr("SWH");
 	map(0x0101, 0x0101).portr("SWG");
 	map(0x0102, 0x0102).portr("IN0");
 	map(0x0103, 0x0103).portr("IN1");
 	map(0x0320, 0x0323).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0x0340, 0x0340).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0341, 0x0341).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x0340, 0x0340).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0341, 0x0341).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0360, 0x0360).w(FUNC(balsente_state::random_reset_w));
 	map(0x0380, 0x0380).r(FUNC(balsente_state::random_num_r));
 	map(0x03a0, 0x03a0).w(FUNC(balsente_state::rombank_select_w));
 	map(0x03c0, 0x03c0).w(FUNC(balsente_state::palette_select_w));
 	map(0x03e0, 0x03e0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram"); // probably wrong
-	map(0x8000, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram"); // probably wrong
-	map(0x8800, 0x8fff).ram().share("spriteram"); // probably wrong
+	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram"); // probably wrong
 	map(0x8800, 0x88ff).rw("nov0", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0x8900, 0x89ff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0xa000, 0xbfff).bankr("bankab");
@@ -1445,7 +1444,7 @@ void balsente_state::triviamb(machine_config &config)
 
 	PIA6821(config, "pia");
 
-	mc6845_device &crtc(MC6845(config, "crtc", 20000000 / 16)); // specific type unknown
+	mc6845_device &crtc(C6545_1(config, "crtc", 20000000 / 16)); // specific type unknown, but must allow VBLANK polling
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);
@@ -1745,6 +1744,8 @@ ROM_START( triviag2 )
 	ROM_LOAD( "ab45.bin",  0x08000, 0x4000, CRC(a7ff789c) SHA1(a3421ae46dadd6f514cfc514ff07dfcca2cb1478) )
 	ROM_LOAD( "ab67.bin",  0x0c000, 0x4000, CRC(cc5c68ef) SHA1(38713796e07f84c9a1b21d8c66f76e620132d77e) )
 	ROM_LOAD( "cd45.bin",  0x18000, 0x4000, CRC(fc9c752a) SHA1(239507fb5d75e86aca295978aab1dd4514d8d761) )
+	ROM_RELOAD(            0x10000, 0x4000 )
+	ROM_RELOAD(            0x14000, 0x4000 )
 	ROM_LOAD( "cd6ef.bin", 0x1c000, 0x4000, CRC(23b56fb8) SHA1(9ac726de69e4b374886a3542829745f7477d7556) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )        /* up to 64k of sprites */
@@ -2268,10 +2269,22 @@ ROM_END
 */
 ROM_START( triviaes4 )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // all 27256, ROM loading order probably wrong
-	ROM_LOAD( "tpe-35-volumen 4.ic35",  0x10000, 0x08000, CRC(8233c9af) SHA1(1853cbff5ff9b0bed4c12717ef705f6ee9679622) )
-	ROM_LOAD( "tpe-43-volumen 4.ic43",  0x08000, 0x08000, CRC(b404b163) SHA1(de30b47d08765a953b01cc3a6bdd95938af6b3d8) )
-	ROM_LOAD( "tpe-53-volumen 4.ic53",  0x00000, 0x08000, CRC(64e439d9) SHA1(f5fe3fa38997c1088c16361f8949648acc353c57) )
-	ROM_LOAD( "tpe-60-volumen 4.ic60",  0x18000, 0x08000, CRC(0773a142) SHA1(5654ece65be7714b25970f08ba876b9766d8ebb5) )
+	ROM_LOAD( "tpe-35-volumen 4.ic35",  0x00000, 0x02000, CRC(8233c9af) SHA1(1853cbff5ff9b0bed4c12717ef705f6ee9679622) )
+	ROM_CONTINUE(                       0x08000, 0x02000 )
+	ROM_CONTINUE(                       0x10000, 0x02000 )
+	ROM_CONTINUE(                       0x18000, 0x02000 )
+	ROM_LOAD( "tpe-43-volumen 4.ic43",  0x02000, 0x02000, CRC(b404b163) SHA1(de30b47d08765a953b01cc3a6bdd95938af6b3d8) )
+	ROM_CONTINUE(                       0x0a000, 0x02000 )
+	ROM_CONTINUE(                       0x12000, 0x02000 )
+	ROM_CONTINUE(                       0x1a000, 0x02000 )
+	ROM_LOAD( "tpe-53-volumen 4.ic53",  0x04000, 0x02000, CRC(64e439d9) SHA1(f5fe3fa38997c1088c16361f8949648acc353c57) )
+	ROM_CONTINUE(                       0x0c000, 0x02000 )
+	ROM_CONTINUE(                       0x14000, 0x02000 )
+	ROM_CONTINUE(                       0x1c000, 0x02000 )
+	ROM_LOAD( "tpe-60-volumen 4.ic60",  0x06000, 0x02000, CRC(0773a142) SHA1(5654ece65be7714b25970f08ba876b9766d8ebb5) )
+	ROM_CONTINUE(                       0x0e000, 0x02000 )
+	ROM_CONTINUE(                       0x06000, 0x02000 )
+	ROM_CONTINUE(                       0x1e000, 0x02000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // all 27256
 	ROM_LOAD( "tpe-2a0.bin", 0x00000, 0x8000, CRC(9aefea1d) SHA1(2af60e19de37533a5ad111de4c6b58de41be92fd) )
@@ -2362,13 +2375,7 @@ void balsente_state::init_snakepit()  { expand_roms(EXPAND_ALL);  config_shooter
 void balsente_state::init_snakjack()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
 void balsente_state::init_stocker()   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
 void balsente_state::init_triviag1()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
-void balsente_state::init_triviag2()
-{
-	uint8_t *rom = memregion("maincpu")->base();
-	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
-	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
-	expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */);
-}
+void balsente_state::init_triviag2()  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
 void balsente_state::init_triviaes()  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */); }
 void balsente_state::init_triviaes2() { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
 void balsente_state::init_gimeabrk()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
