@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	K055555(config, m_k055555, 0);
 
-	MCFG_K053250PS_ADD("k053250", "palette", "screen", -16, 0)
+	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
 
 	K055673(config, m_k055673, 0);
 	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback), this);

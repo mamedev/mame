@@ -1532,17 +1532,19 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x200)
+void atarigx2_state::atarigx2_0x200(machine_config &config)
+{
 	atarigx2(config);
-	MCFG_DEVICE_ADD("xga", ATARI_136094_0072, 0)
-	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
-MACHINE_CONFIG_END
+	ATARI_136094_0072(config, m_xga, 0);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
+}
 
-MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x400)
+void atarigx2_state::atarigx2_0x400(machine_config &config)
+{
 	atarigx2(config);
-	MCFG_DEVICE_ADD("xga", ATARI_136095_0072, 0)
-	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
-MACHINE_CONFIG_END
+	ATARI_136095_0072(config, m_xga, 0);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
+}
 
 
 

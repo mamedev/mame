@@ -1021,9 +1021,9 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
-	MCFG_KONPPC_CGBOARD_NUMBER(1)
-	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
+	KONPPC(config, m_konppc, 0);
+	m_konppc->set_num_boards(1);
+	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 MACHINE_CONFIG_END
 
 void gticlub_state::thunderh(machine_config &config)
@@ -1138,9 +1138,9 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
-	MCFG_KONPPC_CGBOARD_NUMBER(2)
-	MCFG_KONPPC_CGBOARD_TYPE(HANGPLT)
+	KONPPC(config, m_konppc, 0);
+	m_konppc->set_num_boards(2);
+	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HANGPLT);
 MACHINE_CONFIG_END
 
 /*************************************************************************/

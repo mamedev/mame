@@ -375,8 +375,8 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 
 	K053251(config, m_k053251, 0);
 
-	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
-	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
+	K053250(config, "k053250_1", 0, "palette", m_screen, 0, 0);
+	K053250(config, "k053250_2", 0, "palette", m_screen, 0, 0);
 
 	K053252(config, m_k053252, XTAL(24'000'000)/4);
 	m_k053252->set_offsets(13*8, 2*8);

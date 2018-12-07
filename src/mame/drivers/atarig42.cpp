@@ -552,9 +552,10 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
+void atarig42_0x200_state::atarig42_0x200(machine_config &config)
+{
 	atarig42(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz / 16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
@@ -562,15 +563,16 @@ MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
 
 	/* ASIC65 */
 	ASIC65(config, m_asic65, 0, ASIC65_ROMBASED);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(atarig42_0x400_state::atarig42_0x400)
+void atarig42_0x400_state::atarig42_0x400(machine_config &config)
+{
 	atarig42(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
 
 	/* ASIC65 */
 	ASIC65(config, m_asic65, 0, ASIC65_GUARDIANS);
-MACHINE_CONFIG_END
+}
 
 
 

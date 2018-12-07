@@ -1502,10 +1502,10 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg1", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx5", 0x00000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx6", 0x00000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
@@ -1555,10 +1555,10 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg1", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx5", 0x00000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx6", 0x00000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
@@ -1593,10 +1593,10 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg1", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx5", 0x00000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx6", 0x00000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
@@ -1631,12 +1631,12 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bluehawk)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg1", "gfxdecode", 3, "gfx4", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg2", "gfxdecode", 4, "gfx5", 0x1c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx3", 0x3c000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx4", 0x3c000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_ROM_TILEMAP(config, m_fg[1], m_gfxdecode, 4, "gfx5", 0x1c000);
+	m_fg[1]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
 
@@ -1671,11 +1671,11 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flytiger)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg1", "gfxdecode", 3, "gfx4", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx3", 0x3c000);
+	m_bg[0]->set_transparent_pen(15);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx4", 0x3c000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
 
@@ -1707,12 +1707,12 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_primella)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 1, "gfx2", -0x4000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg1", "gfxdecode", 2, "gfx3", -0x4000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "gfx2", -0x4000);
+	m_bg[0]->set_primella_code_bits(10);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 2, "gfx3", -0x4000);
+	m_fg[0]->set_transparent_pen(15);
+	m_fg[0]->set_primella_code_bits(10);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
 
@@ -1758,13 +1758,13 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_RSHARK_ROM_TILEMAP_ADD("bg1", "gfxdecode", 4, "gfx5", 0x00000, "gfx6", 0x60000)
-	MCFG_RSHARK_ROM_TILEMAP_ADD("bg2", "gfxdecode", 3, "gfx4", 0x00000, "gfx6", 0x40000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
-	MCFG_RSHARK_ROM_TILEMAP_ADD("fg1", "gfxdecode", 2, "gfx3", 0x00000, "gfx6", 0x20000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
-	MCFG_RSHARK_ROM_TILEMAP_ADD("fg2", "gfxdecode", 1, "gfx2", 0x00000, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
+	RSHARK_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 4, "gfx5", 0x00000, "gfx6", 0x60000);
+	RSHARK_ROM_TILEMAP(config, m_bg[1], m_gfxdecode, 3, "gfx4", 0x00000, "gfx6", 0x40000);
+	m_bg[1]->set_transparent_pen(15);
+	RSHARK_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 2, "gfx3", 0x00000, "gfx6", 0x20000);
+	m_fg[0]->set_transparent_pen(15);
+	RSHARK_ROM_TILEMAP(config, m_fg[1], m_gfxdecode, 1, "gfx2", 0x00000, "gfx6", 0x00000);
+	m_fg[1]->set_transparent_pen(15);
 
 	// sound hardware
 	sound_2151_4mhz(config);
@@ -1810,10 +1810,10 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 1, "gfx2", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg2", "gfxdecode", 2, "gfx3", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "gfx2", 0x00000);
+	m_bg[0]->set_primella_code_bits(11);
+	DOOYONG_ROM_TILEMAP(config, m_bg[1], m_gfxdecode, 2, "gfx3", 0x00000);
+	m_bg[1]->set_primella_code_bits(11);
 
 	// sound hardware
 	sound_2151_4mhz(config);

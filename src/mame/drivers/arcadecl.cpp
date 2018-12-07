@@ -352,12 +352,13 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(arcadecl_state::arcadecl)
+void arcadecl_state::arcadecl(machine_config &config)
+{
 	sparkz(config);
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
-MACHINE_CONFIG_END
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, arcadecl_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+}
 
 
 

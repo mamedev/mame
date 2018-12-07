@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_ATARIRLE_ADD("rle", modesc)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
 
 	/* sound hardware */
 	ATARI_CAGE(config, m_cage, 0);

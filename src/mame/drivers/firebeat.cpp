@@ -1301,8 +1301,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
 	midi_chan1.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch1_irq_callback));
 
-	MCFG_MIDI_KBD_ADD("kbd0", WRITELINE(midi_chan0, ins8250_uart_device, rx_w), 31250)
-	MCFG_MIDI_KBD_ADD("kbd1", WRITELINE(midi_chan1, ins8250_uart_device, rx_w), 31250)
+	MIDI_KBD(config, m_kbd[0], 31250).tx_callback().set(midi_chan0, FUNC(ins8250_uart_device::rx_w));
+	MIDI_KBD(config, m_kbd[1], 31250).tx_callback().set(midi_chan1, FUNC(ins8250_uart_device::rx_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(firebeat_state::firebeat_spu)

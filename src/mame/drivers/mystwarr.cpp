@@ -1051,7 +1051,7 @@ MACHINE_CONFIG_START(mystwarr_state::metamrph)
 
 	m_k053252->set_offsets(24, 15);
 
-	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
+	K053250(config, m_k053250_1, 0, m_palette, m_screen, -7, 0);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)

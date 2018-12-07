@@ -903,9 +903,9 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
-	MCFG_KONPPC_CGBOARD_NUMBER(2)
-	MCFG_KONPPC_CGBOARD_TYPE(NWKTR)
+	KONPPC(config, m_konppc, 0);
+	m_konppc->set_num_boards(2);
+	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
 MACHINE_CONFIG_END
 
 void nwktr_state::thrilld(machine_config &config)

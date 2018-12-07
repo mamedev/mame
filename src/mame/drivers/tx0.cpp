@@ -1567,10 +1567,10 @@ MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx0_state, screen_vblank_tx0))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crt", CRT, 0)
-	MCFG_CRT_NUM_LEVELS(pen_crt_num_levels)
-	MCFG_CRT_OFFSETS(crt_window_offset_x, crt_window_offset_y)
-	MCFG_CRT_SIZE(crt_window_width, crt_window_height)
+	CRT(config, m_crt, 0);
+	m_crt->set_num_levels(pen_crt_num_levels);
+	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
+	m_crt->set_size(crt_window_width, crt_window_height);
 
 	MCFG_DEVICE_ADD("readt", TX0_READTAPE, 0)
 	MCFG_DEVICE_ADD("punch", TX0_PUNCHTAPE, 0)

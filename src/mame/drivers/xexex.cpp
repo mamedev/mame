@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 32);
 	m_k053246->set_palette(m_palette);
 
-	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
+	K053250(config, m_k053250, 0, m_palette, m_screen, -5, -16);
 
 	K053251(config, m_k053251, 0);
 

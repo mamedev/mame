@@ -760,8 +760,8 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy1_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarisy1_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", atarisy1_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy1_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
