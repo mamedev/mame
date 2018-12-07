@@ -17,8 +17,6 @@
 // driver is required to use set_input_line(SM510_INPUT_LINE_K, state)
 #define SM510_INPUT_LINE_K 0
 
-#define SM510_R_CONTROL_OUTPUT -1
-
 // ACL input pin
 #define SM510_INPUT_LINE_ACL INPUT_LINE_RESET
 
@@ -72,9 +70,9 @@ public:
 		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
-		, m_r_mask_option(SM510_R_CONTROL_OUTPUT)
+		, m_r_mask_option(RMASK_DIRECT)
 		, m_lcd_ram_a(*this, "lcd_ram_a"), m_lcd_ram_b(*this, "lcd_ram_b"), m_lcd_ram_c(*this, "lcd_ram_c")
-		, m_write_sega(*this), m_write_segb(*this), m_write_segc(*this), m_write_segbs(*this)
+		, m_write_segs(*this)
 		, m_melody_rom(*this, "melody")
 		, m_read_k(*this)
 		, m_read_ba(*this), m_read_b(*this)
@@ -84,9 +82,10 @@ public:
 
 	// For SM510, SM500, SM5A, R port output is selected with a mask option,
 	// either from the divider or direct contol. Documented options are:
-	// SM510/SM5A: control, 2(4096Hz meant for alarm sound)
+	// SM510/SM5A: direct control, 2(4096Hz meant for alarm sound)
 	// SM500: 14, 11, 3 (divider f1, f4, f12)
 	void set_r_mask_option(int bit) { m_r_mask_option = bit; }
+	static constexpr int RMASK_DIRECT = -1;
 
 	// 4-bit K input port (pull-down)
 	auto read_k() { return m_read_k.bind(); }
@@ -103,13 +102,10 @@ public:
 	// 1/2/4-bit R (buzzer/melody) output port
 	auto write_r() { return m_write_r.bind(); }
 
-	// LCD segment outputs: H1-4 as offset(low), a/b/c 1-16 as data d0-d15
-	auto write_sega() { return m_write_sega.bind(); }
-	auto write_segb() { return m_write_segb.bind(); }
-	auto write_segc() { return m_write_segc.bind(); }
-
-	// LCD bs output: same as above, but only up to 2 bits used
-	auto write_segbs() { return m_write_segbs.bind(); }
+	// LCD segment outputs, SM51X: H1-4 as offset(low), a/b/c 1-16 as data d0-d15,
+	// bs output is same as above, but only up to 2 bits used.
+	// SM500/SM5A: H1/2 as a0, O group as a1-a4, O data as d0-d3
+	auto write_segs() { return m_write_segs.bind(); }
 
 protected:
 	// device-level overrides
@@ -164,7 +160,7 @@ protected:
 
 	// lcd driver
 	optional_shared_ptr<u8> m_lcd_ram_a, m_lcd_ram_b, m_lcd_ram_c;
-	devcb_write16 m_write_sega, m_write_segb, m_write_segc, m_write_segbs;
+	devcb_write16 m_write_segs;
 	emu_timer *m_lcd_timer;
 	u8 m_l, m_x;
 	u8 m_y;

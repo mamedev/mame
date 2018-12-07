@@ -221,13 +221,6 @@ WRITE8_MEMBER(hh_sm510_state::piezo2bit_input_w)
 	input_w(space, 0, data >> 1);
 }
 
-void hh_sm510_state::write_segs(machine_config &config)
-{
-	m_maincpu->write_sega().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->write_segb().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->write_segc().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->write_segbs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-}
 
 
 
@@ -291,7 +284,7 @@ MACHINE_CONFIG_START(kdribble_state::kdribble)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -363,7 +356,7 @@ MACHINE_CONFIG_START(ktopgun_state::ktopgun)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -436,7 +429,7 @@ MACHINE_CONFIG_START(kcontra_state::kcontra)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -508,7 +501,7 @@ MACHINE_CONFIG_START(ktmnt_state::ktmnt)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -577,7 +570,7 @@ MACHINE_CONFIG_START(kgradius_state::kgradius)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -644,7 +637,7 @@ MACHINE_CONFIG_START(kloneran_state::kloneran)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -715,7 +708,7 @@ MACHINE_CONFIG_START(kblades_state::kblades)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -787,7 +780,7 @@ MACHINE_CONFIG_START(knfl_state::knfl)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -858,7 +851,7 @@ MACHINE_CONFIG_START(kbilly_state::kbilly)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -923,7 +916,7 @@ MACHINE_CONFIG_START(kbucky_state::kbucky)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -992,7 +985,7 @@ MACHINE_CONFIG_START(kgarfld_state::kgarfld)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1083,12 +1076,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 
 	/* basic machine hardware */
-	sm5a_device &sm5a(SM5A(config, m_maincpu));
-	sm5a.set_r_mask_option(SM510_R_CONTROL_OUTPUT); // ?
-	sm5a.write_o().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	sm5a.read_k().set(FUNC(hh_sm510_state::input_r));
-	sm5a.write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	sm5a.read_ba().set_ioport("BA");
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // ?
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1117,12 +1110,12 @@ MACHINE_CONFIG_START(gnw_mmouse_state::nupogodi)
 	gnw_mmouse(config);
 
 	/* basic machine hardware */
-	kb1013vk12_device &sm5a(KB1013VK12(config.replace(), m_maincpu));
-	sm5a.set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	sm5a.write_o().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-	sm5a.read_k().set(FUNC(hh_sm510_state::input_r));
-	sm5a.write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	sm5a.read_ba().set_ioport("BA");
+	KB1013VK12(config.replace(), m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // ?
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1198,7 +1191,7 @@ MACHINE_CONFIG_START(gnw_opanic_state::gnw_opanic)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1283,7 +1276,7 @@ MACHINE_CONFIG_START(gnw_dkong_state::gnw_dkong)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1363,7 +1356,7 @@ MACHINE_CONFIG_START(gnw_mickdon_state::gnw_mickdon)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r2_w));
@@ -1452,7 +1445,7 @@ MACHINE_CONFIG_START(gnw_ghouse_state::gnw_ghouse)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1537,7 +1530,7 @@ MACHINE_CONFIG_START(gnw_dkong2_state::gnw_dkong2)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1622,7 +1615,7 @@ MACHINE_CONFIG_START(gnw_mario_state::gnw_mario)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1714,7 +1707,7 @@ MACHINE_CONFIG_START(gnw_dkjr_state::gnw_dkjr)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1795,7 +1788,7 @@ MACHINE_CONFIG_START(gnw_mariocm_state::gnw_mariocm)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1870,7 +1863,7 @@ MACHINE_CONFIG_START(gnw_tfish_state::gnw_tfish)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -1952,7 +1945,7 @@ MACHINE_CONFIG_START(gnw_smb_state::gnw_smb)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2033,7 +2026,7 @@ MACHINE_CONFIG_START(gnw_climber_state::gnw_climber)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2134,7 +2127,7 @@ MACHINE_CONFIG_START(gnw_boxing_state::gnw_boxing)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2243,8 +2236,8 @@ MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2345,8 +2338,8 @@ MACHINE_CONFIG_START(tddragon_state::tddragon)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT); // confirmed
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2439,8 +2432,8 @@ MACHINE_CONFIG_START(tkarnov_state::tkarnov)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2532,8 +2525,8 @@ MACHINE_CONFIG_START(tvindictr_state::tvindictr)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2648,8 +2641,8 @@ MACHINE_CONFIG_START(tgaiden_state::tgaiden)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(tgaiden_state::write_r));
@@ -2737,8 +2730,8 @@ MACHINE_CONFIG_START(tbatman_state::tbatman)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2830,8 +2823,8 @@ MACHINE_CONFIG_START(tsharr2_state::tsharr2)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT); // confirmed
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -2920,8 +2913,8 @@ MACHINE_CONFIG_START(tstrider_state::tstrider)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3014,8 +3007,8 @@ MACHINE_CONFIG_START(tgoldnaxe_state::tgoldnaxe)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3125,8 +3118,8 @@ MACHINE_CONFIG_START(trobocop2_state::trobocop2)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3232,8 +3225,8 @@ MACHINE_CONFIG_START(taltbeast_state::taltbeast)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT); // confirmed
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3326,8 +3319,8 @@ MACHINE_CONFIG_START(tsf2010_state::tsf2010)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3416,8 +3409,8 @@ MACHINE_CONFIG_START(tswampt_state::tswampt)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3510,8 +3503,8 @@ MACHINE_CONFIG_START(tspidman_state::tspidman)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3604,8 +3597,8 @@ MACHINE_CONFIG_START(txmen_state::txmen)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3698,8 +3691,8 @@ MACHINE_CONFIG_START(tddragon3_state::tddragon3)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3792,8 +3785,8 @@ MACHINE_CONFIG_START(tflash_state::tflash)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3887,7 +3880,7 @@ MACHINE_CONFIG_START(tmchammer_state::tmchammer)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -3980,8 +3973,8 @@ MACHINE_CONFIG_START(tbtoads_state::tbtoads)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4074,8 +4067,8 @@ MACHINE_CONFIG_START(thook_state::thook)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4167,8 +4160,8 @@ MACHINE_CONFIG_START(tbttf_state::tbttf)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4263,8 +4256,8 @@ MACHINE_CONFIG_START(taddams_state::taddams)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4357,8 +4350,8 @@ MACHINE_CONFIG_START(thalone_state::thalone)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4447,8 +4440,8 @@ MACHINE_CONFIG_START(txmenpx_state::txmenpx)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4541,8 +4534,8 @@ MACHINE_CONFIG_START(thalone2_state::thalone2)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4630,7 +4623,7 @@ MACHINE_CONFIG_START(tsonic_state::tsonic)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
@@ -4723,8 +4716,8 @@ MACHINE_CONFIG_START(trobocop3_state::trobocop3)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4813,8 +4806,8 @@ MACHINE_CONFIG_START(tdummies_state::tdummies)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -4907,8 +4900,8 @@ MACHINE_CONFIG_START(tsfight2_state::tsfight2)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5001,8 +4994,8 @@ MACHINE_CONFIG_START(twworld_state::twworld)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5091,8 +5084,8 @@ MACHINE_CONFIG_START(tjpark_state::tjpark)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5180,7 +5173,7 @@ MACHINE_CONFIG_START(tsonic2_state::tsonic2)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
@@ -5278,8 +5271,8 @@ MACHINE_CONFIG_START(tsddragon_state::tsddragon)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5373,8 +5366,8 @@ MACHINE_CONFIG_START(tdennis_state::tdennis)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5471,8 +5464,8 @@ MACHINE_CONFIG_START(tnmarebc_state::tnmarebc)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(tnmarebc_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5565,8 +5558,8 @@ MACHINE_CONFIG_START(ttransf2_state::ttransf2)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5655,8 +5648,8 @@ MACHINE_CONFIG_START(topaliens_state::topaliens)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5750,8 +5743,8 @@ MACHINE_CONFIG_START(tmkombat_state::tmkombat)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5844,8 +5837,8 @@ MACHINE_CONFIG_START(tshadow_state::tshadow)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -5938,8 +5931,8 @@ MACHINE_CONFIG_START(tskelwarr_state::tskelwarr)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6033,8 +6026,8 @@ MACHINE_CONFIG_START(tbatfor_state::tbatfor)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6128,8 +6121,8 @@ MACHINE_CONFIG_START(tjdredd_state::tjdredd)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6223,8 +6216,8 @@ MACHINE_CONFIG_START(tapollo13_state::tapollo13)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6318,8 +6311,8 @@ MACHINE_CONFIG_START(tgoldeye_state::tgoldeye)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6408,8 +6401,8 @@ MACHINE_CONFIG_START(tinday_state::tinday)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6498,8 +6491,8 @@ MACHINE_CONFIG_START(tsjam_state::tsjam)
 
 	/* basic machine hardware */
 	SM510(config, m_maincpu); // no external XTAL
-	m_maincpu->set_r_mask_option(SM510_R_CONTROL_OUTPUT);
-	write_segs(config);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6588,7 +6581,7 @@ MACHINE_CONFIG_START(tbatmana_state::tbatmana)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
@@ -6692,7 +6685,7 @@ MACHINE_CONFIG_START(tigarden_state::tigarden)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(2); // confirmed
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
@@ -6791,7 +6784,7 @@ MACHINE_CONFIG_START(nummunch_state::nummunch)
 
 	/* basic machine hardware */
 	SM511(config, m_maincpu);
-	write_segs(config);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));

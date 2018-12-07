@@ -32,10 +32,10 @@
 class eva_base_state : public driver_device
 {
 public:
-	eva_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_tms5100(*this, "tms5100")
-		, m_tms6100(*this, "tms6100")
+	eva_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_tms5100(*this, "tms5100"),
+		m_tms6100(*this, "tms6100")
 	{ }
 
 	void eva_sound(machine_config &config);
@@ -49,9 +49,9 @@ protected:
 class eva11_state : public eva_base_state
 {
 public:
-	eva11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eva_base_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+	eva11_state(const machine_config &mconfig, device_type type, const char *tag) :
+		eva_base_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void eva(machine_config &config);
@@ -68,9 +68,9 @@ private:
 class eva24_state : public eva_base_state
 {
 public:
-	eva24_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eva_base_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+	eva24_state(const machine_config &mconfig, device_type type, const char *tag) :
+		eva_base_state(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void eva(machine_config &config);
