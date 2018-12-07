@@ -326,16 +326,56 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 	}
 }
 
+
+// takes an x/y pixel position in the virtual tilemap and returns the code + attributes etc. for it
 inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int y, int page, int& code, int& attr, int& flipx, int& flipy, int& color)
 {
-	uint16_t *s3 = &spriteram[2 * ((page * 0x2000 / 4) + ((y & 0x1f) << 6) + (x & 0x03f))];
+	int xtile = x >> (is_16x16 ? 4 : 3);
+	int ytile = y >> (is_16x16 ? 4 : 3);
+
+	// yes the tilemap in RAM is flipped?!
+	ytile ^= 0x1f;
+
+	uint16_t *s3 = &spriteram[2 * ((page * 0x2000 / 4) + ((ytile & 0x1f) << 6) + ((xtile) & 0x03f))];
 	attr = s3[0];
 	code = s3[1] + ((attr & 0x0007) << 16);
 	flipx = (attr & 0x0010);
 	flipy = (attr & 0x0008);
 	color = (attr & 0xffe0) >> 5;
 	if (is_16x16)
+	{
 		code &= ~3;
+		
+		if (!flipx)
+		{
+			if (x & 8)
+			{
+				code += 1;
+			}
+		}
+		else
+		{
+			if (!(x & 8))
+			{
+				code += 1;
+			}
+		}
+
+		if (!flipy)
+		{
+			if (y & 8)
+			{
+				code += 2;
+			}
+		}
+		else
+		{
+			if (!(y & 8))
+			{
+				code += 2;
+			}
+		}
+	}
 }
 
 void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -447,30 +487,22 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					{
 						int sourceline = (realline - scrolly) & 0x1ff;
 
-						int y = sourceline >> (is_16x16 ? 4 : 3);
-
-						for (int x = 0; x < 0x40; x++)
+						// we treat 16x16 tiles as 4 8x8 tiles, so while the tilemap is 0x40 tiles wide in memory, that becomes 0x80 tiles in 16x16 mode, with the data wrapping in 8x8 mode
+						for (int x = 0; x < 0x80; x++)
 						{
 							int code, attr, flipx, flipy, color;
-							// tilemap data is NOT buffered? (and yes the tilemap in RAM is flipped?!)
-							get_tile(spriteram, is_16x16, x, y ^ 0x1f, page, code, attr, flipx, flipy, color);
+							// tilemap data is NOT buffered?
+							get_tile(spriteram, is_16x16, x * 8, sourceline, page, code, attr, flipx, flipy, color);
 
-							int line = is_16x16 ? (sourceline & 0x0f) : (sourceline & 0x07);
+							int tileline = sourceline & 0x07;
+							int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
+							int px = (((dx + x * 8) + 0x10) & 0x3ff) - 0x10;
+							int dst_x = px & 0x3ff;
+							dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
 
-							int ty = (line >> 3) & 1;
-							line &= 0x7;
-							for (int tx = 0; tx <= is_16x16; tx++)
+							if ((dst_x >= clip.min_x - 8) && (dst_x <= clip.max_x))
 							{
-								int dx = sx + (scrollx & 0x3ff) + xoffs + 0x10;
-								int px = ((dx + x * (8 << is_16x16) + 0x10) & 0x3ff) - 0x10;
-								int dst_x = (px + (flipx ? is_16x16 - tx : tx) * 8) & 0x3ff;
-								dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
-
-								if ((dst_x >= clip.min_x - 8) && (dst_x <= clip.max_x))
-								{
-									int realcode = code ^ tx ^ ((flipy ? is_16x16 - ty : ty) << 1);
-									drawgfx_line(bitmap, clip, which_gfx, m_spritegfx->get_data(m_realtilenumber[realcode]), color << 4, flipx, flipy, dst_x, use_shadow, realline, line, opaque);
-								}
+								drawgfx_line(bitmap, clip, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x, use_shadow, realline, tileline, opaque);
 							}
 						}
 					}
