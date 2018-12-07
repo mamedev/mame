@@ -643,11 +643,11 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, microvision_state, i8021_t1_read))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, microvision_state, i8021_bus_read))
 
-	MCFG_DEVICE_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
-	MCFG_TMS1XXX_OUTPUT_PLA( microvision_output_pla_0 )
-	MCFG_TMS1XXX_READ_K_CB( READ8( *this, microvision_state, tms1100_read_k ) )
-	MCFG_TMS1XXX_WRITE_O_CB( WRITE16( *this, microvision_state, tms1100_write_o ) )
-	MCFG_TMS1XXX_WRITE_R_CB( WRITE16( *this, microvision_state, tms1100_write_r ) )
+	TMS1100(config, m_tms1100, 500000);   // most games seem to be running at approximately this speed
+	m_tms1100->set_output_pla(microvision_output_pla_0);
+	m_tms1100->k().set(FUNC(microvision_state::tms1100_read_k));
+	m_tms1100->o().set(FUNC(microvision_state::tms1100_write_o));
+	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

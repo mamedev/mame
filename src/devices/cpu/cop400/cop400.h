@@ -134,6 +134,17 @@ public:
 	template<class Object> devcb_base &set_write_so_callback(Object &&cb) { return m_write_so.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_write_sk_callback(Object &&cb) { return m_write_sk.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_read_cko_callback(Object &&cb) { return m_read_cko.set_callback(std::forward<Object>(cb)); }
+	auto read_l() { return m_read_l.bind(); }
+	auto read_l_tristate() { return m_read_l_tristate.bind(); }
+	auto write_l() { return m_write_l.bind(); }
+	auto read_g() { return m_read_g.bind(); }
+	auto write_g() { return m_write_g.bind(); }
+	auto write_d() { return m_write_d.bind(); }
+	auto read_in() { return m_read_in.bind(); }
+	auto read_si() { return m_read_si.bind(); }
+	auto write_so() { return m_write_so.bind(); }
+	auto write_sk() { return m_write_sk.bind(); }
+	auto read_cko() { return m_read_cko.bind(); }
 
 	void set_config(cop400_cki_bond cki, cop400_cko_bond cko, bool has_microbus)
 	{

@@ -1283,14 +1283,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispeak_state::snmath)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0270, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, snspell_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snmath_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, snspell_write_r))
+	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, MASTER_CLOCK/2));
+	tms.k().set(FUNC(tispeak_state::snspell_read_k));
+	tms.o().set(FUNC(tispeak_state::snmath_write_o));
+	tms.r().set(FUNC(tispeak_state::snspell_write_r));
 
-	MCFG_TMS0270_READ_CTL_CB(READ8("tms5100", tms5110_device, ctl_r))
-	MCFG_TMS0270_WRITE_CTL_CB(WRITE8("tms5100", tms5110_device, ctl_w))
-	MCFG_TMS0270_WRITE_PDC_CB(WRITELINE("tms5100", tms5110_device, pdc_w))
+	tms.read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
+	tms.write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
+	tms.write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_snmath);
@@ -1308,8 +1308,7 @@ MACHINE_CONFIG_START(tispeak_state::sns_cd2801)
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
+	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snspell);
 
@@ -1356,8 +1355,7 @@ MACHINE_CONFIG_START(tispeak_state::snread)
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
+	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
 	config.set_default_layout(layout_snread);
 
@@ -1374,9 +1372,8 @@ MACHINE_CONFIG_START(tispeak_state::lantutor)
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, lantutor_write_r))
+	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::lantutor_write_r));
 
 	config.set_default_layout(layout_snread);
 
@@ -1393,10 +1390,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispeak_state::snspellc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, snspellc_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspellc_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, snspellc_write_r))
+	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::snspellc_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	/* no visual feedback! */
 
@@ -1427,10 +1424,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispeak_state::vocaid)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, tntell_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspellc_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, snspellc_write_r))
+	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::tntell_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
@@ -1459,10 +1456,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispeak_state::k28m2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, k28_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, k28_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, k28_write_r))
+	TMS1400(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::k28_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::k28_write_r));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_k28m2);

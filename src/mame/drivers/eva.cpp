@@ -29,56 +29,72 @@
 #include "speaker.h"
 
 
-class eva_state : public driver_device
+class eva_base_state : public driver_device
 {
 public:
-	eva_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_tms5100(*this, "tms5100"),
-		m_tms6100(*this, "tms6100")
+	eva_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_tms5100(*this, "tms5100")
+		, m_tms6100(*this, "tms6100")
 	{ }
 
-	void tms5110_route(machine_config &config);
-	void eva11(machine_config &config);
-	void eva24(machine_config &config);
+	void eva_sound(machine_config &config);
+
+protected:
+	// devices
+	required_device<tms5110_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+};
+
+class eva11_state : public eva_base_state
+{
+public:
+	eva11_state(const machine_config &mconfig, device_type type, const char *tag)
+		: eva_base_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void eva(machine_config &config);
 
 private:
 	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<tms5110_device> m_tms5100;
-	required_device<tms6100_device> m_tms6100;
+	required_device<tms1000_cpu_device> m_maincpu;
 
-	// EVA-24
-	DECLARE_READ8_MEMBER(eva24_read_g);
-	DECLARE_WRITE8_MEMBER(eva24_write_g);
-	DECLARE_WRITE8_MEMBER(eva24_write_d);
-
-	u8 m_g;
-
-	// EVA-11
-	DECLARE_READ8_MEMBER(eva11_read_k);
-	DECLARE_WRITE16_MEMBER(eva11_write_o);
-	DECLARE_WRITE16_MEMBER(eva11_write_r);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	DECLARE_READ8_MEMBER(read_k);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
 };
 
+class eva24_state : public eva_base_state
+{
+public:
+	eva24_state(const machine_config &mconfig, device_type type, const char *tag)
+		: eva_base_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-// machine start/reset
+	void eva(machine_config &config);
 
-void eva_state::machine_start()
+private:
+	virtual void machine_start() override;
+
+	// devices
+	required_device<cop420_cpu_device> m_maincpu;
+
+	DECLARE_READ8_MEMBER(read_g);
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_WRITE8_MEMBER(write_d);
+
+	u8 m_g;
+};
+
+void eva24_state::machine_start()
 {
 	// zerofill
 	m_g = 0;
 
 	// register for savestates
 	save_item(NAME(m_g));
-}
-
-void eva_state::machine_reset()
-{
 }
 
 
@@ -91,19 +107,19 @@ void eva_state::machine_reset()
 
 // EVA-24
 
-WRITE8_MEMBER(eva_state::eva24_write_g)
+WRITE8_MEMBER(eva24_state::write_g)
 {
 	// G3: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 3 & 1);
 	m_g = data;
 }
 
-READ8_MEMBER(eva_state::eva24_read_g)
+READ8_MEMBER(eva24_state::read_g)
 {
 	return m_g;
 }
 
-WRITE8_MEMBER(eva_state::eva24_write_d)
+WRITE8_MEMBER(eva24_state::write_d)
 {
 	// D3210: TMS5100 CTL8421
 	m_tms5100->ctl_w(space, 0, data & 0xf);
@@ -112,19 +128,19 @@ WRITE8_MEMBER(eva_state::eva24_write_d)
 
 // EVA-11
 
-WRITE16_MEMBER(eva_state::eva11_write_r)
+WRITE16_MEMBER(eva11_state::write_r)
 {
 	// R7: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 7 & 1);
 }
 
-WRITE16_MEMBER(eva_state::eva11_write_o)
+WRITE16_MEMBER(eva11_state::write_o)
 {
 	// O3210: TMS5100 CTL8421
 	m_tms5100->ctl_w(space, 0, data & 0xf);
 }
 
-READ8_MEMBER(eva_state::eva11_read_k)
+READ8_MEMBER(eva11_state::read_k)
 {
 	// K84: TMS5100 CTL81(O30)
 	u8 ctl = m_tms5100->ctl_r(space, 0);
@@ -157,50 +173,43 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(eva_state::tms5110_route)
-
-	/* sound hardware */
-	MCFG_DEVICE_MODIFY("tms5100")
-	MCFG_TMS5110_M0_CB(WRITELINE(m_tms6100, tms6100_device, m0_w))
-	MCFG_TMS5110_M1_CB(WRITELINE(m_tms6100, tms6100_device, m1_w))
-	MCFG_TMS5110_ADDR_CB(WRITE8(m_tms6100, tms6100_device, add_w))
-	MCFG_TMS5110_DATA_CB(READLINE(m_tms6100, tms6100_device, data_line_r))
-	MCFG_TMS5110_ROMCLK_CB(WRITELINE(m_tms6100, tms6100_device, clk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(eva_state::eva24)
-
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP420, 640_kHz_XTAL/2) // guessed
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eva_state, eva24_write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, eva_state, eva24_write_g))
-	MCFG_COP400_READ_G_CB(READ8(*this, eva_state, eva24_read_g))
-
+void eva_base_state::eva_sound(machine_config &config)
+{
 	/* sound hardware */
 	TMS6100(config, m_tms6100, 640_kHz_XTAL/4);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
-	tms5110_route(config);
-MACHINE_CONFIG_END
+	TMS5110A(config, m_tms5100, 640_kHz_XTAL);
+	m_tms5100->m0().set(m_tms6100, FUNC(tms6100_device::m0_w));
+	m_tms5100->m1().set(m_tms6100, FUNC(tms6100_device::m1_w));
+	m_tms5100->addr().set(m_tms6100, FUNC(tms6100_device::add_w));
+	m_tms5100->data().set(m_tms6100, FUNC(tms6100_device::data_line_r));
+	m_tms5100->romclk().set(m_tms6100, FUNC(tms6100_device::clk_w));
+	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(eva_state::eva11)
-
+void eva24_state::eva(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS1000, 640_kHz_XTAL/2) // from TMS5110A CPU CK
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, eva_state, eva11_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, eva_state, eva11_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, eva_state, eva11_write_r))
+	COP420(config, m_maincpu, 640_kHz_XTAL/2); // guessed
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(eva24_state::write_d));
+	m_maincpu->write_g().set(FUNC(eva24_state::write_g));
+	m_maincpu->read_g().set(FUNC(eva24_state::read_g));
 
-	/* sound hardware */
-	TMS6100(config, m_tms6100, 640_kHz_XTAL/4);
+	eva_sound(config);
+}
 
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
-	tms5110_route(config);
-MACHINE_CONFIG_END
+void eva11_state::eva(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 640_kHz_XTAL/2); // from TMS5110A CPU CK
+	m_maincpu->k().set(FUNC(eva11_state::read_k));
+	m_maincpu->o().set(FUNC(eva11_state::write_o));
+	m_maincpu->r().set(FUNC(eva11_state::write_r));
+
+	eva_sound(config);
+}
 
 
 
@@ -233,6 +242,6 @@ ROM_END
 
 
 
-//    YEAR  NAME   PARENT CMP MACHINE INPUT  CLASS      INIT        COMPANY     FULLNAME                                FLAGS
-SYST( 1984, eva24, 0,      0, eva24,  eva24, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-SYST( 1983, eva11, eva24,  0, eva11,  eva11, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT CMP MACHINE INPUT  CLASS        INIT        COMPANY     FULLNAME                                FLAGS
+SYST( 1984, eva24, 0,      0, eva,    eva24, eva24_state, empty_init, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+SYST( 1983, eva11, eva24,  0, eva,    eva11, eva11_state, empty_init, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
