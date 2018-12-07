@@ -59,7 +59,7 @@ public:
 	void vt240(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu;
 	required_device<cpu_device> m_i8085;
 	required_device<i8251_device> m_i8251;
 	required_device<scn2681_device> m_duart;
@@ -655,10 +655,10 @@ static INPUT_PORTS_START( vt240 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vt240_state::vt240)
-	MCFG_DEVICE_ADD("maincpu", T11, XTAL(7'372'800)) // confirm
-	MCFG_DEVICE_PROGRAM_MAP(vt240_mem)
-	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_T11_RESET(WRITELINE(*this, vt240_state, t11_reset_w))
+	T11(config, m_maincpu, XTAL(7'372'800)); // confirm
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt240_state::vt240_mem);
+	m_maincpu->set_initial_mode(5 << 13);
+	m_maincpu->out_reset().set(FUNC(vt240_state::t11_reset_w));
 
 	MCFG_DEVICE_ADD("charcpu", I8085A, XTAL(16'097'280) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(vt240_char_mem)

@@ -1185,9 +1185,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", T11, MASTER_CLOCK/2)
-	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	T11(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_initial_mode(0x36ff); /* initial mode word has DAL15,14,11,8 pulled low */
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy2_state::main_map);
 
 	M6502(config, m_audiocpu, SOUND_CLOCK/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy2_state::sound_map);

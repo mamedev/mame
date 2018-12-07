@@ -9,6 +9,7 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
+#include "cpu/sm510/sm510.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
@@ -28,7 +29,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<sm510_base_device> m_maincpu;
 	optional_ioport_array<8> m_inp_matrix; // max 8
 	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
@@ -70,6 +71,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void write_segs(machine_config &config);
 };
 
 

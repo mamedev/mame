@@ -116,7 +116,7 @@ private:
 	} m_video;
 	std::unique_ptr<uint32_t[]> m_videoram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<k1801vm2_device> m_maincpu;
 //  required_device<ms7004_device> m_ms7004;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -347,9 +347,9 @@ static GFXDECODE_START( gfx_kcgd )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(kcgd_state::kcgd)
-	MCFG_DEVICE_ADD("maincpu", K1801VM2, XTAL(30'800'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(kcgd_mem)
-	MCFG_T11_INITIAL_MODE(0100000)
+	K1801VM2(config, m_maincpu, XTAL(30'800'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kcgd_state::kcgd_mem);
+	m_maincpu->set_initial_mode(0100000);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", kcgd_state, scanline_callback, attotime::from_hz(50*28*11)) // XXX verify
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(30'800'000)/KCGD_HORZ_START))

@@ -113,7 +113,7 @@ private:
 
 	void irq_encoder(int irq, int state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu; // actual CPU is T11 clone, KR1807VM1
 	required_device<ram_device> m_ram;
 	required_device<kr1818vg93_device> m_fdc;
 	required_device<floppy_image_device> m_floppy0;
@@ -524,9 +524,9 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 
 MACHINE_CONFIG_START(ms0515_state::ms0515)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", T11, XTAL(15'000'000) / 2) // actual CPU is T11 clone, KR1807VM1
-	MCFG_T11_INITIAL_MODE(0xf2ff)
-	MCFG_DEVICE_PROGRAM_MAP(ms0515_mem)
+	T11(config, m_maincpu, XTAL(15'000'000) / 2); // actual CPU is T11 clone, KR1807VM1
+	m_maincpu->set_initial_mode(0xf2ff);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms0515_state::ms0515_mem);
 
 	/* video hardware -- 50 Hz refresh rate */
 	MCFG_SCREEN_ADD("screen", RASTER)
