@@ -317,9 +317,10 @@ void balsente_state::cpu1_triviamb_map(address_map &map)
 	map(0x03c0, 0x03c0).w(FUNC(balsente_state::palette_select_w));
 	map(0x03e0, 0x03e0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
-	map(0x8800, 0x8fff).ram().w(FUNC(balsente_state::paletteram_byte_w)).share("paletteram"); // probably wrong
+	map(0x8000, 0x83ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x8800, 0x88ff).rw("nov0", FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0x8900, 0x89ff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
+	map(0x8a00, 0x8fff).ram();
 	map(0xa000, 0xbfff).bankr("bankab");
 	map(0xc000, 0xdfff).bankr("bankcd");
 	map(0xe000, 0xffff).bankr("bankef");
@@ -1442,12 +1443,16 @@ void balsente_state::triviamb(machine_config &config)
 	config.device_remove("acia");
 	config.device_remove("audio6vb");
 
-	PIA6821(config, "pia");
+	pia6821_device &pia(PIA6821(config, "pia"));
+	pia.cb2_handler().set("nov0", FUNC(x2212_device::recall));
+	pia.cb2_handler().append("nov1", FUNC(x2212_device::recall));
 
 	mc6845_device &crtc(C6545_1(config, "crtc", 20000000 / 16)); // specific type unknown, but must allow VBLANK polling
-	crtc.set_screen("screen");
+	crtc.set_screen(nullptr);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);
+
+	m_palette->set_format(PALETTE_FORMAT_BBGGGRRR);
 
 	// sound PCB has: 2x Z80CTC, 2x AY8910A, 1x M5205, 1x 8MHz XTAL (divisor unknown for every device)
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);

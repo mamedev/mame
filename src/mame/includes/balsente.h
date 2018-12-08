@@ -126,7 +126,6 @@ private:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(palette_select_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(paletteram_byte_w);
 	DECLARE_WRITE8_MEMBER(shrike_sprite_select_w);
 
 	virtual void machine_start() override;
@@ -201,7 +200,7 @@ private:
 	optional_device<ls259_device> m_outlatch;
 	required_device_array<x2212_device, 2> m_novram;
 	optional_device<acia6850_device> m_acia;
-	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
 
 	required_memory_bank m_bankab;
 	required_memory_bank m_bankcd;
