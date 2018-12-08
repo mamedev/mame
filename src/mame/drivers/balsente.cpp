@@ -211,6 +211,7 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "audio/sente6vb.h"
 #include "machine/6821pia.h"
@@ -318,9 +319,7 @@ void balsente_state::cpu1_triviamb_map(address_map &map)
 	map(0x03e0, 0x03e0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x0800, 0x7fff).ram().w(FUNC(balsente_state::videoram_w)).share("videoram");
 	map(0x8000, 0x83ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x8800, 0x88ff).rw("nov0", FUNC(x2212_device::read), FUNC(x2212_device::write));
-	map(0x8900, 0x89ff).rw("nov1", FUNC(x2212_device::read), FUNC(x2212_device::write));
-	map(0x8a00, 0x8fff).ram();
+	map(0x8800, 0x8fff).ram().share("nvram");
 	map(0xa000, 0xbfff).bankr("bankab");
 	map(0xc000, 0xdfff).bankr("bankcd");
 	map(0xe000, 0xffff).bankr("bankef");
@@ -1437,17 +1436,27 @@ void balsente_state::rescraid(machine_config &config)
 void balsente_state::triviamb(machine_config &config)
 {
 	balsente(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_triviamb_map);
 	config.device_remove("outlatch");
 	config.device_remove("acia");
 	config.device_remove("audio6vb");
+	config.device_remove("nov0");
+	config.device_remove("nov1");
 
-	pia6821_device &pia(PIA6821(config, "pia"));
-	pia.cb2_handler().set("nov0", FUNC(x2212_device::recall));
-	pia.cb2_handler().append("nov1", FUNC(x2212_device::recall));
+	m_maincpu->set_clock(10_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_triviamb_map);
 
-	mc6845_device &crtc(C6545_1(config, "crtc", 20000000 / 16)); // specific type unknown, but must allow VBLANK polling
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HY6116AP-10 + battery (only 512x4 bits are actually saved)
+
+	pia6821_device &pia(PIA6821(config, "pia")); // Thomson EF6821P
+	pia.writepb_handler().set(FUNC(balsente_state::out0_w)).bit(0);
+	pia.writepb_handler().append(FUNC(balsente_state::out1_w)).bit(1);
+	pia.writepb_handler().append(FUNC(balsente_state::out2_w)).bit(2);
+	pia.writepb_handler().append(FUNC(balsente_state::out3_w)).bit(3);
+	pia.writepb_handler().append(FUNC(balsente_state::out4_w)).bit(4);
+	pia.writepb_handler().append(FUNC(balsente_state::out5_w)).bit(5);
+	pia.writepb_handler().append(FUNC(balsente_state::out6_w)).bit(6);
+
+	mc6845_device &crtc(C6545_1(config, "crtc", 10_MHz_XTAL / 8)); // specific type unknown, but must allow VBLANK polling
 	crtc.set_screen(nullptr);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);
