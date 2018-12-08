@@ -1220,7 +1220,7 @@ ROM_START( kov )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600.117",    0x100000, 0x400000, CRC(c4d19fe6) SHA1(14ef31539bfbc665e76c9703ee01b12228344052) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1247,7 +1247,7 @@ ROM_START( kov115 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600.115",    0x100000, 0x400000, CRC(527a2924) SHA1(7e3b166dddc5245d7b408e78437c16fd2986d1d9) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1309,7 +1309,7 @@ ROM_START( kov100 )
 	ROM_LOAD16_BYTE( "sav111.u8",      0x200000, 0x080000, CRC(003cbf49) SHA1(fb5bea47ecae025b1b425af52cd05e061f45e377) )
 	ROM_LOAD16_WORD_SWAP( "sav111.u10",0x300000, 0x080000, CRC(d5536107) SHA1(f963e015d99c1621323eecf63e773c0b9f4b6a43) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1340,7 +1340,7 @@ ROM_START( kov100hk )
 	ROM_LOAD16_BYTE( "sav114.u8",      0x200000, 0x080000, CRC(ab129997) SHA1(b0e56a09df0def3e8b584ca6f53cd3c88634653e) )
 	ROM_LOAD16_WORD_SWAP( "sav114.u10",0x300000, 0x080000, CRC(8f84ecfd) SHA1(2e7f322da6c4b1d6daf7a308229f4cf2e69fda8f) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027.bin", 0x000000, 0x04000, NO_DUMP ) // IGS 027 55857E 100 9901 HONG KONG
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1367,7 +1367,7 @@ ROM_START( kovplus )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600.119",    0x100000, 0x400000, CRC(e4b0875d) SHA1(e8382e131b0e431406dc2a05cc1ef128302d987c) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1430,7 +1430,7 @@ ROM_START( kovplusa )
 	ROM_LOAD16_BYTE( "v119.u6",     0x200000, 0x080000, CRC(71e28f27) SHA1(db382807e9185f0dc17124f210165fa1b36ca6ac) )
 	ROM_LOAD16_WORD_SWAP( "v119.u2",0x300000, 0x080000, CRC(29588ef2) SHA1(17d1a308d44434cf65224a24360cf4b6e32d28f3) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1457,7 +1457,7 @@ ROM_START( kovsgqyz )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "pgm_sgqyz.rom",    0x100000, 0x400000, CRC(18e1eed9) SHA1(db18d9121bb533140957e9c58dbc38211d164b01) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsgqyz_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1484,7 +1484,7 @@ ROM_START( kovsgqyza )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "pgm_sgqyza.rom",    0x100000, 0x400000, CRC(5a30dcb7) SHA1(64f34faf99a19c0a54899990695129c512d5a3c8) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsgqyza_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1511,7 +1511,7 @@ ROM_START( kovsgqyzb )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "pgm_sgqyzb.rom",    0x100000, 0x400000, CRC(18b8b9c0) SHA1(f4937aa21cd11af16fb50e7a75c8d4c4ed27c5cf) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsgqyzb_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // bootleg is probably a different device
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1542,7 +1542,7 @@ ROM_START( kovsh )
 	ROM_LOAD16_WORD_SWAP( "p0600.322",    0x100000, 0x400000, CRC(7c78e5f3) SHA1(9b1e4bd63fb1294ebeb539966842273c8dc7683b) )
 	//ROM_LOAD16_WORD_SWAP( "kovsh-v0104-u1.bin",    0x100000, 0x400000, CRC(4e2ba39b) SHA1(f3b5aa6f45cfd5a7f1e2a2e893d1652a3f23d6b8) ) // identical but the last 1MB is filled with 0xff instead of 0x00
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1572,7 +1572,7 @@ ROM_START( kovsh103 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600.103",    0x100000, 0x400000, CRC(f0b3da82) SHA1(4067beb69c049b51bce6154f4cf880600ca4de11) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1602,7 +1602,7 @@ ROM_START( kovsh102 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600.102",    0x100000, 0x400000, CRC(fdd4fb0f) SHA1(6906ce68f37b82e52ba30e5cceb1304d9e01430a) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1632,7 +1632,7 @@ ROM_START( kovsh101 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600.101",    0x100000, 0x400000, CRC(517a9bcf) SHA1(1ee0333aee2a7569e15bb2a1be8dd03f8b08e08c) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1662,7 +1662,7 @@ ROM_START( kovsh100 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "kovsh-v0100-u1.bin",    0x100000, 0x400000, CRC(d145c1ca) SHA1(ce4da36791bc5eea9fe1ef6db180d789bab0bab7) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1692,7 +1692,7 @@ ROM_START( kovqhsgs )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "qhsg_c51.rom", 0x100000, 0x400000, CRC(e5cbac85) SHA1(4b424206387057863990b04f6d5bd0b6f754814f) ) // V300CN V303CN Nov 21 2008 19:03:49
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "qhsg_prot.c51", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1733,7 +1733,7 @@ ROM_START( photoy2k )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0701_v105.u2",     0x100000, 0x200000, CRC(fab142e0) SHA1(8dc7e53b740ed68bac98c0ef7ca4943c517e6f5d) ) // 10/12/99 21:07:53
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china.asic", 0x000000, 0x04000, CRC(1a0b68f6) SHA1(290441ed652f54b26ace8f59a26220881fb62084) ) // 3 bytes differ from the read in the other sets.  I think this one is GOOD and the other is bad.  This always gives the same read, so unless the actual chips is bad... TBC
 
 	ROM_REGION( 0x480000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1763,7 +1763,7 @@ ROM_START( photoy2k104 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v104.16m",     0x100000, 0x200000, CRC(e051070f) SHA1(a5a1a8dd7542a30632501af8d02fda07475fd9aa) ) // 06/10/99 17:28:34
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china_alt.asic", 0x000000, 0x04000,  CRC(6dd7f257) SHA1(1984f98a282d8b3264674f231c3b7def1757cf72) )
 
 	ROM_REGION( 0x480000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1825,7 +1825,7 @@ ROM_START( photoy2k102 )
 	ROM_LOAD16_BYTE( "v102.u5",     0x200001, 0x080000, CRC(9201621b) SHA1(1ca3ebe7eec40614bfa8b911657fa2b51f2c51a4) )
 	ROM_LOAD16_BYTE( "v102.u8",     0x200000, 0x080000, CRC(3be22b8f) SHA1(03634fbd6a8a8369c6cb1fd6694a3784dac5bf59) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china_alt.asic", 0x000000, 0x04000,  CRC(6dd7f257) SHA1(1984f98a282d8b3264674f231c3b7def1757cf72) )
 
 	ROM_REGION( 0x480000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1874,7 +1874,7 @@ ROM_START( py2k2 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "y2k2_m-101xx.u1",     0x100000, 0x200000, CRC(c47795f1) SHA1(5be4af4275571932d7740c3ea0857a1f58a3f6d9) ) // 68k (encrypted) 2nd half empty...; 05/25/01 11:02:54
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k2.asic", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x480000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -1902,7 +1902,7 @@ ROM_START( pgm3in1 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v-100cn.u3",     0x100000, 0x200000, CRC(a39f59b4) SHA1(4eb53fb9f173cb470e16dc8f193c8909cf045e3d)) // M68K V100 07/13/04 12:09:20 (encrypted)
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_pgm3in1.asic", 0x000000, 0x04000, NO_DUMP )
 
 	/* No external ARM rom */
@@ -2177,7 +2177,7 @@ ROM_START( puzlstar )
 	ROM_LOAD16_BYTE( "v100mg.u1",     0x100000, 0x080000, CRC(5788b77d) SHA1(7770aae6e686da92b2623c977d1bc8f019f48267) )
 	ROM_LOAD16_BYTE( "v100mg.u2",     0x100001, 0x080000, CRC(4c79d979) SHA1(3b92052a35994f2b3dd164930154184c45d5e2d0) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzlstar_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -2413,7 +2413,7 @@ ROM_START( kov2 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u18.107",      0x100000, 0x400000, CRC(661a5b2c) SHA1(125054fabc93d4f4cba869c3e6adf863650d30cf) ) // 05/10/01 14:24:08 V107
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2443,7 +2443,7 @@ ROM_START( kov2106 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u18.106",    0x100000, 0x400000, CRC(40051ad9) SHA1(ba2ddf267fe688d5dfed575aeeccbab10135b37b) ) // 02/27/01 13:26:46 V106
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2474,7 +2474,7 @@ ROM_START( kov2104 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u18.104",    0x100000, 0x400000, CRC(0fdb050b) SHA1(8ac704459e1a17d0956dd3529e81b6bcd8abf361) ) // 01/19/01 10:19:38 V104
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2505,7 +2505,7 @@ ROM_START( kov2103 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u18.103",    0x100000, 0x400000, CRC(98c32f76) SHA1(ec7e35e8071bb7097e415493be4e40be0ca19fd6) ) // 12/28/00 15:09:31 V103
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2536,7 +2536,7 @@ ROM_START( kov2102 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u18.102",    0x100000, 0x400000, CRC(a2489c37) SHA1(77ea7cdec211848296dafd45bee1d042133ea2a6) ) // 12/14/00 10:33:36 V102
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2567,7 +2567,7 @@ ROM_START( kov2101 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u18.101",    0x100000, 0x400000, CRC(c9926f35) SHA1(a9c72d0c5d239164107894c7d3fffe4af29ed201) ) // 12/07/00 16:40:30 V101
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2598,7 +2598,7 @@ ROM_START( kov2100 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "igs_u18.rom",    0x100000, 0x400000, CRC(86205879) SHA1(f73d5b70b41d39be1cac75e474b025de2cce0b01) ) // 11/29/00 11:03:08 V100
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2630,7 +2630,7 @@ ROM_START( kov2p )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u8-27322.rom",    0x100000, 0x400000, CRC(3a2cc0de) SHA1(d7511478b34bfb03b2fb5b8268b60502d05b9414) ) // 04/25/02 17:48:27 M205XX
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2661,7 +2661,7 @@ ROM_START( kov2p204 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v204-32m.rom",    0x100000, 0x400000, CRC(583e0650) SHA1(2e5656dd9c6cba9f84af9baa3f5f70cdccf9db47) ) // 08/28/01 09:11:49 M204XX
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2692,7 +2692,7 @@ ROM_START( kov2p202 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v202.bin",    0x100000, 0x400000, CRC(e9b5aa0c) SHA1(39a776c8501e8557d305cfa56c997f9adeb6bcd2) ) // 07/09/01 11:03:50 M202XX
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2723,7 +2723,7 @@ ROM_START( kov2p200 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v200_32m.ic8",    0x100000, 0x400000, CRC(9a09fd61) SHA1(690a0b323e1f275a08ba84febf93bf8edc2d0802) ) // 06/18/01  22:59:12 M200XX
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -2770,27 +2770,27 @@ Some logic IC's, resistors, caps etc.
 */
 
 #define DDP2_ASIC027_CHINA \
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
 	ROM_LOAD( "ddp2_igs027a_china.bin", 0x000000, 0x04000, CRC(8c566319) SHA1(bb001d8ada56bf446f9ab88e00936501652daf11) ) /* 00 */
 
 #define DDP2_ASIC027_TAIWAN \
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
 	ROM_LOAD( "ddp2_igs027a_taiwan.bin", 0x000000, 0x04000, CRC(1dd34bdc) SHA1(4f2ee38ee37d5cc63b2a63ef51bd392e4f18d836) ) /* 01 */
 
 #define DDP2_ASIC027_JAPAN \
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
 	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) ) /* 02 */
 
 #define DDP2_ASIC027_KOREA \
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
 	ROM_LOAD( "ddp2_igs027a_korea.bin", 0x000000, 0x04000, CRC(e5a81c17) SHA1(cfe4e28a44a1b3a5c1c9e303941b335dbde7dd8d) ) /* 03 */
 
 #define DDP2_ASIC027_HONG_KONG \
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
 	ROM_LOAD( "ddp2_igs027a_hong_kong.bin", 0x000000, 0x04000, CRC(a7d1cace) SHA1(b9391da52c8234ca0182484f33b5242827c51c76) ) /* 04 */
 
 #define DDP2_ASIC027_WORLD \
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ \
 	ROM_LOAD( "ddp2_igs027a_world.bin", 0x000000, 0x04000, CRC(3654e20b) SHA1(e00ef1d51efe66354e3eaf4750d9d819c74ddfbf) ) /* 05 */
 
 #define DDP2_COMMON_ROMS \
@@ -2961,7 +2961,7 @@ ROM_START( dw2001 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "2001.u22", 0x100000, 0x80000, CRC(5cabed92) SHA1(d513e353c5c4695b16228e0bda9388c396aa4a81) ) // 02/21/01 16:05:16
 
-	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dw2001_igs027a_japan.bin", 0x000000, 0x04000, CRC(3a79159b) SHA1(0d693c798ce24c6a749669be8c7b1e4633409e49) )
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
@@ -2989,7 +2989,7 @@ ROM_START( dwpc )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "dwpc_v101jp.u22", 0x100000, 0x80000, CRC(b93027c0) SHA1(602e5f651ccb63e6465ebd7762d8d2dcf7d54077) ) // 09/26/01 10:23:26
 
-	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dw2001_igs027a_japan.bin", 0x000000, 0x04000, CRC(3a79159b) SHA1(0d693c798ce24c6a749669be8c7b1e4633409e49) )
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
@@ -3070,7 +3070,7 @@ ROM_START( puzzli2 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v100.u5",     0x100000, 0x200000, CRC(1abb4595) SHA1(860bb49efc3cb55b6b9846f5ab787d6fd586432d) )
 
-	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x600000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3095,7 +3095,7 @@ ROM_START( puzzli2s )
 	ROM_LOAD16_BYTE( "2sp_v200.u3",     0x100000, 0x080000, CRC(2a5ba8a6) SHA1(4c87b849fd6f39152e3e2ef699b78ce24b3fb6d0) )
 	ROM_LOAD16_BYTE( "2sp_v200.u4",     0x100001, 0x080000, CRC(fa5c86c1) SHA1(11c219722b891b775c0f7f9bc8276cdd8f74d657) )
 
-	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x600000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3178,7 +3178,7 @@ ROM_START( martmast )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v104_32m.u9",    0x100000, 0x400000, CRC(cfd9dff4) SHA1(328eaf6ac49a73265ee4e0f992b1b1312f49877b) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "martial_masters_v102_usa.asic", 0x000000, 0x04000, CRC(a6c0828c) SHA1(0a5bda56dca264c3c7ff7698b8f699563f203c4d) ) // not verified, could be bad
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -3210,7 +3210,7 @@ ROM_START( martmastc )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v104_32m.u9",    0x100000, 0x400000, CRC(cfd9dff4) SHA1(328eaf6ac49a73265ee4e0f992b1b1312f49877b) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "martial_masters_v101_cn.asic", 0x000000, 0x04000, CRC(b3e25b7d) SHA1(6147d7ee2e11636521df1bb96ed5da8ad21b2a57) ) // not verified, could be bad
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -3242,7 +3242,7 @@ ROM_START( martmastc103 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v103_32m.u9",    0x100000, 0x400000, CRC(df5ffbe9) SHA1(cd37900b3741707f81077ca07565997031409131) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "martial_masters_v101_cn.asic", 0x000000, 0x04000, CRC(b3e25b7d) SHA1(6147d7ee2e11636521df1bb96ed5da8ad21b2a57) ) // v102 on the PCB the maincpu ROM was dumped from. v102 Chinese ASIC hasn't been dumped yet.
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -3274,7 +3274,7 @@ ROM_START( martmastc102 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "martmast_u9-v102.322",    0x100000, 0x400000, CRC(bb24b92a) SHA1(442cb9e3f51727be82f71c078c5c3e49dc1a23f0) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "martial_masters_v101_cn.asic", 0x000000, 0x04000, CRC(b3e25b7d) SHA1(6147d7ee2e11636521df1bb96ed5da8ad21b2a57) ) // not verified, could be bad
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -3312,7 +3312,7 @@ ROM_START( martmasttw )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "mm_v102_u9.bin",    0x100000, 0x400000, CRC(7eb41ed4) SHA1(7df7789db8f9110fe747f41e193b4a28096018e7) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "martial_masters_v101_tw.asic", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -3395,7 +3395,7 @@ ROM_START( dmnfrnt )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v105_16m.u5",    0x100000, 0x200000, CRC(bda083bd) SHA1(58d6438737a2c43aa8bbcb7f34fb51375b781b1c) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
@@ -3424,7 +3424,7 @@ ROM_START( dmnfrnta )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v102_16m.u5",    0x100000, 0x200000, CRC(3d4d481a) SHA1(95953b8f31343389405cc722b4177ff5adf67b62) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
@@ -3454,7 +3454,7 @@ ROM_START( dmnfrntb )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v103_16m.u5",    0x100000, 0x200000, CRC(2ddafb3d) SHA1(c7d22e007952459de6d23a42ce32aab67b493fc3) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
@@ -3483,7 +3483,7 @@ ROM_START( dmnfrntpcb )
 	ROM_LOAD16_WORD_SWAP( "pgm_p02s.u42",    0x00000, 0x020000, CRC(78c15fa2) SHA1(885a6558e022602cc6f482ac9667ba9f61e75092) ) /* IGS PGM P02S 1A3708A1A0 S002838  (uses standard PGM v2 bios) */
 	ROM_LOAD16_WORD_SWAP( "demonfront_v107-u43.bin",    0x100000, 0x200000,  CRC(671d8a31) SHA1(a0c2af67d7c56b4b355883892a47640fc72408a1) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
@@ -3517,7 +3517,7 @@ ROM_START( theglad )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v101.u6",      0x100000, 0x080000, CRC(f799e866) SHA1(dccc3c903357c40c3cf85ac0ae8fc12fb0f853a6) ) // V101 05/15/03 09:00:32
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "theglad_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
 
@@ -3547,7 +3547,7 @@ ROM_START( theglad100 ) // is this actually a pre-v100 proto?
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u6.rom",       0x100000, 0x080000, CRC(14c85212) SHA1(8d2489708e176a2c460498a13173be01f645b79e) ) // 01/06/03 09:27:02
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "theglad_igs027a_older.bin", 0x0188, 0x3e78, BAD_DUMP CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) ) // this is wrong for this set, we patch it to work
 
@@ -3578,7 +3578,7 @@ ROM_START( theglad101 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v100.u6",       0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) ) // 02/25/03 17:42:51
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "theglad_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
 
@@ -3609,7 +3609,7 @@ ROM_START( thegladpcb )
 	ROM_LOAD16_WORD_SWAP( "bios.42",    0x000000, 0x020000, CRC(517cf7a2) SHA1(f5720b29e3be6ec22be03a768618cb2a1aa4ade7) ) // V0001-001J
 	ROM_LOAD16_WORD_SWAP( "glad_v100.43",  0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) ) // 02/25/03 17:42:51
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "thegladpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "thegladpcb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(d7f06e2d) SHA1(9c3aca7a487f5329d84731e2c63d5ed591bf9d24) )    // from 'thegladpcb set'
 
@@ -3640,7 +3640,7 @@ ROM_START( oldsplus )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p05301.rom",   0x100000, 0x400000, CRC(923f7246) SHA1(818ade79e9724f5a2b0cc5a647ae5d4ee0374799) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "oldsplus_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASE00 )
@@ -3669,7 +3669,7 @@ ROM_START( kovshp )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600h_101.rom",   0x100000, 0x400000, CRC(e1d89a19) SHA1(30e11c145652d03464b14d3cd09e4f35fff6120e) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3696,7 +3696,7 @@ ROM_START( kovshpa )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "p0600h.rom",   0x100000, 0x400000, CRC(e251e8e4) SHA1(af5b7c81632a39e1450d932951bed634c76b84e8) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3725,7 +3725,7 @@ ROM_START( kovytzy )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "ytzy_v201cn.rom",   0x100000, 0x400000, CRC(f3705ea0) SHA1(e31ad474d0c2364311d21a8ce37d49919c7b999c) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3752,7 +3752,7 @@ ROM_START( kovshxas )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "de_p0609.322",   0x100000, 0x400000, CRC(3b7b627f) SHA1(b331148501f9349fbd5882fb3f184f6304e58646) ) // V202CN Oct 6 2008 09:59:26
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3780,7 +3780,7 @@ ROM_START( kovlsqh )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "lsqh_v200cn.rom", 0x100000, 0x400000, CRC(9935a27a) SHA1(3075935293172466c4bd997dcb67f864ae26493e) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3809,7 +3809,7 @@ ROM_START( kovlsqh2 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "lsqh2_prg.rom",0x100000, 0x400000, CRC(d71e3d50) SHA1(bda78648bc176b0ded74118a8e340ee661bb930d) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3839,7 +3839,7 @@ ROM_START( kovlsjb )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "lsjb_prg.rom", 0x100000, 0x400000, CRC(adf06b37) SHA1(be3c0af64de374046d28492ac49c01da1ec78e40) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3868,7 +3868,7 @@ ROM_START( kovlsjba )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "lsjba_prg.rom",0x100000, 0x400000, CRC(8b42f456) SHA1(48796e48f6f1a5f68442cf15a6b195095d443a35) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
 
 	ROM_REGION( 0xc00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3898,7 +3898,7 @@ ROM_START( killbldp )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v300x.u6",     0x100000, 0x080000, CRC(b7fb8ec9) SHA1(e71b2d74269a82c7155b9818821156e128b68b28) ) // V300 05-09-16 11:58:20
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	/* the first 0x268 bytes of this are EXECUTE ONLY in the original chip, attempting to read them even via the original CPU just returns what is on the bus */
 //  ROM_LOAD( "killbldp_igs027a.bin", 0x000000, 0x04000, CRC(c7868d90) SHA1(335c99933a38b77fcfc3f8004063f35124364f3e) ) // this is the original rom with the first 0x268 bytes from the bootleg - but it doesn't work?
 	/* there are some differences around 0x2e80, investigate - maybe above is badly dumped?, padding at 0x3ac0 is also different */
@@ -3932,7 +3932,7 @@ ROM_START( svg )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "u30.bin",      0x100000, 0x080000, CRC(34c18f3f) SHA1(42d1edd0dcfaa5e44861c6a1d4cb24f51ba23de8) ) // V200 09/12/05 16:42:51
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "svg_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svg_igs027a_v200_china.bin", 0x0188, 0x3e78, CRC(72b73169) SHA1(ffc0caea855ab4b01beb3aebd0bf17187c66c22c) )
 
@@ -3965,7 +3965,7 @@ ROM_START( svgtw )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v101tw.u30",      0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) ) // V100 03/14/05 20:04:08
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // marked H1
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // marked H1
 	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svgcpb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) ) // this is from the Japan set, the cart this came from was Taiwan
 
@@ -3999,7 +3999,7 @@ ROM_START( svgpcb )
 	ROM_LOAD16_WORD_SWAP( "svg_bios.u49",    0x000000, 0x020000, CRC(3346401f) SHA1(28bd730b6026c1e521c95072d33c7bdcd19c1460) )
 	ROM_LOAD16_WORD_SWAP( "svg_v100jp.u50",  0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) ) // V100 03/14/05 20:04:08
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svgcpb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) )
 
@@ -4034,7 +4034,7 @@ ROM_START( happy6 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v101cn.u5",      0x100000, 0x080000, CRC(aa4646e3) SHA1(e6772cc480ddd3e1d199364b1f2ff93b973e6842) ) // V101 03/17/04 11:26:48
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	// data before 0x188 is read-protected and cannot be read even with a trojan (as with most 2001/2+ IGS titles)
 //  ROM_LOAD( "happy6_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 	ROM_LOAD( "happy6_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
@@ -4065,7 +4065,7 @@ ROM_START( happy6101 )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "happy6in1_v100cn.u5",      0x100000, 0x080000, CRC(a25418e8) SHA1(acd7e7b69956cb4ce8e26c6420cb97bb4bf404e7) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	// data before 0x188 is read-protected and cannot be read even with a trojan (as with most 2001/2+ IGS titles)
 //  ROM_LOAD( "happy6_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 	ROM_LOAD( "happy6_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
@@ -4098,7 +4098,7 @@ ROM_START( ket )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketsui_v100.u38", 0x000000, 0x200000, CRC(dfe62f3b) SHA1(baa58d1ce47a707f84f65779ac0689894793e9d9) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4125,7 +4125,7 @@ ROM_START( ket1 ) // only difference between this and ket1 is the rom fill on th
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketsui_v100_alt_fill.u38", 0x000000, 0x200000, CRC(e140f8a4) SHA1(34fd25f8896935503d7537e89a4cd174e8995070) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4152,7 +4152,7 @@ ROM_START( keta )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketsui_prg_revised.bin", 0x000000, 0x200000, CRC(69fcf5eb) SHA1(f726e251b4daa2f8d717e32000d4d7abc71c710d) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4179,7 +4179,7 @@ ROM_START( ketb )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketsui_prg_original.bin", 0x000000, 0x200000, CRC(cca5e153) SHA1(b653feaa2004c379312def6b1613c3497f654ddf) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4207,7 +4207,7 @@ ROM_START( ketarr10 )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketarr_v100.u38", 0x000000, 0x200000, CRC(d4c7a8ab) SHA1(65d104d17bd4fd03a2b44297a003ba03d746c7ee) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4235,7 +4235,7 @@ ROM_START( ketarrf )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketarrf_v100.u38", 0x000000, 0x200000, CRC(6ad17aa4) SHA1(791bd1a107433a3811c8a79ea26a73e66ddd296f) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4262,7 +4262,7 @@ ROM_START( ketarr15 )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketarr15_v100.u38", 0x000000, 0x200000, CRC(552a7d95) SHA1(4f3fb13f34d58a7482e1d26623d38aa0b54ca8dd) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4289,7 +4289,7 @@ ROM_START( ketarrs15 )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketarrs15_v100.u38", 0x000000, 0x200000, CRC(a95e71e0) SHA1(182c12e3581ebb20176d8abca41ee62aadcd63e0) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4316,7 +4316,7 @@ ROM_START( ketarr151 )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketarr151_v100.u38", 0x000000, 0x200000, CRC(2b7c030d) SHA1(9aaba1242d7ce29915a31d40341da82985927f9d) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4343,7 +4343,7 @@ ROM_START( ketarrs151 )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketarrs151_v100.u38", 0x000000, 0x200000, CRC(35c984e4) SHA1(d4517f318de0c40a3b30e41374f33bb355581434) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4369,7 +4369,7 @@ ROM_START( ketarr )
 	ROM_REGION( 0x600000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "ketarr17_v100.u38", 0x000000, 0x200000, CRC(2cb80b89) SHA1(e1aa072b8344890486e11795e02703aa2d234bb1) )
 
-	ROM_REGION( 0x4000, "prot", 0 )
+	ROM_REGION32_LE( 0x4000, "prot", 0 )
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 )
@@ -4410,7 +4410,7 @@ ROM_START( ketbl ) // this assumes a Dodonpachi 2 Bee Storm cart was used
 	ROM_LOAD16_WORD_SWAP( "ketsui_u1.bin", 0x000000, 0x200000, CRC(391767b4) SHA1(722e364d3a8982a40df8f898e995212a1a6fee35) )
 	ROM_CONTINUE(0x000000,0x200000) // first half is empty, use 2nd half
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // leftover from original game
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // leftover from original game
 	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */ // leftover from original game
@@ -4437,7 +4437,7 @@ ROM_START( espgal )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "espgaluda_v100.u38", 0x000000, 0x200000, CRC(08ecec34) SHA1(bce2e7fb9105ed51603d09cbd3a9eeb5b8f47ee2) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "espgal_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4462,7 +4462,7 @@ ROM_START( espgalbl ) // this assumes a Dodonpachi 2 Bee Storm cart was used
 	// the program rom in the cartridge actually ends up mapping OVER the motherboard bios rom, you don't get the PGM splash etc.
 	ROM_LOAD16_WORD_SWAP( "espgaluda_u8.bin", 0x000000, 0x400000, CRC(6a92dd52) SHA1(d4b694c88deaeebb7b1c0ddbf29a06380b06426f) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // leftover from original game
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // leftover from original game
 	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */ // leftover from original game
@@ -4490,7 +4490,7 @@ ROM_START( ddp3 )
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "ddp3_v101_16m.u36",  0x100000, 0x200000,CRC(fba2180e) SHA1(59c1a76243e587c07215c8a76649401ef0bff7c7) ) // marked 怒首領蜂(dodonpachi) 3 V101 16M
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4517,7 +4517,7 @@ ROM_START( ddpdoj )
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "ddp3_v101.u36",  0x100000, 0x200000, CRC(195b5c1e) SHA1(f18d791c034b0a3d85888a92fb5d326ee3deb04f) ) // yes this one was actually marked v101 which goes against the standard Cave marking system
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4545,7 +4545,7 @@ ROM_START( ddpdoja )
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "ddp3_d_d_1_0.u36",  0x100000, 0x200000, CRC(5d3f85ba) SHA1(4c24ea206140863d456179750366921442e1d2b8) ) // marked v100
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4572,7 +4572,7 @@ ROM_START( ddpdojb )
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "dd v100.bin",  0x100000, 0x200000, CRC(7da0c1e4) SHA1(aca2fe35ba0ab3628900fa2aba2d22fc4fd7046d) ) // marked v100
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4600,7 +4600,7 @@ ROM_START( ddpdojblk )
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "ddb_1dot.u45",  0x100000, 0x200000, CRC(265f26cd) SHA1(91abc7fc4722f3d01d76a4c1ae14c4132e4e576c) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4627,7 +4627,7 @@ ROM_START( ddpdojblka )
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
 	ROM_LOAD16_WORD_SWAP( "ddb10.u45",  0x100000, 0x200000, CRC(72b35510) SHA1(9a432e5e1ebe61aafd737b6acc905653e5af0d38) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -4655,7 +4655,7 @@ ROM_START( ddpdojblkbl )
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "ddp_doj_u1.bin",  0x100000, 0x400000, CRC(eb4ab06a) SHA1(187c37e5319395e36a1cf3626b53e08df615cc0c) )
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION32_LE( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */

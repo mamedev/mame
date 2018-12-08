@@ -66,10 +66,8 @@ private:
 	pgm_arm_sim_command_handler arm_sim_handler;
 
 	/////////////// emulation
-	uint16_t        m_arm_type1_highlatch_arm_w;
-	uint16_t        m_arm_type1_lowlatch_arm_w;
-	uint16_t        m_arm_type1_highlatch_68k_w;
-	uint16_t        m_arm_type1_lowlatch_68k_w;
+	uint32_t        m_arm_type1_latch_arm;
+	uint32_t        m_arm_type1_latch_68k;
 	uint32_t        m_arm_type1_counter;
 	optional_shared_ptr<uint32_t> m_arm7_shareram;
 
@@ -83,8 +81,6 @@ private:
 	DECLARE_WRITE16_MEMBER( arm7_type1_68k_protlatch_w );
 	DECLARE_READ16_MEMBER( arm7_type1_ram_r );
 	DECLARE_WRITE16_MEMBER( arm7_type1_ram_w );
-	DECLARE_READ32_MEMBER( arm7_type1_unk_r );
-	DECLARE_READ32_MEMBER( arm7_type1_exrom_r );
 	DECLARE_READ32_MEMBER( arm7_type1_shareram_r );
 	DECLARE_WRITE32_MEMBER( arm7_type1_shareram_w );
 	DECLARE_READ16_MEMBER( kovsh_fake_region_r );

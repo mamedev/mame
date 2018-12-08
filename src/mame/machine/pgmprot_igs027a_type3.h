@@ -34,6 +34,7 @@ private:
 	optional_device<cpu_device> m_prot;
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE32_MEMBER( svg_arm7_ram_sel_w );
 	DECLARE_READ32_MEMBER( svg_arm7_shareram_r );
 	DECLARE_WRITE32_MEMBER( svg_arm7_shareram_w );
@@ -57,7 +58,6 @@ private:
 	DECLARE_READ32_MEMBER( happy6_speedup_r );
 	DECLARE_READ32_MEMBER( svg_speedup_r );
 	DECLARE_READ32_MEMBER( svgpcb_speedup_r );
-	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
 	void _55857G_arm7_map(address_map &map);
 	void svg_68k_mem(address_map &map);
 };

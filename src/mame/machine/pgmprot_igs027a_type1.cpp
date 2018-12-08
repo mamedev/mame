@@ -70,51 +70,32 @@ READ32_MEMBER(pgm_arm_type1_state::arm7_type1_protlatch_r )
 {
 	machine().scheduler().synchronize(); // force resync
 
-	return (m_arm_type1_highlatch_68k_w << 16) | (m_arm_type1_lowlatch_68k_w);
+	return m_arm_type1_latch_68k;
 }
 
 WRITE32_MEMBER(pgm_arm_type1_state::arm7_type1_protlatch_w )
 {
 	machine().scheduler().synchronize(); // force resync
 
-	if (ACCESSING_BITS_16_31)
-	{
-		m_arm_type1_highlatch_arm_w = data >> 16;
-		m_arm_type1_highlatch_68k_w = 0;
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		m_arm_type1_lowlatch_arm_w = data;
-		m_arm_type1_lowlatch_68k_w = 0;
-	}
+	COMBINE_DATA(&m_arm_type1_latch_arm);
+	m_arm_type1_latch_68k &= ~mem_mask;
 }
 
 READ16_MEMBER(pgm_arm_type1_state::arm7_type1_68k_protlatch_r )
 {
 	machine().scheduler().synchronize(); // force resync
 
-	switch (offset)
-	{
-		case 1: return m_arm_type1_highlatch_arm_w;
-		case 0: return m_arm_type1_lowlatch_arm_w;
-	}
-	return -1;
+	return m_arm_type1_latch_arm >> ((offset & 1) << 4) & 0xffff;
 }
 
 WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_68k_protlatch_w )
 {
 	machine().scheduler().synchronize(); // force resync
 
-	switch (offset)
-	{
-		case 1:
-			m_arm_type1_highlatch_68k_w = data;
-			break;
-
-		case 0:
-			m_arm_type1_lowlatch_68k_w = data;
-			break;
-	}
+	if (offset & 1)
+		m_arm_type1_latch_68k = (m_arm_type1_latch_68k & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
+	else
+		m_arm_type1_latch_68k = (m_arm_type1_latch_68k & ~(mem_mask)) | (data & mem_mask);
 }
 
 READ16_MEMBER(pgm_arm_type1_state::arm7_type1_ram_r )
@@ -137,16 +118,6 @@ WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_ram_w )
 
 
 
-
-READ32_MEMBER(pgm_arm_type1_state::arm7_type1_unk_r )
-{
-	return m_arm_type1_counter++;
-}
-
-READ32_MEMBER(pgm_arm_type1_state::arm7_type1_exrom_r )
-{
-	return 0x00000000;
-}
 
 READ32_MEMBER(pgm_arm_type1_state::arm7_type1_shareram_r )
 {
@@ -176,11 +147,11 @@ void pgm_arm_type1_state::kov_map(address_map &map)
 void pgm_arm_type1_state::_55857E_arm7_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom();
-	map(0x08100000, 0x083fffff).r(FUNC(pgm_arm_type1_state::arm7_type1_exrom_r)); // unpopulated, returns 0 to keep checksum happy
+	map(0x08100000, 0x083fffff).lr8("exrom_r", [this]() -> u8 { return 0; }); // unpopulated, returns 0 to keep checksum happy
 	map(0x10000000, 0x100003ff).ram(); // internal ram for asic
 	map(0x40000000, 0x40000003).rw(FUNC(pgm_arm_type1_state::arm7_type1_protlatch_r), FUNC(pgm_arm_type1_state::arm7_type1_protlatch_w));
 	map(0x40000008, 0x4000000b).nopw(); // ?
-	map(0x4000000c, 0x4000000f).r(FUNC(pgm_arm_type1_state::arm7_type1_unk_r));
+	map(0x4000000c, 0x4000000f).lr32("unk_r", [this]() -> u32 { return m_arm_type1_counter++; });
 	map(0x50800000, 0x5080003f).rw(FUNC(pgm_arm_type1_state::arm7_type1_shareram_r), FUNC(pgm_arm_type1_state::arm7_type1_shareram_w)).share("arm7_shareram");
 	map(0x50000000, 0x500003ff).ram(); // uploads xor table to decrypt 68k rom here
 }
@@ -207,16 +178,12 @@ void pgm_arm_type1_state::cavepgm_mem(address_map &map)
 void pgm_arm_type1_state::machine_start()
 {
 	//pgm_state::machine_start();
-	m_arm_type1_highlatch_arm_w = 0;
-	m_arm_type1_lowlatch_arm_w = 0;
-	m_arm_type1_highlatch_68k_w = 0;
-	m_arm_type1_lowlatch_68k_w = 0;
+	m_arm_type1_latch_arm = 0;
+	m_arm_type1_latch_68k = 0;
 	m_arm_type1_counter = 1;
 
-	save_item(NAME(m_arm_type1_highlatch_arm_w));
-	save_item(NAME(m_arm_type1_lowlatch_arm_w));
-	save_item(NAME(m_arm_type1_highlatch_68k_w));
-	save_item(NAME(m_arm_type1_lowlatch_68k_w));
+	save_item(NAME(m_arm_type1_latch_arm));
+	save_item(NAME(m_arm_type1_latch_68k));
 	save_item(NAME(m_arm_type1_counter));
 
 	if (m_arm_status == arm_type::SIMULATED)
@@ -300,7 +267,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
 	switch (offset)
 	{
 		case 0:
-			m_arm_type1_lowlatch_68k_w = data;
+			m_arm_type1_latch_68k = (m_arm_type1_latch_68k & ~(mem_mask)) | (data & mem_mask);
 		return;
 
 		case 1:
@@ -347,7 +314,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
 				case 0xf8: asic_cmd = 0xf3; break;
 			}
 
-			m_arm_type1_highlatch_68k_w = asic_cmd ^ (asic_key | (asic_key << 8));
+			m_arm_type1_latch_68k = (m_arm_type1_latch_68k & 0xffff) | ((asic_cmd ^ (asic_key | (asic_key << 8))) << 16);
 		}
 		return;
 	}

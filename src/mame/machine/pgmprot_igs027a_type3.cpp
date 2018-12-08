@@ -154,7 +154,7 @@ void pgm_arm_type3_state::_55857G_arm7_map(address_map &map)
 
 
 
-MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
+void pgm_arm_type3_state::machine_reset()
 {
 	// internal roms aren't fully dumped
 	uint16_t *temp16 = (uint16_t *)memregion("prot")->base();
@@ -211,8 +211,6 @@ MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
 	/* protection CPU */
 	MCFG_DEVICE_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
 	MCFG_DEVICE_PROGRAM_MAP(_55857G_arm7_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
 MACHINE_CONFIG_END
 
 
@@ -641,8 +639,6 @@ void pgm_arm_type3_state::init_svg()
 	init_pgm();
 	create_dummy_internal_arm_region_theglad(1);
 	m_prot->space(AS_PROGRAM).install_read_handler(0xB90, 0xB93, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
-
-
 }
 
 void pgm_arm_type3_state::init_svgpcb()
@@ -651,7 +647,6 @@ void pgm_arm_type3_state::init_svgpcb()
 	init_pgm();
 	create_dummy_internal_arm_region_theglad(0);
 	m_prot->space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svgpcb_speedup_r),this));
-
 }
 
 
