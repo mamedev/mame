@@ -93,19 +93,6 @@ WRITE8_MEMBER(balsente_state::paletteram_w)
 	m_palette->set_pen_color(offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-WRITE8_MEMBER(balsente_state::paletteram_byte_w)
-{
-	int r, g, b;
-
-	m_generic_paletteram_8[offset] = data;
-
-	r = m_generic_paletteram_8[(offset & ~1) + 0] & 0x0f;
-	g = m_generic_paletteram_8[(offset & ~1) + 0] >> 4;
-	b = m_generic_paletteram_8[(offset & ~1) + 1] & 0x0f;
-
-	m_palette->set_pen_color(offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
-}
-
 
 
 /*************************************
