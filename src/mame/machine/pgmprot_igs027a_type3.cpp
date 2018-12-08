@@ -47,82 +47,82 @@
 #include "includes/pgm.h"
 #include "machine/pgmprot_igs027a_type3.h"
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_ram_sel_w )
+WRITE32_MEMBER(pgm_arm_type3_state::arm7_ram_sel_w)
 {
-//  printf("svg_arm7_ram_sel_w %08x\n", data);
+//  printf("arm7_ram_sel_w %08x\n", data);
 	machine().scheduler().synchronize(); // force resync
-	m_svg_ram_sel = data & 1;
+	m_ram_sel = data & 1;
 }
 
-READ32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_r )
+READ32_MEMBER(pgm_arm_type3_state::arm7_shareram_r)
 {
-	uint32_t retdata = m_svg_shareram[m_svg_ram_sel & 1][offset];
-//  logerror("%s ARM7: shared read (bank %02x) offset - %08x retdata - %08x mask - %08x\n", machine().describe_context(), m_svg_ram_sel, offset*4, retdata, mem_mask );
+	uint32_t retdata = m_shareram[m_ram_sel & 1][offset];
+//  logerror("%s ARM7: shared read (bank %02x) offset - %08x retdata - %08x mask - %08x\n", machine().describe_context(), m_ram_sel, offset*4, retdata, mem_mask );
 	return retdata;
 }
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_w )
+WRITE32_MEMBER(pgm_arm_type3_state::arm7_shareram_w)
 {
-//  logerror("%s ARM7: shared write (bank %02x) offset - %08x retdata - %08x mask - %08x\n", machine().describe_context(), m_svg_ram_sel, offset*4, data, mem_mask );
-	COMBINE_DATA(&m_svg_shareram[m_svg_ram_sel & 1][offset]);
+//  logerror("%s ARM7: shared write (bank %02x) offset - %08x retdata - %08x mask - %08x\n", machine().describe_context(), m_ram_sel, offset*4, data, mem_mask );
+	COMBINE_DATA(&m_shareram[m_ram_sel & 1][offset]);
 }
 
-READ16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_r )
+READ16_MEMBER(pgm_arm_type3_state::m68k_ram_r)
 {
-	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
-	uint16_t *share16 = (uint16_t *)(m_svg_shareram[ram_sel & 1].get());
+	int ram_sel = (m_ram_sel & 1) ^ 1;
+	uint16_t *share16 = (uint16_t *)(m_shareram[ram_sel & 1].get());
 
 	return share16[BYTE_XOR_LE(offset)];
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_w )
+WRITE16_MEMBER(pgm_arm_type3_state::m68k_ram_w)
 {
-	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
-	uint16_t *share16 = (uint16_t *)(m_svg_shareram[ram_sel & 1].get());
+	int ram_sel = (m_ram_sel & 1) ^ 1;
+	uint16_t *share16 = (uint16_t *)(m_shareram[ram_sel & 1].get());
 
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
-READ16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_r )
+READ16_MEMBER(pgm_arm_type3_state::m68k_nmi_r)
 {
 	return 0;
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_w )
+WRITE16_MEMBER(pgm_arm_type3_state::m68k_nmi_w)
 {
 	m_prot->pulse_input_line(ARM7_FIRQ_LINE, m_prot->minimum_quantum_time());
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_latch_68k_w )
+WRITE16_MEMBER(pgm_arm_type3_state::latch_68k_w)
 {
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch write: %04x (%04x) %s\n", data & 0x0000ffff, mem_mask, machine().describe_context());
-	COMBINE_DATA(&m_svg_latchdata_68k_w);
+	COMBINE_DATA(&m_latchdata_68k_w);
 }
 
 
-READ16_MEMBER(pgm_arm_type3_state::svg_latch_68k_r )
+READ16_MEMBER(pgm_arm_type3_state::latch_68k_r)
 {
 	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch read: %04x (%04x) %s\n", m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, machine().describe_context());
-	return m_svg_latchdata_arm_w;
+		logerror("M68K: Latch read: %04x (%04x) %s\n", m_latchdata_arm_w & 0x0000ffff, mem_mask, machine().describe_context());
+	return m_latchdata_arm_w;
 }
 
 
 
-READ32_MEMBER(pgm_arm_type3_state::svg_latch_arm_r )
+READ32_MEMBER(pgm_arm_type3_state::latch_arm_r)
 {
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch read: %08x (%08x) %s\n", m_svg_latchdata_68k_w, mem_mask, machine().describe_context());
-	return m_svg_latchdata_68k_w;
+		logerror("ARM7: Latch read: %08x (%08x) %s\n", m_latchdata_68k_w, mem_mask, machine().describe_context());
+	return m_latchdata_68k_w;
 }
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_latch_arm_w )
+WRITE32_MEMBER(pgm_arm_type3_state::latch_arm_w)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch write: %08x (%08x) %s\n", data, mem_mask, machine().describe_context());
 
-	COMBINE_DATA(&m_svg_latchdata_arm_w);
+	COMBINE_DATA(&m_latchdata_arm_w);
 }
 
 /* 55857G? */
@@ -133,9 +133,9 @@ void pgm_arm_type3_state::svg_68k_mem(address_map &map)
 	pgm_state::pgm_mem(map);
 	map(0x100000, 0x1fffff).bankr("mainbank");  /* Game ROM */
 
-	map(0x500000, 0x50ffff).rw(FUNC(pgm_arm_type3_state::svg_m68k_ram_r), FUNC(pgm_arm_type3_state::svg_m68k_ram_w));    /* ARM7 Shared RAM */
-	map(0x5c0000, 0x5c0001).rw(FUNC(pgm_arm_type3_state::svg_68k_nmi_r), FUNC(pgm_arm_type3_state::svg_68k_nmi_w));      /* ARM7 FIQ */
-	map(0x5c0300, 0x5c0301).rw(FUNC(pgm_arm_type3_state::svg_latch_68k_r), FUNC(pgm_arm_type3_state::svg_latch_68k_w)); /* ARM7 Latch */
+	map(0x500000, 0x50ffff).rw(FUNC(pgm_arm_type3_state::m68k_ram_r), FUNC(pgm_arm_type3_state::m68k_ram_w));    /* ARM7 Shared RAM */
+	map(0x5c0000, 0x5c0001).rw(FUNC(pgm_arm_type3_state::m68k_nmi_r), FUNC(pgm_arm_type3_state::m68k_nmi_w));      /* ARM7 FIQ */
+	map(0x5c0300, 0x5c0301).rw(FUNC(pgm_arm_type3_state::latch_68k_r), FUNC(pgm_arm_type3_state::latch_68k_w)); /* ARM7 Latch */
 }
 
 
@@ -145,9 +145,9 @@ void pgm_arm_type3_state::_55857G_arm7_map(address_map &map)
 	map(0x08000000, 0x087fffff).rom().region("user1", 0);
 	map(0x10000000, 0x100003ff).ram().share("arm_ram2");
 	map(0x18000000, 0x1803ffff).ram().share("arm_ram");
-	map(0x38000000, 0x3800ffff).rw(FUNC(pgm_arm_type3_state::svg_arm7_shareram_r), FUNC(pgm_arm_type3_state::svg_arm7_shareram_w));
-	map(0x48000000, 0x48000003).rw(FUNC(pgm_arm_type3_state::svg_latch_arm_r), FUNC(pgm_arm_type3_state::svg_latch_arm_w)); /* 68k Latch */
-	map(0x40000018, 0x4000001b).w(FUNC(pgm_arm_type3_state::svg_arm7_ram_sel_w)); /* RAM SEL */
+	map(0x38000000, 0x3800ffff).rw(FUNC(pgm_arm_type3_state::arm7_shareram_r), FUNC(pgm_arm_type3_state::arm7_shareram_w));
+	map(0x48000000, 0x48000003).rw(FUNC(pgm_arm_type3_state::latch_arm_r), FUNC(pgm_arm_type3_state::latch_arm_w)); /* 68k Latch */
+	map(0x40000018, 0x4000001b).w(FUNC(pgm_arm_type3_state::arm7_ram_sel_w)); /* RAM SEL */
 	map(0x50000000, 0x500003ff).ram();
 }
 
@@ -184,19 +184,19 @@ void pgm_arm_type3_state::machine_reset()
 void pgm_arm_type3_state::machine_start()
 {
 	//pgm_state::machine_start();
-	m_svg_latchdata_68k_w = 0;
-	m_svg_latchdata_arm_w = 0;
+	m_latchdata_68k_w = 0;
+	m_latchdata_arm_w = 0;
 
-	m_svg_shareram[0] = std::make_unique<uint32_t[]>(0x20000 / 4);
-	m_svg_shareram[1] = std::make_unique<uint32_t[]>(0x20000 / 4);
-	m_svg_ram_sel = 0;
+	m_shareram[0] = std::make_unique<uint32_t[]>(0x20000 / 4);
+	m_shareram[1] = std::make_unique<uint32_t[]>(0x20000 / 4);
+	m_ram_sel = 0;
 
-	save_item(NAME(m_svg_latchdata_68k_w));
-	save_item(NAME(m_svg_latchdata_arm_w));
+	save_item(NAME(m_latchdata_68k_w));
+	save_item(NAME(m_latchdata_arm_w));
 
-	save_pointer(NAME(m_svg_shareram[0]), 0x20000 / 4);
-	save_pointer(NAME(m_svg_shareram[1]), 0x20000 / 4);
-	save_item(NAME(m_svg_ram_sel));
+	save_pointer(NAME(m_shareram[0]), 0x20000 / 4);
+	save_pointer(NAME(m_shareram[1]), 0x20000 / 4);
+	save_item(NAME(m_ram_sel));
 }
 
 
@@ -708,15 +708,15 @@ void pgm_arm_type3_state::init_dmnfrnt()
 	m_prot->space(AS_PROGRAM).install_read_handler(0x18000444, 0x18000447, read32_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_speedup_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r),this));
 
-	m_svg_ram_sel = 1;
+	m_ram_sel = 1;
 
 	// the internal rom probably also supplies the region here
 	// we have to copy it to both shared ram regions because it reads from a different one before the attract story?
 	// could be a timing error? or shared ram behavior isn't how we think it is?
 	uint16_t *share16;
-	share16 = (uint16_t *)(m_svg_shareram[1].get());
+	share16 = (uint16_t *)(m_shareram[1].get());
 	share16[0x158/2] = 0x0005;
-	share16 = (uint16_t *)(m_svg_shareram[0].get());
+	share16 = (uint16_t *)(m_shareram[0].get());
 	share16[0x158/2] = 0x0005;
 }
 

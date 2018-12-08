@@ -36,54 +36,54 @@
 #include "includes/pgm.h"
 #include "machine/pgmprot_igs027a_type2.h"
 
-READ32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_r )
+READ32_MEMBER(pgm_arm_type2_state::latch_arm_r)
 {
 	m_prot->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
 
 	if (PGMARM7LOGERROR)
-		logerror("%s ARM7: Latch read: %08x (%08x)\n", machine().describe_context(), m_kov2_latchdata_68k_w, mem_mask);
-	return m_kov2_latchdata_68k_w;
+		logerror("%s ARM7: Latch read: %08x (%08x)\n", machine().describe_context(), m_latchdata_68k_w, mem_mask);
+	return m_latchdata_68k_w;
 }
 
-WRITE32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_w )
+WRITE32_MEMBER(pgm_arm_type2_state::latch_arm_w)
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s ARM7: Latch write: %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 
-	COMBINE_DATA(&m_kov2_latchdata_arm_w);
+	COMBINE_DATA(&m_latchdata_arm_w);
 }
 
-READ32_MEMBER(pgm_arm_type2_state::arm7_shareram_r )
+READ32_MEMBER(pgm_arm_type2_state::shareram_r)
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, m_arm7_shareram[offset], mem_mask);
 	return m_arm7_shareram[offset];
 }
 
-WRITE32_MEMBER(pgm_arm_type2_state::arm7_shareram_w )
+WRITE32_MEMBER(pgm_arm_type2_state::shareram_w)
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x)\n", machine().describe_context(), offset << 2, data, mem_mask);
 	COMBINE_DATA(&m_arm7_shareram[offset]);
 }
 
-READ16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_r )
+READ16_MEMBER(pgm_arm_type2_state::latch_68k_r)
 {
 	if (PGMARM7LOGERROR)
-		logerror("%s M68K: Latch read: %04x (%04x)\n", machine().describe_context(), m_kov2_latchdata_arm_w & 0x0000ffff, mem_mask);
-	return m_kov2_latchdata_arm_w;
+		logerror("%s M68K: Latch read: %04x (%04x)\n", machine().describe_context(), m_latchdata_arm_w & 0x0000ffff, mem_mask);
+	return m_latchdata_arm_w;
 }
 
-WRITE16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_w )
+WRITE16_MEMBER(pgm_arm_type2_state::latch_68k_w)
 {
 	if (PGMARM7LOGERROR)
 		logerror("%s M68K: Latch write: %04x (%04x)\n", machine().describe_context(), data & 0x0000ffff, mem_mask);
-	COMBINE_DATA(&m_kov2_latchdata_68k_w);
+	COMBINE_DATA(&m_latchdata_68k_w);
 
 	m_prot->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
 }
 
-READ16_MEMBER(pgm_arm_type2_state::arm7_ram_r )
+READ16_MEMBER(pgm_arm_type2_state::ram_r)
 {
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
@@ -92,7 +92,7 @@ READ16_MEMBER(pgm_arm_type2_state::arm7_ram_r )
 	return share16[BYTE_XOR_LE(offset)];
 }
 
-WRITE16_MEMBER(pgm_arm_type2_state::arm7_ram_w )
+WRITE16_MEMBER(pgm_arm_type2_state::ram_w)
 {
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
@@ -108,8 +108,8 @@ void pgm_arm_type2_state::kov2_mem(address_map &map)
 {
 	pgm_state::pgm_mem(map);
 	map(0x100000, 0x5fffff).bankr("mainbank"); /* Game ROM */
-	map(0xd00000, 0xd0ffff).rw(FUNC(pgm_arm_type2_state::arm7_ram_r), FUNC(pgm_arm_type2_state::arm7_ram_w)); /* ARM7 Shared RAM */
-	map(0xd10000, 0xd10001).rw(FUNC(pgm_arm_type2_state::arm7_latch_68k_r), FUNC(pgm_arm_type2_state::arm7_latch_68k_w)); /* ARM7 Latch */
+	map(0xd00000, 0xd0ffff).rw(FUNC(pgm_arm_type2_state::ram_r), FUNC(pgm_arm_type2_state::ram_w)); /* ARM7 Shared RAM */
+	map(0xd10000, 0xd10001).rw(FUNC(pgm_arm_type2_state::latch_68k_r), FUNC(pgm_arm_type2_state::latch_68k_w)); /* ARM7 Latch */
 }
 
 
@@ -119,19 +119,19 @@ void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 	map(0x08000000, 0x083fffff).rom().region("user1", 0);
 	map(0x10000000, 0x100003ff).ram();
 	map(0x18000000, 0x1800ffff).ram().share("arm_ram");
-	map(0x38000000, 0x38000003).rw(FUNC(pgm_arm_type2_state::arm7_latch_arm_r), FUNC(pgm_arm_type2_state::arm7_latch_arm_w)); /* 68k Latch */
-	map(0x48000000, 0x4800ffff).rw(FUNC(pgm_arm_type2_state::arm7_shareram_r), FUNC(pgm_arm_type2_state::arm7_shareram_w)).share("arm7_shareram");
+	map(0x38000000, 0x38000003).rw(FUNC(pgm_arm_type2_state::latch_arm_r), FUNC(pgm_arm_type2_state::latch_arm_w)); /* 68k Latch */
+	map(0x48000000, 0x4800ffff).rw(FUNC(pgm_arm_type2_state::shareram_r), FUNC(pgm_arm_type2_state::shareram_w)).share("arm7_shareram");
 	map(0x50000000, 0x500003ff).ram();
 }
 
 void pgm_arm_type2_state::machine_start()
 {
 	//pgm_state::machine_start();
-	m_kov2_latchdata_68k_w = 0;
-	m_kov2_latchdata_arm_w = 0;
+	m_latchdata_68k_w = 0;
+	m_latchdata_arm_w = 0;
 
-	save_item(NAME(m_kov2_latchdata_68k_w));
-	save_item(NAME(m_kov2_latchdata_arm_w));
+	save_item(NAME(m_latchdata_68k_w));
+	save_item(NAME(m_latchdata_arm_w));
 }
 
 /******* ARM 55857F *******/

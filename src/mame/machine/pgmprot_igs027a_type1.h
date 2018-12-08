@@ -85,11 +85,11 @@ private:
 	DECLARE_WRITE32_MEMBER(shareram_w);
 	DECLARE_READ16_MEMBER(kovsh_fake_region_r);
 	DECLARE_WRITE16_MEMBER(kovshp_asic27a_write_word);
-	void pgm_decode_kovlsqh2_tiles();
-	void pgm_decode_kovlsqh2_sprites(uint8_t *src );
-	void pgm_decode_kovlsqh2_samples();
-	void pgm_decode_kovqhsgs_program();
-	void pgm_decode_kovqhsgs2_program();
+	void decode_kovlsqh2_tiles();
+	void decode_kovlsqh2_sprites(uint8_t *src );
+	void decode_kovlsqh2_samples();
+	void decode_kovqhsgs_program();
+	void decode_kovqhsgs2_program();
 	DECLARE_READ16_MEMBER(sim_r);
 	void command_handler_ddp3(int pc);
 	void command_handler_puzzli2(int pc);

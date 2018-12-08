@@ -343,7 +343,7 @@ void pgm_arm_type1_state::init_kovshxas()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
 
-void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
+void pgm_arm_type1_state::decode_kovlsqh2_tiles()
 {
 	int i, j;
 	uint16_t *src = (uint16_t *)(memregion("tiles")->base() + 0x180000);
@@ -359,7 +359,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 	memcpy( src, &dst[0], 0x800000 );
 }
 
-void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( uint8_t *src )
+void pgm_arm_type1_state::decode_kovlsqh2_sprites( uint8_t *src )
 {
 	int i, j;
 	std::vector<uint8_t> dst(0x800000);
@@ -374,7 +374,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( uint8_t *src )
 	memcpy( src, &dst[0], 0x800000 );
 }
 
-void pgm_arm_type1_state::pgm_decode_kovlsqh2_samples()
+void pgm_arm_type1_state::decode_kovlsqh2_samples()
 {
 	int i;
 	uint8_t *src = (uint8_t *)(memregion("ics")->base() + 0x400000);
@@ -386,7 +386,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_samples()
 	memcpy( src + 0x400000, src, 0x400000 );
 }
 
-void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
+void pgm_arm_type1_state::decode_kovqhsgs_program()
 {
 	int i;
 	uint16_t *src = (uint16_t *)(memregion("maincpu")->base() + 0x100000);
@@ -402,7 +402,7 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 	memcpy( src, &dst[0], 0x400000 );
 }
 
-void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
+void pgm_arm_type1_state::decode_kovqhsgs2_program()
 {
 	int i;
 	uint16_t *src = (uint16_t *)(memregion("maincpu")->base() + 0x100000);
@@ -421,19 +421,19 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
 
 void pgm_arm_type1_state::init_kovlsqh2()
 {
-	pgm_decode_kovqhsgs2_program();
-	pgm_decode_kovlsqh2_tiles();
+	decode_kovqhsgs2_program();
+	decode_kovlsqh2_tiles();
 
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
+	decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
+	decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
 
-	pgm_decode_kovlsqh2_samples();
+	decode_kovlsqh2_samples();
 	init_pgm();
 	m_arm_status = arm_type::SIMULATED;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
@@ -442,19 +442,19 @@ void pgm_arm_type1_state::init_kovlsqh2()
 
 void pgm_arm_type1_state::init_kovqhsgs()
 {
-	pgm_decode_kovqhsgs_program();
-	pgm_decode_kovlsqh2_tiles();
+	decode_kovqhsgs_program();
+	decode_kovlsqh2_tiles();
 
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
+	decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
+	decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
+	decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
 
-	pgm_decode_kovlsqh2_samples();
+	decode_kovlsqh2_samples();
 	init_pgm();
 	m_arm_status = arm_type::SIMULATED;
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
