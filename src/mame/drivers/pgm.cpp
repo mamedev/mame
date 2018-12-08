@@ -204,47 +204,42 @@ Notes:
 #define PGMLOGERROR 0
 
 
-READ16_MEMBER(pgm_state::pgm_videoram_r)
+READ16_MEMBER(pgm_state::videoram_r)
 {
 	if (offset < 0x4000 / 2)
-		return m_bg_videoram[offset&0x7ff];
+		return m_bg_videoram[offset & 0x7ff];
 	else if (offset < 0x7000 / 2)
-		return m_tx_videoram[offset&0xfff];
+		return m_tx_videoram[offset & 0xfff];
 	else
 		return m_videoram[offset];
 }
 
-WRITE16_MEMBER(pgm_state::pgm_videoram_w)
+WRITE16_MEMBER(pgm_state::videoram_w)
 {
 	if (offset < 0x4000 / 2)
-		pgm_bg_videoram_w(space, offset&0x7ff, data, mem_mask);
+		pgm_bg_videoram_w(offset & 0x7ff, data, mem_mask);
 	else if (offset < 0x7000 / 2)
-		pgm_tx_videoram_w(space, offset&0xfff, data, mem_mask);
+		pgm_tx_videoram_w(offset & 0xfff, data, mem_mask);
 	else
 		COMBINE_DATA(&m_videoram[offset]);
 }
 
-WRITE16_MEMBER(pgm_state::pgm_coin_counter_w)
+WRITE16_MEMBER(pgm_state::coin_counter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-	machine().bookkeeping().coin_counter_w(1, data & 0x0002);
-	machine().bookkeeping().coin_counter_w(2, data & 0x0004);
-	machine().bookkeeping().coin_counter_w(3, data & 0x0008);
+	for (int i = 0; i < 4; i++)
+		machine().bookkeeping().coin_counter_w(i, BIT(data, i));
 }
 
-READ16_MEMBER(pgm_state::z80_ram_r)
+READ8_MEMBER(pgm_state::z80_ram_r)
 {
-	return (m_z80_mainram[offset * 2] << 8) | m_z80_mainram[offset * 2 + 1];
+	return m_z80_mainram[offset];
 }
 
-WRITE16_MEMBER(pgm_state::z80_ram_w)
+WRITE8_MEMBER(pgm_state::z80_ram_w)
 {
-	int pc = m_maincpu->pc();
+	uint32_t const pc = m_maincpu->pc();
 
-	if (ACCESSING_BITS_8_15)
-		m_z80_mainram[offset * 2] = data >> 8;
-	if (ACCESSING_BITS_0_7)
-		m_z80_mainram[offset * 2 + 1] = data;
+	m_z80_mainram[offset] = data;
 
 	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
 		if (PGMLOGERROR)
@@ -276,15 +271,12 @@ WRITE16_MEMBER(pgm_state::z80_ctrl_w)
 		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 }
 
-WRITE16_MEMBER(pgm_state::m68k_l1_w)
+WRITE8_MEMBER(pgm_state::m68k_l1_w)
 {
-	if(ACCESSING_BITS_0_7)
-	{
-		if (PGMLOGERROR)
-			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
-		m_soundlatch->write(space, 0, data);
-		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
+	if (PGMLOGERROR)
+		logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
+	m_soundlatch->write(space, 0, data);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(pgm_state::z80_l3_w)
@@ -299,12 +291,12 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 
 /*** Z80 (sound CPU)**********************************************************/
 
-void pgm_state::pgm_z80_mem(address_map &map)
+void pgm_state::z80_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("z80_mainram");
 }
 
-void pgm_state::pgm_z80_io(address_map &map)
+void pgm_state::z80_io(address_map &map)
 {
 	map(0x8000, 0x8003).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write));
 	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::z80_l3_w));
@@ -314,18 +306,17 @@ void pgm_state::pgm_z80_io(address_map &map)
 
 /*** 68000 (main CPU) + variants for protection devices **********************/
 
-void pgm_state::pgm_base_mem(address_map &map)
+void pgm_state::base_mem(address_map &map)
 {
 	map(0x700006, 0x700007).nopw(); // Watchdog?
 
 	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share("sram"); /* Main Ram */
 
-	map(0x900000, 0x907fff).mirror(0x0f8000).rw(FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
+	map(0x900000, 0x907fff).mirror(0x0f8000).rw(FUNC(pgm_state::videoram_r), FUNC(pgm_state::videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
 	map(0xa00000, 0xa011ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xb00000, 0xb0ffff).ram().share("videoregs"); /* Video Regs inc. Zoom Table */
 
-	map(0xc00003, 0xc00003).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc00002, 0xc00003).w(FUNC(pgm_state::m68k_l1_w));
+	map(0xc00003, 0xc00003).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::m68k_l1_w));
 	map(0xc00005, 0xc00005).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 	map(0xc00007, 0xc00007).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
 	map(0xc00008, 0xc00009).w(FUNC(pgm_state::z80_reset_w));
@@ -335,21 +326,21 @@ void pgm_state::pgm_base_mem(address_map &map)
 	map(0xc08000, 0xc08001).portr("P1P2");
 	map(0xc08002, 0xc08003).portr("P3P4");
 	map(0xc08004, 0xc08005).portr("Service");
-	map(0xc08006, 0xc08007).portr("DSW").w(FUNC(pgm_state::pgm_coin_counter_w));
+	map(0xc08006, 0xc08007).portr("DSW").w(FUNC(pgm_state::coin_counter_w));
 
 	map(0xc10000, 0xc1ffff).rw(FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
 }
 
 void pgm_state::pgm_mem(address_map &map)
 {
-	pgm_base_mem(map);
+	base_mem(map);
 	map(0x000000, 0x0fffff).rom();   /* BIOS ROM */
 }
 
-void pgm_state::pgm_basic_mem(address_map &map)
+void pgm_state::basic_mem(address_map &map)
 {
 	pgm_mem(map);
-	map(0x100000, 0x3fffff).bankr("bank1"); /* Game ROM */
+	map(0x100000, 0x3fffff).bankr("mainbank"); /* Game ROM */
 }
 
 
@@ -454,9 +445,9 @@ static const gfx_layout pgm8_charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 3, 2, 1, 0 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP4(3,-1) },
+	{ STEP8(0, 4) },
+	{ STEP8(0, 4*8) },
 	8*32
 };
 
@@ -466,15 +457,9 @@ static const gfx_layout pgm32_charlayout =
 	RGN_FRAC(1,1),
 	5,
 	{ 4, 3, 2, 1, 0 },
-	{ 0, 5, 10, 15, 20, 25, 30, 35,
-		40, 45, 50, 55, 60, 65, 70, 75,
-		80, 85, 90, 95, 100, 105, 110, 115,
-		120, 125, 130, 135, 140, 145, 150, 155 },
-	{ 0*160, 1*160, 2*160, 3*160, 4*160, 5*160, 6*160, 7*160,
-		8*160, 9*160,10*160,11*160,12*160,13*160,14*160,15*160,
-		16*160,17*160,18*160,19*160,20*160,21*160,22*160,23*160,
-		24*160,25*160,26*160,27*160,28*160,29*160,30*160,31*160 },
-		32*160
+	{ STEP32(0, 5) },
+	{ STEP32(0, 5*32) },
+	32*160
 };
 
 GFXDECODE_START( gfx_pgm )
@@ -486,41 +471,41 @@ GFXDECODE_END
 
 /* most games require IRQ4 for inputs to work, Puzzli 2 is explicit about not wanting it tho
    what is the source? */
-TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::interrupt)
 {
 	int scanline = param;
 
-// already being generated  by MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
+// already being generated  by MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm_state, screen_vblank))
 //  if(scanline == 224)
 //      m_maincpu->set_input_line(6, HOLD_LINE);
 
-	if(scanline == 0)
-		if (!m_irq4_disabled) m_maincpu->set_input_line(4, HOLD_LINE);
+	if (scanline == 0)
+		if (!m_irq4_disabled)
+			m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(pgm_state,pgm)
+/*
+void pgm_state::machine_start()
 {
 //  machine().base_datetime(m_systime);
 }
+*/
 
-MACHINE_RESET_MEMBER(pgm_state,pgm)
+void pgm_state::machine_reset()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(pgm_state::pgmbase)
+MACHINE_CONFIG_START(pgm_state::pgm)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
-	MCFG_DEVICE_PROGRAM_MAP(pgm_basic_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, pgm_interrupt, "screen", 0, 1)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL) /* 20 mhz! verified on real board */
+	MCFG_DEVICE_PROGRAM_MAP(basic_mem)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 33868800/4)
-	MCFG_DEVICE_PROGRAM_MAP(pgm_z80_mem)
-	MCFG_DEVICE_IO_MAP(pgm_z80_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 33.8688_MHz_XTAL/4)
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 
-	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	V3021(config, "rtc");
@@ -531,15 +516,13 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update_pgm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm_state, screen_vblank_pgm))
+	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgm)
-	MCFG_PALETTE_ADD("palette", 0x1200/2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pgm);
+	MCFG_PALETTE_ADD_INIT_BLACK(m_palette, 0x1200/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_VIDEO_START_OVERRIDE(pgm_state,pgm)
 
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -548,13 +531,9 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	GENERIC_LATCH_8(config, "soundlatch2");
 	GENERIC_LATCH_8(config, m_soundlatch3);
 
-	MCFG_ICS2115_ADD("ics", 0)
+	MCFG_ICS2115_ADD("ics", 0)//33.8688_MHz_XTAL
 	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pgm_state::pgm)
-	pgmbase(config);
 MACHINE_CONFIG_END
 
 
@@ -4727,21 +4706,17 @@ void pgm_state::expand_colourdata()
 	}
 }
 
-void pgm_state::pgm_basic_init( bool set_bank)
+void pgm_state::init_pgm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	if (set_bank) membank("bank1")->set_base(&ROM[0x100000]);
+	if (m_mainbank)
+		m_mainbank->set_base(&ROM[0x100000]);
 
 	expand_colourdata();
 
 	m_bg_videoram = &m_videoram[0];
 	m_tx_videoram = &m_videoram[0x4000/2];
 	m_rowscrollram = &m_videoram[0x7000/2];
-}
-
-void pgm_state::init_pgm()
-{
-	pgm_basic_init();
 }
 
 
@@ -4756,14 +4731,14 @@ GAME( 1997, pgm,          0,         pgm,                   pgm,       pgm_state
 //西游释厄传/Xīyóu shì è chuán (China; Simplified Chinese)
 //西遊釋厄傳/Xīyóu shì è chuán (Taiwan; Traditional Chinese)
 // the version numbering on these is a mess... date strings from ROM (and in some cases even those are missing..)
-GAME( 1997, orlegend,     pgm,       pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 126)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 01/14/98 18:16:38 - runs as World
-GAME( 1997, orlegende,    orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 112)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 07/14/97 11:19:45 - runs as World
-GAME( 1997, orlegendc,    orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 112, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 05/05/97 10:08:21 - runs as World, Korea, China
-GAME( 1997, orlegendca,   orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. ???, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 04/02/97 13:35:43 - runs as HongKong, China, China
-GAME( 1997, orlegend111c, orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 no date!          - runs as HongKong, China, China
-GAME( 1997, orlegend111t, orlegend,  pgm_asic3,           orlegendt, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Taiwanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// V0001 no date! - needs a different protection sequence
-GAME( 1997, orlegend111k, orlegend,  pgm_asic3,           orlegendk, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )   // not checked
-GAME( 1997, orlegend105k, orlegend,  pgm_asic3,           orlegendk, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 105, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  //  V0000 no date!          - runs as Korea
+GAME( 1997, orlegend,     pgm,       pgm,                 orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 126)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 01/14/98 18:16:38 - runs as World
+GAME( 1997, orlegende,    orlegend,  pgm,                 orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 112)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 07/14/97 11:19:45 - runs as World
+GAME( 1997, orlegendc,    orlegend,  pgm,                 orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 112, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 05/05/97 10:08:21 - runs as World, Korea, China
+GAME( 1997, orlegendca,   orlegend,  pgm,                 orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. ???, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 04/02/97 13:35:43 - runs as HongKong, China, China
+GAME( 1997, orlegend111c, orlegend,  pgm,                 orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 no date!          - runs as HongKong, China, China
+GAME( 1997, orlegend111t, orlegend,  pgm,                 orlegendt, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Taiwanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// V0001 no date! - needs a different protection sequence
+GAME( 1997, orlegend111k, orlegend,  pgm,                 orlegendk, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )   // not checked
+GAME( 1997, orlegend105k, orlegend,  pgm,                 orlegendk, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 105, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  //  V0000 no date!          - runs as Korea
 
 //Dragon World II
 //中國龍II/Zhōngguó lóng II (China, Taiwan, Japan; Traditional Chinese only in title screen)
@@ -4881,44 +4856,44 @@ GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,    pgm,      pgm_arm_type3_s
 
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
-GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
-GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
-GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
+GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
+GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,         pgm,     pgm_arm_type1_state, init_kovsh,    ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
 
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
 // the only difference between 'ket' and 'ket1' is the ROM fill at 0x1443bc-0x1c88cd, on ket1 it seems to be randomized / garbage data, on ket it's all 0xff, both have been seen on more than one PCB.
-GAME( 2002, ket,          0,         pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ket1,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.) (alt rom fill)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ket,          0,         pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ket1,         ket,       pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.) (alt rom fill)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ketbl,        ket,       pgm_arm_type2,         pgm,     pgm_arm_type2_state, init_ddp2,     ROT270, "bootleg",            "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver., bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 
 // these are modern hacks, some of them have been seen on original PCBs, also reportedly on a bootleg PCB with mostly original components but the ARM replaced with a custom chip.
 // this is a significantly reworked version of the game
-GAME( 2014, ketarr,    ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr151, ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
-GAME( 2012, ketarr15,  ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr10,  ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2014, ketarr,    ket,       pgm_arm_type1_cave,       cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr151, ket,       pgm_arm_type1_cave,       cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
+GAME( 2012, ketarr15,  ket,       pgm_arm_type1_cave,       cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr10,  ket,       pgm_arm_type1_cave,       cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // these simplify the scoring system
-GAME( 2012, ketarrs151, ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarrs15,  ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrs151, ket,       pgm_arm_type1_cave,      cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrs15,  ket,       pgm_arm_type1_cave,      cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // this has the 'programmed slowdown' removed.
-GAME( 2012, ketarrf,    ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 FAST. VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrf,    ket,       pgm_arm_type1_cave,      cavepgm, pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 FAST. VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // this version is stupid, it just simulates what happens if the protection chip isn't returning proper values
 // ROM_LOAD16_WORD_SWAP( "ketarrb_v100.u38", 0x000000, 0x200000, CRC(ec7a4f92) SHA1(6351fb386586956fbdb5f0730c481fb539cc267a) )
-// GAME( 2002, ketarrb,    ket,       pgm_arm_type1_cave,   pgm,     pgm_arm_type1_state, init_ket,      ROT270, "trap15", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 BACK. VER)", MACHINE_SUPPORTS_SAVE )
+// GAME( 2002, ketarrb,    ket,       pgm_arm_type1_cave,   cavepgm,     pgm_arm_type1_state, init_ket,      ROT270, "trap15", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 BACK. VER)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_espgal,   ROT270, "Cave (AMI license)", "Espgaluda (2003/10/15 Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    cavepgm, pgm_arm_type1_state, init_espgal,   ROT270, "Cave (AMI license)", "Espgaluda (2003/10/15 Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, espgalbl,     espgal,    pgm_arm_type2,         pgm,     pgm_arm_type2_state, init_ddp2,     ROT270, "bootleg",            "Espgaluda (2003/10/15 Master Ver, bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 //泡泡鱼/Pào pào yú (China)

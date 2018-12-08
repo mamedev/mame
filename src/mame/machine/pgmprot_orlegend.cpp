@@ -47,7 +47,7 @@ void pgm_asic3_state::asic3_compute_hold(int y, int z)
 		break;
 	}
 }
-READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
+READ16_MEMBER(pgm_asic3_state::asic3_r)
 {
 	switch (m_asic3_reg)
 	{
@@ -93,7 +93,7 @@ READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
 	return 0;
 }
 
-WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
+WRITE16_MEMBER(pgm_asic3_state::asic3_w)
 {
 	if (offset == 0) {
 		m_asic3_reg = data;
@@ -163,9 +163,9 @@ WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
 
 void pgm_asic3_state::init_orlegend()
 {
-	pgm_basic_init();
+	init_pgm();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC04000, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::pgm_asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC04000, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::asic3_w),this));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;
@@ -221,5 +221,5 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(pgm_asic3_state::pgm_asic3)
-	pgmbase(config);
+	pgm(config);
 MACHINE_CONFIG_END

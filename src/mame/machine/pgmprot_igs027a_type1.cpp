@@ -66,58 +66,58 @@
 /**************************** EMULATION *******************************/
 /* used by photoy2k, kovsh */
 
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_protlatch_r )
+READ32_MEMBER(pgm_arm_type1_state::arm7_type1_protlatch_r )
 {
 	machine().scheduler().synchronize(); // force resync
 
-	return (m_pgm_arm_type1_highlatch_68k_w << 16) | (m_pgm_arm_type1_lowlatch_68k_w);
+	return (m_arm_type1_highlatch_68k_w << 16) | (m_arm_type1_lowlatch_68k_w);
 }
 
-WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w )
+WRITE32_MEMBER(pgm_arm_type1_state::arm7_type1_protlatch_w )
 {
 	machine().scheduler().synchronize(); // force resync
 
 	if (ACCESSING_BITS_16_31)
 	{
-		m_pgm_arm_type1_highlatch_arm_w = data >> 16;
-		m_pgm_arm_type1_highlatch_68k_w = 0;
+		m_arm_type1_highlatch_arm_w = data >> 16;
+		m_arm_type1_highlatch_68k_w = 0;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		m_pgm_arm_type1_lowlatch_arm_w = data;
-		m_pgm_arm_type1_lowlatch_68k_w = 0;
+		m_arm_type1_lowlatch_arm_w = data;
+		m_arm_type1_lowlatch_68k_w = 0;
 	}
 }
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_r )
+READ16_MEMBER(pgm_arm_type1_state::arm7_type1_68k_protlatch_r )
 {
 	machine().scheduler().synchronize(); // force resync
 
 	switch (offset)
 	{
-		case 1: return m_pgm_arm_type1_highlatch_arm_w;
-		case 0: return m_pgm_arm_type1_lowlatch_arm_w;
+		case 1: return m_arm_type1_highlatch_arm_w;
+		case 0: return m_arm_type1_lowlatch_arm_w;
 	}
 	return -1;
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_w )
+WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_68k_protlatch_w )
 {
 	machine().scheduler().synchronize(); // force resync
 
 	switch (offset)
 	{
 		case 1:
-			m_pgm_arm_type1_highlatch_68k_w = data;
+			m_arm_type1_highlatch_68k_w = data;
 			break;
 
 		case 0:
-			m_pgm_arm_type1_lowlatch_68k_w = data;
+			m_arm_type1_lowlatch_68k_w = data;
 			break;
 	}
 }
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_r )
+READ16_MEMBER(pgm_arm_type1_state::arm7_type1_ram_r )
 {
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
@@ -126,7 +126,7 @@ READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_r )
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_w )
+WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_ram_w )
 {
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
@@ -138,24 +138,24 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_ram_w )
 
 
 
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_unk_r )
+READ32_MEMBER(pgm_arm_type1_state::arm7_type1_unk_r )
 {
-	return m_pgm_arm_type1_counter++;
+	return m_arm_type1_counter++;
 }
 
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_exrom_r )
+READ32_MEMBER(pgm_arm_type1_state::arm7_type1_exrom_r )
 {
 	return 0x00000000;
 }
 
-READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_r )
+READ32_MEMBER(pgm_arm_type1_state::arm7_type1_shareram_r )
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) %s\n", offset << 2, m_arm7_shareram[offset], mem_mask, machine().describe_context());
 	return m_arm7_shareram[offset];
 }
 
-WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_w )
+WRITE32_MEMBER(pgm_arm_type1_state::arm7_type1_shareram_w )
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) %s\n", offset << 2, data, mem_mask, machine().describe_context());
@@ -167,21 +167,21 @@ WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_w )
 /*  no execute only space? */
 void pgm_arm_type1_state::kov_map(address_map &map)
 {
-	pgm_mem(map);
-	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
-	map(0x4f0000, 0x4f003f).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_w)); /* ARM7 Shared RAM */
-	map(0x500000, 0x500005).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
+	pgm_state::pgm_mem(map);
+	map(0x100000, 0x4effff).bankr("mainbank"); /* Game ROM */
+	map(0x4f0000, 0x4f003f).rw(FUNC(pgm_arm_type1_state::arm7_type1_ram_r), FUNC(pgm_arm_type1_state::arm7_type1_ram_w)); /* ARM7 Shared RAM */
+	map(0x500000, 0x500005).rw(FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
 }
 
 void pgm_arm_type1_state::_55857E_arm7_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom();
-	map(0x08100000, 0x083fffff).r(FUNC(pgm_arm_type1_state::pgm_arm7_type1_exrom_r)); // unpopulated, returns 0 to keep checksum happy
+	map(0x08100000, 0x083fffff).r(FUNC(pgm_arm_type1_state::arm7_type1_exrom_r)); // unpopulated, returns 0 to keep checksum happy
 	map(0x10000000, 0x100003ff).ram(); // internal ram for asic
-	map(0x40000000, 0x40000003).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w));
+	map(0x40000000, 0x40000003).rw(FUNC(pgm_arm_type1_state::arm7_type1_protlatch_r), FUNC(pgm_arm_type1_state::arm7_type1_protlatch_w));
 	map(0x40000008, 0x4000000b).nopw(); // ?
-	map(0x4000000c, 0x4000000f).r(FUNC(pgm_arm_type1_state::pgm_arm7_type1_unk_r));
-	map(0x50800000, 0x5080003f).rw(FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_w)).share("arm7_shareram");
+	map(0x4000000c, 0x4000000f).r(FUNC(pgm_arm_type1_state::arm7_type1_unk_r));
+	map(0x50800000, 0x5080003f).rw(FUNC(pgm_arm_type1_state::arm7_type1_shareram_r), FUNC(pgm_arm_type1_state::arm7_type1_shareram_w)).share("arm7_shareram");
 	map(0x50000000, 0x500003ff).ram(); // uploads xor table to decrypt 68k rom here
 }
 
@@ -192,76 +192,79 @@ void pgm_arm_type1_state::_55857E_arm7_map(address_map &map)
 
 void pgm_arm_type1_state::kov_sim_map(address_map &map)
 {
-	pgm_mem(map);
-	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
+	pgm_state::pgm_mem(map);
+	map(0x100000, 0x4effff).bankr("mainbank"); /* Game ROM */
 }
 
 void pgm_arm_type1_state::cavepgm_mem(address_map &map)
 {
-	pgm_base_mem(map);
+	base_mem(map);
 	map(0x000000, 0x3fffff).rom();
-	/* protection devices installed (simulated) later */
+	/* protection devices installed (SIMULATED) later */
 }
 
 
-MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
+void pgm_arm_type1_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
-	save_item(NAME(m_value0));
-	save_item(NAME(m_value1));
-	save_item(NAME(m_valuekey));
-	save_item(NAME(m_valueresponse));
-	save_item(NAME(m_curslots));
-	save_item(NAME(m_slots));
+	//pgm_state::machine_start();
+	m_arm_type1_highlatch_arm_w = 0;
+	m_arm_type1_lowlatch_arm_w = 0;
+	m_arm_type1_highlatch_68k_w = 0;
+	m_arm_type1_lowlatch_68k_w = 0;
+	m_arm_type1_counter = 1;
+
+	save_item(NAME(m_arm_type1_highlatch_arm_w));
+	save_item(NAME(m_arm_type1_lowlatch_arm_w));
+	save_item(NAME(m_arm_type1_highlatch_68k_w));
+	save_item(NAME(m_arm_type1_lowlatch_68k_w));
+	save_item(NAME(m_arm_type1_counter));
+
+	if (m_arm_status == arm_type::SIMULATED)
+	{
+		save_item(NAME(m_value0));
+		save_item(NAME(m_value1));
+		save_item(NAME(m_valuekey));
+		save_item(NAME(m_valueresponse));
+		save_item(NAME(m_curslots));
+		save_item(NAME(m_slots));
+	}
 }
-
-MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
-	pgmbase(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cavepgm_mem)
-
-	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type1_state, pgm_arm_type1 )
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_sim)
-	pgm_arm_type1_cave(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kov_sim_map)
-
-	/* protection CPU */
-	MCFG_DEVICE_ADD("prot", ARM7, 20000000 )   // 55857E?
-	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1)
-	pgm_arm_type1_cave(config);
+	pgm(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(kov_map)
 
 	/* protection CPU */
 	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857E?
 	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
+
+//	MCFG_SCREEN_MODIFY("screen")
+//	MCFG_SCREEN_REFRESH_RATE(59.17) // Correct? Verify this from real PGM PCB
 MACHINE_CONFIG_END
 
-void pgm_arm_type1_state::pgm_arm7_type1_latch_init()
-{
-	m_pgm_arm_type1_highlatch_arm_w = 0;
-	m_pgm_arm_type1_lowlatch_arm_w = 0;
-	m_pgm_arm_type1_highlatch_68k_w = 0;
-	m_pgm_arm_type1_lowlatch_68k_w = 0;
-	m_pgm_arm_type1_counter = 1;
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_sim)
+	pgm_arm_type1(config);
 
-	save_item(NAME(m_pgm_arm_type1_highlatch_arm_w));
-	save_item(NAME(m_pgm_arm_type1_lowlatch_arm_w));
-	save_item(NAME(m_pgm_arm_type1_highlatch_68k_w));
-	save_item(NAME(m_pgm_arm_type1_lowlatch_68k_w));
-	save_item(NAME(m_pgm_arm_type1_counter));
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov_sim_map)
+
+	/* protection CPU */
+	MCFG_DEVICE_MODIFY("prot")   // 55857E?
+	MCFG_DEVICE_DISABLE()
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
+	//pgm_arm_type1(config);
+	pgm_arm_type1_sim(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cavepgm_mem)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
+MACHINE_CONFIG_END
 
 READ16_MEMBER(pgm_arm_type1_state::kovsh_fake_region_r )
 {
@@ -275,18 +278,18 @@ READ16_MEMBER(pgm_arm_type1_state::kovsh_fake_region_r )
 
 void pgm_arm_type1_state::init_photoy2k()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_photoy2k_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::EMULATED;
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 }
 
 void pgm_arm_type1_state::init_kovsh()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_kovsh_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::EMULATED;
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 }
@@ -297,7 +300,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
 	switch (offset)
 	{
 		case 0:
-			m_pgm_arm_type1_lowlatch_68k_w = data;
+			m_arm_type1_lowlatch_68k_w = data;
 		return;
 
 		case 1:
@@ -344,7 +347,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
 				case 0xf8: asic_cmd = 0xf3; break;
 			}
 
-			m_pgm_arm_type1_highlatch_68k_w = asic_cmd ^ (asic_key | (asic_key << 8));
+			m_arm_type1_highlatch_68k_w = asic_cmd ^ (asic_key | (asic_key << 8));
 		}
 		return;
 	}
@@ -353,9 +356,9 @@ WRITE16_MEMBER(pgm_arm_type1_state::kovshp_asic27a_write_word )
 
 void pgm_arm_type1_state::init_kovshp()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_kovshp_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::SIMULATED;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
@@ -366,9 +369,9 @@ void pgm_arm_type1_state::init_kovshp()
 
 void pgm_arm_type1_state::init_kovshxas()
 {
-	pgm_basic_init();
+	init_pgm();
 //  pgm_kovshp_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::SIMULATED;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
@@ -464,8 +467,8 @@ void pgm_arm_type1_state::init_kovlsqh2()
 	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples();
-	pgm_basic_init();
-	pgm_arm7_type1_latch_init();
+	init_pgm();
+	m_arm_status = arm_type::SIMULATED;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x500000, 0x500005, write16_delegate(FUNC(pgm_arm_type1_state::kovshp_asic27a_write_word),this));
 }
@@ -485,8 +488,8 @@ void pgm_arm_type1_state::init_kovqhsgs()
 	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples();
-	pgm_basic_init();
-	pgm_arm7_type1_latch_init();
+	init_pgm();
+	m_arm_status = arm_type::SIMULATED;
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0008, 0x4f0009, read16_delegate(FUNC(pgm_arm_type1_state::kovsh_fake_region_r),this));
 }
@@ -500,7 +503,7 @@ void pgm_arm_type1_state::init_kovqhsgs()
  bp A71A0,1,{d0=0x12;g}
 */
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_r )
+READ16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_r )
 {
 	if (offset == 0)
 	{
@@ -1741,7 +1744,7 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 	}
 }
 
-WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
+WRITE16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_w )
 {
 	int pc = m_maincpu->pc();
 
@@ -1776,7 +1779,7 @@ WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
 	}
 }
 
-READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r )
+READ16_MEMBER(pgm_arm_type1_state::arm7_type1_sim_protram_r )
 {
 	if (offset == 4)
 		return m_simregion;
@@ -1799,26 +1802,29 @@ READ16_MEMBER(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r )
 
 void pgm_arm_type1_state::init_ddp3()
 {
-	pgm_basic_init(false);
+	init_pgm();
 	pgm_py2k2_decrypt(machine()); // yes, it's the same as photo y2k2
+	m_arm_status = arm_type::SIMULATED;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
 }
 
 void pgm_arm_type1_state::init_ket()
 {
-	pgm_basic_init(false);
+	init_pgm();
 	pgm_ket_decrypt(machine());
+	m_arm_status = arm_type::SIMULATED;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
 }
 
 void pgm_arm_type1_state::init_espgal()
 {
-	pgm_basic_init(false);
+	init_pgm();
 	pgm_espgal_decrypt(machine());
+	m_arm_status = arm_type::SIMULATED;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_ddp3;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x400000, 0x400005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
 }
 
 
@@ -2108,13 +2114,12 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(uint8_t datvalue)
 
 void pgm_arm_type1_state::init_puzzli2()
 {
-	pgm_basic_init();
-
-
+	init_pgm();
 	pgm_puzzli2_decrypt(machine());
+	m_arm_status = arm_type::SIMULATED;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_puzzli2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 	m_irq4_disabled = 1; // // doesn't like this irq?? - seems to be RTC related
 
 	hackcount = 0;
@@ -2122,6 +2127,7 @@ void pgm_arm_type1_state::init_puzzli2()
 	hack_47_value = 0;
 	hack_31_table_offset = 0;
 
+	save_item(NAME(m_puzzli_54_trigger));
 //#define PUZZLI2_LEVEL_STRUCTURE_LOG
 #ifdef PUZZLI2_LEVEL_STRUCTURE_LOG
 	uint8_t *src2 = (uint8_t *) (machine().root_device().memregion("maincpu")->base());
@@ -2240,28 +2246,30 @@ void pgm_arm_type1_state::init_puzzli2()
 
 void pgm_arm_type1_state::init_py2k2()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_py2k2_decrypt(machine());
+	m_arm_status = arm_type::SIMULATED;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 }
 
 void pgm_arm_type1_state::init_pgm3in1()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_decrypt_pgm3in1(machine());
+	m_arm_status = arm_type::SIMULATED;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 	m_irq4_disabled = 1; // // doesn't like this irq??
 }
 
 void pgm_arm_type1_state::init_pstar()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_pstar_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::SIMULATED;
 
 	m_pstar_e7_value = 0;
 	m_pstar_b1_value = 0;
@@ -2272,7 +2280,7 @@ void pgm_arm_type1_state::init_pstar()
 	memset(m_slots, 0, 16 * sizeof(uint32_t));
 
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_pstars;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pstars_arm7_type1_sim_protram_r),this));
 
 	save_item(NAME(m_pstar_e7_value));
@@ -2283,45 +2291,88 @@ void pgm_arm_type1_state::init_pstar()
 
 void pgm_arm_type1_state::init_kov()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_kov_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::SIMULATED;
 	m_curslots = 0;
 	m_kov_c0_value = 0;
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	save_item(NAME(m_kov_c0_value));
+	save_item(NAME(m_kov_cb_value));
+	save_item(NAME(m_kov_fe_value));
 }
 
 void pgm_arm_type1_state::init_kovboot()
 {
-	pgm_basic_init();
+	init_pgm();
 //  pgm_kov_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::SIMULATED;
 	m_curslots = 0;
 	m_kov_c0_value = 0;
 	m_kov_cb_value = 0;
 	m_kov_fe_value = 0;
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_kov;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
+	save_item(NAME(m_kov_c0_value));
+	save_item(NAME(m_kov_cb_value));
+	save_item(NAME(m_kov_fe_value));
 
 }
 
 void pgm_arm_type1_state::init_oldsplus()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_oldsplus_decrypt(machine());
-	pgm_arm7_type1_latch_init();
+	m_arm_status = arm_type::SIMULATED;
 	memset(m_extra_ram, 0, 0x100 * sizeof(uint16_t));
 	memset(m_slots, 0, 0x100 * sizeof(uint32_t));
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_oldsplus;
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r),this));
 	save_item(NAME(m_extra_ram));
 }
+
+INPUT_PORTS_START( cavepgm )
+	PORT_INCLUDE ( pgm )
+
+	PORT_MODIFY("P3P4")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no player 3/4 inputs
+
+	PORT_MODIFY("Service")
+	PORT_BIT( 0xfccc, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ""
+
+	PORT_MODIFY("DSW")
+	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:!1" )
+	// DSW 2-8 : Manual says "Unused"
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 
 INPUT_PORTS_START( photoy2k )
 	PORT_INCLUDE ( pgm )

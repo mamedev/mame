@@ -152,19 +152,19 @@ static const uint8_t m_olds_source_data[8][0xec] = // table addresses $2951CA
 	}
 };
 
-MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::machine_reset()
 {
 	int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00900000 | region;
 
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	pgm_state::machine_reset();
 }
 
 void pgm_028_025_state::init_olds()
 {
-	pgm_basic_init();
+	init_pgm();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::olds_w), (igs025_device*)m_igs025));
 	m_igs028->m_sharedprotram = m_sharedprotram;
@@ -174,8 +174,8 @@ void pgm_028_025_state::init_olds()
 
 void pgm_028_025_state::olds_mem(address_map &map)
 {
-	pgm_mem(map);
-	map(0x100000, 0x3fffff).bankr("bank1"); /* Game ROM */
+	pgm_state::pgm_mem(map);
+	map(0x100000, 0x3fffff).bankr("mainbank"); /* Game ROM */
 	map(0x400000, 0x403fff).ram().share("sharedprotram"); // Shared with protection device
 }
 
@@ -187,7 +187,7 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 
 
 MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
-	pgmbase(config);
+	pgm(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(olds_mem)
@@ -196,8 +196,6 @@ MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
 	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
 
 	IGS028(config, m_igs028, 0);
-
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_028_025_state,olds)
 MACHINE_CONFIG_END
 
 

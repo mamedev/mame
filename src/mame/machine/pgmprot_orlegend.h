@@ -6,9 +6,13 @@ class pgm_asic3_state : public pgm_state
 {
 public:
 	pgm_asic3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
-	}
+		: pgm_state(mconfig, type, tag)
+	{}
 
+	void init_orlegend();
+
+	void pgm_asic3(machine_config &config);
+private:
 	// ASIC 3 (oriental legends protection)
 	uint8_t         m_asic3_reg;
 	uint8_t         m_asic3_latch[3];
@@ -16,11 +20,9 @@ public:
 	uint16_t        m_asic3_hilo;
 	uint16_t        m_asic3_hold;
 
-	void init_orlegend();
 	void asic3_compute_hold(int,int);
-	DECLARE_READ16_MEMBER( pgm_asic3_r );
-	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
-	void pgm_asic3(machine_config &config);
+	DECLARE_READ16_MEMBER( asic3_r );
+	DECLARE_WRITE16_MEMBER( asic3_w );
 };
 
 INPUT_PORTS_EXTERN( orlegend );

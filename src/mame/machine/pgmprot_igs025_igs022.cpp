@@ -34,7 +34,7 @@
 
 /* NON-device stuff, game specific, keep here */
 
-void pgm_022_025_state::pgm_dw3_decrypt()
+void pgm_022_025_state::dw3_decrypt()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
@@ -54,7 +54,7 @@ void pgm_022_025_state::pgm_dw3_decrypt()
 	}
 }
 
-void pgm_022_025_state::pgm_killbld_decrypt()
+void pgm_022_025_state::killbld_decrypt()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
@@ -320,7 +320,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 	m_igs025->m_kb_region = region - 0x16;
 	m_igs025->m_kb_game_id = 0x89911400 | region;
 
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	pgm_state::machine_reset();
 }
 
 MACHINE_RESET_MEMBER(pgm_022_025_state, dw3)
@@ -330,7 +330,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state, dw3)
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00060000 | region;
 
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	pgm_state::machine_reset();
 }
 
 
@@ -346,8 +346,8 @@ void pgm_022_025_state::igs025_to_igs022_callback( void )
 
 void pgm_022_025_state::init_killbld()
 {
-	pgm_basic_init();
-	pgm_killbld_decrypt();
+	init_pgm();
+	killbld_decrypt();
 
 	// install and configure protection device(s)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
@@ -357,8 +357,8 @@ void pgm_022_025_state::init_killbld()
 
 void pgm_022_025_state::init_drgw3()
 {
-	pgm_basic_init();
-	pgm_dw3_decrypt();
+	init_pgm();
+	dw3_decrypt();
 
 	// install and configure protection device(s)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
@@ -369,14 +369,14 @@ void pgm_022_025_state::init_drgw3()
 
 void pgm_022_025_state::killbld_mem(address_map &map)
 {
-	pgm_mem(map);
-	map(0x100000, 0x2fffff).bankr("bank1"); /* Game ROM */
+	pgm_state::pgm_mem(map);
+	map(0x100000, 0x2fffff).bankr("mainbank"); /* Game ROM */
 	map(0x300000, 0x303fff).ram().share("sharedprotram"); // Shared with protection device
 }
 
 
 MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025)
-	pgmbase(config);
+	pgm(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(killbld_mem)

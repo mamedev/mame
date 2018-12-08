@@ -23,7 +23,7 @@
 
 /* Dragon World 2 */
 
-void pgm_012_025_state::pgm_drgw2_decrypt()
+void pgm_012_025_state::drgw2_decrypt()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
@@ -106,12 +106,12 @@ static const uint8_t drgw2_source_data[0x08][0xec] =
 	{ 0, }  // Region 7, not used
 };
 
-MACHINE_RESET_MEMBER(pgm_012_025_state,drgw2)
+/*
+void pgm_012_025_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(pgm);
-
-
+	pgm_state::machine_reset();
 }
+*/
 
 void pgm_012_025_state::drgw2_common_init()
 {
@@ -120,29 +120,27 @@ void pgm_012_025_state::drgw2_common_init()
 
 	m_igs025->m_kb_source_data = drgw2_source_data;
 
-	pgm_basic_init();
-	pgm_drgw2_decrypt();
+	init_pgm();
+	drgw2_decrypt();
 
 
 }
 
 void pgm_012_025_state::drgw2_mem(address_map &map)
 {
-	pgm_mem(map);
-	map(0x100000, 0x1fffff).bankr("bank1"); /* Game ROM */
+	pgm_state::pgm_mem(map);
+	map(0x100000, 0x1fffff).bankr("mainbank"); /* Game ROM */
 	map(0xd00000, 0xd00fff).noprw(); // Written, but never read back? Related to the protection device? - IGS012?
 }
 
 MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
-	pgmbase(config);
+	pgm(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(drgw2_mem)
 
 	IGS025(config, m_igs025, 0);
 	//m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs012_callback), this);
-
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_012_025_state,drgw2)
 MACHINE_CONFIG_END
 
 

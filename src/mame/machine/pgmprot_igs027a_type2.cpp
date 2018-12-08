@@ -106,8 +106,8 @@ WRITE16_MEMBER(pgm_arm_type2_state::arm7_ram_w )
 /*  no execute only space? */
 void pgm_arm_type2_state::kov2_mem(address_map &map)
 {
-	pgm_mem(map);
-	map(0x100000, 0x5fffff).bankr("bank1"); /* Game ROM */
+	pgm_state::pgm_mem(map);
+	map(0x100000, 0x5fffff).bankr("mainbank"); /* Game ROM */
 	map(0xd00000, 0xd0ffff).rw(FUNC(pgm_arm_type2_state::arm7_ram_r), FUNC(pgm_arm_type2_state::arm7_ram_w)); /* ARM7 Shared RAM */
 	map(0xd10000, 0xd10001).rw(FUNC(pgm_arm_type2_state::arm7_latch_68k_r), FUNC(pgm_arm_type2_state::arm7_latch_68k_w)); /* ARM7 Latch */
 }
@@ -124,18 +124,20 @@ void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 	map(0x50000000, 0x500003ff).ram();
 }
 
-MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
+void pgm_arm_type2_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
-	/* register type specific Save State stuff here */
+	//pgm_state::machine_start();
+	m_kov2_latchdata_68k_w = 0;
+	m_kov2_latchdata_arm_w = 0;
+
+	save_item(NAME(m_kov2_latchdata_68k_w));
+	save_item(NAME(m_kov2_latchdata_arm_w));
 }
 
 /******* ARM 55857F *******/
 
 MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
-	pgmbase(config);
-
-	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
+	pgm(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(kov2_mem)
@@ -147,15 +149,6 @@ MACHINE_CONFIG_END
 
 
 
-
-void pgm_arm_type2_state::kov2_latch_init()
-{
-	m_kov2_latchdata_68k_w = 0;
-	m_kov2_latchdata_arm_w = 0;
-
-	save_item(NAME(m_kov2_latchdata_68k_w));
-	save_item(NAME(m_kov2_latchdata_arm_w));
-}
 
 WRITE32_MEMBER(pgm_arm_type2_state::kov2_arm_region_w )
 {
@@ -177,9 +170,8 @@ WRITE32_MEMBER(pgm_arm_type2_state::kov2p_arm_region_w )
 
 void pgm_arm_type2_state::init_kov2()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_kov2_decrypt(machine());
-	kov2_latch_init();
 
 	// we only have a HK internal ROM dumped for now, allow us to override that for debugging purposes.
 	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::kov2_arm_region_w),this));
@@ -191,9 +183,8 @@ void pgm_arm_type2_state::init_kov2p()
 	// this hacks the identification of the kov2 rom to return the string required for kov2p
 	// this isn't guaranteed to work properly (and definitely wouldn't on real hardware due to the internal
 	// ROM uploading the encryption table)  The internal ROM should be dumped properly.
-	pgm_basic_init();
+	init_pgm();
 	pgm_kov2p_decrypt(machine());
-	kov2_latch_init();
 
 	// we only have a China internal ROM dumped for now, allow us to override that for debugging purposes.
 	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::kov2p_arm_region_w),this));
@@ -210,9 +201,8 @@ WRITE32_MEMBER(pgm_arm_type2_state::martmast_arm_region_w )
 
 void pgm_arm_type2_state::init_martmast()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_mm_decrypt(machine());
-	kov2_latch_init();
 
 	// we only have a USA / CHINA internal ROMs dumped for now, allow us to override that for debugging purposes.
 	m_prot->space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::martmast_arm_region_w),this));
@@ -256,9 +246,8 @@ READ16_MEMBER(pgm_arm_type2_state::ddp2_main_speedup_r )
 
 void pgm_arm_type2_state::init_ddp2()
 {
-	pgm_basic_init();
+	init_pgm();
 	pgm_ddp2_decrypt(machine());
-	kov2_latch_init();
 
 	m_prot->space(AS_PROGRAM).install_read_handler(0x1800300c, 0x1800300f, read32_delegate(FUNC(pgm_arm_type2_state::ddp2_speedup_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16_delegate(FUNC(pgm_arm_type2_state::ddp2_main_speedup_r),this));
@@ -267,15 +256,13 @@ void pgm_arm_type2_state::init_ddp2()
 
 void pgm_arm_type2_state::init_dw2001()
 {
-	pgm_basic_init();
-	kov2_latch_init();
+	init_pgm();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
 
 void pgm_arm_type2_state::init_dwpc()
 {
-	pgm_basic_init();
-	kov2_latch_init();
+	init_pgm();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
 

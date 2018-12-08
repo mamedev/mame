@@ -5,23 +5,11 @@ class pgm_arm_type3_state : public pgm_state
 {
 public:
 	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag),
-			m_arm_ram(*this, "arm_ram"),
-			m_arm_ram2(*this, "arm_ram2"),
-			m_prot(*this, "prot") {
-	}
-	// svg
-	int           m_svg_ram_sel;
-	std::unique_ptr<uint32_t[]>      m_svg_shareram[2];    //for 5585G MACHINE
-
-	uint32_t        m_svg_latchdata_68k_w;
-	uint32_t        m_svg_latchdata_arm_w;
-	required_shared_ptr<uint32_t> m_arm_ram;
-	required_shared_ptr<uint32_t> m_arm_ram2;
-
-	uint32_t* m_armrom;
-
-	optional_device<cpu_device> m_prot;
+		: pgm_state(mconfig, type, tag)
+		, m_arm_ram(*this, "arm_ram")
+		, m_arm_ram2(*this, "arm_ram2")
+		, m_armrom(*this, "prot")
+		, m_prot(*this, "prot") { }
 
 	void init_theglad();
 	void init_theglada();
@@ -30,7 +18,22 @@ public:
 	void init_killbldp();
 	void init_dmnfrnt();
 	void init_happy6();
-	DECLARE_MACHINE_START(pgm_arm_type3);
+
+	void pgm_arm_type3(machine_config &config);
+private:
+	// svg
+	int           m_svg_ram_sel;
+	std::unique_ptr<uint32_t[]>      m_svg_shareram[2];    //for 5585G MACHINE
+
+	uint32_t        m_svg_latchdata_68k_w;
+	uint32_t        m_svg_latchdata_arm_w;
+	required_shared_ptr<uint32_t> m_arm_ram;
+	required_shared_ptr<uint32_t> m_arm_ram2;
+	required_region_ptr<uint32_t> m_armrom;
+
+	optional_device<cpu_device> m_prot;
+
+	virtual void machine_start() override;
 	DECLARE_WRITE32_MEMBER( svg_arm7_ram_sel_w );
 	DECLARE_READ32_MEMBER( svg_arm7_shareram_r );
 	DECLARE_WRITE32_MEMBER( svg_arm7_shareram_w );
@@ -42,13 +45,11 @@ public:
 	DECLARE_READ16_MEMBER( svg_latch_68k_r );
 	DECLARE_READ32_MEMBER( svg_latch_arm_r );
 	DECLARE_WRITE32_MEMBER( svg_latch_arm_w );
-	void svg_basic_init();
-	void pgm_create_dummy_internal_arm_region(int size);
-	void pgm_patch_external_arm_rom_jumptable_theglada(int base);
-	void pgm_create_dummy_internal_arm_region_theglad(int is_svg);
-	void pgm_descramble_happy6(uint8_t* src);
-	void pgm_descramble_happy6_2(uint8_t* src);
-	void svg_latch_init();
+	void create_dummy_internal_arm_region(int size);
+	void patch_external_arm_rom_jumptable_theglada(int base);
+	void create_dummy_internal_arm_region_theglad(int is_svg);
+	void descramble_happy6(uint8_t* src);
+	void descramble_happy6_2(uint8_t* src);
 	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
 	DECLARE_READ32_MEMBER( killbldp_speedup_r );
@@ -57,7 +58,6 @@ public:
 	DECLARE_READ32_MEMBER( svg_speedup_r );
 	DECLARE_READ32_MEMBER( svgpcb_speedup_r );
 	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
-	void pgm_arm_type3(machine_config &config);
 	void _55857G_arm7_map(address_map &map);
 	void svg_68k_mem(address_map &map);
 };

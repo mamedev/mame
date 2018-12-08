@@ -10,6 +10,16 @@ public:
 			m_arm7_shareram(*this, "arm7_shareram"),
 			m_prot(*this, "prot") {
 	}
+
+	void init_kov2();
+	void init_kov2p();
+	void init_martmast();
+	void init_ddp2();
+	void init_dw2001();
+	void init_dwpc();
+
+	void pgm_arm_type2(machine_config &config);
+private:
 	// kov2
 	uint32_t        m_kov2_latchdata_68k_w;
 	uint32_t        m_kov2_latchdata_arm_w;
@@ -19,13 +29,7 @@ public:
 
 	optional_device<cpu_device> m_prot;
 
-	void init_kov2();
-	void init_kov2p();
-	void init_martmast();
-	void init_ddp2();
-	void init_dw2001();
-	void init_dwpc();
-	DECLARE_MACHINE_START(pgm_arm_type2);
+	virtual void machine_start() override;
 	DECLARE_READ32_MEMBER( arm7_latch_arm_r );
 	DECLARE_WRITE32_MEMBER( arm7_latch_arm_w );
 	DECLARE_READ32_MEMBER( arm7_shareram_r );
@@ -34,13 +38,11 @@ public:
 	DECLARE_WRITE16_MEMBER( arm7_latch_68k_w );
 	DECLARE_READ16_MEMBER( arm7_ram_r );
 	DECLARE_WRITE16_MEMBER( arm7_ram_w );
-	void kov2_latch_init();
 	DECLARE_WRITE32_MEMBER( martmast_arm_region_w );
 	DECLARE_WRITE32_MEMBER( kov2_arm_region_w );
 	DECLARE_WRITE32_MEMBER( kov2p_arm_region_w );
 	DECLARE_READ32_MEMBER( ddp2_speedup_r );
 	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
-	void pgm_arm_type2(machine_config &config);
 	void _55857F_arm7_map(address_map &map);
 	void kov2_mem(address_map &map);
 };

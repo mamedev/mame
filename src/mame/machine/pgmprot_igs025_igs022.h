@@ -5,20 +5,26 @@ class pgm_022_025_state : public pgm_state
 {
 public:
 	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag),
-			m_sharedprotram(*this, "sharedprotram"),
-			m_igs025(*this,"igs025"),
-			m_igs022(*this,"igs022")
+		: pgm_state(mconfig, type, tag)
+		, m_sharedprotram(*this, "sharedprotram")
+		, m_igs025(*this, "igs025")
+		, m_igs022(*this, "igs022")
 
 	{ }
 
-	void pgm_dw3_decrypt();
-	void pgm_killbld_decrypt();
+	void init_killbld();
+	void init_drgw3();
+
+	void pgm_022_025(machine_config &config);
+	void pgm_022_025_dw3(machine_config &config);
+	void pgm_022_025_killbld(machine_config &config);
+
+private:
+	void dw3_decrypt();
+	void killbld_decrypt();
 
 	required_shared_ptr<uint16_t> m_sharedprotram;
 
-	void init_killbld();
-	void init_drgw3();
 	DECLARE_MACHINE_RESET(killbld);
 	DECLARE_MACHINE_RESET(dw3);
 
@@ -26,9 +32,6 @@ public:
 
 	required_device<igs025_device> m_igs025;
 	required_device<igs022_device> m_igs022;
-	void pgm_022_025(machine_config &config);
-	void pgm_022_025_dw3(machine_config &config);
-	void pgm_022_025_killbld(machine_config &config);
 	void killbld_mem(address_map &map);
 };
 
