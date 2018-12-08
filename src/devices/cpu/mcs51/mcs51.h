@@ -100,8 +100,11 @@ public:
 	void set_port_forced_input(uint8_t port, uint8_t forced_input) { m_forced_inputs[port] = forced_input; }
 	template<class Object> devcb_base &set_serial_rx_cb(Object &&cb) { return m_serial_rx_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_serial_tx_cb(Object &&cb) { return m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
+
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
+	auto serial_rx_cb() { return m_serial_rx_cb.bind(); }
+	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
 
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);

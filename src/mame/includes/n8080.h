@@ -65,7 +65,7 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8035_device> m_audiocpu;
 	optional_device<dac_bit_interface> m_n8080_dac;
 	optional_device<dac_8bit_r2r_device> m_helifire_dac;
 	optional_device<sn76477_device> m_sn;

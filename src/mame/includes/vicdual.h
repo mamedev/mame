@@ -85,7 +85,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	optional_device<i8039_device> m_audiocpu;
 	optional_device<ay8910_device> m_psg;
 	optional_device<samples_device> m_samples;
 	optional_device<discrete_device> m_discrete;

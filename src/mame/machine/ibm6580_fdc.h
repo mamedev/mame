@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"
 
@@ -36,7 +37,7 @@ private:
 	devcb_write_line m_out_data;
 	devcb_write_line m_out_clock;
 	devcb_write_line m_out_strobe;
-	required_device<cpu_device> m_mcu;
+	required_device<i8048_device> m_mcu;
 
 	DECLARE_WRITE8_MEMBER(bus_w);
 	DECLARE_READ8_MEMBER(bus_r);

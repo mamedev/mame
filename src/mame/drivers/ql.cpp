@@ -145,7 +145,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_ipc;
+	required_device<i8749_device> m_ipc;
 	required_device<zx8301_device> m_zx8301;
 	required_device<zx8302_device> m_zx8302;
 	required_device<speaker_sound_device> m_speaker;
@@ -903,13 +903,13 @@ MACHINE_CONFIG_START(ql_state::ql)
 	MCFG_DEVICE_ADD(m_maincpu, M68008, X1/2)
 	MCFG_DEVICE_PROGRAM_MAP(ql_mem)
 
-	MCFG_DEVICE_ADD(I8749_TAG, I8749, X4)
-	MCFG_DEVICE_IO_MAP(ipc_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ql_state, ipc_port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ql_state, ipc_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ql_state, ipc_port2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ql_state, ipc_t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ql_state, ipc_bus_r))
+	I8749(config, m_ipc, X4);
+	m_ipc->set_addrmap(AS_IO, &ql_state::ipc_io);
+	m_ipc->p1_out_cb().set(FUNC(ql_state::ipc_port1_w));
+	m_ipc->p2_in_cb().set(FUNC(ql_state::ipc_port2_r));
+	m_ipc->p2_out_cb().set(FUNC(ql_state::ipc_port2_w));
+	m_ipc->t1_in_cb().set(FUNC(ql_state::ipc_t1_r));
+	m_ipc->bus_in_cb().set(FUNC(ql_state::ipc_bus_r));
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

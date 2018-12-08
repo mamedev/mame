@@ -1211,11 +1211,11 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("kbdmcu", I8041, 12.8544_MHz_XTAL / 2)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_12_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_12_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_port2_w))
+	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
+	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
+	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_12_state::kbd_matrix_w));
+	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_12_state::kbd_port2_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(alphatp_12_state::kbd_port2_w));
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_12_state::alphatp2_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
@@ -1288,11 +1288,11 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("kbdmcu", I8041, 12.8544_MHz_XTAL /2)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_34_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_34_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_port2_w))
+	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
+	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
+	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(alphatp_34_state::kbd_port2_w));
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_34_state::alphatp3_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 

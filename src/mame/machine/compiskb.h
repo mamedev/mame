@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "sound/spkrdev.h"
 
 
@@ -40,7 +41,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8748_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<9> m_y;
 	required_ioport m_special;

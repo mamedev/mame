@@ -308,11 +308,11 @@ MACHINE_CONFIG_START(quasar_state::quasar)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quasar_state,  quasar_interrupt)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
-	MCFG_DEVICE_ADD("soundcpu",I8035,6000000)          /* 6MHz crystal divide by 15 in CPU */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, quasar_state, audio_t1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
+	i8035_device &soundcpu(I8035(config, "soundcpu", 6000000)); /* 6MHz crystal divide by 15 in CPU */
+	soundcpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &quasar_state::sound_portmap);
+	soundcpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
+	soundcpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 
 	MCFG_MACHINE_START_OVERRIDE(quasar_state,quasar)
 	MCFG_MACHINE_RESET_OVERRIDE(quasar_state,quasar)

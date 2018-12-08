@@ -1974,13 +1974,13 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_DEVICE_ADD("n7751", N7751, 6000000)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, segas16a_state, n7751_rom_r))
-	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, segas16a_state, n7751_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segas16a_state, n7751_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
+	N7751(config, m_n7751, 6000000);
+	m_n7751->bus_in_cb().set(FUNC(segas16a_state::n7751_rom_r));
+	m_n7751->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
+	m_n7751->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_n7751->p2_in_cb().set(FUNC(segas16a_state::n7751_p2_r));
+	m_n7751->p2_out_cb().set(FUNC(segas16a_state::n7751_p2_w));
+	m_n7751->prog_out_cb().set("n7751_8243", FUNC(i8243_device::prog_w));
 
 	I8243(config, m_n7751_i8243);
 	m_n7751_i8243->p4_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<0>));

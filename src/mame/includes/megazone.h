@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "sound/flt_rc.h"
 #include "emupal.h"
 
@@ -55,7 +56,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_daccpu;
+	required_device<i8039_device> m_daccpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device_array<filter_rc_device, 3> m_filter;

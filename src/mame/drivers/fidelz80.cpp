@@ -1784,13 +1784,13 @@ MACHINE_CONFIG_START(fidelz80_state::vbrc)
 	MCFG_DEVICE_IO_MAP(vbrc_main_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("mcu", I8041, 5_MHz_XTAL)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, fidelz80_state, vbrc_mcu_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, fidelz80_state, vbrc_mcu_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(m_i8243, i8243_device, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t1_r))
+	I8041(config, m_mcu, 5_MHz_XTAL);
+	m_mcu->p1_out_cb().set(FUNC(fidelz80_state::vbrc_mcu_p1_w));
+	m_mcu->p2_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_p2_r));
+	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
+	m_mcu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+	m_mcu->t0_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t0_r));
+	m_mcu->t1_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t1_r));
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<0>));

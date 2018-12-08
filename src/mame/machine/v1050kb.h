@@ -44,7 +44,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8049_device> m_maincpu;
 	required_device<discrete_sound_device> m_discrete;
 	required_ioport_array<12> m_y;
 	devcb_write_line   m_out_tx_handler;

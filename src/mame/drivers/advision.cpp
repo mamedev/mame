@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "includes/advision.h"
 
-#include "cpu/mcs48/mcs48.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
@@ -65,13 +64,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(advision_state::advision)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8048_TAG, I8048, XTAL(11'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, advision_state, controller_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, advision_state, bankswitch_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, advision_state, av_control_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, advision_state, vsync_r))
+	I8048(config, m_maincpu, XTAL(11'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &advision_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &advision_state::io_map);
+	m_maincpu->p1_in_cb().set(FUNC(advision_state::controller_r));
+	m_maincpu->p1_out_cb().set(FUNC(advision_state::bankswitch_w));
+	m_maincpu->p2_out_cb().set(FUNC(advision_state::av_control_w));
+	m_maincpu->t1_in_cb().set(FUNC(advision_state::vsync_r));
 
 	MCFG_DEVICE_ADD(COP411_TAG, COP411, 52631*4) // COP411L-KCN/N, R11=82k, C8=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, false)

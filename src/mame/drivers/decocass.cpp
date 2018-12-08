@@ -962,11 +962,11 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_DEVICE_PROGRAM_MAP(decocass_sound_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
-	MCFG_DEVICE_ADD("mcu", I8041, HCLK)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, decocass_state, i8041_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, decocass_state, i8041_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, decocass_state, i8041_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, decocass_state, i8041_p2_w))
+	I8041(config, m_mcu, HCLK);
+	m_mcu->p1_in_cb().set(FUNC(decocass_state::i8041_p1_r));
+	m_mcu->p1_out_cb().set(FUNC(decocass_state::i8041_p1_w));
+	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));
+	m_mcu->p2_out_cb().set(FUNC(decocass_state::i8041_p2_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 

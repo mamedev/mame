@@ -781,10 +781,10 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DEVICE_PROGRAM_MAP(dmv_mem)
 	MCFG_DEVICE_IO_MAP(dmv_io)
 
-	MCFG_DEVICE_ADD("kb_ctrl_mcu", I8741, XTAL(6'000'000))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, dmv_state, kb_mcu_port1_r)) // bit 0 data from kb
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port1_w)) // bit 1 data to kb
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port2_w))
+	i8741_device &kbmcu(I8741(config, "kb_ctrl_mcu", XTAL(6'000'000)));
+	kbmcu.p1_in_cb().set(FUNC(dmv_state::kb_mcu_port1_r)); // bit 0 data from kb
+	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
+	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

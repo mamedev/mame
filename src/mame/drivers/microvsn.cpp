@@ -95,7 +95,7 @@ private:
 
 
 	required_device<dac_byte_interface> m_dac;
-	required_device<cpu_device> m_i8021;
+	required_device<i8021_device> m_i8021;
 	required_device<tms1100_cpu_device> m_tms1100;
 	required_device<generic_slot_device> m_cart;
 
@@ -636,12 +636,12 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(microvision_state::microvision)
-	MCFG_DEVICE_ADD("maincpu1", I8021, 2000000)    // approximately
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, microvision_state, i8021_p0_write))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, microvision_state, i8021_p1_write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, microvision_state, i8021_p2_write))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, microvision_state, i8021_t1_read))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, microvision_state, i8021_bus_read))
+	I8021(config, m_i8021, 2000000);    // approximately
+	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_write));
+	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_write));
+	m_i8021->p2_out_cb().set(FUNC(microvision_state::i8021_p2_write));
+	m_i8021->t1_in_cb().set(FUNC(microvision_state::i8021_t1_read));
+	m_i8021->bus_in_cb().set(FUNC(microvision_state::i8021_bus_read));
 
 	TMS1100(config, m_tms1100, 500000);   // most games seem to be running at approximately this speed
 	m_tms1100->set_output_pla(microvision_output_pla_0);

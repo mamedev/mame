@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
@@ -41,7 +42,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_audiocpu_2;
+	required_device<i8039_device> m_audiocpu_2;
 	required_device<discrete_device> m_discrete;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;

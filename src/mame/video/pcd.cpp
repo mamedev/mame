@@ -100,10 +100,10 @@ ioport_constructor pcd_video_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("graphics", I8741, 16_MHz_XTAL / 2)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcd_video_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcd_video_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcd_video_device, t1_r))
+	i8741_device &mcu(I8741(config, "graphics", 16_MHz_XTAL / 2));
+	mcu.p1_in_cb().set(FUNC(pcd_video_device::p1_r));
+	mcu.p2_out_cb().set(FUNC(pcd_video_device::p2_w));
+	mcu.t1_in_cb().set(FUNC(pcd_video_device::t1_r));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

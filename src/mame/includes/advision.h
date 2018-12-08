@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include "sound/dac.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/mcs48/mcs48.h"
+#include "sound/dac.h"
 #include "emupal.h"
 
 #define SCREEN_TAG  "screen"
@@ -33,7 +34,7 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<generic_slot_device> m_cart;

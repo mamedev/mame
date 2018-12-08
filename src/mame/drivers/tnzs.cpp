@@ -1566,12 +1566,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tnzs_mcu_state::tnzs)
 	tnzs_base(config);
-	MCFG_DEVICE_ADD("mcu", I8742, 12000000/2)  /* 400KHz ??? - Main board Crystal is 12MHz */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, tnzs_mcu_state, mcu_port1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, tnzs_mcu_state, mcu_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, tnzs_mcu_state, mcu_port2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COIN1"))
-	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COIN2"))
+	I8742(config, m_mcu, 12000000/2);  /* 400KHz ??? - Main board Crystal is 12MHz */
+	m_mcu->p1_in_cb().set(FUNC(tnzs_mcu_state::mcu_port1_r));
+	m_mcu->p2_in_cb().set(FUNC(tnzs_mcu_state::mcu_port2_r));
+	m_mcu->p2_out_cb().set(FUNC(tnzs_mcu_state::mcu_port2_w));
+	m_mcu->t0_in_cb().set_ioport("COIN1");
+	m_mcu->t1_in_cb().set_ioport("COIN2");
 
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(tnzs_sub_map)

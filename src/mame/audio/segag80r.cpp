@@ -812,13 +812,13 @@ WRITE8_MEMBER(monsterb_sound_device::n7751_p2_w)
 
 MACHINE_CONFIG_START(monsterb_sound_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_audiocpu, N7751, 6000000)
-	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, monsterb_sound_device, n7751_command_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, monsterb_sound_device, n7751_rom_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monsterb_sound_device, n7751_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
+	N7751(config, m_audiocpu, 6000000);
+	m_audiocpu->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
+	m_audiocpu->p2_in_cb().set(FUNC(monsterb_sound_device::n7751_command_r));
+	m_audiocpu->bus_in_cb().set(FUNC(monsterb_sound_device::n7751_rom_r));
+	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_audiocpu->p2_out_cb().set(FUNC(monsterb_sound_device::n7751_p2_w));
+	m_audiocpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<0>));

@@ -495,12 +495,12 @@ MACHINE_CONFIG_START(vp415_state::vp415)
 	MCFG_DEVICE_PROGRAM_MAP(z80_program_map)
 	MCFG_DEVICE_IO_MAP(z80_io_map)
 
-	MCFG_DEVICE_ADD(DATAMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, vp415_state, data_mcu_port1_r));
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vp415_state, data_mcu_port1_w));
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, vp415_state, data_mcu_port2_r));
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vp415_state, data_mcu_port2_w));
-	MCFG_DEVICE_PROGRAM_MAP(datamcu_program_map)
+	I8041(config, m_datamcu, XTAL(4'000'000)); // Verified on schematic
+	m_datamcu->p1_in_cb().set(FUNC(vp415_state::data_mcu_port1_r));
+	m_datamcu->p1_out_cb().set(FUNC(vp415_state::data_mcu_port1_w));
+	m_datamcu->p2_in_cb().set(FUNC(vp415_state::data_mcu_port2_r));
+	m_datamcu->p2_out_cb().set(FUNC(vp415_state::data_mcu_port2_w));
+	m_datamcu->set_addrmap(AS_PROGRAM, &vp415_state::datamcu_program_map);
 
 	MCFG_DEVICE_ADD(SCSI_TAG, NCR5385, XTAL(8'000'000)/2) // Same clock signal as above, per schematic
 	MCFG_NCR5385_INT_CB(WRITELINE(*this, vp415_state, cpu_int1_w))
@@ -514,12 +514,12 @@ MACHINE_CONFIG_START(vp415_state::vp415)
 	MCFG_DEVICE_PROGRAM_MAP(ctrl_program_map)
 	MCFG_DEVICE_IO_MAP(ctrl_io_map)
 
-	MCFG_DEVICE_ADD(CTRLMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, vp415_state, ctrl_mcu_port1_r));
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vp415_state, ctrl_mcu_port1_w));
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, vp415_state, ctrl_mcu_port2_r));
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vp415_state, ctrl_mcu_port2_w));
-	MCFG_DEVICE_PROGRAM_MAP(ctrlmcu_program_map)
+	I8041(config, m_ctrlmcu, XTAL(4'000'000)); // Verified on schematic
+	m_ctrlmcu->p1_in_cb().set(FUNC(vp415_state::ctrl_mcu_port1_r));
+	m_ctrlmcu->p1_out_cb().set(FUNC(vp415_state::ctrl_mcu_port1_w));
+	m_ctrlmcu->p2_in_cb().set(FUNC(vp415_state::ctrl_mcu_port2_r));
+	m_ctrlmcu->p2_out_cb().set(FUNC(vp415_state::ctrl_mcu_port2_w));
+	m_ctrlmcu->set_addrmap(AS_PROGRAM, &vp415_state::ctrlmcu_program_map);
 
 	// Module R: Drive
 	MCFG_DEVICE_ADD(DRIVECPU_TAG, I8031, XTAL(12'000'000)) // 12MHz, per schematic

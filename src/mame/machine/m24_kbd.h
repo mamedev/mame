@@ -32,7 +32,7 @@ private:
 	uint8_t m_p1;
 	bool m_keypress, m_kbcdata;
 	devcb_write_line m_out_data;
-	required_device<cpu_device> m_mcu;
+	required_device<i8049_device> m_mcu;
 	emu_timer *m_reset_timer;
 
 	DECLARE_WRITE8_MEMBER(bus_w);

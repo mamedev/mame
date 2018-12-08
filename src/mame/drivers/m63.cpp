@@ -185,7 +185,7 @@ private:
 	optional_device<ay8910_device> m_ay2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_soundcpu;
+	required_device<i8039_device> m_soundcpu;
 	optional_device<samples_device> m_samples;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -770,13 +770,13 @@ MACHINE_CONFIG_START(m63_state::m63)
 	outlatch.q_out_cb<6>().set(FUNC(m63_state::coin1_w));
 	outlatch.q_out_cb<7>().set(FUNC(m63_state::coin2_w));
 
-	MCFG_DEVICE_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
-	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
-	MCFG_DEVICE_IO_MAP(i8039_port_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, m63_state, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, m63_state, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, m63_state, irq_r))
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
+	I8039(config, m_soundcpu, XTAL(12'000'000)/4); /* ????? */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m63_state::i8039_map);
+	m_soundcpu->set_addrmap(AS_IO, &m63_state::i8039_port_map);
+	m_soundcpu->p1_out_cb().set(FUNC(m63_state::p1_w));
+	m_soundcpu->p2_out_cb().set(FUNC(m63_state::p2_w));
+	m_soundcpu->t1_in_cb().set(FUNC(m63_state::irq_r));
+	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
