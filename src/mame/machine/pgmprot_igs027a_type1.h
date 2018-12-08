@@ -66,40 +66,40 @@ private:
 	pgm_arm_sim_command_handler arm_sim_handler;
 
 	/////////////// emulation
-	uint32_t        m_arm_type1_latch_arm;
-	uint32_t        m_arm_type1_latch_68k;
-	uint32_t        m_arm_type1_counter;
+	uint32_t        m_latch_arm;
+	uint32_t        m_latch_68k;
+	uint32_t        m_counter;
 	optional_shared_ptr<uint32_t> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
 
 	virtual void machine_start() override;
 
-	DECLARE_READ32_MEMBER( arm7_type1_protlatch_r );
-	DECLARE_WRITE32_MEMBER( arm7_type1_protlatch_w );
-	DECLARE_READ16_MEMBER( arm7_type1_68k_protlatch_r );
-	DECLARE_WRITE16_MEMBER( arm7_type1_68k_protlatch_w );
-	DECLARE_READ16_MEMBER( arm7_type1_ram_r );
-	DECLARE_WRITE16_MEMBER( arm7_type1_ram_w );
-	DECLARE_READ32_MEMBER( arm7_type1_shareram_r );
-	DECLARE_WRITE32_MEMBER( arm7_type1_shareram_w );
-	DECLARE_READ16_MEMBER( kovsh_fake_region_r );
-	DECLARE_WRITE16_MEMBER( kovshp_asic27a_write_word );
+	DECLARE_READ32_MEMBER(protlatch_r);
+	DECLARE_WRITE32_MEMBER(protlatch_w);
+	DECLARE_READ16_MEMBER(_68k_protlatch_r);
+	DECLARE_WRITE16_MEMBER(_68k_protlatch_w);
+	DECLARE_READ16_MEMBER(ram_r);
+	DECLARE_WRITE16_MEMBER(ram_w);
+	DECLARE_READ32_MEMBER(shareram_r);
+	DECLARE_WRITE32_MEMBER(shareram_w);
+	DECLARE_READ16_MEMBER(kovsh_fake_region_r);
+	DECLARE_WRITE16_MEMBER(kovshp_asic27a_write_word);
 	void pgm_decode_kovlsqh2_tiles();
 	void pgm_decode_kovlsqh2_sprites(uint8_t *src );
 	void pgm_decode_kovlsqh2_samples();
 	void pgm_decode_kovqhsgs_program();
 	void pgm_decode_kovqhsgs2_program();
-	DECLARE_READ16_MEMBER( arm7_type1_sim_r );
+	DECLARE_READ16_MEMBER(sim_r);
 	void command_handler_ddp3(int pc);
 	void command_handler_puzzli2(int pc);
 	void command_handler_py2k2(int pc);
 	void command_handler_pstars(int pc);
 	void command_handler_kov(int pc);
 	void command_handler_oldsplus(int pc);
-	DECLARE_WRITE16_MEMBER( arm7_type1_sim_w );
-	DECLARE_READ16_MEMBER( arm7_type1_sim_protram_r );
-	DECLARE_READ16_MEMBER( pstars_arm7_type1_sim_protram_r );
+	DECLARE_WRITE16_MEMBER(sim_w);
+	DECLARE_READ16_MEMBER(sim_protram_r);
+	DECLARE_READ16_MEMBER(pstars_sim_protram_r);
 	int m_simregion;
 
 	/* puzzli2 protection internal state stuff */
