@@ -511,11 +511,6 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 							int dst_x = px & 0x3ff;
 							dst_x = (dst_x & 0x1ff) - (dst_x & 0x200);
 
-							if (special)
-							{
-								color = 0x7f0;
-							}
-
 							if ((dst_x >= clip.min_x - 8) && (dst_x <= clip.max_x))
 							{
 								drawgfx_line(bitmap, clip, which_gfx, m_spritegfx->get_data(m_realtilenumber[code]), color << 4, flipx, flipy, dst_x, use_shadow, realline, tileline, opaque);
@@ -567,6 +562,12 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						int line = realline - firstline;
 						int y = (line >> 3);
 						line &= 0x7;
+
+						if (special)
+						{
+							// grdians map...
+							color = 0x7ff;
+						}
 
 						for (int x = 0; x <= sizex; x++)
 						{
