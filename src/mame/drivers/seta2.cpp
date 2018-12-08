@@ -909,7 +909,7 @@ READ16_MEMBER(funcube_state::coins_r)
 
 	uint8_t hopper_bit = (m_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
 
-	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/20);
+	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/10);
 
 	if ( m_coin_start_cycles )
 	{
@@ -2820,38 +2820,28 @@ ROM_END
 void funcube_state::init_funcube()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
-
-	// Sub CPU
-	sub_cpu[0x506/2] = 0x5470;  // rte -> rts
 }
 
 void funcube_state::init_funcube2()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0xa5c/4] = 0x4e713e3c;       // PIC protection?
 	main_cpu[0xa74/4] = 0x4e713e3c;
 	main_cpu[0xa8c/4] = 0x4e7141f9;
 
-	// Sub CPU
-	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
 void funcube_state::init_funcube3()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x008bc/4] = 0x4a804e71;
 	main_cpu[0x19f0c/4] = 0x4e714e71;
 	main_cpu[0x19fb8/4] = 0x4e714e71;
 
-	// Sub CPU
-	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
 /***************************************************************************
