@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders:Roberto Fresca, Grull Osgo
+
 #ifndef MAME_INCLUDES_AMPOKER2_H
 #define MAME_INCLUDES_AMPOKER2_H
 
