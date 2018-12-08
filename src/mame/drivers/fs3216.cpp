@@ -4,6 +4,8 @@
 
     Skeleton driver for Fortune 32:16.
 
+    Also known as the Micromega 32 in France (distributed by Thomson).
+
 ****************************************************************************/
 
 #include "emu.h"

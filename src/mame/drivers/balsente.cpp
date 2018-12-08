@@ -1442,7 +1442,7 @@ void balsente_state::triviamb(machine_config &config)
 	config.device_remove("nov0");
 	config.device_remove("nov1");
 
-	m_maincpu->set_clock(10_MHz_XTAL / 4);
+	m_maincpu->set_clock(10_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_triviamb_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HY6116AP-10 + battery (only 512x4 bits are actually saved)
