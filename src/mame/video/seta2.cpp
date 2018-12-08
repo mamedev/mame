@@ -468,7 +468,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					scrollx &= 0x3ff;
 					scrolly &= 0x1ff;
 
-					scrolly += global_yoffset;	
+					scrolly += global_yoffset;
 
 					rectangle clip;
 					// sprite clipping region (x)
