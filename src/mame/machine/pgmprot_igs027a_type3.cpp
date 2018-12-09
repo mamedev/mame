@@ -183,7 +183,6 @@ void pgm_arm_type3_state::machine_reset()
 
 void pgm_arm_type3_state::machine_start()
 {
-	//pgm_state::machine_start();
 	m_latchdata_68k_w = 0;
 	m_latchdata_arm_w = 0;
 

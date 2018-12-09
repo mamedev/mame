@@ -484,13 +484,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::interrupt)
 			m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-/*
-void pgm_state::machine_start()
-{
-//  machine().base_datetime(m_systime);
-}
-*/
-
 void pgm_state::machine_reset()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);

@@ -177,7 +177,6 @@ void pgm_arm_type1_state::cavepgm_mem(address_map &map)
 
 void pgm_arm_type1_state::machine_start()
 {
-	//pgm_state::machine_start();
 	m_latch_arm = 0;
 	m_latch_68k = 0;
 	m_counter = 1;

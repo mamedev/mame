@@ -76,7 +76,6 @@ protected:
 	int m_irq4_disabled;
 
 	virtual void video_start() override;
-	//virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void base_mem(address_map &map);
@@ -90,13 +89,6 @@ private:
 	required_region_ptr<uint8_t> m_bdata;
 	int m_aoffset;
 	int m_boffset;
-
-	/* calendar */
-	uint8_t        m_cal_val;
-	uint8_t        m_cal_mask;
-	uint8_t        m_cal_com;
-	uint8_t        m_cal_cnt;
-	system_time  m_systime;
 
 	DECLARE_READ16_MEMBER(videoram_r);
 	DECLARE_WRITE16_MEMBER(videoram_w);
