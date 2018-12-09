@@ -89,13 +89,13 @@
     0/2/4/6                             Horizontal: Sync, Blank, DSPdot, Cycle (same as ssv.c?)
     8/a/c/e                             Vertical  : Sync, Blank, DSPdot, Cycle (same as ssv.c?)
 
-    10
-    12                                  Offset X?
+    10                                  Offxet X low bits (sub pixels)
+    12                                  Offset X high bits (pixels)
     14                                  Zoom X? low bits
     16                                  Zoom X? high bits *
 
-    18
-    1a                                  Offset Y?
+    18                                  Offset Y low bits (sub pixels)
+    1a                                  Offset Y high bits (pixels)
     1c                                  Zoom Y? low bits
     1e                                  Zoom Y? high bits *
 
@@ -108,8 +108,25 @@
 
     32..3f                              ?
 
-    * A value of 0x0100 is means no zoom, a value of 0x0200 will halve the size.
-      A value less than 0x0100 probably means magnification.
+	Global X offset values based on penbros
+
+	0x1c0 - when zoom is smallest
+	counts up to 0x7ff
+	then 0x00 when finished
+
+	counts up to 0x089 when zooming in
+
+	Zoom values (both x and y) based on penbros and others (x flip/unflip logic is reverse of y logic)
+
+	(unflipped gfx)
+	0x7f5 00 = smallest
+	0x7ff 00 = normal
+	0x7ff xx = larger
+
+	(flipped gfx, negative zoom factor!, used instead of flipscreen bits in some cases)
+	0x00b 00 = smallest
+	0x001 00 = normal
+	0x001 xx = larger
 
 ***************************************************************************/
 
@@ -142,6 +159,9 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	uint16_t olddata = m_vregs[offset];
 
 	COMBINE_DATA(&m_vregs[offset]);
+
+//	popmessage("%04x %04x", m_vregs[0x1e/2],  m_vregs[0x1c/2]);
+
 	if (m_vregs[offset] != olddata)
 		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
 
@@ -172,9 +192,6 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 	case 0x26: // something display list related? buffering control?
 		if (data)
 		{
-			// Buffer sprites by 1 frame
-			//memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
-
 			/* copy the base spritelist to a private (non-CPU visible buffer)
 			   copy the indexed sprites to 0 in spriteram, adjusting pointers in base sprite list as appropriate
 			   this at least gets the sprite data in the right place for the grdians raster effect to write the
@@ -380,19 +397,35 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 
 void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (!m_vregs.found())
+		return; // ablastb (bootleg) doesn't have obvious video registers, so just abandon, probably needs a different driver
+
 	// Sprites list
 	uint16_t *spriteram = m_spriteram;
-	int global_yoffset = (m_vregs[0x1a/2] & 0x7ff);
+	int global_yoffset = (m_vregs[0x1a/2] & 0x7ff); // and 0x18/2 for low bits
 	if (global_yoffset & 0x400)
 		global_yoffset -= 0x800;
 
-	global_yoffset += 1;
+	global_yoffset += 1; // +2 for myangel / myangel2?
+
+	int global_xoffset = (m_vregs[0x12/2] & 0x7ff); // and 0x10/2 for low bits
+	if (global_xoffset & 0x400)
+		global_xoffset -= 0x800;
+
+	// funcube3 sets a global xoffset of -1 causing a single pixel shift, does something else compensate for it?
+
+	int global_xzoom = (m_vregs[0x16/2] & 0x7ff); // and 0x14/2 for low bits
+
+	// HACK: this inverts the zoom on all sprites, thus flipping the screen and altering positions as the origin becomes the right hand side, not left, see star audition (by default) or deer hunting when you turn on horizontal flip
+	// TODO: properly render negative zoom sprites
+	if (global_xzoom & 0x400) 
+	{
+		global_xoffset -= 0x150;
+	}
 
 	uint16_t *s1 = m_private_spriteram.get();
 
-
-	//  for ( ; s1 < end; s1+=4 )
-	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4)   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
+	for (; s1 < &m_private_spriteram[0x1000 / 2]; s1 += 4)
 	{
 		int num = s1[0];
 
@@ -422,6 +455,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			use_shadow = 0;
 		//	which_gfx = 4 << 8;
 			global_yoffset = -0x90;
+			global_xoffset = 0x80;
 		}
 
 		// Number of single-sprites
@@ -456,6 +490,8 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					if (sy & 0x100)
 						sy -= 0x200;
 
+					sx -= global_xoffset;
+
 					int width = use_global_size ? global_sizex : local_sizex;
 					int height = use_global_size ? global_sizey : local_sizey;
 
@@ -464,7 +500,6 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					if (!width)
 						continue;
 
-					scrollx += m_xoffset;
 					scrollx &= 0x3ff;
 					scrolly &= 0x1ff;
 
@@ -472,7 +507,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 					rectangle clip;
 					// sprite clipping region (x)
-					clip.min_x = (sx + xoffs) & 0x3ff;
+					clip.min_x = (sx + xoffs);
 					clip.min_x = (clip.min_x & 0x1ff) - (clip.min_x & 0x200);
 					clip.max_x = clip.min_x + width * 0x10 - 1;
 
@@ -535,10 +570,10 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					sizey = (1 << ((sizey & 0x0c00) >> 10)) - 1;
 
 					sx += xoffs;
-					sy += yoffs;
-
 					sx = (sx & 0x1ff) - (sx & 0x200);
+					sx -= global_xoffset;
 
+					sy += yoffs;
 					sy += global_yoffset;
 
 					sy &= 0x1ff;
@@ -611,10 +646,7 @@ void seta2_state::video_start()
 	for (int i = 0; m_gfxdecode->gfx(i); ++i)
 		m_gfxdecode->gfx(i)->set_granularity(16);
 
-	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 	m_private_spriteram = make_unique_clear<uint16_t[]>(0x1000 / 2);
-
-	m_xoffset = 0;
 
 	m_realtilenumber = std::make_unique<uint32_t[]>(0x80000);
 
@@ -627,20 +659,6 @@ void seta2_state::video_start()
 	m_raster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta2_state::raster_timer_done), this));
 
 	save_pointer(NAME(m_private_spriteram), 0x1000 / 2);
-}
-
-VIDEO_START_MEMBER(seta2_state,xoffset)
-{
-	video_start();
-
-	m_xoffset = 0x200;
-}
-
-VIDEO_START_MEMBER(seta2_state,xoffset1)
-{
-	video_start();
-
-	m_xoffset = 0x1;
 }
 
 uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -663,12 +681,6 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE_LINE_MEMBER(seta2_state::screen_vblank)
 {
-	// rising edge
-	if (state)
-	{
-		// Buffer sprites by 1 frame, moved to video register 0x26, improves grdians intro there
-		//memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
-	}
 }
 
 // staraudi

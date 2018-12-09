@@ -85,9 +85,6 @@ protected:
 	DECLARE_READ16_MEMBER(spriteram_r);
 	DECLARE_WRITE16_MEMBER(spriteram_w);
 
-	DECLARE_VIDEO_START(xoffset);
-	DECLARE_VIDEO_START(xoffset1);
-
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -136,12 +133,8 @@ protected:
 	output_finder<7> m_leds;
 	output_finder<11> m_lamps;
 
-	int m_xoffset;
 	int m_keyboard_row;
-	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
-
 	std::unique_ptr<uint16_t[]> m_private_spriteram;
-
 
 private:
 	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int shadow, int realline, int line, int opaque);
