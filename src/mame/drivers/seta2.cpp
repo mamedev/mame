@@ -194,7 +194,7 @@ void seta2_state::grdians_map(address_map &map)
 	map(0xc00000, 0xc3ffff).ram().w(FUNC(seta2_state::spriteram_w)).share("spriteram");    // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
@@ -233,7 +233,7 @@ void seta2_state::gundamex_map(address_map &map)
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
@@ -291,7 +291,7 @@ void seta2_state::mj4simai_map(address_map &map)
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -315,7 +315,7 @@ void seta2_state::myangel_map(address_map &map)
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -339,7 +339,7 @@ void seta2_state::myangel2_map(address_map &map)
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xd00000, 0xd3ffff).ram().share("spriteram");       // Sprites
 	map(0xd40000, 0xd4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xd60000, 0xd6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
+	map(0xd60000, 0xd6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -381,7 +381,7 @@ void seta2_state::pzlbowl_map(address_map &map)
 	map(0x700000, 0x700001).r(FUNC(seta2_state::pzlbowl_protection_r));          // Protection
 	map(0x800000, 0x83ffff).ram().share("spriteram");       // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
@@ -415,7 +415,7 @@ void seta2_state::penbros_map(address_map &map)
 	map(0x500300, 0x500301).portr("DSW1");
 	map(0x500302, 0x500303).portr("DSW2");
 	map(0x500300, 0x50030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);
-	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
 
@@ -481,7 +481,7 @@ void seta2_state::reelquak_map(address_map &map)
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -496,7 +496,7 @@ void seta2_state::namcostr_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -537,7 +537,7 @@ void seta2_state::samshoot_map(address_map &map)
 
 	map(0x800000, 0x83ffff).ram().share("spriteram"); // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
-	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
 
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 
@@ -634,7 +634,7 @@ void staraudi_state::staraudi_map(address_map &map)
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -690,7 +690,7 @@ void seta2_state::telpacfl_map(address_map &map)
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xb00000, 0xb3ffff).ram().share("spriteram");        // Sprites
 	map(0xb40000, 0xb4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
+	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
 	map(0xd00006, 0xd00007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITE
 	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);              // Samples Banks
@@ -857,7 +857,7 @@ void funcube_state::funcube_map(address_map &map)
 
 	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w)).share("spriteram");
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
-	map(0x00860000, 0x0086003f).w(FUNC(funcube_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).ram().w(FUNC(funcube_state::vregs_w)).share("vregs");
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
 
@@ -878,7 +878,7 @@ void funcube_state::funcube2_map(address_map &map)
 
 	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w)).share("spriteram");
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x00860000, 0x0086003f).w(FUNC(funcube_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).ram().w(FUNC(funcube_state::vregs_w)).share("vregs");
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
 
@@ -909,7 +909,7 @@ READ16_MEMBER(funcube_state::coins_r)
 
 	uint8_t hopper_bit = (m_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
 
-	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/20);
+	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/10);
 
 	if ( m_coin_start_cycles )
 	{
@@ -2325,7 +2325,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(0x200, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
@@ -2367,7 +2367,7 @@ MACHINE_CONFIG_START(seta2_state::grdians)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x00, 0x00 + 0xe8 -1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x130-1, 0x00, 0xe8 -1)
 MACHINE_CONFIG_END
 
 
@@ -2400,7 +2400,7 @@ MACHINE_CONFIG_START(seta2_state::pzlbowl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x00, 0xf0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2433,11 +2433,8 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
-	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x00, 0xf0-1)
-
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 MACHINE_CONFIG_END
 
 
@@ -2451,9 +2448,8 @@ MACHINE_CONFIG_START(seta2_state::samshoot)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x00, 0xf0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 MACHINE_CONFIG_END
 
 
@@ -2468,7 +2464,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x00, 0x0f0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_seta2)
 MACHINE_CONFIG_END
@@ -2488,8 +2484,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0x00, 0xf0-1)
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0x00, 0xf0-1) // still off by 1 because of different CRTC regs?
 MACHINE_CONFIG_END
 
 
@@ -2820,38 +2815,28 @@ ROM_END
 void funcube_state::init_funcube()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
-
-	// Sub CPU
-	sub_cpu[0x506/2] = 0x5470;  // rte -> rts
 }
 
 void funcube_state::init_funcube2()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0xa5c/4] = 0x4e713e3c;       // PIC protection?
 	main_cpu[0xa74/4] = 0x4e713e3c;
 	main_cpu[0xa8c/4] = 0x4e7141f9;
 
-	// Sub CPU
-	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
 void funcube_state::init_funcube3()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x008bc/4] = 0x4a804e71;
 	main_cpu[0x19f0c/4] = 0x4e714e71;
 	main_cpu[0x19fb8/4] = 0x4e714e71;
 
-	// Sub CPU
-	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
 /***************************************************************************
@@ -3819,7 +3804,7 @@ ROM_START( staraudi )
 	ROM_LOAD( "lh28f016sat_flash.u08", 0x000000, 0x200000, CRC(002255bd) SHA1(5e94c29e9a785fe49229f57bc94234ac79dd2f3b) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "su1_snd.u32", 0x000000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
+	ROM_LOAD( "su1_snd.u32", 0x000000, 0x400000, BAD_DUMP CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
 void staraudi_state::driver_start()
