@@ -790,21 +790,21 @@ uint8_t sat_console_state::smpc_direct_mode(uint16_t in_value,bool which)
 	return 0x80 | 0x10 | ((in_value >> shift_bit[hshake]) & 0xf);
 }
 
-MACHINE_CONFIG_START(sat_console_state::saturn)
-
+void sat_console_state::saturn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_DEVICE_PROGRAM_MAP(saturn_mem)
-	MCFG_SH2_IS_SLAVE(0)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sat_console_state, saturn_scanline, "screen", 0, 1)
+	SH2(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
+	m_maincpu->set_is_slave(0);
+	TIMER(config, "scantimer").configure_scanline(FUNC(sat_console_state::saturn_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_DEVICE_PROGRAM_MAP(saturn_mem)
-	MCFG_SH2_IS_SLAVE(1)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", sat_console_state, saturn_slave_scanline, "screen", 0, 1)
+	SH2(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
+	m_slave->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
+	m_slave->set_is_slave(1);
+	TIMER(config, "slave_scantimer").configure_scanline(FUNC(sat_console_state::saturn_slave_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
+	M68000(config, m_audiocpu, 11289600); //256 x 44100 Hz = 11.2896 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
 
 	SEGA_SCU(config, m_scu, 0);
 	m_scu->set_hostcpu(m_maincpu);
@@ -834,12 +834,13 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(sat_console_state::nvram_init));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(sat_console_state, screen_update_stv_vdp2)
-	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(sat_console_state::screen_update_stv_vdp2));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
+	PALETTE(config, m_palette, 2048+(2048*2)); //standard palette + extra memory for rgb brightness.
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
 
 	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
 
@@ -853,13 +854,13 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	m_scsp->add_route(0, "lspeaker", 1.0);
 	m_scsp->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
-	MCFG_SOUND_ROUTE(0, "scsp", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "scsp", 1.0, 1)
+	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
+	stvcd.add_route(0, "scsp", 1.0, 0);
+	stvcd.add_route(1, "scsp", 1.0, 1);
 
-	MCFG_SATURN_CONTROL_PORT_ADD("ctrl1", saturn_controls, "joypad")
-	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_controls, "joypad")
-MACHINE_CONFIG_END
+	SATURN_CONTROL_PORT(config, "ctrl1", saturn_controls, "joypad");
+	SATURN_CONTROL_PORT(config, "ctrl2", saturn_controls, "joypad");
+}
 
 static void saturn_cart(device_slot_interface &device)
 {

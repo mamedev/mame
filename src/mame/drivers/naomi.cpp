@@ -2898,17 +2898,17 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  // TODO: merge with Dreamcast base machine
 MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(CPU_CLOCK)
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 

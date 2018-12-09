@@ -1122,21 +1122,21 @@ WRITE8_MEMBER( stv_state::pdr2_output_w )
 }
 
 
-MACHINE_CONFIG_START(stv_state::stv)
-
+void stv_state::stv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
-	MCFG_SH2_IS_SLAVE(0)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", stv_state, saturn_scanline, "screen", 0, 1)
+	SH2(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
+	m_maincpu->set_is_slave(0);
+	TIMER(config, "scantimer").configure_scanline(FUNC(stv_state::saturn_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
-	MCFG_SH2_IS_SLAVE(1)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", stv_state, saturn_slave_scanline, "screen", 0, 1)
+	SH2(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
+	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
+	m_slave->set_is_slave(1);
+	TIMER(config, "slave_scantimer").configure_scanline(FUNC(stv_state::saturn_slave_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
+	M68000(config, m_audiocpu, 11289600); //11.2896 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stv_state::sound_mem);
 
 	SEGA_SCU(config, m_scu, 0);
 	m_scu->set_hostcpu(m_maincpu);
@@ -1163,13 +1163,13 @@ MACHINE_CONFIG_START(stv_state::stv)
 	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 352, 263, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(stv_state, screen_update_stv_vdp2)
-	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 352, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(stv_state::screen_update_stv_vdp2));
+	PALETTE(config, m_palette, 2048+(2048*2)); //standard palette + extra memory for rgb brightness.
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
 
 	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
 
@@ -1182,26 +1182,26 @@ MACHINE_CONFIG_START(stv_state::stv)
 	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
 	m_scsp->add_route(0, "lspeaker", 1.0);
 	m_scsp->add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(stv_state::stv_5881)
+void stv_state::stv_5881(machine_config &config)
+{
 	stv(config);
-	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
-	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
-MACHINE_CONFIG_END
+	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	m_cryptdevice->set_read_cb(FUNC(stv_state::crypt_read_callback));
+}
 
-MACHINE_CONFIG_START(stv_state::stvcd)
+void stv_state::stvcd(machine_config &config)
+{
 	stv(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
-	MCFG_DEVICE_MODIFY("slave")
-	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
+	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
 
-	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
-	MCFG_SOUND_ROUTE(0, "scsp", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "scsp", 1.0, 1)
-MACHINE_CONFIG_END
+	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
+	stvcd.add_route(0, "scsp", 1.0, 0);
+	stvcd.add_route(1, "scsp", 1.0, 1);
+}
 
 
 void stv_state::sega5838_map(address_map &map)
@@ -1209,13 +1209,13 @@ void stv_state::sega5838_map(address_map &map)
 	map(0x000000, 0x7fffff).bankr("protbank");
 }
 
-MACHINE_CONFIG_START(stv_state::stv_5838)
+void stv_state::stv_5838(machine_config &config)
+{
 	stv(config);
 
-	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, sega5838_map)
-
-MACHINE_CONFIG_END
+	SEGA315_5838_COMP(config, m_5838crypt, 0);
+	m_5838crypt->set_addrmap(0, stv_state::sega5838_map);
+}
 
 
 /*
@@ -1233,35 +1233,37 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 }
 
 
-MACHINE_CONFIG_START(stv_state::batmanfr)
+void stv_state::batmanfr(machine_config &config)
+{
 	stv(config);
-	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
-MACHINE_CONFIG_END
+	ACCLAIM_RAX(config, "rax", 0);
+}
 
+#define STV_CARTSLOT_ADD(_tag, _load) \
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "stv_cart")  \
+		.set_device_load(device_image_load_delegate(&stv_state::device_image_load_##_load, this));
 
-#define MCFG_STV_CARTSLOT_ADD(_tag, _load) \
-	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "stv_cart")  \
-	MCFG_GENERIC_LOAD(stv_state, _load)
+void stv_state::stv_cartslot(machine_config &config)
+{
+	STV_CARTSLOT_ADD("stv_slot1", stv_cart1);
+	STV_CARTSLOT_ADD("stv_slot2", stv_cart2);
+	STV_CARTSLOT_ADD("stv_slot3", stv_cart3);
+	STV_CARTSLOT_ADD("stv_slot4", stv_cart4);
 
-MACHINE_CONFIG_START(stv_state::stv_cartslot)
+	SOFTWARE_LIST(config, "cart_list").set_original("stv");
+}
 
-	MCFG_STV_CARTSLOT_ADD("stv_slot1", stv_cart1)
-	MCFG_STV_CARTSLOT_ADD("stv_slot2", stv_cart2)
-	MCFG_STV_CARTSLOT_ADD("stv_slot3", stv_cart3)
-	MCFG_STV_CARTSLOT_ADD("stv_slot4", stv_cart4)
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list","stv")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(stv_state::stv_slot)
+void stv_state::stv_slot(machine_config &config)
+{
 	stv(config);
 	stv_cartslot(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(stv_state::hopper)
+void stv_state::hopper(machine_config &config)
+{
 	stv(config);
-	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_CONFIG_END
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+}
 
 MACHINE_RESET_MEMBER(stv_state,stv)
 {
