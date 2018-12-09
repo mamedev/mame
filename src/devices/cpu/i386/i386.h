@@ -1618,8 +1618,13 @@ public:
 	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void opcode_cpuid() override;
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	uint8_t m_processor_name_string[48];
 };
 
 
