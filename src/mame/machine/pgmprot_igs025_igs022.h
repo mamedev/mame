@@ -23,7 +23,7 @@ private:
 	void dw3_decrypt();
 	void killbld_decrypt();
 
-	required_shared_ptr<uint16_t> m_sharedprotram;
+	required_shared_ptr<u16> m_sharedprotram;
 
 	DECLARE_MACHINE_RESET(killbld);
 	DECLARE_MACHINE_RESET(dw3);

@@ -17,7 +17,7 @@ public:
 
 	void pgm_028_025_ol(machine_config &config);
 private:
-	required_shared_ptr<uint16_t> m_sharedprotram;
+	required_shared_ptr<u16> m_sharedprotram;
 	required_device<igs025_device> m_igs025;
 	required_device<igs028_device> m_igs028;
 

@@ -14,11 +14,11 @@ public:
 	void pgm_asic3(machine_config &config);
 private:
 	// ASIC 3 (oriental legends protection)
-	uint8_t         m_asic3_reg;
-	uint8_t         m_asic3_latch[3];
-	uint8_t         m_asic3_x;
-	uint16_t        m_asic3_hilo;
-	uint16_t        m_asic3_hold;
+	u8         m_asic3_reg;
+	u8         m_asic3_latch[3];
+	u8         m_asic3_x;
+	u16        m_asic3_hilo;
+	u16        m_asic3_hold;
 
 	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( asic3_r );

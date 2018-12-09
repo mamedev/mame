@@ -22,14 +22,14 @@ public:
 	void pgm_arm_type3(machine_config &config);
 private:
 	// svg
-	int           m_ram_sel;
-	std::unique_ptr<uint32_t[]>      m_shareram[2];    //for 5585G MACHINE
+	u8           m_ram_sel;
+	std::unique_ptr<u32[]>      m_shareram[2];    //for 5585G MACHINE
 
-	uint32_t        m_latchdata_68k_w;
-	uint32_t        m_latchdata_arm_w;
-	required_shared_ptr<uint32_t> m_arm_ram;
-	required_shared_ptr<uint32_t> m_arm_ram2;
-	required_region_ptr<uint32_t> m_armrom;
+	u32        m_latchdata_68k_w;
+	u32        m_latchdata_arm_w;
+	required_shared_ptr<u32> m_arm_ram;
+	required_shared_ptr<u32> m_arm_ram2;
+	required_region_ptr<u32> m_armrom;
 
 	optional_device<cpu_device> m_prot;
 
@@ -49,8 +49,8 @@ private:
 	void create_dummy_internal_arm_region(int size);
 	void patch_external_arm_rom_jumptable_theglada(int base);
 	void create_dummy_internal_arm_region_theglad(int is_svg);
-	void descramble_happy6(uint8_t* src);
-	void descramble_happy6_2(uint8_t* src);
+	void descramble_happy6(u8* src);
+	void descramble_happy6_2(u8* src);
 	DECLARE_READ32_MEMBER(dmnfrnt_speedup_r);
 	DECLARE_READ16_MEMBER(dmnfrnt_main_speedup_r);
 	DECLARE_READ32_MEMBER(killbldp_speedup_r);

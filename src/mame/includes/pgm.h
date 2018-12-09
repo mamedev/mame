@@ -50,16 +50,16 @@ public:
 	void pgm(machine_config &config);
 protected:
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_videoregs;
-	required_shared_ptr<uint16_t> m_videoram;
-	required_shared_ptr<uint8_t> m_z80_mainram;
-	required_shared_ptr<uint16_t> m_mainram;
-	uint16_t *      m_bg_videoram;
-	uint16_t *      m_tx_videoram;
-	uint16_t *      m_rowscrollram;
-	std::unique_ptr<uint8_t[]>      m_sprite_a_region;
+	required_shared_ptr<u16> m_videoregs;
+	required_shared_ptr<u16> m_videoram;
+	required_shared_ptr<u8> m_z80_mainram;
+	required_shared_ptr<u16> m_mainram;
+	u16 *      m_bg_videoram;
+	u16 *      m_tx_videoram;
+	u16 *      m_rowscrollram;
+	std::unique_ptr<u8[]>      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
-	std::unique_ptr<uint16_t[]>     m_spritebufferram; // buffered spriteram
+	std::unique_ptr<u16[]>     m_spritebufferram; // buffered spriteram
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -86,7 +86,7 @@ private:
 	tilemap_t     *m_tx_tilemap;
 
 	/* used by rendering */
-	required_region_ptr<uint8_t> m_bdata;
+	required_region_ptr<u8> m_bdata;
 	int m_aoffset;
 	int m_boffset;
 
@@ -104,48 +104,48 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	inline void pgm_draw_pix(uint16_t const xdrawpos, uint8_t const pri, uint16_t* dest, uint8_t* destpri, const rectangle &cliprect, uint16_t const srcdat);
-	inline void pgm_draw_pix_nopri(uint16_t const xdrawpos, uint16_t* dest, uint8_t* destpri, const rectangle &cliprect, uint16_t const srcdat);
-	inline void pgm_draw_pix_pri(uint16_t const xdrawpos, uint16_t* dest, uint8_t* destpri, const rectangle &cliprect, uint16_t const srcdat);
+	inline void pgm_draw_pix(u16 const xdrawpos, u8 const pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat);
+	inline void pgm_draw_pix_nopri(u16 const xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat);
+	inline void pgm_draw_pix_pri(u16 const xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat);
 
 	void draw_sprite_line(
-	uint16_t const wide,
-	uint16_t* dest, uint8_t* destpri, const rectangle &cliprect,
-	uint32_t const xzoom, bool const xgrow,
-	uint8_t const flip, int16_t const xpos,
-	uint8_t const pri,
-	uint16_t const realxsize,
-	uint8_t const palt,
+	u16 const wide,
+	u16* dest, u8* destpri, const rectangle &cliprect,
+	u32 const xzoom, bool const xgrow,
+	u8 const flip, s16 const xpos,
+	u8 const pri,
+	u16 const realxsize,
+	u8 const palt,
 	bool const draw);
 
 	void draw_sprite_new_zoomed(
-	uint16_t const wide, uint16_t const high,
-	int16_t const xpos, int16_t const ypos,
-	uint8_t const palt, uint8_t const flip,
+	u16 const wide, u16 const high,
+	s16 const xpos, s16 const ypos,
+	u8 const palt, u8 const flip,
 	bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect,
-	uint32_t const xzoom, bool const xgrow, uint32_t const yzoom, bool const ygrow,
-	uint8_t const pri);
+	u32 const xzoom, bool const xgrow, u32 const yzoom, bool const ygrow,
+	u8 const pri);
 
 	void draw_sprite_line_basic(
-	uint16_t const wide,
-	uint16_t* dest, uint8_t* destpri, const rectangle &cliprect,
-	uint8_t const flip,
-	int16_t const xpos,
-	uint8_t const pri,
-	uint16_t const realxsize,
-	uint8_t const palt,
+	u16 const wide,
+	u16* dest, u8* destpri, const rectangle &cliprect,
+	u8 const flip,
+	s16 const xpos,
+	u8 const pri,
+	u16 const realxsize,
+	u8 const palt,
 	bool const draw);
 
 	void draw_sprite_new_basic(
-	uint16_t const wide, uint16_t const high,
-	int16_t const xpos, int16_t const ypos,
-	uint8_t const palt, uint8_t const flip,
+	u16 const wide, u16 const high,
+	s16 const xpos, s16 const ypos,
+	u8 const palt, u8 const flip,
 	bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect,
-	uint8_t const pri);
+	u8 const pri);
 
 	void draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap);
 	void expand_colourdata();

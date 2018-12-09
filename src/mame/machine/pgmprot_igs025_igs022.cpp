@@ -37,12 +37,12 @@
 void pgm_022_025_state::dw3_decrypt()
 {
 	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
+	u16 *src = (u16 *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x100000;
 
 	for(i=0; i<rom_size/2; i++) {
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if((i & 0x005460) == 0x001400 || (i & 0x005450) == 0x001040)
 			x ^= 0x0100;
@@ -57,12 +57,12 @@ void pgm_022_025_state::dw3_decrypt()
 void pgm_022_025_state::killbld_decrypt()
 {
 	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
+	u16 *src = (u16 *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x200000;
 
 	for(i=0; i<rom_size/2; i++) {
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if((i & 0x006d00) == 0x000400 || (i & 0x006c80) == 0x000880)
 			x ^= 0x0008;
@@ -75,7 +75,7 @@ void pgm_022_025_state::killbld_decrypt()
 }
 
 // these were all xored by a table at $178B2A
-static const uint8_t killbld_source_data[0x0c][0xec] =  // offsets to these tables stored at $155ed0
+static const u8 killbld_source_data[0x0c][0xec] =  // offsets to these tables stored at $155ed0
 {
 	{ // region 16, $178772
 		0x5e, 0x09, 0xb3, 0x39, 0x60, 0x71, 0x71, 0x53, 0x11, 0xe5, 0x26, 0x34, 0x4c, 0x8c, 0x90, 0xee,
@@ -189,7 +189,7 @@ static const uint8_t killbld_source_data[0x0c][0xec] =  // offsets to these tabl
 
 // all tables xored with data from $149c4c
 // tables are the same as olds and drgw2
-static const uint8_t dw3_source_data[0x08][0xec] =
+static const u8 dw3_source_data[0x08][0xec] =
 {
 	{ 0, },
 	{ // region 1, $14c21a

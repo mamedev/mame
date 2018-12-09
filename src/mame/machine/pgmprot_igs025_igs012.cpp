@@ -26,13 +26,13 @@
 void pgm_012_025_state::drgw2_decrypt()
 {
 	int i;
-	uint16_t *src = (uint16_t *) (memregion("maincpu")->base()+0x100000);
+	u16 *src = (u16 *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x80000;
 
 	for (i = 0; i < rom_size / 2; i++)
 	{
-		uint16_t x = src[i];
+		u16 x = src[i];
 
 		if (((i & 0x20890) == 0) || ((i & 0x20000) == 0x20000 && (i & 0x01500) != 0x01400))
 			x ^= 0x0002;
@@ -46,7 +46,7 @@ void pgm_012_025_state::drgw2_decrypt()
 
 // All tables all xored by 'warning' information at $1354ee (drgw2)
 // tables are the same as drgw3 and olds
-static const uint8_t drgw2_source_data[0x08][0xec] =
+static const u8 drgw2_source_data[0x08][0xec] =
 {
 	{ 0, }, // Region 0, not used
 	{   // Region 1, $13A886
@@ -147,7 +147,7 @@ MACHINE_CONFIG_END
 void pgm_012_025_state::init_drgw2()
 {
 	/* incomplete? */
-	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
+	u16 *mem16 = (u16 *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
@@ -162,7 +162,7 @@ void pgm_012_025_state::init_drgw2()
 
 void pgm_012_025_state::init_dw2v100x()
 {
-	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
+	u16 *mem16 = (u16 *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
@@ -177,7 +177,7 @@ void pgm_012_025_state::init_dw2v100x()
 
 void pgm_012_025_state::init_drgw2c()
 {
-	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
+	u16 *mem16 = (u16 *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
@@ -192,7 +192,7 @@ void pgm_012_025_state::init_drgw2c()
 
 void pgm_012_025_state::init_drgw2j()
 {
-	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
+	u16 *mem16 = (u16 *)memregion("maincpu")->base();
 
 	drgw2_common_init();
 
@@ -214,7 +214,7 @@ void pgm_012_025_state::init_drgw2hk()
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
-	uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
+	u16 *mem16 = (u16 *)memregion("maincpu")->base();
 	mem16[0x12f520 / 2] = 0x4e93;
 	mem16[0x12f5c6 / 2] = 0x4e93;
 	mem16[0x12f656 / 2] = 0x4e93;

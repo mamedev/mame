@@ -42,22 +42,22 @@ private:
 
 	arm_type m_arm_status;
 	/////////////// simulations
-	uint16_t m_value0;
-	uint16_t m_value1;
-	uint16_t m_valuekey;
-	uint16_t m_ddp3lastcommand;
-	uint32_t m_valueresponse;
+	u16 m_value0;
+	u16 m_value1;
+	u16 m_valuekey;
+	u16 m_ddp3lastcommand;
+	u32 m_valueresponse;
 	int m_curslots;
-	uint32_t m_slots[0x100];
+	u32 m_slots[0x100];
 
 	// pstars / oldsplus / kov
-	uint16_t m_pstar_e7_value;
-	uint16_t m_pstar_b1_value;
-	uint16_t m_pstar_ce_value;
-	uint16_t m_kov_c0_value;
-	uint16_t m_kov_cb_value;
-	uint16_t m_kov_fe_value;
-	uint16_t m_extra_ram[0x100];
+	u16 m_pstar_e7_value;
+	u16 m_pstar_b1_value;
+	u16 m_pstar_ce_value;
+	u16 m_kov_c0_value;
+	u16 m_kov_cb_value;
+	u16 m_kov_fe_value;
+	u16 m_extra_ram[0x100];
 	// puzzli2
 	int32_t m_puzzli_54_trigger;
 
@@ -66,10 +66,10 @@ private:
 	pgm_arm_sim_command_handler arm_sim_handler;
 
 	/////////////// emulation
-	uint32_t        m_latch_arm;
-	uint32_t        m_latch_68k;
-	uint32_t        m_counter;
-	optional_shared_ptr<uint32_t> m_arm7_shareram;
+	u32        m_latch_arm;
+	u32        m_latch_68k;
+	u32        m_counter;
+	optional_shared_ptr<u32> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
 
@@ -86,7 +86,7 @@ private:
 	DECLARE_READ16_MEMBER(kovsh_fake_region_r);
 	DECLARE_WRITE16_MEMBER(kovshp_asic27a_write_word);
 	void decode_kovlsqh2_tiles();
-	void decode_kovlsqh2_sprites(uint8_t *src );
+	void decode_kovlsqh2_sprites(u8 *src );
 	void decode_kovlsqh2_samples();
 	void decode_kovqhsgs_program();
 	void decode_kovqhsgs2_program();
@@ -114,7 +114,7 @@ private:
 	int prev_tablloc;
 	int numbercolumns;
 	int depth;
-	uint16_t m_row_bitmask;
+	u16 m_row_bitmask;
 	int hackcount;
 	int hackcount2;
 	int hack_47_value;
@@ -122,16 +122,16 @@ private:
 	int hack_31_table_offset2;
 	int p2_31_retcounter;
 
-	uint8_t coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
+	u8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
 	int command_31_write_type;
 
 
 	// the maximum level size returned or read by the device appears to be this size
-	uint16_t level_structure[8][10];
+	u16 level_structure[8][10];
 
 
-	int puzzli2_take_leveldata_value(uint8_t datvalue);
+	int puzzli2_take_leveldata_value(u8 datvalue);
 	void _55857E_arm7_map(address_map &map);
 	void cavepgm_mem(address_map &map);
 	void kov_map(address_map &map);

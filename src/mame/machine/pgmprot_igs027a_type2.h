@@ -21,11 +21,11 @@ public:
 	void pgm_arm_type2(machine_config &config);
 private:
 	// kov2
-	uint32_t        m_latchdata_68k_w;
-	uint32_t        m_latchdata_arm_w;
+	u32        m_latchdata_68k_w;
+	u32        m_latchdata_arm_w;
 
-	required_shared_ptr<uint32_t> m_arm_ram;
-	required_shared_ptr<uint32_t> m_arm7_shareram;
+	required_shared_ptr<u32> m_arm_ram;
+	required_shared_ptr<u32> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
 

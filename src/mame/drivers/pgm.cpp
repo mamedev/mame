@@ -237,7 +237,7 @@ READ8_MEMBER(pgm_state::z80_ram_r)
 
 WRITE8_MEMBER(pgm_state::z80_ram_w)
 {
-	uint32_t const pc = m_maincpu->pc();
+	u32 const pc = m_maincpu->pc();
 
 	m_z80_mainram[offset] = data;
 
@@ -4675,7 +4675,7 @@ ROM_END
 
 void pgm_state::expand_colourdata()
 {
-	uint8_t *src = memregion( "sprcol" )->base();
+	u8 *src = memregion( "sprcol" )->base();
 	size_t srcsize = memregion( "sprcol" )->bytes();
 	int cnt;
 	size_t needed = srcsize / 2 * 3;
@@ -4686,11 +4686,11 @@ void pgm_state::expand_colourdata()
 	while (m_sprite_a_region_size < needed)
 		m_sprite_a_region_size <<= 1;
 
-	m_sprite_a_region = std::make_unique<uint8_t[]>(m_sprite_a_region_size);
+	m_sprite_a_region = std::make_unique<u8[]>(m_sprite_a_region_size);
 
 	for (cnt = 0 ; cnt < srcsize / 2 ; cnt++)
 	{
-		uint16_t colpack;
+		u16 colpack;
 
 		colpack = ((src[cnt * 2]) | (src[cnt * 2 + 1] << 8));
 		m_sprite_a_region[cnt * 3 + 0] = (colpack >> 0 ) & 0x1f;
@@ -4701,7 +4701,7 @@ void pgm_state::expand_colourdata()
 
 void pgm_state::init_pgm()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	u8 *ROM = memregion("maincpu")->base();
 	if (m_mainbank)
 		m_mainbank->set_base(&ROM[0x100000]);
 
