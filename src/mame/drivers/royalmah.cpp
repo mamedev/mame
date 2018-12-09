@@ -144,6 +144,7 @@ public:
 	void janptr96(machine_config &config);
 	void ippatsu(machine_config &config);
 	void suzume(machine_config &config);
+	void jongshin(machine_config &config);
 	void mjclub(machine_config &config);
 	void makaijan(machine_config &config);
 	void janyoup2(machine_config &config);
@@ -263,6 +264,7 @@ private:
 	void jansou_sub_iomap(address_map &map);
 	void jansou_sub_map(address_map &map);
 	void janyoup2_iomap(address_map &map);
+	void jongshin_iomap(address_map &map);
 	void majs101b_iomap(address_map &map);
 	void makaijan_iomap(address_map &map);
 	void mjapinky_iomap(address_map &map);
@@ -706,6 +708,19 @@ void royalmah_state::suzume_iomap(address_map &map)
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x80, 0x80).r(FUNC(royalmah_state::suzume_dsw_r));
 	map(0x81, 0x81).w(FUNC(royalmah_state::suzume_bank_w));
+}
+
+void royalmah_state::jongshin_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
+	// map(0x80, 0x80).w(FUNC(royalmah_state::suzume_bank_w));
+	map(0x81, 0x81).portr("DSW2");
+	map(0x82, 0x82).portr("DSW3");
+	map(0xc0, 0xc0).w(FUNC(royalmah_state::suzume_bank_w)); // moving this to 0x80 make a girl in the attract appear but doesn't fix mahjong tiles
 }
 
 void royalmah_state::mjyarou_iomap(address_map &map)
@@ -1804,6 +1819,40 @@ static INPUT_PORTS_START( suzume )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jongshin )
+	PORT_INCLUDE( mjctrl2 )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjyarou )
@@ -3477,7 +3526,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(royalmah_state::royalmah)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, Z80, 18432000/6)        /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(royalmah_map)
 	MCFG_DEVICE_IO_MAP(royalmah_iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
@@ -3616,6 +3665,12 @@ MACHINE_CONFIG_START(royalmah_state::suzume)
 	MCFG_DEVICE_IO_MAP(suzume_iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", royalmah_state,  suzume_irq)
 MACHINE_CONFIG_END
+
+void royalmah_state::jongshin(machine_config &config)
+{
+	suzume(config);
+	m_maincpu->set_addrmap(AS_IO, &royalmah_state::jongshin_iomap);
+}
 
 MACHINE_CONFIG_START(royalmah_state::tontonb)
 	dondenmj(config);
@@ -5265,7 +5320,7 @@ GAME( 1986,  jangtaku, 0,        jansou,   jansou,   royalmah_state, init_jansou
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, init_ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
-GAME( 1986,  jongshin, 0,        suzume,   suzume,   royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // mahjong tile GFX missing, controls work in test mode but not in game
+GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // mahjong tile GFX missing, controls work in test mode but not in game
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, empty_init,    ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
