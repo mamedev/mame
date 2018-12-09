@@ -1214,7 +1214,7 @@ void stv_state::stv_5838(machine_config &config)
 	stv(config);
 
 	SEGA315_5838_COMP(config, m_5838crypt, 0);
-	m_5838crypt->set_addrmap(0, stv_state::sega5838_map);
+	m_5838crypt->set_addrmap(0, &stv_state::sega5838_map);
 }
 
 
