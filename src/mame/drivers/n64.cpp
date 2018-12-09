@@ -427,8 +427,8 @@ INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 	m_rcp_periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);
 }
 
-MACHINE_CONFIG_START(n64_mess_state::n64)
-
+void n64_mess_state::n64(machine_config &config)
+{
 	/* basic machine hardware */
 	VR4300BE(config, m_vr4300, 93750000);
 	m_vr4300->set_force_no_drc(true);

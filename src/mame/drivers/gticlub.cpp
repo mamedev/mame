@@ -954,21 +954,21 @@ uint32_t gticlub_state::screen_update_rscreen(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-MACHINE_CONFIG_START(gticlub_state::gticlub)
-
+void gticlub_state::gticlub(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gticlub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gticlub_state::gticlub_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gticlub_state::gticlub_vblank));
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gticlub_state::sound_memmap);
 
-	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(sharc_map)
+	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp->set_addrmap(AS_DATA, &gticlub_state::sharc_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
@@ -982,13 +982,13 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	K056230(config, m_k056230, "maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_gticlub)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(512, 384);
+	screen.set_visarea(0, 511, 0, 383);
+	screen.set_screen_update(FUNC(gticlub_state::screen_update_gticlub));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, m_palette, 65536);
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
@@ -999,7 +999,7 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	m_k001604_1->set_roz_mem_offset(0);
 	m_k001604_1->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
+	K001005(config, m_k001005, 0, "k001006_1");
 
 	K001006(config, m_k001006_1, 0);
 	m_k001006_1->set_gfx_region("gfx1");
@@ -1017,14 +1017,14 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
+	rfsnd.add_route(0, "lspeaker", 1.0);
+	rfsnd.add_route(1, "rspeaker", 1.0);
 
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
-MACHINE_CONFIG_END
+}
 
 void gticlub_state::thunderh(machine_config &config)
 {
@@ -1053,24 +1053,24 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(gticlub_state::hangplt)
-
+void gticlub_state::hangplt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hangplt_map)
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gticlub_state::hangplt_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gticlub_state::sound_memmap);
 
-	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(hangplt_sharc0_map)
+	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc0_map);
 
-	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(hangplt_sharc1_map)
+	ADSP21062(config, m_dsp2, XTAL(36'000'000));
+	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp2->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc1_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
@@ -1082,37 +1082,37 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	K056230(config, m_k056230, "maincpu");
 
-	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2,2)
-	MCFG_VOODOO_SCREEN_TAG("lscreen")
-	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, gticlub_state,voodoo_vblank_0))
+	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(2,2);
+	m_voodoo[0]->set_screen_tag("lscreen");
+	m_voodoo[0]->set_cpu_tag(m_dsp);
+	m_voodoo[0]->vblank_callback().set(FUNC(gticlub_state::voodoo_vblank_0));
 
-	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2,2)
-	MCFG_VOODOO_SCREEN_TAG("rscreen")
-	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, gticlub_state,voodoo_vblank_1))
+	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(2,2);
+	m_voodoo[1]->set_screen_tag("rscreen");
+	m_voodoo[1]->set_cpu_tag(m_dsp2);
+	m_voodoo[1]->vblank_callback().set(FUNC(gticlub_state::voodoo_vblank_1));
 
 	K033906(config, "k033906_1", 0, "voodoo0");
 	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, m_palette, 65536);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_lscreen)
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_size(512, 384);
+	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_screen_update(FUNC(gticlub_state::screen_update_lscreen));
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_rscreen)
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_size(512, 384);
+	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_screen_update(FUNC(gticlub_state::screen_update_rscreen));
 
 	K001604(config, m_k001604_1, 0);
 	m_k001604_1->set_layer_size(0);
@@ -1134,14 +1134,14 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
+	rfsnd.add_route(0, "lspeaker", 1.0);
+	rfsnd.add_route(1, "rspeaker", 1.0);
 
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HANGPLT);
-MACHINE_CONFIG_END
+}
 
 /*************************************************************************/
 
