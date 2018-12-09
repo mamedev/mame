@@ -198,7 +198,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_outlatch;
-	required_device_array<x2212_device, 2> m_novram;
+	optional_device_array<x2212_device, 2> m_novram;
 	optional_device<acia6850_device> m_acia;
 	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
 

@@ -408,12 +408,21 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int global_sizex = xoffs & 0xfc00;
 		int global_sizey = yoffs & 0xfc00;
 
+
+		int special = num & 0x4000; // ignore various things including global offsets, zoom.  different palette selection too?
 		bool opaque = num & 0x2000;
 		int use_global_size = num & 0x1000;
 		int use_shadow = num & 0x0800;
 		int which_gfx = num & 0x0700;
 		xoffs &= 0x3ff;
 		yoffs &= 0x3ff;
+
+		if (special)
+		{
+			use_shadow = 0;
+		//	which_gfx = 4 << 8;
+			global_yoffset = -0x90;
+		}
 
 		// Number of single-sprites
 		num = (num & 0x00ff) + 1;
@@ -439,7 +448,9 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					int local_sizex = sx & 0xfc00;
 					int local_sizey = sy & 0xfc00;
 					sx &= 0x3ff;
+
 					sy += global_yoffset;
+
 					sy &= 0x1ff;
 
 					if (sy & 0x100)
@@ -551,6 +562,12 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						int line = realline - firstline;
 						int y = (line >> 3);
 						line &= 0x7;
+
+						if (special)
+						{
+							// grdians map...
+							color = 0x7ff;
+						}
 
 						for (int x = 0; x <= sizex; x++)
 						{

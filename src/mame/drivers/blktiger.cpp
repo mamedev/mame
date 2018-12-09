@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "includes/blktiger.h"
 
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -296,16 +295,16 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)  /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(blktiger_map)
 	MCFG_DEVICE_IO_MAP(blktiger_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(blktiger_sound_map)
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(24'000'000)/4) /* ??? */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, blktiger_state, blktiger_from_main_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, blktiger_state, blktiger_to_main_w))
+	I8751(config, m_mcu, XTAL(24'000'000)/4); /* ??? */
+	m_mcu->port_in_cb<0>().set(FUNC(blktiger_state::blktiger_from_main_r));
+	m_mcu->port_out_cb<0>().set(FUNC(blktiger_state::blktiger_to_main_w));
 	// other ports unknown
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
+	//m_mcu->set_vblank_int("screen", FUNC(blktiger_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

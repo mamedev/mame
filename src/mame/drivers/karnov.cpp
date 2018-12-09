@@ -832,15 +832,16 @@ void karnov_state::chelnovjbl_mcu_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(karnov_state::chelnovjbl)
+void karnov_state::chelnovjbl(machine_config &config)
+{
 	karnov(config);
-	MCFG_DEVICE_ADD("mcu", I8031, 2000000) // ??mhz
-	MCFG_DEVICE_PROGRAM_MAP(chelnovjbl_mcu_map)
-//  MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, karnov_state, p1_r))
-//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, karnov_state, p1_w))
-//  MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, karnov_state, p3_r))
-//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, karnov_state, p3_w))
-MACHINE_CONFIG_END
+	i8031_device &mcu(I8031(config, "mcu", 2000000)); // ??mhz
+	mcu.set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
+//  mcu.port_in_cb<1>().set(FUNC(karnov_state::p1_r));
+//  mcu.port_out_cb<1>().set(FUNC(karnov_state::p1_w));
+//  mcu.port_in_cb<3>().set(FUNC(karnov_state::p3_r));
+//  mcu.port_out_cb<3>().set(FUNC(karnov_state::p3_w));
+}
 
 
 

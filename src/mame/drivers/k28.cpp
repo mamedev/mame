@@ -464,6 +464,8 @@ void k28_state::k28(machine_config &config)
 	TIMER(config, "on_button", 0).configure_generic(timer_device::expired_delegate());
 	TIMER(config, "display_decay", 0).configure_periodic(timer_device::expired_delegate(FUNC(k28_state::display_decay_tick), this), attotime::from_msec(1));
 
+	config.set_default_layout(layout_k28);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	VOTRAX_SC01(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin

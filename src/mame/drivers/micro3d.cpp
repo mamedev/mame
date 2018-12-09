@@ -321,15 +321,15 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
 	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("audiocpu", I8051, 11.0592_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
-	MCFG_DEVICE_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p3_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, micro3d_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, micro3d_state, data_to_i8031))
+	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &micro3d_state::soundmem_prg);
+	m_audiocpu->set_addrmap(AS_IO, &micro3d_state::soundmem_io);
+	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_r));
+	m_audiocpu->port_out_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_w));
+	m_audiocpu->port_in_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_r));
+	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_w));
+	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
+	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
 	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))

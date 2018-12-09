@@ -1560,10 +1560,10 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	MCFG_DEVICE_PROGRAM_MAP(bigfghtr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(16'000'000)/2)   // verified
-	MCFG_DEVICE_PROGRAM_MAP(bigfghtr_mcu_map)
-	MCFG_DEVICE_IO_MAP(bigfghtr_mcu_io_map)
-	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0xdf)) // bit 5: bus contention related?
+	i8751_device &mcu(I8751(config, "mcu", XTAL(16'000'000)/2));   // verified
+	mcu.set_addrmap(AS_PROGRAM, &bigfghtr_state::bigfghtr_mcu_map);
+	mcu.set_addrmap(AS_IO, &bigfghtr_state::bigfghtr_mcu_io_map);
+	mcu.port_in_cb<1>().set_constant(0xdf); // bit 5: bus contention related?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

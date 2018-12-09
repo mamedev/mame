@@ -32,33 +32,6 @@
 #pragma once
 
 
-#define MCFG_MCS51_PORT_P0_IN_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(0, DEVCB_##_devcb);
-#define MCFG_MCS51_PORT_P0_OUT_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(0, DEVCB_##_devcb);
-
-#define MCFG_MCS51_PORT_P1_IN_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(1, DEVCB_##_devcb);
-#define MCFG_MCS51_PORT_P1_OUT_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(1, DEVCB_##_devcb);
-
-#define MCFG_MCS51_PORT_P2_IN_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(2, DEVCB_##_devcb);
-#define MCFG_MCS51_PORT_P2_OUT_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(2, DEVCB_##_devcb);
-
-#define MCFG_MCS51_PORT_P3_IN_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_in_cb(3, DEVCB_##_devcb);
-#define MCFG_MCS51_PORT_P3_OUT_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_port_out_cb(3, DEVCB_##_devcb);
-
-#define MCFG_MCS51_SERIAL_RX_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_serial_rx_cb(DEVCB_##_devcb);
-
-#define MCFG_MCS51_SERIAL_TX_CB(_devcb) \
-	downcast<mcs51_cpu_device &>(*device).set_serial_tx_cb(DEVCB_##_devcb);
-
-
 enum
 {
 	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPTR, MCS51_DPH, MCS51_DPL, MCS51_IE, MCS51_IP,

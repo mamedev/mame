@@ -881,10 +881,10 @@ MACHINE_CONFIG_START(artmagic_state::shtstar)
 	YM2149(config, "aysnd", 3686400/2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/*gun board cpu*/
-	MCFG_DEVICE_ADD("guncpu", I80C31, 6000000)
-	MCFG_DEVICE_IO_MAP(shtstar_guncpu_io_map)
-	MCFG_DEVICE_PROGRAM_MAP(shtstar_guncpu_map)
-	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ?
+	i80c31_device &guncpu(I80C31(config, "guncpu", 6000000));
+	guncpu.set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_guncpu_map);
+	guncpu.set_addrmap(AS_IO, &artmagic_state::shtstar_guncpu_io_map);
+	guncpu.port_in_cb<1>().set_constant(0); // ?
 MACHINE_CONFIG_END
 
 

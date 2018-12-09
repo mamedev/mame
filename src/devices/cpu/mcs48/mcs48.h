@@ -224,6 +224,8 @@ protected:
 	address_space *m_data;
 	address_space *m_io;
 
+	required_shared_ptr<uint8_t> m_dataptr;
+
 	uint8_t       m_feature_mask;       /* processor feature flags */
 	uint16_t      m_int_rom_size;       /* internal rom size */
 

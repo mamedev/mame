@@ -10,6 +10,7 @@
 #include "sound/okim6295.h"
 #include "video/kan_pand.h" // for the original pandora
 #include "emupal.h"
+#include "screen.h"
 
 class snowbros_state : public driver_device
 {
@@ -21,6 +22,7 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_pandora(*this, "pandora"),
 		m_hyperpac_ram(*this, "hyperpac_ram"),
@@ -55,6 +57,7 @@ private:
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch; // not snowbro3
 
 	optional_device<kaneko_pandora_device> m_pandora;

@@ -6,9 +6,10 @@
 #pragma once
 
 #include "machine/gen_latch.h"
-#include "video/decospr.h"
 #include "sound/okim6295.h"
+#include "video/decospr.h"
 #include "emupal.h"
+#include "screen.h"
 
 class tumbleb_state : public driver_device
 {
@@ -26,6 +27,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
+		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
@@ -89,6 +91,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<decospr_device> m_sprgen;
+	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	uint8_t m_semicom_prot_offset;

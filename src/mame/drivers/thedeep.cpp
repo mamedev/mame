@@ -30,7 +30,6 @@ Notes:
 #include "includes/thedeep.h"
 
 #include "cpu/m6502/m65c02.h"
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "screen.h"
@@ -401,40 +400,39 @@ INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(thedeep_state::thedeep)
-
+void thedeep_state::thedeep(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedeep_state, interrupt, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &thedeep_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M65C02, XTAL(12'000'000)/8)      /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	TIMER(config, "scantimer", 0).configure_scanline(FUNC(thedeep_state::interrupt), "screen", 0, 1);
+
+	M65C02(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &thedeep_state::audio_map);
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, thedeep_state, p0_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, thedeep_state, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, thedeep_state, from_main_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, thedeep_state, to_main_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, thedeep_state, p3_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thedeep_state, mcu_irq) // unknown source, but presumably vblank
-	MCFG_DEVICE_DISABLE()
-
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(thedeep_state::p0_r));
+	m_mcu->port_out_cb<1>().set(FUNC(thedeep_state::p1_w));
+	m_mcu->port_in_cb<1>().set(FUNC(thedeep_state::from_main_r));
+	m_mcu->port_out_cb<2>().set(FUNC(thedeep_state::to_main_w));
+	m_mcu->port_out_cb<3>().set(FUNC(thedeep_state::p3_w));
+	m_mcu->set_vblank_int("screen", FUNC(thedeep_state::mcu_irq)); // unknown source, but presumably vblank
+	m_mcu->set_disable();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x100, 0xf8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x100-1, 0, 0xf8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(thedeep_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x100, 0xf8);
+	screen.set_visarea(0, 0x100-1, 0, 0xf8-1);
+	screen.set_screen_update(FUNC(thedeep_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedeep)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(thedeep_state, thedeep)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thedeep);
+	PALETTE(config, m_palette, 512).set_init(FUNC(thedeep_state::palette_init_thedeep));
 
 	DECO_MXC06(config, m_spritegen, 0);
 	m_spritegen->set_gfx_region(0);
@@ -447,10 +445,10 @@ MACHINE_CONFIG_START(thedeep_state::thedeep)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)  /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2203_device &ym(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
+	ym.irq_handler().set_inputline("audiocpu", 0);
+	ym.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

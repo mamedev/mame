@@ -267,7 +267,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c32_device> m_maincpu;
 	required_device<r6545_1_device> m_crtc;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<screen_device> m_screen;
@@ -1373,25 +1373,25 @@ void peplus_state::machine_start()
 
 MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, I80C32, XTAL(20'000'000)/2) /* 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, peplus_state, paldata_w<0>))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, peplus_state, paldata_w<1>))
+	I80C32(config, m_maincpu, XTAL(20'000'000)/2); /* 10MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &peplus_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &peplus_state::main_iomap);
+	m_maincpu->port_out_cb<1>().set(FUNC(peplus_state::paldata_w<0>));
+	m_maincpu->port_out_cb<3>().set(FUNC(peplus_state::paldata_w<1>));
 
 	NVRAM(config, "cmos", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size((52+1)*8, (31+1)*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 25*8-1);
+	m_screen->set_screen_update(FUNC(peplus_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_peplus)
-	MCFG_PALETTE_ADD(m_palette, 16*16*2)
-	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_peplus);
+
+	PALETTE(config, m_palette, 16*16*2).set_init(FUNC(peplus_state::palette_init_peplus));
 
 	R6545_1(config, m_crtc, XTAL(20'000'000)/8/3);
 	m_crtc->set_screen(m_screen);
@@ -1400,13 +1400,13 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	m_crtc->set_on_update_addr_change_callback(FUNC(peplus_state::crtc_addr), this);
 	m_crtc->out_vsync_callback().set(FUNC(peplus_state::crtc_vsync));
 
-	MCFG_X2404P_ADD(m_i2cmem)
+	X2404P(config, m_i2cmem);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	AY8912(config, "aysnd", XTAL(20'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.75);
-MACHINE_CONFIG_END
+}
 
 
 
