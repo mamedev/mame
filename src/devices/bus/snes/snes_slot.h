@@ -98,10 +98,14 @@ enum
 	ADDON_Z80GB
 };
 
+class base_sns_cart_slot_device;
+
 // ======================> device_sns_cart_interface
 
 class device_sns_cart_interface : public device_slot_card_interface
 {
+	friend class base_sns_cart_slot_device;
+
 public:
 	// construction/destruction
 	virtual ~device_sns_cart_interface();
@@ -137,6 +141,8 @@ public:
 protected:
 	device_sns_cart_interface(const machine_config &mconfig, device_t &device);
 
+	DECLARE_WRITE_LINE_MEMBER(write_irq);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -145,6 +151,8 @@ protected:
 	std::vector<uint8_t> m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
 
 	uint8_t rom_bank_map[256];    // 32K chunks of rom
+
+	base_sns_cart_slot_device *m_slot;
 };
 
 
@@ -157,6 +165,9 @@ class base_sns_cart_slot_device : public device_t,
 public:
 	// construction/destruction
 	virtual ~base_sns_cart_slot_device();
+
+	// configuration
+	auto irq_callback() { return m_irq_callback.bind(); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -187,14 +198,16 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	DECLARE_READ8_MEMBER(read_l);
+	DECLARE_READ8_MEMBER(read_h);
+	DECLARE_READ8_MEMBER(read_ram);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE8_MEMBER(write_h);
+	DECLARE_WRITE8_MEMBER(write_ram);
+	DECLARE_READ8_MEMBER(chip_read);
+	DECLARE_WRITE8_MEMBER(chip_write);
+
+	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
 
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we
 	// check if the required data is present and update bank map accordingly
@@ -214,6 +227,9 @@ public:
 
 protected:
 	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	devcb_write_line m_irq_callback;
 };
 
 // ======================> sns_cart_slot_device
@@ -222,6 +238,15 @@ class sns_cart_slot_device : public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: sns_cart_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "snes_cart"; }
 	virtual const char *file_extensions() const override { return "sfc"; }
@@ -233,6 +258,15 @@ class sns_sufami_cart_slot_device : public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sns_sufami_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "st_cart"; }
 	virtual const char *file_extensions() const override { return "st"; }
@@ -245,6 +279,15 @@ class sns_bsx_cart_slot_device :  public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sns_bsx_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "bspack"; }
 	virtual const char *file_extensions() const override { return "bs"; }
@@ -263,19 +306,6 @@ DECLARE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device)
  ***************************************************************************/
 
 #define SNSSLOT_ROM_REGION_TAG ":cart:rom"
-
-
-#define MCFG_SNS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SNS_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_SNS_SUFAMI_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SNS_SUFAMI_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_SNS_BSX_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SNS_BSX_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 #endif // MAME_BUS_SNES_SNES_SLOT_H

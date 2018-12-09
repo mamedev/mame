@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "sfx.h"
-#include "cpu/g65816/g65816.h"
 
 //-------------------------------------------------
 //  sns_rom_superfx_device - constructor
@@ -82,13 +81,13 @@ void sns_rom_superfx_device::sfx_map(address_map &map)
 
 WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 {
-	machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, state);
+	write_irq(state);
 }
 
 
 void sns_rom_superfx_device::device_add_mconfig(machine_config &config)
 {
-	SUPERFX(config, m_superfx, 21480000);  /* 21.48MHz */
+	SUPERFX(config, m_superfx, DERIVED_CLOCK(1, 1));  /* 21.48MHz */
 	m_superfx->set_addrmap(AS_PROGRAM, &sns_rom_superfx_device::sfx_map);
 	m_superfx->irq().set(FUNC(sns_rom_superfx_device::snes_extern_irq_w));  /* IRQ line from cart */
 }
