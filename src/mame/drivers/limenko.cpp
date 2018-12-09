@@ -750,11 +750,11 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_DEVICE_IO_MAP(spotty_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, limenko_state, spotty_sound_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("oki", okim6295_device, write)) //? sound latch and ?
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
+	at89c4051_device &audiocpu(AT89C4051(config, "audiocpu", 4000000));    /* 4 MHz */
+	audiocpu.port_in_cb<1>().set(FUNC(limenko_state::spotty_sound_r));
+	audiocpu.port_out_cb<1>().set("oki", FUNC(okim6295_device::write)); //? sound latch and ?
+	audiocpu.port_in_cb<3>().set(FUNC(limenko_state::spotty_sound_cmd_r));
+	audiocpu.port_out_cb<3>().set(FUNC(limenko_state::spotty_sound_cmd_w)); //not sure about anything...
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

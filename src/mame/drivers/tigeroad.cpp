@@ -701,10 +701,10 @@ MACHINE_CONFIG_START(f1dream_state::f1dream)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(f1dream_map)
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(10'000'000)) /* ??? */
-	MCFG_DEVICE_IO_MAP(f1dream_mcu_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, f1dream_state, out1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, f1dream_state, out3_w))
+	I8751(config, m_mcu, XTAL(10'000'000)); /* ??? */
+	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
+	m_mcu->port_out_cb<1>().set(FUNC(f1dream_state::out1_w));
+	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
 MACHINE_CONFIG_END
 
 /* same as above but with additional Z80 for samples playback */

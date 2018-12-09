@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/decmxc06.h"
@@ -40,7 +41,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_mcu;
+	required_device<i8751_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<deco_mxc06_device> m_spritegen;

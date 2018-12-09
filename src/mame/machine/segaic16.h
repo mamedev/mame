@@ -86,6 +86,14 @@ public:
 	typedef device_delegate<void (sega_315_5195_mapper_device &, uint8_t)> mapper_delegate;
 
 	// construction/destruction
+	template <typename T>
+	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: sega_315_5195_mapper_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+		m_cpuregion.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
@@ -94,9 +102,22 @@ public:
 		m_cpu.set_tag(cpu);
 		m_cpuregion.set_tag(cpu);
 	}
+
 	void set_mapper(mapper_delegate callback) { m_mapper = callback; }
+	template <class FunctionClass> void set_mapper(const char *devname
+		, void (FunctionClass::*callback)(sega_315_5195_mapper_device &, uint8_t), const char *name)
+	{
+		set_mapper(mapper_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_mapper(void (FunctionClass::*callback)(sega_315_5195_mapper_device &, uint8_t), const char *name)
+	{
+		set_mapper(mapper_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	template<class Object> devcb_base &set_pbf_callback(Object &&object) { return m_pbf_callback.set_callback(std::forward<Object>(object)); }
 	template<class Object> devcb_base &set_mcu_int_callback(Object &&object) { return m_mcu_int_callback.set_callback(std::forward<Object>(object)); }
+	auto pbf() { return m_pbf_callback.bind(); }
+	auto mcu_int() { return m_mcu_int_callback.bind(); }
 
 	// public interface
 	DECLARE_READ8_MEMBER( read );

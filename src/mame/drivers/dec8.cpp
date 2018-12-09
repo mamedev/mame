@@ -47,7 +47,6 @@ To do:
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs51/mcs51.h"
 #include "machine/deco222.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
@@ -2007,13 +2006,13 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_DEVICE_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, shackled_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // needs heavy sync, otherwise one of the two CPUs will miss an irq and makes the game to hang
@@ -2069,13 +2068,13 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_DEVICE_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -2129,13 +2128,13 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_DEVICE_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -2189,13 +2188,13 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, 3000000*4)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, 3000000*4);
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<3>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -2374,11 +2373,11 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* unknown frequency */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, srdarwin_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000)); /* unknown frequency */
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::srdarwin_mcu_to_main_w));
+	m_mcu->port_in_cb<0>().set_ioport("I8751");
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 

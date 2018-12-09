@@ -142,7 +142,6 @@ Notes:
 #include "includes/djboy.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -496,15 +495,15 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_DEVICE_IO_MAP(soundcpu_port_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("beast", I80C51, 12_MHz_XTAL / 2) // 6.000MHz, verified
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, djboy_state, beast_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, djboy_state, beast_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, djboy_state, beast_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, djboy_state, beast_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, djboy_state, beast_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, djboy_state, beast_p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, djboy_state, beast_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, djboy_state, beast_p3_w))
+	I80C51(config, m_beast, 12_MHz_XTAL / 2); // 6.000MHz, verified
+	m_beast->port_in_cb<0>().set(FUNC(djboy_state::beast_p0_r));
+	m_beast->port_out_cb<0>().set(FUNC(djboy_state::beast_p0_w));
+	m_beast->port_in_cb<1>().set(FUNC(djboy_state::beast_p1_r));
+	m_beast->port_out_cb<1>().set(FUNC(djboy_state::beast_p1_w));
+	m_beast->port_in_cb<2>().set(FUNC(djboy_state::beast_p2_r));
+	m_beast->port_out_cb<2>().set(FUNC(djboy_state::beast_p2_w));
+	m_beast->port_in_cb<3>().set(FUNC(djboy_state::beast_p3_r));
+	m_beast->port_out_cb<3>().set(FUNC(djboy_state::beast_p3_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
