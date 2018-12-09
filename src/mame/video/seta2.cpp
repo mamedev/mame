@@ -413,6 +413,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		global_xoffset -= 0x800;
 
 	// funcube3 sets a global xoffset of -1 causing a single pixel shift, does something else compensate for it?
+	// note, it also writes a different address for the sprite buffering (related?) but doesn't also have the global zoom set to negative like Star Audition which also writes there.
 
 	int global_xzoom = (m_vregs[0x16/2] & 0x7ff); // and 0x14/2 for low bits
 
@@ -420,7 +421,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	// TODO: properly render negative zoom sprites
 	if (global_xzoom & 0x400) 
 	{
-		global_xoffset -= 0x150;
+		global_xoffset -= 0x14f;
 	}
 
 	uint16_t *s1 = m_private_spriteram.get();
