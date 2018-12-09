@@ -2742,7 +2742,7 @@ void model2a_state::model2a_0229(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_0229_mem);
 
 	SEGA315_5838_COMP(config, m_0229crypt, 0);
-	m_0229crypt->set_addrmap(0, model2a_state::sega_0229_map);
+	m_0229crypt->set_addrmap(0, &model2a_state::sega_0229_map);
 }
 
 void model2a_state::zeroguna(machine_config &config)
@@ -2807,7 +2807,7 @@ void model2b_state::model2b_0229(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_0229_mem);
 
 	SEGA315_5838_COMP(config, m_0229crypt, 0);
-	m_0229crypt->set_addrmap(0, model2b_state::sega_0229_map);
+	m_0229crypt->set_addrmap(0, &model2b_state::sega_0229_map);
 }
 
 void model2b_state::indy500(machine_config &config)
