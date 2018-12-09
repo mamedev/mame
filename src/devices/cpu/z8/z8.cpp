@@ -11,7 +11,6 @@
     TODO:
 
     - strobed I/O
-    - expose register file to disassembler
     - timer Tin/Tout modes
     - serial
     - instruction pipeline
@@ -27,30 +26,6 @@
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-enum
-{
-	Z8_REGISTER_P0 = 0,
-	Z8_REGISTER_P1,
-	Z8_REGISTER_P2,
-	Z8_REGISTER_P3,
-	Z8_REGISTER_SIO = 0xf0,
-	Z8_REGISTER_TMR,
-	Z8_REGISTER_T1,
-	Z8_REGISTER_PRE1,
-	Z8_REGISTER_T0,
-	Z8_REGISTER_PRE0,
-	Z8_REGISTER_P2M,
-	Z8_REGISTER_P3M,
-	Z8_REGISTER_P01M,
-	Z8_REGISTER_IPR,
-	Z8_REGISTER_IRQ,
-	Z8_REGISTER_IMR,
-	Z8_REGISTER_FLAGS,
-	Z8_REGISTER_RP,
-	Z8_REGISTER_SPH,
-	Z8_REGISTER_SPL
-};
 
 #define Z8_P3_DAV0                  0x04    /* not supported */
 #define Z8_P3_DAV1                  0x08    /* not supported */
@@ -104,7 +79,7 @@ enum
 #define Z8_P01M_P0H_MODE_INPUT      0x40
 #define Z8_P01M_P0H_MODE_A12_A15    0x80
 
-#define Z8_P3M_P2_ACTIVE_PULLUPS    0x01    /* not supported */
+#define Z8_P3M_P2_ACTIVE_PULLUPS    0x01
 #define Z8_P3M_P0_STROBED           0x04    /* not supported */
 #define Z8_P3M_P33_P34_MASK         0x18
 #define Z8_P3M_P33_P34_INPUT_OUTPUT 0x00
@@ -119,12 +94,6 @@ enum
 #define Z8_IMR_RAM_PROTECT          0x40    /* not supported */
 
 #define Z8_IRQ_MASK                 0x3f
-#define Z8_IRQ_FLAG_IRQ5            0x20
-#define Z8_IRQ_FLAG_IRQ4            0x10
-#define Z8_IRQ_FLAG_IRQ3            0x08
-#define Z8_IRQ_FLAG_IRQ2            0x04
-#define Z8_IRQ_FLAG_IRQ1            0x02
-#define Z8_IRQ_FLAG_IRQ0            0x01
 
 #define Z8_FLAGS_F1                 0x01
 #define Z8_FLAGS_F2                 0x02
@@ -144,15 +113,6 @@ enum
 /***************************************************************************
     MACROS
 ***************************************************************************/
-
-#define P01M        m_r[Z8_REGISTER_P01M]
-#define P2M         m_r[Z8_REGISTER_P2M]
-#define P3M         m_r[Z8_REGISTER_P3M]
-#define T0          m_r[Z8_REGISTER_T0]
-#define T1          m_r[Z8_REGISTER_T1]
-#define PRE0        m_r[Z8_REGISTER_PRE0]
-#define PRE1        m_r[Z8_REGISTER_PRE1]
-
 
 DEFINE_DEVICE_TYPE(Z8601,   z8601_device,   "z8601",   "Zilog Z8601")
 DEFINE_DEVICE_TYPE(UB8830D, ub8830d_device, "ub8830d", "UB8830D")
@@ -176,11 +136,37 @@ void z8_device::preprogrammed_map(address_map &map)
 	map(0x0000, m_rom_size - 1).rom().region("internal", 0);
 }
 
+void z8_device::register_map(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(z8_device::p0_read), FUNC(z8_device::p0_write));
+	map(0x01, 0x01).rw(FUNC(z8_device::p1_read), FUNC(z8_device::p1_write));
+	map(0x02, 0x02).rw(FUNC(z8_device::p2_read), FUNC(z8_device::p2_write));
+	map(0x03, 0x03).rw(FUNC(z8_device::p3_read), FUNC(z8_device::p3_write));
+	map(0x04, 0x7f).ram();
+	map(0xf0, 0xf0).rw(FUNC(z8_device::sio_read), FUNC(z8_device::sio_write));
+	map(0xf1, 0xf1).rw(FUNC(z8_device::tmr_read), FUNC(z8_device::tmr_write));
+	map(0xf2, 0xf2).rw(FUNC(z8_device::t1_read), FUNC(z8_device::t1_write));
+	map(0xf3, 0xf3).w(FUNC(z8_device::pre1_write));
+	map(0xf4, 0xf4).rw(FUNC(z8_device::t0_read), FUNC(z8_device::t0_write));
+	map(0xf5, 0xf5).w(FUNC(z8_device::pre0_write));
+	map(0xf6, 0xf6).w(FUNC(z8_device::p2m_write));
+	map(0xf7, 0xf7).w(FUNC(z8_device::p3m_write));
+	map(0xf8, 0xf8).w(FUNC(z8_device::p01m_write));
+	map(0xf9, 0xf9).w(FUNC(z8_device::ipr_write));
+	map(0xfa, 0xfa).rw(FUNC(z8_device::irq_read), FUNC(z8_device::irq_write));
+	map(0xfb, 0xfb).rw(FUNC(z8_device::imr_read), FUNC(z8_device::imr_write));
+	map(0xfc, 0xfc).rw(FUNC(z8_device::flags_read), FUNC(z8_device::flags_write));
+	map(0xfd, 0xfd).rw(FUNC(z8_device::rp_read), FUNC(z8_device::rp_write));
+	map(0xfe, 0xfe).rw(FUNC(z8_device::sph_read), FUNC(z8_device::sph_write));
+	map(0xff, 0xff).rw(FUNC(z8_device::spl_read), FUNC(z8_device::spl_write));
+}
+
 
 z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, preprogrammed ? address_map_constructor(FUNC(z8_device::preprogrammed_map), this) : address_map_constructor(FUNC(z8_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
+	, m_register_config("register", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(z8_device::register_map), this))
 	, m_input_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_output_cb{{*this}, {*this}, {*this}, {*this}}
 	, m_rom_size(rom_size)
@@ -242,13 +228,15 @@ device_memory_interface::space_config_vector z8_device::memory_space_config() co
 	{
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_DATA,    &m_data_config)
+			std::make_pair(AS_DATA,    &m_data_config),
+			std::make_pair(AS_IO,      &m_register_config)
 		};
 	}
 	else
 	{
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config)
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO,      &m_register_config)
 		};
 	}
 }
@@ -259,18 +247,18 @@ device_memory_interface::space_config_vector z8_device::memory_space_config() co
 
 uint16_t z8_device::mask_external_address(uint16_t addr)
 {
-	switch (P01M & (Z8_P01M_P0L_MODE_A8_A11 | Z8_P01M_P0H_MODE_A12_A15))
+	switch (m_p01m & (Z8_P01M_P0L_MODE_A8_A11 | Z8_P01M_P0H_MODE_A12_A15))
 	{
 		case 0:
-			addr = (addr & 0x00ff) | register_read(Z8_REGISTER_P0) << 8;
+			addr = (addr & 0x00ff) | p0_read() << 8;
 			break;
 
 		case Z8_P01M_P0L_MODE_A8_A11:
-			addr = (addr & 0x0fff) | (register_read(Z8_REGISTER_P0) & 0xf0) << 8;
+			addr = (addr & 0x0fff) | (p0_read() & 0xf0) << 8;
 			break;
 
 		case Z8_P01M_P0H_MODE_A12_A15:
-			addr = (addr & 0xf0ff) | (register_read(Z8_REGISTER_P0) & 0x0f) << 8;
+			addr = (addr & 0xf0ff) | (p0_read() & 0x0f) << 8;
 			break;
 	}
 	return addr;
@@ -311,218 +299,316 @@ uint16_t z8_device::fetch_word()
 }
 
 
-uint8_t z8_device::register_read(uint8_t offset)
+uint8_t z8_device::p0_read()
 {
 	uint8_t data = 0xff;
 	uint8_t mask = 0;
 
-	switch (offset)
+	switch (m_p01m & Z8_P01M_P0L_MODE_MASK)
 	{
-	case Z8_REGISTER_P0:
-		switch (P01M & Z8_P01M_P0L_MODE_MASK)
-		{
-		case Z8_P01M_P0L_MODE_OUTPUT:
-			data = m_output[offset] & 0x0f;
-			break;
-		case Z8_P01M_P0L_MODE_INPUT:
-			mask = 0x0f;
-			break;
-		default: /* A8...A11 */
-			data = 0x0f;
-			break;
-		}
-
-		switch (P01M & Z8_P01M_P0H_MODE_MASK)
-		{
-		case Z8_P01M_P0H_MODE_OUTPUT:
-			data |= m_output[offset] & 0xf0;
-			break;
-		case Z8_P01M_P0H_MODE_INPUT:
-			mask |= 0xf0;
-			break;
-		default: /* A12...A15 */
-			data |= 0xf0;
-			break;
-		}
-
-		if (!(P3M & Z8_P3M_P0_STROBED))
-		{
-			if (mask) m_input[offset] = m_input_cb[0](0, mask);
-		}
-
-		data |= m_input[offset] & mask;
+	case Z8_P01M_P0L_MODE_OUTPUT:
+		data = m_output[0] & 0x0f;
 		break;
-
-	case Z8_REGISTER_P1:
-		switch (P01M & Z8_P01M_P1_MODE_MASK)
-		{
-		case Z8_P01M_P1_MODE_OUTPUT:
-			data = m_output[offset];
-			break;
-		case Z8_P01M_P1_MODE_INPUT:
-			mask = 0xff;
-			break;
-		default: /* AD0..AD7 */
-			data = 0xff;
-			break;
-		}
-
-		if ((P3M & Z8_P3M_P33_P34_MASK) != Z8_P3M_P33_P34_DAV1_RDY1)
-		{
-			if (mask) m_input[offset] = m_input_cb[1](0, mask);
-		}
-
-		data |= m_input[offset] & mask;
+	case Z8_P01M_P0L_MODE_INPUT:
+		mask = 0x0f;
 		break;
-
-	case Z8_REGISTER_P2:
-		mask = m_r[Z8_REGISTER_P2M];
-
-		if (!(P3M & Z8_P3M_P2_STROBED))
-		{
-			if (mask) m_input[offset] = m_input_cb[2](0, mask);
-		}
-
-		data = (m_input[offset] & mask) | (m_output[offset] & ~mask);
-		break;
-
-	case Z8_REGISTER_P3:
-		// TODO: special port 3 modes
-		//if (!(P3M & 0x7c))
-		//{
-			mask = 0x0f;
-		//}
-
-		if (mask) m_input[offset] = m_input_cb[3](0, mask);
-
-		data = (m_input[offset] & mask) | (m_output[offset] & ~mask);
-		break;
-
-	case Z8_REGISTER_T0:
-		data = m_t0;
-		break;
-
-	case Z8_REGISTER_T1:
-		data = m_t1;
-		break;
-
-	case Z8_REGISTER_PRE1:
-	case Z8_REGISTER_PRE0:
-	case Z8_REGISTER_P2M:
-	case Z8_REGISTER_P3M:
-	case Z8_REGISTER_P01M:
-	case Z8_REGISTER_IPR:
-		/* write only */
-		break;
-
-	default:
-		data = m_r[offset];
+	default: /* A8...A11 */
+		data = 0x0f;
 		break;
 	}
 
+	switch (m_p01m & Z8_P01M_P0H_MODE_MASK)
+	{
+	case Z8_P01M_P0H_MODE_OUTPUT:
+		data |= m_output[0] & 0xf0;
+		break;
+	case Z8_P01M_P0H_MODE_INPUT:
+		mask |= 0xf0;
+		break;
+	default: /* A12...A15 */
+		data |= 0xf0;
+		break;
+	}
+
+	if (!(m_p3m & Z8_P3M_P0_STROBED))
+	{
+		if (mask)
+			m_input[0] = m_input_cb[0](0, mask);
+	}
+
+	data |= m_input[0] & mask;
 	return data;
 }
 
-uint16_t z8_device::register_pair_read(uint8_t offset)
-{
-	return (register_read(offset) << 8) | register_read(offset + 1);
-}
-
-void z8_device::register_write(uint8_t offset, uint8_t data)
+void z8_device::p0_write(uint8_t data)
 {
 	uint8_t mask = 0;
 
-	switch (offset)
+	m_output[0] = data;
+	if ((m_p01m & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_OUTPUT)
+		mask |= 0x0f;
+	if ((m_p01m & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_OUTPUT)
+		mask |= 0xf0;
+	if (mask)
+		m_output_cb[0](0, data & mask, mask);
+}
+
+uint8_t z8_device::p1_read()
+{
+	uint8_t data = 0xff;
+	uint8_t mask = 0;
+
+	switch (m_p01m & Z8_P01M_P1_MODE_MASK)
 	{
-	case Z8_REGISTER_P0:
-		m_output[offset] = data;
-		if ((P01M & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_OUTPUT) mask |= 0x0f;
-		if ((P01M & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_OUTPUT) mask |= 0xf0;
-		if (mask) m_output_cb[0](0, data & mask, mask);
+	case Z8_P01M_P1_MODE_OUTPUT:
+		data = m_output[1];
 		break;
-
-	case Z8_REGISTER_P1:
-		m_output[offset] = data;
-		if ((P01M & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_OUTPUT) mask = 0xff;
-		if (mask) m_output_cb[1](0, data & mask, mask);
+	case Z8_P01M_P1_MODE_INPUT:
+		mask = 0xff;
 		break;
-
-	case Z8_REGISTER_P2:
-		m_output[offset] = data;
-		mask = m_r[Z8_REGISTER_P2M] ^ 0xff;
-		if (mask) m_output_cb[2](0, data & mask, mask);
-		break;
-
-	case Z8_REGISTER_P3:
-		m_output[offset] = data;
-
-		// TODO: special port 3 modes
-		//if (!(P3M & 0x7c))
-		//{
-			mask = 0xf0;
-		//}
-
-		if (mask) m_output_cb[3](0, data & mask, mask);
-		break;
-
-	case Z8_REGISTER_SIO:
-		break;
-
-	case Z8_REGISTER_TMR:
-		if (data & Z8_TMR_LOAD_T0)
-		{
-			m_t0 = T0;
-			m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE0 >> 2) + 1)));
-		}
-
-		m_t0_timer->enable(data & Z8_TMR_ENABLE_T0);
-
-		if (data & Z8_TMR_LOAD_T1)
-		{
-			m_t1 = T1;
-			m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE1 >> 2) + 1)));
-		}
-
-		m_t1_timer->enable(data & Z8_TMR_ENABLE_T1);
-		break;
-
-	case Z8_REGISTER_P2M:
-		break;
-	case Z8_REGISTER_P3M:
-		break;
-	case Z8_REGISTER_P01M:
-		break;
-	case Z8_REGISTER_IPR:
-		break;
-	case Z8_REGISTER_IRQ:
-		break;
-	case Z8_REGISTER_IMR:
-		break;
-	case Z8_REGISTER_FLAGS:
-		break;
-	case Z8_REGISTER_RP:
-		break;
-	case Z8_REGISTER_SPH:
-		break;
-	case Z8_REGISTER_SPL:
-		break;
-	default:
-		// TODO ignore missing registers
+	default: /* AD0..AD7 */
+		data = 0xff;
 		break;
 	}
 
-	m_r[offset] = data;
+	if ((m_p3m & Z8_P3M_P33_P34_MASK) != Z8_P3M_P33_P34_DAV1_RDY1)
+	{
+		if (mask)
+			m_input[1] = m_input_cb[1](0, mask);
+	}
+
+	data |= m_input[1] & mask;
+	return data;
+}
+
+void z8_device::p1_write(uint8_t data)
+{
+	uint8_t mask = 0;
+
+	m_output[1] = data;
+	if ((m_p01m & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_OUTPUT)
+		mask = 0xff;
+	if (mask)
+		m_output_cb[1](0, data & mask, mask);
+}
+
+uint8_t z8_device::p2_read()
+{
+	uint8_t mask = m_p2m;
+
+	// open drain lines can be externally driven where data = 1
+	if (!(m_p3m & Z8_P3M_P2_ACTIVE_PULLUPS))
+		mask |= m_output[2];
+
+	if (!(m_p3m & Z8_P3M_P2_STROBED))
+	{
+		if (mask)
+			m_input[2] = m_input_cb[2](0, mask);
+	}
+
+	return (m_input[2] & mask) | (m_output[2] & ~mask);
+}
+
+void z8_device::p2_write(uint8_t data)
+{
+	uint8_t mask = m_p2m ^ 0xff;
+
+	m_output[2] = data;
+	if (mask)
+		m_output_cb[2](0, data & mask, mask);
+}
+
+uint8_t z8_device::p3_read()
+{
+	uint8_t mask = 0x0f;
+
+	// TODO: special port 3 modes
+	//if (!(m_p3m & 0x7c))
+	//{
+	//}
+
+	if (mask)
+		m_input[3] = m_input_cb[3](0, mask);
+
+	return (m_input[3] & mask) | (m_output[3] & ~mask);
+}
+
+void z8_device::p3_write(uint8_t data)
+{
+	uint8_t mask = 0;
+
+	m_output[3] = data;
+
+	// TODO: special port 3 modes
+	//if (!(m_p3m & 0x7c))
+	//{
+		mask = 0xf0;
+	//}
+
+	if (mask)
+		m_output_cb[3](0, data & mask, mask);
+}
+
+uint8_t z8_device::sio_read()
+{
+	return 0xff;
+}
+
+void z8_device::sio_write(uint8_t data)
+{
+}
+
+uint8_t z8_device::tmr_read()
+{
+	return m_tmr;
+}
+
+void z8_device::tmr_write(uint8_t data)
+{
+	m_tmr = data;
+
+	if (data & Z8_TMR_LOAD_T0)
+	{
+		m_count[0] = m_t[0];
+		m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((m_pre[0] >> 2) + 1)));
+	}
+
+	m_t0_timer->enable(data & Z8_TMR_ENABLE_T0);
+
+	if (data & Z8_TMR_LOAD_T1)
+	{
+		m_count[1] = m_t[1];
+		m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((m_pre[1] >> 2) + 1)));
+	}
+
+	m_t1_timer->enable(data & Z8_TMR_ENABLE_T1);
+}
+
+uint8_t z8_device::t0_read()
+{
+	return m_count[0];
+}
+
+void z8_device::t0_write(uint8_t data)
+{
+	m_t[0] = data;
+}
+
+uint8_t z8_device::t1_read()
+{
+	return m_count[1];
+}
+
+void z8_device::t1_write(uint8_t data)
+{
+	m_t[1] = data;
+}
+
+void z8_device::pre0_write(uint8_t data)
+{
+	m_pre[0] = data;
+}
+
+void z8_device::pre1_write(uint8_t data)
+{
+	m_pre[0] = data;
+}
+
+void z8_device::p01m_write(uint8_t data)
+{
+	m_p01m = data;
+}
+
+void z8_device::p2m_write(uint8_t data)
+{
+	m_p2m = data;
+}
+
+void z8_device::p3m_write(uint8_t data)
+{
+	m_p3m = data;
+}
+
+void z8_device::ipr_write(uint8_t data)
+{
+	m_ipr = data;
+}
+
+uint8_t z8_device::irq_read()
+{
+	return m_irq;
+}
+
+void z8_device::irq_write(uint8_t data)
+{
+	if (m_irq_initialized)
+		m_irq = data;
+}
+
+uint8_t z8_device::imr_read()
+{
+	return m_imr;
+}
+
+void z8_device::imr_write(uint8_t data)
+{
+	m_imr = data;
+}
+
+uint8_t z8_device::flags_read()
+{
+	return m_flags;
+}
+
+void z8_device::flags_write(uint8_t data)
+{
+	m_flags = data;
+}
+
+uint8_t z8_device::rp_read()
+{
+	return m_rp;
+}
+
+void z8_device::rp_write(uint8_t data)
+{
+	m_rp = data;
+}
+
+uint8_t z8_device::sph_read()
+{
+	return m_sp.b.h;
+}
+
+void z8_device::sph_write(uint8_t data)
+{
+	m_sp.b.h = data;
+}
+
+uint8_t z8_device::spl_read()
+{
+	return m_sp.b.l;
+}
+
+void z8_device::spl_write(uint8_t data)
+{
+	m_sp.b.l = data;
+}
+
+
+uint16_t z8_device::register_pair_read(uint8_t offset)
+{
+	return m_regs->read_word_unaligned(offset);
 }
 
 void z8_device::register_pair_write(uint8_t offset, uint16_t data)
 {
-	register_write(offset, data >> 8);
-	register_write(offset + 1, data & 0xff);
+	m_regs->write_word_unaligned(offset, data);
 }
 
 uint8_t z8_device::get_working_register(int offset)
 {
-	return (m_r[Z8_REGISTER_RP] & 0xf0) | (offset & 0x0f);
+	return (m_rp & 0xf0) | (offset & 0x0f);
 }
 
 uint8_t z8_device::get_register(uint8_t offset)
@@ -540,11 +626,11 @@ uint8_t z8_device::get_intermediate_register(int offset)
 
 void z8_device::stack_push_byte(uint8_t src)
 {
-	if (P01M & Z8_P01M_INTERNAL_STACK)
+	if (m_p01m & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 1 (predecrement)
-		uint8_t sp = register_read(Z8_REGISTER_SPL) - 1;
-		register_write(Z8_REGISTER_SPL, sp);
+		uint8_t sp = m_sp.b.l - 1;
+		m_sp.b.l = sp;
 
 		// @SP <- src
 		register_write(sp, src);
@@ -552,8 +638,8 @@ void z8_device::stack_push_byte(uint8_t src)
 	else
 	{
 		// SP <- SP - 1 (predecrement)
-		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) - 1;
-		register_pair_write(Z8_REGISTER_SPH, sp);
+		uint16_t sp = m_sp.w - 1;
+		m_sp.w = sp;
 
 		// @SP <- src
 		m_data->write_byte(mask_external_address(sp), src);
@@ -562,11 +648,11 @@ void z8_device::stack_push_byte(uint8_t src)
 
 void z8_device::stack_push_word(uint16_t src)
 {
-	if (P01M & Z8_P01M_INTERNAL_STACK)
+	if (m_p01m & Z8_P01M_INTERNAL_STACK)
 	{
 		// SP <- SP - 2 (predecrement)
-		uint8_t sp = register_read(Z8_REGISTER_SPL) - 2;
-		register_write(Z8_REGISTER_SPL, sp);
+		uint8_t sp = m_sp.b.l - 2;
+		m_sp.b.l = sp;
 
 		// @SP <- src
 		register_pair_write(sp, src);
@@ -574,8 +660,8 @@ void z8_device::stack_push_word(uint16_t src)
 	else
 	{
 		// SP <- SP - 2 (predecrement)
-		uint16_t sp = register_pair_read(Z8_REGISTER_SPH) - 2;
-		register_pair_write(Z8_REGISTER_SPH, sp);
+		uint16_t sp = m_sp.w - 2;
+		m_sp.w = sp;
 
 		// @SP <- src
 		m_data->write_word_unaligned(mask_external_address(sp), src);
@@ -584,25 +670,25 @@ void z8_device::stack_push_word(uint16_t src)
 
 uint8_t z8_device::stack_pop_byte()
 {
-	if (P01M & Z8_P01M_INTERNAL_STACK)
+	if (m_p01m & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
-		uint8_t sp = register_read(Z8_REGISTER_SPL);
+		uint8_t sp = m_sp.b.l;
 		uint8_t byte = register_read(sp);
 
 		// SP <- SP + 1 (postincrement)
-		register_write(Z8_REGISTER_SPL, sp + 1);
+		m_sp.b.l = sp + 1;
 
 		return byte;
 	}
 	else
 	{
 		// @SP <- src
-		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
+		uint16_t sp = m_sp.w;
 		uint8_t byte = m_data->read_byte(mask_external_address(sp));
 
 		// SP <- SP + 1 (postincrement)
-		register_pair_write(Z8_REGISTER_SPH, sp + 1);
+		m_sp.w = sp + 1;
 
 		return byte;
 	}
@@ -610,25 +696,25 @@ uint8_t z8_device::stack_pop_byte()
 
 uint16_t z8_device::stack_pop_word()
 {
-	if (P01M & Z8_P01M_INTERNAL_STACK)
+	if (m_p01m & Z8_P01M_INTERNAL_STACK)
 	{
 		// @SP <- src
-		uint8_t sp = register_read(Z8_REGISTER_SPL);
+		uint8_t sp = m_sp.b.l;
 		uint16_t word = register_pair_read(sp);
 
 		// SP <- SP + 2 (postincrement)
-		register_write(Z8_REGISTER_SPL, sp + 2);
+		m_sp.b.l = sp + 2;
 
 		return word;
 	}
 	else
 	{
 		// @SP <- src
-		uint16_t sp = register_pair_read(Z8_REGISTER_SPH);
+		uint16_t sp = m_sp.w;
 		uint16_t word = m_data->read_word_unaligned(mask_external_address(sp));
 
 		// SP <- SP + 2 (postincrement)
-		register_pair_write(Z8_REGISTER_SPH, sp + 2);
+		m_sp.w = sp + 2;
 
 		return word;
 	}
@@ -637,9 +723,9 @@ uint16_t z8_device::stack_pop_word()
 void z8_device::set_flag(uint8_t flag, int state)
 {
 	if (state)
-		m_r[Z8_REGISTER_FLAGS] |= flag;
+		m_flags |= flag;
 	else
-		m_r[Z8_REGISTER_FLAGS] &= ~flag;
+		m_flags &= ~flag;
 }
 
 #define set_flag_h(state)   set_flag(Z8_FLAGS_H, state);
@@ -755,27 +841,27 @@ const z8_device::z8_opcode_map z8_device::Z8601_OPCODE_MAP[256] =
 
 TIMER_CALLBACK_MEMBER( z8_device::t0_tick )
 {
-	m_t0--;
+	m_count[0]--;
 
-	if (m_t0 == 0)
+	if (m_count[0] == 0)
 	{
-		m_t0 = T0;
-		m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE0 >> 2) + 1)));
-		m_t0_timer->enable(PRE0 & Z8_PRE0_COUNT_MODULO_N);
-		m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ4;
+		m_count[0] = m_t[0];
+		m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((m_pre[0] >> 2) + 1)));
+		m_t0_timer->enable(m_pre[0] & Z8_PRE0_COUNT_MODULO_N);
+		request_interrupt(4);
 	}
 }
 
 TIMER_CALLBACK_MEMBER( z8_device::t1_tick )
 {
-	m_t1--;
+	m_count[1]--;
 
-	if (m_t1 == 0)
+	if (m_count[1] == 0)
 	{
-		m_t1 = T1;
-		m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE1 >> 2) + 1)));
-		m_t1_timer->enable(PRE1 & Z8_PRE0_COUNT_MODULO_N);
-		m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ5;
+		m_count[1] = m_t[1];
+		m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((m_pre[1] >> 2) + 1)));
+		m_t1_timer->enable(m_pre[1] & Z8_PRE0_COUNT_MODULO_N);
+		request_interrupt(5);
 	}
 }
 
@@ -795,21 +881,26 @@ void z8_device::device_start()
 		state_add(Z8_PC,         "PC",        m_pc).callimport();
 		state_add(STATE_GENPC,   "GENPC",     m_pc).callimport().noshow();
 		state_add(STATE_GENPCBASE, "CURPC",   m_ppc).callimport().noshow();
-		state_add(Z8_SP,         "SP",        m_fake_sp).callimport().callexport();
-		state_add(STATE_GENSP,   "GENSP",     m_fake_sp).callimport().callexport().noshow();
-		state_add(Z8_RP,         "RP",        m_r[Z8_REGISTER_RP]);
-		state_add(STATE_GENFLAGS, "GENFLAGS", m_r[Z8_REGISTER_FLAGS]).noshow().formatstr("%6s");
-		state_add(Z8_IMR,        "IMR",       m_r[Z8_REGISTER_IMR]);
-		state_add(Z8_IRQ,        "IRQ",       m_r[Z8_REGISTER_IRQ]);
-		state_add(Z8_IPR,        "IPR",       m_r[Z8_REGISTER_IPR]);
-		state_add(Z8_P01M,       "P01M",      m_r[Z8_REGISTER_P01M]);
-		state_add(Z8_P3M,        "P3M",       m_r[Z8_REGISTER_P3M]);
-		state_add(Z8_P2M,        "P2M",       m_r[Z8_REGISTER_P2M]);
-		state_add(Z8_PRE0,       "PRE0",      m_r[Z8_REGISTER_PRE0]);
-		state_add(Z8_T0,         "T0",        m_t0);
-		state_add(Z8_PRE1,       "PRE1",      m_r[Z8_REGISTER_PRE1]);
-		state_add(Z8_T1,         "T1",        m_t1);
-		state_add(Z8_TMR,        "TMR",       m_r[Z8_REGISTER_TMR]);
+		state_add(Z8_SP,         "SP",        m_sp.w);
+		state_add(STATE_GENSP,   "GENSP",     m_sp.w).noshow();
+		state_add(Z8_RP,         "RP",        m_rp);
+		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%6s");
+		state_add(Z8_IMR,        "IMR",       m_imr);
+		state_add(Z8_IRQ,        "IRQ",       m_irq);
+		state_add(Z8_IPR,        "IPR",       m_ipr);
+		state_add(Z8_P0,         "P0",        m_output[0]);
+		if (m_rom_size > 0)
+			state_add(Z8_P1, "P1",        m_output[1]);
+		state_add(Z8_P2,         "P2",        m_output[2]);
+		state_add(Z8_P3,         "P3",        m_output[3]).mask(0xf0);
+		state_add(Z8_P01M,       "P01M",      m_p01m);
+		state_add(Z8_P2M,        "P2M",       m_p2m);
+		state_add(Z8_P3M,        "P3M",       m_p3m);
+		state_add(Z8_PRE0,       "PRE0",      m_pre[0]);
+		state_add(Z8_T0,         "T0",        m_t[0]);
+		state_add(Z8_PRE1,       "PRE1",      m_pre[1]);
+		state_add(Z8_T1,         "T1",        m_t[1]);
+		state_add(Z8_TMR,        "TMR",       m_tmr);
 
 		for (int regnum = 0; regnum < 16; regnum++)
 			state_add(Z8_R0 + regnum, string_format("R%d", regnum).c_str(), m_fake_r[regnum]).callimport().callexport();
@@ -819,34 +910,50 @@ void z8_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_data = has_space(AS_DATA) ? &space(AS_DATA) : m_program;
+	m_regs = &space(AS_IO);
 
 	/* allocate timers */
 	m_t0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::t0_tick), this));
 	m_t1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::t1_tick), this));
 
 	/* Clear state */
-	for (auto & elem : m_irq_line)
-		elem = CLEAR_LINE;
-	for (auto & elem : m_r)
-		elem = 0;
-	for ( int i = 0; i < 4; i++ )
-	{
-		m_input[i] = 0;
-		m_output[i] = 0;
-	}
-	for (auto & elem : m_fake_r)
-		elem = 0;
-	m_fake_sp = 0;
-	m_t0 = 0;
-	m_t1 = 0;
+	std::fill(std::begin(m_irq_line), std::end(m_irq_line), CLEAR_LINE);
+	std::fill(std::begin(m_input), std::end(m_input), 0);
+	std::fill(std::begin(m_output), std::end(m_output), 0);
+	std::fill(std::begin(m_t), std::end(m_t), 0);
+	std::fill(std::begin(m_count), std::end(m_count), 0);
+	std::fill(std::begin(m_pre), std::end(m_pre), 0);
+	std::fill(std::begin(m_fake_r), std::end(m_fake_r), 0);
+	m_pc = 0;
+	m_ppc = 0;
+	m_sp.w = 0;
+	m_rp = 0;
+	m_flags = 0;
+	m_p01m = 0;
+	m_p2m = 0;
+	m_p3m = 0;
+	m_tmr = 0;
+	m_irq_taken = false;
+	m_irq_initialized = false;
 
 	/* register for state saving */
 	save_item(NAME(m_pc));
-	save_item(NAME(m_r));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_sp.w));
+	save_item(NAME(m_rp));
+	save_item(NAME(m_flags));
 	save_item(NAME(m_input));
 	save_item(NAME(m_output));
+	save_item(NAME(m_p01m));
+	save_item(NAME(m_p2m));
+	save_item(NAME(m_p3m));
+	save_item(NAME(m_tmr));
+	save_item(NAME(m_t));
+	save_item(NAME(m_count));
+	save_item(NAME(m_pre));
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_irq_taken));
+	save_item(NAME(m_irq_initialized));
 
 	set_icountptr(m_icount);
 }
@@ -855,16 +962,24 @@ void z8_device::device_start()
     INTERRUPTS
 ***************************************************************************/
 
+void z8_device::request_interrupt(int irq)
+{
+	assert(irq >= 0 && irq < 6);
+
+	if (m_irq_initialized)
+		m_irq |= 1 << irq;
+}
+
 void z8_device::take_interrupt(int irq)
 {
 	//logerror("Taking IRQ%d (previous PC = %04X)\n", irq, m_pc);
 	m_irq_taken = true;
 
 	// disable interrupts
-	m_r[Z8_REGISTER_IMR] &= ~Z8_IMR_ENABLE;
+	m_imr &= ~Z8_IMR_ENABLE;
 
 	// acknowledge the IRQ
-	m_r[Z8_REGISTER_IRQ] &= ~(1 << irq);
+	m_irq &= ~(1 << irq);
 
 	// get the interrupt vector address
 	uint16_t vector = irq * 2;
@@ -873,7 +988,7 @@ void z8_device::take_interrupt(int irq)
 
 	// push registers onto stack
 	stack_push_word(m_pc);
-	stack_push_byte(m_r[Z8_REGISTER_FLAGS]);
+	stack_push_byte(m_flags);
 
 	// branch to the vector
 	m_pc = m_cache->read_byte(vector) << 8;
@@ -883,22 +998,22 @@ void z8_device::take_interrupt(int irq)
 void z8_device::process_interrupts()
 {
 	m_irq_taken = false;
-	uint8_t pending_irqs = m_r[Z8_REGISTER_IMR] & m_r[Z8_REGISTER_IRQ] & Z8_IRQ_MASK;
-	if (!(m_r[Z8_REGISTER_IMR] & Z8_IMR_ENABLE) || pending_irqs == 0)
+	uint8_t pending_irqs = m_imr & m_irq & Z8_IRQ_MASK;
+	if (!(m_imr & Z8_IMR_ENABLE) || pending_irqs == 0)
 		return;
 
 	int group_a[2] = { 5, 3 };
 	int group_b[2] = { 2, 0 };
 	int group_c[2] = { 1, 4 };
 
-	if (BIT(m_r[Z8_REGISTER_IPR], 5))
+	if (BIT(m_ipr, 5))
 		std::swap(group_a[0], group_a[1]);
-	if (BIT(m_r[Z8_REGISTER_IPR], 2))
+	if (BIT(m_ipr, 2))
 		std::swap(group_b[0], group_b[1]);
-	if (BIT(m_r[Z8_REGISTER_IPR], 1))
+	if (BIT(m_ipr, 1))
 		std::swap(group_c[0], group_c[1]);
 
-	switch ((m_r[Z8_REGISTER_IPR] & 0x18) >> 2 | (m_r[Z8_REGISTER_IPR] & 0x01))
+	switch ((m_ipr & 0x18) >> 2 | (m_ipr & 0x01))
 	{
 		case 0: // (000) reserved according to Zilog (but must process at least IRQ4)
 		case 1: // (001) C > A > B
@@ -1030,16 +1145,18 @@ void z8_device::execute_run()
 void z8_device::device_reset()
 {
 	m_pc = 0x000c;
+	m_rp = 0x00;
+	m_irq = 0x00;
+	m_imr &= ~Z8_IMR_ENABLE;
+	m_irq_initialized = false;
 
-	register_write(Z8_REGISTER_TMR, 0x00);
-	register_write(Z8_REGISTER_PRE1, PRE1 & 0xfc);
-	register_write(Z8_REGISTER_PRE0, PRE0 & 0xfe);
-	register_write(Z8_REGISTER_P2M, 0xff);
-	register_write(Z8_REGISTER_P3M, 0x00);
-	register_write(Z8_REGISTER_P01M, 0x4d);
-	register_write(Z8_REGISTER_IRQ, 0x00);
-	register_write(Z8_REGISTER_IMR, 0x00);
-	register_write(Z8_REGISTER_RP, 0x00);
+	p01m_write(0x4d);
+	p2m_write(0xff);
+	p3m_write(0x00);
+
+	m_pre[0] &= ~Z8_PRE0_COUNT_MODULO_N;
+	m_pre[1] &= ~(Z8_PRE1_COUNT_MODULO_N | Z8_PRE1_INTERNAL_CLOCK);
+	tmr_write(0x00);
 }
 
 
@@ -1060,15 +1177,12 @@ void z8_device::state_import(const device_state_entry &entry)
 			m_pc = m_ppc;
 			break;
 
-		case Z8_SP:
-		case STATE_GENSP:
-			m_r[Z8_REGISTER_SPH] = m_fake_sp >> 8;
-			m_r[Z8_REGISTER_SPL] = m_fake_sp & 0xff;
-			break;
-
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-			m_r[m_r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)] = m_fake_r[entry.index() - Z8_R0];
+		{
+			auto dis = machine().disable_side_effects();
+			register_write(m_rp + (entry.index() - Z8_R0), m_fake_r[entry.index() - Z8_R0]);
 			break;
+		}
 
 		default:
 			fatalerror("CPU_IMPORT_STATE(z8) called for unexpected value\n");
@@ -1079,14 +1193,12 @@ void z8_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case Z8_SP:
-		case STATE_GENSP:
-			m_fake_sp = (m_r[Z8_REGISTER_SPH] << 8) | m_r[Z8_REGISTER_SPL];
-			break;
-
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-			m_fake_r[entry.index() - Z8_R0] = m_r[m_r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)];
+		{
+			auto dis = machine().disable_side_effects();
+			m_fake_r[entry.index() - Z8_R0] = register_read(m_rp + (entry.index() - Z8_R0));
 			break;
+		}
 
 		default:
 			fatalerror("CPU_EXPORT_STATE(z8) called for unexpected value\n");
@@ -1098,12 +1210,12 @@ void z8_device::state_string_export(const device_state_entry &entry, std::string
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS: str = string_format("%c%c%c%c%c%c",
-										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
-										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
-										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',
-										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_V ? 'V' : '.',
-										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_D ? 'D' : '.',
-										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_H ? 'H' : '.');   break;
+										m_flags & Z8_FLAGS_C ? 'C' : '.',
+										m_flags & Z8_FLAGS_Z ? 'Z' : '.',
+										m_flags & Z8_FLAGS_S ? 'S' : '.',
+										m_flags & Z8_FLAGS_V ? 'V' : '.',
+										m_flags & Z8_FLAGS_D ? 'D' : '.',
+										m_flags & Z8_FLAGS_H ? 'H' : '.');   break;
 	}
 }
 
@@ -1114,25 +1226,25 @@ void z8_device::execute_set_input(int inputnum, int state)
 	{
 		case INPUT_LINE_IRQ0:
 			if (state != CLEAR_LINE && m_irq_line[0] == CLEAR_LINE)
-				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ0;
+				request_interrupt(0);
 			m_irq_line[0] = state;
 			break;
 
 		case INPUT_LINE_IRQ1:
 			if (state != CLEAR_LINE && m_irq_line[1] == CLEAR_LINE)
-				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ1;
+				request_interrupt(1);
 			m_irq_line[1] = state;
 			break;
 
 		case INPUT_LINE_IRQ2:
 			if (state != CLEAR_LINE && m_irq_line[2] == CLEAR_LINE)
-				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ2;
+				request_interrupt(2);
 			m_irq_line[2] = state;
 			break;
 
 		case INPUT_LINE_IRQ3:
 			if (state != CLEAR_LINE && m_irq_line[3] == CLEAR_LINE)
-				m_r[Z8_REGISTER_IRQ] |= Z8_IRQ_FLAG_IRQ3;
+				request_interrupt(3);
 			m_irq_line[3] = state;
 			break;
 
