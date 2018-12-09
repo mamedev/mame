@@ -53,26 +53,14 @@ enum
 	DS5002FP_PFI_LINE       /* DS5002FP Power fail interrupt */
 };
 
-/* At least CMOS devices may be forced to read from ports configured as output.
- * All you need is a low impedance output connect to the port.
- */
-
-#define MCFG_MCS51_PORT1_CONFIG(_forced_inputs) \
-	downcast<mcs51_cpu_device &>(*device).set_port_forced_input(1, _forced_inputs);
-#define MCFG_MCS51_PORT2_CONFIG(_forced_inputs) \
-	downcast<mcs51_cpu_device &>(*device).set_port_forced_input(2, _forced_inputs);
-#define MCFG_MCS51_PORT3_CONFIG(_forced_inputs) \
-	downcast<mcs51_cpu_device &>(*device).set_port_forced_input(3, _forced_inputs);
 
 class mcs51_cpu_device : public cpu_device
 {
 public:
-	// configuration helpers
-	template<class Object> devcb_base &set_port_in_cb(int n, Object &&cb) { return m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_port_out_cb(int n, Object &&cb) { return m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
+	/* At least CMOS devices may be forced to read from ports configured as output.
+	 * All you need is a low impedance output connect to the port.
+	 */
 	void set_port_forced_input(uint8_t port, uint8_t forced_input) { m_forced_inputs[port] = forced_input; }
-	template<class Object> devcb_base &set_serial_rx_cb(Object &&cb) { return m_serial_rx_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_serial_tx_cb(Object &&cb) { return m_serial_tx_cb.set_callback(std::forward<Object>(cb)); }
 
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
