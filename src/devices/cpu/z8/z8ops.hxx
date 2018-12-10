@@ -37,7 +37,7 @@
 	_func(dst, src);
 
 #define mode_IR2_R1(_func) \
-	uint8_t src = register_read(read(R));\
+	uint8_t src = read(read(R));\
 	uint8_t dst = R;\
 	_func(dst, src);
 
