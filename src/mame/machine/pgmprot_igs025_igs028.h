@@ -13,9 +13,13 @@ public:
 	{
 	}
 
-	void init_olds();
+	void driver_init() override;
 
 	void pgm_028_025_ol(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
 private:
 	required_shared_ptr<u16> m_sharedprotram;
 	required_device<igs025_device> m_igs025;
@@ -23,8 +27,7 @@ private:
 
 	void igs025_to_igs028_callback( void );
 
-	virtual void machine_reset() override;
-	void olds_mem(address_map &map);
+	void mem_map(address_map &map);
 };
 
 INPUT_PORTS_EXTERN( olds );

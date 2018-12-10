@@ -20,6 +20,11 @@ public:
 	void init_happy6();
 
 	void pgm_arm_type3(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	// svg
 	u8           m_ram_sel;
@@ -33,8 +38,6 @@ private:
 
 	optional_device<cpu_device> m_prot;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_WRITE32_MEMBER(arm7_ram_sel_w);
 	DECLARE_READ32_MEMBER(arm7_shareram_r);
 	DECLARE_WRITE32_MEMBER(arm7_shareram_w);

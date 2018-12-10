@@ -18,7 +18,7 @@
 
 void pgm_asic3_state::asic3_compute_hold(int y, int z)
 {
-	unsigned short old = m_asic3_hold;
+	u16 const old = m_asic3_hold;
 
 	m_asic3_hold = ((old << 1) | (old >> 15));
 
@@ -159,13 +159,18 @@ WRITE16_MEMBER(pgm_asic3_state::asic3_w)
 	}
 }
 
+void pgm_asic3_state::mem_map(address_map &map)
+{
+	pgm_state::pgm_mem(map);
+	map(0x100000, 0x2fffff).bankr("mainbank"); /* Game ROM */
+	map(0xC04000, 0xC0400f).rw(FUNC(pgm_asic3_state::asic3_r), FUNC(pgm_asic3_state::asic3_w));
+}
+
 /* Oriental Legend INIT */
 
-void pgm_asic3_state::init_orlegend()
+void pgm_asic3_state::driver_init()
 {
 	init_pgm();
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC04000, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::asic3_w),this));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;
@@ -220,6 +225,9 @@ INPUT_PORTS_START( orlegendk )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(pgm_asic3_state::pgm_asic3)
+void pgm_asic3_state::pgm_asic3(machine_config &config)
+{
 	pgm(config);
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_asic3_state::mem_map);
+}

@@ -9,7 +9,7 @@ public:
 		: pgm_state(mconfig, type, tag)
 	{}
 
-	void init_orlegend();
+	void driver_init() override;
 
 	void pgm_asic3(machine_config &config);
 private:
@@ -23,6 +23,8 @@ private:
 	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( asic3_r );
 	DECLARE_WRITE16_MEMBER( asic3_w );
+
+	void mem_map(address_map &map);
 };
 
 INPUT_PORTS_EXTERN( orlegend );

@@ -23,6 +23,5 @@ private:
 	void drgw2_decrypt();
 	void drgw2_common_init();
 
-	//virtual void machine_reset() override;
-	void drgw2_mem(address_map &map);
+	void mem_map(address_map &map);
 };

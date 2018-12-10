@@ -34,6 +34,10 @@ public:
 	void pgm_arm_type1_sim(machine_config &config);
 	void pgm_arm_type1_cave(machine_config &config);
 	void pgm_arm_type1(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	enum class arm_type {
 		EMULATED,
@@ -72,8 +76,6 @@ private:
 	optional_shared_ptr<u32> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
-
-	virtual void machine_start() override;
 
 	DECLARE_READ32_MEMBER(protlatch_r);
 	DECLARE_WRITE32_MEMBER(protlatch_w);

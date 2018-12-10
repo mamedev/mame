@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
-#include "screen.h"
 
 /******************************************************************************
  Sprites
@@ -19,7 +18,7 @@
 // bg pri is 2
 // sprite already here is 1 / 3
 
-inline void pgm_state::pgm_draw_pix(u16 const xdrawpos, u8 const pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat)
+inline void pgm_state::pgm_draw_pix(u16 xdrawpos, u8 pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.left()) && (xdrawpos <= cliprect.right()))
 	{
@@ -42,7 +41,7 @@ inline void pgm_state::pgm_draw_pix(u16 const xdrawpos, u8 const pri, u16* dest,
 	}
 }
 
-inline void pgm_state::pgm_draw_pix_nopri(u16 const xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat)
+inline void pgm_state::pgm_draw_pix_nopri(u16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.left()) && (xdrawpos <= cliprect.right()))
 	{
@@ -54,7 +53,7 @@ inline void pgm_state::pgm_draw_pix_nopri(u16 const xdrawpos, u16* dest, u8* des
 	}
 }
 
-inline void pgm_state::pgm_draw_pix_pri(u16 const xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat)
+inline void pgm_state::pgm_draw_pix_pri(u16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
 	if ((xdrawpos >= cliprect.left()) && (xdrawpos <= cliprect.right()))
 	{
@@ -74,27 +73,19 @@ inline void pgm_state::pgm_draw_pix_pri(u16 const xdrawpos, u16* dest, u8* destp
   for complex zoomed cases
 *************************************************************************/
 
-void pgm_state::draw_sprite_line(
-	u16 const wide,
-	u16* dest, u8* destpri, const rectangle &cliprect,
-	u32 const xzoom, bool const xgrow,
-	u8 const flip,
-	s16 const xpos,
-	u8 const pri,
-	u16 const realxsize,
-	u8 const palt,
-	bool const draw)
+void pgm_state::draw_sprite_line(u16 wide, u16* dest, u8* destpri, const rectangle &cliprect,
+		u32 xzoom, bool xgrow, u8 flip, s16 xpos, u8 pri, u16 realxsize, u8 palt, bool draw)
 {
-	int xzoombit;
+	u8 xzoombit;
 	int xoffset = 0;
-	int xdrawpos = 0;
+	u16 xdrawpos = 0;
 
 	const u8 *adata = m_sprite_a_region.get();
 	size_t  adatasize = m_sprite_a_region_size - 1;
 
-	int xcntdraw = 0;
+	u16 xcntdraw = 0;
 
-	for (int xcnt = 0 ; xcnt < wide ; xcnt++)
+	for (u16 xcnt = 0; xcnt < wide; xcnt++)
 	{
 		u16 const msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |( m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
 
@@ -163,18 +154,13 @@ void pgm_state::draw_sprite_line(
 	}
 }
 
-void pgm_state::draw_sprite_new_zoomed(
-	u16 const wide, u16 const high,
-	s16 const xpos, s16 const ypos,
-	u8 const palt, u8 const flip,
-	bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect,
-	u32 const xzoom, bool const xgrow, u32 const yzoom, bool const ygrow,
-	u8 const pri)
+void pgm_state::draw_sprite_new_zoomed(u16 wide, u16 high, s16 xpos, s16 ypos, u8 palt, u8 flip,
+		bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, u8 pri)
 {
-	int ydrawpos;
-	int yzoombit;
-	int xzoombit;
-	int xcnt = 0;
+	u16 ydrawpos;
+	u8 yzoombit;
+	u8 xzoombit;
+	u16 xcnt = 0;
 
 
 	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdata.mask()] << 24) | (m_bdata[(m_boffset + 2) & m_bdata.mask()] << 16) |
@@ -187,9 +173,9 @@ void pgm_state::draw_sprite_new_zoomed(
 	/* if we're to avoid pre-decoding the data for each sprite each time we draw then we have to draw the sprite data
 	   in the order it is in ROM due to the nature of the compresson scheme.  This means drawing upwards from the end point
 	   in the case of flipped sprites */
-	int ycnt = 0;
-	int ycntdraw = 0;
-	int realysize = 0;
+	u16 ycnt = 0;
+	u16 ycntdraw = 0;
+	u16 realysize = 0;
 
 	while (ycnt < high)
 	{
@@ -202,7 +188,7 @@ void pgm_state::draw_sprite_new_zoomed(
 	}
 	realysize--;
 
-	int realxsize = 0;
+	u16 realxsize = 0;
 
 	while (xcnt < wide * 16)
 	{
@@ -226,8 +212,8 @@ void pgm_state::draw_sprite_new_zoomed(
 
 		if (yzoombit == 1 && ygrow) // double this line
 		{
-			int temp_aoffset = m_aoffset;
-			int temp_boffset = m_boffset;
+			u32 temp_aoffset = m_aoffset;
+			u32 temp_boffset = m_boffset;
 
 			if (BIT(~flip, 1))
 				ydrawpos = ypos + ycntdraw;
@@ -324,26 +310,18 @@ void pgm_state::draw_sprite_new_zoomed(
 }
 
 
-void pgm_state::draw_sprite_line_basic(
-	u16 const wide,
-	u16* dest, u8* destpri, const rectangle &cliprect,
-	u8 const flip,
-	s16 const xpos,
-	u8 const pri,
-	u16 const realxsize,
-	u8 const palt,
-	bool const draw)
+void pgm_state::draw_sprite_line_basic(u16 wide, u16* dest, u8* destpri, const rectangle &cliprect, u8 flip, s16 xpos, u8 pri, u16 realxsize, u8 palt, bool draw)
 {
 	int xoffset = 0;
-	int xdrawpos = 0;
+	u16 xdrawpos = 0;
 	const u8 *adata = m_sprite_a_region.get();
 	size_t  adatasize = m_sprite_a_region_size - 1;
 
-	int xcntdraw = 0;
+	u16 xcntdraw = 0;
 
 	if (!pri)
 	{
-		for (int xcnt = 0; xcnt < wide ; xcnt++)
+		for (u16 xcnt = 0; xcnt < wide; xcnt++)
 		{
 			u16 const msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |( m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
 
@@ -381,7 +359,7 @@ void pgm_state::draw_sprite_line_basic(
 	}
 	else
 	{
-		for (int xcnt = 0 ; xcnt < wide ; xcnt++)
+		for (u16 xcnt = 0; xcnt < wide; xcnt++)
 		{
 			u16 const msk = ((m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) |( m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0));
 
@@ -424,14 +402,10 @@ void pgm_state::draw_sprite_line_basic(
   simplified version for non-zoomed cases, a bit faster
 *************************************************************************/
 
-void pgm_state::draw_sprite_new_basic(
-	u16 const wide, u16 const high,
-	s16 const xpos, s16 const ypos,
-	u8 const palt, u8 const flip,
-	bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect,
-	u8 const pri)
+void pgm_state::draw_sprite_new_basic(u16 wide, u16 high, s16 xpos, s16 ypos, u8 palt, u8 flip,
+		bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u8 pri)
 {
-	int ydrawpos;
+	u16 ydrawpos;
 
 	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdata.mask()] << 24) | (m_bdata[(m_boffset + 2) & m_bdata.mask()] << 16) |
 				(m_bdata[(m_boffset + 1) & m_bdata.mask()] << 8) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
@@ -439,12 +413,12 @@ void pgm_state::draw_sprite_new_basic(
 
 	m_boffset+=4;
 
-	int realysize = high-1;
-	int realxsize = (wide * 16)-1;
+	u16 realysize = high-1;
+	u16 realxsize = (wide * 16)-1;
 
 	/* now draw it */
-	int ycnt = 0;
-	int ycntdraw = 0;
+	u16 ycnt = 0;
+	u16 ycntdraw = 0;
 
 	while (ycnt < high)
 	{

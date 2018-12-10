@@ -196,41 +196,38 @@ void pgm_arm_type1_state::machine_start()
 	}
 }
 
-MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1)
+void pgm_arm_type1_state::pgm_arm_type1(machine_config &config)
+{
 	pgm(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kov_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::kov_map);
 
 	/* protection CPU */
-	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857E?
-	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
+	ARM7(config, m_prot, 20000000);    // 55857E?
+	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
 
-//	MCFG_SCREEN_MODIFY("screen")
-//	MCFG_SCREEN_REFRESH_RATE(59.17) // Correct? Verify this from real PGM PCB
-MACHINE_CONFIG_END
+//	m_screen->set_refresh(HZ_TO_ATTOSECONDS(59.17)); // Correct? Verify this from real PGM PCB
+}
 
-MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_sim)
+void pgm_arm_type1_state::pgm_arm_type1_sim(machine_config &config)
+{
 	pgm_arm_type1(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kov_sim_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::kov_sim_map);
 
 	/* protection CPU */
-	MCFG_DEVICE_MODIFY("prot")   // 55857E?
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
+	m_prot->set_disable();
+}
 
-MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
+void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
+{
 	//pgm_arm_type1(config);
 	pgm_arm_type1_sim(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cavepgm_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::cavepgm_mem);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
-MACHINE_CONFIG_END
+	m_screen->set_refresh(HZ_TO_ATTOSECONDS(59.17)); // verified on pcb
+}
 
 READ16_MEMBER(pgm_arm_type1_state::kovsh_fake_region_r )
 {
@@ -2313,29 +2310,15 @@ INPUT_PORTS_START( cavepgm )
 	PORT_BIT( 0xfccc, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ""
 
 	PORT_MODIFY("DSW")
-	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:!1" )
+	PORT_SERVICE_DIPLOC(    0x0001, IP_ACTIVE_LOW, "SW1:!1" )
 	// DSW 2-8 : Manual says "Unused"
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!5")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!7")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:!2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW1:!4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:!6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:!7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW1:!8" )
 INPUT_PORTS_END
 
 

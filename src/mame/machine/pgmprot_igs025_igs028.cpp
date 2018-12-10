@@ -162,21 +162,20 @@ void pgm_028_025_state::machine_reset()
 	pgm_state::machine_reset();
 }
 
-void pgm_028_025_state::init_olds()
+void pgm_028_025_state::driver_init()
 {
 	init_pgm();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::olds_w), (igs025_device*)m_igs025));
 	m_igs028->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = m_olds_source_data;
-
 }
 
-void pgm_028_025_state::olds_mem(address_map &map)
+void pgm_028_025_state::mem_map(address_map &map)
 {
 	pgm_state::pgm_mem(map);
 	map(0x100000, 0x3fffff).bankr("mainbank"); /* Game ROM */
 	map(0x400000, 0x403fff).ram().share("sharedprotram"); // Shared with protection device
+	map(0xdcb400, 0xdcb403).rw(m_igs025, FUNC(igs025_device::killbld_igs025_prot_r), FUNC(igs025_device::killbld_igs025_prot_w));
 }
 
 void pgm_028_025_state::igs025_to_igs028_callback( void )
@@ -185,18 +184,17 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 	m_igs028->IGS028_handle();
 }
 
-
-MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
+void pgm_028_025_state::pgm_028_025_ol(machine_config &config)
+{
 	pgm(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(olds_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_028_025_state::mem_map);
 
 	IGS025(config, m_igs025, 0);
 	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
 
 	IGS028(config, m_igs028, 0);
-MACHINE_CONFIG_END
+}
 
 
 INPUT_PORTS_START( olds )

@@ -34,7 +34,7 @@
 
 /* NON-device stuff, game specific, keep here */
 
-void pgm_022_025_state::dw3_decrypt()
+void pgm_022_025_dw3_state::decrypt()
 {
 	int i;
 	u16 *src = (u16 *) (memregion("maincpu")->base()+0x100000);
@@ -54,7 +54,7 @@ void pgm_022_025_state::dw3_decrypt()
 	}
 }
 
-void pgm_022_025_state::killbld_decrypt()
+void pgm_022_025_killbld_state::decrypt()
 {
 	int i;
 	u16 *src = (u16 *) (memregion("maincpu")->base()+0x100000);
@@ -313,7 +313,7 @@ static const u8 dw3_source_data[0x08][0xec] =
 	}
 };
 
-MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
+void pgm_022_025_killbld_state::machine_reset()
 {
 	int region = (ioport(":Region")->read()) & 0xff;
 
@@ -323,7 +323,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 	pgm_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(pgm_022_025_state, dw3)
+void pgm_022_025_dw3_state::machine_reset()
 {
 	int region = (ioport(":Region")->read()) & 0xff;
 
@@ -344,59 +344,72 @@ void pgm_022_025_state::igs025_to_igs022_callback( void )
 
 
 
-void pgm_022_025_state::init_killbld()
+void pgm_022_025_killbld_state::driver_init()
 {
 	init_pgm();
-	killbld_decrypt();
+	decrypt();
 
-	// install and configure protection device(s)
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+	// configure protection device(s)
 	m_igs022->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = killbld_source_data;
 }
 
-void pgm_022_025_state::init_drgw3()
+void pgm_022_025_dw3_state::driver_init()
 {
 	init_pgm();
-	dw3_decrypt();
+	decrypt();
 
-	// install and configure protection device(s)
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+	// configure protection device(s)
 	m_igs022->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = dw3_source_data;
 }
 
 
-void pgm_022_025_state::killbld_mem(address_map &map)
+void pgm_022_025_state::mem_map(address_map &map)
 {
 	pgm_state::pgm_mem(map);
 	map(0x100000, 0x2fffff).bankr("mainbank"); /* Game ROM */
 	map(0x300000, 0x303fff).ram().share("sharedprotram"); // Shared with protection device
 }
 
+void pgm_022_025_killbld_state::killbld_map(address_map &map)
+{
+	pgm_022_025_state::mem_map(map);
+	map(0xd40000, 0xd40003).rw(m_igs025, FUNC(igs025_device::killbld_igs025_prot_r), FUNC(igs025_device::killbld_igs025_prot_w));
+}
 
-MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025)
+void pgm_022_025_dw3_state::dw3_map(address_map &map)
+{
+	pgm_022_025_state::mem_map(map);
+	map(0xda5610, 0xda5613).rw(m_igs025, FUNC(igs025_device::killbld_igs025_prot_r), FUNC(igs025_device::killbld_igs025_prot_w));
+}
+
+
+void pgm_022_025_state::pgm_022_025(machine_config &config)
+{
 	pgm(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(killbld_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_022_025_state::mem_map);
 
 	IGS025(config, m_igs025, 0);
 	m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs022_callback), this);
 
 	IGS022(config, m_igs022, 0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025_dw3)
+void pgm_022_025_killbld_state::pgm_022_025_killbld(machine_config &config)
+{
 	pgm_022_025(config);
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_022_025_state, dw3)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025_killbld)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_022_025_killbld_state::killbld_map);
+}
+
+void pgm_022_025_dw3_state::pgm_022_025_dw3(machine_config &config)
+{
 	pgm_022_025(config);
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_022_025_state, killbld)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_022_025_dw3_state::dw3_map);
+}
 
 
 INPUT_PORTS_START( killbld )
@@ -431,7 +444,6 @@ INPUT_PORTS_START( dw3 )
 	PORT_CONFSETTING(      0x0005, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
 	PORT_CONFSETTING(      0x0007, "Singapore" )
-
 INPUT_PORTS_END
 
 
@@ -448,5 +460,4 @@ INPUT_PORTS_START( dw3j ) // for dw3100 set
 //  PORT_CONFSETTING(      0x0005, DEF_STR( China ) )
 //  PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
 //  PORT_CONFSETTING(      0x0007, "Singapore" )
-
 INPUT_PORTS_END

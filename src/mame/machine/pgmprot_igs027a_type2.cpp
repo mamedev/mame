@@ -135,16 +135,16 @@ void pgm_arm_type2_state::machine_start()
 
 /******* ARM 55857F *******/
 
-MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
+void pgm_arm_type2_state::pgm_arm_type2(machine_config &config)
+{
 	pgm(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kov2_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::kov2_mem);
 
 	/* protection CPU */
-	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857F
-	MCFG_DEVICE_PROGRAM_MAP(_55857F_arm7_map)
-MACHINE_CONFIG_END
+	ARM7(config, m_prot, 20000000);    // 55857F
+	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type2_state::_55857F_arm7_map);
+}
 
 
 
@@ -254,12 +254,6 @@ void pgm_arm_type2_state::init_ddp2()
 
 
 void pgm_arm_type2_state::init_dw2001()
-{
-	init_pgm();
-	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
-}
-
-void pgm_arm_type2_state::init_dwpc()
 {
 	init_pgm();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters

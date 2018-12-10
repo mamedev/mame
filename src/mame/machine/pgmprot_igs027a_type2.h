@@ -16,9 +16,12 @@ public:
 	void init_martmast();
 	void init_ddp2();
 	void init_dw2001();
-	void init_dwpc();
 
 	void pgm_arm_type2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	// kov2
 	u32        m_latchdata_68k_w;
@@ -29,7 +32,6 @@ private:
 
 	optional_device<cpu_device> m_prot;
 
-	virtual void machine_start() override;
 	DECLARE_READ32_MEMBER(latch_arm_r);
 	DECLARE_WRITE32_MEMBER(latch_arm_w);
 	DECLARE_READ32_MEMBER(shareram_r);

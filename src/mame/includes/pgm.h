@@ -19,6 +19,7 @@
 #include "machine/timer.h"
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
+#include "screen.h"
 #include "emupal.h"
 
 #define PGMARM7LOGERROR 0
@@ -34,6 +35,7 @@ public:
 		, m_mainram(*this, "sram")
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
+		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
@@ -64,6 +66,7 @@ protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -87,8 +90,8 @@ private:
 
 	/* used by rendering */
 	required_region_ptr<u8> m_bdata;
-	int m_aoffset;
-	int m_boffset;
+	u32 m_aoffset;
+	u32 m_boffset;
 
 	DECLARE_READ16_MEMBER(videoram_r);
 	DECLARE_WRITE16_MEMBER(videoram_w);
@@ -108,44 +111,20 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	inline void pgm_draw_pix(u16 const xdrawpos, u8 const pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat);
-	inline void pgm_draw_pix_nopri(u16 const xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat);
-	inline void pgm_draw_pix_pri(u16 const xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 const srcdat);
+	inline void pgm_draw_pix(u16 xdrawpos, u8 pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
+	inline void pgm_draw_pix_nopri(u16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
+	inline void pgm_draw_pix_pri(u16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
 
-	void draw_sprite_line(
-	u16 const wide,
-	u16* dest, u8* destpri, const rectangle &cliprect,
-	u32 const xzoom, bool const xgrow,
-	u8 const flip, s16 const xpos,
-	u8 const pri,
-	u16 const realxsize,
-	u8 const palt,
-	bool const draw);
+	void draw_sprite_line(u16 wide, u16* dest, u8* destpri, const rectangle &cliprect,
+	        u32 xzoom, bool xgrow, u8 flip, s16 xpos, u8 pri, u16 realxsize, u8 palt, bool draw);
 
-	void draw_sprite_new_zoomed(
-	u16 const wide, u16 const high,
-	s16 const xpos, s16 const ypos,
-	u8 const palt, u8 const flip,
-	bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect,
-	u32 const xzoom, bool const xgrow, u32 const yzoom, bool const ygrow,
-	u8 const pri);
+	void draw_sprite_new_zoomed(u16 wide, u16 high, s16 xpos, s16 ypos, u8 palt, u8 flip,
+			bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, u8 pri);
 
-	void draw_sprite_line_basic(
-	u16 const wide,
-	u16* dest, u8* destpri, const rectangle &cliprect,
-	u8 const flip,
-	s16 const xpos,
-	u8 const pri,
-	u16 const realxsize,
-	u8 const palt,
-	bool const draw);
+	void draw_sprite_line_basic(u16 wide, u16* dest, u8* destpri, const rectangle &cliprect, u8 flip, s16 xpos, u8 pri, u16 realxsize, u8 palt, bool draw);
 
-	void draw_sprite_new_basic(
-	u16 const wide, u16 const high,
-	s16 const xpos, s16 const ypos,
-	u8 const palt, u8 const flip,
-	bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect,
-	u8 const pri);
+	void draw_sprite_new_basic(u16 wide, u16 high, s16 xpos, s16 ypos, u8 palt, u8 flip,
+			bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u8 pri);
 
 	void draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap);
 	void expand_colourdata();
