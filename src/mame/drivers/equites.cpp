@@ -388,8 +388,8 @@ D                                                                               
 
 WRITE_LINE_MEMBER(equites_state::equites_8155_timer_pulse)
 {
-	if (!state) // active low
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (!state)
+		m_audiocpu->set_input_line(I8085_TRAP_LINE, ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
@@ -410,12 +410,12 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 	switch (offset)
 	{
 		case 0: // c0f8: NMI ack (written by NMI handler)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			m_audiocpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			m_audiocpu->pulse_input_line(I8085_RST75_LINE, m_audiocpu->minimum_quantum_time());
+			m_audiocpu->pulse_input_line(I8085_RST75_LINE, attotime::zero);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
@@ -1150,6 +1150,8 @@ void splndrbt_state::machine_start()
 
 void equites_state::machine_reset()
 {
+	m_audiocpu->set_input_line(I8085_INTR_LINE, CLEAR_LINE);
+	m_audiocpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
 }
 
 
