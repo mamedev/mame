@@ -1691,10 +1691,10 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	MB3773(config, "watchdog");
 
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
 
 	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
 	m_cmptimer_1->m68kint_callback().set(FUNC(segaxbd_state::timer_irq_w));

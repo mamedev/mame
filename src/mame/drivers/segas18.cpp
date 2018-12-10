@@ -1320,10 +1320,9 @@ MACHINE_CONFIG_START(segas18_state::system18)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, 10000000)
-	MCFG_SEGA_315_5195_CPU("maincpu")
-	MCFG_SEGA_315_5195_MAPPER_HANDLER(segas18_state, memory_mapper)
-	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, 10000000, m_maincpu);
+	m_mapper->set_mapper(FUNC(segas18_state::memory_mapper), this);
+	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	SEGA_315_5296(config, m_io, 16000000);
 	m_io->in_pa_callback().set_ioport("P1");
@@ -1444,8 +1443,7 @@ MACHINE_CONFIG_START(segas18_state::system18_i8751)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
-	MCFG_DEVICE_MODIFY("mapper")
-	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
+	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
@@ -1459,8 +1457,7 @@ MACHINE_CONFIG_START(segas18_state::system18_fd1094_i8751)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
-	MCFG_DEVICE_MODIFY("mapper")
-	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
+	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
 	MCFG_DEVICE_IO_MAP(mcu_io_map)

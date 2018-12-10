@@ -483,12 +483,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(vigilant_state::vigilant)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(vigilant_map)
 	MCFG_DEVICE_IO_MAP(vigilant_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("soundcpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579645));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
 	ymsnd.add_route(0, "lspeaker", 0.55);
 	ymsnd.add_route(1, "rspeaker", 0.55);
@@ -598,12 +598,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vigilant_state::kikcubic)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(kikcubic_map)
 	MCFG_DEVICE_IO_MAP(kikcubic_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("soundcpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579645));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
 	ymsnd.add_route(0, "lspeaker", 0.55);
 	ymsnd.add_route(1, "rspeaker", 0.55);

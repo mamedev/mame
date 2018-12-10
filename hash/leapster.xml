@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-Known games listed by part-no, (*) denotes undumped:
+Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but not dumped yet:
 
 |  PART-NO    |LAN| GAME TITLE                                                | CARTRIDGE-TYPE |
 ================================================================================================
@@ -46,8 +46,13 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-12160-A |ENG| Scooby Doo! - Spooky Snacks!                              | LEAPSTER       |
 | 500-12161-A |ENG| Dora the Explorer - Piñata Party - Arcade-Style Learning! | LEAPSTER       |
 | 500-12171-A |GER| Cars                                                      | LEAPSTER       |
+| 500-12202-A |SPA| La Conquista De Los Números                               | LEAPSTER       | (**)
+| 500-12206-A |SPA| Don Lápiz - Aprender A Dibujar Y Escribir                 | LEAPSTER       | (**)
+| 500-12210-A |SPA| Buscando A Nemo - Leer Bajo El Mar                        | LEAPSTER       | (**)
 | 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       |
 | 500-12223-A |SPA| Cars                                                      | LEAPSTER       |
+| 500-12227-A |SPA| Spider-Man -  El Caso De Las Letras Revueltas             | LEAPSTER       | (**)
+| 500-12259-A |SPA| El Labirinto De Las Letras                                | LEAPSTER       | (**)
 | 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
 | 500-12296-A |ENG| SonicX                                                    | LEAPSTER       |
 | 500-12339-A |FRA| Dora L' Exploratrice - Au Secours Des Animaux             | LEAPSTER       |

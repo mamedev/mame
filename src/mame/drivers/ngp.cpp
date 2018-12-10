@@ -860,7 +860,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ngp_state::ngp)
 	ngp_common(config);
 
-	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( *this, ngp_state, ngp_vblank_pin_w ), WRITELINE( *this, ngp_state, ngp_hblank_pin_w ) )
+	K1GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
@@ -878,7 +880,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ngp_state::ngpc)
 	ngp_common(config);
-	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( *this, ngp_state, ngp_vblank_pin_w ), WRITELINE( *this, ngp_state, ngp_hblank_pin_w ) )
+	K2GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")

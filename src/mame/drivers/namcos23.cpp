@@ -3594,33 +3594,30 @@ static GFXDECODE_START( gfx_namcos23 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(namcos23_state::gorgon)
-
+void namcos23_state::gorgon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*4)
-	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
-	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_DEVICE_PROGRAM_MAP(gorgon_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	R4650BE(config, m_maincpu, BUSCLOCK*4);
+	m_maincpu->set_icache_size(8192);   // VERIFIED
+	m_maincpu->set_dcache_size(8192);   // VERIFIED
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::gorgon_map);
+	m_maincpu->set_vblank_int("screen", FUNC(namcos23_state::interrupt));
 
-	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
-	MCFG_DEVICE_IO_MAP( s23h8iomap )
+	H83002(config, m_subcpu, H8CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
+	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
-	MCFG_DEVICE_ADD(m_iocpu, H83334, JVSCLOCK )
-	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
-	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
+	H83334(config, m_iocpu, JVSCLOCK);
+	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
+	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
+	config.m_minimum_quantum = attotime::from_hz(2*115200);
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -3636,17 +3633,17 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VSYNC1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(VSYNC1);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not in any way accurate
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 639, 0, 479);
+	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	PALETTE(config, m_palette, 0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3654,41 +3651,38 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	c352_device &c352(C352(config, "c352", C352CLOCK, C352DIV));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	c352.add_route(2, "lspeaker", 1.00);
+	c352.add_route(3, "rspeaker", 1.00);
+}
 
 
-MACHINE_CONFIG_START(namcos23_state::s23)
-
+void namcos23_state::s23(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*4)
-	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
-	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_DEVICE_PROGRAM_MAP(s23_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	R4650BE(config, m_maincpu, BUSCLOCK*4);
+	m_maincpu->set_icache_size(8192);   // VERIFIED
+	m_maincpu->set_dcache_size(8192);   // VERIFIED
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23_map);
+	m_maincpu->set_vblank_int("screen", FUNC(namcos23_state::interrupt));
 
-	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
-	MCFG_DEVICE_IO_MAP( s23h8iomap )
+	H83002(config, m_subcpu, H8CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
+	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
-	MCFG_DEVICE_ADD(m_iocpu, H83334, JVSCLOCK )
-	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
-	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
+	H83334(config, m_iocpu, JVSCLOCK);
+	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
+	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
+	config.m_minimum_quantum = attotime::from_hz(2*115200);
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -3704,17 +3698,17 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VSYNC1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(VSYNC1);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not in any way accurate
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 639, 0, 479);
+	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	PALETTE(config, m_palette, 0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3722,54 +3716,52 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_CONFIG_END
+	c352_device &c352(C352(config, "c352", C352CLOCK, C352DIV));
+	c352.add_route(0, "rspeaker", 1.00);
+	c352.add_route(1, "lspeaker", 1.00);
+	c352.add_route(2, "rspeaker", 1.00);
+	c352.add_route(3, "lspeaker", 1.00);
+}
 
-MACHINE_CONFIG_START(namcos23_state::timecrs2)
+void namcos23_state::timecrs2(machine_config &config)
+{
 	s23(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("iocpu")
-	MCFG_DEVICE_PROGRAM_MAP( timecrs2iobrdmap )
-MACHINE_CONFIG_END
+	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
+}
 
-MACHINE_CONFIG_START(namcos23_state::gmen)
+void namcos23_state::gmen(machine_config &config)
+{
 	s23(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(BUSCLOCK*5)
-	MCFG_DEVICE_PROGRAM_MAP(gmen_mips_map)
+	m_maincpu->set_clock(BUSCLOCK*5);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_mips_map);
 
-	MCFG_DEVICE_ADD("gmen_sh2", SH2, XTAL(28'700'000))
-	MCFG_DEVICE_PROGRAM_MAP(gmen_sh2_map)
+	SH2(config, m_gmen_sh2, XTAL(28'700'000));
+	m_gmen_sh2->set_addrmap(AS_PROGRAM, &namcos23_state::gmen_sh2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(namcos23_state::ss23)
-
+void namcos23_state::ss23(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, R4650BE, BUSCLOCK*5)
-	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
-	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_DEVICE_PROGRAM_MAP(s23_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	R4650BE(config, m_maincpu, BUSCLOCK*5);
+	m_maincpu->set_icache_size(8192);   // VERIFIED
+	m_maincpu->set_dcache_size(8192);   // VERIFIED
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23_map);
+	m_maincpu->set_vblank_int("screen", FUNC(namcos23_state::interrupt));
 
-	MCFG_DEVICE_ADD(m_subcpu, H83002, H8CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
-	MCFG_DEVICE_IO_MAP( s23h8iomap )
+	H83002(config, m_subcpu, H8CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23h8rwmap);
+	m_subcpu->set_addrmap(AS_IO, &namcos23_state::s23h8iomap);
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
+	config.m_minimum_quantum = attotime::from_hz(2*115200);
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -3785,17 +3777,17 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VSYNC1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(VSYNC1);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not in any way accurate
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 639, 0, 479);
+	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	PALETTE(config, m_palette, 0x8000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3803,42 +3795,39 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, C352CLOCK, C352DIV)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_CONFIG_END
+	c352_device &c352(C352(config, "c352", C352CLOCK, C352DIV));
+	c352.add_route(0, "rspeaker", 1.00);
+	c352.add_route(1, "lspeaker", 1.00);
+	c352.add_route(2, "rspeaker", 1.00);
+	c352.add_route(3, "lspeaker", 1.00);
+}
 
-MACHINE_CONFIG_START(namcos23_state::timecrs2v4a)
+void namcos23_state::timecrs2v4a(machine_config &config)
+{
 	ss23(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_DEVICE_PROGRAM_MAP( timecrs2iobrdmap )
-	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
+	H83334(config, m_iocpu, JVSCLOCK);
+	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::timecrs2iobrdmap);
+	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
-MACHINE_CONFIG_END
+	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+}
 
-MACHINE_CONFIG_START(namcos23_state::ss23e2)
+void namcos23_state::ss23e2(machine_config &config)
+{
 	ss23(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(BUSCLOCK*6)
+	m_maincpu->set_clock(BUSCLOCK*6);
 
-	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
-	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
+	H83334(config, m_iocpu, JVSCLOCK);
+	m_iocpu->set_addrmap(AS_PROGRAM, &namcos23_state::s23iobrdmap);
+	m_iocpu->set_addrmap(AS_IO, &namcos23_state::s23iobrdiomap);
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
-MACHINE_CONFIG_END
+	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
+	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
+}
 
 
 

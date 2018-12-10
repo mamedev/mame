@@ -830,26 +830,26 @@ void nwktr_state::machine_reset()
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(nwktr_state::nwktr)
-
+void nwktr_state::nwktr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_DEVICE_PROGRAM_MAP(nwktr_map)
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nwktr_state::nwktr_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nwktr_state::sound_memmap);
 
-	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(sharc0_map)
+	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp->set_addrmap(AS_DATA, &nwktr_state::sharc0_map);
 
-	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(sharc1_map)
+	ADSP21062(config, m_dsp2, XTAL(36'000'000));
+	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp2->set_addrmap(AS_DATA, &nwktr_state::sharc1_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
+	config.m_minimum_quantum = attotime::from_hz(9000);
 
-	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
+	M48T58(config, "m48t58", 0);
 
 	ADC12138(config, m_adc12138, 0);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
@@ -858,33 +858,33 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2,2)
-	MCFG_VOODOO_SCREEN_TAG("lscreen")
-	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state,voodoo_vblank_0))
+	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(2,2);
+	m_voodoo[0]->set_screen_tag("lscreen");
+	m_voodoo[0]->set_cpu_tag(m_dsp);
+	m_voodoo[0]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_0));
 
-	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2, 2)
-	MCFG_VOODOO_SCREEN_TAG("rscreen")
-	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state, voodoo_vblank_1))
+	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(2,2);
+	m_voodoo[1]->set_screen_tag("rscreen");
+	m_voodoo[1]->set_cpu_tag(m_dsp);
+	m_voodoo[1]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_1));
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_lscreen)
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_size(512, 384);
+	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_screen_update(FUNC(nwktr_state::screen_update_lscreen));
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_rscreen)
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_size(512, 384);
+	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_screen_update(FUNC(nwktr_state::screen_update_rscreen));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, m_palette, 65536);
 
 	K001604(config, m_k001604, 0);
 	m_k001604->set_layer_size(0);
@@ -899,14 +899,14 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	K056800(config, m_k056800, XTAL(16'934'400));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));  // as per Guru readme above
+	rfsnd.add_route(0, "lspeaker", 1.0);
+	rfsnd.add_route(1, "rspeaker", 1.0);
 
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
-MACHINE_CONFIG_END
+}
 
 void nwktr_state::thrilld(machine_config &config)
 {

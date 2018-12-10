@@ -435,14 +435,13 @@ uint8_t z8_device::p3_read()
 
 void z8_device::p3_write(uint8_t data)
 {
-	uint8_t mask = 0;
+	uint8_t mask = 0xf0;
 
 	m_output[3] = data;
 
 	// TODO: special port 3 modes
 	//if (!(m_p3m & 0x7c))
 	//{
-		mask = 0xf0;
 	//}
 
 	if (mask)
@@ -511,7 +510,7 @@ void z8_device::pre0_write(uint8_t data)
 
 void z8_device::pre1_write(uint8_t data)
 {
-	m_pre[0] = data;
+	m_pre[1] = data;
 }
 
 void z8_device::p01m_write(uint8_t data)
@@ -1153,6 +1152,7 @@ void z8_device::device_reset()
 	p01m_write(0x4d);
 	p2m_write(0xff);
 	p3m_write(0x00);
+	p3_write(m_output[3] | 0xf0);
 
 	m_pre[0] &= ~Z8_PRE0_COUNT_MODULO_N;
 	m_pre[1] &= ~(Z8_PRE1_COUNT_MODULO_N | Z8_PRE1_INTERNAL_CLOCK);

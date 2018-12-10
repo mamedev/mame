@@ -187,10 +187,11 @@ class aleck64_state : public n64_state
 {
 public:
 	aleck64_state(const machine_config &mconfig, device_type type, const char *tag)
-		: n64_state(mconfig, type, tag),
-			m_e90_vram(*this,"e90vram"),
-			m_e90_pal(*this,"e90pal"),
-			m_dip_read_offset(0) { }
+		: n64_state(mconfig, type, tag)
+		, m_e90_vram(*this,"e90vram")
+		, m_e90_pal(*this,"e90pal")
+		, m_dip_read_offset(0)
+	{ }
 
 	void aleck64(machine_config &config);
 	void a64_e90(machine_config &config);
@@ -972,45 +973,43 @@ static INPUT_PORTS_START( srmvs )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(aleck64_state::aleck64)
-
+void aleck64_state::aleck64(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", VR4300BE, 93750000)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(8192)
-	MCFG_MIPS3_SYSTEM_CLOCK(62500000)
-	MCFG_DEVICE_PROGRAM_MAP(n64_map)
-	MCFG_CPU_FORCE_NO_DRC()
+	VR4300BE(config, m_vr4300, 93750000);
+	m_vr4300->set_icache_size(16384);
+	m_vr4300->set_dcache_size(8192);
+	m_vr4300->set_system_clock(62500000);
+	m_vr4300->set_addrmap(AS_PROGRAM, &aleck64_state::n64_map);
+	m_vr4300->set_force_no_drc(true);
 
-	MCFG_DEVICE_ADD("rsp", RSP, 62500000)
-	MCFG_RSP_DP_REG_R_CB(READ32("rcp",n64_periphs, dp_reg_r))
-	MCFG_RSP_DP_REG_W_CB(WRITE32("rcp",n64_periphs, dp_reg_w))
-	MCFG_RSP_SP_REG_R_CB(READ32("rcp",n64_periphs, sp_reg_r))
-	MCFG_RSP_SP_REG_W_CB(WRITE32("rcp",n64_periphs, sp_reg_w))
-	MCFG_RSP_SP_SET_STATUS_CB(WRITE32("rcp",n64_periphs, sp_set_status))
-	MCFG_DEVICE_PROGRAM_MAP(rsp_map)
-	MCFG_CPU_FORCE_NO_DRC()
+	RSP(config, m_rsp, 62500000);
+	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
+	m_rsp->dp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_w));
+	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
+	m_rsp->sp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_w));
+	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
+	m_rsp->set_addrmap(AS_PROGRAM, &aleck64_state::rsp_map);
+	m_rsp->set_force_no_drc(true);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 525)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aleck64_state, screen_vblank_n64))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 525);
+	screen.set_visarea(0, 639, 0, 239);
+	screen.set_screen_update(FUNC(aleck64_state::screen_update_n64));
+	screen.screen_vblank().set(FUNC(aleck64_state::screen_vblank_n64));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, "palette", 0x1000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("dac1", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_DEVICE_ADD("dac2", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	N64PERIPH(config, "rcp", 0);
-MACHINE_CONFIG_END
+	N64PERIPH(config, m_rcp_periphs, 0);
+}
 
 uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1087,14 +1086,13 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-MACHINE_CONFIG_START(aleck64_state::a64_e90)
+void aleck64_state::a64_e90(machine_config &config)
+{
 	aleck64(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(e90_map)
+	m_vr4300->set_addrmap(AS_PROGRAM, &aleck64_state::e90_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(aleck64_state::screen_update_e90));
+}
 
 void aleck64_state::init_aleck64()
 {

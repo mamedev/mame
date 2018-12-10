@@ -3725,8 +3725,8 @@ void segas16b_state::system16b(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK_10MHz, m_maincpu);
-	m_mapper->set_mapper(FUNC(segas16b_state::memory_mapper));
-	m_mapper->pbf().set_inputline("soundcpu", 0);
+	m_mapper->set_mapper(FUNC(segas16b_state::memory_mapper), this);
+	m_mapper->pbf().set_inputline(m_soundcpu, 0);
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_segas16b);
@@ -3962,23 +3962,23 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segas16b_state::atomicp) // 10MHz CPU Clock verified
+void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
+{
 	system16b(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REMOVE("soundcpu")
-	MCFG_DEVICE_REMOVE("sprites")
+	config.device_remove("soundcpu");
+	config.device_remove("sprites");
 
-	MCFG_DEVICE_MODIFY("mapper")
-	MCFG_SEGA_315_5195_PBF_CALLBACK(NOOP)
+	m_mapper->pbf().set_nop();
 
 	// sound hardware
-	MCFG_DEVICE_REMOVE("ym2151")
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	config.device_remove("ym2151");
+	YM2413(config, m_ym2413, XTAL(20'000'000)/4); // 20MHz OSC divided by 4 (verified)
+	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REMOVE("upd")
-MACHINE_CONFIG_END
+	config.device_remove("upd");
+}
 
 
 MACHINE_CONFIG_START(segas16b_state::system16c)

@@ -583,19 +583,19 @@ void dc_cons_state::gdrom_config(device_t *device)
 
 MACHINE_CONFIG_START(dc_cons_state::dc)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK)
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dc_map)
-	MCFG_DEVICE_IO_MAP(dc_port)
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
+	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 

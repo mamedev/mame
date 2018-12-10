@@ -2077,6 +2077,7 @@ void segas16a_state::system16a_no7751(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segas16a_state::sound_no7751_portmap);
 
 	config.device_remove("n7751");
+	config.device_remove("n7751_8243");
 	config.device_remove("dac");
 	config.device_remove("vref");
 
@@ -2091,7 +2092,7 @@ void segas16a_state::system16a_no7751p(machine_config &config)
 	z80.set_addrmap(AS_PROGRAM, &segas16a_state::sound_map);
 	z80.set_addrmap(AS_IO, &segas16a_state::sound_no7751_portmap);
 	z80.set_addrmap(AS_OPCODES, &segas16a_state::sound_decrypted_opcodes_map);
-	z80.set_decrypted_tag(":decrypted_opcodes");
+	z80.set_decrypted_tag(":sound_decrypted_opcodes");
 }
 
 /*

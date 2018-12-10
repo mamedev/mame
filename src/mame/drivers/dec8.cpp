@@ -1972,8 +1972,7 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
@@ -2037,8 +2036,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
 
@@ -2097,8 +2095,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
 
@@ -2157,8 +2154,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
 
@@ -2193,7 +2189,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
 	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<3>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
@@ -2219,7 +2215,9 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	screen.set_palette("palette");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ghostb)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
 	/* sound hardware */
@@ -2277,8 +2275,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
@@ -2341,8 +2338,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oscar)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
 
@@ -2377,7 +2373,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::srdarwin_mcu_to_main_w));
-	m_mcu->port_in_cb<0>().set_ioport("I8751");
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 
@@ -2395,8 +2391,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srdarwin)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(144)
+	DECO_RMC3(config, m_palette, 0, 144); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
 
@@ -2452,8 +2447,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cobracom)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(256)
+	DECO_RMC3(config, m_palette, 0, 256); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
 
