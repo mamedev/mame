@@ -551,7 +551,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 				code,
 				color,
 				flipx,0,
-				sx + m_xoffset,sy + m_yoffset,0);
+				sx + m_xoffset,sy + m_yoffset,m_sprtranspen);
 	}
 }
 
@@ -570,6 +570,7 @@ VIDEO_START_MEMBER(powerbal_state,atombjt)
 
 	m_xoffset = 32;
 	m_yoffset = 8;
+	m_sprtranspen = 0xf;
 
 	m_bg_tilemap->set_scrollx(0, -64);
 }
