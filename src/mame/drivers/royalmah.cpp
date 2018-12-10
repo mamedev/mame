@@ -717,10 +717,10 @@ void royalmah_state::jongshin_iomap(address_map &map)
 	map(0x02, 0x03).w(m_ay, FUNC(ay8910_device::data_address_w));
 	map(0x10, 0x10).portr("DSW1").w(FUNC(royalmah_state::royalmah_palbank_w));
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
-	// map(0x80, 0x80).w(FUNC(royalmah_state::suzume_bank_w));
+	// map(0x80, 0x80).w(FUNC(royalmah_state::???)); // set to 1 at start-up, then never changed?
 	map(0x81, 0x81).portr("DSW2");
 	map(0x82, 0x82).portr("DSW3");
-	map(0xc0, 0xc0).w(FUNC(royalmah_state::suzume_bank_w)); // moving this to 0x80 make a girl in the attract appear but doesn't fix mahjong tiles
+	map(0xc0, 0xc0).w(FUNC(royalmah_state::suzume_bank_w));
 }
 
 void royalmah_state::mjyarou_iomap(address_map &map)
@@ -1825,34 +1825,34 @@ static INPUT_PORTS_START( jongshin )
 	PORT_INCLUDE( mjctrl2 )
 
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW1:8")
 
 	PORT_START("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW2:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW2:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW2:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW2:8") // setting this causes the game to continually reset on title screen
 
 	PORT_START("DSW3")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW3:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjyarou )
@@ -3989,7 +3989,7 @@ ROM_START( suzume )
 ROM_END
 
 ROM_START( jongshin )
-	ROM_REGION( 0x100000, "maincpu", 0 ) // all 2732
+	ROM_REGION( 0x28000, "maincpu", 0 ) // all 2732
 	ROM_LOAD( "js1.p1",     0x00000, 0x1000, CRC(0c33eb1c) SHA1(4258f2df8e9d4d3fd3fd77c555bd36ced601c45f) )
 	ROM_LOAD( "js2.p2",     0x01000, 0x1000, CRC(a74bfa19) SHA1(378ec5dcddbe1c1e66b9ec0576b898442e3ba89c) )
 	ROM_LOAD( "js3.p3",     0x02000, 0x1000, CRC(7519804f) SHA1(4181e58964ae149e675c2aeb49edee6f5d06f6ed) )
@@ -3997,9 +3997,9 @@ ROM_START( jongshin )
 	ROM_LOAD( "js5.p5",     0x04000, 0x1000, CRC(4631153f) SHA1(d31e15de3d54118905946836e72b4794dae89004) )
 	ROM_LOAD( "js6.p6",     0x05000, 0x1000, CRC(ed32bd57) SHA1(6d5d1ae959e07207146197c7c370810306dca462) )
 	/* bank switched ROMs follow */
-	ROM_LOAD( "dyna 1.8c",       0x10000, 0x08000, CRC(d2cea54a) SHA1(16143974731d3b81ad377ebe58c9253c127e5588) ) // 27256
-	ROM_LOAD( "dyna 2.7c",       0x18000, 0x08000, CRC(9d7c62ff) SHA1(92de7bb84f6f64b887b5500a54ff6f0b84e0b07d) ) // 27256
-	ROM_LOAD( "dyna 3.6c",       0x20000, 0x04000, CRC(b716f2e1) SHA1(f29617185771a43f057dff062a2493bcf281c85a) ) // 27128
+	ROM_LOAD( "dyna 3.6c",       0x10000, 0x04000, CRC(b716f2e1) SHA1(f29617185771a43f057dff062a2493bcf281c85a) ) // 27128
+	ROM_LOAD( "dyna 1.8c",       0x18000, 0x08000, CRC(d2cea54a) SHA1(16143974731d3b81ad377ebe58c9253c127e5588) ) // 27256
+	ROM_LOAD( "dyna 2.7c",       0x20000, 0x08000, CRC(9d7c62ff) SHA1(92de7bb84f6f64b887b5500a54ff6f0b84e0b07d) ) // 27256
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.6k",   0x0000, 0x0020, CRC(faa20ce5) SHA1(408e90c13d5bd5fefdd9767a7643808a3cd9c111) )
@@ -5320,7 +5320,7 @@ GAME( 1986,  jangtaku, 0,        jansou,   jansou,   royalmah_state, init_jansou
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, init_ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
-GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // mahjong tile GFX missing, controls work in test mode but not in game
+GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     MACHINE_NOT_WORKING ) // controls work in test mode but not in game (AY port read never enabled in game mode?)
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, empty_init,    ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
