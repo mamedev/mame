@@ -21796,7 +21796,7 @@ momokoe                         // (c) 1986 Jaleco (English text)
 monacogp                        // (c) 1980 Sega
 monacogpa                       // (c) 1980 Sega
 
-@source:monacogp.cpp
+@source:monon_color.cpp
 mononcol                        // (c) 2011 M&D
 
 @source:monty.cpp
