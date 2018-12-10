@@ -1309,12 +1309,12 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_MSM6253_IN2_ANALOG_PORT("ADC.2")
 	MCFG_MSM6253_IN3_ANALOG_READ(segaybd_state, analog_mux)
 
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_suby")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_suby")
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_suby", 0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

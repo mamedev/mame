@@ -19,26 +19,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SEGA_315_5195_CPU(_cputag) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_cputag(_cputag);
-#define MCFG_SEGA_315_5195_MAPPER_HANDLER(_class, _mapper) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
-#define MCFG_SEGA_315_5195_PBF_CALLBACK(_devcb) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_pbf_callback(DEVCB_##_devcb);
-#define MCFG_SEGA_315_5195_MCU_INT_CALLBACK(_devcb) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_mcu_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
-
-#define MCFG_SEGA_315_5249_DIVIDER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGA_315_5249_DIVIDER, 0)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -62,7 +42,7 @@ protected:
 	// internal helpers
 	void palette_init();
 
-public: // -- stupid system16.c
+public: // -- stupid system16.cpp
 	// memory pointers
 	required_shared_ptr<uint16_t> m_paletteram;
 protected:
@@ -97,25 +77,8 @@ public:
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	void set_cputag(const char *cpu)
-	{
-		m_cpu.set_tag(cpu);
-		m_cpuregion.set_tag(cpu);
-	}
+	template <typename... T> void set_mapper(T &&... args) { m_mapper = mapper_delegate(std::forward<T>(args)...); }
 
-	void set_mapper(mapper_delegate callback) { m_mapper = callback; }
-	template <class FunctionClass> void set_mapper(const char *devname
-		, void (FunctionClass::*callback)(sega_315_5195_mapper_device &, uint8_t), const char *name)
-	{
-		set_mapper(mapper_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_mapper(void (FunctionClass::*callback)(sega_315_5195_mapper_device &, uint8_t), const char *name)
-	{
-		set_mapper(mapper_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
-	template<class Object> devcb_base &set_pbf_callback(Object &&object) { return m_pbf_callback.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_mcu_int_callback(Object &&object) { return m_mcu_int_callback.set_callback(std::forward<Object>(object)); }
 	auto pbf() { return m_pbf_callback.bind(); }
 	auto mcu_int() { return m_mcu_int_callback.bind(); }
 

@@ -457,7 +457,8 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	MCFG_DEVICE_IO_MAP(prof80_io)
 
 	// MMU
-	MCFG_PROF80_MMU_ADD(m_mmu, prof80_mmu)
+	PROF80_MMU(config, m_mmu, 0);
+	m_mmu->set_addrmap(AS_PROGRAM, &prof80_state::prof80_mmu);
 
 	// RTC
 	UPD1990A(config, m_rtc);

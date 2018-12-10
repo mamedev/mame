@@ -2197,8 +2197,7 @@ MACHINE_CONFIG_START(nbmj8891_state::gionbana)
 	MCFG_DEVICE_IO_MAP(gionbana_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8891_state, irq0_line_hold)
 
-	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_GIONBANA )
+	NB1413M3(config, m_nb1413m3, 0, NB1413M3_GIONBANA);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2230,8 +2229,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mgion)
 	MCFG_DEVICE_PROGRAM_MAP(mgion_map)
 	MCFG_DEVICE_IO_MAP(mgion_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MGION )
+	m_nb1413m3->set_type(NB1413M3_MGION);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -2244,8 +2242,7 @@ MACHINE_CONFIG_START(nbmj8891_state::omotesnd)
 	MCFG_DEVICE_PROGRAM_MAP(omotesnd_map)
 	MCFG_DEVICE_IO_MAP(omotesnd_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_OMOTESND )
+	m_nb1413m3->set_type(NB1413M3_OMOTESND);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2256,12 +2253,12 @@ MACHINE_CONFIG_START(nbmj8891_state::omotesnd)
 	fmsnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nbmj8891_state::abunai)
+void nbmj8891_state::abunai(machine_config &config)
+{
 	gionbana(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_ABUNAI )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_ABUNAI);
+}
 
 /* NBMJDRV2 */
 MACHINE_CONFIG_START(nbmj8891_state::mjcamerb)
@@ -2271,8 +2268,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjcamerb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(hanamomo_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MJCAMERB )
+	m_nb1413m3->set_type(NB1413M3_MJCAMERB);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2289,8 +2285,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mmcamera)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(hanamomo_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MMCAMERA )
+	m_nb1413m3->set_type(NB1413M3_MMCAMERA);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2308,8 +2303,7 @@ MACHINE_CONFIG_START(nbmj8891_state::hanamomo)
 	MCFG_DEVICE_PROGRAM_MAP(hanamomo_map)
 	MCFG_DEVICE_IO_MAP(hanamomo_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_HANAMOMO )
+	m_nb1413m3->set_type(NB1413M3_HANAMOMO);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2325,28 +2319,25 @@ MACHINE_CONFIG_START(nbmj8891_state::msjiken)
 	MCFG_DEVICE_PROGRAM_MAP(gionbana_map)
 	MCFG_DEVICE_IO_MAP(msjiken_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MSJIKEN )
+	m_nb1413m3->set_type(NB1413M3_MSJIKEN);
 MACHINE_CONFIG_END
 
 /* NBMJDRV3 */
 MACHINE_CONFIG_START(nbmj8891_state::telmahjn)
 	gionbana(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_TELMAHJN )
+	m_nb1413m3->set_type(NB1413M3_TELMAHJN);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nbmj8891_state::mgmen89)
+void nbmj8891_state::mgmen89(machine_config &config)
+{
 	telmahjn(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MGMEN89 )
-
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_MGMEN89);
+}
 
 /* NBMJDRV4 */
 MACHINE_CONFIG_START(nbmj8891_state::mjfocus)
@@ -2354,26 +2345,25 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocus)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MJFOCUS )
+	m_nb1413m3->set_type(NB1413M3_MJFOCUS);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nbmj8891_state::pairsnb)
+void nbmj8891_state::pairsnb(machine_config &config)
+{
 	gionbana(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSNB )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_PAIRSNB);
+}
 
-MACHINE_CONFIG_START(nbmj8891_state::pairsten)
+void nbmj8891_state::pairsten(machine_config &config)
+{
 	gionbana(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSTEN )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_PAIRSTEN);
+}
 
 /* NBMJDRV5 */
 MACHINE_CONFIG_START(nbmj8891_state::mjnanpas)
@@ -2383,8 +2373,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjnanpas)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(club90s_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MJNANPAS )
+	m_nb1413m3->set_type(NB1413M3_MJNANPAS);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::maiko)
@@ -2395,8 +2384,7 @@ MACHINE_CONFIG_START(nbmj8891_state::maiko)
 	MCFG_DEVICE_PROGRAM_MAP(maiko_map)
 	MCFG_DEVICE_IO_MAP(maiko_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MAIKO )
+	m_nb1413m3->set_type(NB1413M3_MAIKO);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::mmaiko)
@@ -2406,8 +2394,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mmaiko)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mmaiko_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MMAIKO )
+	m_nb1413m3->set_type(NB1413M3_MMAIKO);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -2420,8 +2407,7 @@ MACHINE_CONFIG_START(nbmj8891_state::lovehous)
 	MCFG_DEVICE_PROGRAM_MAP(lovehous_map)
 	MCFG_DEVICE_IO_MAP(lovehous_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_LOVEHOUS )
+	m_nb1413m3->set_type(NB1413M3_LOVEHOUS);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -2433,8 +2419,7 @@ MACHINE_CONFIG_START(nbmj8891_state::hanaoji)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hanaoji_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_HANAOJI )
+	m_nb1413m3->set_type(NB1413M3_HANAOJI);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -2465,8 +2450,7 @@ MACHINE_CONFIG_START(nbmj8891_state::scandal)
 	MCFG_DEVICE_PROGRAM_MAP(scandalm_map)
 	MCFG_DEVICE_IO_MAP(scandal_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_SCANDAL )
+	m_nb1413m3->set_type(NB1413M3_SCANDAL);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::bananadr)
@@ -2477,32 +2461,31 @@ MACHINE_CONFIG_START(nbmj8891_state::bananadr)
 	MCFG_DEVICE_PROGRAM_MAP(scandalm_map)
 	MCFG_DEVICE_IO_MAP(bananadr_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_BANANADR )
+	m_nb1413m3->set_type(NB1413M3_BANANADR);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nbmj8891_state::club90s)
+void nbmj8891_state::club90s(machine_config &config)
+{
 	mjnanpas(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_CLUB90S )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_CLUB90S);
+}
 
-MACHINE_CONFIG_START(nbmj8891_state::mladyhtr)
+void nbmj8891_state::mladyhtr(machine_config &config)
+{
 	mjnanpas(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MLADYHTR )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_MLADYHTR);
+}
 
-MACHINE_CONFIG_START(nbmj8891_state::chinmoku)
+void nbmj8891_state::chinmoku(machine_config &config)
+{
 	mjnanpas(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_CHINMOKU )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_CHINMOKU);
+}
 
 /* NBMJDRV6 */
 MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
@@ -2513,8 +2496,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
 	MCFG_DEVICE_PROGRAM_MAP(scandalm_map)
 	MCFG_DEVICE_IO_MAP(scandalm_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MJFOCUSM )
+	m_nb1413m3->set_type(NB1413M3_MJFOCUSM);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2530,12 +2512,12 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
 	fmsnd.add_route(ALL_OUTPUTS, "speaker", 0.7);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(nbmj8891_state::scandalm)
+void nbmj8891_state::scandalm(machine_config &config)
+{
 	mjfocusm(config);
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_SCANDALM )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_SCANDALM);
+}
 
 MACHINE_CONFIG_START(nbmj8891_state::taiwanmb)
 	gionbana(config);
@@ -2546,8 +2528,7 @@ MACHINE_CONFIG_START(nbmj8891_state::taiwanmb)
 	MCFG_DEVICE_IO_MAP(taiwanmb_io_map)
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8891_state, irq0_line_hold)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_TAIWANMB )
+	m_nb1413m3->set_type(NB1413M3_TAIWANMB);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

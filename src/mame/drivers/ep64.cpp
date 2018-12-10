@@ -577,8 +577,15 @@ MACHINE_CONFIG_START(ep64_state::ep64)
 	MCFG_DEVICE_IO_MAP(ep64_io)
 
 	// video hardware
-	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL(8'000'000))
-	MCFG_NICK_VIRQ_CALLBACK(WRITELINE(m_dave, dave_device, int1_w))
+	screen_device& screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT);
+	screen.set_visarea(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1);
+	screen.set_screen_update(NICK_TAG, FUNC(nick_device::screen_update));
+
+	NICK(config, m_nick, XTAL(8'000'000), SCREEN_TAG);
+	m_nick->virq_wr_callback().set(m_dave, FUNC(dave_device::int1_w));
 
 	// sound hardware
 	MCFG_DAVE_ADD(m_dave, XTAL(8'000'000), dave_64k_mem, dave_io)

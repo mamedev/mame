@@ -1578,11 +1578,11 @@ WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_clk )
 
 void ksys573_state::salarymc_cassette_install(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( WRITELINE( *this, ksys573_state, salarymc_lamp_clk ) )
-	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( WRITELINE( *this, ksys573_state, salarymc_lamp_rst ) )
-	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( WRITELINE( *this, ksys573_state, salarymc_lamp_d ) )
+	konami573_cassette_y_device &cassette = downcast<konami573_cassette_y_device &>(*device);
+
+	cassette.d5_handler().set(*this, FUNC(ksys573_state::salarymc_lamp_clk));
+	cassette.d6_handler().set(*this, FUNC(ksys573_state::salarymc_lamp_rst));
+	cassette.d7_handler().set(*this, FUNC(ksys573_state::salarymc_lamp_d));
 }
 
 void ksys573_state::init_salarymc()
@@ -1661,26 +1661,26 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe3 )
 
 void ksys573_state::hyperbbc_cassette_install(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe3 ) ) // line shared with x76f100 sda
-	MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 scl
-	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
-	MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_green ) )
-	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_blue ) )
-	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_red ) )
-	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_start ) )
+	konami573_cassette_y_device &cassette = downcast<konami573_cassette_y_device &>(*device);
+
+	cassette.d0_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_strobe3)); // line shared with x76f100 sda
+	cassette.d1_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_strobe2)); // line shared with x76f100 scl
+	cassette.d3_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_strobe1)); // line shared with x76f100 rst
+	cassette.d4_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_green));
+	cassette.d5_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_blue));
+	cassette.d6_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_red));
+	cassette.d7_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_start));
 }
 
 void ksys573_state::hypbbc2p_cassette_install(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 sda
-	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
-	MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_green ) )
-	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_blue ) )
-	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_red ) )
+	konami573_cassette_y_device &cassette = downcast<konami573_cassette_y_device &>(*device);
+
+	cassette.d0_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_strobe2)); // line shared with x76f100 sda
+	cassette.d3_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_strobe1)); // line shared with x76f100 rst
+	cassette.d4_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_green));
+	cassette.d5_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_blue));
+	cassette.d6_handler().set(*this, FUNC(ksys573_state::hyperbbc_lamp_red));
 }
 
 void ksys573_state::init_hyperbbc()
@@ -2108,8 +2108,8 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cr589", cr589_config )
 	MCFG_SLOT_DEFAULT_OPTION( "cr589" )
 
-	MCFG_DEVICE_ADD( "cassette", KONAMI573_CASSETTE_SLOT, 0 )
-	MCFG_KONAMI573_CASSETTE_DSR_HANDLER(WRITELINE( "maincpu:sio1", psxsio1_device, write_dsr ) )
+	konami573_cassette_slot_device &cassette(KONAMI573_CASSETTE_SLOT(config, "cassette", 0));
+	cassette.dsr_handler().set("maincpu:sio1", FUNC(psxsio1_device::write_dsr));
 
 	// onboard flash
 	FUJITSU_29F016A( config, "29f016a.31m" );
@@ -2196,49 +2196,49 @@ MACHINE_CONFIG_END
 //
 // Up to two carts can be used
 
-MACHINE_CONFIG_START(ksys573_state::cassx)
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_X )
-	MCFG_SLOT_DEFAULT_OPTION( "game" )
-MACHINE_CONFIG_END
+void ksys573_state::cassx(machine_config &config)
+{
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "game", KONAMI573_CASSETTE_X );
+	subdevice<konami573_cassette_slot_device>("cassette")->set_default_option( "game" );
+}
 
-MACHINE_CONFIG_START(ksys573_state::cassxi)
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_XI )
-	MCFG_SLOT_DEFAULT_OPTION( "game" )
-MACHINE_CONFIG_END
+void ksys573_state::cassxi(machine_config &config)
+{
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "game", KONAMI573_CASSETTE_XI );
+	subdevice<konami573_cassette_slot_device>("cassette")->set_default_option( "game" );
+}
 
-MACHINE_CONFIG_START(ksys573_state::cassy)
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_Y )
-	MCFG_SLOT_DEFAULT_OPTION( "game" )
-MACHINE_CONFIG_END
+void ksys573_state::cassy(machine_config &config)
+{
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "game", KONAMI573_CASSETTE_Y );
+	subdevice<konami573_cassette_slot_device>("cassette")->set_default_option( "game" );
+}
 
-MACHINE_CONFIG_START(ksys573_state::cassyi)
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_YI )
-	MCFG_SLOT_DEFAULT_OPTION( "game" )
-MACHINE_CONFIG_END
+void ksys573_state::cassyi(machine_config &config)
+{
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "game", KONAMI573_CASSETTE_YI );
+	subdevice<konami573_cassette_slot_device>("cassette")->set_default_option( "game" );
+}
 
-MACHINE_CONFIG_START(ksys573_state::cassyyi)
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_YI )
-	MCFG_SLOT_OPTION_ADD( "install", KONAMI573_CASSETTE_YI )
-	MCFG_SLOT_DEFAULT_OPTION( "game" )
-MACHINE_CONFIG_END
+void ksys573_state::cassyyi(machine_config &config)
+{
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "game", KONAMI573_CASSETTE_YI );
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "install", KONAMI573_CASSETTE_YI );
+	subdevice<konami573_cassette_slot_device>("cassette")->set_default_option( "game" );
+}
 
-MACHINE_CONFIG_START(ksys573_state::casszi)
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_ZI )
-	MCFG_SLOT_DEFAULT_OPTION( "game" )
-MACHINE_CONFIG_END
+void ksys573_state::casszi(machine_config &config)
+{
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "game", KONAMI573_CASSETTE_ZI );
+	subdevice<konami573_cassette_slot_device>("cassette")->set_default_option( "game" );
+}
 
-MACHINE_CONFIG_START(ksys573_state::cassxzi)
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_ZI )
-	MCFG_SLOT_OPTION_ADD( "install", KONAMI573_CASSETTE_XI )
-	MCFG_SLOT_DEFAULT_OPTION( "game" )
-MACHINE_CONFIG_END
+void ksys573_state::cassxzi(machine_config &config)
+{
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "game", KONAMI573_CASSETTE_ZI );
+	subdevice<konami573_cassette_slot_device>("cassette")->option_add( "install", KONAMI573_CASSETTE_XI );
+	subdevice<konami573_cassette_slot_device>("cassette")->set_default_option( "game" );
+}
 
 // Dance Dance Revolution
 
@@ -2434,29 +2434,29 @@ void ksys573_state::fbaitbc(machine_config & config)
 	cassx(config);
 }
 
-MACHINE_CONFIG_START(ksys573_state::hyperbbc)
+void ksys573_state::hyperbbc(machine_config &config)
+{
 	konami573(config);
 	cassy(config); // The game doesn't check the security chip
 
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { hyperbbc_cassette_install(device); } )
-MACHINE_CONFIG_END
+	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config( "game", [this] (device_t *device) { hyperbbc_cassette_install(device); } );
+}
 
-MACHINE_CONFIG_START(ksys573_state::hypbbc2p)
+void ksys573_state::hypbbc2p(machine_config &config)
+{
 	konami573(config);
 	cassy(config);
 
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { hypbbc2p_cassette_install(device); } )
-MACHINE_CONFIG_END
+	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config( "game", [this] (device_t *device) { hypbbc2p_cassette_install(device); } );
+}
 
-MACHINE_CONFIG_START(ksys573_state::salarymc)
+void ksys573_state::salarymc(machine_config &config)
+{
 	konami573(config);
 	cassyi(config);
 
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { salarymc_cassette_install(device); } )
-MACHINE_CONFIG_END
+	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config( "game", [this] (device_t *device) { salarymc_cassette_install(device); } );
+}
 
 void ksys573_state::gchgchmp(machine_config &config)
 {
@@ -2465,16 +2465,17 @@ void ksys573_state::gchgchmp(machine_config &config)
 	cassx(config);
 }
 
-MACHINE_CONFIG_START(ksys573_state::pnchmn)
+void ksys573_state::pnchmn(machine_config &config)
+{
+
 	konami573(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573a_map);
 
 	cassxi(config);
 	pccard1_32mb(config);
 
-	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { punchmania_cassette_install(device); } )
-MACHINE_CONFIG_END
+	subdevice<konami573_cassette_slot_device>("cassette")->set_option_machine_config( "game", [this] (device_t *device) { punchmania_cassette_install(device); } );
+}
 
 void ksys573_state::pnchmn2(machine_config &config)
 {
