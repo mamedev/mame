@@ -22,12 +22,12 @@ public:
 	scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_flag_out_cb(Object &&cb) { return m_flag_out_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sout_cb(Object &&cb) { return m_sout_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sin_cb(Object &&cb) { return m_sin_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sensea_cb(Object &&cb) { return m_sensea_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_senseb_cb(Object &&cb) { return m_senseb_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_halt_cb(Object &&cb) { return m_halt_func.set_callback(std::forward<Object>(cb)); }
+	auto flag_out() { return m_flag_out_func.bind(); }
+	auto s_out() { return m_sout_func.bind(); }
+	auto s_in() { return m_sin_func.bind(); }
+	auto sense_a() { return m_sensea_func.bind(); }
+	auto sense_b() { return m_senseb_func.bind(); }
+	auto halt() { return m_halt_func.bind(); }
 
 protected:
 	enum
