@@ -118,4 +118,4 @@ ROM_START( mononcol )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-CONS( 2011, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2011, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IS_SKELETON )
