@@ -3668,7 +3668,7 @@ MACHINE_CONFIG_END
 
 void royalmah_state::jongshin(machine_config &config)
 {
-	suzume(config);
+	dondenmj(config);
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::jongshin_iomap);
 }
 
@@ -5320,7 +5320,7 @@ GAME( 1986,  jangtaku, 0,        jansou,   jansou,   royalmah_state, init_jansou
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, init_ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
-GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     MACHINE_NOT_WORKING ) // controls work in test mode but not in game (AY port read never enabled in game mode?)
+GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     0 )
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, empty_init,    ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
