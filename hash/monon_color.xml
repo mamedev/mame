@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="monon_color" description="M&amp;D Monon Color cartridges">
+
+  <!-- TODO: romanization of titles and proper set names! the current ones have no bearing on the title or release order -->
+  
+  <software name="game1">
+    <description>僵尸猎人</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="cd9d372d" sha1="71b09bf181a5565e7cca4281def59364b270767e" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game2">
+    <description>冰之蓝</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="554af334" sha1="94c54a7ad4828e95074ec341eef9278b552f655e" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game3">
+    <description>卡牌战纪</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="0015d25c" sha1="50de7d969bead2df60e8ea4051f8518dd8989633" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game4">
+    <description>机甲旋风 格斗大师</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x0800000" crc="441d5f9d" sha1="2ec85c5225b7ed0291b13f5d3bc57a9ef0153b5e" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game5">
+    <description>武道大会</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="d5bd966e" sha1="792b22444a329d08520591e80599835d77f38b3c" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game6">
+    <description>洛克王国大冒险</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="cf52653e" sha1="96aa826821d20af3edfe0f8058e6158841b7bf08" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game7">
+    <description>洛克王国魔法阵</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x0800000" crc="15ed170d" sha1="ce4832f57459acf01deae688c62d444cffaa271a" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game8">
+    <description>神魄 游戏</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x0800000" crc="e7fd791a" sha1="7572d11ce5fae30a01ebe1053d8632329249fba8" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game9">
+    <description>英雄联盟</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="e4833f82" sha1="877c28d188d19b882909b4b0934ce2f900d2ce30" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game10">
+    <description>赛尔号w</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x0800000" crc="7eced0cf" sha1="3e34abbaf1259094099f1587302dfbd84ffb8384" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game11">
+    <description>赛尔号能源大作战</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x0400000" crc="47b4a312" sha1="c4600ce39fd2301df3778afe896936d510cbbd5b" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game12">
+    <description>逻辑拼一拼</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x0400000" crc="e8f19fdc" sha1="330980c975e3fafea9b3dda1b010fdd469100919" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game13">
+    <description>钢铁侠</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x0800000" crc="68517eea" sha1="e262f5ac691d8a3e30232a6b51d9428b73b9e8e2" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game14">
+    <description>铠甲勇士</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="84d1224c" sha1="9c427031221dc69034275a359e87c0dda82ae295" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="game15">
+    <description>黑之炎</description>
+    <year>2011</year>
+    <publisher>M&amp;D</publisher>
+    <part name="cart" interface="monon_color_cart">
+      <dataarea name="rom" size="0x1000000">
+        <rom name="rom.bin" size="0x1000000" crc="8541d04e" sha1="5fa6edc852622f6c2cca07ec9c7f377bea020f9b" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+</softwarelist>
