@@ -2193,7 +2193,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
 	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
-	m_mcu->port_out_cb<3>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
@@ -2377,7 +2377,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::srdarwin_mcu_to_main_w));
-	m_mcu->port_in_cb<0>().set_ioport("I8751");
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 
