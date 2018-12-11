@@ -134,8 +134,8 @@ void patinho_feio_state::teletype_kbd_input(u8 data)
 	//I figured out that the data is provided inverted (2's complement)
 	//based on a comment in the source code listing of the HEXAM program.
 	//It is not clear though, if all I/O devices complement the data when
-	//communicating with the computer, or if this behavious is a particular
-	//caracteristics of the teletype.
+	//communicating with the computer, or if this behaviour is a particular
+	//characteristic of the teletype.
 
 	m_maincpu->transfer_byte_from_external_device(0xB, ~data);
 }
@@ -263,22 +263,22 @@ MACHINE_CONFIG_START(patinho_feio_state::patinho_feio)
 
 	/* Teleprinter
 	   TeleType ASR33
-	   (max. speed: 10 characteres per second)
+	   (max. speed: 10 characters per second)
 	   with paper tape reading (and optionally punching) capabilities */
 	MCFG_PATINHO_IODEV_WRITE_CB(0xB, WRITE8(*this, patinho_feio_state, teletype_data_w))
 
 	/* Papertape Reader
 	   Hewlett-Packard HP-2737-A
-	   Optical Papertape Reader (max. speed: 300 characteres per second) */
+	   Optical Papertape Reader (max. speed: 300 characters per second) */
 //  MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(*this, patinho_feio_state, papertapereader_data_r))
 
 	/* DECWRITER */
-	MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, decwriter_kbd_input))
+	teleprinter_device &decwriter(TELEPRINTER(config, "decwriter", 0));
+	decwriter.set_keyboard_callback(FUNC(patinho_feio_state::decwriter_kbd_input));
 
 	/* Teletype */
-	MCFG_DEVICE_ADD("teletype", TELEPRINTER, 1)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, teletype_kbd_input))
+	teleprinter_device &teletype(TELEPRINTER(config, "teletype", 1));
+	teletype.set_keyboard_callback(FUNC(patinho_feio_state::teletype_kbd_input));
 
 	/* punched tape */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")

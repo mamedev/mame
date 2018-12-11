@@ -359,8 +359,8 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(tavernie_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(tavernie_state::kbd_put));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // unknown clock
 	crtc.set_screen("screen");

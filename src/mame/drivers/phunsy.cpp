@@ -372,8 +372,8 @@ MACHINE_CONFIG_START(phunsy_state::phunsy)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(phunsy_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(phunsy_state::kbd_put));
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* quickload */

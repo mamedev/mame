@@ -140,18 +140,19 @@ void vax11_state::kbd_put(u8 data)
 	m_term_status = 0xffff;
 }
 
-MACHINE_CONFIG_START(vax11_state::vax11)
+void vax11_state::vax11(machine_config &config)
+{
 	/* basic machine hardware */
 	T11(config, m_maincpu, XTAL(4'000'000)); // Need proper CPU here
 	m_maincpu->set_initial_mode(0 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vax11_state::vax11_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(vax11_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(vax11_state::kbd_put));
 
 	RX01(config, "rx01", 0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( vax785 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )

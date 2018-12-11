@@ -62,8 +62,10 @@ public:
 	void czk80(machine_config &config);
 	void init_czk80();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
 	DECLARE_READ8_MEMBER(port81_r);
@@ -153,7 +155,7 @@ TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
 	membank("bankr0")->set_entry(1);
 }
 
-MACHINE_RESET_MEMBER( czk80_state, czk80 )
+void czk80_state::machine_reset()
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(czk80_state::czk80_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
@@ -185,19 +187,18 @@ void czk80_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(czk80_state::czk80)
+void czk80_state::czk80(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &czk80_state::czk80_mem);
 	m_maincpu->set_addrmap(AS_IO, &czk80_state::czk80_io);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
-
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(czk80_state::kbd_put));
 	UPD765A(config, m_fdc, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -213,7 +214,7 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 
 	z80pio_device& pio(Z80PIO(config, "pio", XTAL(16'000'000)/4));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-MACHINE_CONFIG_END
+}
 
 
 /* ROM definition */

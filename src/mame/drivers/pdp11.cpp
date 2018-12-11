@@ -353,18 +353,19 @@ void pdp11_state::kbd_put(u8 data)
 	m_teletype_status |= 0x80;
 }
 
-MACHINE_CONFIG_START(pdp11_state::pdp11)
+void pdp11_state::pdp11(machine_config &config)
+{
 	/* basic machine hardware */
 	T11(config, m_maincpu, XTAL(4'000'000)); // Need proper CPU here
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pdp11_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(pdp11_state::kbd_put));
 
 	RX01(config, "rx01", 0);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(pdp11_state::pdp11ub2)
 	pdp11(config);

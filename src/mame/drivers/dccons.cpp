@@ -606,7 +606,8 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 //  MACRONIX_29LV160TMC(config, "dcflash");
 
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
+	MAPLE_DC(config, m_maple, 0, m_maincpu);
+	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2:0", ":P2:1", ":P2:A0", ":P2:A1", ":P2:A2", ":P2:A3", ":P2:A4", ":P2:A5")
 	MCFG_DC_CONTROLLER_ADD("dcctrl2", "maple_dc", 2, ":P3:0", ":P3:1", ":P3:A0", ":P3:A1", ":P3:A2", ":P3:A3", ":P3:A4", ":P3:A5")

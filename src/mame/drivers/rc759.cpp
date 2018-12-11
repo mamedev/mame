@@ -568,8 +568,8 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_I82730_SINT_HANDLER(WRITELINE(m_pic, pic8259_device, ir4_w))
 
 	// keyboard
-	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(rc759_state, keyb_put))
+	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
+	keyb.set_keyboard_callback(FUNC(rc759_state::keyb_put));
 
 	// cassette
 	MCFG_CASSETTE_ADD("cas")

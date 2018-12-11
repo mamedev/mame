@@ -198,8 +198,8 @@ MACHINE_CONFIG_START(d6809_state::d6809)
 	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(d6809_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(d6809_state::kbd_put));
 
 	// Floppy
 	UPD765A(config, m_fdc, true, true);

@@ -528,8 +528,8 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(abc80_state, kbd_w))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
 	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 2)
 

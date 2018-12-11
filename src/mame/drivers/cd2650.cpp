@@ -321,8 +321,8 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(cd2650_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(cd2650_state::kbd_put));
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 

@@ -1316,7 +1316,7 @@ MACHINE_CONFIG_START(konamim2_state::m2)
 	MCFG_DEVICE_PROGRAM_MAP(m2_main_s)
 
 	// TODO: declaring as second screen causes palette confusion (wants to use palette from the other screen?)
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
+	GENERIC_TERMINAL(config, m_terminal, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

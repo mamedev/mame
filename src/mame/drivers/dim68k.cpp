@@ -342,8 +342,8 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row), this);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(dim68k_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")

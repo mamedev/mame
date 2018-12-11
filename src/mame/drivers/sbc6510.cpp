@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(sbc6510_state::sbc6510)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbc6510)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
+	GENERIC_TERMINAL(config, m_terminal, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

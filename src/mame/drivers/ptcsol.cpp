@@ -783,8 +783,8 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	m_uart_s->set_rx_clock(4800.0);
 	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(sol20_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(sol20_state::kbd_put));
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "sol20_cass")
 MACHINE_CONFIG_END

@@ -369,8 +369,8 @@ MACHINE_CONFIG_START(ravens_state::ravens2)
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ravens_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(ravens_state::kbd_put));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)

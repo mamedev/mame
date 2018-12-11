@@ -317,8 +317,8 @@ MACHINE_CONFIG_START(dm7000_state::dm7000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dm7000_state, screen_update_dm7000)
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dm7000_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(dm7000_state::kbd_put));
 
 MACHINE_CONFIG_END
 

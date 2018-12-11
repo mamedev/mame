@@ -476,8 +476,8 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	m_ppi->out_pc_callback().set(FUNC(olyboss_state::ppic_w));
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(olyboss_state, keyboard_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( olyboss_state::olybossb )
@@ -540,8 +540,8 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(olyboss_state, keyboard85_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard85_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( olyboss_state::bossa85 )

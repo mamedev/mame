@@ -554,8 +554,8 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(dg680_state, kbd_put))
+	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
+	keyb.set_keyboard_callback(FUNC(dg680_state::kbd_put));
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )

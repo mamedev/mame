@@ -263,7 +263,7 @@ void pes_state::pes(machine_config &config)
 	m_speech->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(KEYBOARDCB_PUT(pes_state, pes_kbd_input));
+	m_terminal->set_keyboard_callback(FUNC(pes_state::pes_kbd_input));
 }
 
 /******************************************************************************
