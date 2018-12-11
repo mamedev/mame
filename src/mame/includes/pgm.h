@@ -111,17 +111,17 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	inline void pgm_draw_pix(u16 xdrawpos, u8 pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
-	inline void pgm_draw_pix_nopri(u16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
-	inline void pgm_draw_pix_pri(u16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
+	inline void pgm_draw_pix(s16 xdrawpos, u8 pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
+	inline void pgm_draw_pix_nopri(s16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
+	inline void pgm_draw_pix_pri(s16 xdrawpos, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat);
 
 	void draw_sprite_line(u16 wide, u16* dest, u8* destpri, const rectangle &cliprect,
-	        u32 xzoom, bool xgrow, u8 flip, s16 xpos, u8 pri, u16 realxsize, u8 palt, bool draw);
+	        u32 xzoom, bool xgrow, u8 flip, s16 xpos, u8 pri, s16 realxsize, u8 palt, bool draw);
 
 	void draw_sprite_new_zoomed(u16 wide, u16 high, s16 xpos, s16 ypos, u8 palt, u8 flip,
 			bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, u8 pri);
 
-	void draw_sprite_line_basic(u16 wide, u16* dest, u8* destpri, const rectangle &cliprect, u8 flip, s16 xpos, u8 pri, u16 realxsize, u8 palt, bool draw);
+	void draw_sprite_line_basic(u16 wide, u16* dest, u8* destpri, const rectangle &cliprect, u8 flip, s16 xpos, u8 pri, s16 realxsize, u8 palt, bool draw);
 
 	void draw_sprite_new_basic(u16 wide, u16 high, s16 xpos, s16 ypos, u8 palt, u8 flip,
 			bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u8 pri);
