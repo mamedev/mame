@@ -216,9 +216,9 @@ READ16_MEMBER(pgm_state::videoram_r)
 WRITE16_MEMBER(pgm_state::videoram_w)
 {
 	if (offset < 0x4000 / 2)
-		pgm_bg_videoram_w(offset & 0x7ff, data, mem_mask);
+		bg_videoram_w(offset & 0x7ff, data, mem_mask);
 	else if (offset < 0x7000 / 2)
-		pgm_tx_videoram_w(offset & 0xfff, data, mem_mask);
+		tx_videoram_w(offset & 0xfff, data, mem_mask);
 	else
 		COMBINE_DATA(&m_videoram[offset]);
 }

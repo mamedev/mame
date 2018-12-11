@@ -524,7 +524,7 @@ void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &clipre
 }
 
 /* TX Layer */
-void pgm_state::pgm_tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+void pgm_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_tx_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset / 2);
@@ -556,7 +556,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_tx_tilemap_tile_info)
 
 /* BG Layer */
 
-void pgm_state::pgm_bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+void pgm_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

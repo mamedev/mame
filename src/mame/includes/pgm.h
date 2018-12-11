@@ -102,8 +102,8 @@ private:
 	DECLARE_WRITE16_MEMBER(z80_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m68k_l1_w);
 	DECLARE_WRITE8_MEMBER(z80_l3_w);
-	void pgm_tx_videoram_w(offs_t offset, u16 data, u16 mem_mask);
-	void pgm_bg_videoram_w(offs_t offset, u16 data, u16 mem_mask);
+	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask);
+	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask);
 
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
