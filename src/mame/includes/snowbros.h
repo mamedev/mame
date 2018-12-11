@@ -67,6 +67,7 @@ private:
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
 	uint8_t m_semicom_prot_offset;
+	uint16_t m_yutnori_prot_val;
 
 	DECLARE_WRITE8_MEMBER(snowbros_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
@@ -83,6 +84,8 @@ private:
 	DECLARE_WRITE8_MEMBER(twinadv_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 	DECLARE_READ16_MEMBER(toto_read);
+	DECLARE_WRITE16_MEMBER(yutnori_prot_w);
+	DECLARE_READ16_MEMBER(yutnori_prot_r);
 
 	DECLARE_MACHINE_RESET(semiprot);
 	DECLARE_MACHINE_RESET(finalttr);
