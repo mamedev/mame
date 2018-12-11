@@ -2916,6 +2916,7 @@ void snowbros_state::init_yutnori()
 {
 	m_yutnori_prot_val = 0;
 	m_pandora->set_bg_pen(0xf0);
+	save_item(NAME(m_yutnori_prot_val));
 }
 
 GAME( 1990, snowbros,   0,        snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
