@@ -51,19 +51,19 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-12210-A |SPA| Buscando A Nemo - Leer Bajo El Mar                        | LEAPSTER       | (**)
 | 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       |
 | 500-12223-A |SPA| Cars                                                      | LEAPSTER       |
-| 500-12227-A |SPA| Spider-Man -  El Caso De Las Letras Revueltas             | LEAPSTER       | (**)
-| 500-12259-A |SPA| El Labirinto De Las Letras                                | LEAPSTER       | (**)
+| 500-12227-A |SPA| Spider-Man - El Caso De Las Letras Revueltas              | LEAPSTER       | (**)
+| 500-12259-A |SPA| El Laberinto De Las Letras                                | LEAPSTER       | (**)
 | 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
 | 500-12296-A |ENG| SonicX                                                    | LEAPSTER       |
-| 500-12339-A |FRA| Dora L' Exploratrice - Au Secours Des Animaux             | LEAPSTER       |
+| 500-12339-A |FRA| Dora L'Exploratrice - Au Secours Des Animaux              | LEAPSTER       |
 | 500-12350-A |ENG| Letterpillar                                              | LEAPSTER       |
-| 500-12392-A |FRA| Dora L' Exploratrice - Le Pont Casse                      | LEAPSTER       |
-| 500-12393-A |FRA| La Riviere Des Lapins + L'atelier De Peinture             | LEAPSTER       |
+| 500-12392-A |FRA| Dora L'Exploratrice - Le Pont Casse                       | LEAPSTER       |
+| 500-12393-A |FRA| La Rivière Des Lapins + L'atelier De Peinture             | LEAPSTER       |
 | 500-12411-A |FRA| Disney Princesse - La Magie D'Apprendre                   | LEAPSTER       |
-| 500-12413-A |FRA| A La Conquete Des Nombres                                 | LEAPSTER       |
+| 500-12413-A |FRA| A La Conquête Des Nombres                                 | LEAPSTER       |
 | 500-12414-A |FRA| Cars                                                      | LEAPSTER       |
 | 500-12415-A |FRA| Bob Leponge - Heros D'un Jour                             | LEAPSTER       |
-| 500-12416-A |FRA| Spider-Man - L'Affaire Des Mots Mysteres                  | LEAPSTER       |
+| 500-12416-A |FRA| Spider-Man - L'Affaire Des Mots Mystères                  | LEAPSTER       |
 | 500-12466-A |ENG| Clifford - The Big Red Dog - Reading                      | LEAPSTER       |
 | 500-12475-A |FRA| Adibou - A La Recherche De Robitoc                        | LEAPSTER       |
 | 500-12562-B |GER| Dora - Retter der Wildnis                                 | LEAPSTER       |
@@ -112,7 +112,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       |
 
 -->
-
 
 <!-- Entries are ordered by title of the parent, clones are list after the parent, Leapster L-Max in an own section at the end -->
 
@@ -455,7 +454,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="doraf" cloneof="dora" supported="no">
-		<description>Dora L' Exploratrice - Au Secours Des Animaux (Fra)</description>
+		<description>Dora L'Exploratrice - Au Secours Des Animaux (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12339-A" />
@@ -467,7 +466,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="dorapont" supported="no">
-		<description>Dora L' Exploratrice - Le Pont Casse (Fra)</description>
+		<description>Dora L'Exploratrice - Le Pont Casse (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12392-A" />
@@ -587,7 +586,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="riviere" supported="no">
-		<description>La Riviere Des Lapins + L'Atelier De Peinture (Fra)</description>
+		<description>La Rivière Des Lapins + L'Atelier De Peinture (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12393-A" />
@@ -695,7 +694,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="numraidf" cloneof="numraid" supported="no">
-		<description>A La Conquete Des Nombres - Un Jeu D'Arcade Éducatif! (Fra)</description>
+		<description>A La Conquête Des Nombres - Un Jeu D'Arcade Éducatif! (Fra)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12413-A" />
@@ -948,7 +947,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spidermnf" cloneof="spidermn" supported="no">
-		<description>Spider-Man - L'Affaire Des Mots Mysteres (Fra)</description>
+		<description>Spider-Man - L'Affaire Des Mots Mystères (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12416-A" />
