@@ -304,7 +304,7 @@ void sound_sdl::update_audio_stream(bool is_throttled, const int16_t *buffer, in
 
 	if (stream_buffer->free_size() < bytes_this_frame) {
 		if (LOG_SOUND)
-			fprintf(sound_log, "Overflow: DS=%lu FS=%lu BTF=%lu\n", data_size, free_size, bytes_this_frame);
+			fprintf(sound_log, "Overflow: DS=%zu FS=%zu BTF=%zu\n", data_size, free_size, bytes_this_frame);
 		buffer_overflows++;
 		return;
 	}
@@ -314,7 +314,7 @@ void sound_sdl::update_audio_stream(bool is_throttled, const int16_t *buffer, in
 	size_t nfree_size = stream_buffer->free_size();
 	size_t ndata_size = stream_buffer->data_size();
 	if (LOG_SOUND)
-		fprintf(sound_log, "Appended data: DS=%lu(%lu) FS=%lu(%lu) BTF=%lu\n", data_size, ndata_size, free_size, nfree_size, bytes_this_frame);
+		fprintf(sound_log, "Appended data: DS=%zu(%zu) FS=%zu(%zu) BTF=%zu\n", data_size, ndata_size, free_size, nfree_size, bytes_this_frame);
 }
 
 
@@ -350,7 +350,7 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 	{
 		thiz->buffer_underflows++;
 		if (LOG_SOUND)
-			fprintf(sound_log, "Underflow at sdl_callback: DS=%lu FS=%lu Len=%d\n", data_size, free_size, len);
+			fprintf(sound_log, "Underflow at sdl_callback: DS=%zu FS=%zu Len=%d\n", data_size, free_size, len);
 
 		// Maybe read whatever is left in the stream_buffer anyway?
 		memset(stream, 0, len);
@@ -364,7 +364,7 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 	thiz->attenuate((int16_t *)stream, len);
 
 	if (LOG_SOUND)
-		fprintf(sound_log, "callback: xfer DS=%lu FS=%lu Len=%d\n", data_size, free_size, len);
+		fprintf(sound_log, "callback: xfer DS=%zu FS=%zu Len=%d\n", data_size, free_size, len);
 }
 
 
