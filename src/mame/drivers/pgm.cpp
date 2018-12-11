@@ -4674,7 +4674,6 @@ void pgm_state::expand_colourdata()
 {
 	u8 *src = memregion( "sprcol" )->base();
 	size_t srcsize = memregion( "sprcol" )->bytes();
-	int cnt;
 	size_t needed = srcsize / 2 * 3;
 
 	/* work out how much ram we need to allocate to expand the sprites into
@@ -4685,11 +4684,9 @@ void pgm_state::expand_colourdata()
 
 	m_sprite_a_region = std::make_unique<u8[]>(m_sprite_a_region_size);
 
-	for (cnt = 0 ; cnt < srcsize / 2 ; cnt++)
+	for (int cnt = 0 ; cnt < srcsize / 2 ; cnt++)
 	{
-		u16 colpack;
-
-		colpack = ((src[cnt * 2]) | (src[cnt * 2 + 1] << 8));
+		u16 const colpack = ((src[cnt * 2]) | (src[cnt * 2 + 1] << 8));
 		m_sprite_a_region[cnt * 3 + 0] = (colpack >> 0 ) & 0x1f;
 		m_sprite_a_region[cnt * 3 + 1] = (colpack >> 5 ) & 0x1f;
 		m_sprite_a_region[cnt * 3 + 2] = (colpack >> 10) & 0x1f;
