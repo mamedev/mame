@@ -22,11 +22,9 @@
 #if defined(__FreeBSD_kernel__) || defined(__DragonFly__)
 #include <termios.h>
 #include <libutil.h>
-#elif defined(__NetBSD__) || defined(__OpenBSD__)
+#elif defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
 #include <termios.h>
 #include <util.h>
-#elif defined(__APPLE__)
-#include <termios.h>
 #elif defined(__linux__) || defined(EMSCRIPTEN)
 #include <pty.h>
 #elif defined(__HAIKU__)
