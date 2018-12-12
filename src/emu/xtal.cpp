@@ -148,6 +148,7 @@ const double XTAL::known_xtals[] = {
 	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
+	 10'480'000, /* 10.48_MHz_XTAL         System-80 (50 Hz) */
 	 10'500'000, /* 10.5_MHz_XTAL          Agat-7 */
 	 10'595'000, /* 10.595_MHz_XTAL        Mad Alien */
 	 10'644'500, /* 10.6445_MHz_XTAL       TRS-80 Model I */

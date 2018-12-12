@@ -56,6 +56,7 @@ public:
 	{ }
 
 	void sys80(machine_config &config);
+	void sys80p(machine_config &config);
 	void trs80(machine_config &config);
 	void lnw80(machine_config &config);
 	void radionic(machine_config &config);

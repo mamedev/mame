@@ -582,8 +582,16 @@ MACHINE_CONFIG_START(trs80_state::sys80)
 	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_tcp));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(trs80_state::ht1080z)
+MACHINE_CONFIG_START(trs80_state::sys80p)
 	sys80(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(10.48_MHz_XTAL / 6)
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(10.48_MHz_XTAL, 672, 0, 384, 312, 0, 192)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(trs80_state::ht1080z)
+	sys80p(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(ht1080z_io)
 
@@ -706,6 +714,8 @@ ROM_START(sys80)
 	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
+#define rom_sys80p rom_sys80
+
 
 ROM_START(lnw80)
 	ROM_REGION(0x3800, "maincpu",0)
@@ -768,7 +778,8 @@ void trs80_state::init_trs80l2()
 COMP( 1977, trs80,       0,        0,      trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  0 )
 COMP( 1978, trs80l2,     0,        0,      model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", 0 )
 COMP( 1983, radionic,    trs80l2,  0,      radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        0 )
-COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80",                       0 )
+COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               0 )
+COMP( 1980, sys80p,      trs80l2,  0,      sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               0 )
 COMP( 1981, lnw80,       trs80l2,  0,      lnw80,    sys80,   trs80_state, init_trs80,    "LNW Research",                "LNW-80",                          0 )
 COMP( 1983, ht1080z,     trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               0 )
 COMP( 1984, ht1080z2,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              0 )
