@@ -905,8 +905,8 @@ Split full screen image across monitors. Default is OFF (\-nouseallheads).
 .SS Sound options
 .\" *******************************************************
 .TP
-.B \-[no]sound
-Enable or disable sound altogether. The default is ON (\-sound).
+.B \-sound \fIvalue
+Specifies which sound subsystem to use. 'none' disables sound altogether. The default value is 'auto' (\-sound).
 .TP
 .B \-samplerate, \-srf \fIvalue
 Sets the audio sample rate. Smaller values (e.g. 11025) cause lower
@@ -927,9 +927,9 @@ Sets the startup volume. It can later be changed with the user interface
 .TP
 .B \-audio_latency \fIvalue
 This controls the amount of latency built into the audio streaming.
-The latency parameter controls the lower threshold. The default is 1
-(meaning lower=1/5 and upper=2/5). Set it to 2 (\-audio_latency 2) to keep
-the sound buffer between 2/5 and 3/5 full. If you crank it up to 4,
+The latency parameter controls the lower threshold. The default is 2
+(meaning lower=2/5 and upper=3/5). Set it to 1 (\-audio_latency 1) to keep
+the sound buffer between 1/5 and 2/5 full. If you crank it up to 4,
 you can definitely notice the lag.
 .\"
 .\" *******************************************************

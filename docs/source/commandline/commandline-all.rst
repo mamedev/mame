@@ -1121,7 +1121,7 @@ Core Sound Options
 
 **-audio_latency** *<value>*
 
-	This controls the amount of latency built into the audio streaming. By default MAME tries to keep the DirectSound audio buffer between 1/5 and 2/5 full. On some systems, this is pushing it too close to the edge, and you get poor sound sometimes. The latency parameter controls the lower threshold. The default is *1* (meaning lower=1/5 and upper=2/5). Set it to 2 (**-audio_latency 2**) to keep the sound buffer between 2/5 and 3/5 full. If you crank it up to 4, you can *definitely* notice audio lag.
+	This controls the amount of latency built into the audio streaming. By default MAME tries to keep the DirectSound audio buffer between 2/5 and 3/5 full. On some systems, this is pushing it too close to the edge, and you get poor sound sometimes. The latency parameter controls the lower threshold. The default is *2* (meaning lower=2/5 and upper=3/5). Set it to 1 (**-audio_latency 1**) to keep the sound buffer between 1/5 and 2/5 full. If you crank it up to 4, you can *definitely* notice audio lag.
 
 
 
