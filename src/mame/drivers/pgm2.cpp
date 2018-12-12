@@ -1272,7 +1272,7 @@ static void sprite_colour_decode(u16* rom, int len)
 
 READ32_MEMBER(pgm2_state::orleg2_speedup_r)
 {
-	int pc = m_maincpu->pc();
+	u32 const pc = m_maincpu->pc();
 	if ((pc == 0x1002faec) || (pc == 0x1002f9b8))
 	{
 		if ((m_mainram[0x20114 / 4] == 0x00) && (m_mainram[0x20118 / 4] == 0x00))
@@ -1288,7 +1288,7 @@ READ32_MEMBER(pgm2_state::orleg2_speedup_r)
 
 READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 {
-	int pc = m_maincpu->pc();
+	u32 const pc = m_maincpu->pc();
 
 	if ((pc == 0x10053a94) || (pc == 0x1005332c) || (pc == 0x1005327c))
 	{
@@ -1307,7 +1307,7 @@ READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 
 READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
 {
-	int pc = m_maincpu->pc();
+	u32 const pc = m_maincpu->pc();
 
 	if (pc == 0x100028f6)
 	{
@@ -1326,7 +1326,7 @@ READ32_MEMBER(pgm2_state::kof98umh_speedup_r)
 
 READ32_MEMBER(pgm2_state::kov3_speedup_r)
 {
-	int pc = m_maincpu->pc();
+	u32 const pc = m_maincpu->pc();
 
 	if ((pc == 0x1000729a) || (pc == 0x1000729e))
 	{
@@ -1348,7 +1348,7 @@ READ32_MEMBER(pgm2_state::kov3_speedup_r)
 
 READ32_MEMBER(pgm2_state::ddpdojt_speedup_r)
 {
-	int pc = m_maincpu->pc();
+	u32 const pc = m_maincpu->pc();
 
 	if (pc == 0x10001a7e)
 	{
@@ -1367,7 +1367,7 @@ READ32_MEMBER(pgm2_state::ddpdojt_speedup_r)
 
 READ32_MEMBER(pgm2_state::ddpdojt_speedup2_r)
 {
-	int pc = m_maincpu->pc();
+	u32 const pc = m_maincpu->pc();
 
 	if (pc == 0x1008fefe || pc == 0x1008fbe8)
 	{
