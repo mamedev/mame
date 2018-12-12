@@ -2968,46 +2968,56 @@ MACHINE_CONFIG_END
  * Naomi 1, unprotected ROM sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomi)
+void naomi_state::naomi(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi_state::naomigd)
+void naomi_state::naomigd(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, "naomibd_eeprom", ":gdrom", "pic"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M1 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim1)
+void naomi_state::naomim1(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m1_board &rom_board(NAOMI_M1_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim2)
+void naomi_state::naomim2(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m2_board &rom_board(NAOMI_M2_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M4 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim4)
+void naomi_state::naomim4(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", 0, "naomibd_eeprom", "pic_readout"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi M2 with Keyboard controllers
@@ -3052,13 +3062,13 @@ void naomi2_state::naomi2_base(machine_config &config)
 	// TODO: ELAN device
 }
 
-MACHINE_CONFIG_START(naomi2_state::naomi2gd)
+void naomi2_state::naomi2gd(machine_config &config)
+{
 	naomigd(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Naomi 2, M1 sub-board
@@ -3076,13 +3086,13 @@ MACHINE_CONFIG_END
  * Naomi 2, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2m2)
+void naomi2_state::naomi2m2(machine_config &config)
+{
 	naomim2(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Atomiswave
@@ -3095,7 +3105,8 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_DEVICE_PROGRAM_MAP(aw_map)
 	MCFG_DEVICE_IO_MAP(aw_port)
 	MACRONIX_29L001MC(config, "awflash");
-	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
+	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0, "rom_key"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);

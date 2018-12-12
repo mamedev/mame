@@ -1876,11 +1876,13 @@ MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(chihiro_state::chihirogd)
+void chihiro_state::chihirogd(machine_config &config)
+{
 	chihiro_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
-	MCFG_DEVICE_ADD("network", SEGA_NETWORK_BOARD, 0)
-MACHINE_CONFIG_END
+	NAOMI_GDROM_BOARD(config, m_dimmboard, 0, ":gdrom", "pic");
+	m_dimmboard->irq_callback().set_nop();
+	SEGA_NETWORK_BOARD(config, "network", 0);
+}
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
