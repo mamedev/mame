@@ -77,13 +77,13 @@
     06 - zoom something, 0F-7F, default 1F
     08 - fg scroll x
     0a - fg scroll y
-    0e - resolution, 0 - low (kof98), 1 - high (rest of games)
-    10 - ? orleg2 - 0x13, kov2nl, kof98, ddpdojt - 0x14 at init
+    0e - resolution, 0 - low (kof98umh), 1 - high (rest of games), 2 - higher (kov3)
+    10 - ? orleg2 - 0x13, kov2nl, kov3, kof98umh, ddpdojt - 0x14 at init
     14 - sprite enable ? set to 0 before spriteram update, to 1 after
-    16 - set to 1 before access to vrams/palettes, reset after. bits: 0 - bg ram and palette, 1 - fg ram and palette, 2 - sprite palette.
+    16 - set to 1 before access to vrams/palettes, reset after. bits: 0 - bg RAM and palette, 1 - fg RAM and palette, 2 - sprite palette.
     18 - vblank ack
     1a - ? 0 at init
-    1c - ? orleg2 - 5, kov2nl, kof, ddpdojt - 7 at init
+    1c - ? orleg2 - 5, kov2nl, kov3, kof98umh, ddpdojt - 7 at init
     1e - ? 2 at init
     32 - shared RAM bank
     34, 36 - ? 0 at init
@@ -154,19 +154,17 @@ void pgm2_state::device_post_load()
 
 WRITE32_MEMBER(pgm2_state::encryption_do_w)
 {
+	igs036_decryptor decrypter(m_encryption_table);
 	if (m_romboard_ram)
 	{
-		igs036_decryptor decrypter(m_encryption_table);
 		decrypter.decrypter_rom((u16*)&m_romboard_ram[0], m_romboard_ram.bytes(), 0);
 		decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), m_romboard_ram.bytes());   // assume the rom at 0x0200000 also gets decrypted as if it was at 0x0200000 even if it isn't used (the game has already copied it to RAM where it properly decrypted)
-		m_has_decrypted = true;
 	}
 	else
 	{
-		igs036_decryptor decrypter(m_encryption_table);
 		decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), 0);
-		m_has_decrypted = true;
 	}
+	m_has_decrypted = true;
 }
 
 
@@ -219,7 +217,7 @@ void pgm2_state::mcu_command(bool is_command)
 			m_mcu_result0 = m_mcu_regs[0];
 			m_mcu_result1 = m_mcu_regs[1];
 			break;
-		case 0xe1: // shared ram access (unimplemented)
+		case 0xe1: // shared RAM access (unimplemented)
 		{
 			// MCU access to RAM shared at 0x30100000, 2x banks, in the same time CPU and MCU access different banks
 			u8 mode = m_mcu_regs[0] >> 16; // 0 - ???, 1 - read, 2 - write
@@ -244,7 +242,7 @@ void pgm2_state::mcu_command(bool is_command)
 				status = 0xf4;
 			m_mcu_result0 = cmd;
 			break;
-		case 0xc2: // read data to shared ram
+		case 0xc2: // read data to shared RAM
 			for (int i = 0; i < arg3; i++)
 			{
 				if (m_memcard[arg1 & 3]->present() != -1)
@@ -254,7 +252,7 @@ void pgm2_state::mcu_command(bool is_command)
 			}
 			m_mcu_result0 = cmd;
 			break;
-		case 0xc3: // save data from shared ram
+		case 0xc3: // save data from shared RAM
 			for (int i = 0; i < arg3; i++)
 			{
 				if (m_memcard[arg1 & 3]->present() != -1)
@@ -513,7 +511,7 @@ void pgm2_state::pgm2_map(address_map &map)
 {
 	map(0x00000000, 0x00003fff).rom(); //AM_REGION("mainrom", 0x00000) // internal ROM
 
-	map(0x02000000, 0x0200ffff).ram().share("sram"); // 'battery ram' (in CPU?)
+	map(0x02000000, 0x0200ffff).ram().share("sram"); // 'battery RAM' (in CPU?)
 
 	map(0x03600000, 0x036bffff).rw(FUNC(pgm2_state::mcu_r), FUNC(pgm2_state::mcu_w));
 
@@ -522,7 +520,8 @@ void pgm2_state::pgm2_map(address_map &map)
 
 	map(0x20000000, 0x2007ffff).ram().share("mainram");
 
-	map(0x30000000, 0x30001fff).ram().share("sp_videoram"); // spriteram ('move' ram in test mode)
+	map(0x30000000, 0x30001fff).ram().share("sp_videoram"); // spriteram ('move' RAM in test mode)
+	map(0x30002000, 0x30003fff).ram(); // Second half of RAM 6 area of later RAM test, more sprite RAM or mirror of above?
 
 	map(0x30020000, 0x30021fff).ram().w(FUNC(pgm2_state::bg_videoram_w)).share("bg_videoram");
 	map(0x30040000, 0x30045fff).ram().w(FUNC(pgm2_state::fg_videoram_w)).share("fg_videoram");
@@ -534,12 +533,14 @@ void pgm2_state::pgm2_map(address_map &map)
 	map(0x300a0000, 0x300a07ff).ram().w(m_tx_palette, FUNC(palette_device::write32)).share("tx_palette");
 
 	map(0x300c0000, 0x300c01ff).ram().share("sp_zoom"); // sprite zoom table - it uploads the same data 4x, maybe xshrink,xgrow,yshrink,ygrow or just redundant mirrors
+	map(0x300c0200, 0x300c03ff).ram(); // Second half of RAM 4 area of later RAM test, more sprite zoom table or mirror of above?
 
-	/* linescroll ram - it clears to 0x3bf on startup which is enough bytes for 240 lines if each rowscroll value was 8 bytes, but each row is 4,
+	/* linescroll RAM - it clears to 0x3bf on startup which is enough bytes for 240 lines if each rowscroll value was 8 bytes, but each row is 4,
 	so only half of this is used? or tx can do it too (unlikely, as orl2 writes 256 lines of data) maybe just bad mem check bounds on orleg2.
 	It reports pass even if it fails the first byte but if the first byte passes it attempts to test 0x10000 bytes, which is far too big so
 	what is the real size? */
 	map(0x300e0000, 0x300e03ff).ram().share("lineram").mirror(0x000fc00);
+	map(0x300f0000, 0x300fffff).ram(); // RAM 5 area of later RAM test, more linescroll RAM or mirror of above?
 
 	map(0x30100000, 0x301000ff).rw(FUNC(pgm2_state::shareram_r), FUNC(pgm2_state::shareram_w)).umask32(0x00ff00ff);
 
