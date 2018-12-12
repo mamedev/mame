@@ -882,17 +882,17 @@ void pgm2_state::pgm2_ramrom(machine_config &config)
 
 #define ORLEG2_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "xyj2_cn.igs036", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) ) \
+	ROM_LOAD( "xyj2_cn.igs036", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) ) /* Core V100 China */ \
 	ROM_REGION( 0x108, "default_card", 0 ) \
 	ROM_LOAD( "blank_orleg2_china_card.pg2", 0x000, 0x108, CRC(dc29556f) SHA1(2335cc7af25d4dd9763c6944d3f0eb50276de80a) )
 
 #define ORLEG2_INTERNAL_OVERSEAS \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "ol2_fa.igs036", 0x00000000, 0x0004000, CRC(cc4d398a) SHA1(c50bcc81f02cd5aa8ad157d73209dc53bdedc023) )
+	ROM_LOAD( "ol2_fa.igs036", 0x00000000, 0x0004000, CRC(cc4d398a) SHA1(c50bcc81f02cd5aa8ad157d73209dc53bdedc023) ) // Core V100 Oversea
 
 #define ORLEG2_INTERNAL_JAPAN \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "ol2_a10.igs036", 0x00000000, 0x0004000, CRC(69375284) SHA1(a120c6a3d8d7898cc3ca508abea78e5e54090c66) )
+	ROM_LOAD( "ol2_a10.igs036", 0x00000000, 0x0004000, CRC(69375284) SHA1(a120c6a3d8d7898cc3ca508abea78e5e54090c66) ) // Core V100 Japan
 
 ROM_START( orleg2 )
 	ORLEG2_INTERNAL_OVERSEAS
@@ -988,7 +988,7 @@ ROM_END
 // Region 0x00 - China
 #define KOV2NL_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "gsyx_igs036_china.rom", 0x00000000, 0x0004000, CRC(e09fe4ce) SHA1(c0cac64ef8727cbe79d503ec4df66ddb6f2c925e) ) \
+	ROM_LOAD( "gsyx_igs036_china.rom", 0x00000000, 0x0004000, CRC(e09fe4ce) SHA1(c0cac64ef8727cbe79d503ec4df66ddb6f2c925e) ) /* Core V100 China */ \
 	ROM_REGION( 0x108, "default_card", 0 ) \
 	ROM_LOAD( "blank_gsyx_china.pg2", 0x000, 0x108, CRC(02842ae8) SHA1(a6cda633b09a706039a79b73db2c258094826f85) )
 
@@ -1008,7 +1008,7 @@ ROM_END
 // Region 0x05 - Overseas
 #define KOV2NL_INTERNAL_OVERSEA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "kov2nl_igs036_oversea.rom", 0x00000000, 0x0004000, CRC(25ec60cd) SHA1(7dd12d2bc642bfa79520676fe5de458ce7d08ef6) ) \
+	ROM_LOAD( "kov2nl_igs036_oversea.rom", 0x00000000, 0x0004000, CRC(25ec60cd) SHA1(7dd12d2bc642bfa79520676fe5de458ce7d08ef6) ) /* Core V100 oversea */ \
 	ROM_REGION( 0x108, "default_card", 0 ) \
 	ROM_LOAD( "blank_kov2nl_overseas_card.pg2", 0x000, 0x108, CRC(1155f01f) SHA1(60f7bed1461b362a3da687503cd72ed2d5e96f30) )
 
@@ -1117,7 +1117,7 @@ ROM_END
 
 #define KOV3_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "kov3_igs036_china.rom", 0x00000000, 0x0004000, CRC(c7d33764) SHA1(5cd48f876e637d60391d39ac6e40bf243300cc75) ) \
+	ROM_LOAD( "kov3_igs036_china.rom", 0x00000000, 0x0004000, CRC(c7d33764) SHA1(5cd48f876e637d60391d39ac6e40bf243300cc75) ) /* Core V100 China */ \
 	ROM_REGION( 0x108, "default_card", 0 ) \
 	ROM_LOAD( "blank_kov3_china_card.pg2", 0x000, 0x108, CRC(bd5a968f) SHA1(b9045eb70e02afda7810431c592208053d863980) )
 
@@ -1197,7 +1197,7 @@ all others:         SPANSION S99-50070
 
 ROM_START( kof98umh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "kof98umh_internal_rom.bin",       0x00000000, 0x0004000, CRC(3ed2e50f) SHA1(35310045d375d9dda36c325e35257123a7b5b8c7) )
+	ROM_LOAD( "kof98umh_internal_rom.bin",       0x00000000, 0x0004000, CRC(3ed2e50f) SHA1(35310045d375d9dda36c325e35257123a7b5b8c7) ) // Core V100 China
 
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "kof98umh_v100cn.u4",        0x00000000, 0x1000000, CRC(2ea91e3b) SHA1(5a586bb99cc4f1b02e0db462d5aff721512e0640) ) // V100 09-08-23 17:52:03
