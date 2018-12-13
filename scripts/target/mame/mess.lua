@@ -3813,6 +3813,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mod8.cpp",
 	MAME_DIR .. "src/mame/drivers/modellot.cpp",
 	MAME_DIR .. "src/mame/drivers/molecular.cpp",
+	MAME_DIR .. "src/mame/drivers/monon_color.cpp",
 	MAME_DIR .. "src/mame/drivers/ms0515.cpp",
 	MAME_DIR .. "src/mame/drivers/ms9540.cpp",
 	MAME_DIR .. "src/mame/drivers/mstation.cpp",
