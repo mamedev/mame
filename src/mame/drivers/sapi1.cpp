@@ -27,6 +27,8 @@ ToDo:
 
 Unable to proceed due to no info available (& in English).
 
+ZPS stands for "Základní Počítačová Sestava" (basic computer system).
+
 ****************************************************************************/
 
 
