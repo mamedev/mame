@@ -985,7 +985,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpc664)
 	amstrad_base(config);
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpc6128)
 	amstrad_base(config);
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
@@ -1089,7 +1089,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_CASSETTE_INTERFACE("cpc_cass")
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 40_MHz_XTAL / 10, true, true);
 
 	cpcplus_cartslot(config);
 
@@ -1176,7 +1176,7 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 
 	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
-	I8272A(config.replace(), m_fdc, true);
+	I8272A(config.replace(), m_fdc, 16_MHz_XTAL / 4, true);
 
 	MCFG_DEVICE_REMOVE("exp")
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)

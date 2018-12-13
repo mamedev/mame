@@ -1063,7 +1063,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
 	lpt.irq_handler().set_inputline(m_maincpu, 0);
 
-	PC_FDC_SUPERIO(config, m_fdc);
+	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)

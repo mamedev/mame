@@ -2370,7 +2370,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	d8255_slave.in_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_r));
 	d8255_slave.out_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, INPUT_LINE_IRQ0);
 
 	#if USE_PROPER_I8214

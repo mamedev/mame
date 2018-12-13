@@ -649,7 +649,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	rs232.rxd_handler().set(UPD8251_TAG, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(UPD8251_TAG, FUNC(i8251_device::write_dsr));
 
-	UPD765A(config, m_fdc, false, false);
+	UPD765A(config, m_fdc, 8'000'000, false, false);
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")

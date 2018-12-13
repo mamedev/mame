@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	PIC8259(config, m_pic1, 0);
 	m_pic1->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
-	I8272A(config, m_fdc, true);
+	I8272A(config, m_fdc, 16_MHz_XTAL / 4, true);
 	m_fdc->set_select_lines_connected(true);
 	m_fdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(FUNC(tandy2k_state::fdc_drq_w));

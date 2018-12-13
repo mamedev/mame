@@ -178,7 +178,7 @@ void fs3216_state::fs3216(machine_config &config)
 
 	Z80DART(config, "dart", 44.2368_MHz_XTAL / 8); // Z8470BPS
 
-	UPD765A(config, m_fdc, true, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, false);
 
 	X2212(config, m_earom);
 

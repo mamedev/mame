@@ -70,7 +70,7 @@ MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
 	m_cpu->out_p2_cb().set(FUNC(epson_pf10_device::port2_w));
 	m_cpu->out_ser_tx_cb().set(FUNC(epson_pf10_device::hd6303_tx_w));
 
-	UPD765A(config, m_fdc, false, true);
+	UPD765A(config, m_fdc, 4'000'000, false, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "smd165", floppy_image_device::default_floppy_formats)
 
 	MCFG_EPSON_SIO_ADD("sio", nullptr)

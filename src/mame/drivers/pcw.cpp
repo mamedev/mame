@@ -1261,7 +1261,7 @@ void pcw_state::pcw(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 4'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw_state::pcw_fdc_interrupt));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats);

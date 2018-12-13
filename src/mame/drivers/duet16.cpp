@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_INPUT_MERGER_ANY_HIGH("tmint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir0_w)) // INT6
 
-	UPD765A(config, m_fdc, true, false);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w)); // INT4
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)

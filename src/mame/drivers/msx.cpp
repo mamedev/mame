@@ -1310,7 +1310,7 @@ void msx_state::msx_mb8877a(machine_config & config)
 
 void msx_state::msx_tc8566af(machine_config &config)
 {
-	TC8566AF(config, "fdc");
+	TC8566AF(config, "fdc", 16'000'000);
 }
 
 void msx_state::msx_microsol(machine_config &config)

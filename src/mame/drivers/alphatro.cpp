@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through SED-9420C
 	m_fdc->intrq_wr_callback().set(FUNC(alphatro_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)

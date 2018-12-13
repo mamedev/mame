@@ -2351,7 +2351,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	I8251(config, m_sio, 0);
 
-	UPD765A(config, m_fdc_2hd, true, true);
+	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
 	m_fdc_2hd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
 	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
@@ -2401,7 +2401,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	// TODO: maybe force dips to avoid beep error
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
-	UPD765A(config, m_fdc_2dd, false, true);
+	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
 	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
 	m_fdc_2dd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
 	FLOPPY_CONNECTOR(config, "upd765_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);

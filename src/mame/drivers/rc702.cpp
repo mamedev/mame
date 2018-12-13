@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
