@@ -369,6 +369,9 @@ public:
 	template <class Object> devcb_base &set_if_handler(Object &&cb) { return m_out_if_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_esc_opcode_handler(Object &&cb) { return m_esc_opcode_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_esc_data_handler(Object &&cb) { return m_esc_data_handler.set_callback(std::forward<Object>(cb)); }
+	auto if_handler() { return m_out_if_func.bind(); }
+	auto esc_opcode_handler() { return m_esc_opcode_handler.bind(); }
+	auto esc_data_handler() { return m_esc_data_handler.bind(); }
 
 protected:
 	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);

@@ -114,7 +114,7 @@ public:
 
 	void init_mbc55x();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_iodecode;
 	uint32_t      m_debug_machine;
 
