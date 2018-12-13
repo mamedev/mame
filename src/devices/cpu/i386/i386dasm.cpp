@@ -269,9 +269,9 @@ const i386_disassembler::I386_OPCODE i386_disassembler::i386_opcode_table1[256] 
 	// 0xf0
 	{"lock",            0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"repne",           PREFIX,         0,                  0,                  0               },
+	{"repne",           PREFIX,         0,                  0,                  0,              STEP_OVER},
 	{"rep",             PREFIX,         0,                  0,                  0,              STEP_OVER},
-	{"hlt",             0,              0,                  0,                  0,              STEP_OVER},
+	{"hlt",             0,              0,                  0,                  0               },
 	{"cmc",             0,              0,                  0,                  0               },
 	{"groupF6",         GROUP,          0,                  0,                  0               },
 	{"groupF7",         GROUP,          0,                  0,                  0               },
