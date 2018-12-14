@@ -6,8 +6,8 @@
 
     driver by Mike Appolo
 
-    Modified 10/08/2006 by Jess M. Askey to include support for Speech which was not stuffed on production
-    Major Havoc PCB's. However, the hardware if stuffed is functional. Speech is used in Major Havoc Return
+    Modified 10/08/2006 by Jess M. Askey to include support for Speech which was not used on production
+    Major Havoc PCB's. However, the hardware if used is functional. Speech is used in Major Havoc Return
     to Vax.
 
     Games supported:
@@ -620,7 +620,7 @@ MACHINE_CONFIG_END
 
 ROM_START( mhavoc )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )   /* 152KB for ROMs */
+	ROM_REGION( 0x18000, "alpha", 0 )   /* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -633,8 +633,9 @@ ROM_START( mhavoc )
 	ROM_LOAD( "136025.318",   0x14000, 0x4000, CRC(ba935067) SHA1(05ad81e7a1982b9d8fddb48502546f48b5dc21b7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.107",   0x4000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
@@ -648,7 +649,7 @@ ROM_END
 
 ROM_START( mhavoc2 )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.110",   0x05000, 0x2000, CRC(16eef583) SHA1(277252bd716dd96d5b98ec5e33a3a6a3bc1a9abf) )
 
@@ -661,8 +662,9 @@ ROM_START( mhavoc2 )
 	ROM_LOAD( "136025.109",   0x14000, 0x4000, CRC(4d766827) SHA1(7697bf6f92bff0e62850ed75ff66008a08583ef7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.107",   0x4000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -678,7 +680,7 @@ ROM_END
 
 ROM_START( mhavocrv )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )   /* 152KB for ROMs */
+	ROM_REGION( 0x18000, "alpha", 0 )   /* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -691,8 +693,9 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.918",   0x14000, 0x4000, CRC(84735445) SHA1(21aacd862ce8911d257c6f48ead119ee5bb0b60d) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.907",   0x1c000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.907",   0x4000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -708,7 +711,7 @@ ROM_END
 
 ROM_START( mhavocp )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.010",   0x05000, 0x2000, CRC(3050c0e6) SHA1(f19a9538996d949cdca7e6abd4f04e8ff6e0e2c1) )
 
@@ -721,8 +724,9 @@ ROM_START( mhavocp )
 	ROM_LOAD( "136025.018",   0x14000, 0x4000, CRC(a8c35ccd) SHA1(c243a5407557390a64c6560d857f5031f839973f) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.006",   0x18000, 0x4000, CRC(e272ed41) SHA1(0de395d1c4300a64da7f45746d7b550779e36a21) )
-	ROM_LOAD( "136025.007",   0x1c000, 0x4000, CRC(e152c9d8) SHA1(79d0938fa9ad262c7f28c5a8ad21004a4dec9ed8) )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.006",   0x0000, 0x4000, CRC(e272ed41) SHA1(0de395d1c4300a64da7f45746d7b550779e36a21) )
+	ROM_LOAD( "136025.007",   0x4000, 0x4000, CRC(e152c9d8) SHA1(79d0938fa9ad262c7f28c5a8ad21004a4dec9ed8) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -737,7 +741,7 @@ ROM_END
 
 
 ROM_START( alphaone )
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -752,8 +756,9 @@ ROM_START( alphaone )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "vec_pg01.tw",  0x18000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
-	ROM_LOAD( "vec_pg23.tw",  0x1c000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "vec_pg01.tw",  0x0000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
+	ROM_LOAD( "vec_pg23.tw",  0x4000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -764,7 +769,7 @@ ROM_END
 
 
 ROM_START( alphaonea )
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -779,8 +784,9 @@ ROM_START( alphaonea )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "vec_pg01.tw",  0x18000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
-	ROM_LOAD( "vec_pg23.tw",  0x1c000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "vec_pg01.tw",  0x0000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
+	ROM_LOAD( "vec_pg23.tw",  0x4000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
