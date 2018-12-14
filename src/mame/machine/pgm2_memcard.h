@@ -43,21 +43,21 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read_prot);
-	DECLARE_WRITE8_MEMBER(write_prot);
-	DECLARE_READ8_MEMBER(read_sec);
-	DECLARE_WRITE8_MEMBER(write_sec);
-	void auth(uint8_t p1, uint8_t p2, uint8_t p3);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 read_prot(offs_t offset);
+	void write_prot(offs_t offset, u8 data);
+	u8 read_sec(offs_t offset);
+	void write_sec(offs_t offset, u8 data);
+	void auth(u8 p1, u8 p2, u8 p3);
 
 	/* returns the index of the current memory card, or -1 if none */
 	int present() { return is_loaded() ? 0 : -1; }
 private:
-	uint8_t m_memcard_data[0x100];
-	uint8_t m_protection_data[4];
-	uint8_t m_security_data[4];
-	bool authenticated;
+	u8 m_memcard_data[0x100];
+	u8 m_protection_data[4];
+	u8 m_security_data[4];
+	bool m_authenticated;
 };
 
 
