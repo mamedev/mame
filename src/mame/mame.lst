@@ -35420,6 +35420,7 @@ kinstb                          // bootleg
 mk3snes                         // bootleg
 rushbeat                        // bootleg
 sblast2b                        // bootleg
+spidrmnb                        // bootleg
 
 @source:snk.cpp
 alphamis                        // (c) 1985
