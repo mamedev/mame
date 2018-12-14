@@ -27,28 +27,14 @@
 
 
 //**************************************************************************
-//  CONSTANTS/MACROS
-//**************************************************************************
-
-#define NASCOM1_KEY_RESET   0x02
-#define NASCOM1_KEY_INCR    0x01
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct nascom1_portstat_t
-{
-	uint8_t   stat_flags;
-	uint8_t   stat_count;
-};
 
 class nascom_state : public driver_device
 {
 public:
-	nascom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nascom_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_hd6402(*this, "hd6402"),
@@ -88,7 +74,8 @@ private:
 	int m_tape_size;
 	uint8_t *m_tape_image;
 	int m_tape_index;
-	nascom1_portstat_t m_portstat;
+	uint8_t m_kb_select;
+	uint8_t m_kb_control;
 
 	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
 	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
@@ -159,10 +146,7 @@ private:
 
 READ8_MEMBER( nascom_state::nascom1_port_00_r )
 {
-	if (m_portstat.stat_count < 9)
-		return ((m_keyboard[m_portstat.stat_count % 8])->read() | ~0x7f);
-
-	return 0xff;
+	return m_keyboard[m_kb_select]->read() | ~0x7f;
 }
 
 WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
@@ -170,21 +154,15 @@ WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
 	m_cassette->change_state(
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-	if (!(data & NASCOM1_KEY_RESET))
-	{
-		if (m_portstat.stat_flags & NASCOM1_KEY_RESET)
-			m_portstat.stat_count = 0;
-	}
-	else
-		m_portstat.stat_flags = NASCOM1_KEY_RESET;
+	// d0 falling edge: increment keyboard matrix column select counter
+	if (m_kb_control & ~data & 1)
+		m_kb_select = (m_kb_select + 1) & 7;
 
-	if (!(data & NASCOM1_KEY_INCR))
-	{
-		if (m_portstat.stat_flags & NASCOM1_KEY_INCR)
-			m_portstat.stat_count++;
-	}
-	else
-		m_portstat.stat_flags = NASCOM1_KEY_INCR;
+	// d1 falling edge: reset it
+	if (m_kb_control & ~data & 2)
+		m_kb_select = 0;
+
+	m_kb_control = data & 3;
 }
 
 
@@ -196,7 +174,6 @@ READ8_MEMBER( nascom_state::nascom1_port_01_r )
 {
 	return m_hd6402->get_received_data();
 }
-
 
 WRITE8_MEMBER( nascom_state::nascom1_port_01_w )
 {
@@ -342,6 +319,9 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 
 void nascom_state::machine_reset()
 {
+	m_kb_select = 0;
+	m_kb_control = 0;
+
 	// Set up hd6402 pins
 	m_hd6402->write_swe(1);
 
