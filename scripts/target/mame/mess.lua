@@ -1106,6 +1106,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"mos",
 		"motorola",
 		"multitch",
+		"mupid",
 		"nakajima",
 		"nascom",
 		"ncd",
@@ -2564,6 +2565,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/mkit09.cpp",
 	MAME_DIR .. "src/mame/drivers/mpf1.cpp",
 	MAME_DIR .. "src/mame/includes/mpf1.h",
+}
+
+createMESSProjects(_target, _subtarget, "mupid")
+files {
+	MAME_DIR .. "src/mame/drivers/mdisk.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "nakajima")

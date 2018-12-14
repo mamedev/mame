@@ -20836,6 +20836,10 @@ spyhunt2a                       // (c) 1987
 trisport                        // (c) 1989
 xenophob                        // (c) 1987
 
+@source:mdisk.cpp
+mdisk							// (c) 198? mupid Computer Ges.m.b.H.
+fl100							// (c) 198? Grundig
+
 @source:meadows.cpp
 bowl3d                          // [1978?]
 deadeye                         // [1978?]

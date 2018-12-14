@@ -406,6 +406,7 @@ mc8020.cpp
 mc8030.cpp
 mcb216.cpp
 mccpm.cpp
+mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd2.cpp
