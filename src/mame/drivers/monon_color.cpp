@@ -7,13 +7,13 @@
    https://gbatemp.net/threads/the-monon-color-a-new-video-game-console-from-china.467788/
    https://twitter.com/Splatoon2weird/status/1072182093206052864
 
-   uses AX208 CPU (8051 @ 96Mhz with single cycle instructions + integrated video, jpeg decoder etc.)
+   uses AX208 CPU (custom 8051 @ 96Mhz with single cycle instructions, extended '16 bit' opcodes + integrated video, jpeg decoder etc.)
    https://docplayer.net/52724058-Ax208-product-specification.html
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/axc51-core.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -75,7 +75,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(monon_color_state::monon_color)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8051, 96000000) // AX208! (needs custom core)
+	MCFG_DEVICE_ADD("maincpu", AX208, 96000000) // (8051 / MCS51 derived) incomplete core!
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
