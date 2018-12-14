@@ -28,7 +28,7 @@ public:
 	snk68_tile_indirection_delegate m_newtilecb;
 
 	void tile_callback_noindirect(int& tile, int& fx, int& fy, int& region);
-	void set_flip(int flip);
+	void set_flip(bool flip);
 
 protected:
 	virtual void device_start() override;
@@ -38,7 +38,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<screen_device> m_screen;
-	int m_flipscreen;
+	bool m_flipscreen;
 	int m_partialupdates; // the original hardware needs this, the cloned hardware does not.
 };
 

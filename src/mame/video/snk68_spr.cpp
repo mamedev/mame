@@ -12,7 +12,7 @@ snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *ta
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, "^spriteram")
 	, m_screen(*this, "^screen")
-	, m_flipscreen(0)
+	, m_flipscreen(false)
 	, m_partialupdates(1)
 {
 	m_newtilecb =  snk68_tile_indirection_delegate(FUNC(snk68_spr_device::tile_callback_noindirect), this);
@@ -137,8 +137,7 @@ void snk68_spr_device::draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &c
 	draw_sprites(bitmap, cliprect, 1);
 }
 
-void snk68_spr_device::set_flip(int flip)
+void snk68_spr_device::set_flip(bool flip)
 {
-	if (flip) m_flipscreen = 1;
-	else m_flipscreen = 0;
+	m_flipscreen = flip;
 }
