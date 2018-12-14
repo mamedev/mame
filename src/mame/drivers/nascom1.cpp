@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Dirk Best
+// copyright-holders:Dirk Best,Paul Danials
 /***************************************************************************
 
     Nascom 1/2/3
@@ -7,9 +7,6 @@
     Single board computer
 
 ***************************************************************************/
-//
-// Fixed keyboard handling so that CTRL now works. 12-2018 PHS.
-// 
 
 #include "emu.h"
 
@@ -537,7 +534,7 @@ static INPUT_PORTS_START( nascom1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
 	PORT_BIT(0x48, IP_ACTIVE_LOW, IPT_UNUSED)
-	
+
 	PORT_START("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
