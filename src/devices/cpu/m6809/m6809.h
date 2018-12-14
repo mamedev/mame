@@ -317,7 +317,7 @@ public:
 	mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class Object> devcb_base &set_lic_cb(Object &&cb) { return m_lic_func.set_callback(std::forward<Object>(cb)); }
+	auto lic() { return m_lic_func.bind(); }
 };
 
 // ======================> m6809_device (LEGACY)
