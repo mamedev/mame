@@ -972,12 +972,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpc464)
 	amstrad_base(config);
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc464_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
+
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc464_exp_cards, nullptr));
+	exp.set_cpu_tag(m_maincpu);
+	exp.irq_callback().set_inputline("maincpu", 0);
+	exp.nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	exp.romdis_callback().set(FUNC(amstrad_state::cpc_romdis));  // ROMDIS
+	exp.rom_select_callback().set(FUNC(amstrad_state::rom_select));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,320K,576K");
@@ -990,12 +991,12 @@ MACHINE_CONFIG_START(amstrad_state::cpc664)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
+	exp.set_cpu_tag(m_maincpu);
+	exp.irq_callback().set_inputline("maincpu", 0);
+	exp.nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	exp.romdis_callback().set(FUNC(amstrad_state::cpc_romdis));  // ROMDIS
+	exp.rom_select_callback().set(FUNC(amstrad_state::rom_select));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("128K,320K,576K");
@@ -1008,12 +1009,12 @@ MACHINE_CONFIG_START(amstrad_state::cpc6128)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
+	exp.set_cpu_tag(m_maincpu);
+	exp.irq_callback().set_inputline("maincpu", 0);
+	exp.nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	exp.romdis_callback().set(FUNC(amstrad_state::cpc_romdis));  // ROMDIS
+	exp.rom_select_callback().set(FUNC(amstrad_state::rom_select));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("320K,576K");
@@ -1097,12 +1098,12 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpcplus_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 40_MHz_XTAL / 10, cpcplus_exp_cards, nullptr));
+	exp.set_cpu_tag(m_maincpu);
+	exp.irq_callback().set_inputline("maincpu", 0);
+	exp.nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	exp.romdis_callback().set(FUNC(amstrad_state::cpc_romdis));  // ROMDIS
+	exp.rom_select_callback().set(FUNC(amstrad_state::rom_select));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K,320K,576K");
@@ -1178,13 +1179,12 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 
 	I8272A(config.replace(), m_fdc, 16_MHz_XTAL / 4, true);
 
-	MCFG_DEVICE_REMOVE("exp")
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(aleste_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config.replace(), "exp", 16_MHz_XTAL / 4, aleste_exp_cards, nullptr));
+	exp.set_cpu_tag(m_maincpu);
+	exp.irq_callback().set_inputline("maincpu", 0);
+	exp.nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	exp.romdis_callback().set(FUNC(amstrad_state::cpc_romdis));  // ROMDIS
+	exp.rom_select_callback().set(FUNC(amstrad_state::rom_select));
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)
