@@ -1873,7 +1873,19 @@ MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
 
 	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
-	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
+	sega837.set_port_tag<0>("TILT");
+	sega837.set_port_tag<1>("P1");
+	sega837.set_port_tag<2>("P2");
+	sega837.set_port_tag<3>("A0");
+	sega837.set_port_tag<4>("A1");
+	sega837.set_port_tag<5>("A2");
+	sega837.set_port_tag<6>("A3");
+	sega837.set_port_tag<7>("A4");
+	sega837.set_port_tag<8>("A5");
+	sega837.set_port_tag<9>("A6");
+	sega837.set_port_tag<10>("A7");
+	sega837.set_port_tag<11>("OUTPUT");
 MACHINE_CONFIG_END
 
 void chihiro_state::chihirogd(machine_config &config)

@@ -2955,7 +2955,21 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	// - unrolled NOPs then GPIO toggle - 12.76MHz (or 3.19M NOP instructions per second)
 	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
 	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
-	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
+	sega837.set_port_tag<0>("TILT");
+	sega837.set_port_tag<1>("P1");
+	sega837.set_port_tag<2>("P2");
+	sega837.set_port_tag<3>("A0");
+	sega837.set_port_tag<4>("A1");
+	sega837.set_port_tag<5>("A2");
+	sega837.set_port_tag<6>("A3");
+	sega837.set_port_tag<7>("A4");
+	sega837.set_port_tag<8>("A5");
+	sega837.set_port_tag<9>("A6");
+	sega837.set_port_tag<10>("A7");
+	sega837.set_port_tag<11>("OUTPUT");
+
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
