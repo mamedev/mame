@@ -77,7 +77,7 @@ void monon_color_state::machine_start()
 	 
 	//  block starting at e000 in flash is not code? (or encrypted?)
 	//  no code to map at 0x9000 in address space (possible BIOS?)
-	//  no code in ROM past the first 64kb? must be some kind of script interpreter? J2ME maybe?
+	//  no code in flash ROM past the first 64kb(?) which is basically the same on all games, must be some kind of script interpreter? J2ME maybe?
 }
 
 
