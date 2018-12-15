@@ -28,7 +28,8 @@ public:
 		m_cart(*this, "cartslot"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_mainram(*this, "mainram")
 	{ }
 
 	void monon_color(machine_config &config);
@@ -46,16 +47,37 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_mainram;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(monon_color_cart);
+
+	void monon_color_map(address_map &map);
 };
 
 void monon_color_state::machine_start()
 {
+	uint8_t* flash = memregion("flash")->base();
+	uint8_t* maincpu = &m_mainram[0];
+
+	memcpy(maincpu, flash+0x200, 0x2000);
+
+	/*
+	there is also a block of code at 0x2000 in the flash
+
+	a move and a jump at 0x4200
+	another block of code at 0x4c00
+	another at 0x5600
+	another at 0x6000
+	another at 0x6a00 etc.
+	
+	need to see where they map / if they need to be copied at startup
+	*/
+
 }
 
 void monon_color_state::machine_reset()
 {
+	m_maincpu->set_state_int(MCS51_PC, 0x4000);
 }
 
 void monon_color_state::video_start()
@@ -71,11 +93,18 @@ uint32_t monon_color_state::screen_update(screen_device &screen, bitmap_ind16 &b
 static INPUT_PORTS_START( monon_color )
 INPUT_PORTS_END
 
+void monon_color_state::monon_color_map(address_map &map)
+{
+	map(0x4000, 0x5fff).ram().share("mainram");
+}
+
+
 
 MACHINE_CONFIG_START(monon_color_state::monon_color)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", AX208, 96000000) // (8051 / MCS51 derived) incomplete core!
+	MCFG_DEVICE_PROGRAM_MAP(monon_color_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -109,13 +138,13 @@ DEVICE_IMAGE_LOAD_MEMBER( monon_color_state, monon_color_cart )
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(&temp[0], size, "rom");
 
-	memcpy(memregion("maincpu")->base(), &temp[0], size);
+	memcpy(memregion("flash")->base(), &temp[0], size);
 
 	return image_init_result::PASS;
 }
 
 ROM_START( mononcol )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000000, "flash", ROMREGION_ERASE00 )
 ROM_END
 
 CONS( 2011, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IS_SKELETON )
