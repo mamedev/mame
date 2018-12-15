@@ -151,7 +151,7 @@ the wide tilemap mode)
 
 DEFINE_DEVICE_TYPE(TC0100SCN, tc0100scn_device, "tc0100scn", "Taito TC0100SCN")
 
-tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TC0100SCN, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, m_ram(nullptr)
@@ -162,10 +162,9 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	, m_bgscrolly(0)
 	, m_fgscrollx(0)
 	, m_fgscrolly(0)
-	, m_bg_tilemask(0)
-	, m_gfxbank(0)
 	, m_tx_colbank(0)
 	, m_dblwidth(0)
+	, m_dirty(false)
 	, m_gfxnum(0)
 	, m_x_offset(0)
 	, m_y_offset(0)
@@ -174,7 +173,7 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	, m_flip_text_xoffs(0)
 	, m_flip_text_yoffs(0)
 	, m_multiscrn_xoffs(0)
-	, m_multiscrn_hack(0)
+	, m_multiscrn_hack(false)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	std::fill(std::begin(m_bg_colbank), std::end(m_bg_colbank), 0);
@@ -186,6 +185,9 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 
 void tc0100scn_device::device_start()
 {
+	// bind callbacks
+	m_tc0100scn_cb.bind_relative_to(*owner());
+
 	static const gfx_layout tc0100scn_charlayout =
 	{
 	8,8,    /* 8*8 characters */
@@ -229,8 +231,8 @@ void tc0100scn_device::device_start()
 	   7 bits higher and 2 pixels to the left than chip #1 because
 	   that's how thundfox wants it. */
 
-	xd = (m_multiscrn_hack == 0) ?  (-m_x_offset) : (-m_x_offset - 2);
-	yd = (m_multiscrn_hack == 0) ?  (8 - m_y_offset) : (1 - m_y_offset);
+	xd = (!m_multiscrn_hack) ?  (-m_x_offset) : (-m_x_offset - 2);
+	yd = (!m_multiscrn_hack) ?  (8 - m_y_offset) : (1 - m_y_offset);
 
 	m_tilemap[0][0]->set_scrolldx(xd - 16, -m_flip_xoffs - xd - 16);
 	m_tilemap[0][0]->set_scrolldy(yd,      -m_flip_yoffs - yd);
@@ -259,9 +261,7 @@ void tc0100scn_device::device_start()
 	m_tilemap[0][1]->set_scroll_rows(512);
 	m_tilemap[1][1]->set_scroll_rows(512);
 
-	m_bg_tilemask = 0xffff;    /* Mjnquest has 0x7fff tilemask */
-
-	m_ram = make_unique_clear<uint16_t[]>(TC0100SCN_RAM_SIZE / 2);
+	m_ram = make_unique_clear<u16[]>(TC0100SCN_RAM_SIZE / 2);
 
 	set_layer_ptrs();
 
@@ -283,7 +283,6 @@ void tc0100scn_device::device_start()
 	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_dblwidth));
-	save_item(NAME(m_gfxbank));
 }
 
 //-------------------------------------------------
@@ -293,7 +292,6 @@ void tc0100scn_device::device_start()
 void tc0100scn_device::device_reset()
 {
 	m_dblwidth = 0;
-	gfxbank_w(0); /* Mjnquest uniquely banks tiles */
 
 	for (auto & elem : m_ctrl)
 		elem = 0;
@@ -308,12 +306,16 @@ template<int Offset, int Layer>
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
 {
 	/* Mahjong Quest (F2 system) inexplicably has a banking feature */
-	uint32_t const code = (m_ram[Offset + 2 * tile_index + 1] & m_bg_tilemask) + (m_gfxbank << 15);
-	uint16_t const attr = m_ram[Offset + 2 * tile_index];
+	u32 code = m_ram[Offset + 2 * tile_index + 1];
+	u16 const attr = m_ram[Offset + 2 * tile_index];
+	u16 color = attr & 0xff;
+
+	if (!m_tc0100scn_cb.isnull())
+		m_tc0100scn_cb(&code, &color);
 
 	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,
-			((attr + m_bg_colbank[Layer]) & 0xff),
+			(color + m_bg_colbank[Layer]) & 0xff,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
@@ -328,31 +330,17 @@ TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-void tc0100scn_device::set_colbanks( int bg0, int bg1, int tx )
+void tc0100scn_device::set_colbanks(u8 bg0, u8 bg1, u8 tx)
 {
 	m_bg_colbank[0] = bg0;
 	m_bg_colbank[1] = bg1;
 	m_tx_colbank = tx;
 }
 
-void tc0100scn_device::set_bg_tilemask( int mask )
+void tc0100scn_device::tilemap_set_dirty()
 {
-	m_bg_tilemask = mask;
-}
-
-void tc0100scn_device::gfxbank_w(u8 data)   /* Mjnquest banks its 2 sets of scr tiles */
-{
-	if ((data & 0x1) != m_gfxbank)
-	{
-		m_gfxbank = (data & 0x1);
-		for (int i = 0; i < 2; i++)
-		{
-			for (int j = 0; j < 2; j++)
-			{
-				m_tilemap[i][j]->mark_all_dirty();
-			}
-		}
-	}
+	if (!m_dirty)
+		m_dirty = true;
 }
 
 void tc0100scn_device::set_layer_ptrs()
@@ -482,7 +470,7 @@ void tc0100scn_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 
 		case 0x06:
 		{
-			int old_width = m_dblwidth;
+			u8 const old_width = m_dblwidth;
 			m_dblwidth = (data & 0x10) >> 4;
 
 			if (m_dblwidth != old_width)   /* tilemap width is changing */
@@ -513,6 +501,17 @@ void tc0100scn_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 
 void tc0100scn_device::tilemap_update()
 {
+	if (m_dirty)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				m_tilemap[i][j]->mark_all_dirty();
+			}
+		}
+		m_dirty = false;
+	}
 	int j;
 
 	m_tilemap[0][m_dblwidth]->set_scrolly(0, m_bgscrolly);
@@ -524,7 +523,7 @@ void tc0100scn_device::tilemap_update()
 		m_tilemap[1][m_dblwidth]->set_scrollx((j + m_fgscrolly) & 0x1ff, m_fgscrollx - m_fgscroll_ram[j]);
 }
 
-void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, uint32_t priority )
+void tc0100scn_device::tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, u32 priority, u32 pri_mask)
 {
 	const bitmap_ind16 &src_bitmap = tmap->pixmap();
 	int width_mask, height_mask, x, y, p;
@@ -560,7 +559,7 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 				if (screen.priority().valid())
 				{
 					uint8_t *pri = &screen.priority().pix8(y);
-					pri[x + cliprect.min_x] |= priority;
+					pri[x + cliprect.min_x] = (pri[x + cliprect.min_x] & pri_mask) | priority;
 				}
 			}
 			src_x = (src_x + 1) & width_mask;
@@ -569,7 +568,7 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
-int tc0100scn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority )
+int tc0100scn_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority, u32 pri_mask)
 {
 	int disable = m_ctrl[6] & 0xf7;
 	rectangle clip = cliprect;
@@ -585,17 +584,17 @@ if (disable != 0 && disable != 3 && disable != 7)
 		case 0:
 			if (disable & 0x01)
 				return 1;
-			m_tilemap[0][m_dblwidth]->draw(screen, bitmap, clip, flags, priority);
+			m_tilemap[0][m_dblwidth]->draw(screen, bitmap, clip, flags, priority, pri_mask);
 			break;
 		case 1:
 			if (disable & 0x02)
 				return 1;
-			tilemap_draw_fg(screen, bitmap, clip, m_tilemap[1][m_dblwidth], flags, priority);
+			tilemap_draw_fg(screen, bitmap, clip, m_tilemap[1][m_dblwidth], flags, priority, pri_mask);
 			break;
 		case 2:
 			if (disable & 0x04)
 				return 1;
-			m_tilemap[2][m_dblwidth]->draw(screen, bitmap, clip, flags, priority);
+			m_tilemap[2][m_dblwidth]->draw(screen, bitmap, clip, flags, priority, pri_mask);
 			break;
 	}
 	return 0;
