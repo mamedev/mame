@@ -69,7 +69,7 @@ void monon_color_state::machine_start()
 //	memcpy(maincpu+0x1e00, flash+0x4200, 0x1000); // just set register + a jump
 //	memcpy(maincpu+0x1e00, flash+0x4c00, 0x1000);
 //	memcpy(maincpu+0x1e00, flash+0x5600, 0x1000);
-	memcpy(maincpu+0x1e00, flash+0x5e00, 0x1000);
+	memcpy(maincpu+0x1e00, flash+0x6000, 0x1000);
 //	memcpy(maincpu+0x1e00, flash+0x6a00, 0x1000);
 //  memcpy(maincpu+0x1e00, flash+0x7e00, 0x1000);
 //  memcpy(maincpu+0x1e00, flash+0x8800, 0x1000);
