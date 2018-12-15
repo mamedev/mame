@@ -29,7 +29,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_mainram(*this, "mainram")
+		m_mainram(*this, "mainram"),
+		m_otherram(*this, "otherram")
 	{ }
 
 	void monon_color(machine_config &config);
@@ -48,6 +49,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_otherram;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(monon_color_cart);
 
@@ -59,21 +61,26 @@ void monon_color_state::machine_start()
 	uint8_t* flash = memregion("flash")->base();
 	uint8_t* maincpu = &m_mainram[0];
 
-	memcpy(maincpu, flash+0x200, 0x2000);
+	memcpy(maincpu, flash+0x200, 0x1e00); // 0x4000-0x5dff fixed code?
 
-	/*
-	there is also a block of code at 0x2000 in the flash
-
-	a move and a jump at 0x4200
-	another block of code at 0x4c00
-	another at 0x5600
-	another at 0x6000
-	another at 0x6a00 etc.
+	// there are a whole bunch of blocks that map at 0x5e00
 	
-	need to see where they map / if they need to be copied at startup
-	*/
-
+//	memcpy(maincpu+0x1e00, flash+0x2000, 0x1000);
+//	memcpy(maincpu+0x1e00, flash+0x4200, 0x1000); // just set register + a jump
+//	memcpy(maincpu+0x1e00, flash+0x4c00, 0x1000);
+//	memcpy(maincpu+0x1e00, flash+0x5600, 0x1000);
+	memcpy(maincpu+0x1e00, flash+0x5e00, 0x1000);
+//	memcpy(maincpu+0x1e00, flash+0x6a00, 0x1000);
+//  memcpy(maincpu+0x1e00, flash+0x7e00, 0x1000);
+//  memcpy(maincpu+0x1e00, flash+0x8800, 0x1000);
+//  memcpy(maincpu+0x1e00, flash+0x9200, 0x1000);
+	 
+	//  block starting at e000 in flash is not code? (or encrypted?)
+	//  no code to map at 0x9000 in address space (possible BIOS?)
+	//  no code in ROM past the first 64kb? must be some kind of script interpreter? J2ME maybe?
 }
+
+
 
 void monon_color_state::machine_reset()
 {
@@ -95,10 +102,9 @@ INPUT_PORTS_END
 
 void monon_color_state::monon_color_map(address_map &map)
 {
-	map(0x4000, 0x5fff).ram().share("mainram");
+	map(0x4000, 0x6fff).ram().share("mainram");
+	map(0x9000, 0x9fff).ram().share("otherram"); // lots of jumps to here, is there some kind of BIOS? none of the code appears to map here?
 }
-
-
 
 MACHINE_CONFIG_START(monon_color_state::monon_color)
 
