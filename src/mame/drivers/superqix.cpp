@@ -1356,9 +1356,9 @@ void hotsmash_state::pbillian(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hotsmash_state::pbillian_port_map);
 
 	m68705p5_device &mcu(M68705P5(config, m_mcu, XTAL(12'000'000)/4)); /* 3mhz???? */
-	mcu.porta_r_cb().set(FUNC(hotsmash_state::hotsmash_68705_porta_r));
-	mcu.portb_w_cb().set(FUNC(hotsmash_state::hotsmash_68705_portb_w));
-	mcu.portc_w_cb().set(FUNC(hotsmash_state::hotsmash_68705_portc_w));
+	mcu.porta_r().set(FUNC(hotsmash_state::hotsmash_68705_porta_r));
+	mcu.portb_w().set(FUNC(hotsmash_state::hotsmash_68705_portb_w));
+	mcu.portc_w().set(FUNC(hotsmash_state::hotsmash_68705_portc_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

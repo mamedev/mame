@@ -336,13 +336,13 @@ void device_sound_interface::interface_post_start()
 						int streamoutputnum;
 						sound_stream *const outputstream = sound.output_to_stream_output(outputnum, streamoutputnum);
 						if (!outputstream)
-							fatalerror("Sound device '%s' specifies route for non-existent output #%d\n", sound.device().tag(), outputnum);
+							fatalerror("Sound device '%s' specifies route for nonexistent output #%d\n", sound.device().tag(), outputnum);
 
 						// find the input stream to connect to
 						int streaminputnum;
 						sound_stream *const inputstream = input_to_stream_input(inputnum++, streaminputnum);
 						if (!inputstream)
-							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d\n", sound.device().tag(), outputnum, m_device.tag(), inputnum - 1);
+							fatalerror("Sound device '%s' targeted output #%d to nonexistent device '%s' input %d\n", sound.device().tag(), outputnum, m_device.tag(), inputnum - 1);
 
 						// set the input
 						inputstream->set_input(streaminputnum, outputstream, streamoutputnum, route.m_gain);

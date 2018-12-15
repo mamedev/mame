@@ -55,10 +55,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 private:
-	DECLARE_READ8_MEMBER(mcu_portA_r);
-	DECLARE_WRITE8_MEMBER(mcu_portA_w);
-	DECLARE_WRITE8_MEMBER(mcu_portB_w);
-	DECLARE_WRITE8_MEMBER(mcu_portC_w);
+	DECLARE_READ8_MEMBER(mcu_porta_r);
+	DECLARE_WRITE8_MEMBER(mcu_porta_w);
+	DECLARE_WRITE8_MEMBER(mcu_portb_w);
+	DECLARE_WRITE8_MEMBER(mcu_portc_w);
 	DECLARE_READ8_MEMBER(pia_pa_r);
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	WRITE8_MEMBER(pia_pb_w) { mmu(data); }
@@ -68,15 +68,15 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	bool atari_input_disabled() const { return !BIT(m_portB_out, 7); }
+	bool atari_input_disabled() const { return !BIT(m_portb_out, 7); }
 	void mmu(uint8_t new_mmu);
 
 	void a600xl_mem(address_map &map);
 
-	uint8_t m_portB_out;
-	uint8_t m_portC_out;
+	uint8_t m_portb_out;
+	uint8_t m_portc_out;
 
-	required_device<cpu_device> m_mcu;
+	required_device<m68705p3_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_region_maincpu;
 	required_ioport m_dsw;
@@ -120,7 +120,7 @@ void maxaflex_state::mmu(uint8_t new_mmu)
     7   (out) AUDIO
 */
 
-READ8_MEMBER(maxaflex_state::mcu_portA_r)
+READ8_MEMBER(maxaflex_state::mcu_porta_r)
 {
 	return
 			((m_dsw->read()     << 0) & 0x0f) |
@@ -129,7 +129,7 @@ READ8_MEMBER(maxaflex_state::mcu_portA_r)
 			0xc0;
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_portA_w)
+WRITE8_MEMBER(maxaflex_state::mcu_porta_w)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
@@ -145,10 +145,10 @@ WRITE8_MEMBER(maxaflex_state::mcu_portA_w)
     7   (out)   TOFF - enables/disables user controls
 */
 
-WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
+WRITE8_MEMBER(maxaflex_state::mcu_portb_w)
 {
-	const uint8_t diff = data ^ m_portB_out;
-	m_portB_out = data;
+	const uint8_t diff = data ^ m_portb_out;
+	m_portb_out = data;
 
 	/* clear coin interrupt */
 	if (BIT(data, 2))
@@ -164,10 +164,10 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 	/* latch for lamps */
 	if (BIT(diff, 6) && !BIT(data, 6))
 	{
-		m_lamps[0] = BIT(m_portC_out, 0);
-		m_lamps[1] = BIT(m_portC_out, 1);
-		m_lamps[2] = BIT(m_portC_out, 2);
-		m_lamps[3] = BIT(m_portC_out, 3);
+		m_lamps[0] = BIT(m_portc_out, 0);
+		m_lamps[1] = BIT(m_portc_out, 1);
+		m_lamps[2] = BIT(m_portc_out, 2);
+		m_lamps[3] = BIT(m_portc_out, 3);
 	}
 }
 
@@ -177,18 +177,18 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
     2   (out)   lamp START
     3   (out)   lamp OVER */
 
-WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
+WRITE8_MEMBER(maxaflex_state::mcu_portc_w)
 {
 	/* uses a 7447A, which is equivalent to an LS47/48 */
 	constexpr static uint8_t ls48_map[16] =
 			{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
-	m_portC_out = data & 0x0f;
+	m_portc_out = data & 0x0f;
 
 	/* displays */
-	uint8_t const sel = m_portB_out & 0x03;
+	uint8_t const sel = m_portb_out & 0x03;
 	if (3U > sel)
-		m_digits[sel] = ls48_map[m_portC_out];
+		m_digits[sel] = ls48_map[m_portc_out];
 }
 
 INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
@@ -298,8 +298,8 @@ void maxaflex_state::machine_start()
 	m_lamps.resolve();
 	m_digits.resolve();
 
-	save_item(NAME(m_portB_out));
-	save_item(NAME(m_portC_out));
+	save_item(NAME(m_portb_out));
+	save_item(NAME(m_portc_out));
 }
 
 void maxaflex_state::machine_reset()
@@ -309,8 +309,8 @@ void maxaflex_state::machine_reset()
 	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
 
 	// Supervisor board reset
-	m_portB_out = 0xff;
-	m_portC_out = 0xff;
+	m_portb_out = 0xff;
+	m_portc_out = 0xff;
 
 	std::fill(std::begin(m_lamps), std::end(m_lamps), 0);
 	std::fill(std::begin(m_digits), std::end(m_digits), 0x00);
@@ -327,11 +327,11 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_DEVICE_PROGRAM_MAP(a600xl_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", maxaflex_state, mf_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("mcu", M68705P3, 3579545)
-	MCFG_M68705_PORTA_R_CB(READ8(*this, maxaflex_state, mcu_portA_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, maxaflex_state, mcu_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, maxaflex_state, mcu_portB_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(*this, maxaflex_state, mcu_portC_w))
+	M68705P3(config, m_mcu, 3579545);
+	m_mcu->porta_r().set(FUNC(maxaflex_state::mcu_porta_r));
+	m_mcu->porta_w().set(FUNC(maxaflex_state::mcu_porta_w));
+	m_mcu->portb_w().set(FUNC(maxaflex_state::mcu_portb_w));
+	m_mcu->portc_w().set(FUNC(maxaflex_state::mcu_portc_w));
 
 	ATARI_GTIA(config, m_gtia, 0);
 	m_gtia->set_region(GTIA_NTSC);

@@ -521,7 +521,6 @@ void pgm2_state::pgm2_map(address_map &map)
 	map(0x20000000, 0x2007ffff).ram().share("mainram");
 
 	map(0x30000000, 0x30001fff).ram().share("sp_videoram"); // spriteram ('move' RAM in test mode)
-	map(0x30002000, 0x30003fff).ram(); // Second half of RAM 6 area of later RAM test, more sprite RAM or mirror of above?
 
 	map(0x30020000, 0x30021fff).ram().w(FUNC(pgm2_state::bg_videoram_w)).share("bg_videoram");
 	map(0x30040000, 0x30045fff).ram().w(FUNC(pgm2_state::fg_videoram_w)).share("fg_videoram");
@@ -533,14 +532,12 @@ void pgm2_state::pgm2_map(address_map &map)
 	map(0x300a0000, 0x300a07ff).ram().w(m_tx_palette, FUNC(palette_device::write32)).share("tx_palette");
 
 	map(0x300c0000, 0x300c01ff).ram().share("sp_zoom"); // sprite zoom table - it uploads the same data 4x, maybe xshrink,xgrow,yshrink,ygrow or just redundant mirrors
-	map(0x300c0200, 0x300c03ff).ram(); // Second half of RAM 4 area of later RAM test, more sprite zoom table or mirror of above?
 
 	/* linescroll RAM - it clears to 0x3bf on startup which is enough bytes for 240 lines if each rowscroll value was 8 bytes, but each row is 4,
 	so only half of this is used? or tx can do it too (unlikely, as orl2 writes 256 lines of data) maybe just bad mem check bounds on orleg2.
 	It reports pass even if it fails the first byte but if the first byte passes it attempts to test 0x10000 bytes, which is far too big so
 	what is the real size? */
 	map(0x300e0000, 0x300e03ff).ram().share("lineram").mirror(0x000fc00);
-	map(0x300f0000, 0x300fffff).ram(); // RAM 5 area of later RAM test, more linescroll RAM or mirror of above?
 
 	map(0x30100000, 0x301000ff).rw(FUNC(pgm2_state::shareram_r), FUNC(pgm2_state::shareram_w)).umask32(0x00ff00ff);
 

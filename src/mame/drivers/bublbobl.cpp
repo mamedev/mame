@@ -1077,19 +1077,20 @@ MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 	m_latch = 0;
 }
 
-MACHINE_CONFIG_START(bub68705_state::bub68705)
+void bub68705_state::bub68705(machine_config &config)
+{
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally
-	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, bub68705_state, port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, bub68705_state, port_b_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
+	M68705P3(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
+	m_mcu->portc_r().set_ioport("IN0");
+	m_mcu->porta_w().set(FUNC(bub68705_state::port_a_w));
+	m_mcu->portb_w().set(FUNC(bub68705_state::port_b_w));
+	m_mcu->set_vblank_int("screen", FUNC(bub68705_state::bublbobl_m68705_interrupt)); // ??? should come from the same clock which latches the INT pin on the second Z80
 
 	MCFG_MACHINE_START_OVERRIDE(bub68705_state, bub68705)
 	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)
-MACHINE_CONFIG_END
+}
 
 
 

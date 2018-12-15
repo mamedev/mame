@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/m6805/m68705.h"
 #include "emupal.h"
 
 class pitnrun_state : public driver_device
@@ -31,7 +32,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<m68705p5_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -44,8 +45,8 @@ private:
 	uint8_t m_toz80;
 	int m_zaccept;
 	int m_zready;
-	uint8_t m_portA_in;
-	uint8_t m_portA_out;
+	uint8_t m_porta_in;
+	uint8_t m_porta_out;
 	int m_address;
 	int m_h_heed;
 	int m_v_heed;
@@ -63,11 +64,11 @@ private:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_READ8_MEMBER(m68705_portA_r);
-	DECLARE_WRITE8_MEMBER(m68705_portA_w);
-	DECLARE_READ8_MEMBER(m68705_portB_r);
-	DECLARE_WRITE8_MEMBER(m68705_portB_w);
-	DECLARE_READ8_MEMBER(m68705_portC_r);
+	DECLARE_READ8_MEMBER(m68705_porta_r);
+	DECLARE_WRITE8_MEMBER(m68705_porta_w);
+	DECLARE_READ8_MEMBER(m68705_portb_r);
+	DECLARE_WRITE8_MEMBER(m68705_portb_w);
+	DECLARE_READ8_MEMBER(m68705_portc_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE_LINE_MEMBER(char_bank_select_w);

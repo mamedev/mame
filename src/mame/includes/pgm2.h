@@ -126,15 +126,16 @@ private:
 	tilemap_t    *m_fg_tilemap;
 	tilemap_t    *m_bg_tilemap;
 
-	std::unique_ptr<u32[]>     m_spritebufferram; // buffered spriteram
+	bitmap_ind16 m_sprite_bitmap;
 
 	void skip_sprite_chunk(u32 &palette_offset, u32 maskdata, bool reverse);
-	void draw_sprite_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 palette_offset, s16 realx, s16 realy, u16 pal, u8 pri);
-	void draw_sprite_chunk(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 &palette_offset, s16 x, s16 realy,
-			u16 sizex, int xdraw, u16 pal, u32 maskdata, u32 zoomx_bits, u8 repeats, s16 &realxdraw, s8 realdraw_inc, s8 palette_inc, u8 pri);
-	void draw_sprite_line(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 &mask_offset, u32 &palette_offset, s16 x, s16 realy,
-			bool flipx, bool reverse, u16 sizex, u16 pal, u8 zoomybit, u32 zoomx_bits, u8 xrepeats, u8 pri);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32* spriteram);
+	void draw_sprite_pixel(const rectangle &cliprect, u32 palette_offset, s16 realx, s16 realy, u16 pal);
+	void draw_sprite_chunk(const rectangle &cliprect, u32 &palette_offset, s16 x, s16 realy,
+			u16 sizex, int xdraw, u16 pal, u32 maskdata, u32 zoomx_bits, u8 repeats, s16 &realxdraw, s8 realdraw_inc, s8 palette_inc);
+	void draw_sprite_line(const rectangle &cliprect, u32 &mask_offset, u32 &palette_offset, s16 x, s16 realy,
+			bool flipx, bool reverse, u16 sizex, u16 pal, u8 zoomybit, u32 zoomx_bits, u8 xrepeats);
+	void draw_sprites(const rectangle &cliprect);
+	void copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri);
 
 	void common_encryption_init();
 	u8 m_encryption_table[0x100];
