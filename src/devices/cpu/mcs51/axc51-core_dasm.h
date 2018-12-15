@@ -23,6 +23,8 @@ public:
 	axc51core_disassembler();
 	virtual ~axc51core_disassembler() = default;
 
+	static const mem_info axc51core_names[];
+
 protected:
 	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op) override;
 };
