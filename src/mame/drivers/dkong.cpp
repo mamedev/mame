@@ -1860,16 +1860,17 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(dkong_state::s2650)
+void dkong_state::s2650(machine_config &config)
+{
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE(m_maincpu, S2650, CLOCK_1H / 2)    /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(s2650_map)
-	MCFG_DEVICE_IO_MAP(s2650_io_map)
-	MCFG_DEVICE_DATA_MAP(s2650_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dkong_state, s2650_fo_w))
+	s2650_device &s2650(S2650(config.replace(), m_maincpu, CLOCK_1H / 2));    /* ??? */
+	s2650.set_addrmap(AS_PROGRAM, &dkong_state::s2650_map);
+	s2650.set_addrmap(AS_IO, &dkong_state::s2650_io_map);
+	s2650.set_addrmap(AS_DATA, &dkong_state::s2650_data_map);
+	s2650.sense_handler().set("screen", FUNC(screen_device::vblank));
+	s2650.flag_handler().set(FUNC(dkong_state::s2650_fo_w));
 
 	m_screen->screen_vblank().set(FUNC(dkong_state::s2650_interrupt));
 
@@ -1877,7 +1878,7 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 	m_dma8257->out_memw_cb().set(FUNC(dkong_state::hb_dma_write_byte));
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
-MACHINE_CONFIG_END
+}
 
 void dkong_state::herbiedk(machine_config &config)
 {
@@ -1885,15 +1886,12 @@ void dkong_state::herbiedk(machine_config &config)
 	downcast<s2650_device &>(*m_maincpu).sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
 }
 
-MACHINE_CONFIG_START(dkong_state::spclforc)
+void dkong_state::spclforc(machine_config &config)
+{
 	herbiedk(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("soundcpu")
-
-	/* video hardware */
+	config.device_remove("soundcpu");
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_spclforc));
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

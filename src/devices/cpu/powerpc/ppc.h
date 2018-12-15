@@ -164,10 +164,6 @@ enum
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-#define MCFG_PPC_BUS_FREQUENCY(_frequency) \
-	downcast<ppc_device &>(*device).set_bus_frequency(_frequency);
-
-
 class ppc_device : public cpu_device, public device_vtlb_interface
 {
 protected:

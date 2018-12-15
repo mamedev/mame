@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
 #include "video/saa5050.h"
 #include "emupal.h"
@@ -39,7 +40,7 @@ protected:
 
 private:
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device_array<s2636_device, 2> m_s2636;
 	required_device<saa5050_device> m_trom;
 	required_shared_ptr<uint8_t> m_videoram;

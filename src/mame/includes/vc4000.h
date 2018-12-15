@@ -141,7 +141,7 @@ private:
 	void elektor_mem(address_map &map);
 	void vc4000_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<vc4000_cart_slot_device> m_cart;
