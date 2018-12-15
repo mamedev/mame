@@ -20,6 +20,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_p1_io(*this, "P1"),
+		m_p2_io(*this, "P2"),
 		m_system_io(*this, "SYSTEM")
 	{
 	}
@@ -39,6 +41,8 @@ protected:
 	required_shared_ptr<uint16_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
+	optional_ioport m_p1_io;
+	optional_ioport m_p2_io;
 	optional_ioport m_system_io;
 
 	bool m_sprite_flip_axis;
@@ -78,8 +82,6 @@ class searchar_state : public snk68_state
 public:
 	searchar_state(const machine_config &mconfig, device_type type, const char *tag) :
 		snk68_state(mconfig, type, tag),
-		m_p1_io(*this, "P1"),
-		m_p2_io(*this, "P2"),
 		m_rotary_io(*this, "ROT%u", 1U)
 	{
 	}
@@ -91,8 +93,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	optional_ioport m_p1_io;
-	optional_ioport m_p2_io;
 	optional_ioport_array<2> m_rotary_io;
 
 	uint8_t m_invert_controls;
