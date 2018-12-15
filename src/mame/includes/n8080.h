@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 
+#include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -64,7 +65,7 @@ private:
 	int m_inte;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8035_device> m_audiocpu;
 	optional_device<dac_bit_interface> m_n8080_dac;
 	optional_device<dac_8bit_r2r_device> m_helifire_dac;

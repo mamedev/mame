@@ -362,9 +362,7 @@ D                                                                               
 #include "includes/equites.h"
 
 #include "cpu/alph8201/alph8201.h"
-#include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -1042,16 +1040,16 @@ static const char *const alphamc07_sample_names[] =
 // the sound board is the same in all games
 MACHINE_CONFIG_START(equites_state::common_sound)
 
-	MCFG_DEVICE_ADD("audiocpu", I8085A, 6.144_MHz_XTAL) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
+	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &equites_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &equites_state::sound_portmap);
+	m_audiocpu->set_clk_out("audio8155", FUNC(i8155_device::set_unscaled_clock));
 
-	i8155_device &i8155(I8155(config, "audio8155", 0));
-	i8155.out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
-	i8155.out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
-	i8155.out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
-	i8155.out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
+	I8155(config, m_audio8155, 0);
+	m_audio8155->out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
+	m_audio8155->out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
+	m_audio8155->out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
+	m_audio8155->out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

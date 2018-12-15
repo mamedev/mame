@@ -71,9 +71,13 @@ public:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	typedef delegate<uint32_t (bool)> a20_cb;
-	template <typename Object> void set_a20_callback(Object &&cb) { m_a20_callback = std::forward<Object>(cb); }
-	template <class Object> devcb_base &set_shutdown_callback(Object &&cb) { return m_out_shutdown_func.set_callback(std::forward<Object>(cb)); }
+	typedef device_delegate<uint32_t (bool)> a20_cb;
+	void set_a20_callback(a20_cb callback) { m_a20_callback = callback; }
+	template <class FunctionClass> void set_a20_callback(uint32_t (FunctionClass::*callback)(bool), const char *name)
+	{
+		set_a20_callback(a20_cb(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	auto shutdown_callback() { return m_out_shutdown_func.bind(); }
 
 protected:
@@ -161,11 +165,5 @@ private:
 	bool m_shutdown;
 	devcb_write_line m_out_shutdown_func;
 };
-
-#define MCFG_80286_A20(_class, _a20_cb) \
-	downcast<i80286_cpu_device &>(*device).set_a20_callback(i80286_cpu_device::a20_cb(&_class::_a20_cb, this));
-
-#define MCFG_80286_SHUTDOWN(_devcb) \
-	downcast<i80286_cpu_device &>(*device).set_shutdown_callback(DEVCB_##_devcb);
 
 #endif // MAME_CPU_I86_I286_H

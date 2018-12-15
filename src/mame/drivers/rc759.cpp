@@ -532,13 +532,14 @@ static void rc759_floppies(device_slot_interface &device)
 	device.option_add("hd", FLOPPY_525_HD);
 }
 
-MACHINE_CONFIG_START(rc759_state::rc759)
-	MCFG_DEVICE_ADD("maincpu", I80186, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(rc759_map)
-	MCFG_DEVICE_IO_MAP(rc759_io)
-	MCFG_80186_IRQ_SLAVE_ACK(READ8(*this, rc759_state, irq_callback))
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE(*this, rc759_state, i186_timer0_w))
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE(*this, rc759_state, i186_timer1_w))
+void rc759_state::rc759(machine_config &config)
+{
+	I80186(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rc759_state::rc759_map);
+	m_maincpu->set_addrmap(AS_IO, &rc759_state::rc759_io);
+	m_maincpu->read_slave_ack_callback().set(FUNC(rc759_state::irq_callback));
+	m_maincpu->tmrout0_handler().set(FUNC(rc759_state::i186_timer0_w));
+	m_maincpu->tmrout1_handler().set(FUNC(rc759_state::i186_timer1_w));
 
 	// interrupt controller
 	PIC8259(config, m_pic, 0);
@@ -554,18 +555,17 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	m_ppi->out_pc_callback().set(FUNC(rc759_state::ppi_portc_w));
 
 	// rtc
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(m_pic, pic8259_device, ir3_w))
+	MM58167(config, "rtc", 32.768_kHz_XTAL).irq().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	// video
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(1250000 * 16, 896, 96, 816, 377, 4, 364) // 22 kHz setting
-	MCFG_SCREEN_UPDATE_DEVICE("txt", i82730_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(1250000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
+	screen.set_screen_update("txt", FUNC(i82730_device::screen_update));
 
-	MCFG_I82730_ADD("txt", "maincpu", 1250000)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_I82730_UPDATE_ROW_CB(rc759_state, txt_update_row)
-	MCFG_I82730_SINT_HANDLER(WRITELINE(m_pic, pic8259_device, ir4_w))
+	I82730(config, m_txt, 1250000, m_maincpu);
+	m_txt->set_screen("screen");
+	m_txt->set_update_row_callback(FUNC(rc759_state::txt_update_row));
+	m_txt->sint().set(m_pic, FUNC(pic8259_device::ir4_w));
 
 	// keyboard
 	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
@@ -581,12 +581,12 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	SN76489A(config, m_snd, 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// internal centronics
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, rc759_state, centronics_busy_w))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, rc759_state, centronics_ack_w))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, rc759_state, centronics_fault_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, rc759_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, rc759_state, centronics_select_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(rc759_state::centronics_busy_w));
+	m_centronics->ack_handler().set(FUNC(rc759_state::centronics_ack_w));
+	m_centronics->fault_handler().set(FUNC(rc759_state::centronics_fault_w));
+	m_centronics->perror_handler().set(FUNC(rc759_state::centronics_perror_w));
+	m_centronics->select_handler().set(FUNC(rc759_state::centronics_select_w));
 
 	// isbx slot
 	ISBX_SLOT(config, m_isbx, 0, isbx_cards, nullptr);
@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	// floppy drives
 	FLOPPY_CONNECTOR(config, "fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

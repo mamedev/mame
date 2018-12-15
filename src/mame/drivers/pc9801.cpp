@@ -2214,7 +2214,8 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 	m_keyb->irq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
 }
 
-MACHINE_CONFIG_START(pc9801_state::pc9801_mouse)
+void pc9801_state::pc9801_mouse(machine_config &config)
+{
 	i8255_device &ppi_mouse(I8255(config, "ppi8255_mouse"));
 	ppi_mouse.in_pa_callback().set(FUNC(pc9801_state::ppi_mouse_porta_r));
 	ppi_mouse.out_pa_callback().set(FUNC(pc9801_state::ppi_mouse_porta_w));
@@ -2223,64 +2224,58 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_mouse)
 	ppi_mouse.in_pc_callback().set_ioport("DSW4");
 	ppi_mouse.out_pc_callback().set(FUNC(pc9801_state::ppi_mouse_portc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pc9801_state, mouse_irq_cb, attotime::from_hz(120))
-MACHINE_CONFIG_END
+	TIMER(config, "mouse_timer").configure_periodic(FUNC(pc9801_state::mouse_irq_cb), attotime::from_hz(120));
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9801_cbus)
-	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus_devices, "pc9801_26")
-	MCFG_PC9801CBUS_CPU("maincpu")
-	MCFG_PC9801CBUS_INT0_CALLBACK(WRITELINE("ir3", input_merger_device, in_w<0>))
-	MCFG_PC9801CBUS_INT1_CALLBACK(WRITELINE("ir5", input_merger_device, in_w<0>))
-	MCFG_PC9801CBUS_INT2_CALLBACK(WRITELINE("ir6", input_merger_device, in_w<0>))
-	MCFG_PC9801CBUS_INT3_CALLBACK(WRITELINE("ir9", input_merger_device, in_w<0>))
-	MCFG_PC9801CBUS_INT4_CALLBACK(WRITELINE("pic8259_slave", pic8259_device, ir2_w))
-	MCFG_PC9801CBUS_INT5_CALLBACK(WRITELINE("ir12", input_merger_device, in_w<0>))
-	MCFG_PC9801CBUS_INT6_CALLBACK(WRITELINE("ir13", input_merger_device, in_w<0>))
+void pc9801_state::pc9801_cbus(machine_config &config)
+{
+	pc9801_slot_device &cbus0(PC9801CBUS_SLOT(config, "cbus0", m_maincpu, pc9801_cbus_devices, "pc9801_26"));
+	cbus0.int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
+	cbus0.int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
+	cbus0.int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
+	cbus0.int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
+	cbus0.int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
+	cbus0.int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
+	cbus0.int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus_devices, nullptr)
-	MCFG_PC9801CBUS_CPU("maincpu")
-	MCFG_PC9801CBUS_INT0_CALLBACK(WRITELINE("ir3", input_merger_device, in_w<1>))
-	MCFG_PC9801CBUS_INT1_CALLBACK(WRITELINE("ir5", input_merger_device, in_w<1>))
-	MCFG_PC9801CBUS_INT2_CALLBACK(WRITELINE("ir6", input_merger_device, in_w<1>))
-	MCFG_PC9801CBUS_INT3_CALLBACK(WRITELINE("ir9", input_merger_device, in_w<1>))
-	MCFG_PC9801CBUS_INT4_CALLBACK(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
-	MCFG_PC9801CBUS_INT5_CALLBACK(WRITELINE("ir12", input_merger_device, in_w<1>))
-	MCFG_PC9801CBUS_INT6_CALLBACK(WRITELINE("ir13", input_merger_device, in_w<1>))
+	pc9801_slot_device &cbus1(PC9801CBUS_SLOT(config, "cbus1", m_maincpu, pc9801_cbus_devices, nullptr));
+	cbus1.int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
+	cbus1.int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
+	cbus1.int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
+	cbus1.int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<1>));
+	cbus1.int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
+	cbus1.int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<1>));
+	cbus1.int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<1>));
 //  TODO: six max slots
 
-	MCFG_INPUT_MERGER_ANY_HIGH("ir3")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir3_w))
-	MCFG_INPUT_MERGER_ANY_HIGH("ir5")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir5_w))
-	MCFG_INPUT_MERGER_ANY_HIGH("ir6")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir6_w))
-	MCFG_INPUT_MERGER_ANY_HIGH("ir9")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir1_w))
-	MCFG_INPUT_MERGER_ANY_HIGH("ir12")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
-	MCFG_INPUT_MERGER_ANY_HIGH("ir13")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir5_w))
-MACHINE_CONFIG_END
+	INPUT_MERGER_ANY_HIGH(config, "ir3").output_handler().set("pic8259_master", FUNC(pic8259_device::ir3_w));
+	INPUT_MERGER_ANY_HIGH(config, "ir5").output_handler().set("pic8259_master", FUNC(pic8259_device::ir5_w));
+	INPUT_MERGER_ANY_HIGH(config, "ir6").output_handler().set("pic8259_master", FUNC(pic8259_device::ir6_w));
+	INPUT_MERGER_ANY_HIGH(config, "ir9").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
+	INPUT_MERGER_ANY_HIGH(config, "ir12").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
+	INPUT_MERGER_ANY_HIGH(config, "ir13").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9801_sasi)
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
-	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, pc9801_state, write_sasi_io)) // bit2
-	MCFG_SCSI_CD_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit5))
-	MCFG_SCSI_ACK_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, pc9801_state, write_sasi_req))
+void pc9801_state::pc9801_sasi(machine_config &config)
+{
+	SCSI_PORT(config, m_sasibus, 0);
+	m_sasibus->set_data_input_buffer("sasi_data_in");
+	m_sasibus->io_handler().set(FUNC(pc9801_state::write_sasi_io)); // bit2
+	m_sasibus->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	m_sasibus->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4));
+	m_sasibus->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit5));
+	m_sasibus->ack_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	m_sasibus->req_handler().set(FUNC(pc9801_state::write_sasi_req));
+	m_sasibus->set_slot_device(1, "harddisk", PC9801_SASI, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", PC9801_SASI, SCSI_ID_0)
-
-	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
-	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("sasi_ctrl_in", INPUT_BUFFER, 0)
+	output_latch_device &sasi_out(OUTPUT_LATCH(config, "sasi_data_out"));
+	m_sasibus->set_output_latch(sasi_out);
+	INPUT_BUFFER(config, "sasi_data_in");
+	INPUT_BUFFER(config, "sasi_ctrl_in");
 
 	m_dmac->in_ior_callback<0>().set(FUNC(pc9801_state::sasi_data_r));
 	m_dmac->out_iow_callback<0>().set(FUNC(pc9801_state::sasi_data_w));
-MACHINE_CONFIG_END
+}
 
 void pc9801_state::cdrom_headphones(device_t *device)
 {
@@ -2289,23 +2284,23 @@ void pc9801_state::cdrom_headphones(device_t *device)
 	MCFG_SOUND_ROUTE(1, "^^rheadphone", 1.0)
 }
 
-MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
+void pc9801_state::pc9801_ide(machine_config &config)
+{
 	SPEAKER(config, "lheadphone").front_left();
 	SPEAKER(config, "rheadphone").front_right();
 	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
 	m_ide[0]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<0>));
 	ATA_INTERFACE(config, m_ide[1]).options(pc9801_atapi_devices, "pc9801_cd", nullptr, false);
 	m_ide[1]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<1>));
-	MCFG_DEVICE_MODIFY("ide2:0")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("pc9801_cd", cdrom_headphones)
+	m_ide[1]->slot(0).set_option_machine_config("pc9801_cd", cdrom_headphones);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("ideirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir1_w))
+	INPUT_MERGER_ANY_HIGH(config, "ideirq").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","pc98_cd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cd_list").set_original("pc98_cd");
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9801_common)
+void pc9801_state::pc9801_common(machine_config &config)
+{
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(MAIN_CLOCK_X1); // heartbeat IRQ
 	m_pit8253->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
@@ -2363,13 +2358,13 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	ppi_fdd.in_pc_callback().set_constant(0xff);
 	//ppi_fdd.out_pc_callback().set(FUNC(pc9801_state::ppi_fdd_portc_w));
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
+	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(pc9801_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pc9801_state, vrtc_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400);
+	m_screen->set_screen_update(FUNC(pc9801_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(pc9801_state::vrtc_irq));
 
 	UPD7220(config, m_hgdc1, 21.0526_MHz_XTAL / 8);
 	m_hgdc1->set_addrmap(0, &pc9801_state::upd7220_1_map);
@@ -2382,21 +2377,21 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc9801)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc9801);
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9801)
-	MCFG_DEVICE_ADD("maincpu", I8086, 5000000) //unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(pc9801_map)
-	MCFG_DEVICE_IO_MAP(pc9801_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+void pc9801_state::pc9801(machine_config &config)
+{
+	I8086(config, m_maincpu, 5000000); //unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
 
 	// TODO: maybe force dips to avoid beep error
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
@@ -2413,111 +2408,111 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_w));
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, 16).set_init(FUNC(pc9801_state::palette_init_pc9801));
+}
 
 
-MACHINE_CONFIG_START(pc9801_state::pc9801rs)
-	MCFG_DEVICE_ADD("maincpu", I386SX, MAIN_CLOCK_X1*8) // unknown clock.
-	MCFG_DEVICE_PROGRAM_MAP(pc9801rs_map)
-	MCFG_DEVICE_IO_MAP(pc9801rs_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+void pc9801_state::pc9801rs(machine_config &config)
+{
+	I386SX(config, m_maincpu, MAIN_CLOCK_X1*8); // unknown clock.
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801rs_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801rs_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
 
 	ADDRESS_MAP_BANK(config, "ipl_bank").set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801rs)
 
-	MCFG_DEVICE_MODIFY("i8237")
-	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
+	m_dmac->set_clock(MAIN_CLOCK_X1*8); // unknown clock
 
 	pc9801_ide(config);
 	UPD4990A(config, m_rtc);
 
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
 
-	MCFG_DEVICE_MODIFY("upd7220_btm")
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_grcg_2_map)
+	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_grcg_2_map);
 
-	MCFG_PALETTE_ADD("palette", 16+16)
-	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, 16+16).set_init(FUNC(pc9801_state::palette_init_pc9801));
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9801vm)
+void pc9801_state::pc9801vm(machine_config &config)
+{
 	pc9801rs(config);
-	MCFG_DEVICE_REPLACE("maincpu",V30,10000000)
-	MCFG_DEVICE_PROGRAM_MAP(pc9801ux_map)
-	MCFG_DEVICE_IO_MAP(pc9801ux_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	V30(config.replace(), m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801ux_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	m_ram->set_default_size("640K").set_extra_options("640K"); // ???
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
-MACHINE_CONFIG_END
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801_common)
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9801ux)
+void pc9801_state::pc9801ux(machine_config &config)
+{
 	pc9801rs(config);
-	MCFG_DEVICE_REPLACE("maincpu",I80286,10000000)
-	MCFG_DEVICE_PROGRAM_MAP(pc9801ux_map)
-	MCFG_DEVICE_IO_MAP(pc9801ux_io)
-	MCFG_80286_A20(pc9801_state, a20_286)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc9801_state::pc9801ux_map);
+	maincpu.set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
+	maincpu.set_a20_callback(FUNC(pc9801_state::a20_286));
+	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 //  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9801bx2)
+void pc9801_state::pc9801bx2(machine_config &config)
+{
 	pc9801rs(config);
-	MCFG_DEVICE_REPLACE("maincpu",I486,25000000)
-	MCFG_DEVICE_PROGRAM_MAP(pc9821_map)
-	MCFG_DEVICE_IO_MAP(pc9821_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I486(config.replace(), m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
-MACHINE_CONFIG_END
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801bx2)
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9821)
+void pc9801_state::pc9821(machine_config &config)
+{
 	pc9801rs(config);
-	MCFG_DEVICE_REPLACE("maincpu", I486, 16000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(pc9821_map)
-	MCFG_DEVICE_IO_MAP(pc9821_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I486(config.replace(), m_maincpu, 16000000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	m_pit8253->set_clk<0>(MAIN_CLOCK_X2);
 	m_pit8253->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit8253->set_clk<2>(MAIN_CLOCK_X2);
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9821)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9821)
 
-	MCFG_DEVICE_MODIFY("i8237")
-	MCFG_DEVICE_CLOCK(16000000); // unknown clock
+	m_dmac->set_clock(16000000); // unknown clock
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 16+16+256)
-	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-MACHINE_CONFIG_END
+	PALETTE(config.replace(), m_palette, 16+16+256).set_init(FUNC(pc9801_state::palette_init_pc9801));
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9821ap2)
+void pc9801_state::pc9821ap2(machine_config &config)
+{
 	pc9821(config);
-	MCFG_DEVICE_REPLACE("maincpu", I486, 66666667) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(pc9821_map)
-	MCFG_DEVICE_IO_MAP(pc9821_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I486(config.replace(), m_maincpu, 66666667); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
-MACHINE_CONFIG_END
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9821ap2)
+}
 
-MACHINE_CONFIG_START(pc9801_state::pc9821v20)
+void pc9801_state::pc9821v20(machine_config &config)
+{
 	pc9821(config);
-	MCFG_DEVICE_REPLACE("maincpu",PENTIUM,32000000) /* TODO: clock */
-	MCFG_DEVICE_PROGRAM_MAP(pc9821_map)
-	MCFG_DEVICE_IO_MAP(pc9821_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
-MACHINE_CONFIG_END
+	PENTIUM(config.replace(), m_maincpu, 32000000); /* TODO: clock */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+}
 
 /* took from "raw" memory dump, uncomment ROM_FILL if you want to play with it */
 #define LOAD_IDE_ROM \

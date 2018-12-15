@@ -409,10 +409,10 @@ void compis_state::compis_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(MM58174A_TAG, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
-	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
+	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
+	map(0x0180, 0x01ff) /* PCS3 */ .rw(m_graphics, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
-	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(I80130_TAG, FUNC(i80130_device::io_map));
+	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(m_osp, FUNC(i80130_device::io_map));
 	map(0x0300, 0x030f).rw(FUNC(compis_state::pcs6_0_1_r), FUNC(compis_state::pcs6_0_1_w));
 	map(0x0310, 0x031f).rw(FUNC(compis_state::pcs6_2_3_r), FUNC(compis_state::pcs6_2_3_w));
 	map(0x0320, 0x032f).rw(FUNC(compis_state::pcs6_4_5_r), FUNC(compis_state::pcs6_4_5_w));
@@ -737,20 +737,21 @@ void compis_state::machine_reset()
 //  MACHINE_CONFIG( compis )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_state::compis)
+void compis_state::compis(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(I80186_TAG, I80186, 15.36_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(compis_mem)
-	MCFG_DEVICE_IO_MAP(compis_io)
-	MCFG_80186_IRQ_SLAVE_ACK(READ8(DEVICE_SELF, compis_state, compis_irq_callback))
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE(DEVICE_SELF, compis_state, tmr0_w))
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE(DEVICE_SELF, compis_state, tmr1_w))
+	I80186(config, m_maincpu, 15.36_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &compis_state::compis_mem);
+	m_maincpu->set_addrmap(AS_IO, &compis_state::compis_io);
+	m_maincpu->read_slave_ack_callback().set(FUNC(compis_state::compis_irq_callback));
+	m_maincpu->tmrout0_handler().set(FUNC(compis_state::tmr0_w));
+	m_maincpu->tmrout1_handler().set(FUNC(compis_state::tmr1_w));
 
 	// devices
 	I80130(config, m_osp, 15.36_MHz_XTAL/2);
-	m_osp->irq().set(I80186_TAG, FUNC(i80186_cpu_device::int0_w));
-	m_osp->systick().set(I80130_TAG, FUNC(i80130_device::ir3_w));
-	m_osp->delay().set(I80130_TAG, FUNC(i80130_device::ir7_w));
+	m_osp->irq().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	m_osp->systick().set(m_osp, FUNC(i80130_device::ir3_w));
+	m_osp->delay().set(m_osp, FUNC(i80130_device::ir7_w));
 	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
 	PIT8253(config, m_pit, 0);
@@ -767,8 +768,8 @@ MACHINE_CONFIG_START(compis_state::compis)
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(COMPIS_KEYBOARD_TAG, FUNC(compis_keyboard_device::si_w));
-	m_uart->rxrdy_handler().set(I80130_TAG, FUNC(i80130_device::ir2_w));
-	m_uart->txrdy_handler().set(I80186_TAG, FUNC(i80186_cpu_device::int1_w));
+	m_uart->rxrdy_handler().set(m_osp, FUNC(i80130_device::ir2_w));
+	m_uart->txrdy_handler().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
 	compis_keyboard_device &kb(COMPIS_KEYBOARD(config, COMPIS_KEYBOARD_TAG, 0));
 	kb.out_tx_handler().set(m_uart, FUNC(i8251_device::write_rxd));
@@ -808,39 +809,38 @@ MACHINE_CONFIG_START(compis_state::compis)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_COMPIS_GRAPHICS_SLOT_ADD(GRAPHICS_TAG, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg")
+	COMPIS_GRAPHICS_SLOT(config, m_graphics, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg");
 
 	ISBX_SLOT(config, m_isbx0, 0, isbx_cards, "fdc");
-	m_isbx0->mintr0().set(I80130_TAG, FUNC(i80130_device::ir1_w));
-	m_isbx0->mintr1().set(I80130_TAG, FUNC(i80130_device::ir0_w));
-	m_isbx0->mdrqt().set(I80186_TAG, FUNC(i80186_cpu_device::drq0_w));
+	m_isbx0->mintr0().set(m_osp, FUNC(i80130_device::ir1_w));
+	m_isbx0->mintr1().set(m_osp, FUNC(i80130_device::ir0_w));
+	m_isbx0->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
 	ISBX_SLOT(config, m_isbx1, 0, isbx_cards, nullptr);
-	m_isbx1->mintr0().set(I80130_TAG, FUNC(i80130_device::ir6_w));
-	m_isbx1->mintr1().set(I80130_TAG, FUNC(i80130_device::ir5_w));
-	m_isbx1->mdrqt().set(I80186_TAG, FUNC(i80186_cpu_device::drq1_w));
+	m_isbx1->mintr0().set(m_osp, FUNC(i80130_device::ir6_w));
+	m_isbx1->mintr1().set(m_osp, FUNC(i80130_device::ir5_w));
+	m_isbx1->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("compis");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( compis2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_state::compis2)
+void compis_state::compis2(machine_config &config)
+{
 	compis(config);
-	// basic machine hardware
-	MCFG_DEVICE_MODIFY(I80186_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(compis2_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &compis_state::compis2_mem);
 	// TODO 8087
 
 	// internal ram
 	m_ram->set_default_size("256K").set_extra_options("512K,768K");
-MACHINE_CONFIG_END
+}
 
 
 

@@ -18,10 +18,10 @@
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 
-#include "machine/ram.h"
-#include "machine/wd_fdc.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
 
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
@@ -87,7 +87,7 @@ private:
 	void vector06_io(address_map &map);
 	void vector06_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;

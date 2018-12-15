@@ -1327,7 +1327,7 @@ void konamim2_state::m2(machine_config &config)
 	screen.set_screen_update(FUNC(konamim2_state::screen_update_m2));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 32768).set_init(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, "palette", 32768).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
 
 	/*cd-rom*/
 	CDROM(config, "cdrom", 0).set_interface("3do_m2_cdrom");

@@ -443,37 +443,37 @@ static void pci_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, 12_MHz_XTAL / 2 /*6000000*/)
-	MCFG_DEVICE_PROGRAM_MAP(at16_map)
-	MCFG_DEVICE_IO_MAP(at16_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
+	i80286_cpu_device &maincpu(I80286(config, m_maincpu, 12_MHz_XTAL / 2 /*6000000*/));
+	maincpu.set_addrmap(AS_PROGRAM, &at_state::at16_map);
+	maincpu.set_addrmap(AS_IO, &at_state::at16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	AT_MB(config, m_mb, 0);
+	config.m_minimum_quantum = attotime::from_hz(60);
+
 	downcast<at_mb_device *>(device)->at_softlists(config);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ega", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdc", false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", false)
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "ega", false);
+	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "fdc", false);
+	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, "comat", false);
+	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, "ide", false);
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(at_state::ibm5170a)
+void at_state::ibm5170a(machine_config &config)
+{
 	ibm5170(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 2)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(16_MHz_XTAL / 2);
+}
 
 MACHINE_CONFIG_START(at_state::ews286)
 	ibm5170(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 2) // Exact crystal needs to be verified, 8 MHz according to specification
+	m_maincpu->set_clock(16_MHz_XTAL / 2); // Exact crystal needs to be verified, 8 MHz according to specification
 
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K) // From pictures but also with a 3.5" as second floppy
@@ -483,11 +483,11 @@ MACHINE_CONFIG_START(at_state::ews286)
 	m_ram->set_default_size("640K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(at_state::ec1842)
+void at_state::ec1842(machine_config &config)
+{
 	ibm5170(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12000000)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(12000000);
+}
 
 MACHINE_CONFIG_START(at_state::ibm5162)
 	ibm5170(config);
@@ -520,23 +520,23 @@ MACHINE_CONFIG_START(at_state::atvga)
 	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false) // FIXME: determine ISA bus clock
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(at_state::neat)
+void at_state::neat(machine_config &config)
+{
 	atvga(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(neat_io)
+	m_maincpu->set_addrmap(AS_IO, &at_state::neat_io);
 
 	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc")); // TODO: move this into the cs8221
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
 	rtc.set_century_index(0x32);
 
 	CS8221(config, "cs8221", 0, "maincpu", "mb:isa", "bios");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(at_state::xb42639)
+void at_state::xb42639(machine_config &config)
+{
 	atvga(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12500000)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(12500000);
+}
 
 MACHINE_CONFIG_START(at_state::k286i)
 	ibm5162(config);
@@ -793,24 +793,23 @@ MACHINE_CONFIG_END
 // Compaq Portable III
 MACHINE_CONFIG_START(at_state::comportiii)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, 48_MHz_XTAL / 4 /*12000000*/)
-	MCFG_DEVICE_PROGRAM_MAP(at16_map)
-	MCFG_DEVICE_IO_MAP(at16_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
+	i80286_cpu_device &maincpu(I80286(config, m_maincpu, 48_MHz_XTAL / 4 /*12000000*/));
+	maincpu.set_addrmap(AS_PROGRAM, &at_state::at16_map);
+	maincpu.set_addrmap(AS_IO, &at_state::at16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	AT_MB(config, m_mb, 0);
+	config.m_minimum_quantum = attotime::from_hz(60);
 	downcast<at_mb_device *>(device)->at_softlists(config);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdc", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K)
-	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
-	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "hdc", true)
-	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "cga_cportiii", true)
-	MCFG_DEVICE_ADD("isa1",   ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa2",   ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_single_1200K);
+	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "hdc", true);
+	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "cga_cportiii", true);
+	ISA16_SLOT(config, "isa1",   0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "mb:isabus", pc_isa16_cards, nullptr, false);
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
