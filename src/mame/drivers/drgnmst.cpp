@@ -23,7 +23,7 @@ PCB Layout
                                      TPC1020
 DSW1 62256   62256                   (PLCC84)
     DM1000A DM1000B
-DSW2    68000      TPC1020           62256
+DSW2  MC68000P12   TPC1020           62256
                    (PLCC84)          62256
 12MHz 32MHz
 
@@ -32,7 +32,7 @@ Notes:
           *: Unknown PLCC84 chip (surface scratched)
       VSync: 60Hz
       HSync: 15.625kHz
-  68K clock: 16MHz
+  68K clock: 12MHz
 
 */
 
@@ -375,11 +375,11 @@ void drgnmst_state::machine_reset()
 
 MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* Confirmed */
+	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) /* Confirmed */
 	MCFG_DEVICE_PROGRAM_MAP(drgnmst_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
 
-	PIC16C55(config, m_audiocpu, 32000000/8);  /* Confirmed */
+	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
 	m_audiocpu->read_a().set(FUNC(drgnmst_state::pic16c5x_port0_r));
 	m_audiocpu->write_a().set(FUNC(drgnmst_state::pcm_banksel_w));
 	m_audiocpu->read_b().set(FUNC(drgnmst_state::snd_command_r));
@@ -403,11 +403,11 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, drgnmst_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
