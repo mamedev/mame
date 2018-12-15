@@ -2029,11 +2029,11 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 	m72_audio_chips(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(m72_state::kengo)
+void m72_state::kengo(machine_config &config)
+{
 	cosmccop(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_V25_CONFIG(gunforce_decryption_table)
-MACHINE_CONFIG_END
+	subdevice<v35_device>("maincpu")->set_decryption_table(gunforce_decryption_table);
+}
 
 
 /****************************************** M82 ***********************************************/

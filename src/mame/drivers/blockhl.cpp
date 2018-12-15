@@ -67,7 +67,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank5800;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
@@ -278,30 +278,31 @@ INPUT_PORTS_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(blockhl_state::blockhl)
+void blockhl_state::blockhl(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)     // Konami 052526
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, blockhl_state, banking_callback))
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/8); // Konami 052526
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockhl_state::main_map);
+	m_maincpu->line().set(FUNC(blockhl_state::banking_callback));
 
 	ADDRESS_MAP_BANK(config, "bank5800").set_map(&blockhl_state::bank5800_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &blockhl_state::audio_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240);
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(blockhl_state, screen_update_blockhl)
-	MCFG_SCREEN_PALETTE("palette")
+//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_screen_update(FUNC(blockhl_state::screen_update_blockhl));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	palette_device &palette(PALETTE(config, "palette", 1024));
+	palette.enable_shadows();
+	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
@@ -320,7 +321,7 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

@@ -3446,21 +3446,22 @@ device_memory_interface::space_config_vector psxcpu_device::memory_space_config(
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
-	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
+void psxcpu_device::device_add_mconfig(machine_config &config)
+{
+	auto &irq(PSX_IRQ(config, "irq", 0));
+	irq.irq().set_inputline(DEVICE_SELF, PSXCPU_IRQ0);
 
-	MCFG_DEVICE_ADD( "dma", PSX_DMA, 0 )
-	MCFG_PSX_DMA_IRQ_HANDLER( WRITELINE("irq", psxirq_device, intin3 ) )
+	auto &dma(PSX_DMA(config, "dma", 0));
+	dma.irq().set("irq", FUNC(psxirq_device::intin3));
 
-	MCFG_DEVICE_ADD( "mdec", PSX_MDEC, 0 )
-	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psxdma_device::write_delegate(&psxmdec_device::dma_write, (psxmdec_device *) device ) )
-	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psxdma_device::read_delegate(&psxmdec_device::dma_read, (psxmdec_device *) device ) )
+	auto &mdec(PSX_MDEC(config, "mdec", 0));
+	dma.install_write_handler(0, psxdma_device::write_delegate(&psxmdec_device::dma_write, &mdec));
+	dma.install_read_handler(1, psxdma_device::write_delegate(&psxmdec_device::dma_write, &mdec));
 
-	MCFG_DEVICE_ADD( "rcnt", PSX_RCNT, 0 )
-	MCFG_PSX_RCNT_IRQ0_HANDLER( WRITELINE( "irq", psxirq_device, intin4 ) )
-	MCFG_PSX_RCNT_IRQ1_HANDLER( WRITELINE( "irq", psxirq_device, intin5 ) )
-	MCFG_PSX_RCNT_IRQ2_HANDLER( WRITELINE( "irq", psxirq_device, intin6 ) )
+	auto &rcnt(PSX_RCNT(config, "rcnt", 0));
+	rcnt.irq0().set("irq", FUNC(psxirq_device::intin4));
+	rcnt.irq1().set("irq", FUNC(psxirq_device::intin5));
+	rcnt.irq2().set("irq", FUNC(psxirq_device::intin6));
 
 	auto &sio0(PSX_SIO0(config, "sio0", DERIVED_CLOCK(1, 2)));
 	sio0.irq_handler().set("irq", FUNC(psxirq_device::intin7));
@@ -3468,5 +3469,5 @@ MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	auto &sio1(PSX_SIO1(config, "sio1", DERIVED_CLOCK(1, 2)));
 	sio1.irq_handler().set("irq", FUNC(psxirq_device::intin8));
 
-	RAM( config, "ram" ).set_default_value( 0x00 );
-MACHINE_CONFIG_END
+	RAM(config, "ram").set_default_value(0x00);
+}

@@ -97,7 +97,6 @@ Todo & FIXME:
 
 #include "emu.h"
 #include "includes/cvs.h"
-#include "cpu/s2650/s2650.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -964,46 +963,45 @@ void cvs_state::machine_reset()
 	m_stars_scroll = 0;
 }
 
-
-MACHINE_CONFIG_START(cvs_state::cvs)
-
+void cvs_state::cvs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/16)
-	MCFG_DEVICE_PROGRAM_MAP(cvs_main_cpu_map)
-	MCFG_DEVICE_IO_MAP(cvs_main_cpu_io_map)
-	MCFG_DEVICE_DATA_MAP(cvs_main_cpu_data_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cvs_state, cvs_main_cpu_interrupt)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+	S2650(config, m_maincpu, XTAL(14'318'181)/16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &cvs_state::cvs_main_cpu_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &cvs_state::cvs_main_cpu_data_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::cvs_main_cpu_interrupt));
+	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
+	m_maincpu->flag_handler().set(FUNC(cvs_state::write_s2650_flag));
 
-	MCFG_DEVICE_ADD("audiocpu", S2650, XTAL(14'318'181)/16)
-	MCFG_DEVICE_PROGRAM_MAP(cvs_dac_cpu_map)
+	S2650(config, m_audiocpu, XTAL(14'318'181)/16);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_dac_cpu_map);
 	/* doesn't look like it is used at all */
 	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
 
-	MCFG_DEVICE_ADD("speechcpu", S2650, XTAL(14'318'181)/16)
-	MCFG_DEVICE_PROGRAM_MAP(cvs_speech_cpu_map)
+	S2650(config, m_speechcpu, XTAL(14'318'181)/16);
+	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_speech_cpu_map);
 	/* romclk is much more probable, 393 Hz results in timing issues */
 	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
-	MCFG_S2650_SENSE_INPUT(READLINE("tms", tms5110_device, romclk_hack_r))
+	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cvs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cvs);
 
-	MCFG_PALETTE_ADD("palette", (256+4)*8+8+1)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(cvs_state,cvs)
+	PALETTE(config, m_palette, (256+4)*8+8+1);
+	m_palette->set_indirect_entries(16);
+	m_palette->set_init(FUNC(cvs_state::palette_init_cvs));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 1*8, 32*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
-	MCFG_SCREEN_UPDATE_DRIVER(cvs_state, screen_update_cvs)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 30*8-1, 1*8, 32*8-1);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
+	m_screen->set_screen_update(FUNC(cvs_state::screen_update_cvs));
+	m_screen->set_palette(m_palette);
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
@@ -1019,18 +1017,21 @@ MACHINE_CONFIG_START(cvs_state::cvs)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
 
-	MCFG_DEVICE_ADD("tms", TMS5100, XTAL(640'000))
-	MCFG_TMS5110_DATA_CB(READLINE(*this, cvs_state, speech_rom_read_bit))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	TMS5100(config, m_tms5110, XTAL(640'000));
+	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
+	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 /*************************************

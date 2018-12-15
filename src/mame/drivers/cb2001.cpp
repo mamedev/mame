@@ -82,7 +82,7 @@ public:
 	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_READ8_MEMBER(irq_ack_r);
-	required_device<cpu_device> m_maincpu;
+	required_device<v35_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void cb2001(machine_config &config);
@@ -821,12 +821,13 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	}
 }
 
-MACHINE_CONFIG_START(cb2001_state::cb2001)
-	MCFG_DEVICE_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
-	MCFG_V25_CONFIG(cb2001_decryption_table)
-	MCFG_DEVICE_PROGRAM_MAP(cb2001_map)
-	MCFG_DEVICE_IO_MAP(cb2001_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
+void cb2001_state::cb2001(machine_config &config)
+{
+	V35(config, m_maincpu, 20000000); // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
+	m_maincpu->set_decryption_table(cb2001_decryption_table);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb2001_state::cb2001_map);
+	m_maincpu->set_addrmap(AS_IO, &cb2001_state::cb2001_io);
+	m_maincpu->set_vblank_int("screen", FUNC(cb2001_state::vblank_irq));
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("IN0");
@@ -838,17 +839,16 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	ppi1.in_pb_callback().set_ioport("DSW2");
 	ppi1.in_pc_callback().set_ioport("DSW3");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb2001)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cb2001);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cb2001_state, screen_update_cb2001)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(cb2001_state::screen_update_cb2001));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(cb2001_state, cb2001)
+	PALETTE(config, m_palette, 0x100).set_init(FUNC(cb2001_state::palette_init_cb2001));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( cb2001 )

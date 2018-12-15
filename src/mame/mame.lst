@@ -37541,6 +37541,8 @@ tmdo                            // (c) 1996 Midway Games
 
 @source:tmc1800.cpp
 nano                            //
+osc1000b                        //
+tmc1800                         //
 tmc2000                         //
 
 @source:tmc2000e.cpp

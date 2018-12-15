@@ -67,7 +67,6 @@
 #include "emu.h"
 #include "includes/malzak.h"
 
-#include "cpu/s2650/s2650.h"
 #include "machine/nvram.h"
 #include "sound/sn76477.h"
 #include "speaker.h"
@@ -300,11 +299,11 @@ void malzak_state::machine_reset()
 MACHINE_CONFIG_START(malzak_state::malzak)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, S2650, 3800000/4)
-	MCFG_DEVICE_PROGRAM_MAP(malzak_map)
-	MCFG_DEVICE_IO_MAP(malzak_io_map)
-	MCFG_DEVICE_DATA_MAP(malzak_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE(m_screen, screen_device, vblank))
+	S2650(config, m_maincpu, 3800000/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &malzak_state::malzak_map);
+	m_maincpu->set_addrmap(AS_IO, &malzak_state::malzak_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &malzak_state::malzak_data_map);
+	m_maincpu->sense_handler().set(m_screen, FUNC(screen_device::vblank));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

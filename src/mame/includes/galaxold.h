@@ -307,7 +307,7 @@ public:
 	void ckongmc_map(address_map &map);
 	void dkongjrm_map(address_map &map);
 	void dkongjrmc_map(address_map &map);
-	void drivfrcg(address_map &map);
+	void drivfrcg_program(address_map &map);
 	void drivfrcg_io(address_map &map);
 	void galaxold_map(address_map &map);
 	void guttang_map(address_map &map);

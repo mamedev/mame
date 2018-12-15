@@ -130,7 +130,7 @@ private:
 	required_ioport m_controller2_extra;
 	required_ioport m_joysticks;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device<arcadia_cart_slot_device> m_cart;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

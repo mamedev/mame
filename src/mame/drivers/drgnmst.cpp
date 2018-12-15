@@ -379,13 +379,13 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	MCFG_DEVICE_PROGRAM_MAP(drgnmst_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
-	MCFG_PIC16C5x_READ_A_CB(READ8(*this, drgnmst_state, pic16c5x_port0_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, drgnmst_state, pcm_banksel_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, drgnmst_state, snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, drgnmst_state, oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, snd_control_w))
+	PIC16C55(config, m_audiocpu, 32000000/8);  /* Confirmed */
+	m_audiocpu->read_a().set(FUNC(drgnmst_state::pic16c5x_port0_r));
+	m_audiocpu->write_a().set(FUNC(drgnmst_state::pcm_banksel_w));
+	m_audiocpu->read_b().set(FUNC(drgnmst_state::snd_command_r));
+	m_audiocpu->write_b().set(FUNC(drgnmst_state::oki_w));
+	m_audiocpu->read_c().set(FUNC(drgnmst_state::snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(drgnmst_state::snd_control_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
 
@@ -558,7 +558,7 @@ void drgnmst_state::init_drgnmst()
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			m_audiocpu->pic16c5x_set_config(data);
+			m_audiocpu->set_config(data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}

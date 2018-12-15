@@ -75,7 +75,7 @@ private:
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -341,44 +341,45 @@ void phunsy_state::init_phunsy()
 	membank("bankq")->set_entry(0);
 }
 
-MACHINE_CONFIG_START(phunsy_state::phunsy)
+void phunsy_state::phunsy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(phunsy_mem)
-	MCFG_DEVICE_IO_MAP(phunsy_io)
-	MCFG_DEVICE_DATA_MAP(phunsy_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, phunsy_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, phunsy_state, cass_w))
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &phunsy_state::phunsy_mem);
+	m_maincpu->set_addrmap(AS_IO, &phunsy_state::phunsy_io);
+	m_maincpu->set_addrmap(AS_DATA, &phunsy_state::phunsy_data);
+	m_maincpu->sense_handler().set(FUNC(phunsy_state::cass_r));
+	m_maincpu->flag_handler().set(FUNC(phunsy_state::cass_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/* Display (page 12 of pdf)
 	   - 8Mhz clock
 	   - 64 6 pixel characters on a line.
 	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
 	   - 313 line display of which 256 are displayed.
 	*/
-	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256);
+	screen.set_screen_update(FUNC(phunsy_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phunsy)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_phunsy);
+	PALETTE(config, "palette", 8).set_init(FUNC(phunsy_state::palette_init_phunsy));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(phunsy_state::kbd_put));
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", phunsy_state, phunsy, "bin", 2)
-MACHINE_CONFIG_END
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(phunsy_state, phunsy), this), "bin", 2);
+}
 
 
 /* ROM definition */

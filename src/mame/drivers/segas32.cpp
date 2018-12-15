@@ -2841,61 +2841,71 @@ private:
 
 
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_REGULAR_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32(machine_config &config)
+{
+	SEGA_S32_REGULAR_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_analog)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_analog(machine_config &config)
+{
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_track)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_TRACKBALL_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_track(machine_config &config)
+{
+	SEGA_S32_TRACKBALL_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_4p)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_4PLAYER_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_4p(machine_config &config)
+{
+	SEGA_S32_4PLAYER_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_cd)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_CD_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_cd(machine_config &config)
+{
+	SEGA_S32_CD_DEVICE(config, "mainpcb", 0);
+}
 
 // for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
-	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_dual_direct(machine_config &config)
+{
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+}
 
 // air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct_upd7725)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_UPD7725_DEVICE, 0)
-	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_dual_direct_upd7725(machine_config &config)
+{
+	SEGA_S32_UPD7725_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_ga2)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_DEVICE_MODIFY("mainpcb:mcu")
-	MCFG_V25_CONFIG(segas32_v25_state::ga2_opcode_table)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_ga2(machine_config &config)
+{
+	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::ga2_opcode_table);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_arf)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_DEVICE_MODIFY("mainpcb:mcu")
-	MCFG_V25_CONFIG(segas32_v25_state::arf_opcode_table)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_arf(machine_config &config)
+{
+	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::arf_opcode_table);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32(machine_config &config)
+{
+	SEGA_MULTI32_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32_analog)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32_analog(machine_config &config)
+{
+	SEGA_MULTI32_ANALOG_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32_6p)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_6PLAYER_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32_6p(machine_config &config)
+{
+	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb", 0);
+}
 
 /*************************************
  *

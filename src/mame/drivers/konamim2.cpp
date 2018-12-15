@@ -279,13 +279,13 @@ private:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m2);
+	INTERRUPT_GEN_MEMBER(m2_irq);
 	void cde_init();
 	void cde_handle_command();
 	void cde_handle_reports();
 	void cde_dma_transfer(address_space &space, int channel, int next);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<ppc602_device> m_maincpu;
+	required_device<ppc602_device> m_subcpu;
 	void _3do_m2_main(address_map &map);
 	void _3do_m2_main_m(address_map &map);
 	void _3do_m2_main_s(address_map &map);
@@ -1272,7 +1272,7 @@ static INPUT_PORTS_START( m2 )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(konamim2_state::m2)
+INTERRUPT_GEN_MEMBER(konamim2_state::m2_irq)
 {
 	/*
 	 0x000001
@@ -1303,49 +1303,44 @@ void konamim2_state::machine_reset()
 	cde_init();
 }
 
-MACHINE_CONFIG_START(konamim2_state::m2)
-
+void konamim2_state::m2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
-	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_DEVICE_PROGRAM_MAP(m2_main_m)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konamim2_state,  m2)
+	PPC602(config, m_maincpu, 66000000);
+	m_maincpu->set_bus_frequency(33000000);  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamim2_state::m2_main_m);
+	m_maincpu->set_vblank_int("screen", FUNC(konamim2_state::m2_irq));
 
-	MCFG_DEVICE_ADD("sub", PPC602, 66000000)   /* actually PPC602, 66MHz */
-	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_DEVICE_PROGRAM_MAP(m2_main_s)
+	PPC602(config, m_subcpu, 66000000);   /* actually PPC602, 66MHz */
+	m_subcpu->set_bus_frequency(33000000);  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &konamim2_state::m2_main_s);
 
 	// TODO: declaring as second screen causes palette confusion (wants to use palette from the other screen?)
 	GENERIC_TERMINAL(config, m_terminal, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(704, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(konamim2_state, screen_update_m2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(704, 512);
+	screen.set_visarea(0, 511, 0, 383);
+	screen.set_screen_update(FUNC(konamim2_state::screen_update_m2));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-
+	PALETTE(config, "palette", 32768).set_init(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
 
 	/*cd-rom*/
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("3do_m2_cdrom")
+	CDROM(config, "cdrom", 0).set_interface("3do_m2_cdrom");
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(konamim2_state::_3do_m2)
+void konamim2_state::_3do_m2(machine_config &config)
+{
 	m2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(_3do_m2_main_m)
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamim2_state::_3do_m2_main_m);
+	m_subcpu->set_addrmap(AS_PROGRAM, &konamim2_state::_3do_m2_main_s);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(_3do_m2_main_s)
-
-	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cd_list").set_original("3do_m2");
+}
 
 
 ROM_START( polystar )
@@ -1475,19 +1470,15 @@ ROM_START(3do_m2)
 	ROMX_LOAD( "fz35_jpn.bin", 0x000000, 0x100000, CRC(e1c5bfd3) SHA1(0a3e27d672be79eeee1d2dc2da60d82f6eba7934), ROM_BIOS(0) )
 ROM_END
 
-void konamim2_state::init_m2()
-{
-}
-
-GAME( 1997, polystar, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver EBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvicu, totlvice, m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver UAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvicj, totlvice, m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver JAD)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver AAB)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, btltryst, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Battle Tryst (ver JAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, heatof11, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Evil Night (ver UBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, polystar, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Tobe! Polystars (ver JAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver EBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvicu, totlvice, m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver UAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvicj, totlvice, m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver JAD)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver AAB)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, btltryst, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Battle Tryst (ver JAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, heatof11, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Evil Night (ver UBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 CONS( 199?, 3do_m2, 0, 0,  _3do_m2, m2, konamim2_state, empty_init,    "3DO",    "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
