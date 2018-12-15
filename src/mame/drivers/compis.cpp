@@ -782,14 +782,14 @@ MACHINE_CONFIG_START(compis_state::compis)
 	m_mpsc->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
 
-	MCFG_DEVICE_ADD(MM58174A_TAG, MM58274C, 32.768_kHz_XTAL)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	MM58274C(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_mode24(1); // 24 hour
+	m_rtc->set_day1(1);   // monday
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
+	TIMER(config, "tape").configure_periodic(FUNC(compis_state::tape_tick), attotime::from_hz(44100));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
@@ -801,24 +801,26 @@ MACHINE_CONFIG_START(compis_state::compis)
 	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
 	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, compis_state, write_centronics_select))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(compis_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(compis_state::write_centronics_select));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	MCFG_COMPIS_GRAPHICS_SLOT_ADD(GRAPHICS_TAG, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg")
 
-	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir0_w))
-	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE(I80186_TAG, i80186_cpu_device, drq0_w))
-	MCFG_ISBX_SLOT_ADD(ISBX_1_TAG, 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir6_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir5_w))
-	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE(I80186_TAG, i80186_cpu_device, drq1_w))
+	ISBX_SLOT(config, m_isbx0, 0, isbx_cards, "fdc");
+	m_isbx0->mintr0().set(I80130_TAG, FUNC(i80130_device::ir1_w));
+	m_isbx0->mintr1().set(I80130_TAG, FUNC(i80130_device::ir0_w));
+	m_isbx0->mdrqt().set(I80186_TAG, FUNC(i80186_cpu_device::drq0_w));
+	ISBX_SLOT(config, m_isbx1, 0, isbx_cards, nullptr);
+	m_isbx1->mintr0().set(I80130_TAG, FUNC(i80130_device::ir6_w));
+	m_isbx1->mintr1().set(I80130_TAG, FUNC(i80130_device::ir5_w));
+	m_isbx1->mdrqt().set(I80186_TAG, FUNC(i80186_cpu_device::drq1_w));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")
+	SOFTWARE_LIST(config, "flop_list").set_original("compis");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K");

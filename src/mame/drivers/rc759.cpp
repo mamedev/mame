@@ -572,15 +572,13 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	keyb.set_keyboard_callback(FUNC(rc759_state::keyb_put));
 
 	// cassette
-	MCFG_CASSETTE_ADD("cas")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cas);
+	m_cas->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("snd", SN76489A, 20_MHz_XTAL / 10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, m_snd, 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// internal centronics
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
@@ -591,10 +589,10 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, rc759_state, centronics_select_w))
 
 	// isbx slot
-	MCFG_ISBX_SLOT_ADD("isbx", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int1_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int3_w))
-	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
+	ISBX_SLOT(config, m_isbx, 0, isbx_cards, nullptr);
+	m_isbx->mintr0().set("maincpu", FUNC(i80186_cpu_device::int1_w));
+	m_isbx->mintr1().set("maincpu", FUNC(i80186_cpu_device::int3_w));
+	m_isbx->mdrqt().set("maincpu", FUNC(i80186_cpu_device::drq0_w));
 
 	// floppy disk controller
 	WD2797(config, m_fdc, 1000000);
@@ -602,8 +600,8 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 //  m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", rc759_floppies, "hd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
 MACHINE_CONFIG_END
 
 
