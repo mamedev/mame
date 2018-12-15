@@ -1048,12 +1048,12 @@ MACHINE_CONFIG_START(playmark_state::bigtwin)
 	MCFG_DEVICE_PROGRAM_MAP(bigtwin_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
+	PIC16C57(config, m_audiocpu, 12000000);
+	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
+	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1088,12 +1088,12 @@ MACHINE_CONFIG_START(playmark_state::bigtwinb)
 	MCFG_DEVICE_PROGRAM_MAP(bigtwinb_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
+	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);
+	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
+	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1128,13 +1128,13 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	MCFG_DEVICE_PROGRAM_MAP(wbeachvl_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // wrong?
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
-//  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
+	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* 12MHz with internal 4x divisor */
+	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // wrong?
+	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+//  m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w)); // probably closer to this, but this only supports 2 sample bank bits
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
@@ -1171,12 +1171,12 @@ MACHINE_CONFIG_START(playmark_state::excelsr)
 	MCFG_DEVICE_PROGRAM_MAP(excelsr_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
+	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* 12MHz with internal 4x divisor */
+	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
+	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1211,13 +1211,13 @@ MACHINE_CONFIG_START(playmark_state::hrdtimes)
 	MCFG_DEVICE_PROGRAM_MAP(hrdtimes_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
-	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
+	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
+//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
+	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
+	m_audiocpu->set_disable();       /* Internal code is not dumped yet */
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1252,12 +1252,12 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 	MCFG_DEVICE_PROGRAM_MAP(hotmind_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
+	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
+//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
+	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
@@ -1297,12 +1297,12 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 	MCFG_DEVICE_PROGRAM_MAP(luckboomh_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
+	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
+//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
+	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1797,7 +1797,7 @@ void playmark_state::playmark_decode_pic_hex_dump(void)
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			m_audiocpu->pic16c5x_set_config(data);
+			m_audiocpu->set_config(data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}
