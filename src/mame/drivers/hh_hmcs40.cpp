@@ -111,8 +111,6 @@ public:
 	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
@@ -125,8 +123,6 @@ public:
 
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_ioport_array<7> m_inp_matrix; // max 7
 	output_finder<0x20, 0x40> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -1742,10 +1738,12 @@ class pairmtch_state : public hh_hmcs40_state
 public:
 	pairmtch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch%u", 0)
 	{ }
 
 	required_device<hmcs40_cpu_device> m_audiocpu;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
@@ -1792,7 +1790,7 @@ READ8_MEMBER(pairmtch_state::input_r)
 WRITE8_MEMBER(pairmtch_state::sound_w)
 {
 	// R5x: soundlatch (to audiocpu R2x)
-	m_soundlatch->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
+	m_soundlatch[0]->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 
@@ -1801,7 +1799,7 @@ WRITE8_MEMBER(pairmtch_state::sound_w)
 WRITE8_MEMBER(pairmtch_state::sound2_w)
 {
 	// R2x: soundlatch (to maincpu R5x)
-	m_soundlatch2->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
+	m_soundlatch[1]->write(space, 0, bitswap<8>(data,7,6,5,4,0,1,2,3));
 }
 
 WRITE16_MEMBER(pairmtch_state::speaker_w)
@@ -1852,14 +1850,14 @@ void pairmtch_state::pairmtch(machine_config &config)
 	m_maincpu->write_r<3>().set(FUNC(pairmtch_state::plate_w));
 	m_maincpu->read_r<4>().set(FUNC(pairmtch_state::input_r));
 	m_maincpu->write_r<5>().set(FUNC(pairmtch_state::sound_w));
-	m_maincpu->read_r<5>().set(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	m_maincpu->read_r<5>().set(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	m_maincpu->write_r<6>().set(FUNC(pairmtch_state::plate_w));
 	m_maincpu->write_d().set(FUNC(pairmtch_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.2");
 
 	HD38820(config, m_audiocpu, 400000); // approximation
 	m_audiocpu->write_r<2>().set(FUNC(pairmtch_state::sound2_w));
-	m_audiocpu->read_r<2>().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_audiocpu->read_r<2>().set(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	m_audiocpu->write_d().set(FUNC(pairmtch_state::speaker_w));
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
@@ -1871,8 +1869,8 @@ void pairmtch_state::pairmtch(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 }
 
 
