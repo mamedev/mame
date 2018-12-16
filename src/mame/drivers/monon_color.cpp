@@ -75,9 +75,19 @@ void monon_color_state::machine_start()
 //  memcpy(maincpu+0x1e00, flash+0x8800, 0x1000);
 //  memcpy(maincpu+0x1e00, flash+0x9200, 0x1000);
 	 
-	//  block starting at e000 in flash is not code? (or encrypted?)
-	//  no code to map at 0x9000 in address space (possible BIOS?)
-	//  no code in flash ROM past the first 64kb(?) which is basically the same on all games, must be some kind of script interpreter? J2ME maybe?
+	/*  block starting at e000 in flash is not code? (or encrypted?)
+	    no code to map at 0x9000 in address space (possible BIOS?)
+	    no code in flash ROM past the first 64kb(?) which is basically the same on all games, must be some kind of script interpreter? J2ME maybe?
+
+		there are 4 different 'versions' of the code in the dumped ROMs, where the code is the same the roms match up until 0x50000 after which the game specific data starts
+
+		by game number:
+
+		101,102,103,104,105          (1st revision)
+		106,107                      (2nd revision)
+		201                          (3rd revision)
+		202,203,204,205,301,303,304  (4th revision)
+	*/
 }
 
 
