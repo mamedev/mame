@@ -125,7 +125,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<hmcs40_cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
@@ -429,28 +429,29 @@ static INPUT_PORTS_START( bambball )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bambball_state::bambball)
-
+void bambball_state::bambball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(*this, bambball_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bambball_state, grid_w))
+	HD38750(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set(FUNC(bambball_state::input_r));
+	m_maincpu->write_r<1>().set(FUNC(bambball_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bambball_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bambball_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bambball_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 478)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 478-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 478);
+	screen.set_visarea(0, 1920-1, 0, 478-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -564,29 +565,29 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bmboxing_state::bmboxing)
-
+void bmboxing_state::bmboxing(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(*this, bmboxing_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bmboxing_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.4"))
+	HD38750(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set(FUNC(bmboxing_state::input_r));
+	m_maincpu->write_r<1>().set(FUNC(bmboxing_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bmboxing_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bmboxing_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bmboxing_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.4");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 529)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 529-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 529);
+	screen.set_visarea(0, 1920-1, 0, 529-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -688,28 +689,28 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 	update_int1();
 }
 
-MACHINE_CONFIG_START(bfriskyt_state::bfriskyt)
-
+void bfriskyt_state::bfriskyt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bfriskyt_state, grid_w))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(bfriskyt_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(bfriskyt_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bfriskyt_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bfriskyt_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bfriskyt_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 675)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 675-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 675);
+	screen.set_visarea(0, 1920-1, 0, 675-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -797,29 +798,29 @@ static INPUT_PORTS_START( packmon )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(packmon_state::packmon)
-
+void packmon_state::packmon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, packmon_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(*this, packmon_state, input_r))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(packmon_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(packmon_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(packmon_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(packmon_state::plate_w));
+	m_maincpu->write_d().set(FUNC(packmon_state::grid_w));
+	m_maincpu->read_d().set(FUNC(packmon_state::input_r));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 766)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 766-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 766);
+	screen.set_visarea(0, 1920-1, 0, 766-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -931,28 +932,28 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 	update_int0();
 }
 
-MACHINE_CONFIG_START(msthawk_state::msthawk)
-
+void msthawk_state::msthawk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, msthawk_state, grid_w))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(msthawk_state::plate_w));
+	m_maincpu->write_d().set(FUNC(msthawk_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 696)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 696-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 696);
+	screen.set_visarea(0, 1920-1, 0, 696-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1051,29 +1052,29 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 	update_int1();
 }
 
-MACHINE_CONFIG_START(bzaxxon_state::bzaxxon)
-
+void bzaxxon_state::bzaxxon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 450000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bzaxxon_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
+	HD38800(config, m_maincpu, 450000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(bzaxxon_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(bzaxxon_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bzaxxon_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bzaxxon_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bzaxxon_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.5");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(613, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 613-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(613, 1080);
+	screen.set_visarea(0, 613-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1166,31 +1167,31 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 	update_int0();
 }
 
-MACHINE_CONFIG_START(zackman_state::zackman)
-
+void zackman_state::zackman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, zackman_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(zackman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(zackman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(zackman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(zackman_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(zackman_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(zackman_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(zackman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(zackman_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(487, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 487-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(487, 1080);
+	screen.set_visarea(0, 487-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1292,32 +1293,32 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 	update_int0();
 }
 
-MACHINE_CONFIG_START(bpengo_state::bpengo)
-
+void bpengo_state::bpengo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bpengo_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(bpengo_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(bpengo_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bpengo_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bpengo_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(bpengo_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(bpengo_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(bpengo_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bpengo_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.5");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 759)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 759-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 759);
+	screen.set_visarea(0, 1920-1, 0, 759-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1416,31 +1417,31 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 	update_int0();
 }
 
-MACHINE_CONFIG_START(bbtime_state::bbtime)
-
+void bbtime_state::bbtime(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bbtime_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(bbtime_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(bbtime_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bbtime_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bbtime_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(bbtime_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(bbtime_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(bbtime_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bbtime_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(379, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 379-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(379, 1080);
+	screen.set_visarea(0, 379-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1515,30 +1516,30 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bdoramon_state::bdoramon)
-
+void bdoramon_state::bdoramon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bdoramon_state, plate_w))
-	MCFG_HMCS40_READ_R_CB(2, IOPORT("IN.3"))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bdoramon_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(bdoramon_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(bdoramon_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bdoramon_state::plate_w));
+	m_maincpu->read_r<2>().set_ioport("IN.3");
+	m_maincpu->write_r<3>().set(FUNC(bdoramon_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bdoramon_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.2");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 668)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 668-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 668);
+	screen.set_visarea(0, 1920-1, 0, 668-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1607,29 +1608,29 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bultrman_state::bultrman)
-
+void bultrman_state::bultrman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 350000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bultrman_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
+	HD38800(config, m_maincpu, 350000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(bultrman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(bultrman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bultrman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bultrman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bultrman_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.1");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 673)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 673-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 673);
+	screen.set_visarea(0, 1920-1, 0, 673-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1695,30 +1696,30 @@ static INPUT_PORTS_START( machiman )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(machiman_state::machiman)
-
+void machiman_state::machiman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, machiman_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(machiman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(machiman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(machiman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(machiman_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(machiman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(machiman_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.1");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1534, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1534-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1534, 1080);
+	screen.set_visarea(0, 1534-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1842,27 +1843,27 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(pairmtch_state::pairmtch)
-
+void pairmtch_state::pairmtch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pairmtch_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, pairmtch_state, plate_w))
-	MCFG_HMCS40_READ_R_CB(4, READ8(*this, pairmtch_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, pairmtch_state, sound_w))
-	MCFG_HMCS40_READ_R_CB(5, READ8("soundlatch2", generic_latch_8_device, read))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, pairmtch_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pairmtch_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<2>().set(FUNC(pairmtch_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(pairmtch_state::plate_w));
+	m_maincpu->read_r<4>().set(FUNC(pairmtch_state::input_r));
+	m_maincpu->write_r<5>().set(FUNC(pairmtch_state::sound_w));
+	m_maincpu->read_r<5>().set(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	m_maincpu->write_r<6>().set(FUNC(pairmtch_state::plate_w));
+	m_maincpu->write_d().set(FUNC(pairmtch_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.2");
 
-	MCFG_DEVICE_ADD("audiocpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pairmtch_state, sound2_w))
-	MCFG_HMCS40_READ_R_CB(2, READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pairmtch_state, speaker_w))
+	hmcs40_cpu_device &audiocpu(HD38820(config, m_audiocpu, 400000)); // approximation
+	audiocpu.write_r<2>().set(FUNC(pairmtch_state::sound2_w));
+	audiocpu.read_r<2>().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	audiocpu.write_d().set(FUNC(pairmtch_state::speaker_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_pairmtch);
 
 	/* sound hardware */
@@ -1871,9 +1872,8 @@ MACHINE_CONFIG_START(pairmtch_state::pairmtch)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1964,29 +1964,29 @@ static INPUT_PORTS_START( alnattck )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(alnattck_state::alnattck)
-
+void alnattck_state::alnattck(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, alnattck_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(*this, alnattck_state, input_r))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(alnattck_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(alnattck_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(alnattck_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(alnattck_state::plate_w));
+	m_maincpu->write_d().set(FUNC(alnattck_state::grid_w));
+	m_maincpu->read_d().set(FUNC(alnattck_state::input_r));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 700)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 700-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 700);
+	screen.set_visarea(0, 1920-1, 0, 700-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2090,33 +2090,33 @@ void cdkong_state::machine_start()
 	save_item(NAME(m_speaker_volume));
 }
 
-MACHINE_CONFIG_START(cdkong_state::cdkong)
-
+void cdkong_state::cdkong(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cdkong_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(cdkong_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(cdkong_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(cdkong_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(cdkong_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(cdkong_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(cdkong_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(cdkong_state::plate_w));
+	m_maincpu->write_d().set(FUNC(cdkong_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.1");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(605, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 605-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(605, 1080);
+	screen.set_visarea(0, 605-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(1))
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
+}
 
 
 
@@ -2222,28 +2222,28 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	prepare_display();
 }
 
-MACHINE_CONFIG_START(cgalaxn_state::cgalaxn)
-
+void cgalaxn_state::cgalaxn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cgalaxn_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cgalaxn_state, plate_w))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set(FUNC(cgalaxn_state::input_r));
+	m_maincpu->write_r<1>().set(FUNC(cgalaxn_state::grid_w));
+	m_maincpu->write_r<2>().set(FUNC(cgalaxn_state::grid_w));
+	m_maincpu->write_r<3>().set(FUNC(cgalaxn_state::grid_w));
+	m_maincpu->write_d().set(FUNC(cgalaxn_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(526, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 526-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(526, 1080);
+	screen.set_visarea(0, 526-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2340,31 +2340,31 @@ static INPUT_PORTS_START( cpacman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cpacman_state::cpacman)
-
+void cpacman_state::cpacman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cpacman_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cpacman_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set(FUNC(cpacman_state::input_r));
+	m_maincpu->write_r<1>().set(FUNC(cpacman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(cpacman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(cpacman_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(cpacman_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(cpacman_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(cpacman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(cpacman_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(484, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 484-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(484, 1080);
+	screen.set_visarea(0, 484-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2456,31 +2456,31 @@ static INPUT_PORTS_START( cmspacmn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(cmspacmn_state::cmspacmn)
-
+void cmspacmn_state::cmspacmn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cmspacmn_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cmspacmn_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set(FUNC(cmspacmn_state::input_r));
+	m_maincpu->write_r<1>().set(FUNC(cmspacmn_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(cmspacmn_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(cmspacmn_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(cmspacmn_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(cmspacmn_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(cmspacmn_state::plate_w));
+	m_maincpu->write_d().set(FUNC(cmspacmn_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(481, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 481-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(481, 1080);
+	screen.set_visarea(0, 481-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2602,25 +2602,24 @@ static INPUT_PORTS_START( sag )
 	PORT_CONFSETTING(    0x02, "2" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(sag_state::sag)
-
+void sag_state::sag(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 450000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, sag_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, sag_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(*this, sag_state, input_r))
+	HD38800(config, m_maincpu, 450000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(sag_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(sag_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(sag_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(sag_state::plate_w));
+	m_maincpu->write_d().set(FUNC(sag_state::grid_w));
+	m_maincpu->read_d().set(FUNC(sag_state::input_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_sag);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2717,31 +2716,31 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(egalaxn2_state::egalaxn2)
-
+void egalaxn2_state::egalaxn2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(*this, egalaxn2_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, egalaxn2_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set(FUNC(egalaxn2_state::input_r));
+	m_maincpu->write_r<1>().set(FUNC(egalaxn2_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(egalaxn2_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(egalaxn2_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(egalaxn2_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(egalaxn2_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(egalaxn2_state::plate_w));
+	m_maincpu->write_d().set(FUNC(egalaxn2_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(505, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 505-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(505, 1080);
+	screen.set_visarea(0, 505-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2802,14 +2801,14 @@ static INPUT_PORTS_START( epacman2 )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(epacman2_state::epacman2)
+void epacman2_state::epacman2(machine_config &config)
+{
 	egalaxn2(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(505, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 505-1, 0, 1080-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(505, 1080);
+	subdevice<screen_device>("screen")->set_visarea(0, 505-1, 0, 1080-1);
+}
 
 
 
@@ -2968,40 +2967,40 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
-MACHINE_CONFIG_START(eturtles_state::eturtles)
-
+void eturtles_state::eturtles(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, eturtles_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_d().set(FUNC(eturtles_state::grid_w));
 
-	MCFG_DEVICE_ADD("audiocpu", COP411, 215000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, eturtles_state, speaker_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eturtles_state, cop_irq_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, eturtles_state, cop_latch_r))
-	MCFG_COP400_READ_G_CB(READ8(*this, eturtles_state, cop_ack_r))
+	cop411_cpu_device &audiocpu(COP411(config, m_audiocpu, 215000)); // approximation
+	audiocpu.set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	audiocpu.write_sk().set(FUNC(eturtles_state::speaker_w));
+	audiocpu.write_d().set(FUNC(eturtles_state::cop_irq_w));
+	audiocpu.read_l().set(FUNC(eturtles_state::cop_latch_r));
+	audiocpu.read_g().set(FUNC(eturtles_state::cop_ack_r));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(484, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 484-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(484, 1080);
+	screen.set_visarea(0, 484-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3077,39 +3076,39 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(estargte_state::estargte)
-
+void estargte_state::estargte(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, eturtles_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(eturtles_state::plate_w));
+	m_maincpu->write_d().set(FUNC(eturtles_state::grid_w));
 
-	MCFG_DEVICE_ADD("audiocpu", COP411, 190000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, eturtles_state, speaker_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eturtles_state, cop_irq_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, estargte_state, cop_data_r))
+	cop411_cpu_device &audiocpu(COP411(config, m_audiocpu, 190000)); // approximation
+	audiocpu.set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	audiocpu.write_sk().set(FUNC(eturtles_state::speaker_w));
+	audiocpu.write_d().set(FUNC(eturtles_state::cop_irq_w));
+	audiocpu.read_l().set(FUNC(estargte_state::cop_data_r));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 854)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 854-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 854);
+	screen.set_visarea(0, 1920-1, 0, 854-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3202,29 +3201,29 @@ static INPUT_PORTS_START( ghalien )
 	PORT_CONFSETTING(      0x8000, "Professional" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ghalien_state::ghalien)
-
+void ghalien_state::ghalien(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, ghalien_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(*this, ghalien_state, input_r))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(ghalien_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(ghalien_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(ghalien_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(ghalien_state::plate_w));
+	m_maincpu->write_d().set(FUNC(ghalien_state::grid_w));
+	m_maincpu->read_d().set(FUNC(ghalien_state::input_r));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 699)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 699-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 699);
+	screen.set_visarea(0, 1920-1, 0, 699-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3328,29 +3327,29 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 	update_int1();
 }
 
-MACHINE_CONFIG_START(gckong_state::gckong)
-
+void gckong_state::gckong(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, gckong_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(gckong_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(gckong_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(gckong_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(gckong_state::plate_w));
+	m_maincpu->write_d().set(FUNC(gckong_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.5");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(506, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 506-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(506, 1080);
+	screen.set_visarea(0, 506-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3446,31 +3445,31 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 	update_int1();
 }
 
-MACHINE_CONFIG_START(gdigdug_state::gdigdug)
-
+void gdigdug_state::gdigdug(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, gdigdug_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(gdigdug_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(gdigdug_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(gdigdug_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(gdigdug_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(gdigdug_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(gdigdug_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(gdigdug_state::plate_w));
+	m_maincpu->write_d().set(FUNC(gdigdug_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(476, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 476-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(476, 1080);
+	screen.set_visarea(0, 476-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3607,31 +3606,31 @@ INPUT_PORTS_END
 
 static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
 
-MACHINE_CONFIG_START(mwcbaseb_state::mwcbaseb)
-
+void mwcbaseb_state::mwcbaseb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, mwcbaseb_state, plate_w))
-	MCFG_HMCS40_READ_R_CB(4, READ8(*this, mwcbaseb_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, mwcbaseb_state, speaker_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, mwcbaseb_state, grid_w))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<1>().set(FUNC(mwcbaseb_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(mwcbaseb_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(mwcbaseb_state::plate_w));
+	m_maincpu->read_r<4>().set(FUNC(mwcbaseb_state::input_r));
+	m_maincpu->write_r<5>().set(FUNC(mwcbaseb_state::speaker_w));
+	m_maincpu->write_r<6>().set(FUNC(mwcbaseb_state::plate_w));
+	m_maincpu->write_d().set(FUNC(mwcbaseb_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 478)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 478-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 478);
+	screen.set_visarea(0, 1920-1, 0, 478-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(8, mwcbaseb_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->set_levels(8, mwcbaseb_speaker_levels);
+}
 
 
 
@@ -3694,32 +3693,32 @@ static INPUT_PORTS_START( pbqbert )
 	PORT_BIT( 0xe1ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(pbqbert_state::pbqbert)
-
+void pbqbert_state::pbqbert(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pbqbert_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.0"))
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(pbqbert_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(pbqbert_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(pbqbert_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(pbqbert_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(pbqbert_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(pbqbert_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(pbqbert_state::plate_w));
+	m_maincpu->write_d().set(FUNC(pbqbert_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.0");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(603, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 603-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(603, 1080);
+	screen.set_visarea(0, 603-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3818,28 +3817,28 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 	update_int0();
 }
 
-MACHINE_CONFIG_START(kingman_state::kingman)
-
+void kingman_state::kingman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, kingman_state, grid_w))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(kingman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(kingman_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(374, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 374-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(374, 1080);
+	screen.set_visarea(0, 374-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3938,28 +3937,28 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 	update_int1();
 }
 
-MACHINE_CONFIG_START(tmtron_state::tmtron)
-
+void tmtron_state::tmtron(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, tmtron_state, grid_w))
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(tmtron_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(tmtron_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(tmtron_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(tmtron_state::plate_w));
+	m_maincpu->write_d().set(FUNC(tmtron_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 662)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 662-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 662);
+	screen.set_visarea(0, 1920-1, 0, 662-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4031,29 +4030,29 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vinvader_state::vinvader)
-
+void vinvader_state::vinvader(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, IOPORT("IN.0"))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, vinvader_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
+	HD38750(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set_ioport("IN.0");
+	m_maincpu->write_r<1>().set(FUNC(vinvader_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(vinvader_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(vinvader_state::plate_w));
+	m_maincpu->write_d().set(FUNC(vinvader_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.1");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(233, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 233-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(233, 1080);
+	screen.set_visarea(0, 233-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
