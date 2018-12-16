@@ -11,14 +11,14 @@ CPUs    :   2 x 8086? / V20 + 8088
 Sound   :   YM2151 [+ DAC] / 4 x MSM5205
 Video   :   2 x I.G.1BB 48844758V
 
-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
 Year + Game             Main CPU    Sound CPU    Sound            Video
-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
 >=1987  Born To Fight   V20         8088         4 x MSM5205      2 x I.G.1BB 48844758V
 >=1987  Fantasy Land    8086?       8086?        YM2151 + DAC     ?
 1988?   Wheels Runner   V20         Z80          YM3526 + ?       2 x PLCC84 FPGA
-1989/90 Galaxy Gunners  8088        V20          YM2151           2 x I.G.1BB 48844758V (labeled "INGA 1" and "INGA 2"
-----------------------------------------------------------------------------------------------------------------------
+1989/90 Galaxy Gunners  8088        V20          YM2151           2 x I.G.1BB 48844758V (labeled "INGA 1" and "INGA 2")
+-----------------------------------------------------------------------------------------------------------------------
 
 [fantland, galaxygn]
 
@@ -1431,9 +1431,9 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games",       "Born To Fight",                 MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)",          MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners (set 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, galaxygno, galaxygn, galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners (set 2, older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games",       "Born To Fight",                   MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners (1990 copyright)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygno, galaxygn, galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners (1989 copyright)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
