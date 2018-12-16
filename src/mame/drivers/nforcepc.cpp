@@ -167,14 +167,15 @@ void nforcepc_state::nforce_map_io(address_map &map)
   Machine configuration
 */
 
-MACHINE_CONFIG_START(nforcepc_state::nforcepc)
-	MCFG_DEVICE_ADD("maincpu", ATHLONXP, 90000000)
-	MCFG_DEVICE_PROGRAM_MAP(nforce_map)
-	MCFG_DEVICE_IO_MAP(nforce_map_io)
-	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
-	MCFG_DEVICE_ADD(":pci:00.0", CRUSH11, 0, "maincpu", 2 * 1024 * 1024)
-	/*  MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
-	MCFG_I386_SMIACT(WRITELINE("pci:00.0", i82439hx_host_device, smi_act_w))
+void nforcepc_state::nforcepc(machine_config &config)
+{
+	athlonxp_device &maincpu(ATHLONXP(config, "maincpu", 90000000));
+	maincpu.set_addrmap(AS_PROGRAM, &nforcepc_state::nforce_map);
+	maincpu.set_addrmap(AS_IO, &nforcepc_state::nforce_map_io);
+	PCI_ROOT(config, ":pci", 0);
+	CRUSH11(config, ":pci:00.0", 0, "maincpu", 2 * 1024 * 1024);
+	/*  maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_phoenix_ver40_rev6_w));
@@ -183,7 +184,7 @@ MACHINE_CONFIG_START(nforcepc_state::nforcepc)
 	i82371sb_ide_device &ide(I82371SB_IDE(config, ":pci:07.1", 0));
 	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq15_w));*/
-MACHINE_CONFIG_END
+}
 
 ROM_START(nforcepc)
 	ROM_REGION32_LE(0x40000, ":pci:00.0", 0) /* PC bios */

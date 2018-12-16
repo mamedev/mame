@@ -31,8 +31,8 @@ public:
 
 	// configuration helpers
 	auto irq0() { return m_irq0_handler.bind(); }
-	auto irq1() { return m_irq0_handler.bind(); }
-	auto irq2() { return m_irq0_handler.bind(); }
+	auto irq1() { return m_irq1_handler.bind(); }
+	auto irq2() { return m_irq2_handler.bind(); }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );

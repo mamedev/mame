@@ -2458,7 +2458,7 @@ void pc9801_state::pc9801ux(machine_config &config)
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc9801_state::pc9801ux_map);
 	maincpu.set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
-	maincpu.set_a20_callback(FUNC(pc9801_state::a20_286));
+	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801_state::a20_286, this));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 //  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
 }

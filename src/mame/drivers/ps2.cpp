@@ -86,7 +86,8 @@ void ps2_state::machine_start()
 	}
 }
 
-MACHINE_CONFIG_START(ps2_state::ps2m30286)
+void ps2_state::ps2m30286(machine_config &config)
+{
 	/* basic machine hardware */
 	i80286_cpu_device &maincpu(I80286(config, m_maincpu, 10000000));
 	maincpu.set_addrmap(AS_PROGRAM, &ps2_state::ps2_16_map);
@@ -105,13 +106,14 @@ MACHINE_CONFIG_START(ps2_state::ps2m30286)
 	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, "ide", false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, "comat", false);
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ps2_state::ps2386)
+void ps2_state::ps2386(machine_config &config)
+{
 	I386(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ps2_state::ps2_32_map);
 	m_maincpu->set_addrmap(AS_IO, &ps2_state::ps2_32_io);
@@ -133,11 +135,11 @@ MACHINE_CONFIG_START(ps2_state::ps2386)
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M,128M,256M");
-MACHINE_CONFIG_END
+}
 
 ROM_START( i8530286 )
 	ROM_REGION(0x20000,"bios", 0)

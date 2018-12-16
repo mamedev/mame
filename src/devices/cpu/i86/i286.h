@@ -71,12 +71,8 @@ public:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	typedef device_delegate<uint32_t (bool)> a20_cb;
-	void set_a20_callback(a20_cb callback) { m_a20_callback = callback; }
-	template <class FunctionClass> void set_a20_callback(uint32_t (FunctionClass::*callback)(bool), const char *name)
-	{
-		set_a20_callback(a20_cb(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	typedef delegate<uint32_t (bool)> a20_cb;
+	template <typename Object> void set_a20_callback(Object &&cb) { m_a20_callback = std::forward<Object>(cb); }
 
 	auto shutdown_callback() { return m_out_shutdown_func.bind(); }
 

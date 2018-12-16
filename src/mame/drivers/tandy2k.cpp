@@ -888,7 +888,7 @@ void tandy2k_state::tandy2k_hd(machine_config &config)
 {
 	tandy2k(config);
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &tandy2k_state::tandy2k_hd_io);
+	m_maincpu->set_addrmap(AS_IO, &tandy2k_state::tandy2k_hd_io);
 
 	// Tandon TM502 hard disk
 	HARDDISK(config, "harddisk0", 0);

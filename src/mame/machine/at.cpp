@@ -43,7 +43,7 @@ void at_mb_device::device_reset()
 void at_mb_device::device_start()
 {
 	if(!strncmp(m_maincpu->shortname(), "i80286", 6))
-		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(FUNC(at_mb_device::a20_286));
+		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
 }
 
 MACHINE_CONFIG_START(at_mb_device::at_softlists)

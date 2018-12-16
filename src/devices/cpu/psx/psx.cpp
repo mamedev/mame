@@ -3456,7 +3456,7 @@ void psxcpu_device::device_add_mconfig(machine_config &config)
 
 	auto &mdec(PSX_MDEC(config, "mdec", 0));
 	dma.install_write_handler(0, psxdma_device::write_delegate(&psxmdec_device::dma_write, &mdec));
-	dma.install_read_handler(1, psxdma_device::write_delegate(&psxmdec_device::dma_write, &mdec));
+	dma.install_read_handler(1, psxdma_device::write_delegate(&psxmdec_device::dma_read, &mdec));
 
 	auto &rcnt(PSX_RCNT(config, "rcnt", 0));
 	rcnt.irq0().set("irq", FUNC(psxirq_device::intin4));
