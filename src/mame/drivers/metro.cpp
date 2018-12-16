@@ -2994,156 +2994,153 @@ void metro_state::machine_start()
 	save_item(NAME(m_gakusai_oki_bank_hi));
 }
 
-MACHINE_CONFIG_START(metro_state::i4100_config)
+void metro_state::i4100_config(machine_config &config)
+{
 	I4100(config, m_vdp, 26.666_MHz_XTAL);
 	m_vdp->blit_irq_cb().set(FUNC(metro_state::vdp_blit_end_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
-	MCFG_SCREEN_PALETTE("vdp:palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));
+	m_screen->set_palette("vdp:palette");
+}
 
-MACHINE_CONFIG_START(metro_state::i4220_config)
+void metro_state::i4220_config(machine_config &config)
+{
 	I4220(config, m_vdp2, 26.666_MHz_XTAL);
 	m_vdp2->blit_irq_cb().set(FUNC(metro_state::vdp_blit_end_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vdp2", imagetek_i4100_device, screen_update)
-	MCFG_SCREEN_PALETTE("vdp2:palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
+	m_screen->set_screen_update("vdp2", FUNC(imagetek_i4100_device::screen_update));
+	m_screen->set_palette("vdp2:palette");
+}
 
-MACHINE_CONFIG_START(metro_state::i4300_config)
+void metro_state::i4300_config(machine_config &config)
+{
 	I4300(config, m_vdp3, 26.666_MHz_XTAL);
 	m_vdp3->blit_irq_cb().set(FUNC(metro_state::vdp_blit_end_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DEVICE("vdp3", imagetek_i4100_device, screen_update)
-	MCFG_SCREEN_PALETTE("vdp3:palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
+	m_screen->set_screen_update("vdp3", FUNC(imagetek_i4100_device::screen_update));
+	m_screen->set_palette("vdp3:palette");
+}
 
 // TODO: these comes from the CRTC inside the i4100
-MACHINE_CONFIG_START(metro_state::i4100_config_360x224)
+void metro_state::i4100_config_360x224(machine_config &config)
+{
 	i4100_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_SIZE(360, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
-MACHINE_CONFIG_END
+	m_screen->set_size(360, 224);
+	m_screen->set_visarea(0, 360-1, 0, 224-1);
+}
 
-MACHINE_CONFIG_START(metro_state::i4220_config_320x240)
+void metro_state::i4220_config_320x240(machine_config &config)
+{
 	i4220_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-MACHINE_CONFIG_END
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+}
 
-MACHINE_CONFIG_START(metro_state::i4220_config_304x224)
+void metro_state::i4220_config_304x224(machine_config &config)
+{
 	i4220_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
-MACHINE_CONFIG_END
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 304-1, 0, 224-1);
+}
 
-MACHINE_CONFIG_START(metro_state::i4300_config_384x224)
+void metro_state::i4300_config_384x224(machine_config &config)
+{
 	i4300_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-MACHINE_CONFIG_END
+	m_screen->set_size(384, 240);
+	m_screen->set_visarea(0, 384-1, 0, 224-1);
+}
 
-MACHINE_CONFIG_START(metro_state::i4300_config_320x240)
+void metro_state::i4300_config_320x240(machine_config &config)
+{
 	i4300_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-MACHINE_CONFIG_END
+	m_screen->set_size(384, 240);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+}
 
 
-MACHINE_CONFIG_START(metro_state::msgogo)
-
+void metro_state::msgogo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(msgogo_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  60) // ?
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::msgogo_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(60)); // ?
 
 	/* video hardware */
 	i4220_config(config);
 	m_vdp2->set_tmap_xoffsets(-2,-2,-2);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq)) // timing is off, shaking sprites in intro
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq)); // timing is off, shaking sprites in intro
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
-	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK));
+	ymf.set_addrmap(0, &metro_state::ymf278_map);
+	ymf.irq_handler().set_inputline("maincpu", 2);
+	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(metro_state::balcube)
+void metro_state::balcube(machine_config &config)
+{
 	msgogo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(balcube_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::balcube_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
+}
 
-MACHINE_CONFIG_START(metro_state::daitoa)
+void metro_state::daitoa(machine_config &config)
+{
 	msgogo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(daitoa_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::daitoa_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
+}
 
-MACHINE_CONFIG_START(metro_state::bangball)
+void metro_state::bangball(machine_config &config)
+{
 	msgogo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bangball_map)
-	MCFG_DEVICE_PERIODIC_INT_REMOVE()
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::bangball_map);
+	m_maincpu->set_periodic_int(device_interrupt_delegate(), attotime());
+	TIMER(config, "scantimer").configure_scanline(FUNC(metro_state::bangball_scanline), "screen", 0, 1);
 
 	// doesn't like 58.2 Hz
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(60);
+	m_screen->screen_vblank().set_nop();
+}
 
-MACHINE_CONFIG_START(metro_state::batlbubl)
+void metro_state::batlbubl(machine_config &config)
+{
 	msgogo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(batlbubl_map)
-	MCFG_DEVICE_PERIODIC_INT_REMOVE()
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::batlbubl_map);
+	m_maincpu->set_periodic_int(device_interrupt_delegate(), attotime());
+	TIMER(config, "scantimer").configure_scanline(FUNC(metro_state::bangball_scanline), "screen", 0, 1);
 
 	// doesn't like 58.2 Hz
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
-MACHINE_CONFIG_END
-
+	m_screen->set_refresh_hz(60);
+	m_screen->screen_vblank().set_nop();
+}
 
 void metro_state::metro_upd7810_sound(machine_config &config)
 {
@@ -3167,13 +3164,12 @@ void metro_state::daitorid_upd7810_sound(machine_config &config)
 	upd.pc_out_cb().set(FUNC(metro_state::upd7810_rombank_w<0x07>));
 }
 
-
-MACHINE_CONFIG_START(metro_state::daitorid)
-
+void metro_state::daitorid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(daitorid_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 32_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::daitorid_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	daitorid_upd7810_sound(config);
 
@@ -3181,8 +3177,7 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 	i4220_config(config);
 	m_vdp2->set_tmap_xoffsets(-2,-2,-2);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3193,187 +3188,179 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1200000, okim6295_device::PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1200000, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
-MACHINE_CONFIG_START(metro_state::puzzli)
+void metro_state::puzzli(machine_config &config)
+{
 	daitorid(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PERIODIC_INT_REMOVE()
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
+	m_maincpu->set_periodic_int(device_interrupt_delegate(), attotime());
+	TIMER(config, "scantimer").configure_scanline(FUNC(metro_state::bangball_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
-MACHINE_CONFIG_END
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->screen_vblank().set_nop();
+}
 
-MACHINE_CONFIG_START(metro_state::dharma)
-
+void metro_state::dharma(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(dharma_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::dharma_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	/* video hardware */
 	i4220_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-MACHINE_CONFIG_START(metro_state::karatour)
-
+void metro_state::karatour(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(karatour_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::karatour_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	/* video hardware */
 	i4100_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-
-MACHINE_CONFIG_START(metro_state::sankokushi)
-
+void metro_state::sankokushi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(kokushi_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::kokushi_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	/* video hardware */
 	i4220_config_320x240(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
 
-MACHINE_CONFIG_START(metro_state::lastfort)
-
+void metro_state::lastfort(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(lastfort_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::lastfort_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	/* video hardware */
 	i4100_config_360x224(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW) // sample rate =  M6295 clock / 165
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW); // sample rate =  M6295 clock / 165
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-MACHINE_CONFIG_START(metro_state::lastforg)
-
+void metro_state::lastforg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(lastforg_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::lastforg_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	i4100_config_360x224(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-MACHINE_CONFIG_START(metro_state::dokyusei)
-
+void metro_state::dokyusei(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(dokyusei_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,irq_callback)
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::dokyusei_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
 
 	/* video hardware */
 	i4300_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-MACHINE_CONFIG_START(metro_state::dokyusp)
-
+void metro_state::dokyusp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(dokyusp_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,irq_callback)
+	M68000(config, m_maincpu, 32_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::dokyusp_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -3382,26 +3369,24 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	/* video hardware */
 	i4300_config_384x224(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki, 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-
-MACHINE_CONFIG_START(metro_state::gakusai)
-
+void metro_state::gakusai(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gakusai_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,irq_callback)
+	M68000(config, m_maincpu, 16000000); /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::gakusai_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -3410,27 +3395,24 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	/* video hardware */
 	i4300_config_320x240(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	OKIM6295(config, m_oki, 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.00);
+}
 
-
-MACHINE_CONFIG_START(metro_state::gakusai2)
-
+void metro_state::gakusai2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gakusai2_map)
-
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,irq_callback)
+	M68000(config, m_maincpu, 16000000); /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::gakusai2_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -3439,90 +3421,83 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 	/* video hardware */
 	i4300_config_320x240(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	OKIM6295(config, m_oki, 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.00);
+}
 
-
-MACHINE_CONFIG_START(metro_state::pangpoms)
-
+void metro_state::pangpoms(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(pangpoms_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::pangpoms_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	/* video hardware */
 	i4100_config_360x224(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-
-MACHINE_CONFIG_START(metro_state::poitto)
-
+void metro_state::poitto(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(poitto_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::poitto_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	/* video hardware */
 	i4100_config_360x224(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // was /128.. so pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-
-MACHINE_CONFIG_START(metro_state::pururun)
-
+void metro_state::pururun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)       /* Not confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(pururun_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2); /* Not confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::pururun_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	daitorid_upd7810_sound(config);
 
 	/* video hardware */
 	i4220_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3533,104 +3508,100 @@ MACHINE_CONFIG_START(metro_state::pururun)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 3.579545_MHz_XTAL/3, okim6295_device::PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 3.579545_MHz_XTAL/3, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
 
-MACHINE_CONFIG_START(metro_state::skyalert)
-
+void metro_state::skyalert(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(skyalert_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::skyalert_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	i4100_config_360x224(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW) // sample rate =  M6295 clock / 165
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW); // sample rate =  M6295 clock / 165
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
 
-MACHINE_CONFIG_START(metro_state::toride2g)
-
+void metro_state::toride2g(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(toride2g_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::toride2g_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	metro_upd7810_sound(config);
 
 	/* video hardware */
 	i4220_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
 
-MACHINE_CONFIG_START(metro_state::mouja)
-
+void metro_state::mouja(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mouja_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,irq_callback)
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::mouja_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(metro_state::irq_callback));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/1024*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	OKIM6295(config, m_oki, 16_MHz_XTAL/1024*132, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->set_addrmap(0, &metro_state::mouja_okimap);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, m_ymsnd, 3.579545_MHz_XTAL));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
-MACHINE_CONFIG_START(metro_state::vmetal)
-
+void metro_state::vmetal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(vmetal_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::vmetal_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
 	/* video hardware */
 	i4220_config_304x224(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::vblank_irq));
 
 	m_vdp2->set_tmap_xoffsets(-16,-16,-16);
 	m_vdp2->set_tmap_yoffsets(-16,-16,-16);
@@ -3638,49 +3609,47 @@ MACHINE_CONFIG_START(metro_state::vmetal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_RESET_HANDLER(WRITELINE(*this, metro_state, vmetal_es8712_irq))
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	ES8712(config, m_essnd, 0);
+	m_essnd->reset_handler().set(FUNC(metro_state::vmetal_es8712_irq));
+	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
+	m_essnd->set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, value from docs */
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified, value from docs */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL)); /* Not verified, value from docs */
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm6585_device::S40); /* Not verified, value from docs */
+	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(metro_state::blzntrnd)
-
+void metro_state::blzntrnd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(blzntrnd_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(metro_state, periodic_interrupt,  8*60) // ?
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::blzntrnd_map);
+	m_maincpu->set_periodic_int(FUNC(metro_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(blzntrnd_sound_map)
-	MCFG_DEVICE_IO_MAP(blzntrnd_sound_io_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &metro_state::blzntrnd_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &metro_state::blzntrnd_sound_io_map);
 
 	/* video hardware */
 	I4220(config, m_vdp2, 26.666_MHz_XTAL);
 	m_vdp2->blit_irq_cb().set(FUNC(metro_state::vdp_blit_end_w));
 	m_vdp2->set_spriteram_buffered(true); // sprites are 1 frame delayed
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_psac_vdp2_mix)
-	MCFG_SCREEN_PALETTE("vdp2:palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 304-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(metro_state::screen_update_psac_vdp2_mix));
+	m_screen->set_palette("vdp2:palette");
+	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_blzntrnd)
+	GFXDECODE(config, m_gfxdecode, "vdp2:palette", gfx_blzntrnd);
 
 	K053936(config, m_k053936, 0);
 	m_k053936->set_offsets(-77, -21);
@@ -3693,17 +3662,19 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, m_ymsnd, 16_MHz_XTAL/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(metro_state::gstrik2)
+void metro_state::gstrik2(machine_config &config)
+{
 	blzntrnd(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gstrik2)
+	m_gfxdecode->set_info(gfx_gstrik2);
+
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	m_k053936->set_offsets(-77, -19);
@@ -3711,48 +3682,42 @@ MACHINE_CONFIG_START(metro_state::gstrik2)
 	m_vdp2->set_tmap_xoffsets(0,-8,0);
 
 	// HUM-003 PCB Configuration : Mono output only
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2610, 16_MHz_XTAL/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.5)
-	MCFG_SOUND_ROUTE(1, "mono", 0.5)
-	MCFG_SOUND_ROUTE(2, "mono", 0.5)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config.replace(), m_ymsnd, 16_MHz_XTAL/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.5);
+	ymsnd.add_route(1, "mono", 0.5);
+	ymsnd.add_route(2, "mono", 0.5);
+}
 
 
-MACHINE_CONFIG_START(metro_state::puzzlet)
-
+void metro_state::puzzlet(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83007, 20_MHz_XTAL) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
-	MCFG_DEVICE_PROGRAM_MAP(puzzlet_map)
-	MCFG_DEVICE_IO_MAP(puzzlet_io_map)
+	H83007(config, m_maincpu, 20_MHz_XTAL); // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::puzzlet_map);
+	m_maincpu->set_addrmap(AS_IO, &metro_state::puzzlet_io_map);
 
 	/* Coins/service */
 	puzzlet_io_device &coins(PUZZLET_IO(config, "coins", 0));
 	coins.data_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
-	MCFG_DEVICE_MODIFY("maincpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("coins", puzzlet_io_device, ce_w))
-	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("coins", puzzlet_io_device, clk_w))
+	subdevice<h8_sci_device>("maincpu:sci1")->tx_handler().set("coins", FUNC(puzzlet_io_device::ce_w));
+	subdevice<h8_sci_device>("maincpu:sci1")->clk_handler().set("coins", FUNC(puzzlet_io_device::clk_w));
 
 	/* video hardware */
 	// TODO: looks like game is running in i4220 compatibilty mode, $778000 seems to be an id for the chip?
 	i4220_config(config);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, puzzlet_vblank_irq))
+	m_screen->screen_vblank().set(FUNC(metro_state::puzzlet_vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL/5, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 20_MHz_XTAL/5)
-	MCFG_SOUND_ROUTE(0, "mono", 0.90)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 20_MHz_XTAL/5, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50);
+	YM2413(config, m_ymsnd, 20_MHz_XTAL/5).add_route(0, "mono", 0.90);
+}
 
 
 /***************************************************************************

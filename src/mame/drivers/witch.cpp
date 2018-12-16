@@ -998,14 +998,14 @@ MACHINE_CONFIG_START(witch_state::witch)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	es8712_device &essnd(ES8712(config, "essnd", 0));
+	essnd.msm_write_handler().set("msm", FUNC(msm5205_device::data_w));
+	essnd.set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	msm5205_device &msm(MSM5205(config, "msm", MSM5202_CLOCK));   /* actually MSM5202 */
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	ym2203_device &ym1(YM2203(config, "ym1", YM2203_CLOCK));     /* 3 MHz */
 	ym1.port_a_read_callback().set_ioport("YM_PortA");

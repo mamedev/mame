@@ -1830,17 +1830,14 @@ void namcos12_state::jvsiomap(address_map &map)
 MACHINE_CONFIG_START(namcos12_boothack_state::truckk)
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
 	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
 	MCFG_DEVICE_PROGRAM_MAP( jvsmap )
 	MCFG_DEVICE_IO_MAP( jvsiomap )
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
+	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
@@ -1904,8 +1901,7 @@ void namcos12_state::plarailjvsiomap(address_map &map)
 MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
 	// modify H8/3002 map to omit direct-connected controls
 	MCFG_DEVICE_MODIFY("sub")
@@ -1916,10 +1912,8 @@ MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
 	MCFG_DEVICE_PROGRAM_MAP( tdjvsmap )
 	MCFG_DEVICE_IO_MAP( tdjvsiomap )
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
+	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
@@ -1927,8 +1921,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos12_boothack_state::aplarail)
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
 	// modify H8/3002 map to omit direct-connected controls
 	MCFG_DEVICE_MODIFY("sub")
@@ -1939,10 +1932,8 @@ MACHINE_CONFIG_START(namcos12_boothack_state::aplarail)
 	MCFG_DEVICE_PROGRAM_MAP( plarailjvsmap )
 	MCFG_DEVICE_IO_MAP( plarailjvsiomap )
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
+	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
