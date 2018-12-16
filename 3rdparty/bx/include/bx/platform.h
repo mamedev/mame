@@ -133,8 +133,14 @@
 #endif //
 
 #if BX_CPU_PPC
-#	undef  BX_CPU_ENDIAN_BIG
-#	define BX_CPU_ENDIAN_BIG 1
+// _LITTLE_ENDIAN exists on ppc64le.
+#	if _LITTLE_ENDIAN
+#		undef  BX_CPU_ENDIAN_LITTLE
+#		define BX_CPU_ENDIAN_LITTLE 1
+#	else
+#		undef  BX_CPU_ENDIAN_BIG
+#		define BX_CPU_ENDIAN_BIG 1
+#	endif
 #else
 #	undef  BX_CPU_ENDIAN_LITTLE
 #	define BX_CPU_ENDIAN_LITTLE 1
