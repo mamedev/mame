@@ -4411,9 +4411,9 @@ ROM_START( pool10e )
 	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
 
 	ROM_REGION( 0x3000, "plds", 0 )
-	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, BAD_DUMP CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) ) /* read protected */
-	ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
-	ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
+	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, NO_DUMP ) /* read protected */
+	ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, NO_DUMP ) /* read protected */
+	ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, NO_DUMP ) /* read protected */
 ROM_END
 
 
@@ -4507,9 +4507,9 @@ ROM_START( pool10j )
 	ROM_LOAD( "am27s29pc.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) // all read protected
-	ROM_LOAD( "palce16v8h.u5", 0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "palce20v8h.u22",  0x0200, 0x0157, NO_DUMP )
-	ROM_LOAD( "palce20v8h.u23",  0x0400, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u22", 0x0200, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u23", 0x0400, 0x0157, NO_DUMP )
 ROM_END
 
 /*
@@ -5083,7 +5083,7 @@ ROM_START( royalcrdp )
 	ROM_LOAD( "royalcrdp_nvram.bin", 0x0000, 0x0800, BAD_DUMP CRC(553f8c66) SHA1(d2c21786d715f81c537d860d8515fda6d766f630) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, NO_DUMP )
 ROM_END
 
 
