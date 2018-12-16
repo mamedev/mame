@@ -276,20 +276,21 @@ static GFXDECODE_START( gfx_sbc6510 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sbc6510_state::sbc6510)
+void sbc6510_state::sbc6510(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6510, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sbc6510_mem)
+	M6510(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_mem);
 
-	MCFG_DEVICE_ADD("videocpu",ATMEGA88, XTAL(16'000'000))
+	ATMEGA88(config, m_videocpu, XTAL(16'000'000));
 //  MCFG_DEVICE_DISABLE() // trips SLEEP opcode, needs to be emulated
-	MCFG_DEVICE_PROGRAM_MAP(sbc6510_video_mem)
-	MCFG_DEVICE_DATA_MAP(sbc6510_video_data)
-	MCFG_DEVICE_IO_MAP(sbc6510_video_io)
-	MCFG_CPU_AVR8_EEPROM("eeprom")
+	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_video_mem);
+	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::sbc6510_video_data);
+	m_videocpu->set_addrmap(AS_IO, &sbc6510_state::sbc6510_video_io);
+	m_videocpu->set_eeprom_tag("eeprom");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette") // for F4 displayer only
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbc6510)
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome)); // for F4 displayer only
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sbc6510);
 
 	/* video hardware */
 	GENERIC_TERMINAL(config, m_terminal, 0);
@@ -302,12 +303,12 @@ MACHINE_CONFIG_START(sbc6510_state::sbc6510)
 	ay8910.port_b_read_callback().set(FUNC(sbc6510_state::psg_b_r));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("cia6526", MOS6526, XTAL(1'000'000))
-	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(INPUTLINE("maincpu", M6510_IRQ_LINE))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, sbc6510_state, key_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, sbc6510_state, key_r))
-MACHINE_CONFIG_END
+	mos6526_device &cia(MOS6526(config, "cia6526", XTAL(1'000'000)));
+	cia.set_tod_clock(50);
+	cia.irq_wr_callback().set_inputline("maincpu", M6510_IRQ_LINE);
+	cia.pa_wr_callback().set(FUNC(sbc6510_state::key_w));
+	cia.pb_rd_callback().set(FUNC(sbc6510_state::key_r));
+}
 
 /* ROM definition */
 ROM_START( sbc6510 )

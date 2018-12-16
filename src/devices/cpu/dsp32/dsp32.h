@@ -42,7 +42,7 @@ public:
 	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_output_pins_callback(Object &&cb) { return m_output_pins_changed.set_callback(std::forward<Object>(cb)); }
-
+	auto out_cb() { return m_output_pins_changed.bind(); }
 
 	// public interfaces
 	void pio_w(int reg, int data);

@@ -29,8 +29,8 @@ public:
 	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<class Object> devcb_base &set_tape_read_cb(Object &&object) { return m_tape_read_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_tape_punch_cb(Object &&object) { return m_tape_punch_cb.set_callback(std::forward<Object>(object)); }
+	auto tape_read() { return m_tape_read_cb.bind(); }
+	auto tape_punch() { return m_tape_punch_cb.bind(); }
 
 protected:
 	// device-level overrides
