@@ -52,11 +52,15 @@ e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, d
 	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this))
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
-	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this)
-	, m_read_p0(*this), m_read_p1(*this), m_read_p2(*this), m_read_p3(*this)
-	, m_write_p0(*this), m_write_p1(*this), m_write_p2(*this), m_write_p3(*this), m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr),
-	m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0), m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0),
-	m_prgtimer_cur_pulse(0), m_prgtimer_count(0), m_prgtimer_reload(0), m_prgtimer_handle(nullptr), m_bz_43_on(0), m_bz_freq(0), m_bz_envelope(0), m_bz_duty_ratio(0), m_bz_1shot_on(0), m_bz_1shot_running(false), m_bz_1shot_count(0), m_bz_pulse(0), m_buzzer_handle(nullptr)
+	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_p{{*this}, {*this}, {*this}, {*this}}
+	, m_write_p{{*this}, {*this}, {*this}, {*this}}
+	, m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr)
+	, m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0)
+	, m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0)
+	, m_prgtimer_cur_pulse(0), m_prgtimer_count(0), m_prgtimer_reload(0), m_prgtimer_handle(nullptr)
+	, m_bz_43_on(0), m_bz_freq(0), m_bz_envelope(0), m_bz_duty_ratio(0), m_bz_1shot_on(0)
+	, m_bz_1shot_running(false), m_bz_1shot_count(0), m_bz_pulse(0), m_buzzer_handle(nullptr)
 { }
 
 
@@ -70,20 +74,14 @@ void e0c6s46_device::device_start()
 	e0c6200_cpu_device::device_start();
 
 	// find ports
-	m_write_r0.resolve_safe();
-	m_write_r1.resolve_safe();
-	m_write_r2.resolve_safe();
-	m_write_r3.resolve_safe();
-	m_write_r4.resolve_safe();
+	for (int i = 0; i < 5; i++)
+		m_write_r[i].resolve_safe();
 
-	m_read_p0.resolve_safe(0);
-	m_read_p1.resolve_safe(0);
-	m_read_p2.resolve_safe(0);
-	m_read_p3.resolve_safe(0);
-	m_write_p0.resolve_safe();
-	m_write_p1.resolve_safe();
-	m_write_p2.resolve_safe();
-	m_write_p3.resolve_safe();
+	for (int i = 0; i < 4; i++)
+	{
+		m_read_p[i].resolve_safe(0);
+		m_write_p[i].resolve_safe();
+	}
 
 	m_pixel_update_cb.bind_relative_to(*owner());
 
@@ -308,10 +306,10 @@ void e0c6s46_device::write_r(u8 port, u8 data)
 
 	switch (port)
 	{
-		case 0: m_write_r0(port, out, 0xff); break;
-		case 1: m_write_r1(port, out, 0xff); break;
-		case 2: m_write_r2(port, out, 0xff); break;
-		case 3: m_write_r3(port, out, 0xff); break; // TODO: R33 PTCLK/_SRDY
+		case 0: m_write_r[0](port, out, 0xff); break;
+		case 1: m_write_r[1](port, out, 0xff); break;
+		case 2: m_write_r[2](port, out, 0xff); break;
+		case 3: m_write_r[3](port, out, 0xff); break; // TODO: R33 PTCLK/_SRDY
 
 		// R4x: special output
 		case 4:
@@ -332,7 +330,7 @@ void e0c6s46_device::write_r4_out()
 	// R42: FOUT or _BZ
 	// R43: BZ(buzzer)
 	u8 out = (m_port_r[4] & 2) | (m_bz_pulse << 3) | (m_bz_pulse << 2 ^ 4);
-	m_write_r4(4, out, 0xff);
+	m_write_r[4](4, out, 0xff);
 }
 
 
@@ -347,13 +345,7 @@ void e0c6s46_device::write_p(u8 port, u8 data)
 	if (!(m_p_dir >> port & 1))
 		return;
 
-	switch (port)
-	{
-		case 0: m_write_p0(port, data, 0xff); break;
-		case 1: m_write_p1(port, data, 0xff); break;
-		case 2: m_write_p2(port, data, 0xff); break;
-		case 3: m_write_p3(port, data, 0xff); break;
-	}
+	m_write_p[port](port, data, 0xff);
 }
 
 u8 e0c6s46_device::read_p(u8 port)
@@ -362,14 +354,7 @@ u8 e0c6s46_device::read_p(u8 port)
 	if (m_p_dir >> port & 1)
 		return m_port_p[port];
 
-	switch (port)
-	{
-		case 0: return m_read_p0(port, 0xff);
-		case 1: return m_read_p1(port, 0xff);
-		case 2: return m_read_p2(port, 0xff);
-		case 3: return m_read_p3(port, 0xff);
-	}
-
+	m_read_p[port](port, 0xff);
 	return 0;
 }
 
