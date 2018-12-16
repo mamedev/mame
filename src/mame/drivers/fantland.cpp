@@ -1108,18 +1108,18 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( galaxygn )
-	ROM_REGION( 0x80000, "maincpu", 0 )   // Main CPU
+	ROM_REGION( 0x80000, "maincpu", 0 )   // Main CPU (all AM27C512)
 	ROM_LOAD( "3_en_a.bin", 0x10000, 0x10000, CRC(9e469189) SHA1(07e5d36ca9665bdd13e3bb4241d34b9042371b79) )
 	ROM_LOAD( "2_eo_a.bin", 0x20000, 0x10000, CRC(9d893ea5) SHA1(a84effb2dde9895de79d84243e337d3d052a7c83) ) // Just two bytes differs from the older set, to change the year from 1989 to 1990 (offsets 80C0 and 80C1)
 	ROM_LOAD( "1_eq_a.bin", 0x70000, 0x10000, CRC(ad0e5b29) SHA1(f9a7ebce9f47a009af213e4e10811bb1c26f891a) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound CPU
+	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound CPU (all AM27C512)
 	ROM_LOAD( "31_u10_b.bin", 0xc0000, 0x10000, CRC(f5c65a85) SHA1(a094fa9531ea4e68ec0a448568e7d4b2307c8185) )
 	ROM_COPY( "audiocpu", 0xc0000, 0xd0000, 0x10000 )
 	ROM_COPY( "audiocpu", 0xc0000, 0xe0000, 0x10000 )
 	ROM_COPY( "audiocpu", 0xc0000, 0xf0000, 0x10000 )
 
-	ROM_REGION( 0x1b0000, "gfx1", 0 )     // Sprites
+	ROM_REGION( 0x1b0000, "gfx1", 0 )     // Sprites (all AM27C512)
 	ROMX_LOAD( "4_ck0_b.bin",  0x000000, 0x10000, CRC(b3621119) SHA1(66ade772077e57f872ef1c8f45e244f4006023f0) , ROM_SKIP(2) )
 	ROMX_LOAD( "13_cj0_b.bin", 0x000001, 0x10000, CRC(52b70f3e) SHA1(65f11d5700337d6d9b6325ff70c86d076e1bdc26) , ROM_SKIP(2) )
 	ROMX_LOAD( "22_ci0_b.bin", 0x000002, 0x10000, BAD_DUMP CRC(ea49fee4) SHA1(29ae3e5dfade421a5e97efe5be1cb17862fdcea1) , ROM_SKIP(2) ) // Bad on this set, taken from the older set
