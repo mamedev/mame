@@ -3092,11 +3092,11 @@ void estargte_state::estargte(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_d().set(FUNC(eturtles_state::grid_w));
 
-	cop411_cpu_device &audiocpu(COP411(config, m_audiocpu, 190000)); // approximation
-	audiocpu.set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	audiocpu.write_sk().set(FUNC(eturtles_state::speaker_w));
-	audiocpu.write_d().set(FUNC(eturtles_state::cop_irq_w));
-	audiocpu.read_l().set(FUNC(estargte_state::cop_data_r));
+	COP411(config, m_audiocpu, 190000); // approximation
+	m_audiocpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_audiocpu->write_sk().set(FUNC(eturtles_state::speaker_w));
+	m_audiocpu->write_d().set(FUNC(eturtles_state::cop_irq_w));
+	m_audiocpu->read_l().set(FUNC(estargte_state::cop_data_r));
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
