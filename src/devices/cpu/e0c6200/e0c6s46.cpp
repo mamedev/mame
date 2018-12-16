@@ -354,10 +354,7 @@ u8 e0c6s46_device::read_p(u8 port)
 	if (m_p_dir >> port & 1)
 		return m_port_p[port];
 
-	if (port < 4)
-		return m_read_p[port](port, 0xff);
-
-	return 0;
+	return m_read_p[port](port, 0xff);
 }
 
 

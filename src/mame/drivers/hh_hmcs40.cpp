@@ -111,7 +111,6 @@ public:
 	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -126,7 +125,6 @@ public:
 
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_ioport_array<7> m_inp_matrix; // max 7
@@ -1743,8 +1741,11 @@ class pairmtch_state : public hh_hmcs40_state
 {
 public:
 	pairmtch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_hmcs40_state(mconfig, type, tag)
+		: hh_hmcs40_state(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu")
 	{ }
+
+	required_device<hmcs40_cpu_device> m_audiocpu;
 
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
@@ -1856,10 +1857,10 @@ void pairmtch_state::pairmtch(machine_config &config)
 	m_maincpu->write_d().set(FUNC(pairmtch_state::grid_w));
 	m_maincpu->read_d().set_ioport("IN.2");
 
-	hmcs40_cpu_device &audiocpu(HD38820(config, m_audiocpu, 400000)); // approximation
-	audiocpu.write_r<2>().set(FUNC(pairmtch_state::sound2_w));
-	audiocpu.read_r<2>().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	audiocpu.write_d().set(FUNC(pairmtch_state::speaker_w));
+	HD38820(config, m_audiocpu, 400000); // approximation
+	m_audiocpu->write_r<2>().set(FUNC(pairmtch_state::sound2_w));
+	m_audiocpu->read_r<2>().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_audiocpu->write_d().set(FUNC(pairmtch_state::speaker_w));
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
@@ -1868,11 +1869,10 @@ void pairmtch_state::pairmtch(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
-
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -2829,8 +2829,11 @@ class eturtles_state : public hh_hmcs40_state
 public:
 	eturtles_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_hmcs40_state(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu"),
 		m_cop_irq(0)
 	{ }
+
+	required_device<cop411_cpu_device> m_audiocpu;
 
 	virtual void prepare_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
@@ -2980,12 +2983,12 @@ void eturtles_state::eturtles(machine_config &config)
 	m_maincpu->write_r<6>().set(FUNC(eturtles_state::plate_w));
 	m_maincpu->write_d().set(FUNC(eturtles_state::grid_w));
 
-	cop411_cpu_device &audiocpu(COP411(config, m_audiocpu, 215000)); // approximation
-	audiocpu.set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	audiocpu.write_sk().set(FUNC(eturtles_state::speaker_w));
-	audiocpu.write_d().set(FUNC(eturtles_state::cop_irq_w));
-	audiocpu.read_l().set(FUNC(eturtles_state::cop_latch_r));
-	audiocpu.read_g().set(FUNC(eturtles_state::cop_ack_r));
+	COP411(config, m_audiocpu, 215000); // approximation
+	m_audiocpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_audiocpu->write_sk().set(FUNC(eturtles_state::speaker_w));
+	m_audiocpu->write_d().set(FUNC(eturtles_state::cop_irq_w));
+	m_audiocpu->read_l().set(FUNC(eturtles_state::cop_latch_r));
+	m_audiocpu->read_g().set(FUNC(eturtles_state::cop_ack_r));
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 

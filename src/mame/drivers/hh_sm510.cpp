@@ -1685,6 +1685,11 @@ static INPUT_PORTS_START( gnw_squish )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("B") // MCU B(beta) pin pulled to GND
 	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
@@ -1700,6 +1705,7 @@ MACHINE_CONFIG_START(gnw_squish_state::gnw_squish)
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
 	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
