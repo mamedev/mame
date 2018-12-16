@@ -394,6 +394,12 @@ BIGENDIAN := 1
 endif
 endif # BIGENDIAN
 
+# Work around an issue with long doubles on ppc64 (#3157)
+ifneq (,$(findstring ppc64,$(UNAME)))
+ARCHOPTS_C += -mlong-double-64
+ARCHOPTS_CXX += -mlong-double-64
+endif
+
 ifndef PYTHON_EXECUTABLE
 PYTHON := python
 else
