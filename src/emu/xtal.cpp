@@ -125,7 +125,7 @@ const double XTAL::known_xtals[] = {
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
 	  7'864'300, /* 7.8643_MHz_XTAL        Used on InterFlip games as video clock */
 	  7'987'000, /* 7.987_MHz_XTAL         PC9801-86 YM2608 clock */
-	  7'995'500, /* 7.9955_MHz_XTAL        Used on Electronic Devices Italy Galaxy Ranger sound board */
+	  7'995'500, /* 7.9955_MHz_XTAL        Used on Electronic Devices Italy Galaxy Gunners sound board */
 	  8'000'000, /* 8_MHz_XTAL             Extremely common, used on 100's of PCBs */
 	  8'200'000, /* 8.2_MHz_XTAL           Universal Mr. Do - Model 8021 PCB */
 	  8'388'000, /* 8.388_MHz_XTAL         Nintendo Game Boy Color */
