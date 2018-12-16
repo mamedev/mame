@@ -1601,7 +1601,7 @@ void harddriv_state::ds3(machine_config &config)
 	/* basic machine hardware */
 	ADSP2101(config, m_adsp, XTAL(12'000'000));
 	m_adsp->set_addrmap(AS_PROGRAM, &harddriv_state::ds3_program_map);
-	m_adsp->set_addrmap(AS_PROGRAM, &harddriv_state::ds3_data_map);
+	m_adsp->set_addrmap(AS_DATA, &harddriv_state::ds3_data_map);
 
 	config.m_minimum_quantum = attotime::from_hz(60000);
 
