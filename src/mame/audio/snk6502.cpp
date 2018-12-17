@@ -881,16 +881,17 @@ WRITE8_MEMBER(fantasy_sound_device::speech_w)
 	m_custom->speech_w(data, fantasy_table, 0);
 }
 
-MACHINE_CONFIG_START(fantasy_sound_device::device_add_mconfig)
+void fantasy_sound_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_custom, SNK6502_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(fantasy_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	samples_device &samples(SAMPLES(config, "samples"));
+	samples.set_channels(1);
+	samples.set_samples_names(fantasy_sample_names);
+	samples.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
 	// BOMB     GND:    2,9,26,27       +5V: 15,25
@@ -911,9 +912,9 @@ MACHINE_CONFIG_START(fantasy_sound_device::device_add_mconfig)
 	sn76477_1.set_enable(0);
 	sn76477_1.add_route(0, "discrete", 1.0, 0);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, fantasy_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, fantasy_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 void fantasy_sound_device::device_start()
 {
@@ -932,11 +933,12 @@ nibbler_sound_device::nibbler_sound_device(const machine_config &mconfig, const 
 {
 }
 
-MACHINE_CONFIG_START(nibbler_sound_device::device_add_mconfig)
+void nibbler_sound_device::device_add_mconfig(machine_config &config)
+{
 	fantasy_sound_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_REMOVE("samples")
-MACHINE_CONFIG_END
+	config.device_remove("samples");
+}
 
 
 pballoon_sound_device::pballoon_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -944,11 +946,12 @@ pballoon_sound_device::pballoon_sound_device(const machine_config &mconfig, cons
 {
 }
 
-MACHINE_CONFIG_START(pballoon_sound_device::device_add_mconfig)
+void pballoon_sound_device::device_add_mconfig(machine_config &config)
+{
 	fantasy_sound_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_REMOVE("samples")
-MACHINE_CONFIG_END
+	config.device_remove("samples");
+}
 
 void pballoon_sound_device::device_reset()
 {
@@ -1025,16 +1028,17 @@ WRITE8_MEMBER(sasuke_sound_device::sound_w)
 	}
 }
 
-MACHINE_CONFIG_START(sasuke_sound_device::device_add_mconfig)
+void sasuke_sound_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_custom, SNK6502_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(sasuke_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	samples_device &samples(SAMPLES(config, "samples"));
+	samples.set_channels(4);
+	samples.set_samples_names(sasuke_sample_names);
+	samples.add_route(ALL_OUTPUTS, "mono", 0.12);
 
 	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
 	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
@@ -1086,7 +1090,7 @@ MACHINE_CONFIG_START(sasuke_sound_device::device_add_mconfig)
 	sn76477_3.set_envelope_params(1, 0);
 	sn76477_3.set_enable(1);
 	sn76477_3.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 void sasuke_sound_device::device_start()
 {
@@ -1165,16 +1169,17 @@ WRITE8_MEMBER(satansat_sound_device::sound_w)
 	}
 }
 
-MACHINE_CONFIG_START(satansat_sound_device::device_add_mconfig)
+void satansat_sound_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_custom, SNK6502_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(vanguard_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	samples_device &samples(SAMPLES(config, "samples"));
+	samples.set_channels(3);
+	samples.set_samples_names(vanguard_sample_names);
+	samples.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
 	// ???      GND: 2,26,27        +5V: 15,25
@@ -1192,7 +1197,7 @@ MACHINE_CONFIG_START(satansat_sound_device::device_add_mconfig)
 	sn76477_1.set_envelope_params(1, 1);
 	sn76477_1.set_enable(1);
 	sn76477_1.add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 void satansat_sound_device::device_start()
 {
