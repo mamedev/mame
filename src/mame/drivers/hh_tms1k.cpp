@@ -6121,19 +6121,19 @@ void bshipb_state::bshipb(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SN76477(config, m_sn);
-	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));
-	m_sn->set_decay_res(RES_M(3.3));
-	m_sn->set_attack_params(CAP_U(0.47), RES_K(15));
-	m_sn->set_amp_res(RES_K(100));
-	m_sn->set_feedback_res(RES_K(39));
-	m_sn->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270));
+	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));	// R18, R17, C8
+	m_sn->set_decay_res(RES_M(3.3));							// R16
+	m_sn->set_attack_params(CAP_U(0.47), RES_K(15));			// C7, R20
+	m_sn->set_amp_res(RES_K(100));								// R19
+	m_sn->set_feedback_res(RES_K(39));							// R7
+	m_sn->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270));	// R15/R14, C5, switchable R5/R3/R4
 	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(22), RES_K(750));
-	m_sn->set_oneshot_params(0, RES_INF);
-	m_sn->set_vco_mode(0);
-	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->set_envelope_params(1, 0);
-	m_sn->set_enable(0);
+	m_sn->set_slf_params(CAP_U(22), RES_K(750));	// switchable C4, switchable R13/R12
+	m_sn->set_oneshot_params(0, RES_INF);			// NC, switchable R11
+	m_sn->set_vco_mode(0);							// switchable
+	m_sn->set_mixer_params(0, 0, 0);				// switchable, GND, GND
+	m_sn->set_envelope_params(1, 0);				// Vreg, GND
+	m_sn->set_enable(0);							// switchable
 	m_sn->add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
