@@ -11,7 +11,7 @@
   - finish i/o ports
   - serial interface
   - buzzer envelope addition
-  - add mask options to MCFG (eg. buzzer on output port R4x is optional)
+  - add mask options for ports (eg. buzzer on output port R4x is optional)
 
 */
 

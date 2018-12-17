@@ -69,8 +69,8 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_maincpu(*this, "maincpu"),
-		m_sprite_xhigh_ignore_hack(true),
 		m_screen(*this, "screen"),
+		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
 		m_rom_dma_src(*this,"rom_dma_src"),
@@ -114,6 +114,7 @@ protected:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_device<xavix_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 private:
 
@@ -405,8 +406,6 @@ private:
 	DECLARE_WRITE8_MEMBER(mult_w);
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
-
-	required_device<screen_device> m_screen;
 
 	void update_irqs();
 	uint8_t m_irqsource;

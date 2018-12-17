@@ -506,9 +506,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2600_state::a2600)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
-	MCFG_M6502_DISABLE_CACHE()
-	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
+	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
+	m_maincpu->disable_cache();
+	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
 
 	/* video hardware */
 	TIA_NTSC_VIDEO(config, m_tia, 0, "tia");
@@ -516,10 +516,10 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	m_tia->databus_contents_callback().set(FUNC(a2600_state::a2600_get_databus_contents));
 	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
-	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-	MCFG_SCREEN_PALETTE("tia_video:palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
+	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -543,19 +543,19 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
+	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);
 
 	a2600_cartslot(config);
-	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(a2600_state::a2600p)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
-	MCFG_M6502_DISABLE_CACHE()
+	M6507(config, m_maincpu, MASTER_CLOCK_PAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
+	m_maincpu->disable_cache();
 
 	/* video hardware */
 	TIA_PAL_VIDEO(config, m_tia, 0, "tia");
@@ -563,10 +563,10 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	m_tia->databus_contents_callback().set(FUNC(a2600_state::a2600_get_databus_contents));
 	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback_pal));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
-	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-	MCFG_SCREEN_PALETTE("tia_video:palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
+	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -590,11 +590,11 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
+	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);
 
 	a2600_cartslot(config);
-	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
+	subdevice<software_list_device>("cart_list")->set_filter("PAL");
 MACHINE_CONFIG_END
 
 

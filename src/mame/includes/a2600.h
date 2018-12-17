@@ -73,14 +73,13 @@ protected:
 #else
 	required_device<riot6532_device> m_riot;
 #endif
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
+	required_device<screen_device> m_screen;
 
 private:
 	uint16_t m_current_screen_height;
 
-	required_device<vcs_control_port_device> m_joy1;
-	required_device<vcs_control_port_device> m_joy2;
-
-	required_device<screen_device> m_screen;
 	required_ioport m_swb;
 };
 

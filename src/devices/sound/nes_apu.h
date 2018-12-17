@@ -54,6 +54,8 @@ public:
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_mem_read_callback(Object &&cb) { return m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_irq_handler.bind(); }
+	auto mem_read() { return m_mem_read_cb.bind(); }
 
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
