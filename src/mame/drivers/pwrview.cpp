@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
@@ -419,7 +420,7 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	m_pit->set_clk<2>(XTAL(16'000'000)/16);
 
 	// floppy disk controller
-	UPD765A(config, "fdc", true, true); // Rockwell R7675P
+	UPD765A(config, "fdc", 8'000'000, true, true); // Rockwell R7675P
 	//fdc.intrq_wr_callback().set("pic1", FUNC(pic8259_device::ir6_w));
 	//fdc.drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -429,9 +430,9 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 
 	Z80SIO2(config, "sio", 4000000);
 
-	MCFG_DEVICE_ADD("crtc", HD6845, XTAL(64'000'000)/64) // clock unknown
-	MCFG_MC6845_CHAR_WIDTH(32) // ??
-	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
+	crtc.set_char_width(32);   /* ? */
+	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
 
 	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
 MACHINE_CONFIG_END

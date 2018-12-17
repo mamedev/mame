@@ -127,7 +127,7 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7
 
-	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750_device &te7750(TE7750(config, "te7750"));
 	te7750.ios_cb().set_constant(3);
 	te7750.in_port1_cb().set_ioport("IN1");
 	te7750.in_port2_cb().set_ioport("IN2");
@@ -143,19 +143,19 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("soundcpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag("soundcpu");
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gokidetor_state, ym_porta_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ymsnd.irq_handler().set_inputline("soundcpu", 0);
+	ymsnd.port_a_write_callback().set(FUNC(gokidetor_state::ym_porta_w));
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "cpu/m6502/n2a03.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/eepromser.h"
 #include "machine/i8257.h"
 #include "machine/latch8.h"
@@ -172,7 +173,7 @@ public:
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
+	optional_device<mcs48_cpu_device> m_soundcpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<n2a03_device> m_dev_n2a03a; /* dkong3 */
 	optional_device<n2a03_device> m_dev_n2a03b; /* dkong3 */

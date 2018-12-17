@@ -543,11 +543,11 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
 
 	/* Sound CPU */
-	MCFG_DEVICE_ADD("soundcpu", I8032, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sound_prg_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, eolith_state, sound_p1_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
+	I8032(config, m_soundcpu, XTAL(12'000'000));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
+	m_soundcpu->set_addrmap(AS_IO, &eolith_state::sound_io_map);
+	m_soundcpu->port_out_cb<1>().set(FUNC(eolith_state::sound_p1_w));
+	m_soundcpu->serial_tx_cb().set(FUNC(eolith_state::soundcpu_to_qs1000)); // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
@@ -576,8 +576,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", MCS51_INT0_LINE))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, MCS51_INT0_LINE);
 
 	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)

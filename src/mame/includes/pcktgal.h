@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_PCKTGAL_H
+#define MAME_INCLUDES_PCKTGAL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
@@ -9,21 +13,22 @@
 class pcktgal_state : public driver_device
 {
 public:
-	pcktgal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pcktgal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
-		m_tilegen1(*this, "tilegen1"),
+		m_tilegen(*this, "tilegen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
-	required_device<deco_bac06_device> m_tilegen1;
+	required_device<deco_bac06_device> m_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -53,3 +58,5 @@ public:
 	void pcktgal_map(address_map &map);
 	void pcktgal_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PCKTGAL_H

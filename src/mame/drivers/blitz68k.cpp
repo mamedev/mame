@@ -1801,11 +1801,12 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(22'118'400)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq1))
+	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
 	ramdac_config(config);
 
@@ -1832,11 +1833,12 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
 
@@ -1861,11 +1863,12 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq5))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq5));
 
 	ramdac_config(config);
 
@@ -1889,11 +1892,12 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(22'118'400)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
+	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
 
@@ -1919,11 +1923,12 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
 
@@ -1947,11 +1952,12 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(22'118'400)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq1))
+	H46505(config, m_crtc, XTAL(22'118'400)/8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
 	ramdac_config(config);
 
@@ -1980,11 +1986,12 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
-	MCFG_MC6845_ADD(m_crtc, H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, blitz68k_state, crtc_vsync_irq3))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
 

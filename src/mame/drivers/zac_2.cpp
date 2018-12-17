@@ -45,7 +45,7 @@ private:
 	uint8_t m_out_offs;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<6> m_row;
 	output_finder<78> m_digits;
@@ -211,22 +211,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	}
 }
 
-MACHINE_CONFIG_START(zac_2_state::zac_2)
+void zac_2_state::zac_2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, 6000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(zac_2_map)
-	MCFG_DEVICE_IO_MAP(zac_2_io)
-	MCFG_DEVICE_DATA_MAP(zac_2_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_2_state, serial_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_2_state, serial_w))
+	S2650(config, m_maincpu, 6000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zac_2_state::zac_2_map);
+	m_maincpu->set_addrmap(AS_IO, &zac_2_state::zac_2_io);
+	m_maincpu->set_addrmap(AS_DATA, &zac_2_state::zac_2_data);
+	m_maincpu->sense_handler().set(FUNC(zac_2_state::serial_r));
+	m_maincpu->flag_handler().set(FUNC(zac_2_state::serial_w));
 	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_inttimer", zac_2_state, zac_2_inttimer, attotime::from_hz(200))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_outtimer", zac_2_state, zac_2_outtimer, attotime::from_hz(187500))
+	TIMER(config, "zac_2_inttimer").configure_periodic(FUNC(zac_2_state::zac_2_inttimer), attotime::from_hz(200));
+	TIMER(config, "zac_2_outtimer").configure_periodic(FUNC(zac_2_state::zac_2_outtimer), attotime::from_hz(187500));
 
 	/* Video */
 	config.set_default_layout(layout_zac_2);
-MACHINE_CONFIG_END
+}
 
 /*--------------------------------
 / Black Belt (03/86)

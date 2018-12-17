@@ -3,6 +3,10 @@
 /*
     buggychl
 */
+#ifndef MAME_INCLUDES_BUGGYCHL_H
+#define MAME_INCLUDES_BUGGYCHL_H
+
+#pragma once
 
 #include "machine/taito68705interface.h"
 #include "machine/input_merger.h"
@@ -16,8 +20,8 @@
 class buggychl_state : public driver_device
 {
 public:
-	buggychl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	buggychl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_charram(*this, "charram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -106,3 +110,5 @@ private:
 	bool        m_sound_irq_enable;
 	uint8_t       m_sprite_lookup[0x2000];
 };
+
+#endif // MAME_INCLUDES_BUGGYCHL_H

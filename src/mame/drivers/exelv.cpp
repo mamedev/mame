@@ -85,7 +85,7 @@ public:
 	void exl100(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<tms7000_device> m_maincpu;
 	required_device<tms3556_device> m_tms3556;
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
@@ -484,21 +484,21 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 MACHINE_CONFIG_START(exelv_state::exl100)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS7020_EXL, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(tms7020_mem)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7020_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7020_portb_w))
+	TMS7020_EXL(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &exelv_state::tms7020_mem);
+	m_maincpu->in_porta().set(FUNC(exelv_state::tms7020_porta_r));
+	m_maincpu->out_portb().set(FUNC(exelv_state::tms7020_portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
-	MCFG_DEVICE_ADD("tms7041", TMS7041, XTAL(4'915'200))
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7041_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7041_portb_w))
-	MCFG_TMS7000_IN_PORTC_CB(READ8(*this, exelv_state, tms7041_portc_r))
-	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(*this, exelv_state, tms7041_portc_w))
-	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, exelv_state, tms7041_portd_r))
-	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, exelv_state, tms7041_portd_w))
+	tms7041_device &subcpu(TMS7041(config, "tms7041", XTAL(4'915'200)));
+	subcpu.in_porta().set(FUNC(exelv_state::tms7041_porta_r));
+	subcpu.out_portb().set(FUNC(exelv_state::tms7041_portb_w));
+	subcpu.in_portc().set(FUNC(exelv_state::tms7041_portc_r));
+	subcpu.out_portc().set(FUNC(exelv_state::tms7041_portc_w));
+	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
+	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -540,21 +540,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(exelv_state::exeltel)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS7040, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(tms7040_mem)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7020_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7020_portb_w))
+	TMS7040(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &exelv_state::tms7040_mem);
+	m_maincpu->in_porta().set(FUNC(exelv_state::tms7020_porta_r));
+	m_maincpu->out_portb().set(FUNC(exelv_state::tms7020_portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
-	MCFG_DEVICE_ADD("tms7042", TMS7042, XTAL(4'915'200))
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, exelv_state, tms7041_porta_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, exelv_state, tms7041_portb_w))
-	MCFG_TMS7000_IN_PORTC_CB(READ8(*this, exelv_state, tms7041_portc_r))
-	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(*this, exelv_state, tms7041_portc_w))
-	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, exelv_state, tms7041_portd_r))
-	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, exelv_state, tms7041_portd_w))
+	tms7042_device &subcpu(TMS7042(config, "tms7042", XTAL(4'915'200)));
+	subcpu.in_porta().set(FUNC(exelv_state::tms7041_porta_r));
+	subcpu.out_portb().set(FUNC(exelv_state::tms7041_portb_w));
+	subcpu.in_portc().set(FUNC(exelv_state::tms7041_portc_r));
+	subcpu.out_portc().set(FUNC(exelv_state::tms7041_portc_w));
+	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
+	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

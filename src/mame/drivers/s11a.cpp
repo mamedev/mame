@@ -261,9 +261,9 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	MCFG_DEVICE_PROGRAM_MAP(s11a_bg_map)
 
 	SPEAKER(config, "bg").front_center();
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, s11a_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	YM2151(config, m_ym, XTAL(3'579'545));
+	m_ym->irq_handler().set(FUNC(s11a_state::ym2151_irq_w));
+	m_ym->add_route(ALL_OUTPUTS, "bg", 0.50);
 
 	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 

@@ -99,7 +99,6 @@
 #include "includes/pcw.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
 #include "machine/upd765.h"
 // pcw/pcw16 beeper
@@ -937,7 +936,7 @@ void pcw_state::pcw_io(address_map &map)
 	map(0x0f6, 0x0f6).w(FUNC(pcw_state::pcw_pointer_table_top_scan_w));
 	map(0x0f7, 0x0f7).w(FUNC(pcw_state::pcw_vdu_video_control_register_w));
 	map(0x0f8, 0x0f8).rw(FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
-	map(0x0fc, 0x0fd).rw("printer_mcu", FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x0fc, 0x0fd).rw(m_printer_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 }
 
 
@@ -1219,101 +1218,93 @@ static void pcw_floppies(device_slot_interface &device)
 }
 
 /* PCW8256, PCW8512, PCW9256 */
-MACHINE_CONFIG_START(pcw_state::pcw)
+void pcw_state::pcw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pcw_map)
-	MCFG_DEVICE_IO_MAP(pcw_io)
+	Z80(config, m_maincpu, 4000000);       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcw_state::pcw_map);
+	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw_io);
 
-	MCFG_DEVICE_ADD("printer_mcu", I8041, 11000000)  // 11MHz
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, pcw_state, mcu_printer_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcw_state, mcu_printer_p2_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcw_state, mcu_printer_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, pcw_state, mcu_printer_p1_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcw_state, mcu_printer_t1_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, pcw_state, mcu_printer_t0_r))
+	I8041(config, m_printer_mcu, 11000000);  // 11MHz
+	m_printer_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_printer_p2_r));
+	m_printer_mcu->p2_out_cb().set(FUNC(pcw_state::mcu_printer_p2_w));
+	m_printer_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_printer_p1_r));
+	m_printer_mcu->p1_out_cb().set(FUNC(pcw_state::mcu_printer_p1_w));
+	m_printer_mcu->t1_in_cb().set(FUNC(pcw_state::mcu_printer_t1_r));
+	m_printer_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_printer_t0_r));
 
-	MCFG_DEVICE_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcw_state, mcu_kb_scan_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, pcw_state, mcu_kb_scan_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, pcw_state, mcu_kb_scan_high_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcw_state, mcu_kb_scan_high_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcw_state, mcu_kb_t1_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, pcw_state, mcu_kb_t0_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, pcw_state, mcu_kb_data_r))
+	I8048(config, m_keyboard_mcu, 5000000); // 5MHz
+	m_keyboard_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_kb_scan_r));
+	m_keyboard_mcu->p1_out_cb().set(FUNC(pcw_state::mcu_kb_scan_w));
+	m_keyboard_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_kb_scan_high_r));
+	m_keyboard_mcu->p2_out_cb().set(FUNC(pcw_state::mcu_kb_scan_high_w));
+	m_keyboard_mcu->t1_in_cb().set(FUNC(pcw_state::mcu_kb_t1_r));
+	m_keyboard_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_kb_t0_r));
+	m_keyboard_mcu->bus_in_cb().set(FUNC(pcw_state::mcu_kb_data_r));
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(50))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT);
+	m_screen->set_visarea(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1);
+	m_screen->set_screen_update(FUNC(pcw_state::screen_update_pcw));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", PCW_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(pcw_state, pcw)
+	PALETTE(config, m_palette, PCW_NUM_COLOURS);
+	m_palette->set_init(palette_init_delegate(FUNC(pcw_state::palette_init_pcw), this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 4'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw_state::pcw_fdc_interrupt));
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
+	SOFTWARE_LIST(config, "disk_list").set_original("pcw");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("256K");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pcw_timer", pcw_state, pcw_timer_interrupt, attotime::from_hz(300))
-MACHINE_CONFIG_END
+	TIMER(config, "pcw_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(pcw_state::pcw_timer_interrupt), this), attotime::from_hz(300));
+}
 
-MACHINE_CONFIG_START(pcw_state::pcw8256)
+void pcw_state::pcw8256(machine_config &config)
+{
 	pcw(config);
-	MCFG_SCREEN_ADD("printer",RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
-	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	printer.set_refresh_hz(50);
+	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
+	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
+	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
+	printer.set_palette(m_palette);
 
 	config.set_default_layout(layout_pcw);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pcw_state::pcw8512)
-	pcw(config);
-	MCFG_SCREEN_ADD("printer",RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
-	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
-	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_pcw);
+void pcw_state::pcw8512(machine_config &config)
+{
+	pcw8256(config);
 
 	/* internal ram */
 	m_ram->set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
 /* PCW9512, PCW9512+, PCW10 */
-MACHINE_CONFIG_START(pcw_state::pcw9512)
+void pcw_state::pcw9512(machine_config &config)
+{
 	pcw(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_IO_MAP(pcw9512_io)
+	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);
 
 	/* internal ram */
 	m_ram->set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

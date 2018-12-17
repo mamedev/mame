@@ -488,8 +488,8 @@ MACHINE_CONFIG_START(acommand_state::acommand)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("bgtmap", "palette", 0x0f00)
-	MCFG_MEGASYS1_TILEMAP_ADD("txtmap", "palette", 0x2700)
+	MEGASYS1_TILEMAP(config, m_bgtmap, m_palette, 0x0f00);
+	MEGASYS1_TILEMAP(config, m_txtmap, m_palette, 0x2700);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

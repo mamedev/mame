@@ -135,6 +135,7 @@
 #include "cpu/m68000/m68000.h"
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/ncr539x.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"

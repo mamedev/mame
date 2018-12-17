@@ -564,8 +564,8 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
 
-	MCFG_DECO146_ADD(m_deco146)
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+	DECO146PROT(config, m_deco146, 0);
+	m_deco146->set_use_magic_read_address_xor(true);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

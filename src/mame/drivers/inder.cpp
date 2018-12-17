@@ -1389,8 +1389,7 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, XTAL(4'000'000) / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	AY8910(config, "ay", XTAL(4'000'000) / 2).add_route(ALL_OUTPUTS, "ayvol", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::lapbylap)
@@ -1410,11 +1409,10 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, inder_state, sndcmd_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	AY8910(config, "ay1", XTAL(2'000'000)).add_route(ALL_OUTPUTS, "ayvol", 1.0); // same xtal that drives subcpu
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(2'000'000))); // same xtal that drives subcpu
+	ay2.port_a_read_callback().set(FUNC(inder_state::sndcmd_r));
+	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::inder)

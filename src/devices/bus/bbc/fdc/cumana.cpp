@@ -106,7 +106,6 @@ bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device
 	m_fdc(*this, "mb8877a"),
 	m_floppy0(*this, "mb8877a:0"),
 	m_floppy1(*this, "mb8877a:1"),
-	m_dfs_rom(*this, "dfs_rom"),
 	m_drive_control(0)
 {
 }
@@ -131,15 +130,6 @@ bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char
 void bbc_cumanafdc_device::device_start()
 {
 	save_item(NAME(m_drive_control));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_cumanafdc_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
 }
 
 

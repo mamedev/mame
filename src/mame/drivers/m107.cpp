@@ -30,7 +30,6 @@ confirmed for m107 games as well.
 #include "includes/iremipt.h"
 
 #include "cpu/nec/nec.h"
-#include "cpu/nec/v25.h"
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
@@ -730,94 +729,89 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-MACHINE_CONFIG_START(m107_state::firebarr)
-
+void m107_state::firebarr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
-	MCFG_DEVICE_PROGRAM_MAP(firebarr_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+	V33(config, m_maincpu, XTAL(28'000'000)/2);    /* NEC V33, 28MHz clock */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m107_state::firebarr_map);
+	m_maincpu->set_addrmap(AS_IO, &m107_state::main_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("soundcpu", V35, XTAL(14'318'181))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_V25_CONFIG(rtypeleo_decryption_table)
+	V35(config, m_soundcpu, XTAL(14'318'181));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m107_state::sound_map);
+	m_soundcpu->set_decryption_table(rtypeleo_decryption_table);
 
 	PIC8259(config, m_upd71059c, 0);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(m107_state::scanline_interrupt), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
-	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(80, 511-112, 8, 247); /* 320 x 240 */
+	m_screen->set_screen_update(FUNC(m107_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firebarr)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firebarr);
+	PALETTE(config, m_palette, 2048).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP1);
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(m_upd71059c, pic8259_device, ir3_w))
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP0);
+	ymsnd.add_route(0, "lspeaker", 0.40);
+	ymsnd.add_route(1, "rspeaker", 0.40);
 
 	iremga20_device &ga20(IREMGA20(config, "irem", XTAL(14'318'181)/4));
 	ga20.add_route(0, "lspeaker", 1.0);
 	ga20.add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(m107_state::dsoccr94)
+void m107_state::dsoccr94(machine_config &config)
+{
 	firebarr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
-	MCFG_DEVICE_PROGRAM_MAP(dsoccr94_map)
-	MCFG_DEVICE_IO_MAP(dsoccr94_io_map)
+	m_maincpu->set_clock(20000000/2);  /* NEC V33, Could be 28MHz clock? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m107_state::dsoccr94_map);
+	m_maincpu->set_addrmap(AS_IO, &m107_state::dsoccr94_io_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(dsoccr94_decryption_table)
+	m_soundcpu->set_decryption_table(dsoccr94_decryption_table);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_m107)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_m107);
+}
 
 
-MACHINE_CONFIG_START(m107_state::wpksoc)
+void m107_state::wpksoc(machine_config &config)
+{
 	firebarr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wpksoc_map)
-	MCFG_DEVICE_IO_MAP(wpksoc_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m107_state::wpksoc_map);
+	m_maincpu->set_addrmap(AS_IO, &m107_state::wpksoc_io_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(leagueman_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(leagueman_decryption_table);
+}
 
-MACHINE_CONFIG_START(m107_state::airass)
+void m107_state::airass(machine_config &config)
+{
 	firebarr(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_m107)
+	m_gfxdecode->set_info(gfx_m107);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(gunforce_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(gunforce_decryption_table);
+}
 
 /***************************************************************************/
 

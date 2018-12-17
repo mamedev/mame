@@ -75,6 +75,7 @@
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/atarimo.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -97,7 +98,7 @@ void sparkz_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		scanline_int_gen(*m_maincpu);
+		scanline_int_write_line(1);
 }
 
 
@@ -351,12 +352,13 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(arcadecl_state::arcadecl)
+void arcadecl_state::arcadecl(machine_config &config)
+{
 	sparkz(config);
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
-MACHINE_CONFIG_END
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, arcadecl_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+}
 
 
 

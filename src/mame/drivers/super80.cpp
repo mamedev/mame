@@ -817,10 +817,11 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(SUPER80V_DOTS)
-	MCFG_MC6845_UPDATE_ROW_CB(super80_state, crtc_update_row)
+	MC6845(config, m_crtc, MASTER_CLOCK / SUPER80V_DOTS);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(SUPER80V_DOTS);
+	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row), this);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80v)
 	config.set_default_layout(layout_super80);

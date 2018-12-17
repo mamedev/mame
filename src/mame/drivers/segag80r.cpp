@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(segag80r_state::pignewt)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	MCFG_SEGAUSB_ADD("usbsnd", "maincpu")
+	SEGAUSB(config, m_usbsnd, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -973,9 +973,9 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	MCFG_DEVICE_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(sindbadm_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
+	Z80(config, m_audiocpu, SINDBADM_SOUND_CLOCK/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &segag80r_state::sindbadm_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(segag80r_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */

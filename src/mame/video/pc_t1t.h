@@ -116,9 +116,6 @@ private:
 
 DECLARE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device)
 
-#define MCFG_PCVIDEO_T1000_ADD(_tag) \
-		MCFG_DEVICE_ADD(_tag, PCVIDEO_T1000, 0)
-
 class pcvideo_pcjr_device :  public pc_t1t_device
 {
 public:

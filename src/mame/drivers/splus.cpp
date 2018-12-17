@@ -134,8 +134,8 @@ private:
 	required_ioport m_i20;
 	required_ioport m_i30;
 	required_ioport m_sensor;
-	required_device<cpu_device> m_maincpu;
-	required_device<i2cmem_device> m_i2cmem;
+	required_device<i80c32_device> m_maincpu;
+	required_device<x2404p_device> m_i2cmem;
 	output_finder<9> m_digits;
 	output_finder<5,8> m_leds;
 };
@@ -677,34 +677,36 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I80C32, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(splus_map)
-	MCFG_DEVICE_IO_MAP(splus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, splus_state, splus_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
+void splus_state::splus(machine_config &config) // basic machine hardware
+{
+	I80C32(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &splus_state::splus_map);
+	m_maincpu->set_addrmap(AS_IO, &splus_state::splus_iomap);
+	m_maincpu->port_out_cb<1>().set(FUNC(splus_state::splus_p1_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(splus_state::splus_p3_r));
 
 	// Fill NVRAM
 	NVRAM(config, "cmosl", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "cmosh", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware (ALL FAKE, NO VIDEO)
-	MCFG_PALETTE_ADD("palette", 16*16)
-	MCFG_SCREEN_ADD("scrn", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(splus_state, screen_update)
-	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	PALETTE(config, "palette", 16*16);
 
-	MCFG_X2404P_ADD("i2cmem")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(splus_state::screen_update));
+	screen.set_size((52+1)*8, (31+1)*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);
+	screen.set_palette("palette");
+
+	X2404P(config, m_i2cmem);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	AY8912(config, "aysnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
-MACHINE_CONFIG_END
+}
 
 /*************************
 *        Rom Load        *

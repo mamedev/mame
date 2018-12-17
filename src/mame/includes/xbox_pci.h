@@ -87,7 +87,7 @@ class mcpx_smbus_device : public pci_device {
 public:
 	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
+	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
 	DECLARE_READ32_MEMBER(smbus_r);
 	DECLARE_WRITE32_MEMBER(smbus_w);
@@ -115,9 +115,6 @@ private:
 
 DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)
 
-#define MCFG_MCPX_SMBUS_INTERRUPT_HANDLER(_devcb) \
-	downcast<mcpx_smbus_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
-
 /*
  * OHCI USB Controller
  */
@@ -128,7 +125,7 @@ public:
 	void set_hack_callback(std::function<void(void)> hack) { hack_callback = hack; }
 	void plug_usb_device(int port, ohci_function *function);
 
-	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
+	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
 	DECLARE_READ32_MEMBER(ohci_r);
 	DECLARE_WRITE32_MEMBER(ohci_w);
@@ -154,9 +151,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
-
-#define MCFG_MCPX_OHCI_INTERRUPT_HANDLER(_devcb) \
-	downcast<mcpx_ohci_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 /*
  * Ethernet
@@ -284,7 +278,7 @@ class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
+	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -299,8 +293,6 @@ private:
 
 DECLARE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device)
 
-#define MCFG_MCPX_IDE_INTERRUPT_HANDLER(_devcb) \
-	downcast<mcpx_ide_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 /*
  * AGP Bridge
@@ -328,11 +320,17 @@ DECLARE_DEVICE_TYPE(NV2A_AGP, nv2a_agp_device)
 
 class nv2a_gpu_device : public pci_device {
 public:
+	template <typename T>
+	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: nv2a_gpu_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
 	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 	nv2a_renderer *debug_get_renderer() { return nvidia_nv2a; }
 
-	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
+	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
 	DECLARE_READ32_MEMBER(geforce_r);
 	DECLARE_WRITE32_MEMBER(geforce_w);
@@ -353,10 +351,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device)
-
-#define MCFG_MCPX_NV2A_GPU_CPU(_cpu_tag) \
-	downcast<nv2a_gpu_device *>(device)->set_cpu_tag(_cpu_tag);
-#define MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(_devcb) \
-	downcast<nv2a_gpu_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
 
 #endif // MAME_INCLUDES_XBOX_PCI_H

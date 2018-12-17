@@ -56,7 +56,7 @@ static void compis_floppies(device_slot_interface &device)
 
 void compis_fdc_device::device_add_mconfig(machine_config &config)
 {
-	I8272A(config, m_fdc, true);
+	I8272A(config, m_fdc, 8'000'000, true);
 	m_fdc->intrq_wr_callback().set(FUNC(compis_fdc_device::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(compis_fdc_device::fdc_drq));
 	FLOPPY_CONNECTOR(config, m_floppy0, compis_floppies, "525qd", compis_fdc_device::floppy_formats);

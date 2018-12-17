@@ -574,8 +574,8 @@ MACHINE_CONFIG_START(okean240_state::okean240)
 	MCFG_DEVICE_REMOVE("uart")
 	MCFG_DEVICE_REMOVE("rs232")
 	subdevice<pit8253_device>("pit")->out_handler<1>().set_nop();
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(okean240_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(okean240_state::kbd_put));
 MACHINE_CONFIG_END
 
 /* ROM definition */

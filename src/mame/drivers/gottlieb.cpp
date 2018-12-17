@@ -1780,24 +1780,21 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(gottlieb_state::gottlieb1)
+void gottlieb_state::gottlieb1(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::gottlieb2)
+void gottlieb_state::gottlieb2(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 MACHINE_CONFIG_START(gottlieb_state::g2laser)
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))
@@ -1820,11 +1817,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-MACHINE_CONFIG_START(gottlieb_state::gottlieb1_votrax)
+void gottlieb_state::gottlieb1_votrax(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 MACHINE_CONFIG_START(gottlieb_state::reactor)
@@ -1859,9 +1856,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::cobram3)
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
-	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_r2_sound->enable_cobram3_mods();
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))

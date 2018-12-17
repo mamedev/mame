@@ -99,6 +99,7 @@
 #include "includes/nc.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/mc146818.h"   // for NC200 real time clock
 #include "machine/rp5c01.h"     // for NC100 real time clock
 #include "formats/pc_dsk.h"     // for NC200 disk image
@@ -1482,7 +1483,7 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
 	m_uart->txrdy_handler().set(FUNC(nc200_state::nc200_txrdy_callback));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)

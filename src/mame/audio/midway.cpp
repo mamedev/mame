@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    midway.c
+    midway.cpp
 
     Functions to emulate general the various Midway sound cards.
 
@@ -420,12 +420,12 @@ void midway_ssio_device::device_add_mconfig(machine_config &config)
 	AY8910(config, m_ay0, DERIVED_CLOCK(1, 2*4));
 	m_ay0->port_a_write_callback().set(FUNC(midway_ssio_device::porta0_w));
 	m_ay0->port_b_write_callback().set(FUNC(midway_ssio_device::portb0_w));
-	m_ay0->add_route(ALL_OUTPUTS, *this, 0.33, 0);
+	m_ay0->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 0);
 
 	AY8910(config, m_ay1, DERIVED_CLOCK(1, 2*4));
 	m_ay1->port_a_write_callback().set(FUNC(midway_ssio_device::porta1_w));
 	m_ay1->port_b_write_callback().set(FUNC(midway_ssio_device::portb1_w));
-	m_ay1->add_route(ALL_OUTPUTS, *this, 0.33, 1);
+	m_ay1->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 1);
 }
 
 

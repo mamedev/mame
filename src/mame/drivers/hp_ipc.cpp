@@ -366,6 +366,7 @@ Software to look for
 #include "bus/hp_hil/hil_devices.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/hp_ipc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/mm58167.h"
 #include "machine/ram.h"

@@ -283,19 +283,22 @@ static GFXDECODE_START( gfx_osborne1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(osborne1_state::osborne1)
-	MCFG_DEVICE_ADD(m_maincpu, Z80, MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(osborne1_mem)
-	MCFG_DEVICE_OPCODES_MAP(osborne1_op)
-	MCFG_DEVICE_IO_MAP(osborne1_io)
-	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(*this, osborne1_state, irqack_w))
+void osborne1_state::osborne1(machine_config &config)
+{
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &osborne1_state::osborne1_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &osborne1_state::osborne1_op);
+	m_maincpu->set_addrmap(AS_IO, &osborne1_state::osborne1_io);
+	m_maincpu->irqack_cb().set(FUNC(osborne1_state::irqack_w));
 
-	MCFG_SCREEN_ADD_MONOCHROME(m_screen, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_osborne1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_screen_update(FUNC(osborne1_state::screen_update));
+	m_screen->set_raw(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10);
+	m_screen->set_palette("palette");
+
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_osborne1);
+	PALETTE(config, "palette", 3).set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
@@ -310,8 +313,8 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	m_pia0->cb2_handler().set(m_ieee, FUNC(ieee488_device::host_ren_w));
 	m_pia0->irqa_handler().set(FUNC(osborne1_state::ieee_pia_irq_a_func));
 
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_pia0, pia6821_device, ca2_w))
+	IEEE488(config, m_ieee, 0);
+	m_ieee->srq_callback().set(m_pia0, FUNC(pia6821_device::ca2_w));
 
 	PIA6821(config, m_pia1);
 	m_pia1->writepa_handler().set(FUNC(osborne1_state::video_pia_port_a_w));
@@ -332,30 +335,30 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 
 	MB8877(config, m_fdc, MAIN_CLOCK/16);
 	m_fdc->set_force_ready(true);
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("68K"); // 64kB main RAM and 4kbit video attribute RAM
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("osborne1");
+}
 
-MACHINE_CONFIG_START(osborne1nv_state::osborne1nv)
+void osborne1nv_state::osborne1nv(machine_config &config)
+{
 	osborne1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(osborne1nv_io)
+	m_maincpu->set_addrmap(AS_IO, &osborne1nv_state::osborne1nv_io);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_NO_PALETTE
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	m_screen->set_palette(finder_base::DUMMY_TAG);
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(12'288'000)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(osborne1nv_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(osborne1nv_state, crtc_update_addr_changed)
-MACHINE_CONFIG_END
+	sy6545_1_device &crtc(SY6545_1(config, "crtc", XTAL(12'288'000)/8));
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(osborne1nv_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(osborne1nv_state::crtc_update_addr_changed), this);
+}
 
 
 ROM_START( osborne1 )

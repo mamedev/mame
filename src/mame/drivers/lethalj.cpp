@@ -634,12 +634,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(lethalj_state::gameroom)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lethalj_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(lethalj_state, scanline_update)     /* scanline updater (indexed16) */
+	TMS34010(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lethalj_state::lethalj_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_ind16_callback(FUNC(lethalj_state::scanline_update));
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
@@ -668,8 +668,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lethalj_state::lethalj)
 	gameroom(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK_LETHALJ);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)

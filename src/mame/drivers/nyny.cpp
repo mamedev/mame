@@ -617,12 +617,13 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(nyny_state, crtc_update_row)
-	MCFG_MC6845_END_UPDATE_CB(nyny_state, crtc_end_update)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic48_1", ttl74123_device, a_w))
+	H46505(config, m_mc6845, CRTC_CLOCK);
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(nyny_state::crtc_update_row), this);
+	m_mc6845->set_end_update_callback(FUNC(nyny_state::crtc_end_update), this);
+	m_mc6845->out_de_callback().set(m_ic48_1, FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */
 	TTL74123(config, m_ic48_1, 0);
@@ -650,22 +651,21 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch3);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nyny_state, nyny_ay8910_37_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", AUDIO_CPU_1_CLOCK));
+	ay1.port_a_write_callback().set(FUNC(nyny_state::nyny_ay8910_37_port_a_w));
+	ay1.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", AUDIO_CPU_1_CLOCK));
+	ay2.port_a_read_callback().set_ioport("SW2");
+	ay2.port_b_read_callback().set_ioport("SW1");
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
+	AY8910(config, "ay3", AUDIO_CPU_2_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

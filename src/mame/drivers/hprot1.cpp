@@ -88,7 +88,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -245,12 +245,12 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 
 MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
-	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hprot1_state, henry_p1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hprot1_state, henry_p3_w))
+	I80C31(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
+	m_maincpu->port_in_cb<1>().set_ioport("inputs");
+	m_maincpu->port_out_cb<1>().set(FUNC(hprot1_state::henry_p1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(hprot1_state::henry_p3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

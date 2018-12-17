@@ -476,16 +476,13 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); /* unknown clock / divider, hand-tuned to match audio reference */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mightguy_state::mightguy)
@@ -500,8 +497,8 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(mightguy_audio_io_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
-	MCFG_NB1412M2_DAC_CB(WRITE8("dac", dac_byte_interface, data_w))
+	NB1412M2(config, m_prot, XTAL(8'000'000)/2); // divided by 2 maybe
+	m_prot->dac_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -520,7 +517,7 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

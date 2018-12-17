@@ -210,7 +210,7 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this))
+	, m_space_config("gp9001vdp", ENDIANNESS_BIG, 16, 14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this))
 	, m_vram(*this, "vram_%u", 0)
 	, m_spriteram(*this, "spriteram")
 	, m_vint_out_cb(*this)
@@ -241,6 +241,16 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_tile_info)
 	//tileinfo.category = (attrib & 0x0f00) >> 8;
 }
 
+//-------------------------------------------------
+//  device_add_mconfig - device-specific machine
+//  configuration addiitons
+//-------------------------------------------------
+
+void gp9001vdp_device::device_add_mconfig(machine_config &config)
+{
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+}
+
 void gp9001vdp_device::create_tilemaps()
 {
 	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
@@ -255,15 +265,11 @@ void gp9001vdp_device::create_tilemaps()
 
 void gp9001vdp_device::device_start()
 {
-	m_sp.vram16_buffer = make_unique_clear<uint16_t[]>(SPRITERAM_SIZE/2);
-
 	create_tilemaps();
 
 	m_vint_out_cb.resolve();
 
 	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
-
-	save_pointer(NAME(m_sp.vram16_buffer), SPRITERAM_SIZE/2);
 
 	save_item(NAME(m_scroll_reg));
 	save_item(NAME(m_voffs));
@@ -613,12 +619,10 @@ READ_LINE_MEMBER(gp9001vdp_device::fblank_r)
 
 void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap )
 {
-	uint16_t *source;
+	uint16_t const *source = (m_sp.use_sprite_buffer) ? m_spriteram->buffer() : m_spriteram->live();
 
-	if (m_sp.use_sprite_buffer) source = m_sp.vram16_buffer.get();
-	else source = &m_spriteram[0];
-	int total_elements = gfx(1)->elements();
-	int total_colors = gfx(1)->colors();
+	int const total_elements = gfx(1)->elements();
+	int const total_colors = gfx(1)->colors();
 
 	int old_x = (-(m_sp.scrollx)) & 0x1ff;
 	int old_y = (-(m_sp.scrolly)) & 0x1ff;
@@ -630,7 +634,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 		int bank, sprite_num;
 
 		attrib = source[offs];
-		priority = primap[(attrib>>8) & GP9001_PRIMASK]+1;
+		priority = primap[(attrib >> 8) & GP9001_PRIMASK] + 1;
 
 		if ((attrib & 0x8000))
 		{
@@ -642,7 +646,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				sprite_num = source[offs + 1] & 0x7fff;
 				bank = ((attrib & 3) << 1) | (source[offs + 1] >> 15);
-				sprite = (m_gfxrom_bank[bank] << 15 ) | sprite_num;
+				sprite = (m_gfxrom_bank[bank] << 15) | sprite_num;
 			}
 			color = (attrib >> 2) & 0x3f;
 
@@ -721,7 +725,6 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 					color %= total_colors;
 					const pen_t *paldata = &palette().pen(color * 16);
 					{
-						int yy, xx;
 						const uint8_t* srcdata = gfx(1)->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
@@ -753,13 +756,13 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 							xinc = 1;
 						}
 
-						for (yy=ystart;yy!=yend;yy+=yinc)
+						for (int yy = ystart; yy != yend; yy += yinc)
 						{
-							int drawyy = yy+sy;
+							int drawyy = yy + sy;
 
-							for (xx=xstart;xx!=xend;xx+=xinc)
+							for (int xx = xstart; xx != xend; xx += xinc)
 							{
-								int drawxx = xx+sx;
+								int drawxx = xx + sx;
 
 								if (cliprect.contains(drawxx, drawyy))
 								{
@@ -796,12 +799,9 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-void gp9001vdp_device::draw_custom_tilemap( bitmap_ind16 &bitmap, int layer, const uint8_t* priremap, const uint8_t* pri_enable )
+void gp9001vdp_device::draw_custom_tilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, const uint8_t* priremap, const uint8_t* pri_enable )
 {
 	tilemap_t* tilemap = m_tm[layer].tmap;
-	int width = screen().width();
-	int height = screen().height();
-	int y,x;
 	bitmap_ind16 &tmb = tilemap->pixmap();
 	uint16_t* srcptr;
 	uint16_t* dstptr;
@@ -810,27 +810,27 @@ void gp9001vdp_device::draw_custom_tilemap( bitmap_ind16 &bitmap, int layer, con
 	int scrollx = tilemap->scrollx(0);
 	int scrolly = tilemap->scrolly(0);
 
-	for (y=0;y<height;y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		int realy = (y+scrolly)&0x1ff;
+		int realy = (y + scrolly) & 0x1ff;
 
 		srcptr = &tmb.pix16(realy);
 		dstptr = &bitmap.pix16(y);
 		dstpriptr = &this->custom_priority_bitmap->pix8(y);
 
-		for (x=0;x<width;x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			int realx = (x+scrollx)&0x1ff;
+			int realx = (x + scrollx) & 0x1ff;
 
 			uint16_t pixdat = srcptr[realx];
-			uint8_t pixpri = ((pixdat>>12) & GP9001_PRIMASK_TMAPS);
+			uint8_t pixpri = ((pixdat >> 12) & GP9001_PRIMASK_TMAPS);
 
 			if (pri_enable[pixpri])
 			{
-				pixpri = priremap[pixpri]+1; // priority of 0 isn't desireable
-				pixdat &=0x07ff;
+				pixpri = priremap[pixpri] + 1; // priority of 0 isn't desireable
+				pixdat &= 0x07ff;
 
-				if (pixdat&0xf)
+				if (pixdat & 0xf)
 				{
 					if (pixpri >= dstpriptr[x])
 					{
@@ -860,17 +860,17 @@ void gp9001vdp_device::render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprec
 		m_gfxrom_bank_dirty = false;
 	}
 
-	draw_custom_tilemap(bitmap, 0, gp9001_primap1, batsugun_prienable0);
-	draw_custom_tilemap(bitmap, 1, gp9001_primap1, batsugun_prienable0);
-	draw_custom_tilemap(bitmap, 2, gp9001_primap1, batsugun_prienable0);
-	draw_sprites(bitmap,cliprect, gp9001_sprprimap1);
+	draw_custom_tilemap(bitmap, cliprect, 0, gp9001_primap1, batsugun_prienable0);
+	draw_custom_tilemap(bitmap, cliprect, 1, gp9001_primap1, batsugun_prienable0);
+	draw_custom_tilemap(bitmap, cliprect, 2, gp9001_primap1, batsugun_prienable0);
+	draw_sprites(bitmap, cliprect, gp9001_sprprimap1);
 }
 
 
 void gp9001vdp_device::screen_eof(void)
 {
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
-	if (m_sp.use_sprite_buffer) memcpy(m_sp.vram16_buffer.get(),m_spriteram,SPRITERAM_SIZE);
+	if (m_sp.use_sprite_buffer) m_spriteram->copy();
 
 	// the IRQ appears to fire at line 0xe6
 	if (!m_vint_out_cb.isnull())

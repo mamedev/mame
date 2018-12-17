@@ -141,3 +141,4 @@ ROM_START(ti931)
 ROM_END
 
 COMP(1983, ti931, 0, 0, ti931, ti931, ti931_state, empty_init, "Texas Instruments", "Model 931 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+

@@ -103,6 +103,7 @@ class upd7759_device : public upd775x_device
 {
 public:
 	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drqcallback.set_callback(std::forward<Object>(cb)); }
+	auto drq() { return m_drqcallback.bind(); }
 
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 

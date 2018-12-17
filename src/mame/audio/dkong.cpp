@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "includes/dkong.h"
 
-#include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 #include "speaker.h"
 
@@ -1338,16 +1337,16 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	m_dev_vp2->read_cb<5>().set(m_dev_6h, FUNC(latch8_device::bit3_r));
 	m_dev_vp2->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_DISCHARGE_INV>));
 
-	MCFG_DEVICE_ADD("soundcpu", MB8884, I8035_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dkong_sound_map)
-	MCFG_DEVICE_IO_MAP(dkong_sound_io_map)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, dkong_state, dkong_tune_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, dkong_state, dkong_voice_w))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dkong_state, dkong_p1_w)) // only write to dac
-	MCFG_MCS48_PORT_P2_IN_CB(READ8("virtual_p2", latch8_device, read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8("virtual_p2", latch8_device, write))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE("ls259.6h", latch8_device, bit5_q_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE("ls259.6h", latch8_device, bit4_q_r))
+	MB8884(config, m_soundcpu, I8035_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &dkong_state::dkong_sound_io_map);
+	m_soundcpu->bus_in_cb().set(FUNC(dkong_state::dkong_tune_r));
+	m_soundcpu->bus_out_cb().set(FUNC(dkong_state::dkong_voice_w));
+	m_soundcpu->p1_out_cb().set(FUNC(dkong_state::dkong_p1_w)); // only write to dac
+	m_soundcpu->p2_in_cb().set("virtual_p2", FUNC(latch8_device::read));
+	m_soundcpu->p2_out_cb().set("virtual_p2", FUNC(latch8_device::write));
+	m_soundcpu->t0_in_cb().set("ls259.6h", FUNC(latch8_device::bit5_q_r));
+	m_soundcpu->t1_in_cb().set("ls259.6h", FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("discrete", DISCRETE, dkong2b_discrete)
@@ -1365,11 +1364,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
 	radarscp_audio(config);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IO_MAP(radarscp1_sound_io_map)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8("virtual_p1", latch8_device, read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dkong_state, m58817_command_w))
-	MCFG_MCS48_PORT_P2_IN_CB(CONSTANT(0))
+	m_soundcpu->set_addrmap(AS_IO, &dkong_state::radarscp1_sound_io_map);
+	m_soundcpu->p1_in_cb().set("virtual_p1", FUNC(latch8_device::read));
+	m_soundcpu->p1_out_cb().set(FUNC(dkong_state::m58817_command_w));
+	m_soundcpu->p2_in_cb().set_constant(0);
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	latch8_device &vp1(LATCH8(config, "virtual_p1"));   /* virtual latch for port A */
@@ -1412,14 +1410,14 @@ MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
 	m_dev_vp2->read_cb<4>().set(m_dev_6h, FUNC(latch8_device::bit6_r));
 	m_dev_vp2->write_cb<7>().set("discrete", FUNC(discrete_device::write_line<DS_DISCHARGE_INV>));
 
-	MCFG_DEVICE_ADD("soundcpu", MB8884, I8035_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dkong_sound_map)
-	MCFG_DEVICE_IO_MAP(dkongjr_sound_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dkong_state, dkong_p1_w)) // only write to dac
-	MCFG_MCS48_PORT_P2_IN_CB(READ8("virtual_p2", latch8_device, read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8("virtual_p2", latch8_device, write))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE("ls259.6h", latch8_device, bit5_q_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE("ls259.6h", latch8_device, bit4_q_r))
+	MB8884(config, m_soundcpu, I8035_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &dkong_state::dkongjr_sound_io_map);
+	m_soundcpu->p1_out_cb().set(FUNC(dkong_state::dkong_p1_w)); // only write to dac
+	m_soundcpu->p2_in_cb().set("virtual_p2", FUNC(latch8_device::read));
+	m_soundcpu->p2_out_cb().set("virtual_p2", FUNC(latch8_device::write));
+	m_soundcpu->t0_in_cb().set("ls259.6h", FUNC(latch8_device::bit5_q_r));
+	m_soundcpu->t1_in_cb().set("ls259.6h", FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
 

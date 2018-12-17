@@ -2118,7 +2118,7 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
-	MCFG_SCREEN_VISIBLE_AREA_ANTIC()
+	MCFG_SCREEN_VISIBLE_AREA(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y)
 	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2163,12 +2163,12 @@ MACHINE_CONFIG_START(a400_state::atari_common)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("48K");
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_READ_CB(IOPORT("console"))
-	MCFG_GTIA_WRITE_CB(WRITE8(*this, a400_state, gtia_cb))
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->read_callback().set_ioport("console");
+	m_gtia->write_callback().set(FUNC(a400_state::gtia_cb));
 
-	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
-	MCFG_ANTIC_GTIA("gtia")
+	ATARI_ANTIC(config, m_antic, 0);
+	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
 	MCFG_DEVICE_ADD("fdc", ATARI_FDC, 0)
@@ -2193,11 +2193,10 @@ MACHINE_CONFIG_START(a400_state::a400)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	m_gtia->set_region(GTIA_NTSC);
 MACHINE_CONFIG_END
 
 
@@ -2212,11 +2211,10 @@ MACHINE_CONFIG_START(a400_state::a400pal)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
-	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_50HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ)
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_PAL)
+	m_gtia->set_region(GTIA_PAL);
 MACHINE_CONFIG_END
 
 
@@ -2231,11 +2229,10 @@ MACHINE_CONFIG_START(a400_state::a800)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	m_gtia->set_region(GTIA_NTSC);
 
 	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
@@ -2252,11 +2249,10 @@ MACHINE_CONFIG_START(a400_state::a800pal)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
-	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_50HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ)
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_PAL)
+	m_gtia->set_region(GTIA_PAL);
 
 	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
@@ -2275,11 +2271,10 @@ MACHINE_CONFIG_START(a400_state::a600xl)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	m_gtia->set_region(GTIA_NTSC);
 
 	m_ram->set_default_size("16K");
 MACHINE_CONFIG_END
@@ -2300,11 +2295,10 @@ MACHINE_CONFIG_START(a400_state::a800xl)
 	m_ram->set_default_size("64K");
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	m_gtia->set_region(GTIA_NTSC);
 MACHINE_CONFIG_END
 
 
@@ -2316,11 +2310,10 @@ MACHINE_CONFIG_START(a400_state::a800xlpal)
 	MCFG_DEVICE_CLOCK( 1773000 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
-	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_50HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ)
 
-	MCFG_DEVICE_MODIFY("gtia")
-	MCFG_GTIA_REGION(GTIA_PAL)
+	m_gtia->set_region(GTIA_PAL);
 
 	MCFG_DEVICE_MODIFY("pokey")
 	MCFG_DEVICE_CLOCK(1773000)
@@ -2380,11 +2373,11 @@ MACHINE_CONFIG_START(a400_state::a5200)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->set_region(GTIA_NTSC);
 
-	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
-	MCFG_ANTIC_GTIA("gtia")
+	ATARI_ANTIC(config, m_antic, 0);
+	m_antic->set_gtia_tag(m_gtia);
 
 	m_pia->readpa_handler().set_constant(0); // FIXME: is there anything connected here
 	m_pia->readpb_handler().set_constant(0); // FIXME: is there anything connected here
@@ -2393,8 +2386,8 @@ MACHINE_CONFIG_START(a400_state::a5200)
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 
 	MCFG_SCREEN_MODIFY( "screen" )
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
+	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
 
 	MCFG_A5200_CARTRIDGE_ADD("cartleft", a5200_carts, nullptr)
 

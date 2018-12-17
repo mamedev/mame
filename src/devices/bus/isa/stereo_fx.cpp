@@ -115,13 +115,13 @@ const tiny_rom_entry *stereo_fx_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("stereo_fx_cpu", I80C31, XTAL(30'000'000))
-	MCFG_DEVICE_IO_MAP(stereo_fx_io)
-	MCFG_DEVICE_PROGRAM_MAP(stereo_fx_rom)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, stereo_fx_device, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("ldac", dac_byte_interface, data_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, stereo_fx_device, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, stereo_fx_device, p3_w))
+	I80C31(config, m_cpu, XTAL(30'000'000));
+	m_cpu->set_addrmap(AS_PROGRAM, &stereo_fx_device::stereo_fx_rom);
+	m_cpu->set_addrmap(AS_IO, &stereo_fx_device::stereo_fx_io);
+	m_cpu->port_in_cb<1>().set(FUNC(stereo_fx_device::p1_r));
+	m_cpu->port_out_cb<1>().set("ldac", FUNC(dac_byte_interface::data_w));
+	m_cpu->port_in_cb<3>().set(FUNC(stereo_fx_device::p3_r));
+	m_cpu->port_out_cb<3>().set(FUNC(stereo_fx_device::p3_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

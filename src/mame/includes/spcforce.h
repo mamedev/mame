@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+#ifndef MAME_INCLUDES_SPCFORCE_H
+#define MAME_INCLUDES_SPCFORCE_H
 
+#pragma once
+
+#include "cpu/mcs48/mcs48.h"
 #include "machine/74259.h"
 #include "sound/sn76496.h"
 #include "emupal.h"
@@ -27,10 +32,13 @@ public:
 	void meteors(machine_config &config);
 	void spcforce(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(SN76496_latch_w);
-	DECLARE_READ8_MEMBER(SN76496_select_r);
-	DECLARE_WRITE8_MEMBER(SN76496_select_w);
+	DECLARE_WRITE8_MEMBER(sn76496_latch_w);
+	DECLARE_READ8_MEMBER(sn76496_select_r);
+	DECLARE_WRITE8_MEMBER(sn76496_select_w);
 	DECLARE_WRITE_LINE_MEMBER(write_sn1_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn2_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);
@@ -50,11 +58,9 @@ private:
 	void spcforce_map(address_map &map);
 	void spcforce_sound_map(address_map &map);
 
-	virtual void machine_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8035_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<sn76496_device> m_sn1;
@@ -73,3 +79,5 @@ private:
 	int m_sn3_ready;
 	uint8_t m_irq_mask;
 };
+
+#endif // MAME_INCLUDES_SPCFORCE_H

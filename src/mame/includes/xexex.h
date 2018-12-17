@@ -5,6 +5,10 @@
     Xexex
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_XEXEX_H
+#define MAME_INCLUDES_XEXEX_H
+
+#pragma once
 
 #include "video/k053250.h"
 #include "sound/flt_vol.h"
@@ -102,8 +106,8 @@ private:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
 	void xexex_postload();
-	void xexex_objdma( int limiter );
-	void parse_control2(  );
+	void xexex_objdma(int limiter);
+	void parse_control2();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
@@ -111,3 +115,5 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_XEXEX_H

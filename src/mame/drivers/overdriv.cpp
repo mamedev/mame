@@ -357,25 +357,26 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(overdriv_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx1", NORMAL_PLANE_ORDER, 77, 22)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback), this);
+	m_k053246->set_config("gfx1", NORMAL_PLANE_ORDER, 77, 22);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(14, -1)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(overdriv_state, zoom_callback_1)
+	K051316(config, m_k051316_1, 0);
+	m_k051316_1->set_palette("palette");
+	m_k051316_1->set_offsets(14, -1);
+	m_k051316_1->set_wrap(1);
+	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(15, 1)
-	MCFG_K051316_CB(overdriv_state, zoom_callback_2)
+	K051316(config, m_k051316_2, 0);
+	m_k051316_2->set_palette("palette");
+	m_k051316_2->set_offsets(15, 1);
+	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2), this);
 
-	MCFG_K053251_ADD("k053251")
-	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
-	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
+	K053251(config, m_k053251, 0);
+
+	K053250(config, "k053250_1", 0, "palette", m_screen, 0, 0);
+	K053250(config, "k053250_2", 0, "palette", m_screen, 0, 0);
 
 	K053252(config, m_k053252, XTAL(24'000'000)/4);
 	m_k053252->set_offsets(13*8, 2*8);
@@ -384,9 +385,7 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
 
 	MCFG_K053260_ADD("k053260_1", XTAL(3'579'545))
 	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)

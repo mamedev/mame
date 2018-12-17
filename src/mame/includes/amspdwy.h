@@ -5,6 +5,10 @@
     American Speedway
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_AMSPDWY_H
+#define MAME_INCLUDES_AMSPDWY_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
@@ -14,8 +18,8 @@
 class amspdwy_state : public driver_device
 {
 public:
-	amspdwy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	amspdwy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
@@ -28,6 +32,14 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void amspdwy(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -60,14 +72,12 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_back);
 
 	uint32_t screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	uint8_t amspdwy_wheel_r( int index );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t amspdwy_wheel_r(int index);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	void amspdwy(machine_config &config);
 	void amspdwy_map(address_map &map);
 	void amspdwy_portmap(address_map &map);
 	void amspdwy_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AMSPDWY_H

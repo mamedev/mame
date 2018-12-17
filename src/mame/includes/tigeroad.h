@@ -142,6 +142,6 @@ private:
 
 	DECLARE_WRITE16_MEMBER(blktiger_to_mcu_w);
 
-	required_device<cpu_device> m_mcu;
+	required_device<i8751_device> m_mcu;
 	uint8_t m_old_p3;
 };

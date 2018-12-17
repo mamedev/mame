@@ -180,20 +180,20 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	//i8155_device &i8155_2(I8155(config, "ic9", XTAL(18'000'000)/6));
 	//i8155_2.out_to_callback().set(FUNC(mephisto_pinball_state::clk_shift_w));
 
-	MCFG_DEVICE_ADD("soundcpu", I8051, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
-	MCFG_DEVICE_IO_MAP(mephisto_8051_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, mephisto_pinball_state, ay8910_read))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, mephisto_pinball_state, ay8910_write))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, mephisto_pinball_state, t0_t1_w))
-	MCFG_MCS51_SERIAL_RX_CB(CONSTANT(0)) // from MUART
+	i8051_device &soundcpu(I8051(config, "soundcpu", XTAL(12'000'000)));
+	soundcpu.set_addrmap(AS_PROGRAM, &mephisto_pinball_state::mephisto_8051_map); // EA tied high for external program ROM
+	soundcpu.set_addrmap(AS_IO, &mephisto_pinball_state::mephisto_8051_io);
+	soundcpu.port_in_cb<1>().set(FUNC(mephisto_pinball_state::ay8910_read));
+	soundcpu.port_out_cb<1>().set(FUNC(mephisto_pinball_state::ay8910_write));
+	soundcpu.port_out_cb<3>().set(FUNC(mephisto_pinball_state::t0_t1_w));
+	soundcpu.serial_rx_cb().set_constant(0); // from MUART
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mephisto_pinball_state, ay8910_columns_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mephisto_pinball_state, ay8910_inputs_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, m_aysnd, XTAL(12'000'000)/8);
+	m_aysnd->port_a_write_callback().set(FUNC(mephisto_pinball_state::ay8910_columns_w));
+	m_aysnd->port_b_read_callback().set(FUNC(mephisto_pinball_state::ay8910_inputs_r));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MCFG_DEVICE_ADD("dac", DAC08, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

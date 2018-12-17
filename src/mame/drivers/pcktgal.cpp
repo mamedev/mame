@@ -74,11 +74,11 @@ READ8_MEMBER(pcktgal_state::adpcm_reset_r)
 void pcktgal_state::pcktgal_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x0800, 0x0fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
 	map(0x1000, 0x11ff).ram().share("spriteram");
 	map(0x1800, 0x1800).portr("P1");
-	map(0x1800, 0x1807).w(m_tilegen1, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x1810, 0x181f).rw(m_tilegen1, FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x1800, 0x1807).w(m_tilegen, FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x1810, 0x181f).rw(m_tilegen, FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
 
 	map(0x1a00, 0x1a00).portr("P2").w(FUNC(pcktgal_state::sound_w));
 	map(0x1c00, 0x1c00).portr("DSW").w(FUNC(pcktgal_state::bank_w));
@@ -248,15 +248,14 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(pcktgal_state, pcktgal)
 
-
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen, 0);
+	m_tilegen->set_gfx_region_wide(0, 0, 0);
+	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

@@ -5,6 +5,10 @@
     Double Dragon & Double Dragon II (but also China Gate)
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DDRAGON_H
+#define MAME_INCLUDES_DDRAGON_H
+
+#pragma once
 
 #include "cpu/m6805/m68705.h"
 #include "machine/bankdev.h"
@@ -178,7 +182,6 @@ private:
 	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
 
-
 	void darktowr_map(address_map &map);
 	void darktowr_banked_map(address_map &map);
 
@@ -206,3 +209,5 @@ private:
 
 	void toffy_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DDRAGON_H

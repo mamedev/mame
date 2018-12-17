@@ -86,7 +86,7 @@ private:
 	void fastinvaders_6845_io(address_map &map);
 	void fastinvaders_8275_io(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -125,44 +125,48 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::scanline_timer)
 {
 /*  int scanline = param;
 
-
-
-
-    if(scanline == 16){
+    if (scanline == 16)
+    {
         //logerror("scanline\n");
         m_dma8257->dreq1_w(0x01);
-    m_dma8257->hlda_w(1);
-        }
+    	m_dma8257->hlda_w(1);
+    }
     */
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::count_ar)
 {
-	if (m_ar<255){
-		m_riga_sup= ((m_prom[m_ar]&0x08)>>3)&0x01;
-		m_scudi=    ((m_prom[m_ar]&0x04)>>2)&0x01;
-		m_cannone=  ((m_prom[m_ar]&0x02)>>1)&0x01;
-		m_riga_inf= ((m_prom[m_ar]&0x01))&0x01;
+	if (m_ar < 255)
+	{
+		m_riga_sup = BIT(m_prom[m_ar], 3);
+		m_scudi =    BIT(m_prom[m_ar], 2);
+		m_cannone =  BIT(m_prom[m_ar], 1);
+		m_riga_inf = BIT(m_prom[m_ar], 0);
 		//logerror("m_ar = %02X m_riga_sup %02X, m_scudi %02X, m_cannone %02X, m_riga_inf %02X\n",m_ar,m_riga_sup,m_scudi,m_cannone,m_riga_inf);
 
-		if(m_riga_sup==0x01){
-			if(((m_prom[m_ar-1]&0x08)>>3)==0x01){
+		if (m_riga_sup)
+		{
+			if (BIT(m_prom[m_ar - 1], 3))
+			{
 				//logerror("            DMA1            \n");
 				//logerror("m_prom[m_ar]=%d m_prom[m_ar-1]= %d ar = %d r_s %d, sc %d, ca %d, ri %d\n",m_prom[m_ar],m_prom[m_ar-1],m_ar,m_riga_sup,m_scudi,m_cannone,m_riga_inf);
 				m_dma8257->dreq1_w(0x01);
 				m_dma8257->hlda_w(1);
 				//m_pic8259->ir1_w(HOLD_LINE);
-				m_dma1=1;
+				m_dma1 = 1;
 			}
 		}
 		m_ar++;
 	}
 
-	if (m_av<255){
+	if (m_av < 255)
+	{
 		m_av++;
 		//logerror("m_av=%02X\n",m_av);
-		if (m_av == m_io_40){
-			if (m_hsync==1){
+		if (m_av == m_io_40)
+		{
+			if (m_hsync == 1)
+			{
 				logerror("          DMA2            \n");
 				m_dma8257->dreq2_w(0x01);
 				m_dma8257->hlda_w(1);
@@ -176,14 +180,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::count_ar)
 WRITE8_MEMBER(fastinvaders_state::dark_1_clr)
 {
 	//address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	if(data){
+	if (data)
+	{
 		m_dma8257->dreq1_w(0x00);
 	}
-	if(!data){
-		m_dma1=0;
+	if (!data)
+	{
+		m_dma1 = 0;
 	}
 
-//logerror("dma 1 clr\n");
+	//logerror("dma 1 clr\n");
 	//m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	//m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 	//return prog_space.read_byte(offset);
@@ -193,11 +199,13 @@ WRITE8_MEMBER(fastinvaders_state::dark_1_clr)
 WRITE8_MEMBER(fastinvaders_state::dark_2_clr)
 {
 	//address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	if(data){
+	if (data)
+	{
 		m_dma8257->dreq2_w(0x00);
 	}
-/*  if(!data){
-        m_dma1=0;
+/*  if (!data)
+	{
+        m_dma1 = 0;
     }
     */
 }
@@ -219,27 +227,14 @@ uint32_t fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &
 	bitmap.fill(0, cliprect);
 
 	int count = 0;
-
-	for (int y = 0;y < 19;y++)
+	for (int y = 0; y < 19; y++)
 	{
-		for (int x = 0;x < 40;x++)
+		for (int x = 0; x < 40; x++)
 		{
 			uint8_t tile = m_videoram[count];
-
-
-			gfx->transpen(
-				bitmap,
-				cliprect,
-				tile,
-				0,
-				0, 0,
-				x*16, y*14, 0
-				);
-
+			gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x*16, y*14, 0);
 			count++;
-
 		}
-
 	}
 
 	return 0;
@@ -247,7 +242,7 @@ uint32_t fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 WRITE8_MEMBER(fastinvaders_state::io_40_w)
 {
-	m_io_40=data;
+	m_io_40 = data;
 	logerror("av target= %02X\n",m_io_40);
 }
 
@@ -260,13 +255,12 @@ logerror("Audio write &02X\n",data);
 
 READ8_MEMBER(fastinvaders_state::io_60_r)
 {
-	uint8_t tmp=0;
 	//0x60 ds6 input bit 0 DX or SX
 	//               bit 1 DX or SX
-//               bit 2-7 dip switch
+	//               bit 2-7 dip switch
 
-	tmp=ioport("IN1")->read()&0x03;
-	tmp=tmp | (ioport("DSW1")->read()&0xfc);
+	uint8_t tmp = ioport("IN1")->read() & 0x03;
+	tmp =  tmp | (ioport("DSW1")->read() & 0xfc);
 
 	//logerror("return %02X from 0x60\n",tmp);
 	return tmp;
@@ -275,97 +269,101 @@ READ8_MEMBER(fastinvaders_state::io_60_r)
 
 WRITE8_MEMBER(fastinvaders_state::io_70_w)
 {
-//bit 0 rest55 clear
-//bit 1 rest65 clear
-//bit 2 trap clear
-//bit 3 coin counter
+	//bit 0 rest55 clear
+	//bit 1 rest65 clear
+	//bit 2 trap clear
+	//bit 3 coin counter
 
-//bit 4 irq0 clear
-//bit 5 8085 reset
-//bit 6             TODO
-//bit 7 both used   TODO
+	//bit 4 irq0 clear
+	//bit 5 8085 reset
+	//bit 6             TODO
+	//bit 7 both used   TODO
 
-//IRQ clear
-	if (data&0x01){
-		m_rest55=0;
+	//IRQ clear
+	if (BIT(data, 0))
+	{
+		m_rest55 = 0;
 		m_maincpu->set_input_line(I8085_RST55_LINE, CLEAR_LINE);
 	}
-	if (data&0x02){
-		if (m_rest65){
+	if (BIT(data, 1))
+	{
+		if (m_rest65)
+		{
 			//logerror("clear");
-			m_rest65=0;
+			m_rest65 = 0;
 			m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
 		}
 	}
-	if (data&0x04){
+	if (BIT(data, 2))
+	{
 		m_trap=0;
 		m_maincpu->set_input_line(INPUT_LINE_NMI,  CLEAR_LINE);
 	}
-	if (data&0x10){
+	if (BIT(data, 4))
+	{
 		m_irq0=0;
 		m_pic8259->ir0_w(CLEAR_LINE);
 	}
 
 //self reset
-	if (data&0x20){
-		logerror("RESET!!!!!\n");
+	if (BIT(data, 5))
+	{
+		logerror("reset\n");
 	}
-
 
 //coin counter
 //  if (data&0x08){
 //      coin_counter_w(machine(), offset,0x01);
 //  }
-
 }
 
 
 WRITE8_MEMBER(fastinvaders_state::io_a0_w)
 {
-	m_irq1=0;
+	m_irq1 = 0;
 	m_pic8259->ir1_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastinvaders_state::io_b0_w)
 {
-	m_irq2=0;
+	m_irq2 = 0;
 	m_pic8259->ir2_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastinvaders_state::io_c0_w)
 {
-	m_irq3=0;
+	m_irq3 = 0;
 	m_pic8259->ir3_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastinvaders_state::io_d0_w)
 {
-	m_irq5=0;
+	m_irq5 = 0;
 	m_pic8259->ir5_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastinvaders_state::io_e0_w)
 {
-	m_irq4=0;
+	m_irq4 = 0;
 	m_pic8259->ir4_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastinvaders_state::io_f0_w)
 {
-	m_irq6=0;
+	m_irq6 = 0;
 	m_pic8259->ir6_w(CLEAR_LINE);
 }
 
 READ_LINE_MEMBER(fastinvaders_state::sid_read)
 {
-	uint8_t tmp= m_start2_value ? ASSERT_LINE : CLEAR_LINE;
-	m_start2_value=0;
+	uint8_t tmp = m_start2_value ? ASSERT_LINE : CLEAR_LINE;
+	m_start2_value = 0;
 	return tmp;
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::tilt)
 {
-	m_trap=1;
+	m_trap = 1;
 	if (newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 }
@@ -373,116 +371,109 @@ INPUT_CHANGED_MEMBER(fastinvaders_state::tilt)
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::coin_inserted)
 {
-	m_rest65=1;
+	m_rest65 = 1;
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
 }
 
-
 INPUT_CHANGED_MEMBER(fastinvaders_state::start)
 {
-	m_rest55=1;
+	m_rest55 = 1;
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::start2)
 {
-	m_rest55=1;
-	m_start2_value=1;
+	m_rest55 = 1;
+	m_start2_value = 1;
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::in0)
 {
-	m_irq0=1;
+	m_irq0 = 1;
 	if (newval)
 		m_pic8259->ir0_w(HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::in1)
 {
-	m_irq1=1;
+	m_irq1 = 1;
 	if (newval)
 		m_pic8259->ir1_w(HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::in2)
 {
-	m_irq2=1;
+	m_irq2 = 1;
 	if (newval)
 		m_pic8259->ir2_w(HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::in3)
 {
-	m_irq3=1;
+	m_irq3 = 1;
 	if (newval)
 		m_pic8259->ir3_w(HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::in4)
 {
-	m_irq4=1;
+	m_irq4 = 1;
 	if (newval)
 		m_pic8259->ir4_w(HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::in5)
 {
-	m_irq5=1;
+	m_irq5 = 1;
 	if (newval)
 		m_pic8259->ir5_w(HOLD_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fastinvaders_state::in6)
 {
-	m_irq6=1;
+	m_irq6 = 1;
 	if (newval)
 		m_pic8259->ir6_w(HOLD_LINE);
 }
 
-
-
-
 DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::vsync)
 {
 	//logerror("p8257_drq_w\n");
-	if (!state){
+	if (!state)
+	{
 		m_dma8257->dreq0_w(0x01);
 		m_dma8257->hlda_w(1);
 
 		m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 		m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
-	//machine().scheduler().abort_timeslice(); // transfer occurs immediately
-	//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
+		//machine().scheduler().abort_timeslice(); // transfer occurs immediately
+		//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
 		m_av=0;
-	}
-
-	if (state){
 	}
 }
 
 DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::hsync)
 {
 	//m_hsync=1;
-	if (!state){
+	if (!state)
+	{
 		m_hsync=0;
 		m_ar=0;
 	}
-
-	if (state){
+	else
+	{
 		m_hsync=1;
 	}
 }
 
-
-
 READ8_MEMBER(fastinvaders_state::memory_read_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-logerror("dma read\n");
+	logerror("dma read\n");
 	//m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	//m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 	return prog_space.read_byte(offset);
@@ -492,7 +483,7 @@ logerror("dma read\n");
 WRITE8_MEMBER(fastinvaders_state::memory_write_byte)
 {
 	//address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-logerror("dma write\n");
+	logerror("dma write\n");
 	//m_maincpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	//m_maincpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 	//return prog_space.read_byte(offset);
@@ -540,14 +531,12 @@ void fastinvaders_state::fastinvaders_6845_io(address_map &map)
 	map(0xf0, 0xf0).w(FUNC(fastinvaders_state::io_f0_w));  //ds15 irq6 clear
 }
 
-
 void fastinvaders_state::fastinvaders_8275_io(address_map &map)
 {
 	fastinvaders_io_base(map);
 
 	map(0x20, 0x21).rw(m_crtc8275, FUNC(i8275_device::read), FUNC(i8275_device::write));
-
-map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
@@ -581,9 +570,7 @@ PORT_START("COIN")  /* FAKE async input */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in0, 0) // int0, sparo
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,tilt, 0)    //INPUT_LINE_NMI tilt
 
-
 	PORT_START("IN0")
-
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in1, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in2, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("3") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in3, 0)
@@ -591,11 +578,9 @@ PORT_START("COIN")  /* FAKE async input */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("5") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in5, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("6") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in6, 0)
 
-
 	PORT_START("IN1")   //0x60 io port
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-
 
 	PORT_START("DSW1")  //0x60 io port
 	PORT_DIPNAME(   0x04, 0x04, DEF_STR( Unknown ) )
@@ -641,16 +626,17 @@ static GFXDECODE_START( gfx_fastinvaders )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(fastinvaders_state::fastinvaders)
-
+void fastinvaders_state::fastinvaders(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
-	MCFG_DEVICE_PROGRAM_MAP(fastinvaders_map)
-//  MCFG_DEVICE_IO_MAP(fastinvaders_io_map)
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
-	MCFG_I8085A_SID(READLINE(*this, fastinvaders_state, sid_read))
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
+	I8085A(config, m_maincpu, 6144100/2); // 6144100 Xtal /2 internaly
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastinvaders_state::fastinvaders_map);
+//  m_maincpu->set_addrmap(AS_IO, &fastinvaders_state::fastinvaders_io_map);
+//  m_maincpu->set_vblank_int("screen", FUNC(fastinvaders_state::irq0_line_hold));
+	m_maincpu->in_sid_func().set(FUNC(fastinvaders_state::sid_read));
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(fastinvaders_state::scanline_timer), "screen", 0, 1);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
@@ -661,55 +647,53 @@ MACHINE_CONFIG_START(fastinvaders_state::fastinvaders)
 	m_dma8257->out_dack_cb<1>().set(FUNC(fastinvaders_state::dark_1_clr));
 	m_dma8257->out_dack_cb<2>().set(FUNC(fastinvaders_state::dark_2_clr));
 
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("count_ar", fastinvaders_state, count_ar,  attotime::from_hz(11500000/2))
+	TIMER(config, "count_ar").configure_periodic(FUNC(fastinvaders_state::count_ar), attotime::from_hz(11500000/2));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 40*16-1, 0*14, 19*14-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fastinvaders_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*16, 32*16);
+	screen.set_visarea(0*16, 40*16-1, 0*14, 19*14-1);
+	screen.set_screen_update(FUNC(fastinvaders_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastinvaders)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_fastinvaders);
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	// TODO
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_8275)
+void fastinvaders_state::fastinvaders_8275(machine_config &config)
+{
 	fastinvaders(config);
-	MCFG_DEVICE_MODIFY("maincpu" ) // guess
-	MCFG_DEVICE_IO_MAP(fastinvaders_8275_io)
+	m_maincpu->set_addrmap(AS_IO, &fastinvaders_state::fastinvaders_8275_io);
 
-	MCFG_DEVICE_ADD("8275", I8275, 10000000 ) /* guess */ // does not configure a very useful resolution(!)
-	MCFG_I8275_CHARACTER_WIDTH(16)
-//  MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
-//  MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
-MACHINE_CONFIG_END
+	I8275(config, m_crtc8275, 10000000); /* guess */ // does not configure a very useful resolution(!)
+	m_crtc8275->set_character_width(16);
+//  m_crtc8275->set_display_callback(FUNC(apogee_state::display_pixels));
+//  m_crtc8275->drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
+}
 
-MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_6845)
+void fastinvaders_state::fastinvaders_6845(machine_config &config)
+{
 	fastinvaders(config);
-	MCFG_DEVICE_MODIFY("maincpu" ) // guess
-	MCFG_DEVICE_IO_MAP(fastinvaders_6845_io)
+	m_maincpu->set_addrmap(AS_IO, &fastinvaders_state::fastinvaders_6845_io);
 
-	MCFG_MC6845_ADD("6845", MC6845, "screen", 11500000/16) /* confirmed */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fastinvaders_state,vsync))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, fastinvaders_state,hsync))
-MACHINE_CONFIG_END
-
-
-
+	MC6845(config, m_crtc6845, 11500000/16); /* confirmed */
+	m_crtc6845->set_screen("screen");
+	m_crtc6845->set_show_border_area(false);
+	m_crtc6845->set_char_width(16);
+	m_crtc6845->out_vsync_callback().set(FUNC(fastinvaders_state::vsync));
+	m_crtc6845->out_hsync_callback().set(FUNC(fastinvaders_state::hsync));
+}
 
 void fastinvaders_state::init_fi6845()
 {
 	const uint8_t *prom = memregion("prom")->base();
-	for (int i = 0; i < 256; i++){
+	for (int i = 0; i < 256; i++)
+	{
 		m_prom[i] = prom[i];
 	}
 	m_dma1 = 0;

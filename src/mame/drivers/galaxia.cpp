@@ -300,31 +300,30 @@ static GFXDECODE_START( gfx_astrowar )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(galaxia_state::galaxia)
-
+void galaxia_state::galaxia(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_DEVICE_PROGRAM_MAP(galaxia_mem_map)
-	MCFG_DEVICE_IO_MAP(galaxia_io_map)
-	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, galaxia_state, write_s2650_flag))
+	S2650(config, m_maincpu, XTAL(14'318'181)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::galaxia_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &galaxia_state::galaxia_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
+	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
+	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60) // wrong
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_galaxia)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(60); // wrong
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0*8, 30*8-1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(galaxia_state::screen_update_galaxia));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(galaxia_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxia)
-	MCFG_PALETTE_ADD("palette", 0x18+2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
+	PALETTE(config, m_palette, 0x18+2).set_init(FUNC(galaxia_state::palette_init_galaxia));
 
-	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
 	S2636(config, m_s2636[0], 0);
@@ -341,34 +340,32 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(galaxia_state::astrowar)
-
+void galaxia_state::astrowar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_DEVICE_PROGRAM_MAP(astrowar_mem_map)
-	MCFG_DEVICE_IO_MAP(galaxia_io_map)
-	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, galaxia_state, write_s2650_flag))
+	S2650(config, m_maincpu, XTAL(14'318'181)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::astrowar_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &galaxia_state::galaxia_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data_map);
+	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
+	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_astrowar)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(1*8, 31*8-1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(galaxia_state::screen_update_astrowar));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(galaxia_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrowar)
-	MCFG_PALETTE_ADD("palette", 0x18+2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrowar);
+	PALETTE(config, m_palette, 0x18+2).set_init(FUNC(galaxia_state::palette_init_astrowar));
 
-	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
 	S2636(config, m_s2636[0], 0);
@@ -377,7 +374,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

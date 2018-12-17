@@ -5,9 +5,10 @@
  * includes/mz80.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_MZ80_H
 #define MAME_INCLUDES_MZ80_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -30,7 +31,7 @@ public:
 		, m_p_ram(*this, "p_ram")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void mz80kj(machine_config &config);
 	void mz80k(machine_config &config);

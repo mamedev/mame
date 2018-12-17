@@ -122,7 +122,7 @@ public:
 	void init_vega();
 
 private:
-	required_device<cpu_device>     m_maincpu;
+	required_device<i8035_device>   m_maincpu;
 	required_device<i8255_device>   m_i8255;
 	required_device<ins8154_device> m_ins8154;
 	required_device<ay8910_device>  m_ay8910;
@@ -799,16 +799,17 @@ void vega_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(vega_state::vega)
-	MCFG_DEVICE_ADD("maincpu", I8035, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(vega_map)
-	MCFG_DEVICE_IO_MAP(vega_io_map)
-	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("DSW"))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vega_state, rombank_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, vega_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vega_state, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, vega_state, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(NOOP) /* prog - inputs CLK */
+void vega_state::vega(machine_config &config)
+{
+	I8035(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vega_state::vega_map);
+	m_maincpu->set_addrmap(AS_IO, &vega_state::vega_io_map);
+	m_maincpu->p1_in_cb().set_ioport("DSW");
+	m_maincpu->p1_out_cb().set(FUNC(vega_state::rombank_w));
+	m_maincpu->p2_in_cb().set(FUNC(vega_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(vega_state::p2_w));
+	m_maincpu->t1_in_cb().set(FUNC(vega_state::t1_r));
+	m_maincpu->prog_out_cb().set_nop(); /* prog - inputs CLK */
 
 	I8255A(config, m_i8255);
 	m_i8255->in_pa_callback().set(FUNC(vega_state::txtram_r));
@@ -839,17 +840,15 @@ MACHINE_CONFIG_START(vega_state::vega)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_test_decode);
 
 	/* sound hardware */
-
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, 1500000 )
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, vega_state, ay8910_pa_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, vega_state, ay8910_pb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, vega_state, ay8910_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, vega_state, ay8910_pb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910, 1500000);
+	m_ay8910->port_a_read_callback().set(FUNC(vega_state::ay8910_pa_r));
+	m_ay8910->port_b_read_callback().set(FUNC(vega_state::ay8910_pb_r));
+	m_ay8910->port_a_write_callback().set(FUNC(vega_state::ay8910_pa_w));
+	m_ay8910->port_b_write_callback().set(FUNC(vega_state::ay8910_pb_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 ROM_START( vega )
 	ROM_REGION( 0x01000, "mb0", 0 )

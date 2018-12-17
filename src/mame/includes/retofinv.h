@@ -34,6 +34,10 @@ public:
 	void retofinv(machine_config &config);
 	void retofinvb1(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(cpu2_m6000_w);
 	DECLARE_READ8_MEMBER(cpu0_mf800_r);
@@ -63,9 +67,6 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap);
 

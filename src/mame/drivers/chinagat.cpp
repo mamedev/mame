@@ -590,13 +590,13 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.80)
-	MCFG_SOUND_ROUTE(1, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "mono", 0.80);
+	ymsnd.add_route(1, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1065000, okim6295_device::PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -615,13 +615,13 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
 	MCFG_DEVICE_PROGRAM_MAP(saiyugoub1_sound_map)
 
-	MCFG_DEVICE_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
-	MCFG_DEVICE_PROGRAM_MAP(i8748_map)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, chinagat_state, saiyugoub1_mcu_command_r))
+	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
+	mcu.set_addrmap(AS_PROGRAM, &chinagat_state::i8748_map);
+	mcu.bus_in_cb().set(FUNC(chinagat_state::saiyugoub1_mcu_command_r));
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(chinagat_state, saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, chinagat_state, saiyugoub1_m5205_irq_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, chinagat_state, saiyugoub1_adpcm_rom_addr_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, chinagat_state, saiyugoub1_adpcm_control_w))
+	mcu.t1_in_cb().set(FUNC(chinagat_state::saiyugoub1_m5205_irq_r));
+	mcu.p1_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_rom_addr_w));
+	mcu.p2_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_control_w));
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* heavy interleaving to sync up sprite<->main cpu's */
@@ -644,13 +644,13 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.80)
-	MCFG_SOUND_ROUTE(1, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "mono", 0.80);
+	ymsnd.add_route(1, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("adpcm", MSM5205, 9263750 / 24)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinagat_state, saiyugoub1_m5205_irq_w)) /* Interrupt function */
@@ -691,8 +691,8 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 3579545)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

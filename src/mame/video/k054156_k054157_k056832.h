@@ -10,13 +10,6 @@
 typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k056832_cb_delegate;
 #define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags)
 
-#define MCFG_K056832_CB(_class, _method) \
-	downcast<k056832_device &>(*device).set_k056832_callback(k056832_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K056832_CONFIG(_gfx_reg, _bpp, _big, _djmain_hack) \
-	downcast<k056832_device &>(*device).set_config(_gfx_reg, _bpp, _big, _djmain_hack);
-
-
 #define K056832_PAGE_COUNT 16
 
 /* bit depths for the 56832 */
@@ -46,10 +39,12 @@ public:
 
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_k056832_callback(k056832_cb_delegate callback) { m_k056832_cb = callback; }
-	void set_config(const char *gfx_reg, int bpp, int big, int djmain_hack)
+	template <typename... T> void set_tile_callback(T &&... args) { m_k056832_cb = k056832_cb_delegate(std::forward<T>(args)...); }
+
+	template <typename T> 
+	void set_config(T &&gfx_reg, int bpp, int big, int djmain_hack)
 	{
-		m_rombase.set_tag(gfx_reg);
+		m_rombase.set_tag(std::forward<T>(gfx_reg));
 		m_bpp = bpp;
 		m_big = big;
 		m_djmain_hack = djmain_hack;
@@ -216,11 +211,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K056832, k056832_device)
-
-
-#define MCFG_K056832_PALETTE(_palette_tag) \
-	MCFG_GFX_PALETTE(_palette_tag)
-
 
 #endif // MAME_VIDEO_K054156_K054157_K056832_H
 

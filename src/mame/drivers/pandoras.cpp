@@ -28,7 +28,6 @@ Boards:
 #include "includes/konamipt.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
@@ -309,20 +308,20 @@ READ8_MEMBER(pandoras_state::pandoras_portB_r)
 MACHINE_CONFIG_START(pandoras_state::pandoras)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/6)  /* CPU A */
-	MCFG_DEVICE_PROGRAM_MAP(pandoras_master_map)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/6);  /* CPU A */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pandoras_state::pandoras_master_map);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, MASTER_CLOCK/6)      /* CPU B */
-	MCFG_DEVICE_PROGRAM_MAP(pandoras_slave_map)
+	MC6809E(config, m_subcpu, MASTER_CLOCK/6);      /* CPU B */
+	m_subcpu->set_addrmap(AS_PROGRAM, &pandoras_state::pandoras_slave_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(pandoras_sound_map)
+	Z80(config, m_audiocpu, SOUND_CLOCK/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pandoras_state::pandoras_sound_map);
 
-	MCFG_DEVICE_ADD("mcu", I8039, SOUND_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(pandoras_i8039_map)
-	MCFG_DEVICE_IO_MAP(pandoras_i8039_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pandoras_state, i8039_irqen_and_status_w))
+	I8039(config, m_mcu, SOUND_CLOCK/2);
+	m_mcu->set_addrmap(AS_PROGRAM, &pandoras_state::pandoras_i8039_map);
+	m_mcu->set_addrmap(AS_IO, &pandoras_state::pandoras_i8039_io_map);
+	m_mcu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_mcu->p2_out_cb().set(FUNC(pandoras_state::i8039_irqen_and_status_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
@@ -348,6 +347,7 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pandoras_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pandoras)
+
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pandoras_state, pandoras)

@@ -106,8 +106,8 @@ void pktgaldx_state::pktgaldx_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x100000, 0x100fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x102000, 0x102fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x102000, 0x102fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x110000, 0x1107ff).ram().share("pf1_rowscroll");
 	map(0x112000, 0x1127ff).ram().share("pf2_rowscroll");
 
@@ -119,7 +119,7 @@ void pktgaldx_state::pktgaldx_map(address_map &map)
 	map(0x150000, 0x15000f).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x150007, 0x150007).r(m_oki2, FUNC(okim6295_device::read));
 
-	map(0x161800, 0x16180f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x161800, 0x16180f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
 	map(0x164800, 0x164801).w(FUNC(pktgaldx_state::pktgaldx_oki_bank_w));
 	map(0x166800, 0x166801).w(FUNC(pktgaldx_state::vblank_ack_w));
 	map(0x167800, 0x167fff).rw(FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_r), FUNC(pktgaldx_state::pktgaldx_protection_region_f_104_w)).share("prot16ram"); /* Protection device */
@@ -360,25 +360,25 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pktgaldx)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(pktgaldx_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(pktgaldx_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen, 0);
+	m_deco_tilegen->set_split(0);
+	m_deco_tilegen->set_pf1_size(DECO_64x32);
+	m_deco_tilegen->set_pf2_size(DECO_64x32);
+	m_deco_tilegen->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen->set_pf1_col_bank(0x00);
+	m_deco_tilegen->set_pf2_col_bank(0x10);
+	m_deco_tilegen->set_pf1_col_mask(0x0f);
+	m_deco_tilegen->set_pf2_col_mask(0x0f);
+	m_deco_tilegen->set_bank1_callback(FUNC(pktgaldx_state::bank_callback), this);
+	m_deco_tilegen->set_bank2_callback(FUNC(pktgaldx_state::bank_callback), this);
+	m_deco_tilegen->set_pf12_8x8_bank(0);
+	m_deco_tilegen->set_pf12_16x16_bank(1);
+	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");

@@ -138,9 +138,13 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 		if (adr < 0x8000)
 		{
 			if (adr == 0xfe)
+			{
 				return m_codebank;
+			}
 			else if (adr == 0xff)
+			{
 				return databank;
+			}
 
 			return m_lowbus_space->read_byte(adr);
 		}
@@ -154,9 +158,15 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 		if (adr < 0x8000)
 		{
 			if (adr == 0xfe)
+			{
+				//logerror("%02x%04x returning codebank\n", m_codebank, PC);
 				return m_codebank;
+			}
 			else if (adr == 0xff)
+			{
+				//logerror("%02x%04x returning databank\n", m_codebank, PC);
 				return databank;
+			}
 
 			if ((adr & 0x7fff) >= 0x200)
 			{
@@ -164,6 +174,7 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 			}
 			else
 			{
+				//logerror("%02x%04x returning lowbus %04x\n", m_codebank, PC, adr); // useful for debugging opcodes which must ignore lowbus (all indirect ones?)
 				return m_lowbus_space->read_byte(adr);
 			}
 		}

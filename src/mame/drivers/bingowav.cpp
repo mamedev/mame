@@ -119,10 +119,10 @@ MACHINE_CONFIG_START(bingowav_state::bingowav)
 	tmp68301_device &tmp68301(TMP68301(config, "maintmp", 0)); // wrong
 	tmp68301.set_cputag(m_maincpu);
 
-	te7750_device &mainioh(TE7750(config, "mainioh", 0));
+	te7750_device &mainioh(TE7750(config, "mainioh"));
 	mainioh.ios_cb().set_constant(5);
 
-	te7750_device &mainiol(TE7750(config, "mainiol", 0));
+	te7750_device &mainiol(TE7750(config, "mainiol"));
 	mainiol.ios_cb().set_constant(4);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
@@ -136,9 +136,9 @@ MACHINE_CONFIG_START(bingowav_state::bingowav)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt.set_master_tag(m_maincpu);
+	tc0140syt.set_slave_tag("audiocpu");
 
 	MCFG_DEVICE_ADD("termcpu", M68000, 12000000) // actually TMP63803F-16
 	MCFG_DEVICE_PROGRAM_MAP(bingowav_drive_map)

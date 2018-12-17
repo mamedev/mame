@@ -21,15 +21,15 @@
 
 void m52_state::init_palette()
 {
-	const int resistances_3[3] = { 1000, 470, 220 };
-	const int resistances_2[2] = { 470, 220 };
+	constexpr int resistances_3[3] = { 1000, 470, 220 };
+	constexpr int resistances_2[2] = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
 
 	/* compute palette information for characters/backgrounds */
 	scale = compute_resistor_weights(0, 255, -1.0,
-		3, resistances_3, weights_r, 0, 0,
-		3, resistances_3, weights_g, 0, 0,
-		2, resistances_2, weights_b, 0, 0);
+			3, resistances_3, weights_r, 0, 0,
+			3, resistances_3, weights_g, 0, 0,
+			2, resistances_2, weights_b, 0, 0);
 
 	/* character palette */
 	const uint8_t *char_pal = memregion("tx_pal")->base();

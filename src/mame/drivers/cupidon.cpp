@@ -104,8 +104,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(cupidon_state::cupidon)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
-	MCFG_DEVICE_PROGRAM_MAP(cupidon_map)
+	M68340(config, m_maincpu, 16000000);    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &cupidon_state::cupidon_map);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

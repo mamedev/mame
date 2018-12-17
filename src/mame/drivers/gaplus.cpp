@@ -529,13 +529,13 @@ MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_NAMCO_62XX_ADD("62xx", 24576000 / 6 / 2)  /* totally made up - TODO: fix */
-	//MCFG_NAMCO_62XX_INPUT_0_CB(IOPORT("IN0L"))
-	//MCFG_NAMCO_62XX_INPUT_1_CB(IOPORT("IN0H"))
-	//MCFG_NAMCO_62XX_INPUT_2_CB(IOPORT("IN1L"))
-	//MCFG_NAMCO_62XX_INPUT_3_CB(IOPORT("IN1H"))
-	//MCFG_NAMCO_62XX_OUTPUT_0_CB(WRITE8(*this, gaplus_base_state,out_0))
-	//MCFG_NAMCO_62XX_OUTPUT_1_CB(WRITE8(*this, gaplus_base_state,out_1))
+	NAMCO_62XX(config, "62xx", 24576000 / 6 / 2);  /* totally made up - TODO: fix */
+	//n62xx.input_callback<0>().set_ioport("IN0L");
+	//n62xx.input_callback<1>().set_ioport("IN0H");
+	//n62xx.input_callback<2>().set_ioport("IN1L");
+	//n62xx.input_callback<3>().set_ioport("IN1H");
+	//n62xx.output_callback<0>().set(FUNC(gaplus_base_state::out_0));
+	//n62xx.output_callback<1>().set(FUNC(gaplus_base_state::out_1));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -566,59 +566,62 @@ MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gaplus_state::gaplus)
+void gaplus_state::gaplus(machine_config &config)
+{
 	gaplus_base(config);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, gaplus_state, out_lamps0))
-	MCFG_NAMCO56XX_OUT_1_CB(WRITE8(*this, gaplus_state, out_lamps1))
+	NAMCO_56XX(config, m_namco56xx, 0);
+	m_namco56xx->in_callback<0>().set_ioport("COINS");
+	m_namco56xx->in_callback<1>().set_ioport("P1");
+	m_namco56xx->in_callback<2>().set_ioport("P2");
+	m_namco56xx->in_callback<3>().set_ioport("BUTTONS");
+	m_namco56xx->out_callback<0>().set(FUNC(gaplus_state::out_lamps0));
+	m_namco56xx->out_callback<1>().set(FUNC(gaplus_state::out_lamps1));
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("DSWA_HIGH"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("DSWB_LOW"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("DSWB_HIGH"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("DSWA_LOW"))
-MACHINE_CONFIG_END
+	NAMCO_58XX(config, m_namco58xx, 0);
+	m_namco58xx->in_callback<0>().set_ioport("DSWA_HIGH");
+	m_namco58xx->in_callback<1>().set_ioport("DSWB_LOW");
+	m_namco58xx->in_callback<2>().set_ioport("DSWB_HIGH");
+	m_namco58xx->in_callback<3>().set_ioport("DSWA_LOW");
+}
 
-MACHINE_CONFIG_START(gaplusd_state::gaplusd)
+void gaplusd_state::gaplusd(machine_config &config)
+{
 	gaplus_base(config);
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	NAMCO_58XX(config, m_namco58xx, 0);
+	m_namco58xx->in_callback<0>().set_ioport("COINS");
+	m_namco58xx->in_callback<1>().set_ioport("P1");
+	m_namco58xx->in_callback<2>().set_ioport("P2");
+	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(IOPORT("DSWA_HIGH"))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("DSWB_LOW"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("DSWB_HIGH"))
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSWA_LOW"))
-MACHINE_CONFIG_END
+	NAMCO_56XX(config, m_namco56xx, 0);
+	m_namco56xx->in_callback<0>().set_ioport("DSWA_HIGH");
+	m_namco56xx->in_callback<1>().set_ioport("DSWB_LOW");
+	m_namco56xx->in_callback<2>().set_ioport("DSWB_HIGH");
+	m_namco56xx->in_callback<3>().set_ioport("DSWA_LOW");
+}
 
-MACHINE_CONFIG_START(gapluso_state::gapluso)
+void gapluso_state::gapluso(machine_config &config)
+{
 	gaplus_base(config);
 
 	/* basic machine hardware */
 	m_screen->screen_vblank().set(FUNC(gaplus_base_state::screen_vblank));
 	m_screen->screen_vblank().append(FUNC(gapluso_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("namcoio_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
-	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
-	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
-	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
+	NAMCO_56XX(config, m_namco56xx, 0);
+	m_namco56xx->in_callback<0>().set_ioport("COINS");
+	m_namco56xx->in_callback<1>().set_ioport("P1");
+	m_namco56xx->in_callback<2>().set_ioport("P2");
+	m_namco56xx->in_callback<3>().set_ioport("BUTTONS");
 
-	MCFG_DEVICE_ADD("namcoio_2", NAMCO_58XX, 0)
-	MCFG_NAMCO58XX_IN_0_CB(IOPORT("DSWA_HIGH"))
-	MCFG_NAMCO58XX_IN_1_CB(IOPORT("DSWB_LOW"))
-	MCFG_NAMCO58XX_IN_2_CB(IOPORT("DSWB_HIGH"))
-	MCFG_NAMCO58XX_IN_3_CB(IOPORT("DSWA_LOW"))
-MACHINE_CONFIG_END
+	NAMCO_58XX(config, m_namco58xx, 0);
+	m_namco58xx->in_callback<0>().set_ioport("DSWA_HIGH");
+	m_namco58xx->in_callback<1>().set_ioport("DSWB_LOW");
+	m_namco58xx->in_callback<2>().set_ioport("DSWB_HIGH");
+	m_namco58xx->in_callback<3>().set_ioport("DSWA_LOW");
+}
 
 
 

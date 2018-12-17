@@ -304,8 +304,8 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_SCREEN_VISIBLE_AREA(0, 900, 0, 600)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_QUANTUM, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	AVG_QUANTUM(config, m_avg, 0);
+	m_avg->set_vector_tag("vector");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

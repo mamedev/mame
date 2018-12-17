@@ -24,12 +24,8 @@ Todo:
 Game Status:
 - Inbuilt ROM and PDA functions all work
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- All carts appear to work except:
-- - Lost World: freeze just after entering Stage 2 (the nest).
-- --- If you do nothing it freezes at the point where the stegasaurus
-      should turn around. So, straight away start moving to the right
-      and you can keep playing.
-- Weblink and Internet are of no use as there is nothing to connect to.
+- All carts appear to work, from my limited testing.
+-- indy500 skips some speech just before the trial race starts.
 
 ***************************************************************************/
 
@@ -57,7 +53,7 @@ void gamecom_state::gamecom_mem_map(address_map &map)
 	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
 	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
 	map(0x8000, 0x9FFF).bankr("bank4");                                   /* External ROM/Flash. Controlled by MMU4 */
-	map(0xA000, 0xDFFF).ram().share("videoram");             /* VRAM */
+	map(0xA000, 0xDFFF).writeonly().share("videoram").nopr();             /* VRAM - writeonly, returns 0 on read, as expected by lostwrld */
 	map(0xE000, 0xFFFF).ram().share("nvram");           /* Extended I/O, Extended RAM */
 }
 
@@ -261,11 +257,11 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 
 MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	MCFG_DEVICE_PROGRAM_MAP( gamecom_mem_map)
-	MCFG_SM8500_DMA_CB( WRITE8( *this, gamecom_state, gamecom_handle_dma ) )
-	MCFG_SM8500_TIMER_CB( WRITE8( *this, gamecom_state, gamecom_update_timers ) )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
+	SM8500(config, m_maincpu, XTAL(11'059'200)/2);   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamecom_state::gamecom_mem_map);
+	m_maincpu->dma_cb().set(FUNC(gamecom_state::gamecom_handle_dma));
+	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
+	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

@@ -217,15 +217,15 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 	MCFG_PALETTE_INIT_OWNER(hcastle_state, hcastle)
 
 
-	MCFG_K007121_ADD("k007121_1")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K007121_ADD("k007121_2")
-	MCFG_K007121_PALETTE("palette")
+	K007121(config, m_k007121_1, 0);
+	m_k007121_1->set_palette_tag(m_palette);
+	K007121(config, m_k007121_2, 0);
+	m_k007121_2->set_palette_tag(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, hcastle_state, volume_callback))

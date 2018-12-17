@@ -11,6 +11,7 @@ public:
 	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drq.set_callback(std::forward<Object>(cb)); }
+	auto drq() { return m_drq.bind(); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	uint8_t drq_r();

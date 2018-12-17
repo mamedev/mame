@@ -403,6 +403,10 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #define UNICODE_YEN             "\xC2\xA5"
 #define PWRKICK_HOPPER_PULSE    50          // time between hopper pulses in milliseconds (probably wrong)
 
+//#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
+
+constexpr unsigned toaplan2_state::T2PALETTE_LENGTH;
+
 
 /***************************************************************************
   Initialisation handlers
@@ -729,8 +733,8 @@ WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 
 WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 {
-	m_nmk112->okibank_w(space, offset, data & 0x0f);
-	m_nmk112->okibank_w(space, offset + 1, (data >> 4) & 0x0f);
+	m_nmk112->okibank_w(offset, data & 0x0f);
+	m_nmk112->okibank_w(offset + 1, (data >> 4) & 0x0f);
 }
 
 

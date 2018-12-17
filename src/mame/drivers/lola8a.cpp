@@ -65,7 +65,7 @@ private:
 
 	uint8_t m_portb;
 	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -265,40 +265,42 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(lola8a_state::lola8a)
+void lola8a_state::lola8a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(lola8a_mem)
-	MCFG_DEVICE_IO_MAP(lola8a_io)
-	MCFG_I8085A_SID(READLINE(*this, lola8a_state, cass_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, lola8a_state, cass_w))
+	I8085A(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &lola8a_state::lola8a_mem);
+	m_maincpu->set_addrmap(AS_IO, &lola8a_state::lola8a_io);
+	m_maincpu->in_sid_func().set(FUNC(lola8a_state::cass_r));
+	m_maincpu->out_sod_func().set(FUNC(lola8a_state::cass_w));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, lola8a_state, lola8a_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lola8a_state, lola8a_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	ay8910_device &aysnd(AY8910(config, AY8910_TAG, XTAL(4'915'200) / 4));
+	aysnd.port_a_read_callback().set(FUNC(lola8a_state::lola8a_port_a_r));
+	aysnd.port_b_write_callback().set(FUNC(lola8a_state::lola8a_port_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE(HD46505SP_TAG, hd6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
-	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL(8'000'000) / 8) // HD6845 == HD46505S
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, lola8a_state, crtc_vsync))
+	hd6845_device &crtc(HD6845(config, HD46505SP_TAG, XTAL(8'000'000) / 8)); // HD6845 == HD46505S
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(lola8a_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(FUNC(lola8a_state::crtc_vsync));
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, 8).set_init("palette", FUNC(palette_device::palette_init_3bit_brg));
 
 	/* Cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 /* ROM definition */
 ROM_START( lola8a )

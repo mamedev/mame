@@ -653,12 +653,12 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	MCFG_SCREEN_UPDATE_DRIVER(esd16_state, screen_update_hedpanic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_PRIORITY_CB(esd16_state, hedpanic_pri_callback)
-	MCFG_DECO_SPRITE_FLIPALLX(1)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_pri_callback(FUNC(esd16_state::hedpanic_pri_callback), this);
+	m_sprgen->set_flipallx(1);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esd16)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -711,11 +711,11 @@ MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
-MACHINE_CONFIG_START(esd16_state::hedpanic)
+void esd16_state::hedpanic(machine_config &config)
+{
 	hedpanio(config);
-	MCFG_DEVICE_MODIFY("spritegen")
-	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
-MACHINE_CONFIG_END
+	m_sprgen->set_offsets(-0x18, -0x100);
+}
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 

@@ -634,13 +634,13 @@ MACHINE_CONFIG_START(looping_state::looping)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
 
-	MCFG_DEVICE_ADD("mcu", COP420, COP_CLOCK)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, looping_state, cop_l_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_G_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_IN_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_SI_CB(READLINE(*this, looping_state, cop_serial_r))
+	cop420_cpu_device &cop(COP420(config, "mcu", COP_CLOCK));
+	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	cop.write_l().set(FUNC(looping_state::cop_l_w));
+	cop.read_l().set(FUNC(looping_state::cop_unk_r));
+	cop.read_g().set(FUNC(looping_state::cop_unk_r));
+	cop.read_in().set(FUNC(looping_state::cop_unk_r));
+	cop.read_si().set(FUNC(looping_state::cop_serial_r));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C9 on CPU board
 	// Q0 = A16
@@ -673,11 +673,11 @@ MACHINE_CONFIG_START(looping_state::looping)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	AY8910(config, m_aysnd, SOUND_CLOCK/4);
+	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	MCFG_DEVICE_ADD("tms", TMS5220, TMS_CLOCK)
 	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, looping_state, looping_spcint))

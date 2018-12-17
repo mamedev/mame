@@ -55,21 +55,21 @@ void km035_device::km035_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(km035_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(KM035_CPU_TAG, I8035, XTAL(4'608'000))
-	MCFG_DEVICE_PROGRAM_MAP(km035_map)
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, km035_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, km035_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, km035_device, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, km035_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, km035_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, km035_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, km035_device, t1_r))
+void km035_device::device_add_mconfig(machine_config &config)
+{
+	I8035(config, m_maincpu, XTAL(4'608'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &km035_device::km035_map);
+	m_maincpu->bus_out_cb().set(FUNC(km035_device::bus_w));
+	m_maincpu->p1_in_cb().set(FUNC(km035_device::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(km035_device::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(km035_device::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(km035_device::p2_w));
+	m_maincpu->t0_in_cb().set(FUNC(km035_device::t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(km035_device::t1_r));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(KM035_SPK_TAG, BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_speaker, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 const tiny_rom_entry *km035_device::device_rom_region() const
 {

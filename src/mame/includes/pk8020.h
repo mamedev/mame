@@ -5,11 +5,13 @@
  * includes/pk8020.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PK8020_H
 #define MAME_INCLUDES_PK8020_H
 
+#pragma once
+
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -24,8 +26,8 @@
 class pk8020_state : public driver_device
 {
 public:
-	pk8020_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pk8020_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_ppi8255_2(*this, "ppi8255_2"),
@@ -43,7 +45,8 @@ public:
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void pk8020(machine_config &config);
 
@@ -72,7 +75,6 @@ private:
 	DECLARE_WRITE8_MEMBER(devices_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pk8020);
 	uint32_t screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
@@ -103,7 +105,7 @@ private:
 	required_device<pic8259_device> m_pic8259;
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
-	required_memory_region m_region_gfx1;
+	required_region_ptr<uint8_t> m_region_gfx1;
 	ioport_port *m_io_port[16];
 	required_device<palette_device> m_palette;
 	void pk8020_set_bank(uint8_t data);

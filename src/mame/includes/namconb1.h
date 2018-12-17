@@ -5,6 +5,10 @@
     Namco System NB-1 hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_NAMCONB1_H
+#define MAME_INCLUDES_NAMCONB1_H
+
+#pragma once
 
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
@@ -44,7 +48,8 @@ public:
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
 		m_rozbank32(*this, "rozbank32"),
-		m_namconb_shareram(*this, "namconb_share") { }
+		m_namconb_shareram(*this, "namconb_share")
+	{ }
 
 	void namconb1(machine_config &config);
 	void namconb2(machine_config &config);
@@ -161,3 +166,5 @@ private:
 	void namconb1_am(address_map &map);
 	void namconb2_am(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NAMCONB1_H

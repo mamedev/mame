@@ -1066,8 +1066,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
+	TMS32031(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvunit_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1101,43 +1101,44 @@ void midvunit_state::midvunit(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(midvunit_state::crusnwld)
+void midvunit_state::crusnwld(machine_config &config)
+{
 	midvunit(config);
 	/* valid values are 450 or 460 */
-	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
-	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
-MACHINE_CONFIG_END
+	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
+	m_midway_serial_pic->set_upper(450);
+}
 
-MACHINE_CONFIG_START(midvunit_state::offroadc)
+void midvunit_state::offroadc(machine_config &config)
+{
 	midvunit(config);
 	/* valid values are 230 or 234 */
-	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)
-	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
-	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
-MACHINE_CONFIG_END
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	m_midway_serial_pic2->set_upper(230);
+	m_midway_serial_pic2->set_yearoffs(94);
+}
 
 MACHINE_CONFIG_START(midvunit_state::midvplus)
 	midvcommon(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(midvplus_map)
-	MCFG_TMS3203X_XF1_CB(WRITE8(*this, midvunit_state, midvplus_xf1_w))
+	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvplus_map);
+	m_maincpu->xf1().set(FUNC(midvunit_state::midvplus_xf1_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
-	MCFG_DEVICE_REMOVE("nvram")
+	config.device_remove("nvram");
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(0)
-	MCFG_MIDWAY_IOASIC_UPPER(452) /* no alternates */
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
+	MIDWAY_IOASIC(config, m_midway_ioasic, 0);
+	m_midway_ioasic->set_shuffle(0);
+	m_midway_ioasic->set_upper(452); /* no alternates */
+	m_midway_ioasic->set_yearoffs(94);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x3839);
 MACHINE_CONFIG_END
 
 

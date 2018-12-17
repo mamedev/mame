@@ -362,9 +362,7 @@ D                                                                               
 #include "includes/equites.h"
 
 #include "cpu/alph8201/alph8201.h"
-#include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -388,8 +386,8 @@ D                                                                               
 
 WRITE_LINE_MEMBER(equites_state::equites_8155_timer_pulse)
 {
-	if (!state) // active low
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (!state)
+		m_audiocpu->set_input_line(I8085_TRAP_LINE, ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
@@ -410,12 +408,12 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 	switch (offset)
 	{
 		case 0: // c0f8: NMI ack (written by NMI handler)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			m_audiocpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			m_audiocpu->pulse_input_line(I8085_RST75_LINE, m_audiocpu->minimum_quantum_time());
+			m_audiocpu->pulse_input_line(I8085_RST75_LINE, attotime::zero);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
@@ -1042,21 +1040,21 @@ static const char *const alphamc07_sample_names[] =
 // the sound board is the same in all games
 MACHINE_CONFIG_START(equites_state::common_sound)
 
-	MCFG_DEVICE_ADD("audiocpu", I8085A, 6.144_MHz_XTAL) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
+	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &equites_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &equites_state::sound_portmap);
+	m_audiocpu->set_clk_out("audio8155", FUNC(i8155_device::set_unscaled_clock));
 
-	i8155_device &i8155(I8155(config, "audio8155", 0));
-	i8155.out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
-	i8155.out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
-	i8155.out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
-	i8155.out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
+	I8155(config, m_audio8155, 0);
+	m_audio8155->out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
+	m_audio8155->out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
+	m_audio8155->out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
+	m_audio8155->out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
 	MCFG_MSM5232_SET_CAPACITORS(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6) // verified
@@ -1150,6 +1148,8 @@ void splndrbt_state::machine_start()
 
 void equites_state::machine_reset()
 {
+	m_audiocpu->set_input_line(I8085_INTR_LINE, CLEAR_LINE);
+	m_audiocpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
 }
 
 

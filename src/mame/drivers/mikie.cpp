@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -422,5 +422,5 @@ ROM_END
 
 GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiek,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "bootleg", "Shin Ib Sa Won - Seok Dol I",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiek,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "bootleg", "Shin-ip Sawon - Seok Dol-i",   MACHINE_SUPPORTS_SAVE ) // 新入社員 - 石돌이 (신입사원 - 석돌이)
 GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )

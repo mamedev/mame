@@ -19,6 +19,7 @@ public:
 	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_port_write_handler(Object &&cb) { return m_port_write_handler.set_callback(std::forward<Object>(cb)); }
+	auto port_write() { return m_port_write_handler.bind(); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );

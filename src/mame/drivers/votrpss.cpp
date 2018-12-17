@@ -254,16 +254,16 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("votrax", votrax_sc01_device, write))     // port A write
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay(AY8910(config, "ay", XTAL(8'000'000)/4)); /* 2.000 MHz, verified */
+	ay.port_b_read_callback().set_ioport("DSW1");
+	ay.port_a_write_callback().set("votrax", FUNC(votrax_sc01_device::write));
+	ay.add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720 kHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(votrpss_state::kbd_put));
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

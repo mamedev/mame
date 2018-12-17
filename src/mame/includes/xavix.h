@@ -26,7 +26,9 @@ public:
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
-	void enable_voice(int voice);
+	void enable_voice(int voice, bool update_only);
+	void disable_voice(int voice);
+	bool is_voice_enabled(int voice);
 
 protected:
 	// device-level overrides
@@ -40,10 +42,13 @@ private:
 	sound_stream *m_stream;
 
 	struct xavix_voice {
-		bool enabled;
-		uint16_t position;
+		bool enabled[2];
+		uint32_t position[2];
+		uint32_t startposition[2];
 		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
 		int type;
+		int rate;
+		int vol;
 	};
 
 	devcb_read8 m_readregs_cb;
@@ -64,6 +69,7 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_maincpu(*this, "maincpu"),
+		m_sprite_xhigh_ignore_hack(true),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
@@ -85,16 +91,14 @@ public:
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lowbus(*this, "lowbus"),
-		m_hack_timer_disable(false),
 		m_sound(*this, "xavix_sound")
 	{ }
-	
+
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
 
 	void init_xavix();
-	void init_bass();
 
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
@@ -109,6 +113,7 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction);
 	required_ioport m_in0;
 	required_ioport m_in1;
+	required_device<xavix_device> m_maincpu;
 
 private:
 
@@ -139,8 +144,8 @@ private:
 
 	/* this is just a quick memory system bypass for video reads etc. because going through the
 	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
-	   enable the video before actually setting up the source registers! 
-   
+	   enable the video before actually setting up the source registers!
+
 	   this will need modifying if any games have RAM instead of ROM (which I think is possible
 	   with SuperXaviX at least)
 	*/
@@ -285,10 +290,10 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_READ8_MEMBER(sound_reg16_0_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_0_w);
-	DECLARE_READ8_MEMBER(sound_reg16_1_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_1_w);
+	DECLARE_READ8_MEMBER(sound_startstop_r);
+	DECLARE_WRITE8_MEMBER(sound_startstop_w);
+	DECLARE_READ8_MEMBER(sound_updateenv_r);
+	DECLARE_WRITE8_MEMBER(sound_updateenv_w);
 
 	DECLARE_READ8_MEMBER(sound_sta16_r);
 	DECLARE_READ8_MEMBER(sound_75f5_r);
@@ -320,6 +325,10 @@ private:
 	uint8_t m_soundreg16_1[2];
 	uint8_t m_sound_regbase;
 
+	TIMER_CALLBACK_MEMBER(sound_timer_done);
+	emu_timer *m_sound_timer[4];
+
+
 	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
 	DECLARE_READ8_MEMBER(timer_baseval_r);
@@ -338,7 +347,8 @@ private:
 	DECLARE_WRITE8_MEMBER(colmix_l_w);
 	DECLARE_WRITE8_MEMBER(bmp_palram_sh_w);
 	DECLARE_WRITE8_MEMBER(bmp_palram_l_w);
-
+	DECLARE_WRITE8_MEMBER(spriteram_w);
+	bool m_sprite_xhigh_ignore_hack;
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
@@ -396,9 +406,8 @@ private:
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
-	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	
+
 	void update_irqs();
 	uint8_t m_irqsource;
 
@@ -424,7 +433,11 @@ private:
 	uint8_t m_6ff0;
 	uint8_t m_video_ctrl;
 
-	uint8_t m_soundregs[0x10];
+	uint8_t m_mastervol;
+	uint8_t m_unk_snd75f8;
+	uint8_t m_unksnd75f9;
+	uint8_t m_unksnd75ff;
+	uint8_t m_sndtimer[4];
 
 	uint8_t m_timer_baseval;
 
@@ -471,6 +484,7 @@ private:
 	void draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int line);
+	void decode_inline_header(int &flipx, int &flipy, int &test, int& pal, int debug_packets);
 
 	bitmap_ind16 m_zbuffer;
 
@@ -491,8 +505,6 @@ private:
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
 
-	bool m_hack_timer_disable;
-
 	required_device<xavix_sound_device> m_sound;
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
 };
@@ -502,7 +514,9 @@ class xavix_i2c_state : public xavix_state
 public:
 	xavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag),
-		m_i2cmem(*this, "i2cmem")
+		m_i2cmem(*this, "i2cmem"),
+		hackaddress1(-1),
+		hackaddress2(-1)
 	{ }
 
 	void xavix_i2c_24lc04(machine_config &config);
@@ -511,12 +525,35 @@ public:
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
 
+	void init_epo_efdx()
+	{
+		init_xavix();
+		hackaddress1 = 0x958a;
+		hackaddress2 = 0x8524;
+	}
 protected:
 	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+
+private:
+	int hackaddress1;
+	int hackaddress2;
 };
+
+class xavix_i2c_lotr_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_lotr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
 
 
 class xavix_mtrk_state : public xavix_state
@@ -560,9 +597,7 @@ public:
 		m_extra0(*this, "EXTRA0"),
 		m_extra1(*this, "EXTRA1"),
 		m_extraioselect(0),
-		m_extraiowrite(0),
-		m_extrainlatch0(0),
-		m_extrainlatch1(0)
+		m_extraiowrite(0)
 	{ }
 
 	void xavix_ekara(machine_config &config);
@@ -581,10 +616,6 @@ protected:
 
 	uint8_t m_extraioselect;
 	uint8_t m_extraiowrite;
-
-	uint8_t m_extrainlatch0;
-	uint8_t m_extrainlatch1;
-
 };
 
 #endif // MAME_INCLUDES_XAVIX_H

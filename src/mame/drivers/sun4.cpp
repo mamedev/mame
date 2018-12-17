@@ -417,6 +417,7 @@
 #include "bus/sbus/sbus.h"
 #include "bus/sbus/bwtwo.h"
 #include "cpu/sparc/sparc.h"
+#include "imagedev/floppy.h"
 #include "machine/am79c90.h"
 #include "machine/bankdev.h"
 #include "machine/ncr5390.h"
@@ -631,8 +632,6 @@ private:
 	DECLARE_WRITE8_MEMBER( auxio_w );
 	DECLARE_READ32_MEMBER( dma_r );
 	DECLARE_WRITE32_MEMBER( dma_w );
-	DECLARE_READ32_MEMBER( lance_dma_r ); // TODO: Should be 16 bits
-	DECLARE_WRITE32_MEMBER( lance_dma_w );
 	DECLARE_WRITE32_MEMBER( buserr_w );
 
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
@@ -1805,22 +1804,6 @@ WRITE_LINE_MEMBER( sun4_state::fdc_irq )
 	}
 }
 
-READ32_MEMBER( sun4_state::lance_dma_r )
-{
-	if (m_arch == ARCH_SUN4)
-		return sun4_insn_data_r<SUPER_DATA>(space, offset, mem_mask);
-	else
-		return m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>(offset, mem_mask);
-}
-
-WRITE32_MEMBER( sun4_state::lance_dma_w )
-{
-	if (m_arch == ARCH_SUN4)
-		sun4_insn_data_w(space, offset, data, mem_mask);
-	else
-		m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>(offset, data, mem_mask);
-}
-
 WRITE32_MEMBER( sun4_state::buserr_w )
 {
 	COMBINE_DATA(&m_buserr[offset]);
@@ -1865,8 +1848,8 @@ void sun4_state::ncr53c90a(device_t *device)
 
 MACHINE_CONFIG_START(sun4_state::sun4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16'670'000)
-	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
+	MB86901(config, m_maincpu, 16'670'000);
+		m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
 	// TODO: MMU for sun4 hardware
@@ -1897,9 +1880,20 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_s4_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
-	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
+	AM79C90(config, m_lance);
+	m_lance->dma_in().set([this](address_space &space, offs_t offset)
+	{
+		u32 const data = sun4_insn_data_r<SUPER_DATA>(space, (0xff000000U | offset) >> 2);
+
+		return (offset & 2) ? u16(data) : u16(data >> 16);
+	});
+	m_lance->dma_out().set([this](address_space &space, offs_t offset, u16 data, u16 mem_mask)
+	{
+		if (offset & 2)
+			sun4_insn_data_w(space, (0xff000000U | offset) >> 2, data, mem_mask);
+		else
+			sun4_insn_data_w(space, (0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+	});
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1940,8 +1934,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MB86901, 20'000'000)
-	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
+	MB86901(config, m_maincpu, 20'000'000);
+	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4c_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
 	SUN4C_MMU(config, m_mmu, 20'000'000, 7, 0x7f);
@@ -1970,9 +1964,20 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
-	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
+	AM79C90(config, m_lance);
+	m_lance->dma_in().set([this](offs_t offset)
+	{
+		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, 0xffffffffU);
+
+		return (offset & 2) ? u16(data) : u16(data >> 16);
+	});
+	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask)
+	{
+		if (offset & 2)
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, data, mem_mask);
+		else
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+	});
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);

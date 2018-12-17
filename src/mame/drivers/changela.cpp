@@ -416,17 +416,17 @@ void changela_state::machine_reset()
 	m_dir_31 = 0;
 }
 
-MACHINE_CONFIG_START(changela_state::changela)
+void changela_state::changela(machine_config &config)
+{
+	Z80(config, m_maincpu, 5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &changela_state::changela_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(changela_state::changela_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("maincpu", Z80,5000000)
-	MCFG_DEVICE_PROGRAM_MAP(changela_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", changela_state, changela_scanline, "screen", 0, 1)
-
-	MCFG_DEVICE_ADD("mcu", M68705P3, 2500000)
-	MCFG_M68705_PORTB_R_CB(IOPORT("MCU"))
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, changela_state, changela_68705_port_a_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(*this, changela_state, changela_68705_port_c_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
+	M68705P3(config, m_mcu, 2500000);
+	m_mcu->portb_r().set_ioport("MCU");
+	m_mcu->porta_w().set(FUNC(changela_state::changela_68705_port_a_w));
+	m_mcu->portc_w().set(FUNC(changela_state::changela_68705_port_c_w));
+	m_mcu->set_vblank_int("screen", FUNC(changela_state::chl_mcu_irq));
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // U44 on Sound I/O Board
 	outlatch.q_out_cb<0>().set(FUNC(changela_state::collision_reset_0_w));
@@ -437,28 +437,28 @@ MACHINE_CONFIG_START(changela_state::changela)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)  /* vert size is a guess */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(changela_state, screen_update_changela)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 262);  /* vert size is a guess */
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(changela_state::screen_update_changela));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x40)
+	PALETTE(config, m_palette, 0x40);
 
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay1(AY8910(config, "ay1", 1250000));
+	ay1.port_a_read_callback().set_ioport("DSWA");
+	ay1.port_b_read_callback().set_ioport("DSWB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWC"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWD"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
+	ay2.port_a_read_callback().set_ioport("DSWC");
+	ay2.port_b_read_callback().set_ioport("DSWD");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 ROM_START( changela )

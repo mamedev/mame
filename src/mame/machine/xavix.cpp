@@ -241,13 +241,13 @@ WRITE8_MEMBER(xavix_state::adc_7b80_w)
 
 WRITE8_MEMBER(xavix_state::adc_7b81_w)
 {
-//	m_irqsource &= ~0x04;
-//	update_irqs();
+//  m_irqsource &= ~0x04;
+//  update_irqs();
 
 	LOG("%s: adc_7b81_w %02x\n", machine().describe_context(), data);
 	m_adc_control = data;
 
-//	m_adc_timer->adjust(attotime::from_usec(200));
+//  m_adc_timer->adjust(attotime::from_usec(200));
 
 }
 
@@ -410,6 +410,13 @@ uint8_t xavix_i2c_state::read_io1(uint8_t direction)
 
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
+	// ignore these writes so that epo_edfx can send read requests to the ee-prom and doesn't just report an error
+	// TODO: check if these writes shouldn't be happening (the first is a direct write, the 2nd is from a port direction change)
+	//  or if the i2cmem code is oversensitive, or if something else is missing to reset the state
+	if (hackaddress1 != -1)
+		if ((m_maincpu->pc() == hackaddress1) || (m_maincpu->pc() == hackaddress2))
+			return;
+
 	if (direction & 0x08)
 	{
 		m_i2cmem->write_sda((data & 0x08) >> 3);
@@ -418,15 +425,70 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 	if (direction & 0x10)
 	{
 		m_i2cmem->write_scl((data & 0x10) >> 4);
-	}	
+	}
+}
+
+uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
+{
+	uint8_t ret = m_in1->read();
+
+	// some kind of comms with the IR sensor?
+	ret ^= (machine().rand() & 0x02);
+	ret ^= (machine().rand() & 0x04);
+
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
+
+	return ret;
 }
 
 uint8_t xavix_ekara_state::read_io1(uint8_t direction)
 {
+	uint8_t extrainlatch0 = 0x00;
+	uint8_t extrainlatch1 = 0x00;
+
+	switch (m_extraioselect & 0x7f)
+	{
+	case 0x01:
+		extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
+		extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
+		break;
+	case 0x02:
+		extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
+		extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
+		break;
+	case 0x04:
+		extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
+		extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
+		break;
+	case 0x08:
+		extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
+		extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
+		break;
+	case 0x10:
+		extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
+		extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
+		break;
+	case 0x20:
+		extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
+		extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
+		break;
+	case 0x40:
+		extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
+		extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
+		break;
+	default:
+		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+		break;
+	}
+
 	uint8_t ret = m_in1->read();
 	ret &= 0xfc;
-	ret |= m_extrainlatch0 << 0;
-	ret |= m_extrainlatch1 << 1;
+	ret |= extrainlatch0 << 0;
+	ret |= extrainlatch1 << 1;
 	return ret;
 }
 
@@ -439,51 +501,6 @@ void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
 void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 {
 	uint8_t extraiowrite = data & direction;
-
-	if ((extraiowrite & 0x80) != (m_extraiowrite & 0x80))
-	{
-		if (extraiowrite & 0x80)
-		{
-			// clock out bits 0x0c using m_extraioselect (TODO)  (probably the 7segs?)
-			// also latch in bits for reading later?
-
-			switch (m_extraioselect & 0x7f)
-			{
-			case 0x01:
-				m_extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
-				m_extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
-				break;
-			case 0x02:
-				m_extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
-				m_extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
-				break;
-			case 0x04:
-				m_extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
-				m_extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
-				break;
-			case 0x08:
-				m_extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
-				m_extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
-				break;
-			case 0x10:
-				m_extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
-				m_extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
-				break;
-			case 0x20:
-				m_extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
-				m_extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
-				break;
-			case 0x40:
-				m_extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
-				m_extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
-				break;
-			default:
-				LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-				break;
-			}	
-		}
-	}
-
 	m_extraiowrite = extraiowrite;
 }
 
@@ -604,7 +621,7 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 {
 	/* timer is actively used by
 	   ttv_lotr, ttv_sw, drgqst, has_wamg, rad_rh, eka_*, epo_efdx, rad_bass, rad_bb2
-	   
+
 	   gets turned on briefly during the bootup of rad_crdn, but then off again
 
 	   runs during rad_fb / rad_madf, but with IRQs turned off
@@ -629,15 +646,12 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
 	if (data & 0x01) // timer start?
 	{
-		// eka_bass will crash after a certain number of timer IRQs, needs investigation
-		if (!m_hack_timer_disable)
-		{
-			// TODO: work out the proper calculation here
-			// int divide = 1 << ((m_timer_freq&0x0f)+1);
-			// uint32_t freq = m_maincpu->unscaled_clock()/2;
-			// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
-			m_freq_timer->adjust(attotime::from_usec(1000));
-		}
+		// TODO: work out the proper calculation here
+		// int divide = 1 << ((m_timer_freq&0x0f)+1);
+		// uint32_t freq = m_maincpu->unscaled_clock()/2;
+		// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
+		//m_freq_timer->adjust(attotime::from_usec(1000));
+		m_freq_timer->adjust(attotime::from_usec(50));
 	}
 	else
 	{
@@ -705,7 +719,7 @@ TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 		m_timer_control |= 0x80;
 		update_irqs();
 	}
-	
+
 	//logerror("freq_timer_done\n");
 	// reload
 	//m_freq_timer->adjust(attotime::from_usec(50000));
@@ -750,33 +764,33 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 	if (offset == 2)
 	{
 		// assume 0 is upper bits, might be 'mode' instead, check
-		int param1 = m_multparams[1];
-		int param2 = m_multparams[2];
 
-#if 0
-		int signparam1 = (m_multparams[0] & 0x02) >> 1;
-		int signparam2 = (m_multparams[0] & 0x01) >> 0;
 
-		if (signparam1) param1 = -param1;
-		if (signparam2) param2 = -param2;
-#endif
+		int signmode = (m_multparams[0] & 0x3f);
 
 		uint16_t result = 0;
 
 		// rad_madf uses this mode (add to previous result)
 		if ((m_multparams[0] & 0xc0) == 0xc0)
 		{
+			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
+			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
+
 			result = param1 * param2;
+
 			uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
 			result = oldresult + result;
 		}
 		else if ((m_multparams[0] & 0xc0) == 0x00)
 		{
+			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
+			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
+
 			result = param1 * param2;
 		}
 		else
 		{
-			popmessage("unknown multiplier mode %02n", m_multparams[0] & 0xc0);
+			popmessage("unknown multiplier mode %02x", m_multparams[0] & 0xc0);
 		}
 
 		m_multresults[1] = (result >> 8) & 0xff;
@@ -822,6 +836,10 @@ void xavix_state::machine_start()
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
 	m_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::adc_timer_done), this));
 
+	for (int i = 0; i < 4; i++)
+	{
+		m_sound_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::sound_timer_done), this));
+	}
 }
 
 void xavix_state::machine_reset()
@@ -850,15 +868,15 @@ void xavix_state::machine_reset()
 
 	m_spritereg = 0;
 
-	m_soundregs[0] = 0;
-	m_soundregs[1] = 0;
+	m_mastervol = 0x00;
+	m_unk_snd75f8 = 0x00;
+	m_unksnd75f9 = 0x00;
+	m_unksnd75ff = 0x00;
 
-	m_soundregs[6] = 0;
-	m_soundregs[8] = 0;
-	m_soundregs[10] = 0;
-	m_soundregs[11] = 0;
-	m_soundregs[12] = 0;
-	m_soundregs[13] = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		m_sndtimer[i] = 0x00;
+	}
 
 	std::fill(std::begin(m_multparams), std::end(m_multparams), 0x00);
 	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);
@@ -888,6 +906,8 @@ void xavix_state::machine_reset()
 	m_sound_regbase = 0x00;
 
 	m_adc_control = 0x00;
+
+	m_sprite_xhigh_ignore_hack = true;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

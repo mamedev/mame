@@ -47,6 +47,7 @@ public:
 	template <class Object> devcb_base &set_vck_callback(Object &&cb) { return m_vck_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_vck_legacy_callback(Object &&cb) { return m_vck_legacy_cb.set_callback(std::forward<Object>(cb)); }
 	auto vck_callback() { return m_vck_cb.bind(); }
+	auto vck_legacy_callback() { return m_vck_legacy_cb.bind(); }
 
 	// reset signal should keep for 2cycle of VCLK
 	DECLARE_WRITE_LINE_MEMBER(reset_w);

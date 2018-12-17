@@ -1309,12 +1309,12 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_MSM6253_IN2_ANALOG_PORT("ADC.2")
 	MCFG_MSM6253_IN3_ANALOG_READ(segaybd_state, analog_mux)
 
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_suby")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_suby")
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_suby", 0);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1326,9 +1326,9 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_DEVICE_ADD("bsprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("ysprites", SEGA_YBOARD_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_bsprites, 0);
+	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
 	MCFG_PALETTE_ADD("palette", 8192*3)
 
@@ -1336,13 +1336,12 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/8)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/8));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.43);
+	ymsnd.add_route(1, "rspeaker", 0.43);
 
 	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)

@@ -11,8 +11,8 @@
 class xevious_state : public galaga_state
 {
 public:
-	xevious_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaga_state(mconfig, type, tag),
+	xevious_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galaga_state(mconfig, type, tag),
 		m_xevious_sr1(*this, "xevious_sr1"),
 		m_xevious_sr2(*this, "xevious_sr2"),
 		m_xevious_sr3(*this, "xevious_sr3"),
@@ -21,7 +21,8 @@ public:
 		m_xevious_fg_videoram(*this, "fg_videoram"),
 		m_xevious_bg_videoram(*this, "bg_videoram"),
 		m_samples(*this, "samples"),
-		m_subcpu3(*this, "sub3") { }
+		m_subcpu3(*this, "sub3")
+	{ }
 
 	void xevious(machine_config &config);
 

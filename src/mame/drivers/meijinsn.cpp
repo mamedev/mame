@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));

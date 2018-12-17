@@ -37,13 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device)
 
-#define MCFG_DECO_MXC06_GFXDECODE(_gfxtag) \
-	downcast<deco_mxc06_device &>(*device).set_gfxdecode_tag(_gfxtag);
-
-#define MCFG_DECO_MXC06_GFX_REGION(_region) \
-	downcast<deco_mxc06_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_DECO_MXC06_RAMSIZE(_size) \
-	downcast<deco_mxc06_device &>(*device).set_ram_size(_size);
-
 #endif // MAME_VIDEO_DECMXC06_H

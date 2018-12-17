@@ -1000,18 +1000,18 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(1)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_FLIPALLX(1)
-	MCFG_DECO_SPRITE_OFFSETS(0, 8)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(1);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_flipallx(1);
+	m_sprgen->set_offsets(0, 8);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

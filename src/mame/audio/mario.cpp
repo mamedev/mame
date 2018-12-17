@@ -638,25 +638,25 @@ void mario_state::masao_sound_map(address_map &map)
 MACHINE_CONFIG_START(mario_state::mario_audio)
 
 #if USE_8039
-	MCFG_DEVICE_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
+	i8039_device &audiocpu(I8039(config, "audiocpu", I8035_CLOCK));		/* 730 kHz */
 #else
-	MCFG_DEVICE_ADD("audiocpu", M58715, I8035_CLOCK)        /* 730 kHz */
+	m58715_device &audiocpu(M58715(config, m_audiocpu, I8035_CLOCK));	/* 730 kHz */
 #endif
-	MCFG_DEVICE_PROGRAM_MAP(mario_sound_map)
-	MCFG_DEVICE_IO_MAP(mario_sound_io_map)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, mario_state, mario_sh_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, mario_state, mario_sh_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, mario_state, mario_sh_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, mario_state, mario_sh_p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, mario_state, mario_sh_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, mario_state, mario_sh_t1_r))
+	audiocpu.set_addrmap(AS_PROGRAM, &mario_state::mario_sound_map);
+	audiocpu.set_addrmap(AS_IO, &mario_state::mario_sound_io_map);
+	audiocpu.p1_in_cb().set(FUNC(mario_state::mario_sh_p1_r));
+	audiocpu.p1_out_cb().set(FUNC(mario_state::mario_sh_p1_w));
+	audiocpu.p2_in_cb().set(FUNC(mario_state::mario_sh_p2_r));
+	audiocpu.p2_out_cb().set(FUNC(mario_state::mario_sh_p2_w));
+	audiocpu.t0_in_cb().set(FUNC(mario_state::mario_sh_t0_r));
+	audiocpu.t1_in_cb().set(FUNC(mario_state::mario_sh_t1_r));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch3);
+	GENERIC_LATCH_8(config, m_soundlatch4);
 
 #if OLD_SOUND
 	MCFG_DEVICE_ADD("discrete", DISCRETE)
@@ -678,17 +678,16 @@ MACHINE_CONFIG_START(mario_state::mario_audio)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mario_state::masao_audio)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 24576000/16)  /* ???? */
-	MCFG_DEVICE_PROGRAM_MAP(masao_sound_map)
+void mario_state::masao_audio(machine_config &config)
+{
+	Z80(config, m_audiocpu, 24576000/16);  /* ???? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mario_state::masao_sound_map);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 14318000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/6));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}

@@ -388,6 +388,7 @@ firefox.cpp
 firetrap.cpp
 firetrk.cpp
 fitfight.cpp
+flashbeats.cpp
 flicker.cpp
 flipjack.cpp
 flkatck.cpp
@@ -996,6 +997,7 @@ route16.cpp
 rowamet.cpp
 royalmah.cpp
 rpunch.cpp
+rulechan.cpp
 runaway.cpp
 rungun.cpp
 s11.cpp

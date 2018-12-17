@@ -408,11 +408,11 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(UV201_TAG, uv201_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(3636363, 232, 18, 232, 262, 21, 262)
-	MCFG_DEVICE_ADD(UV201_TAG, UV201, 3636363)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_UV201_EXT_INT_CALLBACK(WRITELINE(*this, vidbrain_state, ext_int_w))
-	MCFG_UV201_HBLANK_CALLBACK(WRITELINE(*this, vidbrain_state, hblank_w))
-	MCFG_UV201_DB_CALLBACK(READ8(*this, vidbrain_state, memory_read_byte))
+	UV201(config, m_uv, 3636363);
+	m_uv->set_screen(SCREEN_TAG);
+	m_uv->ext_int_wr_callback().set(FUNC(vidbrain_state::ext_int_w));
+	m_uv->hblank_wr_callback().set(FUNC(vidbrain_state::hblank_w));
+	m_uv->db_rd_callback().set(FUNC(vidbrain_state::memory_read_byte));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

@@ -53,9 +53,8 @@
 	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
 
 #define MCFG_ATARI_VAD_MOB(_config, _gfxtag) \
-	{ std::string fulltag(device->tag()); fulltag.append(":mob"); device_t *device; \
-	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag.c_str(), "screen", _config) \
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) }
+	{ std::string fulltag(device->tag()); fulltag.append(":mob"); \
+	ATARI_MOTION_OBJECTS(config, fulltag.c_str(), 0, "screen", _config).set_gfxdecode(_gfxtag); }
 
 
 

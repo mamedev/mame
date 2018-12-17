@@ -5,14 +5,18 @@
     Gun.Smoke
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GUNSMOKE_H
+#define MAME_INCLUDES_GUNSMOKE_H
+
+#pragma once
 
 #include "emupal.h"
 
 class gunsmoke_state : public driver_device
 {
 public:
-	gunsmoke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gunsmoke_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_scrollx(*this, "scrollx"),
@@ -20,7 +24,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void gunsmoke(machine_config &config);
 
@@ -58,3 +63,5 @@ private:
 	void gunsmoke_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GUNSMOKE_H

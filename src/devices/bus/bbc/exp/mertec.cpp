@@ -99,18 +99,6 @@ void bbc_mertec_device::device_start()
 {
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_mertec_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(0, m_ext_rom->base() + 0x0000);
-	machine().root_device().membank("bank5")->configure_entry(0, m_ext_rom->base() + 0x1000);
-	machine().root_device().membank("bank4")->configure_entry(1, m_ext_rom->base() + 0x4000);
-	machine().root_device().membank("bank5")->configure_entry(1, m_ext_rom->base() + 0x5000);
-}
-
 
 //**************************************************************************
 //  IMPLEMENTATION

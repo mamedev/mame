@@ -1711,21 +1711,21 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
+	GENERIC_LATCH_16(config, m_soundlatch);
+	GENERIC_LATCH_16(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, megasys1_state,sound_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK/2)); /* 3.5MHz (7MHz / 2) verified */
+	ymsnd.irq_handler().set(FUNC(megasys1_state::sound_irq));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH) /* 4MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
@@ -1743,24 +1743,24 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::system_A_iganinju)
 	system_A(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_REMOVE("scantimer")
+	config.device_remove("scantimer");
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(megasys1_state::system_A_soldam)
+void megasys1_state::system_A_soldam(machine_config &config)
+{
 	system_A(config);
-	MCFG_DEVICE_MODIFY("scroll1")
-	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
-MACHINE_CONFIG_END
+
+	m_tmap[1]->set_8x8_scroll_factor(4);
+}
 
 MACHINE_CONFIG_START(megasys1_state::kickoffb)
 	system_A(config);
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(kickoffb_sound_map)
 
-	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("oki2")
+	config.device_remove("ymsnd");
+	config.device_remove("oki2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, SOUND_CPU_CLOCK / 2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, megasys1_state, sound_irq)) // TODO: needs to be checked
@@ -1816,9 +1816,9 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1896,8 +1896,8 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1947,13 +1947,13 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
+	GENERIC_LATCH_8(config, m_soundlatch_z);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

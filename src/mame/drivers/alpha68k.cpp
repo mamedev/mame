@@ -26,6 +26,7 @@ TODO:
 - Super Stingray MCU irq controls timer speed, needs the MCU to be hooked up.
 - Super Champion Baseball "ball speed" protection
 - Fix sound CPU crashes properly on Alpha 68k II / V HW games (nested NMIs)
+- Sky Soldiers : BGM Fade out before boss battle isn't implemented
 
 General notes:
 
@@ -1906,14 +1907,14 @@ MACHINE_CONFIG_START(alpha68k_state::sstingry)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
-	MCFG_DEVICE_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
-//  MCFG_DEVICE_PROGRAM_MAP(i8748_map)
-//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, alpha68k_state, saiyugoub1_mcu_command_r))
+	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
+//  mcu.set_addrmap(AS_PROGRAM, &alpha68k_state::i8748_map);
+//  mcu.bus_in_cb().set(FUNC(alpha68k_state::saiyugoub1_mcu_command_r));
 //  MCFG_MCS48_PORT_T0_CLK_CUSTOM(alpha68k_state, saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
-//  MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, alpha68k_state, saiyugoub1_m5205_irq_r))
-//  MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alpha68k_state, saiyugoub1_adpcm_rom_addr_w))
-//  MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alpha68k_state, saiyugoub1_adpcm_control_w))
-	MCFG_DEVICE_DISABLE()
+//  mcu.t1_in_cb().set(FUNC(alpha68k_state::saiyugoub1_m5205_irq_r));
+//  mcu.p1_out_cb().set(FUNC(alpha68k_state::saiyugoub1_adpcm_rom_addr_w));
+//  mcu.p2_out_cb().set(FUNC(alpha68k_state::saiyugoub1_adpcm_control_w));
+	mcu.set_disable();
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -1937,7 +1938,7 @@ MACHINE_CONFIG_START(alpha68k_state::sstingry)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
@@ -1989,7 +1990,7 @@ MACHINE_CONFIG_START(alpha68k_state::kyros)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL / 12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
@@ -2040,7 +2041,7 @@ MACHINE_CONFIG_START(alpha68k_state::jongbou)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -2079,8 +2080,8 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2132,7 +2133,7 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
 	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
@@ -2198,7 +2199,7 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2203_device &ym1(YM2203(config, "ym1", ALPHA68K_PIXEL_CLOCK / 2));
 	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
@@ -2253,7 +2254,7 @@ MACHINE_CONFIG_START(alpha68k_state::tnextspc)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

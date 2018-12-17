@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_SCRAMBLE_H
+#define MAME_INCLUDES_SCRAMBLE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -12,8 +16,8 @@
 class scramble_state : public galaxold_state
 {
 public:
-	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxold_state(mconfig, type, tag),
+	scramble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galaxold_state(mconfig, type, tag),
 		m_konami_7474(*this, "konami_7474"),
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
@@ -147,3 +151,5 @@ private:
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 };
+
+#endif // MAME_INCLUDES_SCRAMBLE_H

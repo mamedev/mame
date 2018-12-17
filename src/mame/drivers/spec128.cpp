@@ -317,8 +317,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spec128)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ay8912", AY8912, X1_128_SINCLAIR / 10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay8912", X1_128_SINCLAIR / 10).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* expansion port */
 	MCFG_DEVICE_MODIFY("exp")

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Patrick Mackinlay
 
 /*
  * MIPS-I emulation, including R2000[A], R3000[A] and IDT R30xx devices. The
@@ -156,12 +156,14 @@ void mips1core_device_base::device_add_mconfig(machine_config &config)
 
 void mips1core_device_base::icache_map(address_map &map)
 {
-	map(0, m_icache_size - 1).ram().mirror(~(m_icache_size - 1));
+	if (m_icache_size)
+		map(0, m_icache_size - 1).ram().mirror(~(m_icache_size - 1));
 }
 
 void mips1core_device_base::dcache_map(address_map &map)
 {
-	map(0, m_dcache_size - 1).ram().mirror(~(m_dcache_size - 1));
+	if (m_dcache_size)
+		map(0, m_dcache_size - 1).ram().mirror(~(m_dcache_size - 1));
 }
 
 void mips1core_device_base::device_start()

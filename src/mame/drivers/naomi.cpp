@@ -1442,6 +1442,7 @@ Notes:
                Animal Basket                         VM2001F01  -
                Block Pong-Pong                       VM2001F01  -
                WaiWai Drive                          VM2001F01  -
+               Faster Than Speed 837-14681           315-6248   -         (not dumped, known to exists)
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
@@ -2897,31 +2898,33 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  // TODO: merge with Dreamcast base machine
 MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(CPU_CLOCK)
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
 
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
+	MAPLE_DC(config, m_maple, 0, m_maincpu);
+	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
+	POWERVR2(config, m_powervr2, 0);
+	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2952,11 +2955,25 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	// - unrolled NOPs then GPIO toggle - 12.76MHz (or 3.19M NOP instructions per second)
 	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
 	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
-	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
+	sega837.set_port_tag<0>("TILT");
+	sega837.set_port_tag<1>("P1");
+	sega837.set_port_tag<2>("P2");
+	sega837.set_port_tag<3>("A0");
+	sega837.set_port_tag<4>("A1");
+	sega837.set_port_tag<5>("A2");
+	sega837.set_port_tag<6>("A3");
+	sega837.set_port_tag<7>("A4");
+	sega837.set_port_tag<8>("A5");
+	sega837.set_port_tag<9>("A6");
+	sega837.set_port_tag<10>("A7");
+	sega837.set_port_tag<11>("OUTPUT");
+
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
-	MCFG_M3COMM_ADD("comm_board")
+	M3COMM(config, "comm_board", 0);
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -2965,46 +2982,56 @@ MACHINE_CONFIG_END
  * Naomi 1, unprotected ROM sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomi)
+void naomi_state::naomi(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi_state::naomigd)
+void naomi_state::naomigd(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, "naomibd_eeprom", ":gdrom", "pic"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M1 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim1)
+void naomi_state::naomim1(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m1_board &rom_board(NAOMI_M1_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim2)
+void naomi_state::naomim2(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m2_board &rom_board(NAOMI_M2_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M4 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim4)
+void naomi_state::naomim4(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", 0, "naomibd_eeprom", "pic_readout"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi M2 with Keyboard controllers
@@ -3041,19 +3068,21 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2_base)
-	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(*this, dc_state, pvr_irq))
+void naomi2_state::naomi2_base(machine_config &config)
+{
+	POWERVR2(config, m_powervr2_slave, 0);
+	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	// TODO: ELAN device
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(naomi2_state::naomi2gd)
+void naomi2_state::naomi2gd(machine_config &config)
+{
 	naomigd(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Naomi 2, M1 sub-board
@@ -3071,13 +3100,13 @@ MACHINE_CONFIG_END
  * Naomi 2, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2m2)
+void naomi2_state::naomi2m2(machine_config &config)
+{
 	naomim2(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Atomiswave
@@ -3090,7 +3119,8 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_DEVICE_PROGRAM_MAP(aw_map)
 	MCFG_DEVICE_IO_MAP(aw_port)
 	MACRONIX_29L001MC(config, "awflash");
-	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
+	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0, "rom_key"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);

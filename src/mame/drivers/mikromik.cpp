@@ -457,13 +457,15 @@ void mm1_state::machine_reset()
 //  MACHINE_CONFIG( mm1 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1)
+void mm1_state::mm1(machine_config &config)
+{
 	// basic system hardware
-	MCFG_DEVICE_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mm1_map)
-	MCFG_I8085A_SID(READLINE(*this, mm1_state, dsra_r))
-	MCFG_I8085A_SOD(WRITELINE(KB_TAG, mm1_keyboard_device, bell_w))
-	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
+	m_maincpu->in_sid_func().set(FUNC(mm1_state::dsra_r));
+	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w));
+
+	config.m_perfect_cpu_quantum = subtag(I8085A_TAG);
 
 	// peripheral hardware
 	I8212(config, m_iop, 0);
@@ -490,13 +492,11 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	m_pit->set_clk<2>(6.144_MHz_XTAL/2/2);
 	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
-	UPD765A(config, m_fdc, /* 16_MHz_XTAL/2/2, */ true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
 
 	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
 	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
@@ -511,15 +511,15 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
 	m_rs232c->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(KB_TAG, MM1_KEYBOARD, 2500) // actual KBCLK is 6.144_MHz_XTAL/2/16
-	MCFG_MM1_KEYBOARD_KBST_CALLBACK(WRITELINE(I8212_TAG, i8212_device, stb_w))
+	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
+	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mm1_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("mm1_flop");
+}
 
 
 //-------------------------------------------------

@@ -25,6 +25,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
@@ -32,7 +33,6 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "machine/z80ctc.h"
 #include "machine/mm58274c.h"
 #include "bus/rs232/rs232.h"
-#include "machine/clock.h"
 
 
 
@@ -159,17 +159,15 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_DEVICE_IO_MAP(dmax8000_io)
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4_MHz_XTAL / 2)); // 2MHz
-	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
-
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
+	ctc.set_clk<0>(4_MHz_XTAL / 2); // 2MHz
 	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::rxca_w));
 	ctc.zc_callback<0>().append("dart1", FUNC(z80dart_device::txca_w));
 	ctc.zc_callback<0>().append("dart2", FUNC(z80dart_device::rxca_w));
 	ctc.zc_callback<0>().append("dart2", FUNC(z80dart_device::txca_w));
+	ctc.set_clk<1>(4_MHz_XTAL / 2); // 2MHz
 	ctc.zc_callback<1>().set("dart2", FUNC(z80dart_device::rxtxcb_w));
+	ctc.set_clk<2>(4_MHz_XTAL / 2); // 2MHz
 	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
 
 	z80dart_device& dart1(Z80DART(config, "dart1", 4'000'000)); // A = terminal; B = aux

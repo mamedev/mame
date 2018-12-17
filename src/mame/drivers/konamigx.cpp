@@ -1655,22 +1655,22 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konamigx_state, type2_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konamigx_state::type2_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_5, 0, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_screen(m_screen);
+	m_k054338->set_alpha_invert(1);
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(konamigx_state, type2_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -26, -23)
-	MCFG_K055673_SET_SCREEN("screen")
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -26, -23);
+	m_k055673->set_screen(m_screen);
+	m_k055673->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_5bpp)
 
@@ -1704,46 +1704,45 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(konamigx_state::konamigx_bios)
+void konamigx_state::konamigx_bios(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 0, 0)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(konamigx_state::gokuparo)
+	m_k056832->set_config("gfx1", K056832_BPP_4, 0, 0);
+}
+
+void konamigx_state::gokuparo(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -46, -23);
+}
 
-MACHINE_CONFIG_START(konamigx_state::sexyparo)
+void konamigx_state::sexyparo(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -23)
-MACHINE_CONFIG_END
+	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback), this);
 
-MACHINE_CONFIG_START(konamigx_state::tbyahhoo)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -42, -23);
+}
+
+void konamigx_state::tbyahhoo(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0)
-MACHINE_CONFIG_END
+
+	m_k056832->set_config("gfx1", K056832_BPP_5, 0, 0);
+}
 
 MACHINE_CONFIG_START(konamigx_state::dragoonj)
 	konamigx(config);
-	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
 	m_k053252->set_offsets(24+16, 16);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 1, 0)
+	m_k056832->set_config("gfx1", K056832_BPP_5, 1, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(konamigx_state, dragoonj_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -53, -23)
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::dragoonj_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_RNG, -53, -23);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::le2)
@@ -1751,34 +1750,29 @@ MACHINE_CONFIG_START(konamigx_state::le2)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type2_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0)
+	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(konamigx_state, le2_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -46, -23)
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::le2_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -46, -23);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::konamigx_6bpp)
 	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0)
+	m_k056832->set_config("gfx1", K056832_BPP_6, 0, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -46, -23);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(konamigx_state::salmndr2)
+void konamigx_state::salmndr2(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 1, 0)
+	m_k056832->set_config("gfx1", K056832_BPP_6, 1, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(konamigx_state, salmndr2_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -48, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::salmndr2_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -48, -23);
+}
 
 MACHINE_CONFIG_START(konamigx_state::opengolf)
 	konamigx(config);
@@ -1789,8 +1783,7 @@ MACHINE_CONFIG_START(konamigx_state::opengolf)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opengolf)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, opengolf)
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -53, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -53, -23);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gx_type1_map)
@@ -1810,11 +1803,9 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 
 	m_k053252->set_offsets(24-8+16, 0);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0)
+	m_k056832->set_config("gfx1", K056832_BPP_6, 0, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -53, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -53, -23);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gx_type1_map)
@@ -1838,11 +1829,9 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 	m_k053252->set_offsets(0, 16);
 	m_k053252->set_slave_screen("screen2");
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 2)
+	m_k056832->set_config("gfx1", K056832_BPP_6, 0, 2);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -132, -23);
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 16384)
@@ -1896,11 +1885,9 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	m_k053252->set_offsets(0, 16);
 	m_k053252->set_slave_screen("screen2");
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 0)
+	m_k056832->set_config("gfx1", K056832_BPP_8, 0, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -79, -24) // -23 looks better in intro
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -79, -24); // -23 looks better in intro
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
@@ -1919,35 +1906,30 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_vsn)
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2)   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
+	m_k056832->set_config("gfx1", K056832_BPP_8, 0, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -132, -23);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::gxtype4sd2)
 	gxtype4(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_sd2)
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -81, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -81, -23);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(konamigx_state::winspike)
+void konamigx_state::winspike(machine_config &config)
+{
 	konamigx(config);
-	//MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
+	//m_screen->set_visible_area(38, 38+384-1, 16, 16+224-1);
 
 	m_k053252->set_offsets(24+15, 16);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2)
+	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8, 0, 2);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -53, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -53, -23);
+}
 
 
 /**********************************************************************************/

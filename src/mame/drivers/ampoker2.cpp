@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders:Roberto Fresca, Grull Osgo
 /********************************************************************************
 
   AMERICAN POKER 2
@@ -8,8 +8,8 @@
   Company:  Novomatic.
   Year:     1990.
 
-  Driver by Roberto Fresca, with a lot of help of Grull Osgo.
-  Based on a preliminary work of Curt Coder.
+  Driver by Roberto Fresca & Grull Osgo.
+
 
   --- Supported Sets ---
 
@@ -281,6 +281,11 @@
   --- DRIVER UPDATES ---
 
 
+  [2018-12-02]
+
+  - Fixed the NVRAM size to 0x800.
+
+
   [2018-11-10]
 
   Piccolo Poker 100 from Admiral/Novomatic.
@@ -400,6 +405,7 @@
 
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
+
 
 void ampoker2_state::machine_start()
 {
@@ -612,7 +618,7 @@ WRITE8_MEMBER(ampoker2_state::watchdog_reset_w)
 void ampoker2_state::program_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xe000, 0xefff).ram().w(FUNC(ampoker2_state::videoram_w)).share("videoram");
 }
 
@@ -1411,34 +1417,34 @@ Arizona 10. This one has way more Italian text than rabbitpk. Also has Arizona i
 
 PCB is marked: "029 lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
 PCB is marked: "029 ls" and "PKR 92" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
-PCB is labeled: "8/98rb013" on component side 
+PCB is labeled: "8/98rb013" on component side
 
 Devices
-1x 	TMPZ84C00AP-6 		u1 	8-bit Microprocessor - main
-1x 	KC89C72 		u11 	Programmable Sound Generator - sound
-1x 	PIC16F84-04/P 		on small piggyback at u6 	8bit CMOS Microcontroller (internal ROM not dumped)
-1x 	TDA2003 		u16 	Audio Amplifier - sound
-1x 	oscillator 	6.000MHz 	oz1 	
+1x  TMPZ84C00AP-6       u1  8-bit Microprocessor - main
+1x  KC89C72         u11     Programmable Sound Generator - sound
+1x  PIC16F84-04/P       on small piggyback at u6    8bit CMOS Microcontroller (internal ROM not dumped)
+1x  TDA2003         u16     Audio Amplifier - sound
+1x  oscillator  6.000MHz    oz1
 
 ROMs
-1x 	NM27C256 	2 	dumped
-1x 	M27C512 	1 	dumped
-1x 	AM27S29APC 	u48 	dumped
+1x  NM27C256    2   dumped
+1x  M27C512     1   dumped
+1x  AM27S29APC  u48     dumped
 
 RAMs
-1x 	MB8416A-15L 	u39,u40
-1x 	LC3517B-15 	u7
+1x  MB8416A-15L     u39,u40
+1x  LC3517B-15  u7
 
 PLDs
-2x 	PALCE16V8H-25-PC/4 	u8,u41 	read protected
-1x 	GAL22V10D-25LP 	on small piggyback at u6 	read protected
+2x  PALCE16V8H-25-PC/4  u8,u41  read protected
+1x  GAL22V10D-25LP  on small piggyback at u6    read protected
 
 Others
 1x 28x2 JAMMA edge connector
 1x 10 legs connector (CN1)
 1x trimmer (volume)(P1)
 1x 8 DIP switches bank (DIP)
-1x battery 3.6V (BAT1) 
+1x battery 3.6V (BAT1)
 */
 
 ROM_START( arizna10 )

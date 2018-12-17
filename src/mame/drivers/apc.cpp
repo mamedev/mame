@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
@@ -973,7 +974,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
@@ -992,13 +993,13 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
 
-	MCFG_DEVICE_ADD(m_hgdc1, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc1, 3579545); // unk clock
+	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
+	m_hgdc1->set_draw_text_callback(FUNC(apc_state::hgdc_draw_text), this);
 
-	MCFG_DEVICE_ADD(m_hgdc2, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc2, 3579545); // unk clock
+	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
+	m_hgdc2->set_display_pixels_callback(FUNC(apc_state::hgdc_display_pixels), this);
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();

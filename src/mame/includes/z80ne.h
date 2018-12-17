@@ -17,6 +17,7 @@
 
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
 #include "machine/ram.h"

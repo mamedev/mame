@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood
+#ifndef MAME_INCLUDES_MCATADV_H
+#define MAME_INCLUDES_MCATADV_H
+
+#pragma once
 
 #include "machine/watchdog.h"
 #include "emupal.h"
@@ -64,3 +68,5 @@ private:
 	void nost_sound_io_map(address_map &map);
 	void nost_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MCATADV_H

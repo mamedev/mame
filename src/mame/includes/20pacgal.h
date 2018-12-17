@@ -31,7 +31,8 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void _20pacgal(machine_config &config);
 	void _20pacgal_video(machine_config &config);
@@ -100,8 +101,8 @@ protected:
 class _25pacman_state : public _20pacgal_state
 {
 public:
-	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: _20pacgal_state(mconfig, type, tag)
+	_25pacman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		_20pacgal_state(mconfig, type, tag)
 	{ }
 
 	void _25pacman(machine_config &config);

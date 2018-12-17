@@ -775,18 +775,17 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	ay8910_device &ay1(AY8910(config, "ay1", SOUND_CLOCK/4));    /* 3B */
+	ay1.port_a_write_callback().set(FUNC(grchamp_state::portA_0_w));
+	ay1.port_b_write_callback().set(FUNC(grchamp_state::portB_0_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	AY8910(config, "ay2", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_2_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	ay8910_device &ay3(AY8910(config, "ay3", SOUND_CLOCK/4));    /* 1B */
+	ay3.port_a_write_callback().set(FUNC(grchamp_state::portA_2_w));
+	ay3.port_b_write_callback().set(FUNC(grchamp_state::portB_2_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, grchamp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

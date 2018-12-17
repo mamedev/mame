@@ -5,20 +5,25 @@
     Competition Golf Final Round
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_COMPGOLF_H
+#define MAME_INCLUDES_COMPGOLF_H
+
+#pragma once
 
 #include "emupal.h"
 
 class compgolf_state : public driver_device
 {
 public:
-	compgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	compgolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_bg_ram(*this, "bg_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -57,3 +62,5 @@ public:
 	void compgolf(machine_config &config);
 	void compgolf_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_COMPGOLF_H

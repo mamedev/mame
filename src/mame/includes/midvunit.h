@@ -173,7 +173,7 @@ private:
 	DECLARE_MACHINE_RESET(midvplus);
 	uint32_t screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
-	required_device<cpu_device> m_maincpu;
+	required_device<tms32031_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<palette_device> m_palette;
 	optional_device<adc0844_device> m_adc;

@@ -705,7 +705,7 @@ public:
 		{
 			// read a chunk
 			std::unique_ptr<std::uint8_t []> chunk_data;
-			std::uint32_t chunk_type, chunk_length;
+			std::uint32_t chunk_type = 0, chunk_length;
 			error = read_chunk(fp, chunk_data, chunk_type, chunk_length);
 			if (PNGERR_NONE == error)
 			{

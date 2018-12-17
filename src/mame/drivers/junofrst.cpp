@@ -134,7 +134,7 @@ private:
 	void mcu_map(address_map &map);
 
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_i8039;
+	required_device<i8039_device> m_i8039;
 	required_device<filter_rc_device> m_filter_0_0;
 	required_device<filter_rc_device> m_filter_0_1;
 	required_device<filter_rc_device> m_filter_0_2;
@@ -406,17 +406,17 @@ WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
 MACHINE_CONFIG_START(junofrst_state::junofrst)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	KONAMI1(config, m_maincpu, 1500000);         /* 1.5 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &junofrst_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	Z80(config, m_audiocpu, 14318000/8);    /* 1.78975 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &junofrst_state::audio_map);
 
-	MCFG_DEVICE_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, junofrst_state, i8039_irqen_and_status_w))
+	I8039(config, m_i8039, 8000000);  /* 8MHz crystal */
+	m_i8039->set_addrmap(AS_PROGRAM, &junofrst_state::mcu_map);
+	m_i8039->set_addrmap(AS_IO, &junofrst_state::mcu_io_map);
+	m_i8039->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_i8039->p2_out_cb().set(FUNC(junofrst_state::i8039_irqen_and_status_w));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // B3
 	mainlatch.q_out_cb<0>().set(FUNC(junofrst_state::irq_enable_w));
@@ -428,17 +428,16 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	PALETTE(config, m_palette, 16).set_format(PALETTE_FORMAT_BBGGGRRR);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
-	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, junofrst_state, _30hz_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);  /* not sure about the visible area */
+	screen.set_screen_update(FUNC(junofrst_state::screen_update_tutankhm));
+	screen.screen_vblank().set(FUNC(junofrst_state::_30hz_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

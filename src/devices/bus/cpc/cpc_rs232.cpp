@@ -33,7 +33,8 @@ ROM_START( cpc_rs232_ams )
 ROM_END
 
 // device machine config
-MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
+void cpc_rs232_device::device_add_mconfig(machine_config &config)
+{
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(2000000);
 	m_pit->set_clk<1>(2000000);
@@ -54,13 +55,11 @@ MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
 //  m_rs232->ri_handler().set(m_dart, FUNC(z80dart_device::ria_w));
 
 	// pass-through
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-
-MACHINE_CONFIG_END
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));
+	exp.irq_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::irq_w));
+	exp.nmi_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::nmi_w));
+	exp.romdis_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::romdis_w));  // ROMDIS
+}
 
 const tiny_rom_entry *cpc_rs232_device::device_rom_region() const
 {
@@ -104,9 +103,8 @@ cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, const 
 
 void cpc_rs232_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
+	address_space &space = m_slot->cpu().space(AS_IO);
 
 	space.install_readwrite_handler(0xfadc,0xfadf,read8_delegate(FUNC(cpc_rs232_device::dart_r),this),write8_delegate(FUNC(cpc_rs232_device::dart_w),this));
 	space.install_readwrite_handler(0xfbdc,0xfbdf,read8_delegate(FUNC(cpc_rs232_device::pit_r),this),write8_delegate(FUNC(cpc_rs232_device::pit_w),this));

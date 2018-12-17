@@ -24,21 +24,6 @@
 #define DRMATH_MONITOR_DISPLAY      0
 
 
-struct micro3d_vtx
-{
-	int32_t x, y, z;
-};
-
-enum planes
-{
-		CLIP_Z_MIN,
-		CLIP_Z_MAX,
-		CLIP_X_MIN,
-		CLIP_X_MAX,
-		CLIP_Y_MIN,
-		CLIP_Y_MAX
-};
-
 class micro3d_sound_device;
 
 class micro3d_state : public driver_device
@@ -75,10 +60,34 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
 
-private:
+protected:
 	enum
 	{
 		TIMER_MAC_DONE
+	};
+
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	enum planes
+	{
+		CLIP_Z_MIN,
+		CLIP_Z_MAX,
+		CLIP_X_MIN,
+		CLIP_X_MAX,
+		CLIP_Y_MIN,
+		CLIP_Y_MAX
+	};
+
+	struct micro3d_vtx
+	{
+		int32_t x, y, z;
+
+		constexpr int64_t dot_product(micro3d_vtx const &that) const;
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -170,9 +179,6 @@ private:
 	DECLARE_WRITE8_MEMBER(micro3d_sound_p3_w);
 	DECLARE_READ8_MEMBER(micro3d_sound_p1_r);
 	DECLARE_READ8_MEMBER(micro3d_sound_p3_r);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
 	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
@@ -200,8 +206,6 @@ private:
 	void soundmem_io(address_map &map);
 	void soundmem_prg(address_map &map);
 	void vgbmem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<mc2661_device> m_vgb_uart;
 };

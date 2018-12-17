@@ -10,13 +10,15 @@
 
 #pragma once
 
+#include "cpu/i8085/i8085.h"
+#include "machine/74259.h"
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
+#include "machine/i8155.h"
 #include "machine/timer.h"
-#include "machine/74259.h"
-#include "sound/samples.h"
-#include "sound/msm5232.h"
 #include "sound/dac.h"
+#include "sound/msm5232.h"
+#include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -32,6 +34,7 @@ public:
 		m_mcuram(*this, "mcuram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_audio8155(*this, "audio8155"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -73,7 +76,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8085a_cpu_device> m_audiocpu;
+	required_device<i8155_device> m_audio8155;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

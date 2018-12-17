@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.10);
 

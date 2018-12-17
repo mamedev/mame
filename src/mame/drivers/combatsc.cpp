@@ -734,10 +734,10 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatsc)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
-	MCFG_K007121_ADD("k007121_1")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K007121_ADD("k007121_2")
-	MCFG_K007121_PALETTE("palette")
+	K007121(config, m_k007121_1, 0);
+	m_k007121_1->set_palette_tag(m_palette);
+	K007121(config, m_k007121_2, 0);
+	m_k007121_2->set_palette_tag(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -787,8 +787,8 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)

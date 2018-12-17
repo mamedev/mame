@@ -1352,7 +1352,7 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
-	SNES_PPU(config, m_ppu, 0);
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
@@ -1369,7 +1369,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SNS_CARTRIDGE_ADD("snsslot", snes_cart, nullptr)
+	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
+	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ);
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 	MCFG_SOFTWARE_LIST_ADD("bsx_list","snes_bspack")
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
@@ -1382,6 +1384,9 @@ MACHINE_CONFIG_START(snes_console_state::snespal)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)
+
+	m_ppu->set_clock(MCLK_PAL);
+	m_cartslot->set_clock(MCLK_PAL);
 MACHINE_CONFIG_END
 
 

@@ -1909,16 +1909,16 @@ MACHINE_CONFIG_START(suna8_state::hardhead)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16));    /* verified on pcb */
+	aysnd.port_a_write_callback().set(FUNC(suna8_state::suna8_play_samples_w));
+	aysnd.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
@@ -1968,16 +1968,15 @@ MACHINE_CONFIG_START(suna8_state::rranger)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, rranger_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
+	ym2203_device &ym1(YM2203(config, "ym1", SUNA8_MASTER_CLOCK / 16));    /* verified on pcb */
+	ym1.port_a_write_callback().set(FUNC(suna8_state::rranger_play_samples_w));
+	ym1.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.9);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
+	YM2203(config, "ym2", SUNA8_MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "speaker", 0.9);  /* verified on pcb */
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
@@ -2037,15 +2036,14 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     // 3MHz (measured)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    // 1.5MHz (measured)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
+	AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "speaker", 0.33);    // 1.5MHz (measured)
 
 	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
 	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
@@ -2151,16 +2149,16 @@ MACHINE_CONFIG_START(suna8_state::starfigh)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16));
+	aysnd.port_a_write_callback().set(FUNC(suna8_state::suna8_play_samples_w));
+	aysnd.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
@@ -2205,16 +2203,16 @@ MACHINE_CONFIG_START(suna8_state::sparkman)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))  // two sample roms
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16));
+	aysnd.port_a_write_callback().set(FUNC(suna8_state::suna8_play_samples_w));  // two sample roms
+	aysnd.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)

@@ -585,10 +585,10 @@ void cc40_state::machine_start()
 MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS70C20, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, cc40_state, keyboard_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, cc40_state, keyboard_w))
+	TMS70C20(config, m_maincpu, XTAL(5'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cc40_state::main_map);
+	m_maincpu->in_porta().set(FUNC(cc40_state::keyboard_r));
+	m_maincpu->out_portb().set(FUNC(cc40_state::keyboard_w));
 
 	NVRAM(config, "sysram.0", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "sysram.1", nvram_device::DEFAULT_ALL_0);

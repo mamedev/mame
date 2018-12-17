@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_GALPANIC_H
+#define MAME_INCLUDES_GALPANIC_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "video/kan_pand.h"
@@ -10,14 +14,14 @@ class galpanic_state : public driver_device
 {
 public:
 	galpanic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_bgvideoram(*this, "bgvideoram"),
-			m_fgvideoram(*this, "fgvideoram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_pandora(*this, "pandora")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bgvideoram(*this, "bgvideoram")
+		, m_fgvideoram(*this, "fgvideoram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_pandora(*this, "pandora")
 	{ }
 
 	void galpanica(machine_config &config);
@@ -51,3 +55,5 @@ private:
 	void galpanic_oki_map(address_map &map);
 	void galpanica_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALPANIC_H

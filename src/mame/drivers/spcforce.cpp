@@ -39,7 +39,6 @@ TODO:
 #include "includes/spcforce.h"
 
 #include "cpu/i8085/i8085.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
@@ -58,7 +57,7 @@ void spcforce_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-WRITE8_MEMBER(spcforce_state::SN76496_latch_w)
+WRITE8_MEMBER(spcforce_state::sn76496_latch_w)
 {
 	m_sn76496_latch = data;
 }
@@ -78,22 +77,22 @@ WRITE_LINE_MEMBER(spcforce_state::write_sn3_ready)
 	m_sn3_ready = state;
 }
 
-READ8_MEMBER(spcforce_state::SN76496_select_r)
+READ8_MEMBER(spcforce_state::sn76496_select_r)
 {
-	if (~m_sn76496_select & 0x40) return m_sn1_ready;
-	if (~m_sn76496_select & 0x20) return m_sn2_ready;
-	if (~m_sn76496_select & 0x10) return m_sn3_ready;
+	if (!BIT(m_sn76496_select, 6)) return m_sn1_ready;
+	if (!BIT(m_sn76496_select, 5)) return m_sn2_ready;
+	if (!BIT(m_sn76496_select, 4)) return m_sn3_ready;
 
 	return 0;
 }
 
-WRITE8_MEMBER(spcforce_state::SN76496_select_w)
+WRITE8_MEMBER(spcforce_state::sn76496_select_w)
 {
 	m_sn76496_select = data;
 
-	if (~data & 0x40) m_sn1->write(m_sn76496_latch);
-	if (~data & 0x20) m_sn2->write(m_sn76496_latch);
-	if (~data & 0x10) m_sn3->write(m_sn76496_latch);
+	if (!BIT(data, 6)) m_sn1->write(m_sn76496_latch);
+	if (!BIT(data, 5)) m_sn2->write(m_sn76496_latch);
+	if (!BIT(data, 4)) m_sn3->write(m_sn76496_latch);
 }
 
 READ_LINE_MEMBER(spcforce_state::t0_r)
@@ -291,13 +290,13 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	MCFG_DEVICE_PROGRAM_MAP(spcforce_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spcforce_state,  vblank_irq)
 
-	MCFG_DEVICE_ADD("audiocpu", I8035, 6144000)        /* divisor ??? */
-	MCFG_DEVICE_PROGRAM_MAP(spcforce_sound_map)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, spcforce_state, SN76496_latch_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, spcforce_state, SN76496_select_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, spcforce_state, SN76496_select_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, spcforce_state, t0_r))
+	I8035(config, m_audiocpu, 6144000);        /* divisor ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spcforce_state::spcforce_sound_map);
+	m_audiocpu->bus_in_cb().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_audiocpu->p1_out_cb().set(FUNC(spcforce_state::sn76496_latch_w));
+	m_audiocpu->p2_in_cb().set(FUNC(spcforce_state::sn76496_select_r));
+	m_audiocpu->p2_out_cb().set(FUNC(spcforce_state::sn76496_select_w));
+	m_audiocpu->t0_in_cb().set(FUNC(spcforce_state::t0_r));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<3>().set(FUNC(spcforce_state::flip_screen_w));
@@ -320,7 +319,7 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

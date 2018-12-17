@@ -410,12 +410,12 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("sb16_cpu", I80C52, XTAL(24'000'000))
-	MCFG_DEVICE_IO_MAP(sb16_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, sb16_lle_device, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sb16_lle_device, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, sb16_lle_device, p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, sb16_lle_device, p2_w))
+	I80C52(config, m_cpu, XTAL(24'000'000));
+	m_cpu->set_addrmap(AS_IO, &sb16_lle_device::sb16_io);
+	m_cpu->port_in_cb<1>().set(FUNC(sb16_lle_device::p1_r));
+	m_cpu->port_out_cb<1>().set(FUNC(sb16_lle_device::p1_w));
+	m_cpu->port_in_cb<2>().set(FUNC(sb16_lle_device::p2_r));
+	m_cpu->port_out_cb<2>().set(FUNC(sb16_lle_device::p2_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -5,9 +5,10 @@
  * includes/poly88.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_POLY88_H
 #define MAME_INCLUDES_POLY88_H
+
+#pragma once
 
 #include "machine/i8251.h"
 #include "imagedev/cassette.h"
@@ -23,8 +24,8 @@ public:
 		TIMER_CASSETTE
 	};
 
-	poly88_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	poly88_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "uart"),
@@ -36,7 +37,8 @@ public:
 		m_line3(*this, "LINE3"),
 		m_line4(*this, "LINE4"),
 		m_line5(*this, "LINE5"),
-		m_line6(*this, "LINE6") { }
+		m_line6(*this, "LINE6")
+	{ }
 
 	void poly88(machine_config &config);
 	void poly8813(machine_config &config);

@@ -126,7 +126,7 @@ void isa8_ibm_mfc_device::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x00, 0x01).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x10, 0x10).rw("d71051", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x11, 0x11).rw("d71051", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x20, 0x23).rw("d71055c_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -405,10 +405,10 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 
 	SPEAKER(config, "ymleft").front_left();
 	SPEAKER(config, "ymright").front_right();
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(4'000'000))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, ibm_mfc_ym_irq))
-	MCFG_SOUND_ROUTE(0, "ymleft", 1.00)
-	MCFG_SOUND_ROUTE(1, "ymright", 1.00)
+	YM2151(config, m_ym2151, XTAL(4'000'000));
+	m_ym2151->irq_handler().set(FUNC(isa8_ibm_mfc_device::ibm_mfc_ym_irq));
+	m_ym2151->add_route(0, "ymleft", 1.00);
+	m_ym2151->add_route(1, "ymright", 1.00);
 MACHINE_CONFIG_END
 
 

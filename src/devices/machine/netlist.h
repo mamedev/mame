@@ -468,6 +468,11 @@ class netlist_mame_stream_input_device : public device_t, public netlist_mame_su
 {
 public:
 	// construction/destruction
+	netlist_mame_stream_input_device(const machine_config &mconfig, const char *tag, device_t *owner, int channel, const char *param_name)
+		: netlist_mame_stream_input_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_params(channel, param_name);
+	}
 	netlist_mame_stream_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(int channel, const char *param_name);
@@ -489,6 +494,11 @@ class netlist_mame_stream_output_device : public device_t, public netlist_mame_s
 {
 public:
 	// construction/destruction
+	netlist_mame_stream_output_device(const machine_config &mconfig, const char *tag, device_t *owner, int channel, const char *out_name)
+		: netlist_mame_stream_output_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_params(channel, out_name);
+	}
 	netlist_mame_stream_output_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(int channel, const char *out_name);

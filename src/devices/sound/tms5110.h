@@ -56,6 +56,11 @@ public:
 	template <class Object> devcb_base &set_addr_callback(Object &&cb) { return m_addr_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_data_callback(Object &&cb) { return m_data_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_romclk_callback(Object &&cb) { return m_romclk_cb.set_callback(std::forward<Object>(cb)); }
+	auto m0() { return m_m0_cb.bind(); }
+	auto m1() { return m_m1_cb.bind(); }
+	auto addr() { return m_addr_cb.bind(); }
+	auto data() { return m_data_cb.bind(); }
+	auto romclk() { return m_romclk_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( ctl_w );
 	DECLARE_READ8_MEMBER( ctl_r );

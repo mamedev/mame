@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -57,15 +57,15 @@ namespace bx
 
 	/// Generate random point on unit circle.
 	template <typename Rng>
-	void randUnitCircle(float _result[3], Rng* _rng);
+	bx::Vec3 randUnitCircle(Rng* _rng);
 
 	/// Generate random point on unit sphere.
 	template <typename Rng>
-	void randUnitSphere(float _result[3], Rng* _rng);
+	bx::Vec3 randUnitSphere(Rng* _rng);
 
 	/// Generate random point on unit hemisphere.
 	template <typename Ty>
-	void randUnitHemisphere(float _result[3], Ty* _rng, const float _normal[3]);
+	bx::Vec3 randUnitHemisphere(Ty* _rng, const bx::Vec3& _normal);
 
 	/// Sampling with Hammersley and Halton Points
 	/// http://www.cse.cuhk.edu.hk/~ttwong/papers/udpoint/udpoints.html

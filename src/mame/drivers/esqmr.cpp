@@ -254,10 +254,10 @@ READ16_MEMBER(esqmr_state::esq5506_read_adc)
 }
 
 MACHINE_CONFIG_START(esqmr_state::mr)
-	MCFG_DEVICE_ADD("maincpu", M68340, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mr_map)
+	M68340(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &esqmr_state::mr_map);
 
-	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
+	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

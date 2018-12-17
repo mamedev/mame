@@ -5,6 +5,10 @@
     Midway MCR-68k system
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_MCR68_H
+#define MAME_INCLUDES_MCR68_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -17,8 +21,8 @@
 class mcr68_state : public driver_device
 {
 public:
-	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mcr68_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sounds_good(*this, "sg"),
 		m_turbo_cheap_squeak(*this, "tcs"),
 		m_cvsd_sound(*this, "cvsd"),
@@ -101,3 +105,5 @@ private:
 
 	required_device<ptm6840_device> m_ptm;
 };
+
+#endif // MAME_INCLUDES_MCR68_H

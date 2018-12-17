@@ -1102,14 +1102,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midyunit_state::zunit)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(MEDRES_PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(midyunit_state, scanline_update)       /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, FAST_MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midyunit_state::main_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(MEDRES_PIXEL_CLOCK);
+	m_maincpu->set_pixels_per_clock(2);
+	m_maincpu->set_scanline_ind16_callback(FUNC(midyunit_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(midyunit_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(midyunit_state::from_shiftreg));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1145,14 +1145,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(midyunit_state::yunit_core)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(STDRES_PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(midyunit_state, scanline_update)       /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, SLOW_MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midyunit_state::main_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(STDRES_PIXEL_CLOCK);
+	m_maincpu->set_pixels_per_clock(2);
+	m_maincpu->set_scanline_ind16_callback(FUNC(midyunit_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(midyunit_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(midyunit_state::from_shiftreg));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1278,7 +1278,7 @@ MACHINE_CONFIG_START(midyunit_state::mkyawdim)
 
 	/* sound hardware */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

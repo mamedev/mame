@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(redclash_state::zerohour)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
 
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(redclash_state::redclash)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
 
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

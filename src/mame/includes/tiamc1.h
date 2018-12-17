@@ -23,6 +23,10 @@ public:
 	void kot(machine_config &config);
 	void tiamc1(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t *m_tileram;
@@ -56,8 +60,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(kot);
 	DECLARE_PALETTE_INIT(tiamc1);
 	uint32_t screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

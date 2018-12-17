@@ -12,8 +12,8 @@
 
 #pragma once
 
+#include "cpu/saturn/saturn.h"
 #include "machine/hp48_port.h"
-
 #include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -59,7 +59,9 @@ public:
 		, m_dac(*this, "dac")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
-		, m_port(*this, "port%u", 1U) {}
+		, m_port(*this, "port%u", 1U)
+	{
+	}
 
 	void hp48s(machine_config &config);
 	void hp48gp(machine_config &config);
@@ -125,7 +127,7 @@ private:
 	void hp48_common(machine_config &config);
 	void hp48(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<saturn_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

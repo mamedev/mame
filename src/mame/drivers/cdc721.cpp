@@ -329,6 +329,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
 
 	CRT5037(config, m_crtc, 12.936_MHz_XTAL / 8).set_char_width(8);
+	m_crtc->set_screen("screen");
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", 6_MHz_XTAL)); // Zilog Z8430B (M1 pulled up)
 	ctc.intr_callback().set(FUNC(cdc721_state::int_w<6>));

@@ -87,9 +87,11 @@ public:
 		m_asc(*this, "scsibus:7:asc"),
 		m_vrom(*this, "gfx"),
 		m_bt459(*this, "bt459"),
-		m_lance(*this, "am79c90")
+		m_lance(*this, "am79c90"),
+		m_kn01vram(*this, "vram")
 		{ }
 
+	void kn01(machine_config &config);
 	void kn02ba(machine_config &config);
 
 	void init_decstation();
@@ -101,6 +103,13 @@ protected:
 	DECLARE_READ32_MEMBER(cfb_r);
 	DECLARE_WRITE32_MEMBER(cfb_w);
 
+	DECLARE_READ32_MEMBER(kn01_status_r);
+	DECLARE_WRITE32_MEMBER(kn01_control_w);
+	DECLARE_READ32_MEMBER(bt478_palette_r);
+	DECLARE_WRITE32_MEMBER(bt478_palette_w);
+
+	DECLARE_READ32_MEMBER(dz_r);
+
 	void ncr5394(device_t *device);
 
 private:
@@ -108,25 +117,32 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	uint32_t kn01_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<r3000a_device> m_maincpu;
+	required_device<mips1core_device_base> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<lk201_device> m_lk201;
-	required_device<dec_ioga_device> m_ioga;
+	optional_device<lk201_device> m_lk201;
+	optional_device<dec_ioga_device> m_ioga;
 	required_device<mc146818_device> m_rtc;
-	required_device<z80scc_device> m_scc0, m_scc1;
-	required_device<ncr53c94_device> m_asc;
-	required_memory_region m_vrom;
-	required_device<bt459_device> m_bt459;
+	optional_device<z80scc_device> m_scc0, m_scc1;
+	optional_device<ncr53c94_device> m_asc;
+	optional_memory_region m_vrom;
+	optional_device<bt459_device> m_bt459;
 	required_device<am79c90_device> m_lance;
+	optional_shared_ptr<uint32_t> m_kn01vram;
 
+	void kn01_map(address_map &map);
 	void threemin_map(address_map &map);
 
-	uint8_t *m_vrom_ptr;
-	uint32_t m_vram[0x200000/4];
-	uint32_t m_sfb[0x80];
+	u8 *m_vrom_ptr;
+	u32 m_vram[0x200000/4];
+	u32 m_sfb[0x80];
 	int m_copy_src;
+
+	u32 m_kn01_control, m_kn01_status;
+	u32 m_palette[256], m_overlay[256];
+	u8 m_r, m_g, m_b, m_entry, m_stage;
 };
 
 /***************************************************************************
@@ -135,6 +151,26 @@ private:
 
 void decstation_state::video_start()
 {
+}
+
+uint32_t decstation_state::kn01_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint32_t *scanline;
+	int x, y;
+	uint8_t pixels;
+	uint8_t *vram = (uint8_t *)m_kn01vram.target();
+
+	for (y = 0; y < 864; y++)
+	{
+		scanline = &bitmap.pix32(y);
+		for (x = 0; x < 1024; x++)
+		{
+			pixels = vram[(y * 1024) + x];
+			*scanline++ = m_palette[pixels];
+		}
+	}
+
+	return 0;
 }
 
 uint32_t decstation_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -298,6 +334,117 @@ WRITE32_MEMBER(decstation_state::cfb_w)
 	}
 }
 
+READ32_MEMBER(decstation_state::bt478_palette_r)
+{
+	u8 rv = 0;
+
+	if (offset == 1)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_stage++;
+				rv = (m_palette[m_entry] >> 16) & 0xff;
+				break;
+
+			case 1:
+				m_stage++;
+				rv = (m_palette[m_entry] >> 8) & 0xff;
+				break;
+
+			case 2:
+				rv = m_palette[m_entry] & 0xff;
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+		}
+	}
+	else if (offset == 5)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_stage++;
+				rv = (m_overlay[m_entry] >> 16) & 0xff;
+				break;
+
+			case 1:
+				m_stage++;
+				rv = (m_overlay[m_entry] >> 8) & 0xff;
+				break;
+
+			case 2:
+				rv = m_overlay[m_entry] & 0xff;
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+		}
+	}
+
+	return rv;
+}
+
+WRITE32_MEMBER(decstation_state::bt478_palette_w)
+{
+	if ((offset == 0) || (offset == 3) || (offset == 4) || (offset == 7))
+	{
+		m_entry = data & 0xff;
+		//printf("VDAC: entry %d\n", m_entry);
+		m_stage = 0;
+		m_r = m_g = m_b = 0;
+	}
+	else if (offset == 1)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_r = data & 0xff;
+				m_stage++;
+				break;
+
+			case 1:
+				m_g = data & 0xff;
+				m_stage++;
+				break;
+
+			case 2:
+				m_b = data & 0xff;
+				m_palette[m_entry] = rgb_t(m_r, m_g, m_b);
+				//printf("palette[%d] = RGB(%02x, %02x, %02x)\n", m_entry, m_r, m_g, m_b);
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+				m_r = m_g = m_b = 0;
+				break;
+		}
+	}
+	else if (offset == 5)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_r = data & 0xff;
+				m_stage++;
+				break;
+
+			case 1:
+				m_g = data & 0xff;
+				m_stage++;
+				break;
+
+			case 2:
+				m_b = data & 0xff;
+				m_overlay[m_entry] = rgb_t(m_r, m_g, m_b);
+				//printf("overlay[%d] = RGB(%02x, %02x, %02x)\n", m_entry, m_r, m_g, m_b);
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+				m_r = m_g = m_b = 0;
+				break;
+		}
+	}
+}
+
 /***************************************************************************
     MACHINE FUNCTIONS
 ***************************************************************************/
@@ -310,7 +457,8 @@ WRITE_LINE_MEMBER(decstation_state::ioga_irq_w)
 
 void decstation_state::machine_start()
 {
-	m_vrom_ptr = m_vrom->base();
+	if (m_vrom)
+		m_vrom_ptr = m_vrom->base();
 	save_item(NAME(m_vram));
 	save_item(NAME(m_sfb));
 	save_item(NAME(m_copy_src));
@@ -319,11 +467,43 @@ void decstation_state::machine_start()
 void decstation_state::machine_reset()
 {
 	m_copy_src = 1;
+	m_entry = 0;
+	m_stage = 0;
+	m_r = m_g = m_b = 0;
+	m_kn01_status = 0;
+}
+
+READ32_MEMBER(decstation_state::kn01_status_r)
+{
+	m_kn01_status ^= 0x200; // fake vint for now
+	return m_kn01_status;
+}
+
+WRITE32_MEMBER(decstation_state::kn01_control_w)
+{
+	COMBINE_DATA(&m_kn01_control);
+}
+
+READ32_MEMBER(decstation_state::dz_r)
+{
+	return 0x8000;
 }
 
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
+
+void decstation_state::kn01_map(address_map &map)
+{
+	map(0x00000000, 0x017fffff).ram();
+	map(0x0fc00000, 0x0fcfffff).ram().share("vram");
+	map(0x12000000, 0x1200001f).rw(FUNC(decstation_state::bt478_palette_r), FUNC(decstation_state::bt478_palette_w));
+	//map(0x18000000, 0x18000007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0x0000ffff);
+	map(0x1c000000, 0x1c000003).r(FUNC(decstation_state::dz_r));
+	map(0x1d000000, 0x1d0000ff).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct)).umask32(0x000000ff);
+	map(0x1e000000, 0x1effffff).rw(FUNC(decstation_state::kn01_status_r), FUNC(decstation_state::kn01_control_w));
+	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
+}
 
 void decstation_state::threemin_map(address_map &map)
 {
@@ -363,6 +543,23 @@ static void dec_scsi_devices(device_slot_interface &device)
 	device.option_add_internal("asc", NCR53C94);
 }
 
+MACHINE_CONFIG_START(decstation_state::kn01)
+	R2000(config, m_maincpu, 16.67_MHz_XTAL, 65536, 131072);
+	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
+	m_maincpu->set_fpurev(0x340);
+	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::kn01_map);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(69169800, 1280, 0, 1024, 901, 0, 864);
+	m_screen->set_screen_update(FUNC(decstation_state::kn01_screen_update));
+
+	AM79C90(config, m_lance, XTAL(12'500'000));
+
+	MC146818(config, m_rtc, XTAL(32'768));
+	m_rtc->set_binary(true);
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(decstation_state::kn02ba)
 	R3000A(config, m_maincpu, 33.333_MHz_XTAL, 65536, 131072);
 	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
@@ -377,7 +574,7 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	BT459(config, m_bt459, 83'020'800);
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
-	m_lance->irq_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
+	m_lance->intr_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
 
 	DECSTATION_IOGA(config, m_ioga, XTAL(12'500'000));
 	m_ioga->irq_out().set(FUNC(decstation_state::ioga_irq_w));
@@ -393,10 +590,10 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 
 	SCC85C30(config, m_scc1, XTAL(14'745'600)/2);
 	m_scc1->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc1_irq_w));
-	m_scc1->out_txdb_callback().set("lk201", FUNC(lk201_device::rx_w));
+	m_scc1->out_txdb_callback().set(m_lk201, FUNC(lk201_device::rx_w));
 
-	MCFG_DEVICE_ADD("lk201", LK201, 0)
-	MCFG_LK201_TX_HANDLER(WRITELINE("scc1", z80scc_device, rxb_w))
+	LK201(config, m_lk201, 0);
+	m_lk201->tx_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc0, FUNC(z80scc_device::rxa_w));
@@ -435,6 +632,11 @@ void decstation_state::init_decstation()
 
 ***************************************************************************/
 
+ROM_START( ds3100 )
+	ROM_REGION32_LE( 0x40000, "user1", 0 )
+	ROM_LOAD( "kn01-aa.v7.01.img", 0x000000, 0x040000, CRC(e2478aa7) SHA1(e789387c52df3e0d83fde97cb48314627ea90b93) )
+ROM_END
+
 ROM_START( ds5k133 )
 	ROM_REGION32_LE( 0x40000, "user1", 0 )
 	// 5.7j                                                                                                                                                                                                                                 sx
@@ -445,4 +647,5 @@ ROM_START( ds5k133 )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME                FLAGS
+COMP( 1989, ds3100,  0,      0,      kn01,   decstation, decstation_state, init_decstation, "Digital Equipment Corporation", "DECstation 3100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1992, ds5k133, 0,      0,      kn02ba, decstation, decstation_state, init_decstation, "Digital Equipment Corporation", "DECstation 5000/133", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -550,10 +550,10 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4dj, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
 	m_k053252->set_offsets(40, 16);
@@ -596,10 +596,10 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp2_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp2_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4dj, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
 	m_k053252->set_offsets(40, 16);

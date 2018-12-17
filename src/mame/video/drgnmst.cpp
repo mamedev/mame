@@ -31,6 +31,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_fg_tile_info)
 	colour = m_fg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
 
+	tileno |= (BIT(tile_index, 5)) << 15; // 8x8 tile bank seems like cps1
 	SET_TILE_INFO_MEMBER(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 

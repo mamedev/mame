@@ -76,6 +76,13 @@ public:
 	// construction/destruction
 	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	pla_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t inputs, uint32_t outputs, uint32_t terms)
+		: pla_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_num_inputs(inputs);
+		set_num_outputs(outputs);
+		set_num_terms(terms);
+	}
 
 	// configuration helpers
 	void set_num_inputs(uint32_t i) { m_inputs = i; }

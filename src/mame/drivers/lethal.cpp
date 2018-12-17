@@ -516,18 +516,18 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(lethal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8LE, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8LE, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_BPP(6)
-	MCFG_K05324X_OFFSETS(95, 0)
-	MCFG_K05324X_CB(lethal_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette(m_palette);
+	m_k053244->set_bpp(6);
+	m_k053244->set_offsets(95, 0);
+	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback), this);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -547,8 +547,7 @@ MACHINE_CONFIG_START(lethal_state::lethalej)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
 
-	MCFG_DEVICE_MODIFY("k053244")
-	MCFG_K05324X_OFFSETS(-105, 0)
+	m_k053244->set_offsets(-105, 0);
 MACHINE_CONFIG_END
 
 ROM_START( lethalen )   // US version UAE

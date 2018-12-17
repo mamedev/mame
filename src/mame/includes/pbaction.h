@@ -5,6 +5,10 @@
     Pinball Action
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PBACTION_H
+#define MAME_INCLUDES_PBACTION_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -14,8 +18,8 @@
 class pbaction_state : public driver_device
 {
 public:
-	pbaction_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pbaction_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_colorram(*this, "colorram"),
@@ -28,7 +32,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_ctc(*this, "ctc"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -112,7 +117,7 @@ private:
 
 	DECLARE_READ8_MEMBER(subcpu_r);
 	DECLARE_WRITE8_MEMBER(subcpu_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(sub8000_w);
 	DECLARE_WRITE_LINE_MEMBER(sub8001_w);
 	DECLARE_WRITE8_MEMBER(sub8008_w);
@@ -128,3 +133,5 @@ private:
 	uint8_t m_outlatch;
 	uint32_t m_outdata;
 };
+
+#endif // MAME_INCLUDES_PBACTION_H

@@ -1169,10 +1169,9 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
 	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
-	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK/4)
-	MCFG_SEGA_315_5195_CPU("maincpu")
-	MCFG_SEGA_315_5195_MAPPER_HANDLER(segaorun_state, memory_mapper)
-	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK/4, m_maincpu);
+	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper), this);
+	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segaorun)
@@ -1183,16 +1182,14 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	YM2151(config, "ymsnd", SOUND_CLOCK/4).add_route(0, "lspeaker", 0.43).add_route(1, "rspeaker", 0.43);
 
 	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
@@ -1213,7 +1210,7 @@ MACHINE_CONFIG_START(segaorun_state::outrundx)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
 
 	// video hardware
-	MCFG_DEVICE_ADD("sprites", SEGA_OUTRUN_SPRITES, 0)
+	SEGA_OUTRUN_SPRITES(config, m_sprites, 0);
 MACHINE_CONFIG_END
 
 void segaorun_state::outrun(machine_config &config)
@@ -1259,7 +1256,7 @@ MACHINE_CONFIG_START(segaorun_state::shangon)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_shangon)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)

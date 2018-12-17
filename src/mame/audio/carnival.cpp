@@ -200,11 +200,11 @@ void vicdual_state::mboard_map(address_map &map)
 MACHINE_CONFIG_START(vicdual_state::carnival_audio)
 
 	/* music board */
-	MCFG_DEVICE_ADD("audiocpu", I8039, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(mboard_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vicdual_state, carnival_music_port_1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vicdual_state, carnival_music_port_2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, vicdual_state, carnival_music_port_t1_r))
+	I8039(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &vicdual_state::mboard_map);
+	m_audiocpu->p1_out_cb().set(FUNC(vicdual_state::carnival_music_port_1_w));
+	m_audiocpu->p2_out_cb().set(FUNC(vicdual_state::carnival_music_port_2_w));
+	m_audiocpu->t1_in_cb().set(FUNC(vicdual_state::carnival_music_port_t1_r));
 
 	AY8912(config, m_psg, XTAL(3'579'545)/3).add_route(ALL_OUTPUTS, "mono", 0.25);
 

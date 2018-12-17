@@ -53,10 +53,10 @@ MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, msx_cart_sfg_device, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, m_ym2151, XTAL(3'579'545));  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
+	m_ym2151->irq_handler().set(FUNC(msx_cart_sfg_device::ym2151_irq_w));
+	m_ym2151->add_route(0, "lspeaker", 0.80);
+	m_ym2151->add_route(1, "rspeaker", 0.80);
 
 	YM2148(config, m_ym2148, XTAL(4'000'000));
 	m_ym2148->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
