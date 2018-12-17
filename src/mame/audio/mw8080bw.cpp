@@ -1561,12 +1561,12 @@ void mw8080bw_state::gmissile_audio(machine_config &config)
 	SAMPLES(config, m_samples1);
 	m_samples1->set_channels(1);
 	m_samples1->set_samples_names(gmissile_sample_names);
-	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 1.9);
+	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	SAMPLES(config, m_samples2);
 	m_samples2->set_channels(1);
 	m_samples2->set_samples_names(gmissile_sample_names);
-	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 1.9);
+	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 
