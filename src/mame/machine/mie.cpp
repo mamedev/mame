@@ -65,12 +65,13 @@ const tiny_rom_entry *mie_device::device_rom_region() const
 	return ROM_NAME(mie);
 }
 
-MACHINE_CONFIG_START(mie_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mie", Z80, DERIVED_CLOCK(1,1))
-	MCFG_DEVICE_PROGRAM_MAP(mie_map)
-	MCFG_DEVICE_IO_MAP(mie_port)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
-MACHINE_CONFIG_END
+void mie_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, cpu, DERIVED_CLOCK(1,1));
+	cpu->set_addrmap(AS_PROGRAM, &mie_device::mie_map);
+	cpu->set_addrmap(AS_IO, &mie_device::mie_port);
+	cpu->set_irq_acknowledge_callback(FUNC(mie_device::irq_callback));
+}
 
 mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: jvs_host(mconfig, MIE_JVS, tag, owner, clock)
@@ -79,24 +80,16 @@ mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, d
 
 mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: maple_device(mconfig, MIE, tag, owner, clock)
+	, cpu(*this, "mie")
+	, jvs(*this, finder_base::DUMMY_TAG)
+	, gpio_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 {
-	memset(gpio_name, 0, sizeof(gpio_name));
-	jvs_name = nullptr;
-	cpu = nullptr;
-	jvs = nullptr;
 }
 
 void mie_device::device_start()
 {
 	maple_device::device_start();
-	cpu = subdevice<z80_device>("mie");
 	timer = timer_alloc(0);
-	jvs = machine().device<mie_jvs_device>(jvs_name);
-
-	for (int i = 0; i < ARRAY_LENGTH(gpio_name); i++)
-	{
-		gpio_port[i] = gpio_name[i] ? ioport(gpio_name[i]) : nullptr;
-	}
 
 	save_item(NAME(gpiodir));
 	save_item(NAME(gpio_val));

@@ -2954,7 +2954,10 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	// - using UART as timer - 13.260MHz,
 	// - unrolled NOPs then GPIO toggle - 12.76MHz (or 3.19M NOP instructions per second)
 	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
-	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
+	mie_device &mie(MIE(config, "mie" "_maple", 16000000, m_maple, 0, "mie"));
+	mie.set_gpio_name<3>("MIE.3");
+	mie.set_gpio_name<5>("MIE.5");
+	MIE_JVS(config, "mie", 16000000);
 
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
 	sega837.set_port_tag<0>("TILT");
@@ -3037,21 +3040,55 @@ void naomi_state::naomim4(machine_config &config)
  * Naomi M2 with Keyboard controllers
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim2_kb)
+void naomi_state::naomim2_kb(machine_config &config)
+{
 	naomim2(config);
-	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
-	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
-MACHINE_CONFIG_END
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dcctrl0.set_port_tag<0>("P1.M");
+	dcctrl0.set_port_tag<1>("P1.LD");
+	dcctrl0.set_port_tag<2>("P1.KC1");
+	dcctrl0.set_port_tag<3>("P1.KC2");
+	dcctrl0.set_port_tag<4>("P1.KC3");
+	dcctrl0.set_port_tag<5>("P1.KC4");
+	dcctrl0.set_port_tag<6>("P1.KC5");
+	dcctrl0.set_port_tag<7>("P1.KC6");
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dcctrl1.set_port_tag<0>("P2.M");
+	dcctrl1.set_port_tag<1>("P2.LD");
+	dcctrl1.set_port_tag<2>("P2.KC1");
+	dcctrl1.set_port_tag<3>("P2.KC2");
+	dcctrl1.set_port_tag<4>("P2.KC3");
+	dcctrl1.set_port_tag<5>("P2.KC4");
+	dcctrl1.set_port_tag<6>("P2.KC5");
+	dcctrl1.set_port_tag<7>("P2.KC6");
+}
 
 /*
  * Naomi GD with Keyboard controllers
  */
 
-MACHINE_CONFIG_START(naomi_state::naomigd_kb)
+void naomi_state::naomigd_kb(machine_config &config)
+{
 	naomigd(config);
-	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
-	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
-MACHINE_CONFIG_END
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dcctrl0.set_port_tag<0>("P1.M");
+	dcctrl0.set_port_tag<1>("P1.LD");
+	dcctrl0.set_port_tag<2>("P1.KC1");
+	dcctrl0.set_port_tag<3>("P1.KC2");
+	dcctrl0.set_port_tag<4>("P1.KC3");
+	dcctrl0.set_port_tag<5>("P1.KC4");
+	dcctrl0.set_port_tag<6>("P1.KC5");
+	dcctrl0.set_port_tag<7>("P1.KC6");
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dcctrl1.set_port_tag<0>("P2.M");
+	dcctrl1.set_port_tag<1>("P2.LD");
+	dcctrl1.set_port_tag<2>("P2.KC1");
+	dcctrl1.set_port_tag<3>("P2.KC2");
+	dcctrl1.set_port_tag<4>("P2.KC3");
+	dcctrl1.set_port_tag<5>("P2.KC4");
+	dcctrl1.set_port_tag<6>("P2.KC5");
+	dcctrl1.set_port_tag<7>("P2.KC6");
+}
 
 /*
  * Naomi 2
@@ -3126,25 +3163,59 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atomiswave_state::aw1c)
+void atomiswave_state::aw1c(machine_config &config)
+{
 	aw_base(config);
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1.0");
+	dcctrl0.set_port_tag<1>("P1.1");
+	dcctrl0.set_port_tag<2>("P1.A0");
+	dcctrl0.set_port_tag<3>("P1.A1");
+	dcctrl0.set_port_tag<4>("P1.A2");
+	dcctrl0.set_port_tag<5>("P1.A3");
+	dcctrl0.set_port_tag<6>("P1.A4");
+	dcctrl0.set_port_tag<7>("P1.A5");
 	// TODO: isn't it supposed to be just one controller?
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
-MACHINE_CONFIG_END
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2.0");
+	dcctrl1.set_port_tag<1>("P2.1");
+	dcctrl1.set_port_tag<2>("P2.A0");
+	dcctrl1.set_port_tag<3>("P2.A1");
+	dcctrl1.set_port_tag<4>("P2.A2");
+	dcctrl1.set_port_tag<5>("P2.A3");
+	dcctrl1.set_port_tag<6>("P2.A4");
+	dcctrl1.set_port_tag<7>("P2.A5");
+}
 
-MACHINE_CONFIG_START(atomiswave_state::aw2c)
+void atomiswave_state::aw2c(machine_config &config)
+{
 	aw_base(config);
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
-MACHINE_CONFIG_END
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1.0");
+	dcctrl0.set_port_tag<1>("P1.1");
+	dcctrl0.set_port_tag<2>("P1.A0");
+	dcctrl0.set_port_tag<3>("P1.A1");
+	dcctrl0.set_port_tag<4>("P1.A2");
+	dcctrl0.set_port_tag<5>("P1.A3");
+	dcctrl0.set_port_tag<6>("P1.A4");
+	dcctrl0.set_port_tag<7>("P1.A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2.0");
+	dcctrl1.set_port_tag<1>("P2.1");
+	dcctrl1.set_port_tag<2>("P2.A0");
+	dcctrl1.set_port_tag<3>("P2.A1");
+	dcctrl1.set_port_tag<4>("P2.A2");
+	dcctrl1.set_port_tag<5>("P2.A3");
+	dcctrl1.set_port_tag<6>("P2.A4");
+	dcctrl1.set_port_tag<7>("P2.A5");
+}
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 /* BIOS info:
 
-Revisions through C supports only motherboards with X76F100 seral number eeprom
+Revisions through C supports only motherboards with X76F100 serial number eeprom
 Revisions through D can handle game carts only
 Revisions C and later can also handle Multi-board
 Revisions E and later can also handle DIMM board

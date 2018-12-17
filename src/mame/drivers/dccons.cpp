@@ -608,10 +608,42 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2:0", ":P2:1", ":P2:A0", ":P2:A1", ":P2:A2", ":P2:A3", ":P2:A4", ":P2:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl2", "maple_dc", 2, ":P3:0", ":P3:1", ":P3:A0", ":P3:A1", ":P3:A2", ":P3:A3", ":P3:A4", ":P3:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl3", "maple_dc", 3, ":P4:0", ":P4:1", ":P4:A0", ":P4:A1", ":P4:A2", ":P4:A3", ":P4:A4", ":P4:A5")
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1:0");
+	dcctrl0.set_port_tag<1>("P1:1");
+	dcctrl0.set_port_tag<2>("P1:A0");
+	dcctrl0.set_port_tag<3>("P1:A1");
+	dcctrl0.set_port_tag<4>("P1:A2");
+	dcctrl0.set_port_tag<5>("P1:A3");
+	dcctrl0.set_port_tag<6>("P1:A4");
+	dcctrl0.set_port_tag<7>("P1:A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2:0");
+	dcctrl1.set_port_tag<1>("P2:1");
+	dcctrl1.set_port_tag<2>("P2:A0");
+	dcctrl1.set_port_tag<3>("P2:A1");
+	dcctrl1.set_port_tag<4>("P2:A2");
+	dcctrl1.set_port_tag<5>("P2:A3");
+	dcctrl1.set_port_tag<6>("P2:A4");
+	dcctrl1.set_port_tag<7>("P2:A5");
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dcctrl2.set_port_tag<0>("P3:0");
+	dcctrl2.set_port_tag<1>("P3:1");
+	dcctrl2.set_port_tag<2>("P3:A0");
+	dcctrl2.set_port_tag<3>("P3:A1");
+	dcctrl2.set_port_tag<4>("P3:A2");
+	dcctrl2.set_port_tag<5>("P3:A3");
+	dcctrl2.set_port_tag<6>("P3:A4");
+	dcctrl2.set_port_tag<7>("P3:A5");
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dcctrl3.set_port_tag<0>("P4:0");
+	dcctrl3.set_port_tag<1>("P4:1");
+	dcctrl3.set_port_tag<2>("P4:A0");
+	dcctrl3.set_port_tag<3>("P4:A1");
+	dcctrl3.set_port_tag<4>("P4:A2");
+	dcctrl3.set_port_tag<5>("P4:A3");
+	dcctrl3.set_port_tag<6>("P4:A4");
+	dcctrl3.set_port_tag<7>("P4:A5");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
