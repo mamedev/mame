@@ -466,15 +466,13 @@ void n8080_state::n8080_sound_cpu_map(address_map &map)
 	map(0x0000, 0x03ff).rom();
 }
 
-
 void n8080_state::helifire_sound_io_map(address_map &map)
 {
 	map(0x00, 0x7f).r(FUNC(n8080_state::helifire_8035_external_ram_r));
 }
 
-
-MACHINE_CONFIG_START(n8080_state::spacefev_sound)
-
+void n8080_state::spacefev_sound(machine_config &config)
+{
 	MCFG_SOUND_START_OVERRIDE(n8080_state,spacefev)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,spacefev)
 
@@ -486,35 +484,35 @@ MACHINE_CONFIG_START(n8080_state::spacefev_sound)
 	m_audiocpu->p1_in_cb().set(FUNC(n8080_state::n8080_8035_p1_r));
 	m_audiocpu->p2_out_cb().set(FUNC(n8080_state::n8080_dac_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vco_timer", n8080_state, spacefev_vco_voltage_timer, attotime::from_hz(1000))
+	TIMER(config, "vco_timer").configure_periodic(FUNC(n8080_state::spacefev_vco_voltage_timer), attotime::from_hz(1000));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT);
 
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(150), CAP_N(1)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_M(1))                    // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(150))                    // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_N(1), RES_M(1.5))    // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_N(47), RES_M(1))        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_N(47), RES_K(820))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
-MACHINE_CONFIG_END
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(36), RES_K(150), CAP_N(1));
+	m_sn->set_decay_res(RES_M(1));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(20));
+	m_sn->set_amp_res(RES_K(150));
+	m_sn->set_feedback_res(RES_K(47));
+	m_sn->set_vco_params(0, CAP_N(1), RES_M(1.5));
+	m_sn->set_pitch_voltage(0);
+	m_sn->set_slf_params(CAP_N(47), RES_M(1));
+	m_sn->set_oneshot_params(CAP_N(47), RES_K(820));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.35);
+}
 
-
-MACHINE_CONFIG_START(n8080_state::sheriff_sound)
-
+void n8080_state::sheriff_sound(machine_config &config)
+{
 	MCFG_SOUND_START_OVERRIDE(n8080_state,sheriff)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,sheriff)
 
@@ -529,30 +527,30 @@ MACHINE_CONFIG_START(n8080_state::sheriff_sound)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT);
 
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(100), CAP_N(1)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(620))                  // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(150))                    // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_N(1), RES_M(1.5))    // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_N(47), RES_M(1.5))      // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_N(47), RES_K(560))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
-MACHINE_CONFIG_END
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(36), RES_K(100), CAP_N(1));
+	m_sn->set_decay_res(RES_K(620));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(20));
+	m_sn->set_amp_res(RES_K(150));
+	m_sn->set_feedback_res(RES_K(47));
+	m_sn->set_vco_params(0, CAP_N(1), RES_M(1.5));
+	m_sn->set_pitch_voltage(0);
+	m_sn->set_slf_params(CAP_N(47), RES_M(1.5));
+	m_sn->set_oneshot_params(CAP_N(47), RES_K(560));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.35);
+}
 
-
-MACHINE_CONFIG_START(n8080_state::helifire_sound)
-
+void n8080_state::helifire_sound(machine_config &config)
+{
 	MCFG_SOUND_START_OVERRIDE(n8080_state,helifire)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,helifire)
 
@@ -566,11 +564,13 @@ MACHINE_CONFIG_START(n8080_state::helifire_sound)
 	m_audiocpu->p1_out_cb().set("helifire_dac", FUNC(dac_byte_interface::data_w));
 	m_audiocpu->p2_out_cb().set(FUNC(n8080_state::helifire_sound_ctrl_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac_volume_timer", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
+	TIMER(config, "helifire_dac_volume_timer").configure_periodic(FUNC(n8080_state::helifire_dac_volume_timer), attotime::from_hz(1000));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("helifire_dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, m_helifire_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT);
+}

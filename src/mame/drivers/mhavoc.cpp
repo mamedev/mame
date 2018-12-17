@@ -516,28 +516,28 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mhavoc_state::mhavoc)
-
+void mhavoc_state::mhavoc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(alpha_map)
+	M6502(config, m_alpha, MHAVOC_CLOCK_2_5M);     /* 2.5 MHz */
+	m_alpha->set_addrmap(AS_PROGRAM, &mhavoc_state::alpha_map);
 
-	MCFG_DEVICE_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)    /* 1.25 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gamma_map)
+	M6502(config, m_gamma, MHAVOC_CLOCK_1_25M);    /* 1.25 MHz */
+	m_gamma->set_addrmap(AS_PROGRAM, &mhavoc_state::gamma_map);
 
 	EEPROM_2804(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("5k_timer", mhavoc_state, mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
+	TIMER(config, "5k_timer").configure_periodic(FUNC(mhavoc_state::mhavoc_cpu_irq_clock), attotime::from_hz(MHAVOC_CLOCK_5K));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(50);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 300, 0, 260);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
 	avg.set_vector_tag("vector");
@@ -551,54 +551,52 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 	 * ==> DISCRETE emulation, below is just an approximation.
 	 */
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[0], MHAVOC_CLOCK_1_25M);
+	m_pokey[0]->allpot_r().set_ioport("DSW1");
+	m_pokey[0]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[1], MHAVOC_CLOCK_1_25M);
+	m_pokey[1]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[2], MHAVOC_CLOCK_1_25M);
+	m_pokey[2]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey[3], MHAVOC_CLOCK_1_25M);
+	m_pokey[3]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[3]->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-
-MACHINE_CONFIG_START(mhavoc_state::mhavocrv)
+void mhavoc_state::mhavocrv(machine_config &config)
+{
 	mhavoc(config);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	TMS5220(config, m_tms, MHAVOC_CLOCK/2/9);
+	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(mhavoc_state::alphaone)
+void mhavoc_state::alphaone(machine_config &config)
+{
 	mhavoc(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("alpha")
-	MCFG_DEVICE_PROGRAM_MAP(alphaone_map)
-	MCFG_DEVICE_REMOVE("gamma")
+	m_alpha->set_addrmap(AS_PROGRAM, &mhavoc_state::alphaone_map);
+	config.device_remove("gamma");
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
+	subdevice<screen_device>("screen")->set_visarea(0, 580, 0, 500);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	POKEY(config.replace(), m_pokey[0], MHAVOC_CLOCK_1_25M);
+	m_pokey[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	POKEY(config.replace(), m_pokey[1], MHAVOC_CLOCK_1_25M);
+	m_pokey[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_REMOVE("pokey3")
-	MCFG_DEVICE_REMOVE("pokey4")
-MACHINE_CONFIG_END
+	config.device_remove("pokey3");
+	config.device_remove("pokey4");
+}
 
 
 

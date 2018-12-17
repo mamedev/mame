@@ -195,21 +195,22 @@ WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 }
 
 
-MACHINE_CONFIG_START(astrof_state::tomahawk_audio)
+void astrof_state::tomahawk_audio(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                   // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res: N/C
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.033), RES_K(33))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(2.2), RES_K(47))       // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(1)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, 0);
+	m_sn->set_amp_res(RES_K(47));
+	m_sn->set_feedback_res(RES_K(47));
+	m_sn->set_vco_params(0, CAP_U(0.033), RES_K(33));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(2.2), RES_K(47));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(0, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
+}

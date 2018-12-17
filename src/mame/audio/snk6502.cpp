@@ -684,51 +684,52 @@ WRITE8_MEMBER(vanguard_sound_device::speech_w)
 	m_custom->speech_w(data, vanguard_table, 2);
 }
 
-MACHINE_CONFIG_START(vanguard_sound_device::device_add_mconfig)
+void vanguard_sound_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_custom, SNK6502_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(vanguard_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(vanguard_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("sn76477.1", SN76477)
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
 	// SHOT A   GND: 2,9,26,27  +5V: 15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(4.7))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	sn76477_1.set_noise_params(RES_K(470), RES_M(1.5), CAP_P(220));
+	sn76477_1.set_decay_res(0);
+	sn76477_1.set_attack_params(0, 0);
+	sn76477_1.set_amp_res(RES_K(47));
+	sn76477_1.set_feedback_res(RES_K(4.7));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, 0);
+	sn76477_1.set_oneshot_params(0, 0);
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
+	sn76477_1.set_envelope_params(1, 1);
+	sn76477_1.set_enable(1);
+	sn76477_1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn76477.2", SN76477)
+	SN76477(config, m_sn76477_2);
 	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
-	MCFG_SN76477_NOISE_PARAMS(RES_K(10), RES_K(30), 0)   // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(4.7))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	m_sn76477_2->set_noise_params(RES_K(10), RES_K(30), 0);
+	m_sn76477_2->set_decay_res(0);
+	m_sn76477_2->set_attack_params(0, 0);
+	m_sn76477_2->set_amp_res(RES_K(47));
+	m_sn76477_2->set_feedback_res(RES_K(4.7));
+	m_sn76477_2->set_vco_params(0, 0, 0);
+	m_sn76477_2->set_pitch_voltage(0);
+	m_sn76477_2->set_slf_params(0, 0);
+	m_sn76477_2->set_oneshot_params(0, 0);
+	m_sn76477_2->set_vco_mode(0);
+	m_sn76477_2->set_mixer_params(0, 1, 0);
+	m_sn76477_2->set_envelope_params(0, 1);
+	m_sn76477_2->set_enable(1);
+	m_sn76477_2->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 void vanguard_sound_device::device_start()
 {
@@ -891,24 +892,24 @@ MACHINE_CONFIG_START(fantasy_sound_device::device_add_mconfig)
 	MCFG_SAMPLES_NAMES(fantasy_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_DEVICE_ADD("sn76477.1", SN76477)
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
 	// BOMB     GND:    2,9,26,27       +5V: 15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(470))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(4.7))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
+	sn76477_1.set_noise_params(RES_K(470), RES_M(1.5), CAP_P(220));
+	sn76477_1.set_decay_res(0);
+	sn76477_1.set_attack_params(0, 0);
+	sn76477_1.set_amp_res(RES_K(470));
+	sn76477_1.set_feedback_res(RES_K(4.7));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, 0);
+	sn76477_1.set_oneshot_params(0, 0);
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
 	// schematic does not show pin 1 grounded, but it must be.
 	// otherwise it is using the VCO for the envelope, but the VCO is not hooked up
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(0)                               // enable
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
+	sn76477_1.set_envelope_params(0, 1);
+	sn76477_1.set_enable(0);
+	sn76477_1.add_route(0, "discrete", 1.0, 0);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, fantasy_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -1035,56 +1036,56 @@ MACHINE_CONFIG_START(sasuke_sound_device::device_add_mconfig)
 	MCFG_SAMPLES_NAMES(sasuke_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_DEVICE_ADD("sn76477.1", SN76477)
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
 	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_K(150), CAP_P(4700)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(22))                    // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(10))     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(100))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res: N/C
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(0, RES_K(10))                // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(2.2), RES_K(100))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	sn76477_1.set_noise_params(RES_K(470), RES_K(150), CAP_P(4700));
+	sn76477_1.set_decay_res(RES_K(22));
+	sn76477_1.set_attack_params(CAP_U(10), RES_K(10));
+	sn76477_1.set_amp_res(RES_K(100));
+	sn76477_1.set_feedback_res(RES_K(47));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, RES_K(10));
+	sn76477_1.set_oneshot_params(CAP_U(2.2), RES_K(100));
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
+	sn76477_1.set_envelope_params(1, 0);
+	sn76477_1.set_enable(1);
+	sn76477_1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn76477.2", SN76477)
+	sn76477_device &sn76477_2(SN76477(config, "sn76477.2"));
 	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
-	MCFG_SN76477_NOISE_PARAMS(RES_K(340), RES_K(47), CAP_P(100)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(470))                   // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(4.7), RES_K(10))    // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(100))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_P(220), RES_K(1000))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(0, RES_K(220))               // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(22), RES_K(47))    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(1)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	sn76477_2.set_noise_params(RES_K(340), RES_K(47), CAP_P(100));
+	sn76477_2.set_decay_res(RES_K(470));
+	sn76477_2.set_attack_params(CAP_U(4.7), RES_K(10));
+	sn76477_2.set_amp_res(RES_K(100));
+	sn76477_2.set_feedback_res(RES_K(47));
+	sn76477_2.set_vco_params(0, CAP_P(220), RES_K(1000));
+	sn76477_2.set_pitch_voltage(0);
+	sn76477_2.set_slf_params(0, RES_K(220));
+	sn76477_2.set_oneshot_params(CAP_U(22), RES_K(47));
+	sn76477_2.set_vco_mode(1);
+	sn76477_2.set_mixer_params(0, 1, 0);
+	sn76477_2.set_envelope_params(1, 1);
+	sn76477_2.set_enable(1);
+	sn76477_2.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn76477.3", SN76477)
+	sn76477_device &sn76477_3(SN76477(config, "sn76477.3"));
 	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
-	MCFG_SN76477_NOISE_PARAMS(RES_K(330), RES_K(47), CAP_P(100)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(1))                     // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(1))              // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(100))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_P(1000), RES_K(1000)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1), RES_K(10))         // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(2.2), RES_K(150))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(1, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	sn76477_3.set_noise_params(RES_K(330), RES_K(47), CAP_P(100));
+	sn76477_3.set_decay_res(RES_K(1));
+	sn76477_3.set_attack_params(0, RES_K(1));
+	sn76477_3.set_amp_res(RES_K(100));
+	sn76477_3.set_feedback_res(RES_K(47));
+	sn76477_3.set_vco_params(0, CAP_P(1000), RES_K(1000));
+	sn76477_3.set_pitch_voltage(0);
+	sn76477_3.set_slf_params(CAP_U(1), RES_K(10));
+	sn76477_3.set_oneshot_params(CAP_U(2.2), RES_K(150));
+	sn76477_3.set_vco_mode(0);
+	sn76477_3.set_mixer_params(1, 1, 0);
+	sn76477_3.set_envelope_params(1, 0);
+	sn76477_3.set_enable(1);
+	sn76477_3.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 void sasuke_sound_device::device_start()
@@ -1175,22 +1176,22 @@ MACHINE_CONFIG_START(satansat_sound_device::device_add_mconfig)
 	MCFG_SAMPLES_NAMES(vanguard_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("sn76477.1", SN76477)
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
 	// ???      GND: 2,26,27        +5V: 15,25
-	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                 // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, 0, 0)                     // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                        // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(0, 0)                        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                    // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 1, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	sn76477_1.set_noise_params(RES_K(470), RES_M(1.5), CAP_P(220));
+	sn76477_1.set_decay_res(0);
+	sn76477_1.set_attack_params(0, 0);
+	sn76477_1.set_amp_res(RES_K(47));
+	sn76477_1.set_feedback_res(RES_K(47));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, 0);
+	sn76477_1.set_oneshot_params(0, 0);
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
+	sn76477_1.set_envelope_params(1, 1);
+	sn76477_1.set_enable(1);
+	sn76477_1.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 void satansat_sound_device::device_start()

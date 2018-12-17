@@ -392,8 +392,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cloud9_state::cloud9)
-
+void cloud9_state::cloud9(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, MASTER_CLOCK/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cloud9_state::cloud9_map);
@@ -409,29 +409,29 @@ MACHINE_CONFIG_START(cloud9_state::cloud9)
 	X2212(config, "nvram").set_auto_save(true);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloud9)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloud9);
+	PALETTE(config, m_palette, 64);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL)
-	MCFG_SCREEN_SIZE(HTOTAL, VTOTAL)
-	MCFG_SCREEN_VBLANK_TIME(0)          /* VBLANK is handled manually */
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 231)
-	MCFG_SCREEN_UPDATE_DRIVER(cloud9_state, screen_update_cloud9)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL);
+	m_screen->set_size(HTOTAL, VTOTAL);
+	m_screen->set_vblank_time(0);          /* VBLANK is handled manually */
+	m_screen->set_visarea(0, 255, 0, 231);
+	m_screen->set_screen_update(FUNC(cloud9_state::screen_update_cloud9));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0)
+	LS259(config, m_videolatch);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/8));
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/8));
+	pokey2.allpot_r().set_ioport("DSW");
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

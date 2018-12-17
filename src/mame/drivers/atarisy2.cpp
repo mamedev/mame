@@ -1182,8 +1182,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarisy2_state::atarisy2)
-
+void atarisy2_state::atarisy2(machine_config &config)
+{
 	/* basic machine hardware */
 	T11(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_initial_mode(0x36ff); /* initial mode word has DAL15,14,11,8 pulled low */
@@ -1211,22 +1211,21 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy2)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT_CLASS(2, atarisy2_state, RRRRGGGGBBBBIIII)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_atarisy2);
+	PALETTE(config, "palette", 256).set_format(raw_to_rgb_converter(2, &atarisy2_state::RRRRGGGGBBBBIIII_decoder));
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarisy2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
+	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 128,64).set_info_callback(FUNC(atarisy2_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 64,48, 0).set_info_callback(FUNC(atarisy2_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy2_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
-	MCFG_SCREEN_UPDATE_DRIVER(atarisy2_state, screen_update_atarisy2)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy2_state, vblank_int))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_raw(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384);
+	screen.set_screen_update(FUNC(atarisy2_state::screen_update_atarisy2));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(atarisy2_state::vblank_int));
 
 	ADDRESS_MAP_BANK(config, "vrambank").set_map(&atarisy2_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000);
 
@@ -1240,18 +1239,18 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	m_ym2151->add_route(0, "lspeaker", 0.60);
 	m_ym2151->add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, SOUND_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.35)
+	POKEY(config, m_pokey[0], SOUND_CLOCK/8);
+	m_pokey[0]->allpot_r().set_ioport("DSW0");
+	m_pokey[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.35);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, SOUND_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.35)
+	POKEY(config, m_pokey[1], SOUND_CLOCK/8);
+	m_pokey[1]->allpot_r().set_ioport("DSW1");
+	m_pokey[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.35);
 
-	MCFG_DEVICE_ADD("tms", TMS5220C, MASTER_CLOCK/4/4/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	TMS5220C(config, m_tms5220, MASTER_CLOCK/4/4/2);
+	m_tms5220->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_tms5220->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
 
 void atarisy2_state::paperboy(machine_config &config)

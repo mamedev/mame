@@ -1738,15 +1738,15 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(centiped_state::centiped_base)
-
+void centiped_state::centiped_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12096000/8)  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
+	M6502(config, m_maincpu, 12096000/8);  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
 
 	MCFG_MACHINE_START_OVERRIDE(centiped_state,centiped)
 	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,centiped)
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(centiped_state::coin_counter_left_w));
@@ -1758,27 +1758,26 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* timer */
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", centiped_state, generate_interrupt, "screen", 0, 16)
+	TIMER(config, "32v").configure_scanline(FUNC(centiped_state::generate_interrupt), "screen", 0, 16);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(centiped_state::screen_update_centiped));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_centiped)
-	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_centiped);
+	PALETTE(config, m_palette, 4+4*4*4*4);
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,centiped)
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(centiped_state::centiped)
+void centiped_state::centiped(machine_config &config)
+{
 	centiped_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(centiped_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::centiped_map);
 
 	// M10
 	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
@@ -1786,26 +1785,25 @@ MACHINE_CONFIG_START(centiped_state::centiped)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, 12096000/8)
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(3.3), CAP_U(0.01), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	pokey_device &pokey(POKEY(config, "pokey", 12096000/8));
+	pokey.set_output_opamp_low_pass(RES_K(3.3), CAP_U(0.01), 5.0);
+	pokey.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(centiped_state::centipedj)
+void centiped_state::centipedj(machine_config &config)
+{
 	centiped(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(centipedj_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::centipedj_map);
+}
 
-MACHINE_CONFIG_START(centiped_state::caterplr)
+void centiped_state::caterplr(machine_config &config)
+{
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(caterplr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::caterplr_map);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
@@ -1813,15 +1811,14 @@ MACHINE_CONFIG_START(centiped_state::caterplr)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(centiped_state::centipdb)
+void centiped_state::centipdb(machine_config &config)
+{
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(centipdb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::centipdb_map);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
@@ -1831,15 +1828,15 @@ MACHINE_CONFIG_START(centiped_state::centipdb)
 	AY8910(config, m_aysnd, 12096000/8);
 	m_aysnd->port_a_read_callback().set(FUNC(centiped_state::caterplr_unknown_r));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 2.0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(centiped_state::magworm)
+void centiped_state::magworm(machine_config &config)
+{
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(magworm_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::magworm_map);
+
 	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,magworm)
 
 	// 12A
@@ -1849,15 +1846,14 @@ MACHINE_CONFIG_START(centiped_state::magworm)
 	SPEAKER(config, "mono").front_center();
 
 	AY8912(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 2.0); // AY-3-8912 at 2/3H
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(centiped_state::milliped)
+void centiped_state::milliped(machine_config &config)
+{
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(milliped_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::milliped_map);
 
 	// 12E
 	m_outlatch->q_out_cb<5>().set(FUNC(centiped_state::input_select_w)); // TBEN
@@ -1865,47 +1861,43 @@ MACHINE_CONFIG_START(centiped_state::milliped)
 	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::control_select_w)); // CNTRLSEL
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_milliped)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4*4+4*4*4*4*4)
+	m_gfxdecode->set_info(gfx_milliped);
+	m_palette->set_entries(4*4+4*4*4*4*4);
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,milliped)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_milliped)
+	m_screen->set_screen_update(FUNC(centiped_state::screen_update_milliped));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, 12096000/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey", 12096000/8));
+	pokey1.allpot_r().set_ioport("DSW1");
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, 12096000/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", 12096000/8));
+	pokey2.allpot_r().set_ioport("DSW2");
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(centiped_state::multiped)
+void centiped_state::multiped(machine_config &config)
+{
 	milliped(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multiped_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::multiped_map);
 
-	MCFG_DEVICE_REMOVE("earom")
-	EEPROM_93C46_8BIT(config, "eeprom");
-MACHINE_CONFIG_END
+	config.device_remove("earom");
+	EEPROM_93C46_8BIT(config, m_eeprom);
+}
 
-
-MACHINE_CONFIG_START(centiped_state::warlords)
+void centiped_state::warlords(machine_config &config)
+{
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(warlords_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::warlords_map);
 
-	MCFG_DEVICE_REMOVE("earom")
+	config.device_remove("earom");
 
 	// these extra LEDs also appear on Centipede schematics
 	// P9
@@ -1913,50 +1905,46 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 	m_outlatch->q_out_cb<6>().set_output("led3").invert(); // LED 4
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_warlords)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8*4+8*4)
+	m_gfxdecode->set_info(gfx_warlords);
+	m_palette->set_entries(8*4+8*4);
+	m_palette->set_init(FUNC(centiped_state::palette_init_warlords));
 
-	MCFG_PALETTE_INIT_OWNER(centiped_state,warlords)
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,warlords)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_warlords)
+
+	m_screen->set_screen_update(FUNC(centiped_state::screen_update_warlords));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, 12096000/8)
-	MCFG_POKEY_POT0_R_CB(IOPORT("PADDLE0"))
-	MCFG_POKEY_POT1_R_CB(IOPORT("PADDLE1"))
-	MCFG_POKEY_POT2_R_CB(IOPORT("PADDLE2"))
-	MCFG_POKEY_POT3_R_CB(IOPORT("PADDLE3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	pokey_device &pokey(POKEY(config, "pokey", 12096000/8));
+	pokey.pot_r<0>().set_ioport("PADDLE0");
+	pokey.pot_r<1>().set_ioport("PADDLE1");
+	pokey.pot_r<2>().set_ioport("PADDLE2");
+	pokey.pot_r<3>().set_ioport("PADDLE3");
+	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(centiped_state::mazeinv)
+void centiped_state::mazeinv(machine_config &config)
+{
 	milliped(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mazeinv_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::mazeinv_map);
 
 	m_outlatch->q_out_cb<7>().set_nop();
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(centiped_state::screen_update_centiped));
+}
 
-
-MACHINE_CONFIG_START(centiped_state::bullsdrt)
-
+void centiped_state::bullsdrt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, 12096000/8)
-	MCFG_DEVICE_PROGRAM_MAP(bullsdrt_map)
-	MCFG_DEVICE_IO_MAP(bullsdrt_port_map)
-	MCFG_DEVICE_DATA_MAP(bullsdrt_data_map)
+	S2650(config, m_maincpu, 12096000/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &centiped_state::bullsdrt_map);
+	m_maincpu->set_addrmap(AS_IO, &centiped_state::bullsdrt_port_map);
+	m_maincpu->set_addrmap(AS_DATA, &centiped_state::bullsdrt_data_map);
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<1>().set(FUNC(centiped_state::bullsdrt_coin_count_w));
@@ -1967,24 +1955,24 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_bullsdrt)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(centiped_state::screen_update_bullsdrt));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_centiped)
-	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_centiped);
+	PALETTE(config, m_palette, 4+4*4*4*4);
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76496, 12096000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	sn76496_device &snsnd(SN76496(config, "snsnd", 12096000/8));
+	snsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

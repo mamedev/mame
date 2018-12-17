@@ -1311,8 +1311,8 @@ void dkong_state::dkong3_sound2_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
-
+void dkong_state::dkong2b_audio(machine_config &config)
+{
 	/* sound latches */
 	LATCH8(config, m_ls175_3d); /* sound cmd latch */
 	m_ls175_3d->set_maskout(0xf0);
@@ -1349,19 +1349,19 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	m_soundcpu->t1_in_cb().set("ls259.6h", FUNC(latch8_device::bit4_q_r));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, dkong2b_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", dkong2b_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(dkong_state::radarscp_audio)
+void dkong_state::radarscp_audio(machine_config &config)
+{
 	dkong2b_audio(config);
 
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, radarscp_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
-MACHINE_CONFIG_END
+	DISCRETE(config.replace(), "discrete", radarscp_discrete).add_route(ALL_OUTPUTS, "mono", 0.7);
+}
 
 
-MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
+void dkong_state::radarscp1_audio(machine_config &config)
+{
 	radarscp_audio(config);
 
 	m_soundcpu->set_addrmap(AS_IO, &dkong_state::radarscp1_sound_io_map);
@@ -1378,17 +1378,17 @@ MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
 	/* tms memory controller */
 	M58819(config, "m58819", 0);
 
-	MCFG_DEVICE_ADD("tms", M58817, XTAL(640'000))
-	MCFG_TMS5110_M0_CB(WRITELINE("m58819", tms6100_device, m0_w))
-	MCFG_TMS5110_M1_CB(WRITELINE("m58819", tms6100_device, m1_w))
-	MCFG_TMS5110_ADDR_CB(WRITE8("m58819", tms6100_device, add_w))
-	MCFG_TMS5110_DATA_CB(READLINE("m58819", tms6100_device, data_line_r))
-	MCFG_TMS5110_ROMCLK_CB(WRITELINE("m58819", tms6100_device, clk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	M58817(config, m_m58817, XTAL(640'000));
+	m_m58817->m0().set("m58819", FUNC(tms6100_device::m0_w));
+	m_m58817->m1().set("m58819", FUNC(tms6100_device::m1_w));
+	m_m58817->addr().set("m58819", FUNC(tms6100_device::add_w));
+	m_m58817->data().set("m58819", FUNC(tms6100_device::data_line_r));
+	m_m58817->romclk().set("m58819", FUNC(tms6100_device::clk_w));
+	m_m58817->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
-
+void dkong_state::dkongjr_audio(machine_config &config)
+{
 	/* sound latches */
 	LATCH8(config, "ls174.3d").set_maskout(0xe0);
 
@@ -1421,17 +1421,13 @@ MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, dkongjr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", dkongjr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(dkong_state::dkong3_audio)
-
-	MCFG_DEVICE_ADD("n2a03a", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dkong3_sound1_map)
-
-	MCFG_DEVICE_ADD("n2a03b", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dkong3_sound2_map)
+void dkong_state::dkong3_audio(machine_config &config)
+{
+	N2A03(config, "n2a03a", NTSC_APU_CLOCK).set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound1_map);
+	N2A03(config, "n2a03b", NTSC_APU_CLOCK).set_addrmap(AS_PROGRAM, &dkong_state::dkong3_sound2_map);
 
 	/* sound latches */
 	LATCH8(config, "latch1");
@@ -1439,4 +1435,4 @@ MACHINE_CONFIG_START(dkong_state::dkong3_audio)
 	LATCH8(config, "latch3");
 
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}

@@ -228,14 +228,14 @@ static const char *const astrob_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(segag80r_state::astrob_sound_board)
-
+void segag80r_state::astrob_sound_board(machine_config &config)
+{
 	/* sound hardware */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(11)
-	MCFG_SAMPLES_NAMES(astrob_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(11);
+	m_samples->set_samples_names(astrob_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
 
 /*************************************
@@ -415,22 +415,21 @@ static const char *const sega005_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(segag80r_state::sega005_sound_board)
-
+void segag80r_state::sega005_sound_board(machine_config &config)
+{
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(segag80r_state::sega005_sound_a_w));
 	ppi.out_pb_callback().set(FUNC(segag80r_state::sega005_sound_b_w));
 
 	/* sound hardware */
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(7)
-	MCFG_SAMPLES_NAMES(sega005_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(7);
+	m_samples->set_samples_names(sega005_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("005", SEGA005, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	SEGA005(config, "005", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
 
 /*************************************
@@ -577,15 +576,15 @@ static const char *const spaceod_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(segag80r_state::spaceod_sound_board)
-
+void segag80r_state::spaceod_sound_board(machine_config &config)
+{
 	/* sound hardware */
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(11)
-	MCFG_SAMPLES_NAMES(spaceod_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(11);
+	m_samples->set_samples_names(spaceod_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
 
 /*************************************
@@ -810,7 +809,8 @@ WRITE8_MEMBER(monsterb_sound_device::n7751_p2_w)
  *
  *************************************/
 
-MACHINE_CONFIG_START(monsterb_sound_device::device_add_mconfig)
+void monsterb_sound_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
 	N7751(config, m_audiocpu, 6000000);
 	m_audiocpu->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
@@ -826,19 +826,21 @@ MACHINE_CONFIG_START(monsterb_sound_device::device_add_mconfig)
 	m_i8243->p6_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<8>));
 	m_i8243->p7_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_select_w));
 
-	MCFG_DEVICE_ADD(m_samples, SAMPLES)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(monsterb_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(monsterb_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_TMS36XX_ADD(m_music, 247)
-	MCFG_TMS36XX_TYPE(TMS3617)
-	MCFG_TMS36XX_DECAY_TIMES(0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	TMS36XX(config, m_music, 247);
+	m_music->set_subtype(tms36xx_device::subtype::TMS3617);
+	m_music->set_decays(0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
+	m_music->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 50K (R91-97)/100K (R98-106) ladder network
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // 50K (R91-97)/100K (R98-106) ladder network
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}

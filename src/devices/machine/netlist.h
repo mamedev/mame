@@ -411,6 +411,11 @@ class netlist_mame_logic_input_device : public device_t, public netlist_mame_sub
 {
 public:
 	// construction/destruction
+	netlist_mame_logic_input_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *param_name, const uint32_t shift)
+		: netlist_mame_logic_input_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_params(param_name, shift);
+	}
 	netlist_mame_logic_input_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_params(const char *param_name, const uint32_t shift);
