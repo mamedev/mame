@@ -43,7 +43,7 @@ void cpc_rs232_device::device_add_mconfig(machine_config &config)
 	m_pit->out_handler<1>().set(FUNC(cpc_rs232_device::pit_out1_w));
 	m_pit->out_handler<2>().set(FUNC(cpc_rs232_device::pit_out2_w));
 
-	Z80DART(config, m_dart, XTAL(4'000'000));
+	Z80DART(config, m_dart, DERIVED_CLOCK(1, 1));
 	m_dart->out_txda_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_dart->out_dtra_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_dart->out_rtsa_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
