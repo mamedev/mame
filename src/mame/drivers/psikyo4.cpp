@@ -598,64 +598,60 @@ void psikyo4_state::machine_reset()
 	m_oldbrt[1] = -1;
 }
 
-MACHINE_CONFIG_START(psikyo4_state::ps4big)
-
+void psikyo4_state::ps4big(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, 57272700/2)
-	MCFG_DEVICE_PROGRAM_MAP(ps4_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state, interrupt)
+	SH2(config, m_maincpu, 57272700/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo4_state::ps4_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(psikyo4_state::interrupt));
 
-	EEPROM_93C56_8BIT(config, "eeprom").default_value(0);
+	EEPROM_93C56_8BIT(config, m_eeprom).default_value(0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)
-	MCFG_PALETTE_ADD("lpalette", (0x2000/4) + 1) /* palette + clear colour */
-	MCFG_PALETTE_ADD("rpalette", (0x2000/4) + 1)
+	GFXDECODE(config, m_gfxdecode, m_palette[0], gfx_ps4);
+	PALETTE(config, m_palette[0], (0x2000/4) + 1); /* palette + clear colour */
+	PALETTE(config, m_palette[1], (0x2000/4) + 1);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo4_state, screen_update<0>)
-	MCFG_SCREEN_PALETTE("lpalette")
+	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	m_lscreen->set_refresh_hz(60);
+	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_lscreen->set_size(40*8, 32*8);
+	m_lscreen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_lscreen->set_screen_update(FUNC(psikyo4_state::screen_update<0>));
+	m_lscreen->set_palette(m_palette[0]);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo4_state, screen_update<1>)
-	MCFG_SCREEN_PALETTE("rpalette")
+	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	m_rscreen->set_refresh_hz(60);
+	m_rscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_rscreen->set_size(40*8, 32*8);
+	m_rscreen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_rscreen->set_screen_update(FUNC(psikyo4_state::screen_update<1>));
+	m_rscreen->set_palette(m_palette[1]);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, 57272700/2)
-	MCFG_DEVICE_ADDRESS_MAP(0, ps4_ymf_map)
-	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0) // Output for each screen
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(4, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(5, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymf278b_device &ymf(YMF278B(config, "ymf", 57272700/2));
+	ymf.set_addrmap(0, &psikyo4_state::ps4_ymf_map);
+	ymf.irq_handler().set_inputline("maincpu", 12);
+	ymf.add_route(0, "rspeaker", 1.0); // Output for each screen
+	ymf.add_route(1, "lspeaker", 1.0);
+	ymf.add_route(2, "rspeaker", 1.0);
+	ymf.add_route(3, "lspeaker", 1.0);
+	ymf.add_route(4, "rspeaker", 1.0);
+	ymf.add_route(5, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(psikyo4_state::ps4small)
+void psikyo4_state::ps4small(machine_config &config)
+{
 	ps4big(config);
 
-	/* basic machine hardware */
-
-	MCFG_SCREEN_MODIFY("lscreen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-
-	MCFG_SCREEN_MODIFY("rscreen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-MACHINE_CONFIG_END
+	m_lscreen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_rscreen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+}
 
 
 

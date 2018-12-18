@@ -44,6 +44,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_bank4000(*this, "bank4000"),
 		m_bank8000(*this, "bank8000"),
@@ -57,6 +58,7 @@ public:
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<address_map_bank_device> m_bank4000;
 	optional_memory_bank m_bank8000;

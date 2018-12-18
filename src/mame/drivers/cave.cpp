@@ -2010,278 +2010,215 @@ void cave_state::machine_reset()
 	m_agallet_vblank_irq = 0;
 }
 
+void cave_state::add_base_config(machine_config &config)
+{
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_vblank_int("screen", FUNC(cave_state::interrupt));
+
+	TIMER(config, m_int_timer).configure_generic(FUNC(cave_state::vblank_start));
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(15625/271.5);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(cave_state::screen_update));
+
+	PALETTE(config, m_palette, 0x8000);
+	m_palette->set_init(FUNC(cave_state::palette_init_cave));
+}
+
+void cave_state::add_ymz(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
+	ymz.irq_handler().set(FUNC(cave_state::sound_irq_gen));
+	ymz.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::dfeveron)
+void cave_state::dfeveron(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(dfeveron_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::dfeveron_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dfeveron);
 
-	PALETTE(config, m_palette, 0x8000); /* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_dfeveron), this));
+	/* $8000 palette entries for consistency with the other games */
+	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                 Dodonpachi
 ***************************************************************************/
 
-
-MACHINE_CONFIG_START(cave_state::ddonpach)
+void cave_state::ddonpach(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(ddonpach_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::ddonpach_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddonpach);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                     Donpachi
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::donpachi)
+void cave_state::donpachi(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(donpachi_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::donpachi_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_donpachi);
 
-	PALETTE(config, m_palette, 0x8000); /* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_dfeveron), this));
+	/* $8000 palette entries for consistency with the other games */
+	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4.224_MHz_XTAL/4, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.60)
+	OKIM6295(config, m_oki[0], 4.224_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.60);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[1], 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
                                 Esprade
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::esprade)
+void cave_state::esprade(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(esprade_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::esprade_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esprade);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                     Gaia Crusaders
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::gaia)
+void cave_state::gaia(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(gaia_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::gaia_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esprade);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                     Guwange
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::guwange)
+void cave_state::guwange(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(guwange_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::guwange_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esprade);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 /***************************************************************************
                                 Hotdog Storm
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::hotdogst)
+void cave_state::hotdogst(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(hotdogst_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_clock(32_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::hotdogst_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL/8)
-	MCFG_DEVICE_PROGRAM_MAP(hotdogst_sound_map)
-	MCFG_DEVICE_IO_MAP(hotdogst_sound_portmap)
+	Z80(config, m_audiocpu, 32_MHz_XTAL/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::hotdogst_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::hotdogst_sound_portmap);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(384, 240);
+	m_screen->set_visarea(0, 384-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotdogst);
 
-	PALETTE(config, m_palette, 0x8000); /* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_dfeveron), this));
+	/* $8000 palette entries for consistency with the other games */
+	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
@@ -2291,97 +2228,80 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	GENERIC_LATCH_16(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 32_MHz_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 32_MHz_XTAL/8));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.20);
+	ymsnd.add_route(1, "mono", 0.20);
+	ymsnd.add_route(2, "mono", 0.20);
+	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
+}
 
 
 /***************************************************************************
                                Koro Koro Quest
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::korokoro)
+void cave_state::korokoro(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(korokoro_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::korokoro_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_visarea(0, 320-1-2, 0, 240-1-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_korokoro);
 
-	PALETTE(config, m_palette, 0x8000); /* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_korokoro), this));
+	/* $8000 palette entries for consistency with the other games */
+	m_palette->set_init(FUNC(cave_state::palette_init_korokoro));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	add_ymz(config);
+}
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cave_state::crusherm)
+void cave_state::crusherm(machine_config &config)
+{
 	korokoro(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(crusherm_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::crusherm_map);
+}
 
 
 /***************************************************************************
                                 Mazinger Z
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::mazinger)
+void cave_state::mazinger(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mazinger_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::mazinger_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4_MHz_XTAL) // Bidirectional communication
-	MCFG_DEVICE_PROGRAM_MAP(mazinger_sound_map)
-	MCFG_DEVICE_IO_MAP(mazinger_sound_portmap)
+	Z80(config, m_audiocpu, 4_MHz_XTAL); // Bidirectional communication
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::mazinger_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::mazinger_sound_portmap);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(384, 240);
+	m_screen->set_visarea(0, 384-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mazinger);
 
-	PALETTE(config, m_palette, 0x8000); /* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_mazinger), this));
+	/* $8000 palette entries for consistency with the other games */
+	m_palette->set_init(FUNC(cave_state::palette_init_mazinger));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
@@ -2391,52 +2311,47 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	GENERIC_LATCH_16(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 4_MHz_XTAL)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.20);
+	ymsnd.add_route(1, "mono", 0.20);
+	ymsnd.add_route(2, "mono", 0.20);
+	ymsnd.add_route(3, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 2.0);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
+}
 
 
 /***************************************************************************
                                 Metamoqester
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::metmqstr)
+void cave_state::metmqstr(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(metmqstr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_clock(32_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::metmqstr_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(metmqstr_sound_map)
-	MCFG_DEVICE_IO_MAP(metmqstr_sound_portmap)
+	Z80(config, m_audiocpu, 32_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::metmqstr_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::metmqstr_sound_portmap);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x7d, 0x7d + 0x180-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_donpachi);
 
-	PALETTE(config, m_palette, 0x8000); /* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_dfeveron), this));
+	/* $8000 palette entries for consistency with the other games */
+	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
@@ -2450,47 +2365,39 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.6);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	OKIM6295(config, m_oki[0], 32_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_oki[1]->set_addrmap(0, &cave_state::oki2_map);
+}
 
 
 /***************************************************************************
                                    Pac-Slot
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::pacslot)
+void cave_state::pacslot(machine_config &config)
+{
+	add_base_config(config);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(pacslot_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_clock(28_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::pacslot_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
@@ -2498,21 +2405,22 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	// oki2 chip is present but its rom socket is unpopulated
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(cave_state::paceight)
+void cave_state::paceight(machine_config &config)
+{
 	pacslot(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(paceight_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paceight_map);
+}
+
 /***************************************************************************
                                Poka Poka Satan
 ***************************************************************************/
@@ -2522,48 +2430,41 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   // ppsatan: read touch screens
 }
 
-MACHINE_CONFIG_START(cave_state::ppsatan)
+void cave_state::ppsatan(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(ppsatan_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt_ppsatan)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::ppsatan_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(1));  /* a guess, and certainly wrong */
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_lev2", cave_state, timer_lev2_cb, attotime::from_hz(60))
+	TIMER(config, "timer_lev2").configure_periodic(FUNC(cave_state::timer_lev2_cb), attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)       // Top
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_top)
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
 
-	MCFG_SCREEN_ADD("screen_left", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_left)
-	MCFG_TIMER_DRIVER_ADD("int_timer_left", cave_state, vblank_start_left)
+	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_RASTER));
+	screen_left.set_refresh_hz(15625/271.5);
+	screen_left.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen_left.set_size(320, 240);
+	screen_left.set_visarea(0, 320-1, 0, 224-1);
+	screen_left.set_screen_update(FUNC(cave_state::screen_update_ppsatan_left));
+	TIMER(config, "int_timer_left").configure_generic(FUNC(cave_state::vblank_start_left));
 
-	MCFG_SCREEN_ADD("screen_right", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_right)
-	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, vblank_start_right)
+	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_RASTER));
+	screen_right.set_refresh_hz(15625/271.5);
+	screen_right.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen_right.set_size(320, 240);
+	screen_right.set_visarea(0, 320-1, 0, 224-1);
+	screen_right.set_screen_update(FUNC(cave_state::screen_update_ppsatan_right));
+	TIMER(config, "int_timer_right").configure_generic(FUNC(cave_state::vblank_start_right));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ppsatan);
 
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_ppsatan), this));
+	m_palette->set_init(FUNC(cave_state::palette_init_ppsatan));
 
 	config.set_default_layout(layout_ppsatan);
 
@@ -2573,10 +2474,10 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 2.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 2.0);
+}
 
 
 /***************************************************************************
@@ -2585,33 +2486,27 @@ MACHINE_CONFIG_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
-MACHINE_CONFIG_START(cave_state::pwrinst2)
+void cave_state::pwrinst2(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::pwrinst2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)    /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_sound_map)
-	MCFG_DEVICE_IO_MAP(pwrinst2_sound_portmap)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 2);    /* 8 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::pwrinst2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::pwrinst2_sound_portmap);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x70, 0x70 + 0x140-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pwrinst2);
 
-	PALETTE(config, m_palette, 0x8000+0x2800);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_pwrinst2), this));
+	m_palette->set_entries(0x8000+0x2800);
+	m_palette->set_init(FUNC(cave_state::palette_init_pwrinst2));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_4_layers)
 
@@ -2621,23 +2516,23 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	GENERIC_LATCH_16(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym2203(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
+	ym2203.irq_handler().set_inputline("audiocpu", 0);
+	ym2203.add_route(0, "mono", 0.40);
+	ym2203.add_route(1, "mono", 0.40);
+	ym2203.add_route(2, "mono", 0.40);
+	ym2203.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki[0], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	OKIM6295(config, m_oki[1], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -2655,39 +2550,33 @@ MACHINE_RESET_MEMBER(cave_state,sailormn)
 	m_startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
 }
 
-MACHINE_CONFIG_START(cave_state::sailormn)
+void cave_state::sailormn(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(sailormn_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::sailormn_map);
 
 	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
-	MCFG_TIMER_DRIVER_ADD(m_startup, cave_state, sailormn_startup)
+	TIMER(config, m_startup).configure_generic(FUNC(cave_state::sailormn_startup));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
-	MCFG_DEVICE_PROGRAM_MAP(sailormn_sound_map)
-	MCFG_DEVICE_IO_MAP(sailormn_sound_portmap)
+	Z80(config, m_audiocpu, 8_MHz_XTAL); // Bidirectional Communication
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::sailormn_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::sailormn_sound_portmap);
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(600))
+//  config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320+1, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(320+1, 240);
+	m_screen->set_visarea(0+1, 320+1-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sailormn);
 
-	PALETTE(config, m_palette, 0x8000); /* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_sailormn), this)); // 4 bit sprites, 6 bit tiles
+	/* $8000 palette entries for consistency with the other games */
+	m_palette->set_init(FUNC(cave_state::palette_init_sailormn)); // 4 bit sprites, 6 bit tiles
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,sailormn_3_layers) /* Layer 2 has 1 banked ROM */
 
@@ -2701,49 +2590,41 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	OKIM6295(config, m_oki[0], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
+	OKIM6295(config, m_oki[1], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[1]->set_addrmap(0, &cave_state::oki2_map);
 
 
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
                             Tekken Card World
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::tekkencw)
+void cave_state::tekkencw(machine_config &config)
+{
+	add_base_config(config);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tekkencw_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_clock(28_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::tekkencw_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
@@ -2751,51 +2632,43 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	// oki2 chip spot and rom socket are both unpopulated
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cave_state::tekkenbs)
+void cave_state::tekkenbs(machine_config &config)
+{
 	tekkencw(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tekkenbs_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::tekkenbs_map);
+}
 
 
 /***************************************************************************
                             Tobikose! Jumpman
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::tjumpman)
+void cave_state::tjumpman(machine_config &config)
+{
+	add_base_config(config);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tjumpman_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_clock(28_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::tjumpman_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
@@ -2803,51 +2676,35 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	// oki2 chip spot and rom socket are both unpopulated
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
                                 Uo Poko
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::uopoko)
+void cave_state::uopoko(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(uopoko_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::uopoko_map);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, vblank_start)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
-
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(palette_init_delegate(FUNC(cave_state::palette_init_cave), this));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************

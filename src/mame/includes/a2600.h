@@ -69,7 +69,7 @@ protected:
 	required_device<tia_video_device> m_tia;
 	required_device<m6507_device> m_maincpu;
 #if USE_NEW_RIOT
-	required_device<mos6532_t> m_riot;
+	required_device<mos6532_new_device> m_riot;
 #else
 	required_device<riot6532_device> m_riot;
 #endif

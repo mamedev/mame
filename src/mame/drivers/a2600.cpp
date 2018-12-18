@@ -496,15 +496,17 @@ static void a2600_cart(device_slot_interface &device)
 	device.option_add_internal("a26_harmony",   A26_ROM_HARMONY);
 }
 
-MACHINE_CONFIG_START(a2600_state::a2600_cartslot)
-	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, nullptr)
+void a2600_state::a2600_cartslot(machine_config &config)
+{
+	VCS_CART_SLOT(config, "cartslot", a2600_cart, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","a2600")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","a2600_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("a2600");
+	SOFTWARE_LIST(config, "cass_list").set_original("a2600_cass");
+}
 
-MACHINE_CONFIG_START(a2600_state::a2600)
+void a2600_state::a2600(machine_config &config)
+{
 	/* basic machine hardware */
 	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
 	m_maincpu->disable_cache();
@@ -523,17 +525,16 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_NTSC/114)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	TIA(config, "tia", MASTER_CLOCK_NTSC/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
 #if USE_NEW_RIOT
-	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_NTSC / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
+	MOS6532_NEW(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->pb_rd_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
 	RIOT6532(config, m_riot, MASTER_CLOCK_NTSC / 3);
 	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
@@ -548,10 +549,11 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 
 	a2600_cartslot(config);
 	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(a2600_state::a2600p)
+void a2600_state::a2600p(machine_config &config)
+{
 	/* basic machine hardware */
 	M6507(config, m_maincpu, MASTER_CLOCK_PAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
@@ -570,17 +572,16 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	TIA(config, "tia", MASTER_CLOCK_PAL/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
 #if USE_NEW_RIOT
-	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_PAL / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
+	MOS6532_NEW(config, m_riot, MASTER_CLOCK_PAL / 3);
+	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->pb_rd_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
 	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
 	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
@@ -595,7 +596,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 
 	a2600_cartslot(config);
 	subdevice<software_list_device>("cart_list")->set_filter("PAL");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( a2600 )

@@ -425,11 +425,11 @@ void timeplt_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(timeplt_state::timeplt)
-
+void timeplt_state::timeplt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
-	MCFG_DEVICE_PROGRAM_MAP(timeplt_main_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/3/2);  /* not confirmed, but common for Konami games of the era */
+	m_maincpu->set_addrmap(AS_PROGRAM, &timeplt_state::timeplt_main_map);
 
 	LS259(config, m_mainlatch); // B3
 	m_mainlatch->q_out_cb<0>().set(FUNC(timeplt_state::nmi_enable_w));
@@ -444,34 +444,31 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(timeplt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, timeplt_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(timeplt_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(timeplt_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_timeplt)
-	MCFG_PALETTE_ADD("palette", 32*4+64*4)
-	MCFG_PALETTE_INIT_OWNER(timeplt_state, timeplt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_timeplt);
+	PALETTE(config, m_palette, 32*4+64*4);
+	m_palette->set_init(FUNC(timeplt_state::palette_init_timeplt));
 
 	/* sound hardware */
+	TIMEPLT_AUDIO(config, "timeplt_audio");
+}
 
-	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(timeplt_state::psurge)
+void timeplt_state::psurge(machine_config &config)
+{
 	timeplt(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(psurge_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &timeplt_state::psurge_main_map);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	m_screen->screen_vblank().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	m_mainlatch->q_out_cb<0>().set_nop();
 	m_mainlatch->q_out_cb<4>().set_nop();
@@ -479,31 +476,32 @@ MACHINE_CONFIG_START(timeplt_state::psurge)
 	m_mainlatch->q_out_cb<6>().set_nop();
 
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(timeplt_state::bikkuric)
+void timeplt_state::bikkuric(machine_config &config)
+{
 	timeplt(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chkun)
+	m_gfxdecode->set_info(gfx_chkun);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(chkun_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &timeplt_state::chkun_main_map);
 
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(timeplt_state::chkun)
+void timeplt_state::chkun(machine_config &config)
+{
 	bikkuric(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chkun)
+	m_gfxdecode->set_info(gfx_chkun);
 
 	/* sound hardware */
 	subdevice<ay8910_device>("timeplt_audio:ay2")->port_a_write_callback().set(FUNC(timeplt_state::chkun_sound_w));
 
-	MCFG_TC8830F_ADD("tc8830f", XTAL(512'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "timeplt_audio:mono", 0.10)
-MACHINE_CONFIG_END
+	TC8830F(config, m_tc8830f, XTAL(512'000));
+	m_tc8830f->add_route(ALL_OUTPUTS, "timeplt_audio:mono", 0.10);
+}
 
 
 

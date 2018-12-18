@@ -654,7 +654,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
 	lpt0.irq_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_PC_JOY_ADD("pc_joy")
+	PC_JOY(config, "pc_joy");
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette")
