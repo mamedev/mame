@@ -1693,6 +1693,11 @@ ROM_START( ddrdismx )
 	ROM_LOAD( "disney-ddr.bin", 0x00000, 0x200000, CRC(17fb3abb) SHA1(4d0eda4069ff46173468e579cdf9cc92b350146a) ) // 29LV160 Flash
 ROM_END
 
+ROM_START( ddrstraw )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "straws-ddr.bin", 0x00000, 0x200000, CRC(ce94e53a) SHA1(10c6970205a4df28086029c0a348225f57bf0cc5) ) // 26LV160 Flash
+ROM_END
+
 #if 0
 ROM_START( mc_15kin1 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
@@ -1842,11 +1847,11 @@ CONS( 201?, cbrs8,      0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 CONS( 200?, gprnrs1,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 
-// Notes:
+// Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
 // * Console has stereo output (dual RCA connectors).
-// * It hangs when reset (F3) on a MAME debug build.
-CONS( 2006, ddrdismx,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrdismx,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrstraw,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
