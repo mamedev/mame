@@ -9383,6 +9383,9 @@ cspin2                          //
 @source:caprcyc.cpp
 caprcyc                         //
 
+@source:cardinal.cpp
+cardinal                        // (c) 1984 Standard Microsystems Corp.
+
 @source:cardline.cpp
 cardline                        // (c) 199? Veltmeijer
 
