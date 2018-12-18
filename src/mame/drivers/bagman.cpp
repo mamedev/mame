@@ -490,7 +490,7 @@ void bagman_state::bagman(machine_config &config)
 	m_tmsprom->set_reset_bit(6);       /* bit # of rom reset */
 	m_tmsprom->set_stop_bit(7);        /* bit # of stop */
 	m_tmsprom->pdc().set("tms", FUNC(tms5110_device::pdc_w)); /* tms pdc func */
-	m_tmsprom->pdc().set("tms", FUNC(tms5110_device::ctl_w)); /* tms ctl func */
+	m_tmsprom->ctl().set("tms", FUNC(tms5110_device::ctl_w)); /* tms ctl func */
 
 	tms5110a_device &tms(TMS5110A(config, "tms", 640000));
 	tms.m0().set("tmsprom", FUNC(tmsprom_device::m0_w));
