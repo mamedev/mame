@@ -286,6 +286,8 @@ void am7990_device_base::recv_complete_cb(int result)
 			// update the final descriptor
 			u32 const ring_address = (m_rx_ring_base + (m_rx_ring_pos << 3)) & RING_ADDR_MASK;
 
+			LOGMASKED(LOG_RXTX, "receive complete rmd1 0x%04x rmd3 %d\n", m_rx_md[1], result & RMD3_MCNT);
+
 			m_dma_out_cb(ring_address | 2, m_rx_md[1]);
 			m_dma_out_cb(ring_address | 6, result & RMD3_MCNT);
 
@@ -387,7 +389,7 @@ void am7990_device_base::transmit()
 		}
 
 		// minimum length 100 when chaining, or 64 when not, except in loopback mode
-		if (!length && !(m_mode & MODE_LOOP) && tx_buf_length < ((m_tx_md[1] & TMD1_ENP) ? 64 : 100))
+		if (!length && !(m_mode & MODE_LOOP) && tx_buf_length < ((m_tx_md[1] & TMD1_ENP) ? (append_fcs ? 60 : 64) : 100))
 			logerror("first transmit buffer length %d less than required minimum\n", tx_buf_length);
 
 		// read the data from memory
@@ -496,14 +498,18 @@ void am7990_device_base::send_complete_cb(int result)
 
 	case -1: // forced collision
 		m_tx_md[1] |= TMD1_ERR;
-		m_dma_out_cb(ring_address | 6, m_tx_md[3] | TMD3_RTRY);
+		m_tx_md[3] |= TMD3_RTRY;
+		m_dma_out_cb(ring_address | 6, m_tx_md[3]);
 		break;
 
 	case 0: // failure to transmit (assume loss of carrier)
 		m_tx_md[1] |= TMD1_ERR;
-		m_dma_out_cb(ring_address | 6, m_tx_md[3] | TMD3_LCAR);
+		m_tx_md[3] |= TMD3_LCAR;
+		m_dma_out_cb(ring_address | 6, m_tx_md[3]);
 		break;
 	}
+
+	LOGMASKED(LOG_RXTX, "transmit complete tmd1 0x%04x tmd3 0x%04x\n", m_tx_md[1], m_tx_md[3]);
 
 	// update the last descriptor
 	m_dma_out_cb(ring_address | 2, m_tx_md[1]);
@@ -556,7 +562,7 @@ WRITE16_MEMBER(am7990_device_base::regs_w)
 			// STOP takes priority over all other bits
 			if (data & CSR0_STOP)
 			{
-				if ((type() == AM7990) || !(m_csr[0] & CSR0_STOP))
+				if (!(m_csr[0] & CSR0_STOP))
 					device_reset();
 				break;
 			}
