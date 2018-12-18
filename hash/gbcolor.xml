@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
@@ -1129,6 +1129,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19990129"/>
 		<info name="alt_title" value="Bビーダマン爆 外伝 ビクトリーへのみち"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM [MX23C8003-20]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="b-daman bakugaiden - victory e no michi (japan).bin" size="1048576" crc="ddce76d6" sha1="4904102846a5fd0176c6f4bfd421f86fb1fab45b" offset="000000" />
@@ -2737,6 +2743,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19990515"/>
 		<info name="alt_title" value="カードキャプターさくら 〜いつもさくらちゃんといっしょ〜"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KECN-20" />
+			<feature name="u1" value="U1 PRG [LH5S4MUA]" />
+			<feature name="u2" value="U2 MBC3A [MBC3 A]" />
+			<feature name="u3" value="U3 RAM [LH5164AN-10L]" />
+			<feature name="u4" value="U4 MM1134 [6735]" />
+			<feature name="battery" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="524288">
@@ -3419,6 +3431,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20010412"/>
 		<info name="alt_title" value="クロスハンター トレジャーハンターバージョン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C3203-12A2]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="cross hunter - treasure hunter version (japan).bin" size="4194304" crc="623c1516" sha1="b54fcdebd54484113923b899eed7c63550609f74" offset="000000" />
@@ -4424,6 +4442,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20000128"/>
 		<info name="alt_title" value="ドンキーコングGB ディンキーコング&amp;ディクシーコング"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM [M538011E-D6]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
+			<feature name="u3" value="U3 64K SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="donkey kong gb - dinky kong &amp; dixie kong (japan).bin" size="1048576" crc="28d7e8d3" sha1="55b133b739a5472d477336647cb9ec97b7fa85a2" offset="000000" />
@@ -4476,6 +4500,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19990312"/>
 		<info name="alt_title" value="ドラえもんカート2"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM [LH538WW3]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K SRAM [HY6264A]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="doraemon kart 2 (japan).bin" size="1048576" crc="cf1a2038" sha1="b29695b9944c030c518140341d748d1a1f21f982" offset="000000" />
@@ -6226,6 +6256,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20010427"/>
 		<info name="alt_title" value="フロム・テレビ・アニメーション・ワンピース 夢のルフィ海賊団誕生!"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C3203-12A2]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="from tv animation one piece - yume no luffy kaizokudan tanjou! (japan) (rev. a).bin" size="4194304" crc="a4dde805" sha1="53da28b16a4bf0efab1f65c21f7931ce4948865b" offset="000000" />
@@ -7431,6 +7467,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20001215"/>
 		<info name="alt_title" value="ハムスター倶楽部2"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C3203-12A2]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
+			<feature name="u3" value="U3 64K-SRAM [BR6256BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="hamster club 2 (japan).bin" size="4194304" crc="2fb398f9" sha1="dcef750a73d813841cfcb871b5bb5f021a7b7285" offset="000000" />
@@ -7613,6 +7655,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20010727"/>
 		<info name="alt_title" value="花より男子  アナザーラブストーリー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
+			<feature name="u3" value="U3 64K-SRAM [W2465S-70LL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="hana yori dango - another love story (japan).bin" size="2097152" crc="469f0284" sha1="9a403476fa3325d5d48ad0686727b9c715ebaef9" offset="000000" />
@@ -9014,6 +9062,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20001121"/>
 		<info name="alt_title" value="かくれんぼバトル モンスタータクティクス"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-Z03-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="kakurenbo battle monster tactics (japan).bin" size="2097152" crc="9cfa76c3" sha1="45bf50f9ff80df20d25d40cc8f78d829d6a8fab7" offset="000000" />
@@ -9329,6 +9383,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="telefngp">
+		<!-- Notes: This game uses an accessory called "Power Antenna", which is just a LED light connected 
+				to the GB accessories port. It is used ingame to simulate a mobile phone. -->
 		<description>Keitai Denjuu Telefang - Power Version (Jpn)</description>
 		<year>2000</year>
 		<publisher>Natsume</publisher>
@@ -10173,8 +10229,14 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<description>The Legend of Zelda - Oracle of Ages (Euro)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="CGB-ZA8P-EUR"/>
+		<info name="serial" value="CGB-AZ8P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
+			<feature name="u3" value="U3 64K-SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="legend of zelda, the - oracle of ages (europe) (en,fr,de,es,it).bin" size="2097152" crc="5933e3fa" sha1="9f2dff3c46406839f839a8d535353dfc1e3e8670" offset="000000" />
@@ -11002,6 +11064,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20010126"/>
 		<info name="alt_title" value="ラブひな ラブひなパーティー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [LH5164AN-10L]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="love hina party (japan).bin" size="2097152" crc="034d2686" sha1="d3551d99bb03e7945862cc8f1c3c095477119cf2" offset="000000" />
@@ -11523,6 +11591,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19990810"/>
 		<info name="alt_title" value="マリオゴルフGB"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-01" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [N-16019WG5-M17]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [LH5164AN-10L]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mario golf gb (japan).bin" size="2097152" crc="4ca2191a" sha1="5658666a30288c6104f01985018a213e851067de" offset="000000" />
@@ -11820,6 +11894,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19990723"/>
 		<info name="alt_title" value="メダロット2 カブトバージョン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-01" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12 1]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 256K-SRAM [LC35256FM-70U]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="medarot 2 - kabuto version (japan).bin" size="2097152" crc="bf6bd446" sha1="01adf621d6e2cbfec46306d69882fc2eb3d92de5" offset="000000" />
@@ -11838,6 +11917,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19990723"/>
 		<info name="alt_title" value="メダロット2 クワガタバージョン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-01" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [LH537MTN]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
+			<feature name="u3" value="U3 256K-SRAM [LH52256CN-10LL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="medarot 2 - kuwagata version (japan).bin" size="2097152" crc="5b8ffd37" sha1="48fc8c6e84c63ee47f5a2c5e99dc1666d6e9f496" offset="000000" />
@@ -11856,6 +11940,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19991029"/>
 		<info name="alt_title" value="メダロット2 パーツコレクション"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-01" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [R531614G-12]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 256K-SRAM [BR62256F-70LL]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="medarot 2 - parts collection (japan).bin" size="2097152" crc="159673db" sha1="62e6e2800025918a0df9ceb31418dcbfe9e64289" offset="000000" />
@@ -12109,6 +12199,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20000224"/>
 		<info name="alt_title" value="名探偵コナン −からくり寺院殺人事件−"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM [LH538WKH]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K SRAM [LH5164AN-10L]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="meitantei conan - karakuri jiin satsujin jiken (japan).bin" size="1048576" crc="3b5f24fc" sha1="a418ff2f97536e105b4f0a1bd4bb3fa31f911a7d" offset="000000" />
@@ -12314,6 +12410,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20000224"/>
 		<info name="alt_title" value="メタモード"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-01" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [R531614G-26]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="metamode (japan).bin" size="2097152" crc="a76eed5b" sha1="1c1d74c810b90cf4d2ee32859eaea569a5b45c3f" offset="000000" />
@@ -12664,7 +12766,16 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="mobilglf">
-		<!-- Notes: GBC only -->
+		<!-- Notes: GBC only.
+				This game is compatible with the "Mobile System GB", a connected gaming system which uses an external adaptor
+				for connecting to a mobile phone (named "Mobile Adaptor GB" [CGB-005]) and then to an external server. 
+				There are different models depending on the target cellular phone:
+					* Blue adapter can be used by the digital cellular phone terminal PDC. (MAX 9600bps)
+					* Yellow adapter can be used by the CDMAOne portable telephone. (MAX 14.4kbps)
+					* Red adapter can be used by the DDI Pocket Telephone. (MAX 36.6kbps)
+					* Green adapter (unreleased) can be used by the PHS (Astel, NTT DoCoMo).
+				Internally, the "Mobile Adaptor GB" features a ML7060-01P ARM (internal ROM, if any, is undumped), and was
+				manufactured by Mitsumi. -->
 		<description>Mobile Golf (Jpn)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -12689,12 +12800,28 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<!-- when it checks for the connection, it checks for a value of 06 in C27D -->
 	<software name="mobiltrn" supported="partial">
-		<!-- Notes: GBC only -->
+		<!-- Notes: GBC only.
+			This game is compatible with the "Mobile System GB", a connected gaming system which uses an external adaptor
+			for connecting to a mobile phone (named "Mobile Adaptor GB" [CGB-005]) and then to an external server. 
+			There are different models depending on the target cellular phone:
+				* Blue adapter can be used by the digital cellular phone terminal PDC. (MAX 9600bps)
+				* Yellow adapter can be used by the CDMAOne portable telephone. (MAX 14.4kbps)
+				* Red adapter can be used by the DDI Pocket Telephone. (MAX 36.6kbps)
+				* Green adapter (unreleased) can be used by the PHS (Astel, NTT DoCoMo).
+			Internally, the "Mobile Adaptor GB" features a ML7060-01P ARM (internal ROM, if any, is undumped), and was
+			manufactured by Mitsumi. -->
 		<description>Mobile Trainer (Jpn)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="CGB-B9AJ-JPN"/>
 		<info name="alt_title" value="モバイルトレーナー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 256K SRAM [GM76C256GLLFW70]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mobile trainer (japan).bin" size="2097152" crc="7226ead0" sha1="ecc0579edeaf9eccd722d605cc288cd023c8576a" offset="000000" />
@@ -13842,7 +13969,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="networka">
-		<!-- Notes: GBC only -->
+		<!-- Notes: GBC only
+				This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently shaped plastic case),
+				which is just a LED light connected to the GB accessories port. -->
 		<description>Network Boukenki Bugsite - Alpha Version (Jpn)</description>
 		<year>2001</year>
 		<publisher>Smilesoft</publisher>
@@ -13860,7 +13989,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="networkb">
-		<!-- Notes: GBC only -->
+		<!-- Notes: GBC only
+				This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently shaped plastic case),
+				which is just a LED light connected to the GB accessories port. -->
 		<description>Network Boukenki Bugsite - Beta Version (Jpn)</description>
 		<year>2001</year>
 		<publisher>Smilesoft</publisher>
@@ -13868,6 +13999,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20011102"/>
 		<info name="alt_title" value="ネットワーク冒険記 バグサイト・ベータバージョン"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A03-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="network boukenki bugsite - beta version (japan).bin" size="2097152" crc="56f52663" sha1="0c03e241e2931a0e2e54de30678334999beacb48" offset="000000" />
@@ -15027,6 +15164,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19991121"/>
 		<info name="alt_title" value="ポケットモンスター銀"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KFDN-10" />
+			<feature name="u1" value="U1 PRG [M538011E-B9]" />
+			<feature name="u2" value="U2 MBC3A [MBC3 A]" />
+			<feature name="u3" value="U3 RAM [LH52256CN-10LL]" />
+			<feature name="u4" value="U4 MM1134 [134A]" />
+			<feature name="battery" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
@@ -15439,6 +15582,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAUS-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KGDU-10" />
+			<feature name="u1" value="U1 PRG [MC23C1603-12A]" />
+			<feature name="u2" value="U2 MBC3A [MBC3 B]" />
+			<feature name="u3" value="U3 RAM [GM76C256CLLFW70]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="BT1 CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="2097152">
@@ -15536,7 +15685,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="pokecardj" cloneof="pokecard">
-		<!-- Notes: SGB enhanced -->
+		<!-- Notes: SGB enhanced.
+				This game uses an integrated (on-cart) IR port por connected multiplayer gameplay. -->
 		<description>Pokémon Card GB (Jpn)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -15545,10 +15695,10 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="alt_title" value="ポケモンカードGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-TFDN-01" />
-			<feature name="u1" value="U1 PRG" />
+			<feature name="u1" value="U1 PRG [KM23C8000DG]" />
 			<feature name="u2" value="U2 HuC1A" />
-			<feature name="u3" value="U3 RAM" />
-			<feature name="u4" value="U4 1134A" />
+			<feature name="u3" value="U3 RAM [LH52256CN-10LL]" />
+			<feature name="u4" value="U4 1134A [134A]" />
 			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_huc1" />
 			<dataarea name="rom" size="1048576">
@@ -16980,6 +17130,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-BRAJ-JPN"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM [LH538WKP]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K SRAM [LH5164AN-10L]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="raku x raku - mishin (japan).bin" size="1048576" crc="0ba0711b" sha1="58bf5df55d2bab8877f7ec43110339ebe1a5d4c5" offset="000000" />
@@ -18090,7 +18246,9 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="sakura">
-		<!-- Notes: GBC only, 10 variant packs got released! -->
+		<!-- Notes: GBC only, 10 variant packs got released! 
+		            This game is compatible with an external pedometer named "Pocket Sakura" (same hardware as the Pokémon Pikachu Color / Pokémon Pikachu 2 GS pedometer)
+		            wich connects to the GBC via the console's IR port -->
 		<description>Sakura Taisen GB - Geki Hana Gumi Nyuutai! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Media Factory</publisher>
@@ -18098,6 +18256,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20000728"/>
 		<info name="alt_title" value="サクラ大戦GB 激・花組入隊!"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-01" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C3203-12]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="sakura taisen gb - geki hana kumi nyuutai! (japan).bin" size="4194304" crc="ef503d50" sha1="4e30a9b06b5048449057376c8f37b3f687fabd18" offset="000000" />
@@ -18187,6 +18351,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="19981127"/>
 		<info name="alt_title" value="サンリオタイムネット 過去編"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A02-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM [LH538WNE]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 256K-SRAM [GM76C256CLLFW70]" />
+			<feature name="u4" value="U4 MM1134A [134A]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sanrio timenet - kako hen (japan).bin" size="1048576" crc="458b579d" sha1="8421e0d0fc356b25df62cde1967e7775a91983c2" offset="000000" />
@@ -18236,6 +18406,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20000324"/>
 		<info name="alt_title" value="さるパンチャー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-01" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [LH537MYY]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [LH5164AN-10L]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="saru puncher (japan).bin" size="2097152" crc="b02564fc" sha1="db7cc42b4e2a181c31caa4ae8635ec33b5a09f73" offset="000000" />
@@ -21156,6 +21332,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20000908"/>
 		<info name="alt_title" value="とっとこハム太郎 ともだち大作戦でちゅ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-KFDN-10" />
+			<feature name="u1" value="U1 PRG [M538011E-U3]" />
+			<feature name="u2" value="U2 MBC3A [MBC3 B]" />
+			<feature name="u3" value="U3 RAM [GM76C256CLLFW70]" />
+			<feature name="u4" value="U4 MM1134 [134A]" />
+			<feature name="battery" value="Batt CR2025" />
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
 			<dataarea name="rom" size="1048576">
@@ -21968,6 +22150,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20010223"/>
 		<info name="alt_title" value="笑う犬の冒険 SILLY GO LUCKY !"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A06-01" />
+			<feature name="u1" value="U1 2M/4M/8M MROM [MC23C8005-12]" />
+			<feature name="u2" value="U2 MBC-5 [MBC-5]" />
+			<feature name="u3" value="U3 64K SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="warau inu no bouken - silly go lucky! (japan).bin" size="1048576" crc="e93f1582" sha1="3c337b71aeba3b937caada4c84f2b29add517d03" offset="000000" />
@@ -23036,6 +23224,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20001207"/>
 		<info name="alt_title" value="遊戯王デュエルモンスターズ4 最強決闘者戦記 遊戯デッキ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C3203-12A2]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="4194304">
 				<rom name="yu-gi-oh! duel monsters 4 - saikyou kettousha senki - yuugi deck (japan).bin" size="4194304" crc="4d6105f6" sha1="3199283039089fdf1e1b3cbb5b95fe7b26c6765f" offset="000000" />
@@ -23300,6 +23494,12 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		<info name="release" value="20010615"/>
 		<info name="alt_title" value="ゾイド〜白銀の獣機神ライガーゼロ〜"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-A08-10" />
+			<feature name="u1" value="U1 16M/32M/64M MROM [MX23C1603-12A]" />
+			<feature name="u2" value="U2 MBC-5 [MBC5]" />
+			<feature name="u3" value="U3 64K-SRAM [BR6265BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="2097152">
 				<rom name="zoids - shirogane no juukishin liger zero (japan).bin" size="2097152" crc="530705a1" sha1="a5623ab4e026aa546b345f2bd5638cfdfed68c04" offset="000000" />
