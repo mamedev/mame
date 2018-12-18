@@ -510,16 +510,16 @@ void buggychl_state::machine_reset()
 	m_bg_scrollx = 0;
 }
 
-MACHINE_CONFIG_START(buggychl_state::buggychl)
-
+void buggychl_state::buggychl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 48_MHz_XTAL/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
-	MCFG_DEVICE_PROGRAM_MAP(buggychl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 48_MHz_XTAL/8); /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
+	m_maincpu->set_addrmap(AS_PROGRAM, &buggychl_state::buggychl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(buggychl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2) /* 4 MHz according to schematics */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, 8_MHz_XTAL/2/2/256/64) // timer irq
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2); /* 4 MHz according to schematics */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &buggychl_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(buggychl_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL/2/2/256/64)); // timer irq
 	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, 8_MHz_XTAL/2/2/256/64)
 	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
 	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
@@ -530,27 +530,26 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	// TODO: actually hook this up?
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 48_MHz_XTAL/8/2)  /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
-
+	TAITO68705_MCU(config, m_bmcu, 48_MHz_XTAL/8/2); /* CPUspeed/2 MHz according to schematics, so 3MHz if cpu is jumpered for 6MHz */
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // typical Taito 74ls392
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	// derived from ladyfrog.cpp, causes glitches?
-//  MCFG_SCREEN_RAW_PARAMS( 8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
-	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
-	MCFG_SCREEN_PALETTE("palette")
+//  m_screen->set_raw(8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8); // pixel clock appears to run at 8 MHz
+	m_screen->set_screen_update(FUNC(buggychl_state::screen_update_buggychl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buggychl)
-	MCFG_PALETTE_ADD("palette", 128+128)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_PALETTE_INIT_OWNER(buggychl_state, buggychl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buggychl);
+	PALETTE(config, m_palette, 128+128);
+	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
+	m_palette->set_endianness(ENDIANNESS_BIG);
+	m_palette->set_init(FUNC(buggychl_state::palette_init_buggychl));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -558,12 +557,11 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_TA7630_ADD("ta7630")
+	TA7630(config, m_ta7630);
 
 	YM2149(config, m_ay1, 8_MHz_XTAL/4);
 	m_ay1->port_a_write_callback().set(FUNC(buggychl_state::ta7630_volbal_ay1_w));
@@ -575,20 +573,20 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	m_ay2->port_b_write_callback().set(FUNC(buggychl_state::port_b_1_w));
 	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("msm", MSM5232, 8_MHz_XTAL/4)
-	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
+	MSM5232(config, m_msm, 8_MHz_XTAL/4);
+	m_msm->set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6); /* default 0.39 uF capacitors (not verified) */
+	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
+	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
+	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1
+	m_msm->add_route(3, "mono", 1.0);   // pin 31 16'-1
+	m_msm->add_route(4, "mono", 1.0);   // pin 36  2'-2
+	m_msm->add_route(5, "mono", 1.0);   // pin 35  4'-2
+	m_msm->add_route(6, "mono", 1.0);   // pin 34  8'-2
+	m_msm->add_route(7, "mono", 1.0);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

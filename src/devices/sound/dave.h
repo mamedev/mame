@@ -56,9 +56,9 @@ class dave_device : public device_t,
 public:
 	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_lh_wr_callback(Object &&cb) { return m_write_lh.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rh_wr_callback(Object &&cb) { return m_write_rh.set_callback(std::forward<Object>(cb)); }
+	auto irq_wr() { return m_write_irq.bind(); }
+	auto lh_wr() { return m_write_lh.bind(); }
+	auto rh_wr() { return m_write_rh.bind(); }
 
 	virtual void z80_program_map(address_map &map);
 	virtual void z80_io_map(address_map &map);
