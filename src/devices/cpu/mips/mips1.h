@@ -101,32 +101,32 @@ protected:
 
 	enum sr_mask : u32
 	{
-		SR_IEc   = 0x00000001,
-		SR_KUc   = 0x00000002,
-		SR_IEp   = 0x00000004,
-		SR_KUp   = 0x00000008,
-		SR_IEo   = 0x00000010,
-		SR_KUo   = 0x00000020,
-		SR_IMSW0 = 0x00000100,
-		SR_IMSW1 = 0x00000200,
-		SR_IMEX0 = 0x00000400,
-		SR_IMEX1 = 0x00000800,
-		SR_IMEX2 = 0x00001000,
-		SR_IMEX3 = 0x00002000,
-		SR_IMEX4 = 0x00004000,
-		SR_IMEX5 = 0x00008000,
-		SR_IsC   = 0x00010000,
-		SR_SwC   = 0x00020000,
-		SR_PZ    = 0x00040000,
-		SR_CM    = 0x00080000,
-		SR_PE    = 0x00100000,
-		SR_TS    = 0x00200000,
-		SR_BEV   = 0x00400000,
-		SR_RE    = 0x02000000,
-		SR_COP0  = 0x10000000,
-		SR_COP1  = 0x20000000,
-		SR_COP2  = 0x40000000,
-		SR_COP3  = 0x80000000,
+		SR_IEc   = 0x00000001, // interrupt enable
+		SR_KUc   = 0x00000002, // kernel mode
+		SR_IEp   = 0x00000004, // interrupt enable (previous)
+		SR_KUp   = 0x00000008, // kernel mode (previous)
+		SR_IEo   = 0x00000010, // interrupt enable (old)
+		SR_KUo   = 0x00000020, // kernel mode (old)
+		SR_IMSW0 = 0x00000100, // software interrupt 0 enable
+		SR_IMSW1 = 0x00000200, // software interrupt 1 enable
+		SR_IMEX0 = 0x00000400, // external interrupt 0 enable
+		SR_IMEX1 = 0x00000800, // external interrupt 1 enable
+		SR_IMEX2 = 0x00001000, // external interrupt 2 enable
+		SR_IMEX3 = 0x00002000, // external interrupt 3 enable
+		SR_IMEX4 = 0x00004000, // external interrupt 4 enable
+		SR_IMEX5 = 0x00008000, // external interrupt 5 enable
+		SR_IsC   = 0x00010000, // isolate (data) cache
+		SR_SwC   = 0x00020000, // swap caches
+		SR_PZ    = 0x00040000, // cache parity zero
+		SR_CM    = 0x00080000, // cache match
+		SR_PE    = 0x00100000, // cache parity error
+		SR_TS    = 0x00200000, // tlb shutdown
+		SR_BEV   = 0x00400000, // boot exception vectors
+		SR_RE    = 0x02000000, // reverse endianness in user mode
+		SR_COP0  = 0x10000000, // coprocessor 0 usable
+		SR_COP1  = 0x20000000, // coprocessor 1 usable
+		SR_COP2  = 0x40000000, // coprocessor 2 usable
+		SR_COP3  = 0x80000000, // coprocessor 3 usable
 	};
 
 	enum entryhi_mask : u32
@@ -213,7 +213,6 @@ protected:
 
 	// core registers
 	u32 m_pc;
-	u32 m_nextpc;
 	u32 m_hi;
 	u32 m_lo;
 	u32 m_r[32];
@@ -223,8 +222,15 @@ protected:
 	u32 m_ccr[4][32];
 
 	// internal stuff
-	u32 m_ppc;
 	int m_icount;
+	enum branch_state_t : unsigned
+	{
+		NONE   = 0,
+		DELAY  = 1, // delay slot instruction active
+		BRANCH = 2, // branch instruction active
+	}
+	m_branch_state;
+	u32 m_branch_target;
 
 	// cache memory
 	size_t const m_icache_size;

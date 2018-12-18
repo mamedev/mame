@@ -39,12 +39,12 @@
 #define UIMMVAL         u16(op)
 #define LIMMVAL         (op & 0x03ffffff)
 
-#define ADDPC(x)        do { m_nextpc = m_pc + ((x) << 2); } while (0)
-#define ADDPCL(x,l)     do { m_nextpc = m_pc + ((x) << 2); m_r[l] = m_pc + 4; } while (0)
-#define ABSPC(x)        do { m_nextpc = (m_pc & 0xf0000000) | ((x) << 2); } while (0)
-#define ABSPCL(x,l)     do { m_nextpc = (m_pc & 0xf0000000) | ((x) << 2); m_r[l] = m_pc + 4; } while (0)
-#define SETPC(x)        do { m_nextpc = (x); } while (0)
-#define SETPCL(x,l)     do { m_nextpc = (x); m_r[l] = m_pc + 4; } while (0)
+#define ADDPC(x)        do { m_branch_state = BRANCH; m_branch_target = m_pc + 4 + ((x) << 2); } while (0)
+#define ADDPCL(x,l)     do { m_branch_state = BRANCH; m_branch_target = m_pc + 4 + ((x) << 2); m_r[l] = m_pc + 8; } while (0)
+#define ABSPC(x)        do { m_branch_state = BRANCH; m_branch_target = ((m_pc + 4) & 0xf0000000) | ((x) << 2); } while (0)
+#define ABSPCL(x,l)     do { m_branch_state = BRANCH; m_branch_target = ((m_pc + 4) & 0xf0000000) | ((x) << 2); m_r[l] = m_pc + 8; } while (0)
+#define SETPC(x)        do { m_branch_state = BRANCH; m_branch_target = (x); } while (0)
+#define SETPCL(x,l)     do { m_branch_state = BRANCH; m_branch_target = (x); m_r[l] = m_pc + 8; } while (0)
 
 #define SR              m_cpr[0][COP0_Status]
 #define CAUSE           m_cpr[0][COP0_Cause]
@@ -61,6 +61,8 @@ DEFINE_DEVICE_TYPE(R3071,       r3071_device,     "r3071",   "IDT R3071")
 DEFINE_DEVICE_TYPE(R3081,       r3081_device,     "r3081",   "IDT R3081")
 DEFINE_DEVICE_TYPE(SONYPS2_IOP, iop_device,       "sonyiop", "Sony Playstation 2 IOP")
 
+ALLOW_SAVE_TYPE(mips1core_device_base::branch_state_t);
+
 mips1core_device_base::mips1core_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_be("program", ENDIANNESS_BIG, 32, 32)
@@ -71,9 +73,6 @@ mips1core_device_base::mips1core_device_base(const machine_config &mconfig, devi
 	, m_hasfpu(false)
 	, m_fpurev(0)
 	, m_endianness(ENDIANNESS_BIG)
-	, m_pc(0)
-	, m_nextpc(0)
-	, m_ppc(0)
 	, m_icount(0)
 	, m_icache_size(icache_size)
 	, m_dcache_size(dcache_size)
@@ -177,7 +176,7 @@ void mips1core_device_base::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE,  "CURPC",     m_ppc).noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",     m_pc).noshow();
 	state_add(STATE_GENSP,      "GENSP",     m_r[31]).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS",  m_cpr[0][COP0_Status]).noshow();
 
@@ -195,13 +194,13 @@ void mips1core_device_base::device_start()
 
 	// register our state for saving
 	save_item(NAME(m_pc));
-	save_item(NAME(m_nextpc));
 	save_item(NAME(m_hi));
 	save_item(NAME(m_lo));
 	save_item(NAME(m_r));
 	save_item(NAME(m_cpr));
 	save_item(NAME(m_ccr));
-	save_item(NAME(m_ppc));
+	save_item(NAME(m_branch_state));
+	save_item(NAME(m_branch_target));
 
 	// initialise cpu and fpu id registers
 	m_cpr[0][COP0_PRId] = m_cpurev;
@@ -239,7 +238,7 @@ void mips1core_device_base::device_reset()
 {
 	// initialize the state
 	m_pc = 0xbfc00000;
-	m_nextpc = ~0;
+	m_branch_state = NONE;
 
 	// non-tlb devices have tlb shut down
 	m_cpr[0][COP0_Status] = SR_BEV | SR_TS;
@@ -274,18 +273,18 @@ std::unique_ptr<util::disasm_interface> mips1core_device_base::create_disassembl
 void mips1core_device_base::generate_exception(int exception)
 {
 	// set the exception PC
-	m_cpr[0][COP0_EPC] = (exception == EXCEPTION_INTERRUPT) ? m_pc : m_ppc;
+	m_cpr[0][COP0_EPC] = m_pc;
 
 	// put the cause in the low 8 bits and clear the branch delay flag
 	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
 
-	// if we were in a branch delay slot, adjust
-	if (m_nextpc != ~0)
+	// if in a branch delay slot, restart the branch
+	if (m_branch_state == DELAY)
 	{
-		m_nextpc = ~0;
 		m_cpr[0][COP0_EPC] -= 4;
 		CAUSE |= 0x80000000;
 	}
+	m_branch_state = NONE;
 
 	// shift the exception bits
 	SR = (SR & 0xffffffc0) | ((SR << 2) & 0x3c);
@@ -552,7 +551,6 @@ void mips1core_device_base::execute_run()
 	do
 	{
 		// debugging
-		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
 #if ENABLE_IOP_KPUTS
@@ -575,16 +573,6 @@ void mips1core_device_base::execute_run()
 		// fetch and execute instruction
 		fetch(m_pc, [this](u32 const op)
 		{
-			{
-				// adjust for next PC
-				if (m_nextpc != ~0)
-				{
-					m_pc = m_nextpc;
-					m_nextpc = ~0;
-				}
-				else
-					m_pc += 4;
-
 				// parse the instruction
 				switch (op >> 26)
 				{
@@ -784,11 +772,28 @@ void mips1core_device_base::execute_run()
 				case 0x3f:  /* SDC3 */      generate_exception(EXCEPTION_INVALIDOP);               break;
 				default:    /* ??? */       generate_exception(EXCEPTION_INVALIDOP);               break;
 				}
+
+			// update pc and branch state
+			switch (m_branch_state)
+			{
+			case NONE:
+				m_pc += 4;
+				break;
+
+			case DELAY:
+				m_branch_state = NONE;
+				m_pc = m_branch_target;
+				break;
+
+			case BRANCH:
+				m_branch_state = DELAY;
+				m_pc += 4;
+				break;
 			}
 		});
 		m_icount--;
 
-	} while (m_icount > 0 || m_nextpc != ~0);
+	} while (m_icount > 0 || m_branch_state);
 }
 
 void mips1core_device_base::lwl(u32 const op)
@@ -995,7 +1000,8 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 	if (!(intention & TRANSLATE_DEBUG_MASK))
 	{
 		if ((VERBOSE & LOG_TLB) && !dirty)
-			LOGMASKED(LOG_TLB, "tlb miss address 0x%08x\n", address);
+			LOGMASKED(LOG_TLB, "tlb miss %s address 0x%08x (%s)\n",
+				(intention & TRANSLATE_WRITE) ? "store" : "load", address, machine().describe_context());
 
 		// exception
 		m_cpr[0][COP0_BadVAddr] = address;
