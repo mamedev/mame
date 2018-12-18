@@ -2570,6 +2570,7 @@ files {
 createMESSProjects(_target, _subtarget, "mupid")
 files {
 	MAME_DIR .. "src/mame/drivers/mdisk.cpp",
+	MAME_DIR .. "src/mame/drivers/mupid2.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "nakajima")

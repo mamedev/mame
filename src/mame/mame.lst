@@ -28849,6 +28849,11 @@ supergm3                        // 1996
 joyfulr                         // A2001      (c) 1983
 mnchmobl                        // A2001      (c) 1983 + Centuri license
 
+@source:mupid2.cpp
+mupid2							// (c) 1985 mupid
+mupid2i							// (c) 1990 Infonova
+ptc100							// (c) 198? Grundig
+
 @source:murogem.cpp
 lasvegas                        // hack
 murogem                         // ???
