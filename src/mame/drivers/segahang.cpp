@@ -959,7 +959,7 @@ void segahang_state::sharrier(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::i8751_main_cpu_vblank));
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, mcu_io_map);
+	m_mcu->set_addrmap(AS_IO, &segahang_state::mcu_io_map);
 
 	m_screen->screen_vblank().set_inputline("mcu", INPUT_LINE_IRQ0);
 }
