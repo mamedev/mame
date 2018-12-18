@@ -467,6 +467,7 @@ mt735.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
+mupid2.cpp
 mvme147.cpp
 mx2178.cpp
 myb3k.cpp
