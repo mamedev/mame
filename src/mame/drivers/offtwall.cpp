@@ -351,9 +351,10 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_VAD_PLAYFIELD(offtwall_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_MOB(offtwall_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, "screen");
+	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(offtwall_state::get_playfield_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

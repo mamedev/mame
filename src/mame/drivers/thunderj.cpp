@@ -262,11 +262,12 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, thunderj_state, scanline_int_write_line))
-	MCFG_ATARI_VAD_PLAYFIELD(thunderj_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_PLAYFIELD2(thunderj_state, "gfxdecode", get_playfield2_tile_info)
-	MCFG_ATARI_VAD_ALPHA(thunderj_state, "gfxdecode", get_alpha_tile_info)
-	MCFG_ATARI_VAD_MOB(thunderj_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, m_screen);
+	m_vad->scanline_int_cb().set(FUNC(thunderj_state::scanline_int_write_line));
+	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(thunderj_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield2", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(thunderj_state::get_playfield2_tile_info));
+	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(thunderj_state::get_alpha_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, thunderj_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

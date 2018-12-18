@@ -432,13 +432,14 @@ MACHINE_CONFIG_START(pengo_state::pengou)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pengo_state::pengoe)
+void pengo_state::pengoe(machine_config &config)
+{
 	pengo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(pengo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5010_device &maincpu(SEGA_315_5010(config.replace(), m_maincpu, MASTER_CLOCK/6));
+	maincpu.set_addrmap(AS_PROGRAM, &pengo_state::pengo_map);
+	maincpu.set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 MACHINE_CONFIG_START(pengo_state::jrpacmbl)
 	pengo(config);
