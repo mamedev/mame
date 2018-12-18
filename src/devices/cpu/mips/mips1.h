@@ -225,9 +225,10 @@ protected:
 	int m_icount;
 	enum branch_state_t : unsigned
 	{
-		NONE   = 0,
-		DELAY  = 1, // delay slot instruction active
-		BRANCH = 2, // branch instruction active
+		NONE      = 0,
+		DELAY     = 1, // delay slot instruction active
+		BRANCH    = 2, // branch instruction active
+		EXCEPTION = 3, // exception triggered
 	}
 	m_branch_state;
 	u32 m_branch_target;

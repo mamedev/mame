@@ -284,7 +284,7 @@ void mips1core_device_base::generate_exception(int exception)
 		m_cpr[0][COP0_EPC] -= 4;
 		CAUSE |= 0x80000000;
 	}
-	m_branch_state = NONE;
+	m_branch_state = EXCEPTION;
 
 	// shift the exception bits
 	SR = (SR & 0xffffffc0) | ((SR << 2) & 0x3c);
@@ -788,6 +788,10 @@ void mips1core_device_base::execute_run()
 			case BRANCH:
 				m_branch_state = DELAY;
 				m_pc += 4;
+				break;
+
+			case EXCEPTION:
+				m_branch_state = NONE;
 				break;
 			}
 		});
