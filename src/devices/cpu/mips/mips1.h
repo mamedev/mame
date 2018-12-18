@@ -9,6 +9,18 @@
 class mips1core_device_base : public cpu_device
 {
 public:
+	// floating point coprocessor revision numbers recognised by RISC/os 4.52 and IRIX
+	enum fpu_rev_t : u32
+	{
+		MIPS_R2360    = 0x0100, // MIPS R2360 Floating Point Board
+		MIPS_R2010    = 0x0200, // MIPS R2010 VLSI Floating Point Chip
+		MIPS_R2010A   = 0x0310, // MIPS R2010A VLSI Floating Point Chip
+		MIPS_R3010    = 0x0320, // MIPS R3010 VLSI Floating Point Chip
+		MIPS_R3010A   = 0x0330, // MIPS R3010A VLSI Floating Point Chip
+		MIPS_R3010Av4 = 0x0340, // MIPS R3010A VLSI Floating Point Chip
+		MIPS_R6010    = 0x0400, // MIPS R6010 Floating Point Chip
+	};
+
 	// device configuration
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
 	void set_fpurev(u32 revision) { m_hasfpu = true; m_fpurev = revision; }

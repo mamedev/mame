@@ -10,8 +10,6 @@
  *
  * TODO
  *   - interrupts
- *   - dma
- *   - timer
  *   - buzzer
  */
 
@@ -33,6 +31,7 @@ mips_rambo_device::mips_rambo_device(const machine_config &mconfig, const char *
 	, m_parity_out_cb(*this)
 	, m_timer_out_cb(*this)
 	, m_buzzer_out_cb(*this)
+	, m_channel{{ 0,0,0,0,0,0, false, *this, *this }, { 0,0,0,0,0,0, false, *this, *this }}
 	, m_irq_out_state(0)
 	, m_buzzer_out_state(0)
 {
@@ -68,6 +67,13 @@ void mips_rambo_device::device_start()
 	m_timer_out_cb.resolve_safe();
 	m_buzzer_out_cb.resolve_safe();
 
+	for (dma_t &ch : m_channel)
+	{
+		ch.read_cb.resolve_safe(0);
+		ch.write_cb.resolve_safe();
+	}
+
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::timer), this));
 	m_buzzer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips_rambo_device::buzzer_toggle), this));
 
 }
@@ -81,7 +87,11 @@ void mips_rambo_device::device_reset()
 
 READ32_MEMBER(mips_rambo_device::tcount_r)
 {
-	return attotime_to_clocks(machine().time() - m_tcount);
+	u32 const data = attotime_to_clocks(machine().time() - m_tcount);
+
+	LOGMASKED(LOG_REG, "tcount_r 0x%08x (%s)\n", data, machine().describe_context());
+
+	return data;
 }
 
 WRITE32_MEMBER(mips_rambo_device::tcount_w)
@@ -94,6 +104,10 @@ WRITE32_MEMBER(mips_rambo_device::tcount_w)
 WRITE32_MEMBER(mips_rambo_device::tbreak_w)
 {
 	LOGMASKED(LOG_REG, "tbreak_w 0x%08x (%s)\n", data, machine().describe_context());
+
+	COMBINE_DATA(&m_tbreak);
+
+	m_timer->adjust(clocks_to_attotime(m_tbreak) - (machine().time() - m_tcount));
 }
 
 WRITE32_MEMBER(mips_rambo_device::control_w)
@@ -130,6 +144,10 @@ template <unsigned Channel> WRITE32_MEMBER(mips_rambo_device::mode_w)
 {
 	LOGMASKED(LOG_REG, "mode_w<%d> 0x%08x (%s)\n", Channel, data, machine().describe_context());
 
+	if (data & MODE_CHANNEL_EN)
+		m_channel[Channel].current_address = m_channel[Channel].load_address;
+
+	mem_mask &= MODE_WRITE_MASK;
 	COMBINE_DATA(&m_channel[Channel].mode);
 }
 
@@ -138,6 +156,14 @@ template <unsigned Channel> WRITE16_MEMBER(mips_rambo_device::block_count_w)
 	LOGMASKED(LOG_REG, "block_count_w<%d> 0x%04x (%s)\n", Channel, data, machine().describe_context());
 
 	COMBINE_DATA(&m_channel[Channel].block_count);
+	COMBINE_DATA(&m_channel[Channel].reload_count);
+}
+
+TIMER_CALLBACK_MEMBER(mips_rambo_device::timer)
+{
+	// FIXME: clear timer out line here, or on tcount/tbreak write?
+	m_timer_out_cb(ASSERT_LINE);
+	m_timer_out_cb(CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(mips_rambo_device::buzzer_toggle)
@@ -150,8 +176,18 @@ u32 mips_rambo_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	// check if dma channel is configured
 	u32 const blocks_required = (screen.visible_area().height() * screen.visible_area().width()) >> 9;
-	if (!(m_channel[1].mode & MODE_CHANNEL_EN) || !(m_channel[1].mode & MODE_AUTO_RELOAD) || (m_channel[1].block_count != blocks_required))
+	if (!(m_channel[1].mode & MODE_CHANNEL_EN) || (m_channel[1].reload_count != blocks_required))
 		return 1;
+
+	// screen is blanked unless auto reload is enabled
+	if (!(m_channel[1].mode & MODE_AUTO_RELOAD))
+	{
+		m_channel[1].block_count = 0;
+
+		return 0;
+	}
+	else
+		m_channel[1].block_count = m_channel[1].reload_count;
 
 	u32 address = m_channel[1].load_address;
 	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
@@ -172,4 +208,36 @@ u32 mips_rambo_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		}
 
 	return 0;
+}
+
+template WRITE_LINE_MEMBER(mips_rambo_device::drq_w<0>);
+template WRITE_LINE_MEMBER(mips_rambo_device::drq_w<1>);
+
+template <unsigned Channel> WRITE_LINE_MEMBER(mips_rambo_device::drq_w)
+{
+	m_channel[Channel].drq_asserted = bool(state == ASSERT_LINE);
+
+	while (m_channel[Channel].drq_asserted)
+	{
+		// check channel enabled
+		if (!(m_channel[Channel].mode & MODE_CHANNEL_EN))
+			break;
+
+		// TODO: check data remaining
+
+		// FIXME: 16 bit dma
+		if (m_channel[Channel].mode & MODE_TO_MEMORY)
+		{
+			u8 const data = m_channel[Channel].read_cb();
+
+			m_ram->write(BYTE4_XOR_BE(m_channel[Channel].current_address), data);
+		}
+		else
+		{
+			u8 const data = m_ram->read(BYTE4_XOR_BE(m_channel[Channel].current_address));
+			m_channel[Channel].write_cb(data);
+		}
+
+		m_channel[Channel].current_address++;
+	}
 }
