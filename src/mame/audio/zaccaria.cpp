@@ -428,7 +428,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.40, 0); // mc1408.1f
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.40, AUTO_ALLOC_INPUT, 0); // mc1408.1f
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
@@ -439,11 +439,11 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	TMS5200(config, m_speech, 649200); // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
 	m_speech->irq_cb().set(m_pia_1i, FUNC(pia6821_device::cb1_w));
 	m_speech->ready_cb().set(m_pia_1i, FUNC(pia6821_device::ca2_w));
-	m_speech->add_route(ALL_OUTPUTS, *this, 0.80, 0);
+	m_speech->add_route(ALL_OUTPUTS, *this, 0.80, AUTO_ALLOC_INPUT, 0);
 
 	netlist_mame_sound_device &sound_nl(NETLIST_SOUND(config, "sound_nl", 48000));
 	sound_nl.set_constructor(netlist_zac1b11142);
-	sound_nl.add_route(ALL_OUTPUTS, *this, 1.0, 0);
+	sound_nl.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa0",   "I_IOA0.IN",   0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa1",   "I_IOA1.IN",   0);
