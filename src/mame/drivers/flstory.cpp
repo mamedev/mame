@@ -763,7 +763,7 @@ void flstory_state::common(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 	TA7630(config, m_ta7630);
@@ -837,6 +837,10 @@ void flstory_state::victnine(machine_config &config)
 	/* video hardware */
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(flstory_state::screen_update_victnine));
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
+
+	/* sound hardware */
+	m_ay->reset_routes();
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void flstory_state::rumba(machine_config &config)
@@ -849,6 +853,9 @@ void flstory_state::rumba(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6); /* ? */
 
 	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
+
+	/* video hardware */
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(flstory_state::screen_update_rumba));
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 }
 

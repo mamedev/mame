@@ -2435,6 +2435,7 @@ void cave_state::ppsatan(machine_config &config)
 	add_base_config(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_vblank_int("screen", FUNC(cave_state::interrupt_ppsatan));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::ppsatan_map);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(1));  /* a guess, and certainly wrong */
@@ -2445,6 +2446,8 @@ void cave_state::ppsatan(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(cave_state::screen_update_ppsatan_top));
+	subdevice<timer_device>("int_timer")->configure_generic(FUNC(cave_state::vblank_start));
 
 	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_RASTER));
 	screen_left.set_refresh_hz(15625/271.5);
