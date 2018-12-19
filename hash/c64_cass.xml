@@ -437,7 +437,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2420101">
-				<rom name="Armageddon.tap" size="2420101" crc="c433ccbd" sha1="5f4a084578b9d820295c936b55eaa9530c5bcabc" offset="0" />
+				<rom name="Armageddon_(Visions).tap" size="2420101" crc="c433ccbd" sha1="5f4a084578b9d820295c936b55eaa9530c5bcabc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -857,7 +857,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="362156">
-				<rom name="BMX_Racers.tap" size="362156" crc="596aa750" sha1="6a65c244d21126467755461be261907cbad9e204" offset="0" />
+				<rom name="BMX_Racers_a1.tap" size="362156" crc="596aa750" sha1="6a65c244d21126467755461be261907cbad9e204" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -869,7 +869,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="892713">
-				<rom name="BMX_Racers.tap" size="892713" crc="2226578c" sha1="d24e9266961eca704769543e3511c7df60301272" offset="0" />
+				<rom name="BMX_Racers_a2.tap" size="892713" crc="2226578c" sha1="d24e9266961eca704769543e3511c7df60301272" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1013,13 +1013,13 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="298487">
-				<rom name="Booty.tap" size="298487" crc="a26bc0f2" sha1="4230372304ff8896d4b76437773624c5ba4af68b" offset="0" />
+				<rom name="Booty_(Silver).tap" size="298487" crc="a26bc0f2" sha1="4230372304ff8896d4b76437773624c5ba4af68b" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="306866">
-				<rom name="Booty_a1.tap" size="306866" crc="046c843e" sha1="20d896ba3cc233c508d5ab084824846f6852e799" offset="0" />
+				<rom name="Booty_(Silver)_a1.tap" size="306866" crc="046c843e" sha1="20d896ba3cc233c508d5ab084824846f6852e799" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1474,13 +1474,13 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="606572">
-				<rom name="Commando.tap" size="606572" crc="4b343e0f" sha1="890acc174561e6b64a17c7db5d6eb440f9dc8b89" offset="0" />
+				<rom name="Commando_(Encore).tap" size="606572" crc="4b343e0f" sha1="890acc174561e6b64a17c7db5d6eb440f9dc8b89" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="606572">
-				<rom name="Commando_a1.tap" size="606572" crc="746c7c44" sha1="5d91d34b5be5995724633c4b9109299245ba1690" offset="0" />
+				<rom name="Commando_(Encore)_a1.tap" size="606572" crc="746c7c44" sha1="5d91d34b5be5995724633c4b9109299245ba1690" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1714,7 +1714,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="582574">
-				<rom name="Daley_Thompson's_Decathlon.tap" size="582574" crc="9dd4d2d7" sha1="ac0ec2162e68d13a9b72b557625e5bca6151a3a4" offset="0" />
+				<rom name="Daley_Thompson's_Decathlon_(Hit_Squad).tap" size="582574" crc="9dd4d2d7" sha1="ac0ec2162e68d13a9b72b557625e5bca6151a3a4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2230,14 +2230,14 @@
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="578623">
-				<rom name="Frank_Bruno's_Boxing_Side_1.tap" size="578623" crc="93bc825f" sha1="4881fe3e9afe70ebd8170e832bd06b402e849dc3" offset="0" />
+				<rom name="Frank_Bruno's_Boxing_Side_1_(Encore).tap" size="578623" crc="93bc825f" sha1="4881fe3e9afe70ebd8170e832bd06b402e849dc3" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="1332798">
-				<rom name="Frank_Bruno's_Boxing_Side_2.tap" size="1332798" crc="2ada1f77" sha1="58355f09dd11fd59915623acc56c38ff7b1bc0d1" offset="0" />
+				<rom name="Frank_Bruno's_Boxing_Side_2_(Encore).tap" size="1332798" crc="2ada1f77" sha1="58355f09dd11fd59915623acc56c38ff7b1bc0d1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2432,14 +2432,14 @@
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="716590">
-				<rom name="Gauntlet_Side_1.tap" size="716590" crc="55d0fbe0" sha1="5636f24af2a2f9792c6bafbf9f3bc8fd22e1f265" offset="0" />
+				<rom name="Gauntlet_Side_1_(Kixx).tap" size="716590" crc="55d0fbe0" sha1="5636f24af2a2f9792c6bafbf9f3bc8fd22e1f265" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="627540">
-				<rom name="Gauntlet_Side_2.tap" size="627540" crc="2adead5c" sha1="1b373c0d4bb0c7c6972747b6328933bc769d6aa1" offset="0" />
+				<rom name="Gauntlet_Side_2_(Kixx).tap" size="627540" crc="2adead5c" sha1="1b373c0d4bb0c7c6972747b6328933bc769d6aa1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2695,26 +2695,6 @@
 		</part>
 	</software>
 
-	<software name="gpadrianr" cloneof="gpadrian">
-		<description>The Growing Pains of Adrian Mole (Ricochet)</description>
-		<year>19??</year>
-		<publisher>Ricochet</publisher>
-
-		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side 1"/>
-			<dataarea name="cass" size="962424">
-				<rom name="Growing_Pains_of_Adrian_Mole,_The_Side_1.tap" size="962424" crc="c7d5c255" sha1="f6a20a8e787ab6dcaef6697ceae7a0243cf14370" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side 2"/>
-			<dataarea name="cass" size="962424">
-				<rom name="Growing_Pains_of_Adrian_Mole,_The_Side_2.tap" size="962424" crc="32d714ed" sha1="455eebee6fc48877e1861a1420b6a1deba65d25d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gryzor">
 		<description>Gryzor</description>
 		<year>19??</year>
@@ -2878,7 +2858,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="204276">
-				<rom name="Hektik.tap" size="204276" crc="6b3851e0" sha1="3fdb497e4682b5240998769cf83c809856d553aa" offset="0" />
+				<rom name="Hektik_a1.tap" size="204276" crc="6b3851e0" sha1="3fdb497e4682b5240998769cf83c809856d553aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3770,7 +3750,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="383066">
-				<rom name="Manic_Miner.tap" size="383066" crc="9c652294" sha1="a8d2428249335da51fa910d58f85ccc5d71f6ef8" offset="0" />
+				<rom name="Manic_Miner_(MAD).tap" size="383066" crc="9c652294" sha1="a8d2428249335da51fa910d58f85ccc5d71f6ef8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3987,7 +3967,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="487125">
-				<rom name="Motor_Mania.tap" size="487125" crc="b48a9026" sha1="539dbf773cdd1bc4cdabd8438132171b8e11950e" offset="0" />
+				<rom name="Motor_Mania_a1.tap" size="487125" crc="b48a9026" sha1="539dbf773cdd1bc4cdabd8438132171b8e11950e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4023,7 +4003,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="185844">
-				<rom name="Munch_Mania.tap" size="185844" crc="265e4531" sha1="eae7e5a11ca87b4c9c8e4bacf20282a6d423d5a8" offset="0" />
+				<rom name="Munch_Mania_a1.tap" size="185844" crc="265e4531" sha1="eae7e5a11ca87b4c9c8e4bacf20282a6d423d5a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4396,7 +4376,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718554">
-				<rom name="Paperboy.tap" size="718554" crc="8f693c6b" sha1="91a6f2383a58525ae57bdd757b3d8c7692bdc3d7" offset="0" />
+				<rom name="Paperboy_a2.tap" size="718554" crc="8f693c6b" sha1="91a6f2383a58525ae57bdd757b3d8c7692bdc3d7" offset="0" />
 			</dataarea>
 		</part>
 
@@ -5135,7 +5115,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="113922">
-				<rom name="River_Rescue.tap" size="113922" crc="81f927a3" sha1="538e808e412643c3dc4df6aeefb3210a38837feb" offset="0" />
+				<rom name="River_Rescue_(Alternative).tap" size="113922" crc="81f927a3" sha1="538e808e412643c3dc4df6aeefb3210a38837feb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5168,14 +5148,14 @@
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="662834">
-				<rom name="Road_Blasters_Side_1.tap" size="662834" crc="ba7427d9" sha1="8624fbc26cf5171b8457d04ac94f60d6d24e2a07" offset="0" />
+				<rom name="Road_Blasters_Side_1_(Kixx).tap" size="662834" crc="ba7427d9" sha1="8624fbc26cf5171b8457d04ac94f60d6d24e2a07" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="633680">
-				<rom name="Road_Blasters_Side_2.tap" size="633680" crc="bcdd5fe6" sha1="058bc598d3202af6d1501d93163f00bbd661bdbf" offset="0" />
+				<rom name="Road_Blasters_Side_2_(Kixx).tap" size="633680" crc="bcdd5fe6" sha1="058bc598d3202af6d1501d93163f00bbd661bdbf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6880,13 +6860,13 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="457830">
-				<rom name="Who_Dares_Wins_II.tap" size="457830" crc="9c99bcd4" sha1="568fa27fc2fbc33240b2b8cd8fc8344ac311c6c3" offset="0" />
+				<rom name="Who_Dares_Wins_II_(Alternative).tap" size="457830" crc="9c99bcd4" sha1="568fa27fc2fbc33240b2b8cd8fc8344ac311c6c3" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="457844">
-				<rom name="Who_Dares_Wins_II_a1.tap" size="457844" crc="abdc79e4" sha1="c34839a016e8ec8c2c318bc1a8a77f91b8a36fb3" offset="0" />
+				<rom name="Who_Dares_Wins_II_(Alternative)_a1.tap" size="457844" crc="abdc79e4" sha1="c34839a016e8ec8c2c318bc1a8a77f91b8a36fb3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6922,7 +6902,7 @@
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2851760">
-				<rom name="Winter_Games.tap" size="2851760" crc="76bb1e5f" sha1="58afc4b281ad47d7ec5422851bcd20db99ffa0aa" offset="0" />
+				<rom name="Winter_Games_(Kixx).tap" size="2851760" crc="76bb1e5f" sha1="58afc4b281ad47d7ec5422851bcd20db99ffa0aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
