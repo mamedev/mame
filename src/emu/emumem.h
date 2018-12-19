@@ -1786,6 +1786,7 @@ public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
 	void initialize();
+	void bank_reattach();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
