@@ -1854,33 +1854,32 @@ GFXDECODE_END
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(captaven_state::captaven)
-
+void captaven_state::captaven(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
-	MCFG_DEVICE_PROGRAM_MAP(captaven_map)
+	ARM(config, m_maincpu, XTAL(28'000'000)/4); /* verified on pcb (Data East 101 custom)*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &captaven_state::captaven_map);
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000)/4/3));  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
 	audiocpu.set_addrmap(AS_PROGRAM, &captaven_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
 	DECO_IRQ(config, m_deco_irq, 0);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(captaven_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_screen_update(FUNC(captaven_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_captaven)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_captaven);
+	PALETTE(config, m_palette, 2048);
+	m_palette->set_format(PALETTE_FORMAT_XBGR);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);
@@ -1933,34 +1932,35 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	m_ym2151->add_route(0, "lspeaker", 0.42);
 	m_ym2151->add_route(1, "rspeaker", 0.42);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH);  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH); /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+}
 
 // DE-0380-2
-MACHINE_CONFIG_START(fghthist_state::fghthist)
-	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(fghthist_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+void fghthist_state::fghthist(machine_config &config)
+{
+	ARM(config, m_maincpu, XTAL(28'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fghthist_state::fghthist_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
 	audiocpu.set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_custom_latch_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(fghthist_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_screen_update(FUNC(fghthist_state::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghthist)
-	MCFG_PALETTE_ADD("palette", 2048)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghthist);
+	PALETTE(config, m_palette, 2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);
@@ -2018,28 +2018,26 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	m_ym2151->add_route(0, "lspeaker", 0.42);
 	m_ym2151->add_route(1, "rspeaker", 0.42);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+}
 
 // DE-0395-1
-MACHINE_CONFIG_START(fghthist_state::fghthsta)
+void fghthist_state::fghthsta(machine_config &config)
+{
 	fghthist(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fghthsta_memmap)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &fghthist_state::fghthsta_memmap);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_map);
 
 	config.device_remove("soundlatch");
 
 	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
-MACHINE_CONFIG_END
+}
 
 // DE-0396-0
 void fghthist_state::fghthistu(machine_config &config)
@@ -2061,34 +2059,33 @@ void fghthist_state::fghthistu(machine_config &config)
 }
 
 // DE-0359-2 + Bottom board DE-0360-4
-MACHINE_CONFIG_START(dragngun_state::dragngun)
-
+void dragngun_state::dragngun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(dragngun_map)
+	ARM(config, m_maincpu, XTAL(28'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::dragngun_map);
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
 	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
 	DECO_IRQ(config, m_deco_irq, 0);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update)
-	//MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_screen_update(FUNC(dragngun_state::screen_update));
+	//m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
+	BUFFERED_SPRITERAM32(config, m_spriteram);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);
@@ -2125,8 +2122,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
 	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
-	MCFG_PALETTE_ADD("palette", 2048)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
+	PALETTE(config, m_palette, 2048);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -2145,35 +2142,33 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	m_ym2151->add_route(0, "lspeaker", 0.42);
 	m_ym2151->add_route(1, "rspeaker", 0.42);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
 	SPEAKER(config, "gun_speaker").front_center();
 
-	MCFG_DEVICE_ADD("oki3", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gun_speaker", 1.0)
+	OKIM6295(config, m_oki[2], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[2]->add_route(ALL_OUTPUTS, "gun_speaker", 1.0);
 
-	MCFG_DEVICE_ADD("vol_main", LC7535)
-	MCFG_LC7535_SELECT_CB(CONSTANT(1))
-	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
+	LC7535(config, m_vol_main);
+	m_vol_main->select().set_constant(1);
+	m_vol_main->set_volume_callback(FUNC(dragngun_state::volume_main_changed));
 
-	MCFG_DEVICE_ADD("vol_gun", LC7535)
-	MCFG_LC7535_SELECT_CB(CONSTANT(0))
-	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
-MACHINE_CONFIG_END
+	LC7535(config, m_vol_gun);
+	m_vol_gun->select().set_constant(0);
+	m_vol_gun->set_volume_callback(FUNC(dragngun_state::volume_gun_changed));
+}
 
-MACHINE_CONFIG_START(dragngun_state::lockloadu)
+void dragngun_state::lockloadu(machine_config &config)
+{
 	dragngun(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(lockloadu_map)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(lockloadu_sound_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockloadu_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockloadu_sound_map);
 
 	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
@@ -2181,24 +2176,22 @@ MACHINE_CONFIG_START(dragngun_state::lockloadu)
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
 
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
-MACHINE_CONFIG_END
+}
 
 // DE-0420-1 + Bottom board DE-0421-0
-MACHINE_CONFIG_START(dragngun_state::lockload)
-
+void dragngun_state::lockload(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(lockload_map)
+	ARM(config, m_maincpu, XTAL(28'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_map);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 32220000/8)
-	MCFG_DEVICE_PROGRAM_MAP(lockload_sound_map)
-	MCFG_DEVICE_IO_MAP(z80_sound_io)
+	Z80(config, m_audiocpu, 32220000/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &dragngun_state::z80_sound_io);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
 	DECO_IRQ(config, m_deco_irq, 0);
 	m_deco_irq->set_screen_tag(m_screen);
@@ -2208,19 +2201,19 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* to improve main<->audio comms */
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_screen_update(FUNC(dragngun_state::screen_update));
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
+	BUFFERED_SPRITERAM32(config, m_spriteram);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
-	MCFG_PALETTE_ADD("palette", 2048)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
+	PALETTE(config, m_palette, 2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);
@@ -2274,31 +2267,31 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	m_ym2151->add_route(0, "lspeaker", 0.42);
 	m_ym2151->add_route(1, "rspeaker", 0.42);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
-	MCFG_DEVICE_ADD("vol_main", LC7535)
-	MCFG_LC7535_SELECT_CB(CONSTANT(1))
-	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
-MACHINE_CONFIG_END
+	LC7535(config, m_vol_main);
+	m_vol_main->select().set_constant(1);
+	m_vol_main->set_volume_callback(FUNC(dragngun_state::volume_main_changed));
+}
 
-MACHINE_CONFIG_START(nslasher_state::tattass)
-
+void nslasher_state::tattass(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) // unconfirmed
-	MCFG_DEVICE_PROGRAM_MAP(tattass_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+	ARM(config, m_maincpu, 28000000/4); // unconfirmed
+	m_maincpu->set_addrmap(AS_PROGRAM, &nslasher_state::tattass_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
-	EEPROM_93C76_8BIT(config, "eeprom");
+	EEPROM_93C76_8BIT(config, m_eeprom);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_screen_update(FUNC(nslasher_state::screen_update));
 
 	DECO_ACE(config, m_deco_ace, 0);
 
@@ -2342,7 +2335,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_deco_ace, gfx_tattass)
+	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_tattass);
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("IN0");
@@ -2353,29 +2346,28 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 
 	/* sound hardware */
 	DECOBSMT(config, m_decobsmt, 0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(nslasher_state::nslasher)
-
+void nslasher_state::nslasher(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'322'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(nslasher_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+	ARM(config, m_maincpu, XTAL(28'322'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nslasher_state::nslasher_map);
+	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 32220000/9)
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
-	MCFG_DEVICE_IO_MAP(z80_sound_io)
+	Z80(config, m_audiocpu, 32220000/9);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nslasher_state::z80_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &nslasher_state::z80_sound_io);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* to improve main<->audio comms */
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_screen_update(FUNC(nslasher_state::screen_update));
 
 	DECO_ACE(config, m_deco_ace, 0);
 
@@ -2419,7 +2411,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	m_sprgen[1]->set_gfx_region(4);
 	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_deco_ace, gfx_nslasher)
+	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_nslasher);
 
 	DECO104PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("IN0");
@@ -2438,14 +2430,14 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	m_ym2151->add_route(0, "lspeaker", 0.40);
 	m_ym2151->add_route(1, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+}
 
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
 void nslasher_state::nslasheru(machine_config &config)

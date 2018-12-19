@@ -691,25 +691,24 @@ WRITE_LINE_MEMBER(namcos16_state::slave_vblank_irq)
 		m_slave_cpu->set_input_line(6, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(namcos16_state::liblrabl)
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(master_liblrabl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
+void namcos16_state::liblrabl(machine_config &config)
+{
+	MC6809E(config, m_master_cpu, MASTER_CLOCK/4);
+	m_master_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::master_liblrabl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(namcos16_state::master_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", M68000, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	M68000(config, m_slave_cpu, MASTER_CLOCK);
+	m_slave_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::slave_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
+	MC6809E(config, m_sound_cpu, MASTER_CLOCK/4);
+	m_sound_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::sound_map);
+	m_sound_cpu->set_periodic_int(FUNC(namcos16_state::irq0_line_hold), attotime::from_hz(60));
 
-	
 	NAMCO_58XX(config, m_namco58xx, 0);
 	m_namco58xx->in_callback<0>().set_ioport("COINS");
 	m_namco58xx->in_callback<1>().set_ioport("P1_RIGHT");
 	m_namco58xx->in_callback<2>().set_ioport("P2_RIGHT");
 	m_namco58xx->in_callback<3>().set_ioport("BUTTONS");
-
 
 	NAMCO_56XX(config, m_namco56xx_1, 0);
 	m_namco56xx_1->in_callback<0>().set(FUNC(namcos16_state::dipA_h));
@@ -723,29 +722,29 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	m_namco56xx_2->in_callback<2>().set_ioport("P2_LEFT");
 	m_namco56xx_2->in_callback<3>().set_ioport("SERVICE");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK,384,0,288,264,0,224) // derived from Galaxian HW, 60.606060
-	MCFG_SCREEN_UPDATE_DRIVER(namcos16_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos16_state, slave_vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK,384,0,288,264,0,224); // derived from Galaxian HW, 60.606060
+	screen.set_screen_update(FUNC(namcos16_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(namcos16_state::slave_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toypop)
-	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(namcos16_state, toypop)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toypop);
+	PALETTE(config, m_palette, 128*4+64*4+16*2);
+	m_palette->set_indirect_entries(256);
+	m_palette->set_init(FUNC(namcos16_state::palette_init_toypop));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 24000)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_15XX(config, m_namco15xx, 24000);
+	m_namco15xx->set_voices(8);
+	m_namco15xx->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(namcos16_state::toypop)
+void namcos16_state::toypop(machine_config &config)
+{
 	liblrabl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(master_toypop_map)
-MACHINE_CONFIG_END
+	m_master_cpu->set_addrmap(AS_PROGRAM, &namcos16_state::master_toypop_map);
+}
 
 
 ROM_START( liblrabl )
