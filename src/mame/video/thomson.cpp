@@ -568,6 +568,42 @@ UPDATE_LOW( bitmap16 )
 END_UPDATE
 
 
+/* 160x200, 16-colors, no constraint, alternate encoding, undocumented, tested */
+
+static const unsigned tbl_bit16[4][4] = {
+        {  0,  2,  8, 10 },
+        {  1,  3,  9, 11 },
+        {  4,  6, 12, 14 },
+        {  5,  7, 13, 15 }
+};
+
+UPDATE_HI( bitmap16alt )
+{
+        unsigned p0 = tbl_bit16[ramb >> 6][rama >> 6];
+        unsigned p1 = tbl_bit16[(ramb >> 4) & 3][(rama >> 4) & 3];
+        unsigned p2 = tbl_bit16[(ramb >> 2) & 3][(rama >> 2) & 3];
+        unsigned p3 = tbl_bit16[ramb & 3][rama & 3];
+	dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = pal[ p0 ];
+	dst[ 4] = dst[ 5] = dst[ 6] = dst[ 7] = pal[ p1 ];
+	dst[ 8] = dst[ 9] = dst[10] = dst[11] = pal[ p2 ];
+	dst[12] = dst[13] = dst[14] = dst[15] = pal[ p3 ];
+}
+END_UPDATE
+
+UPDATE_LOW( bitmap16alt )
+{
+        unsigned p0 = tbl_bit16[ramb >> 6][rama >> 6];
+        unsigned p1 = tbl_bit16[(ramb >> 4) & 3][(rama >> 4) & 3];
+        unsigned p2 = tbl_bit16[(ramb >> 2) & 3][(rama >> 2) & 3];
+        unsigned p3 = tbl_bit16[ramb & 3][rama & 3];
+	dst[0] = dst[1] = pal[ p0 ];
+	dst[2] = dst[3] = pal[ p1 ];
+	dst[4] = dst[5] = pal[ p2 ];
+	dst[6] = dst[7] = pal[ p3 ];
+}
+END_UPDATE
+
+
 
 /* 640x200 (80 text column), 2-colors, no constraint */
 
@@ -785,7 +821,8 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
 	FUN(to9), FUN(mode80_to9),
-		FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
+        FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
+        FUN(bitmap16alt)
 };
 
 
