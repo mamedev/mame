@@ -1143,7 +1143,7 @@ void snesb_state::init_rushbeat()
 	}
 
 	// boot vector
-	dst[0xfffc] = 0x00;
+	dst[0xfffc] = 0xec;
 	dst[0xfffd] = 0x80;
 
 	init_snes_hirom();
