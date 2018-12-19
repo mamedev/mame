@@ -119,12 +119,6 @@ protected:
 		uint8_t     exsyfg;
 		int       old_crmd;
 		int       old_tvmd;
-		int       old_coar;
-		int       old_coag;
-		int       old_coab;
-		int       old_cobr;
-		int       old_cobg;
-		int       old_cobb;
 	}m_vdp2;
 
 	required_device<sh2_device> m_maincpu;
