@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Olivier Galibert
 /***************************************************************************
 
-    emumem.c
+    emumem.cpp
 
     Functions which handle device memory access.
 
@@ -864,6 +864,9 @@ void memory_manager::initialize()
 		for (auto const memory : memories)
 			memory->set_log_unmap(false);
 
+	// register a callback to reset banks when reloading state
+	machine().save().register_postload(save_prepost_delegate(FUNC(memory_manager::bank_reattach), this));
+
 	// we are now initialized
 	m_initialized = true;
 }
@@ -920,6 +923,14 @@ memory_bank *memory_manager::find(const char *tag) const
 	if (bank != m_banklist.end())
 		return bank->second.get();
 	return nullptr;
+}
+
+void memory_manager::bank_reattach()
+{
+	// for each non-anonymous bank, explicitly reset its entry
+	for (auto &bank : m_banklist)
+		if (!bank.second->anonymous() && bank.second->entry() != -1)
+			bank.second->set_entry(bank.second->entry());
 }
 
 memory_bank *memory_manager::find(address_space &space, offs_t addrstart, offs_t addrend) const
