@@ -29,7 +29,7 @@ TODO:
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
  - denseib  : fix gfx glitches, missing texts
  - legendsb : dipswitches
- - rushbeat : everything
+ - rushbets : everything
 
 ***************************************************************************
 
@@ -173,8 +173,8 @@ public:
 	void init_endless();
 	void init_mk3snes();
 	void init_legendsb();
-	void init_rushbeat();
-	void init_spidrmnb();
+	void init_rushbets();
+	void init_venom();
 
 private:
 	std::unique_ptr<int8_t[]> m_shared_ram;
@@ -701,7 +701,7 @@ static INPUT_PORTS_START( endless )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spidrmnb )
+static INPUT_PORTS_START( venom )
 	PORT_INCLUDE(snes_common)
 
 	PORT_START("DSW1")
@@ -733,6 +733,27 @@ static INPUT_PORTS_START( spidrmnb )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	// The game code has been hacked to use only 3 buttons (the arcade panel) as a result many moves are not even possible and some buttons have multiple purposes compared to the original game
+	PORT_MODIFY("SERIAL1_DATA1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("SERIAL2_DATA1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(snesb_state::kinstb)
@@ -1084,7 +1105,7 @@ void snesb_state::init_endless()
 	init_snes();
 }
 
-void snesb_state::init_rushbeat()
+void snesb_state::init_rushbets()
 {
 	uint8_t *src = memregion("user7")->base();
 	uint8_t *dst = memregion("user3")->base();
@@ -1149,7 +1170,7 @@ void snesb_state::init_rushbeat()
 	init_snes_hirom();
 }
 
-void snesb_state::init_spidrmnb()
+void snesb_state::init_venom()
 {
     uint8_t *src = memregion("user7")->base();
     uint8_t *dst = memregion("user3")->base();
@@ -1404,7 +1425,7 @@ ROM_START( endless )
 	ROM_LOAD( "endlessduel.unknownposition4", 0x180000, 0x80000, CRC(9a9493ad) SHA1(82ee4fce9cc2014cb8404fd43eebb7941cdb9ac1) )
 ROM_END
 
-ROM_START( rushbeat )
+ROM_START( rushbets )
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x100,           "sound_ipl", 0)
@@ -1419,7 +1440,7 @@ ROM_START( rushbeat )
 	ROM_LOAD( "ic22.bin", 0x180000, 0x80000, CRC(95a234d2) SHA1(31a556c8ed395f61ba198631ee086c18cc740792) )
 ROM_END
 
-ROM_START( spidrmnb )
+ROM_START( venom )
 	ROM_REGION( 0x300000, "user3", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x100,           "sound_ipl", 0)
@@ -1442,5 +1463,5 @@ GAME( 1996, denseib,      0,     kinstb,         denseib,  snesb_state, init_den
 GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state, init_sblast2b, ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1996, endless,      0,     kinstb,         endless,  snesb_state, init_endless,  ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, legendsb,     0,     kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rushbeat,     0,     kinstb,         kinstb,   snesb_state, init_rushbeat, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, spidrmnb,     0,     kinstb,         spidrmnb, snesb_state, init_spidrmnb, ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rushbets,     0,     kinstb,         kinstb,   snesb_state, init_rushbets, ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on SNES rushbets set
+GAME( 1997, venom,        0,     kinstb,         venom,    snesb_state, init_venom,    ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based on SNES venomu(?) set
