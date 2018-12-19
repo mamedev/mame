@@ -5,8 +5,9 @@
     mupid/Infonova C2A2
 	Grundig PTC-100
 
-	- 2x Z80
+	- Z80
 	- 128 + 8 KB RAM
+	- Z80 SIO/0
 	- 8035
 	- M58990P-1 ADC
 
@@ -16,6 +17,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/adc0808.h"
+#include "machine/z80sio.h"
 
 
 //**************************************************************************
@@ -27,8 +29,7 @@ class mupid2_state : public driver_device
 public:
 	mupid2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_cpu1(*this, "cpu1"),
-		m_cpu2(*this, "cpu2"),
+		m_maincpu(*this, "maincpu"),
 		m_kbdcpu(*this, "kbdcpu")
 		{ }
 
@@ -40,14 +41,11 @@ private:
 	DECLARE_WRITE8_MEMBER(kbd_p1_w);
 	DECLARE_WRITE8_MEMBER(kbd_p2_w);
 
-	required_device<cpu_device> m_cpu1;
-	required_device<cpu_device> m_cpu2;
+	required_device<cpu_device> m_maincpu;
 	required_device<i8035_device> m_kbdcpu;
 
-	void cpu1_mem(address_map &map);
-	void cpu1_io(address_map &map);
-	void cpu2_mem(address_map &map);
-	void cpu2_io(address_map &map);
+	void maincpu_mem(address_map &map);
+	void maincpu_io(address_map &map);
 	void kbdcpu_mem(address_map &map);
 };
 
@@ -56,24 +54,17 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-void mupid2_state::cpu1_mem(address_map &map)
+void mupid2_state::maincpu_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xffff).ram();
 }
 
-void mupid2_state::cpu1_io(address_map &map)
+void mupid2_state::maincpu_io(address_map &map)
 {
-	// something at 0xa0 and 0xc0
-}
-
-void mupid2_state::cpu2_mem(address_map &map)
-{
-	map(0x0000, 0xffff).noprw();
-}
-
-void mupid2_state::cpu2_io(address_map &map)
-{
+	map.global_mask(0xff);
+//	map(0xa0, 0xa0)
+//	map(0xc0, 0xc0)
 }
 
 void mupid2_state::kbdcpu_mem(address_map &map)
@@ -118,13 +109,11 @@ WRITE8_MEMBER(mupid2_state::kbd_p2_w)
 
 void mupid2_state::c2a2(machine_config &config)
 {
-	Z80(config, m_cpu1, 4000000);
-	m_cpu1->set_addrmap(AS_PROGRAM, &mupid2_state::cpu1_mem);
-	m_cpu1->set_addrmap(AS_IO, &mupid2_state::cpu1_io);
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mupid2_state::maincpu_mem);
+	m_maincpu->set_addrmap(AS_IO, &mupid2_state::maincpu_io);
 
-	Z80(config, m_cpu2, 4000000);
-	m_cpu2->set_addrmap(AS_PROGRAM, &mupid2_state::cpu2_mem);
-	m_cpu2->set_addrmap(AS_IO, &mupid2_state::cpu2_io);
+	Z80SIO(config, "sio", 4000000);
 
 	I8035(config, m_kbdcpu, 4000000);
 	m_kbdcpu->set_addrmap(AS_PROGRAM, &mupid2_state::kbdcpu_mem);
@@ -142,7 +131,7 @@ void mupid2_state::c2a2(machine_config &config)
 //**************************************************************************
 
 ROM_START( mupid2 )
-	ROM_REGION(0x8000, "cpu1", 0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("0090.7012.40.02_27.09.85.u40", 0x0000, 0x4000, CRC(0b320f46) SHA1(064e1b1697b9b767f89be7c1e3d20e1157324791))
 	ROM_LOAD("0090.7012.39.02_27.09.85.u39", 0x4000, 0x4000, CRC(b2fb634c) SHA1(70ced48d0a27a661ddd7fbc529a891bd0bcec926))
 
@@ -152,7 +141,7 @@ ROM_START( mupid2 )
 ROM_END
 
 ROM_START( mupid2i )
-	ROM_REGION(0xc000, "cpu1", 0)
+	ROM_REGION(0xc000, "maincpu", 0)
 	ROM_LOAD("kv_2.5.90_c2a2_ffd3.u40", 0x0000, 0x8000, CRC(a77ccb92) SHA1(9588e07ee0d4f06b346b7f5b58b8086a1b6ef140))
 	ROM_LOAD("kh_2.5.90_c2a2_6860.u39", 0x8000, 0x4000, CRC(cdf64a6d) SHA1(a4a76ac761de016c7a196120a1c9fef6016c171c))
 
@@ -162,7 +151,7 @@ ROM_START( mupid2i )
 ROM_END
 
 ROM_START( ptc100 )
-	ROM_REGION(0x8000, "cpu1", 0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("mup.u40", 0x0000, 0x4000, CRC(b4ac8ccb) SHA1(01bc818ec571d099176b6f69aaa736bb5410dd8e))
 	ROM_LOAD("mup.u39", 0x4000, 0x4000, CRC(9812fefc) SHA1(bb4e69eba504dae6065094d9668be2b0478b0433))
 
