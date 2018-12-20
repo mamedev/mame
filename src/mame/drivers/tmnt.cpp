@@ -2519,7 +2519,7 @@ void tmnt_state::sunsetbl(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, tmnt_state::sunsetbl_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::sunsetbl_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::irq4_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
