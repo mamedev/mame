@@ -101,12 +101,12 @@ protected:
 
 	enum sr_mask : u32
 	{
-		SR_IEc   = 0x00000001, // interrupt enable
-		SR_KUc   = 0x00000002, // kernel mode
+		SR_IEc   = 0x00000001, // interrupt enable (current)
+		SR_KUc   = 0x00000002, // user mode (current)
 		SR_IEp   = 0x00000004, // interrupt enable (previous)
-		SR_KUp   = 0x00000008, // kernel mode (previous)
+		SR_KUp   = 0x00000008, // user mode (previous)
 		SR_IEo   = 0x00000010, // interrupt enable (old)
-		SR_KUo   = 0x00000020, // kernel mode (old)
+		SR_KUo   = 0x00000020, // user mode (old)
 		SR_IMSW0 = 0x00000100, // software interrupt 0 enable
 		SR_IMSW1 = 0x00000200, // software interrupt 1 enable
 		SR_IMEX0 = 0x00000400, // external interrupt 0 enable
@@ -142,6 +142,11 @@ protected:
 		EL_V   = 0x00000200, // valid
 		EL_G   = 0x00000100, // global
 	};
+	enum context_mask : u32
+	{
+		PTE_BASE = 0xffe00000, // base address of page table
+		BAD_VPN  = 0x001ffffc, // virtual address bits 30..12
+	};
 
 	// device_t overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -166,7 +171,7 @@ protected:
 	void dcache_map(address_map &map);
 
 	// interrupts
-	void generate_exception(int exception);
+	void generate_exception(int exception, bool refill = false);
 	void check_irqs();
 	void set_irq_line(int irqline, int state);
 

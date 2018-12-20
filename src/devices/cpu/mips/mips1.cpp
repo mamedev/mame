@@ -91,7 +91,7 @@ r2000_device::r2000_device(const machine_config &mconfig, const char *tag, devic
 }
 
 r2000a_device::r2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R2000A, tag, owner, clock, 0x0216, icache_size, dcache_size)
+	: mips1_device_base(mconfig, R2000A, tag, owner, clock, 0x0210, icache_size, dcache_size)
 {
 }
 
@@ -270,7 +270,7 @@ std::unique_ptr<util::disasm_interface> mips1core_device_base::create_disassembl
 	return std::make_unique<mips1_disassembler>();
 }
 
-void mips1core_device_base::generate_exception(int exception)
+void mips1core_device_base::generate_exception(int exception, bool refill)
 {
 	// set the exception PC
 	m_cpr[0][COP0_EPC] = m_pc;
@@ -289,8 +289,7 @@ void mips1core_device_base::generate_exception(int exception)
 	// shift the exception bits
 	SR = (SR & 0xffffffc0) | ((SR << 2) & 0x3c);
 
-	// only tlb misses on kuseg have dedicated vectors
-	if ((exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE) && !BIT(m_cpr[0][COP0_BadVAddr], 31))
+	if (refill)
 		m_pc = (SR & SR_BEV) ? 0xbfc00100 : 0x80000000;
 	else
 		m_pc = (SR & SR_BEV) ? 0xbfc00180 : 0x80000080;
@@ -347,6 +346,8 @@ void mips1core_device_base::set_cop0_reg(int const index, u32 const data)
 		// update interrupts
 		check_irqs();
 	}
+	else if (index == COP0_Context)
+		m_cpr[0][index] = (m_cpr[0][index] & ~PTE_BASE) | (data & PTE_BASE);
 	else if (index != COP0_PRId)
 		m_cpr[0][index] = data;
 }
@@ -420,8 +421,13 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[index][0] = m_cpr[0][COP0_EntryHi];
 			m_tlb[index][1] = m_cpr[0][COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb index %d program 0x%08x physical 0x%08x\n",
-				index, m_cpr[0][COP0_EntryHi] & ~0xfff, m_cpr[0][COP0_EntryLo] & ~0xfff);
+			LOGMASKED(LOG_TLB, "tlbwi %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				index, (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, m_cpr[0][COP0_EntryHi] & EH_VPN, m_cpr[0][COP0_EntryLo] & EL_PFN,
+				m_cpr[0][COP0_EntryLo] & EL_N ? 'N' : '-',
+				m_cpr[0][COP0_EntryLo] & EL_D ? 'D' : '-',
+				m_cpr[0][COP0_EntryLo] & EL_V ? 'V' : '-',
+				m_cpr[0][COP0_EntryLo] & EL_G ? 'G' : '-',
+				machine().describe_context());
 		}
 		break;
 
@@ -432,8 +438,13 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[random][0] = m_cpr[0][COP0_EntryHi];
 			m_tlb[random][1] = m_cpr[0][COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlb random %d program 0x%08x physical 0x%08x\n",
-				random, m_cpr[0][COP0_EntryHi] & ~0xfff, m_cpr[0][COP0_EntryLo] & ~0xfff);
+			LOGMASKED(LOG_TLB, "tlbwr %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+				random, (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, m_cpr[0][COP0_EntryHi] & EH_VPN, m_cpr[0][COP0_EntryLo] & EL_PFN,
+				m_cpr[0][COP0_EntryLo] & EL_N ? 'N' : '-',
+				m_cpr[0][COP0_EntryLo] & EL_D ? 'D' : '-',
+				m_cpr[0][COP0_EntryLo] & EL_V ? 'V' : '-',
+				m_cpr[0][COP0_EntryLo] & EL_G ? 'G' : '-',
+				machine().describe_context());
 		}
 		break;
 
@@ -445,10 +456,16 @@ void mips1_device_base::handle_cop0(u32 const op)
 			u32 const mask = (m_tlb[index][1] & EL_G) ? EH_VPN : EH_VPN | EH_ASID;
 			if ((m_tlb[index][0] & mask) == (m_cpr[0][COP0_EntryHi] & mask))
 			{
+				LOGMASKED(LOG_TLB, "tlb probe hit vpn 0x%08x index %d (%s)\n",
+					m_cpr[0][COP0_EntryHi] & mask, index, machine().describe_context());
+
 				m_cpr[0][COP0_Index] = index << 8;
 				break;
 			}
 		}
+		if ((VERBOSE & LOG_TLB) && BIT(m_cpr[0][COP0_Index], 31))
+			LOGMASKED(LOG_TLB, "tlb probe miss asid %d vpn 0x%08x(%s)\n",
+				(m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, m_cpr[0][COP0_EntryHi] & EH_VPN, machine().describe_context());
 		break;
 
 	default:
@@ -975,6 +992,7 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 
 	// key is a combination of VPN and ASID
 	u32 const key = (address & EH_VPN) | (m_cpr[0][COP0_EntryHi] & EH_ASID);
+	bool refill = !BIT(m_cpr[0][COP0_BadVAddr], 31);
 	bool dirty = false;
 
 	for (u32 const *entry : m_tlb)
@@ -986,11 +1004,15 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 
 		// test valid
 		if (!(entry[1] & EL_V))
+		{
+			refill = false;
 			break;
+		}
 
 		// test dirty
 		if ((intention & TRANSLATE_WRITE) && !(entry[1] & EL_D))
 		{
+			refill = false;
 			dirty = true;
 			break;
 		}
@@ -1004,16 +1026,15 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 	if (!(intention & TRANSLATE_DEBUG_MASK))
 	{
 		if ((VERBOSE & LOG_TLB) && !dirty)
-			LOGMASKED(LOG_TLB, "tlb miss %s address 0x%08x (%s)\n",
-				(intention & TRANSLATE_WRITE) ? "store" : "load", address, machine().describe_context());
+			LOGMASKED(LOG_TLB, "tlb miss %c asid %d address 0x%08x (%s)\n",
+				(intention & TRANSLATE_WRITE) ? 'w' : 'r', (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, address, machine().describe_context());
 
-		// exception
+		// load tlb exception registers
 		m_cpr[0][COP0_BadVAddr] = address;
 		m_cpr[0][COP0_EntryHi] = key;
-		m_cpr[0][COP0_Context] &= ~0x001fffff;
-		m_cpr[0][COP0_Context] |= (address >> 11) & ~0x3;
+		m_cpr[0][COP0_Context] = (m_cpr[0][COP0_Context] & PTE_BASE) | ((address >> 10) & BAD_VPN);
 
-		generate_exception(dirty ? EXCEPTION_TLBMOD : (intention & TRANSLATE_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD);
+		generate_exception(dirty ? EXCEPTION_TLBMOD : (intention & TRANSLATE_WRITE) ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD, refill);
 	}
 
 	return false;
