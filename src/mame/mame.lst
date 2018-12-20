@@ -12701,8 +12701,8 @@ famibox                         // 1986
 borntofi                        // (c) International Games?
 fantland                        // (c) 198? Electronic Devices Italy
 fantlanda                       // (c) 198? Electronic Devices Italy
-galaxygn                        // (c) 1990 Electronic Devices Italy
-galacygno                       // (c) 1989 Electronic Devices Italy
+galaxygn                        // (c) 1989 Electronic Devices Italy
+galaxygnh                       // (c) 1990 Electronic Devices Italy (1990 year hack)
 wheelrun                        // (c) 1988? International Games
 
 @source:fanucs15.cpp
