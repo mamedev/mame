@@ -37,7 +37,8 @@ public:
 		m_ram(*this, "ram"),
 		m_rombank(*this, "rombank"),
 		m_rambank(*this, "rambank"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_nmi_enabled(false)
 		{ }
 
 	void c2a2(machine_config &config);
@@ -69,6 +70,7 @@ private:
 	void kbdcpu_mem(address_map &map);
 
 	std::unique_ptr<std::array<uint8_t, 3>[]> m_color_ram;
+	bool m_nmi_enabled;
 };
 
 
@@ -179,11 +181,13 @@ void mupid2_state::machine_start()
 
 	// register for save states
 	save_pointer(NAME(m_color_ram), 16);
+	save_item(NAME(m_nmi_enabled));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mupid2_state::nmi)
 {
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (m_nmi_enabled)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(mupid2_state::port_a0_w)
@@ -204,7 +208,7 @@ WRITE8_MEMBER(mupid2_state::port_c0_w)
 {
 	logerror("port_c0_w: %02x\n", data);
 
-	// 7-------  unknown
+	// 7-------  nmi mask
 	// -6------  unknown
 	// --5-----  unknown
 	// ---4----  unknown
@@ -212,6 +216,7 @@ WRITE8_MEMBER(mupid2_state::port_c0_w)
 	// ------1-  unknown
 	// -------0  unknown
 
+	m_nmi_enabled = BIT(data, 7);
 	m_rambank->set_entry((data >> 2) & 0x03);
 }
 
