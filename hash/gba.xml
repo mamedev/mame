@@ -18181,7 +18181,7 @@
 	</software>
 
 	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (shaped like a crystal with a frozen monster inside)
-		contains a serial EEPROM (probable with an ID and some data the game can read and write). -->
+		contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
 	<software name="legendzs">
 		<description>Legendz - Sign of Nekuromu (Jpn)</description>
 		<year>2005</year>
@@ -18203,7 +18203,7 @@
 	</software>
 
 	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (shaped like a crystal with a frozen monster inside)
-		contains a serial EEPROM (probable with an ID and some data the game can read and write). -->
+		contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
 	<software name="legendzy">
 		<description>Legendz - Yomigaeru Shiren no Shima (Jpn)</description>
 		<year>2004</year>
