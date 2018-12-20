@@ -656,12 +656,12 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
+	m_aica->set_master(true);
+	m_aica->irq().set(FUNC(dc_state::aica_irq));
+	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->add_route(0, "lspeaker", 1.0);
+	m_aica->add_route(1, "rspeaker", 1.0);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 

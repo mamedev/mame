@@ -3657,13 +3657,13 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	m_multipcm[1]->add_route(1, "rspeaker", 1);
 
 	UPD7759(config, m_upd7759[0], 0);
-	m_upd7759[0]->set_drq_callback(DEVCB_WRITELINE(*this, vgmplay_state, upd7759_drq_w<0>));
+	m_upd7759[0]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<0>));
 	m_upd7759[0]->set_addrmap(0, &vgmplay_state::upd7759_map<0>);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	UPD7759(config, m_upd7759[1], 0);
-	m_upd7759[1]->set_drq_callback(DEVCB_WRITELINE(*this, vgmplay_state, upd7759_drq_w<1>));
+	m_upd7759[1]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<1>));
 	m_upd7759[1]->set_addrmap(0, &vgmplay_state::upd7759_map<1>);
 	m_upd7759[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_upd7759[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);

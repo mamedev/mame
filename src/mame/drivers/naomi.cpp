@@ -2896,7 +2896,8 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  */
 
  // TODO: merge with Dreamcast base machine
-MACHINE_CONFIG_START(dc_state::naomi_aw_base)
+void dc_state::naomi_aw_base(machine_config &config)
+{
 	/* basic machine hardware */
 	SH4LE(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
@@ -2910,41 +2911,41 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	m_maincpu->set_md(8, 0);
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
+	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_state::dc_audio_map);
 
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
-	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480); /* TODO: where does pclk actually come from? */
+	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
+	PALETTE(config, "palette", 0x1000);
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
+	m_aica->set_master(true);
+	m_aica->irq().set(FUNC(dc_state::aica_irq));
+	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->add_route(0, "lspeaker", 2.0);
+	m_aica->add_route(1, "rspeaker", 2.0);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(naomi_state::naomi_base)
+void naomi_state::naomi_base(machine_config &config)
+{
 	naomi_aw_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi_map)
-	MCFG_DEVICE_IO_MAP(naomi_port)
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_state::naomi_map);
+	m_maincpu->set_addrmap(AS_IO, &naomi_state::naomi_port);
 
 	EEPROM_93C46_16BIT(config, "main_eeprom").default_value(0);
 
@@ -2979,7 +2980,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	M3COMM(config, "comm_board", 0);
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 /*
  * Naomi 1, unprotected ROM sub-board
@@ -3125,13 +3126,13 @@ void naomi2_state::naomi2gd(machine_config &config)
  * Naomi 2, M1 sub-board
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2m1)
+void naomi2_state::naomi2m1(machine_config &config)
+{
 	naomim1(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Naomi 2, M2/3 sub-board
@@ -3149,19 +3150,19 @@ void naomi2_state::naomi2m2(machine_config &config)
  * Atomiswave
  */
 
-MACHINE_CONFIG_START(atomiswave_state::aw_base)
+void atomiswave_state::aw_base(machine_config &config)
+{
 	naomi_aw_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aw_map)
-	MCFG_DEVICE_IO_MAP(aw_port)
+	m_maincpu->set_addrmap(AS_PROGRAM, &atomiswave_state::aw_map);
+	m_maincpu->set_addrmap(AS_IO, &atomiswave_state::aw_port);
 	MACRONIX_29L001MC(config, "awflash");
 	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0, "rom_key"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 void atomiswave_state::aw1c(machine_config &config)
 {
