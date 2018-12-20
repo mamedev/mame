@@ -139,13 +139,14 @@ static const char *const astrof_sample_names[] =
 	nullptr
 };
 
-MACHINE_CONFIG_START(astrof_state::astrof_audio)
+void astrof_state::astrof_audio(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(astrof_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(astrof_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

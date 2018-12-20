@@ -1206,48 +1206,49 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-MACHINE_CONFIG_START(multigam_state::multigam)
+void multigam_state::multigam(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(multigam_map)
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigam_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 262);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PPU2C02_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_2C02(config, m_ppu);
+	m_ppu->set_cpu_tag("maincpu");
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(multigam_state::multigm3)
+void multigam_state::multigm3(machine_config &config)
+{
 	multigam(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multigm3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigm3_map);
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state, multigm3 )
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(multigam_state::multigmt)
+void multigam_state::multigmt(machine_config &config)
+{
 	multigam(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multigmt_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigmt_map);
+}
 
-MACHINE_CONFIG_START(multigam_state::supergm3)
+void multigam_state::supergm3(machine_config &config)
+{
 	multigam(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(supergm3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::supergm3_map);
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state,supergm3)
-MACHINE_CONFIG_END
+}
 
 ROM_START( multigam )
 	ROM_REGION( 0x10000, "maincpu", 0 )

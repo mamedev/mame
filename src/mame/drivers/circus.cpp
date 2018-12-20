@@ -283,72 +283,69 @@ void circus_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(circus_state::circus)
-
+void circus_state::circus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
-
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)   /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_circus)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);  /* needed for proper hardware collisions */
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_circus));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(circus_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(circus_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, circus_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, circus_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(circus_state::robotbwl)
-
+void circus_state::robotbwl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
 	// does not generate irq!
 
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500) /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_robotbwl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_robotbwl));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robotbwl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robotbwl);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(robotbwl_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(robotbwl_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, robotbwl_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, robotbwl_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
 {
@@ -358,71 +355,69 @@ TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(circus_state::crash)
-
+void circus_state::crash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", circus_state, crash_scanline, "screen", 0, 1)
-
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(circus_state::crash_scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500) /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(40*8, 40*8) //TODO
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_crash)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(40*8, 40*8); // TODO // to do what?
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_crash));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(crash_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(crash_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, crash_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, crash_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(circus_state::ripcord)
-
+void circus_state::ripcord(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
-
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)   /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_ripcord)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);          /* needed for proper hardware collisions */
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_ripcord));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(ripcord_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(ripcord_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, circus_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, circus_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

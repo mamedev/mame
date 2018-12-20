@@ -525,25 +525,26 @@ void famibox_state::machine_start()
 	m_coins = 0;
 }
 
-MACHINE_CONFIG_START(famibox_state::famibox)
+void famibox_state::famibox(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(famibox_map)
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &famibox_state::famibox_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 262);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PPU2C02_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_2C02(config, m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(famibox)

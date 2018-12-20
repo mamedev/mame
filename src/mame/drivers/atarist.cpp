@@ -1994,6 +1994,73 @@ static void atari_floppies(device_slot_interface &device)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
+void st_state::common(machine_config &config)
+{
+	// basic machine hardware
+	M68000(config, m_maincpu, Y2/4);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(st_state::atarist_int_ack));
+
+	keyboard(config);
+
+	// sound
+	YM2149(config, m_ymsnd, Y2/16);
+	m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
+	m_ymsnd->port_a_write_callback().set(FUNC(st_state::psg_pa_w));
+	m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+
+	// devices
+	WD1772(config, m_fdc, Y2/4);
+	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
+	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd",  st_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, nullptr, st_state::floppy_formats);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_mfp, FUNC(mc68901_device::i0_w));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+
+	MC68901(config, m_mfp, Y2/8);
+	m_mfp->set_timer_clock(Y1);
+	m_mfp->set_rx_clock(0);
+	m_mfp->set_tx_clock(0);
+	m_mfp->out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
+	m_mfp->out_so_cb().set(m_rs232, FUNC(rs232_port_device::write_txd));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
+	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
+	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
+
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
+	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
+
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
+	aciairq.output_handler().set(m_mfp, FUNC(mc68901_device::i4_w)).invert();
+
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+
+	CLOCK(config, "acia_clock", Y2/64).signal_handler().set(FUNC(st_state::write_acia_clock)); // 500kHz
+
+	// cartridge
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "st_cart", "bin,rom");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_endian(ENDIANNESS_BIG);
+
+	// software lists
+	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");
+}
+
 void st_state::keyboard(machine_config &config)
 {
 	hd6301_cpu_device &ikbd(HD6301(config, HD6301V1_TAG, Y2/8));
@@ -2010,322 +2077,147 @@ void st_state::keyboard(machine_config &config)
 //  MACHINE_CONFIG( st )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(st_state::st)
-	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_DEVICE_PROGRAM_MAP(st_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+void st_state::st(machine_config &config)
+{
+	common(config);
 
-	keyboard(config);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &st_state::st_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(st_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(Y2/2, ATARIST_HTOT_PAL*2, ATARIST_HBEND_PAL*2, ATARIST_HBSTART_PAL*2, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(st_state::screen_update));
+	m_screen->set_raw(Y2/2, ATARIST_HTOT_PAL*2, ATARIST_HBEND_PAL*2, ATARIST_HBSTART_PAL*2, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &ym2149(YM2149(config, YM2149_TAG, Y2/16));
-	ym2149.set_flags(AY8910_SINGLE_OUTPUT);
-	ym2149.set_resistors_load(RES_K(1), 0, 0);
-	ym2149.port_a_write_callback().set(FUNC(st_state::psg_pa_w));
-	ym2149.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	ym2149.add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	// devices
-
-	WD1772(config, m_fdc, Y2/4);
-	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
-	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
-
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_mfp, mc68901_device, i0_w))
-
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-	MC68901(config, m_mfp, Y2/8);
-	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
-	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
-	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
-	rs232.dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
-	rs232.cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
-	rs232.ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
-
-	ACIA6850(config, m_acia0, 0);
-	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
-	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
-
-	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
-	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
-
-	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set(m_mfp, FUNC(mc68901_device::i4_w)).invert();
-
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	// internal ram
-	RAM(config, m_ram)
-		.set_default_size("1M") // 1040ST
-		.set_extra_options("512K,256K"); // 520ST, 260ST
-
-	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("1M"); // 1040ST
+	m_ram->set_extra_options("512K,256K"); // 520ST, 260ST
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( megast )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(megast_state::megast)
-	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_DEVICE_PROGRAM_MAP(megast_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+void megast_state::megast(machine_config &config)
+{
+	common(config);
 
-	keyboard(config);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &megast_state::megast_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(megast_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(megast_state::screen_update));
+	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &ym2149(YM2149(config, YM2149_TAG, Y2/16));
-	ym2149.set_flags(AY8910_SINGLE_OUTPUT);
-	ym2149.set_resistors_load(RES_K(1), 0, 0);
-	ym2149.port_a_write_callback().set(FUNC(st_state::psg_pa_w));
-	ym2149.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	ym2149.add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
 	RP5C15(config, RP5C15_TAG, XTAL(32'768));
 
-	WD1772(config, m_fdc, Y2/4);
-	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
-	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
-
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_mfp, mc68901_device, i0_w))
-
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-	MC68901(config, m_mfp, Y2/8);
-	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
-	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
-	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
-	rs232.dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
-	rs232.cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
-	rs232.ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
-
-	ACIA6850(config, m_acia0, 0);
-	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
-	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
-
-	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
-	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
-
-	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set(m_mfp, FUNC(mc68901_device::i4_w)).invert();
-
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
-
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	// internal ram
-	RAM(config, m_ram)
-		.set_default_size("4M") // Mega ST 4
-		.set_extra_options("2M,1M"); // Mega ST 2, Mega ST 1
-
-	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("4M"); // Mega ST 4
+	m_ram->set_extra_options("2M,1M"); // Mega ST 2, Mega ST 1
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( ste )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ste_state::ste)
-	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_DEVICE_PROGRAM_MAP(ste_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+void ste_state::ste(machine_config &config)
+{
+	common(config);
 
-	keyboard(config);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &ste_state::ste_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(ste_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(ste_state::screen_update));
+	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, m_palette, 512);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	ym2149_device &ym2149(YM2149(config, YM2149_TAG, Y2/16));
-	ym2149.set_flags(AY8910_SINGLE_OUTPUT);
-	ym2149.set_resistors_load(RES_K(1), 0, 0);
-	ym2149.port_a_write_callback().set(FUNC(st_state::psg_pa_w));
-	ym2149.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	ym2149.add_route(0, "lspeaker", 0.50);
-	ym2149.add_route(0, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "lspeaker", 0.50);
+	m_ymsnd->add_route(0, "rspeaker", 0.50);
 /*
     MCFG_DEVICE_ADD("custom", CUSTOM, 0) // DAC
     MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
     MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
 */
-	MCFG_LMC1992_ADD(LMC1992_TAG /* ,atariste_lmc1992_intf */)
-
-	// devices
-
-	WD1772(config, m_fdc, Y2/4);
-	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
-	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
-
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_mfp, mc68901_device, i0_w))
-
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-	MC68901(config, m_mfp, Y2/8);
-	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
-	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
-	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
-	rs232.dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
-	rs232.cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
-	rs232.ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
-
-	ACIA6850(config, m_acia0, 0);
-	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
-	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
-
-	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
-	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
-
-	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set(m_mfp, FUNC(mc68901_device::i4_w)).invert();
-
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
+	LMC1992(config, LMC1992_TAG);
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
 //  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
 
 	// internal ram
-	RAM(config, m_ram)
-		.set_default_size("1M") // 1040STe
-		.set_extra_options("512K"); // 520STe
-
-	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("1M"); // 1040STe
+	m_ram->set_extra_options("512K"); // 520STe
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( megaste )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(megaste_state::megaste)
+void megaste_state::megaste(machine_config &config)
+{
 	ste(config);
-	MCFG_DEVICE_MODIFY(M68000_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(megaste_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &megaste_state::megaste_map);
 	RP5C15(config, RP5C15_TAG, XTAL(32'768));
 	SCC8530(config, Z8530_TAG, Y2/4);
 
 	/* internal ram */
-	m_ram->set_default_size("4M") // Mega STe 4
-		.set_extra_options("2M,1M"); // Mega STe 2, Mega STe 1
-MACHINE_CONFIG_END
+	m_ram->set_default_size("4M"); // Mega STe 4
+	m_ram->set_extra_options("2M,1M"); // Mega STe 2, Mega STe 1
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( stbook )
 //-------------------------------------------------
 #if 0
-static MACHINE_CONFIG_START(stbook_state::stbook)
+void stbook_state::stbook(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, U517/2)
-	MCFG_DEVICE_PROGRAM_MAP(stbook_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+	M68000(config, m_maincpu, U517/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(st_state::atarist_int_ack));
 
 	//MCFG_DEVICE_ADD(COP888_TAG, COP888, Y700)
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_UPDATE_DRIVER(stbook_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_screen_update(FUNC(stbook_state::screen_update));
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 639, 0, 399);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2347,21 +2239,21 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	WD1772(config, m_fdc, U517/2);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
 	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_mfp, mc68901_device, i0_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_mfp, FUNC(mc68901_device::i0_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out");
+	m_centronics->set_output_latch(cent_data_out);
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
-	rs232.dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
-	rs232.cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
-	rs232.ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
+	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
+	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
-	// device hardware
 	ACIA6850(config, m_acia0, 0);
 	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
 	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
@@ -2373,24 +2265,20 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
 	aciairq.output_handler().set(m_mfp, FUNC(mc68901_device::i4_w)).invert();
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, U517/2/16) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
+	CLOCK(config, "acia_clock", Y2/64).signal_handler().set(FUNC(st_state::write_acia_clock)); // 500kHz
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "st_cart", "bin,rom");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_endian(ENDIANNESS_BIG);
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M");
-MACHINE_CONFIG_END
+}
 #endif
 
 //-------------------------------------------------

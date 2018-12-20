@@ -92,6 +92,7 @@ public:
 		: nes_base_state(mconfig, type, tag)
 		, m_ntram(nullptr)
 		, m_chrram(nullptr)
+		, m_screen(*this, "screen")
 		, m_ppu(*this, "ppu")
 		, m_apu(*this, "apu")
 		, m_prg(*this, "prg")
@@ -227,6 +228,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	required_device<screen_device> m_screen;
 	required_device<ppu_vt03_device> m_ppu;
 	required_device<nesapu_device> m_apu;
 	required_device<address_map_bank_device> m_prg;
@@ -1347,32 +1349,32 @@ static const uint8_t descram_ppu_2012_2017[5][6] = {
 	{0x4, 0x7, 0x2, 0x6, 0x5, 0x3},
 };
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt)
+void nes_vt_state::nes_vt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502_VTSCR, NTSC_APU_CLOCK) // selectable speed?
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_map)
+	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK); // selectable speed?
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.0988)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.0988);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	m_screen->set_size(32*8, 262);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "ppu", vt03_gfx_helper)
+	GFXDECODE(config, "gfxdecode", "ppu", vt03_gfx_helper);
 
-	MCFG_PPU_VT03_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_PPU_VT03_READ_BG_CB(READ8(*this, nes_vt_state,chr_r))
-	MCFG_PPU_VT03_READ_SP_CB(READ8(*this, nes_vt_state,spr_r))
+	PPU_VT03(config, m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
+	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
 
 	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
-	MCFG_NES_CONTROL_PORT_ADD("ctrl1", nes_control_port1_devices, "joypad")
-	//MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
-	MCFG_NES_CONTROL_PORT_ADD("ctrl2", nes_control_port2_devices, "joypad")
-	//MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
+	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
+	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1381,116 +1383,106 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
 	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
 	   2nd.  Probably need to split the APU into interface and sound gen logic. */
-	MCFG_DEVICE_ADD("apu", NES_APU, NTSC_APU_CLOCK)
-	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(*this, nes_vt_state, apu_irq))
-	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(*this, nes_vt_state, apu_read_mem))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	NES_APU(config, m_apu, NTSC_APU_CLOCK);
+	m_apu->irq().set(FUNC(nes_vt_state::apu_irq));
+	m_apu->mem_read().set(FUNC(nes_vt_state::apu_read_mem));
+	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_hum)
+void nes_vt_state::nes_vt_hum(machine_config &config)
+{
 	nes_vt(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_hum_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_hum_map);
 
-	MCFG_PPU_VT03_MODIFY("ppu")
-	MCFG_PPU_VT03_SET_DESCRAMBLE(descram_ppu_2012_2017[3]);
-MACHINE_CONFIG_END
+	m_ppu->set_201x_descramble(descram_ppu_2012_2017[3]);
+}
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_pjoy)
+void nes_vt_state::nes_vt_pjoy(machine_config &config)
+{
 	nes_vt(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_pjoy_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_pjoy_map);
 
-	MCFG_PPU_VT03_MODIFY("ppu")
-	MCFG_PPU_VT03_SET_DESCRAMBLE(descram_ppu_2012_2017[2]);
-MACHINE_CONFIG_END
+	m_ppu->set_201x_descramble(descram_ppu_2012_2017[2]);
+}
 
-
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_sp69)
+void nes_vt_state::nes_vt_sp69(machine_config &config)
+{
 	nes_vt(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_sp69_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_sp69_map);
 
-	MCFG_PPU_VT03_MODIFY("ppu")
-	MCFG_PPU_VT03_SET_DESCRAMBLE(descram_ppu_2012_2017[4]);
-MACHINE_CONFIG_END
+	m_ppu->set_201x_descramble(descram_ppu_2012_2017[4]);
+}
 
-
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_xx)
+void nes_vt_state::nes_vt_xx(machine_config &config)
+{
 	nes_vt(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_xx_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_xx_map);
+}
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_cy)
+void nes_vt_state::nes_vt_cy(machine_config &config)
+{
 	nes_vt_xx(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_cy_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_cy_map);
+}
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_bt)
+void nes_vt_state::nes_vt_bt(machine_config &config)
+{
 	nes_vt_xx(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_bt_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_bt_map);
+}
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_dg)
+void nes_vt_state::nes_vt_dg(machine_config &config)
+{
 	nes_vt_xx(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_dg_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_dg_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
-	MCFG_SCREEN_SIZE(32*8, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	m_screen->set_size(32*8, 312);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+}
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_vg )
+void nes_vt_state::nes_vt_vg(machine_config &config)
+{
 	nes_vt_dg(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_hh_map);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_hh_map)
-
-	MCFG_PPU_VT03_MODIFY("ppu")
-	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_VG);
-
-MACHINE_CONFIG_END
+	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);;
+}
 
 // New mystery handheld architecture, VTxx derived
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_hh)
+void nes_vt_state::nes_vt_hh(machine_config &config)
+{
 	nes_vt_xx(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_hh_map)
-	MCFG_PPU_VT03_MODIFY("ppu")
-	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_hh_map);
+	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
-	MCFG_SCREEN_SIZE(32*8, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	m_screen->set_size(32*8, 312);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+}
 
 static INPUT_PORTS_START( nes_vt )
 PORT_START("CARTSEL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_fp)
+void nes_vt_state::nes_vt_fp(machine_config &config)
+{
 	nes_vt_xx(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_fp_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_fp_map);
 
-	MCFG_PPU_VT03_MODIFY("ppu")
-	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB12);
-MACHINE_CONFIG_END
+	m_ppu->set_palette_mode(PAL_MODE_NEW_RGB12);
+}
 
-MACHINE_CONFIG_START(nes_vt_state::nes_vt_fa)
+void nes_vt_state::nes_vt_fa(machine_config &config)
+{
 	nes_vt_xx(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nes_vt_fa_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_state::nes_vt_fa_map);
+}
 
 
 static INPUT_PORTS_START( nes_vt_fp )

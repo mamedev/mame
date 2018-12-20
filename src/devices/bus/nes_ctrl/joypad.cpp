@@ -154,10 +154,11 @@ static void arcstick_daisy(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_arcstick_device::device_add_mconfig)
+void nes_arcstick_device::device_add_mconfig(machine_config &config)
+{
 	// expansion port to allow daisy chaining
-	MCFG_FC_EXPANSION_PORT_ADD("subexp", arcstick_daisy, nullptr)
-MACHINE_CONFIG_END
+	NES_CONTROL_PORT(config, "subexp", arcstick_daisy, nullptr);
+}
 
 
 //**************************************************************************

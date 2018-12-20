@@ -39,12 +39,6 @@
  * processor, as each is shared.
  */
 
-#define MCFG_NES_APU_IRQ_HANDLER(_devcb) \
-	downcast<nesapu_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_NES_APU_MEM_READ_CALLBACK(_devcb) \
-	downcast<nesapu_device &>(*device).set_mem_read_callback(DEVCB_##_devcb);
-
 class nesapu_device : public device_t,
 						public device_sound_interface
 {

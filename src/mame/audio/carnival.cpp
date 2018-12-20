@@ -197,8 +197,8 @@ void vicdual_state::mboard_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(vicdual_state::carnival_audio)
-
+void vicdual_state::carnival_audio(machine_config &config)
+{
 	/* music board */
 	I8039(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vicdual_state::mboard_map);
@@ -209,8 +209,8 @@ MACHINE_CONFIG_START(vicdual_state::carnival_audio)
 	AY8912(config, m_psg, XTAL(3'579'545)/3).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* samples */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(10)
-	MCFG_SAMPLES_NAMES(carnival_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(10);
+	m_samples->set_samples_names(carnival_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
