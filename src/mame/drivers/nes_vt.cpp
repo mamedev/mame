@@ -104,7 +104,10 @@ public:
 		, m_csel(*this, "CARTSEL")
 		{ }
 
+	void nes_vt_base(machine_config &config);
+
 	void nes_vt(machine_config &config);
+	void nes_vt_ddr(machine_config &config);
 
 	void nes_vt_hum(machine_config &config);
 	void nes_vt_pjoy(machine_config &config);
@@ -1349,7 +1352,7 @@ static const uint8_t descram_ppu_2012_2017[5][6] = {
 	{0x4, 0x7, 0x2, 0x6, 0x5, 0x3},
 };
 
-void nes_vt_state::nes_vt(machine_config &config)
+void nes_vt_state::nes_vt_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502_VTSCR(config, m_maincpu, NTSC_APU_CLOCK); // selectable speed?
@@ -1373,9 +1376,6 @@ void nes_vt_state::nes_vt(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
-	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
-	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -1387,6 +1387,22 @@ void nes_vt_state::nes_vt(machine_config &config)
 	m_apu->irq().set(FUNC(nes_vt_state::apu_irq));
 	m_apu->mem_read().set(FUNC(nes_vt_state::apu_read_mem));
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void nes_vt_state::nes_vt(machine_config &config)
+{
+	nes_vt_base(config);
+
+	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
+	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
+}
+
+void nes_vt_state::nes_vt_ddr(machine_config &config)
+{
+	nes_vt_base(config);
+
+	NES_CONTROL_PORT(config, m_ctrl1, majesco_control_port1_devices, "ddr");
+	NES_CONTROL_PORT(config, m_ctrl2, majesco_control_port2_devices, nullptr);
 }
 
 void nes_vt_state::nes_vt_hum(machine_config &config)
@@ -1842,8 +1858,8 @@ CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 // Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
 // * Console has stereo output (dual RCA connectors).
-CONS( 2006, ddrdismx,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
-CONS( 2006, ddrstraw,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ddrdismx,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrstraw,   0,        0,  nes_vt_ddr, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
