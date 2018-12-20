@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "cpu/mb88xx/mb88xx.h"
 #include "emupal.h"
 
 class arabian_state : public driver_device
@@ -73,7 +74,7 @@ private:
 	uint8_t    m_mcu_port_r[4];
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<mb8841_cpu_device> m_mcu;
 	required_device<palette_device> m_palette;
 };
 

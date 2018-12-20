@@ -271,12 +271,12 @@ PALETTE_INIT_MEMBER(triplhnt_state, triplhnt)
 }
 
 
-MACHINE_CONFIG_START(triplhnt_state::triplhnt)
-
-/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 800000)
-	MCFG_DEVICE_PROGRAM_MAP(triplhnt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
+void triplhnt_state::triplhnt(machine_config &config)
+{
+	/* basic machine hardware */
+	M6800(config, m_maincpu, 800000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &triplhnt_state::triplhnt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(triplhnt_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery-backed 74C89 at J5
 
@@ -295,28 +295,27 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(256, 262);
+	screen.set_visarea(0, 255, 0, 239);
+	screen.set_screen_update(FUNC(triplhnt_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_triplhnt);
+	PALETTE(config, m_palette, 8).set_init(FUNC(triplhnt_state::palette_init_triplhnt));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(2)  /* 2 channels */
-	MCFG_SAMPLES_NAMES(triplhnt_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);  /* 2 channels */
+	m_samples->set_samples_names(triplhnt_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, triplhnt_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, triplhnt_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
 
 ROM_START( triplhnt )

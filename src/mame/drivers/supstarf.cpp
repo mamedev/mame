@@ -48,7 +48,7 @@ private:
 
 	virtual void machine_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8035_device> m_soundcpu;
 	required_device_array<ay8910_device, 2> m_psg;
 	required_device_array<i8212_device, 2> m_soundlatch;
@@ -173,12 +173,13 @@ void supstarf_state::machine_start()
 	save_item(NAME(m_port1_data));
 }
 
-MACHINE_CONFIG_START(supstarf_state::supstarf)
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'068'800))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_I8085A_SID(READLINE(*this, supstarf_state, contacts_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, supstarf_state, displays_w))
+void supstarf_state::supstarf(machine_config &config)
+{
+	I8085A(config, m_maincpu, XTAL(5'068'800));
+	m_maincpu->set_addrmap(AS_PROGRAM, &supstarf_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &supstarf_state::main_io_map);
+	m_maincpu->in_sid_func().set(FUNC(supstarf_state::contacts_r));
+	m_maincpu->out_sod_func().set(FUNC(supstarf_state::displays_w));
 
 	I8035(config, m_soundcpu, XTAL(5'068'800) / 2); // from 8085 pin 37 (CLK OUT)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supstarf_state::sound_map);
@@ -207,7 +208,7 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 	m_psg[1]->port_a_read_callback().set_ioport("JO");
 	m_psg[1]->port_b_read_callback().set_ioport("I1");
 	m_psg[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START(supstarf)
 	PORT_START("I1")

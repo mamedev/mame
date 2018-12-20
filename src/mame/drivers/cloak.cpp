@@ -313,18 +313,18 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cloak_state::cloak)
-
+void cloak_state::cloak(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)     /* 1 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  4*60)
+	M6502(config, m_maincpu, 1000000);     /* 1 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cloak_state::master_map);
+	m_maincpu->set_periodic_int(FUNC(cloak_state::irq0_line_hold), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD("slave", M6502, 1250000)       /* 1.25 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  2*60)
+	M6502(config, m_slave, 1250000);       /* 1.25 MHz ???? */
+	m_slave->set_addrmap(AS_PROGRAM, &cloak_state::slave_map);
+	m_slave->set_periodic_int(FUNC(cloak_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
+	config.m_minimum_quantum = attotime::from_hz(1000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -339,32 +339,31 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cloak_state, screen_update_cloak)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 3*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(cloak_state::screen_update_cloak));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloak)
-	MCFG_PALETTE_ADD("palette", 64)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloak);
+	PALETTE(config, m_palette, 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* more low pass filters ==> DISCRETE processing */
-	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("START"))
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.047), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", XTAL(10'000'000)/8));      /* Accurate to recording */
+	pokey1.allpot_r().set_ioport("START");
+	pokey1.set_output_opamp_low_pass(RES_K(1), CAP_U(0.047), 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.022), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", XTAL(10'000'000)/8));      /* Accurate to recording */
+	pokey2.allpot_r().set_ioport("DSW");
+	pokey2.set_output_opamp_low_pass(RES_K(1), CAP_U(0.022), 5.0);
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

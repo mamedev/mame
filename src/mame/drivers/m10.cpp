@@ -812,27 +812,26 @@ static const char *const m10_sample_names[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(m10_state::m10)
-
+void m10_state::m10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(m10_main)
+	M6502(config, m_maincpu, IREMM10_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m10_main);
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m10)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART);
+	m_screen->set_screen_update(FUNC(m10_state::screen_update_m10));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m10)
-	MCFG_PALETTE_ADD("palette", 2*8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m10);
 
-	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
+	PALETTE(config, m_palette, 2*8);
+	m_palette->set_init(FUNC(m10_state::palette_init_m10));
+
 	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
 
 	/* 74LS123 */
@@ -859,63 +858,57 @@ MACHINE_CONFIG_START(m10_state::m10)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(m10_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(m10_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(m10_state::m11)
+void m10_state::m11(machine_config &config)
+{
 	m10(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m11_main)
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m11_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
+}
 
-	/* sound hardware */
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(m10_state::m15)
-
+void m10_state::m15(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(m15_main)
+	M6502(config, m_maincpu, IREMM15_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m15_main);
+	m_maincpu->set_vblank_int("screen", FUNC(m10_state::m15_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m15)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART);
+	m_screen->set_screen_update(FUNC(m10_state::screen_update_m15));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-	MCFG_PALETTE_ADD("palette", 2*8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
+	PALETTE(config, m_palette, 2*8);
+	m_palette->set_init(FUNC(m10_state::palette_init_m10));
+
 	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(m10_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(m10_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(m10_state::headoni)
+void m10_state::headoni(machine_config &config)
+{
 	m15(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(11730000/16)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(11730000/16);
+}
 
 /*************************************
  *

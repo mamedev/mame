@@ -520,13 +520,37 @@ void snowbros_state::finalttr_map(address_map &map)
 }
 
 
+// Yutnori protection.
+// The sequence MEN is sent to the protection device, followed by the code request (4 bytes in all).
+// After each byte, a number of NOPs are executed to give the device time to catch up.
+// After the 4th byte, the code reads the device to get its response.
+READ16_MEMBER(snowbros_state::yutnori_prot_r)
+{
+	switch(m_yutnori_prot_val) // the 4th byte
+	{
+		case 0x33: // C3B6
+			return 0xcc;
+		case 0x60: // 4878
+			return 0xf9;
+		case 0xb8: // D820
+			return 0x74;
+	}
+	logerror("%s: Unhandled protection sequence found: %02X\n", machine().describe_context(), m_yutnori_prot_val);
+	return 0;
+}
+
+WRITE16_MEMBER(snowbros_state::yutnori_prot_w)
+{
+	m_yutnori_prot_val = data;
+}
+
 void snowbros_state::yutnori_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
 	// 0x100000  clr.w on startup
 
-	// 0x200000 could be the protection device, it makes several writes, then executes an entire subroutine of NOPs..
+	map(0x200000, 0x200001).rw(FUNC(snowbros_state::yutnori_prot_r),FUNC(snowbros_state::yutnori_prot_w)); // protection
 
 	map(0x300000, 0x300001).portr("DSW1");
 	map(0x300002, 0x300003).portr("DSW2");
@@ -2890,13 +2914,9 @@ void snowbros_state::init_hyperpac()
 
 void snowbros_state::init_yutnori()
 {
-	// presumably related to the PIC protection
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
-	rom[0x4878 / 2] = 0x4e71;
-	rom[0xd820 / 2] = 0x4e71;
-	rom[0xc3b6 / 2] = 0x4e71;
-
+	m_yutnori_prot_val = 0;
 	m_pandora->set_bg_pen(0xf0);
+	save_item(NAME(m_yutnori_prot_val));
 }
 
 GAME( 1990, snowbros,   0,        snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )

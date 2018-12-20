@@ -311,8 +311,8 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row), this);
 	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr), this);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(v6809_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)

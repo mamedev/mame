@@ -1106,6 +1106,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"mos",
 		"motorola",
 		"multitch",
+		"mupid",
 		"nakajima",
 		"nascom",
 		"ncd",
@@ -2566,6 +2567,12 @@ files {
 	MAME_DIR .. "src/mame/includes/mpf1.h",
 }
 
+createMESSProjects(_target, _subtarget, "mupid")
+files {
+	MAME_DIR .. "src/mame/drivers/mdisk.cpp",
+	MAME_DIR .. "src/mame/drivers/mupid2.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "nakajima")
 files {
 	MAME_DIR .. "src/mame/drivers/nakajies.cpp",
@@ -3055,6 +3062,7 @@ files {
 	MAME_DIR .. "src/mame/includes/mz700.h",
 	MAME_DIR .. "src/mame/drivers/pc1500.cpp",
 	MAME_DIR .. "src/mame/drivers/pocketc.cpp",
+	MAME_DIR .. "src/mame/machine/pocketc.cpp",
 	MAME_DIR .. "src/mame/includes/pocketc.h",
 	MAME_DIR .. "src/mame/video/pc1401.cpp",
 	MAME_DIR .. "src/mame/machine/pc1401.cpp",
@@ -3702,6 +3710,7 @@ files {
 	MAME_DIR .. "src/mame/includes/busicom.h",
 	MAME_DIR .. "src/mame/video/busicom.cpp",
 	MAME_DIR .. "src/mame/drivers/candela.cpp",
+	MAME_DIR .. "src/mame/drivers/cardinal.cpp",
 	MAME_DIR .. "src/mame/drivers/chaos.cpp",
 	MAME_DIR .. "src/mame/drivers/chesstrv.cpp",
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
@@ -3812,6 +3821,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mod8.cpp",
 	MAME_DIR .. "src/mame/drivers/modellot.cpp",
 	MAME_DIR .. "src/mame/drivers/molecular.cpp",
+	MAME_DIR .. "src/mame/drivers/monon_color.cpp",
 	MAME_DIR .. "src/mame/drivers/ms0515.cpp",
 	MAME_DIR .. "src/mame/drivers/ms9540.cpp",
 	MAME_DIR .. "src/mame/drivers/mstation.cpp",

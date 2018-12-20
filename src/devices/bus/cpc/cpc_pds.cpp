@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(CPC_PDS, cpc_pds_device, "cpc_pds", "Programmers Development 
 
 void cpc_pds_device::device_add_mconfig(machine_config &config)
 {
-	Z80PIO(config, m_pio, XTAL(4'000'000));   // no clock on the PCB, so will presume that it uses the CPC's clock
+	Z80PIO(config, m_pio, DERIVED_CLOCK(1, 1));   // no clock on the PCB, so will presume that it uses the CPC's clock
 
 	// no pass-through seen on remake PCBs, unknown if actual hardware had a pass-through port or not
 }
@@ -43,9 +43,8 @@ cpc_pds_device::cpc_pds_device(const machine_config &mconfig, const char *tag, d
 
 void cpc_pds_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
+	address_space &space = m_slot->cpu().space(AS_IO);
 
 	space.install_readwrite_handler(0xfbec,0xfbef,read8_delegate(FUNC(cpc_pds_device::pio_r),this),write8_delegate(FUNC(cpc_pds_device::pio_w),this));
 }

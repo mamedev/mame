@@ -1964,7 +1964,6 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 MACHINE_CONFIG_END
 
-
 MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
 	MCFG_DEVICE_PROGRAM_MAP(maxidbl_map)
@@ -1996,9 +1995,8 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	ramdac_config(config);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_SAA1099_ADD("saa", XTAL(8'000'000)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAA1099(config, "saa", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************************************************************************************

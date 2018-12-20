@@ -144,6 +144,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
+		, m_rom(*this, "rx3230")
 		, m_rambo(*this, "rambo")
 		, m_scsibus(*this, "scsi")
 		, m_scsi(*this, "scsi:7:ncr53c94")
@@ -188,6 +189,7 @@ private:
 	// processors and memory
 	required_device<r3000a_device> m_cpu;
 	required_device<ram_device> m_ram;
+	required_region_ptr<u32> m_rom;
 
 	// i/o devices
 	required_device<mips_rambo_device> m_rambo;

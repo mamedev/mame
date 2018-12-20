@@ -6107,35 +6107,35 @@ READ8_MEMBER(bshipb_state::read_k)
 
 // buttons are same as bship set
 
-MACHINE_CONFIG_START(bshipb_state::bshipb)
-
+void bshipb_state::bshipb(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->k().set(FUNC(bshipb_state::read_k));
 	m_maincpu->r().set(FUNC(bshipb_state::write_r));
 	m_maincpu->o().set(FUNC(bshipb_state::write_o));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76477", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(100), CAP_P(47)) // R18, R17, C8
-	MCFG_SN76477_DECAY_RES(RES_M(3.3))                          // R16
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.47), RES_K(15))          // C7, R20
-	MCFG_SN76477_AMP_RES(RES_K(100))                            // R19
-	MCFG_SN76477_FEEDBACK_RES(RES_K(39))                        // R7
-	MCFG_SN76477_VCO_PARAMS(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)) // R15/R14, C5, switchable R5/R3/R4
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)
-	MCFG_SN76477_SLF_PARAMS(CAP_U(22), RES_K(750))  // switchable C4, switchable R13/R12
-	MCFG_SN76477_ONESHOT_PARAMS(0, RES_INF)         // NC, switchable R11
-	MCFG_SN76477_VCO_MODE(0)                        // switchable
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)              // switchable, GND, GND
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)              // Vreg, GND
-	MCFG_SN76477_ENABLE(0)                          // switchable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));	// R18, R17, C8
+	m_sn->set_decay_res(RES_M(3.3));							// R16
+	m_sn->set_attack_params(CAP_U(0.47), RES_K(15));			// C7, R20
+	m_sn->set_amp_res(RES_K(100));								// R19
+	m_sn->set_feedback_res(RES_K(39));							// R7
+	m_sn->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270));	// R15/R14, C5, switchable R5/R3/R4
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(22), RES_K(750));	// switchable C4, switchable R13/R12
+	m_sn->set_oneshot_params(0, RES_INF);			// NC, switchable R11
+	m_sn->set_vco_mode(0);							// switchable
+	m_sn->set_mixer_params(0, 0, 0);				// switchable, GND, GND
+	m_sn->set_envelope_params(1, 0);				// Vreg, GND
+	m_sn->set_enable(0);							// switchable
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.35);
+}
 
 
 

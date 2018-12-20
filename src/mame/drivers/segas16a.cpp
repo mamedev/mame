@@ -2092,7 +2092,7 @@ void segas16a_state::system16a_no7751p(machine_config &config)
 	z80.set_addrmap(AS_PROGRAM, &segas16a_state::sound_map);
 	z80.set_addrmap(AS_IO, &segas16a_state::sound_no7751_portmap);
 	z80.set_addrmap(AS_OPCODES, &segas16a_state::sound_decrypted_opcodes_map);
-	z80.set_decrypted_tag(":sound_decrypted_opcodes");
+	z80.set_decrypted_tag(m_sound_decrypted_opcodes);
 }
 
 /*

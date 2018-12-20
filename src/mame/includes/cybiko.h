@@ -17,6 +17,8 @@
 #ifndef MAME_INCLUDES_CYBIKO_H
 #define MAME_INCLUDES_CYBIKO_H
 
+#include "bus/rs232/rs232.h"
+
 #include "cpu/h8/h8s2245.h"
 #include "cpu/h8/h8s2320.h"
 
@@ -46,6 +48,7 @@ public:
 		, m_flash1(*this, "flash1")
 		, m_nvram(*this, "nvram")
 		, m_input(*this, "A.%u", 0)
+		, m_debug_serial(*this, "debug_serial")
 	{ }
 
 	DECLARE_WRITE16_MEMBER(serflash_w);
@@ -66,7 +69,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cybiko_usb_w);
 	int cybiko_key_r( offs_t offset, int mem_mask);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<h8_device> m_maincpu;
 	required_device<hd66421_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pcf8593_device> m_rtc;
@@ -74,6 +77,7 @@ public:
 	optional_device<at45db041_device> m_flash1;
 	required_device<nvram_device>   m_nvram;
 	optional_ioport_array<15> m_input;
+	required_device<rs232_port_device> m_debug_serial;
 	void init_cybikoxt();
 	void init_cybiko();
 	virtual void machine_start() override;

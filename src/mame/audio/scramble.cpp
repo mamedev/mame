@@ -263,25 +263,25 @@ void scramble_state::ad2083_sound_io_map(address_map &map)
 	map(0x80, 0x80).w("ay2", FUNC(ay8910_device::address_w));
 }
 
-MACHINE_CONFIG_START(scramble_state::ad2083_audio)
+void scramble_state::ad2083_audio(machine_config &config)
+{
+	Z80(config, m_audiocpu, 14318000/8);   /* 1.78975 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scramble_state::ad2083_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &scramble_state::ad2083_sound_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ad2083_sound_map)
-	MCFG_DEVICE_IO_MAP(ad2083_sound_io_map)
-
-	MCFG_DEVICE_ADD("tmsprom", TMSPROM, AD2083_TMS5110_CLOCK / 2)  /* rom clock */
-	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
-	MCFG_TMSPROM_ROM_SIZE(0x1000)   /* individual rom_size */
-	MCFG_TMSPROM_PDC_BIT(1)         /* bit # of pdc line */
+	TMSPROM(config, m_tmsprom, AD2083_TMS5110_CLOCK / 2);  /* rom clock */
+	m_tmsprom->set_region("5110ctrl"); /* prom memory region - sound region is automatically assigned */
+	m_tmsprom->set_rom_size(0x1000);   /* individual rom_size */
+	m_tmsprom->set_pdc_bit(1);         /* bit # of pdc line */
 	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	MCFG_TMSPROM_CTL1_BIT(8)        /* bit # of ctl1 line */
-	MCFG_TMSPROM_CTL2_BIT(2)        /* bit # of ctl2 line */
-	MCFG_TMSPROM_CTL4_BIT(8)        /* bit # of ctl4 line */
-	MCFG_TMSPROM_CTL8_BIT(2)        /* bit # of ctl8 line */
-	MCFG_TMSPROM_RESET_BIT(6)       /* bit # of rom reset */
-	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
-	MCFG_TMSPROM_PDC_CB(WRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
-	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
+	m_tmsprom->set_ctl1_bit(8);        /* bit # of ctl1 line */
+	m_tmsprom->set_ctl2_bit(2);        /* bit # of ctl2 line */
+	m_tmsprom->set_ctl4_bit(8);        /* bit # of ctl4 line */
+	m_tmsprom->set_ctl8_bit(2);        /* bit # of ctl8 line */
+	m_tmsprom->set_reset_bit(6);       /* bit # of rom reset */
+	m_tmsprom->set_stop_bit(7);        /* bit # of stop */
+	m_tmsprom->pdc().set("tms", FUNC(tms5110_device::pdc_w)); /* tms pdc func */
+	m_tmsprom->ctl().set("tms", FUNC(tms5110_device::ctl_w)); /* tms ctl func */
 
 	SPEAKER(config, "mono").front_center();
 
@@ -295,8 +295,8 @@ MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 	ay2.port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
-	MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
-	MCFG_TMS5110_DATA_CB(READLINE("tmsprom", tmsprom_device, data_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	tms5110a_device &tms(TMS5110A(config, "tms", AD2083_TMS5110_CLOCK));
+	tms.m0().set("tmsprom", FUNC(tmsprom_device::m0_w));
+	tms.data().set("tmsprom", FUNC(tmsprom_device::data_r));
+	tms.add_route(ALL_OUTPUTS, "mono", 1.0);
+}

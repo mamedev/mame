@@ -1179,7 +1179,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
@@ -1267,7 +1267,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);

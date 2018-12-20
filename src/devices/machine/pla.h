@@ -51,13 +51,6 @@
 #define MCFG_PLS100_ADD(tag) \
 	MCFG_DEVICE_ADD((tag), PLS100)
 
-// MOS 8721 PLA
-// TODO: actual number of terms is unknown
-#define MCFG_MOS8721_ADD(tag) \
-	MCFG_PLA_ADD((tag), 27, 18, 379)
-
-
-
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
@@ -129,14 +122,20 @@ private:
 	} m_term[MAX_TERMS];
 };
 
-
 class pls100_device : public pla_device
 {
 public:
 	pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class mos8721_device : public pla_device
+{
+public:
+	mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 DECLARE_DEVICE_TYPE(PLA, pla_device)
 DECLARE_DEVICE_TYPE(PLS100, pls100_device)
+DECLARE_DEVICE_TYPE(MOS8721, mos8721_device)
 
 #endif // MAME_MACHINE_PLA_H

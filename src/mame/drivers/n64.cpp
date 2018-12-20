@@ -467,8 +467,7 @@ void n64_mess_state::n64(machine_config &config)
 	N64PERIPH(config, m_rcp_periphs, 0);
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart"));
-	cartslot.set_extensions("v64,z64,rom,n64,bin");
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));
 	cartslot.set_must_be_loaded(true);
 	cartslot.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64_cart, this));
 

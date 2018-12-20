@@ -140,35 +140,35 @@ static const char *const starcrus_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(starcrus_state::starcrus)
-
+void starcrus_state::starcrus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
-	MCFG_DEVICE_PROGRAM_MAP(starcrus_map)
-	MCFG_DEVICE_IO_MAP(starcrus_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starcrus_state,  irq0_line_hold)
+	I8080(config, m_maincpu, 9750000/9);  /* 8224 chip is a divide by 9 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &starcrus_state::starcrus_map);
+	m_maincpu->set_addrmap(AS_IO, &starcrus_state::starcrus_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(starcrus_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(starcrus_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starcrus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_starcrus);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(starcrus_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(starcrus_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

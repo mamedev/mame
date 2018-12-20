@@ -32,7 +32,8 @@ public:
 		m_inputs(*this, "INPUTS"),
 		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
-		m_ppu(*this, "ppu")
+		m_ppu(*this, "ppu"),
+		m_palette(*this, "palette")
 	{ }
 
 	uint8_t       m_gb_io[0x10];
@@ -116,6 +117,7 @@ protected:
 	required_ioport m_bios_hack;
 	optional_device<ram_device> m_ram;
 	required_device<dmg_ppu_device> m_ppu;
+	required_device<palette_device> m_palette;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();

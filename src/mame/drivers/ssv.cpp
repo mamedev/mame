@@ -2516,68 +2516,64 @@ void ssv_state::init_jsk()          { init(0); save_item(NAME(m_latches)); }
 #define SSV_VBEND 0
 #define SSV_VBSTART 0xf0
 
-MACHINE_CONFIG_START(ssv_state::ssv)
-
+void ssv_state::ssv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,irq_callback)
+	V60(config, m_maincpu, SSV_MASTER_CLOCK); /* Based on STA-0001 & STA-0001B System boards */
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ssv_state::irq_callback));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ssv_state::interrupt), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(SSV_PIXEL_CLOCK,SSV_HTOTAL,SSV_HBEND,SSV_HBSTART,SSV_VTOTAL,SSV_VBEND,SSV_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(SSV_PIXEL_CLOCK,SSV_HTOTAL,SSV_HBEND,SSV_HBSTART,SSV_VTOTAL,SSV_VBEND,SSV_VBSTART);
+	m_screen->set_screen_update(FUNC(ssv_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssv)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssv);
+	PALETTE(config, m_palette, 0x8000).set_format(PALETTE_FORMAT_XRGB);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
-	MCFG_ES5506_REGION0("ensoniq.0")
-	MCFG_ES5506_REGION1("ensoniq.1")
-	MCFG_ES5506_REGION2("ensoniq.2")
-	MCFG_ES5506_REGION3("ensoniq.3")
-	MCFG_ES5506_CHANNELS(1)               /* channels */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.1)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
-MACHINE_CONFIG_END
+	ES5506(config, m_ensoniq, SSV_MASTER_CLOCK);
+	m_ensoniq->set_region0("ensoniq.0");
+	m_ensoniq->set_region1("ensoniq.1");
+	m_ensoniq->set_region2("ensoniq.2");
+	m_ensoniq->set_region3("ensoniq.3");
+	m_ensoniq->set_channels(1);
+	m_ensoniq->add_route(0, "lspeaker", 0.1);
+	m_ensoniq->add_route(1, "rspeaker", 0.1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::drifto94)
+void ssv_state::drifto94(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(drifto94_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::drifto94_map);
 
-	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000) /* TODO: correct? */
-	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
-	MCFG_DEVICE_DATA_MAP(dsp_data_map)
+	UPD96050(config, m_dsp, 10000000); /* TODO: correct? */
+	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
+	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcd-0x25)*2-1, 0, (0x101-0x13)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcd-0x25)*2-1, 0, (0x101-0x13)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::gdfs)
+void ssv_state::gdfs(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gdfs_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::gdfs_map);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	ADC0809(config, m_adc, 1000000); // unknown clock
 	m_adc->in_callback<0>().set_ioport("GUNX1");
@@ -2587,214 +2583,190 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	m_adc->eoc_callback().set(FUNC(ssv_state::gdfs_adc_int_w));
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_gdfs)
+	m_screen->set_visarea(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1);
+	m_screen->set_screen_update(FUNC(ssv_state::screen_update_gdfs));
 
 	ST0020_SPRITES(config, m_gdfs_st0020, 0);
 	m_gdfs_st0020->set_palette(m_palette);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gdfs)
+	m_gfxdecode->set_info(gfx_gdfs);
+
 	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(ssv_state::hypreact)
+void ssv_state::hypreact(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hypreact_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::hypreact_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x22)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcb-0x22)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::hypreac2)
+void ssv_state::hypreac2(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hypreac2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::hypreac2_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x22)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcb-0x22)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::janjans1)
+void ssv_state::janjans1(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(janjans1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::janjans1_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::keithlcy)
+void ssv_state::keithlcy(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(keithlcy_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::keithlcy_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcd-0x25)*2-1, 0, (0x101 - 0x13)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcd-0x25)*2-1, 0, (0x101 - 0x13)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::meosism)
+void ssv_state::meosism(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(meosism_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::meosism_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0xfe - 0x12)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd5-0x2c)*2-1, 0, (0xfe - 0x12)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::mslider)
+void ssv_state::mslider(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mslider_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::mslider_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::ryorioh)
+void ssv_state::ryorioh(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::ryorioh_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-MACHINE_CONFIG_START(ssv_state::vasara)
+void ssv_state::vasara(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::ryorioh_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcc-0x24)*2-1, 0,(0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcc-0x24)*2-1, 0,(0xfe - 0x0e)-1);
+}
 
-MACHINE_CONFIG_START(ssv_state::srmp4)
+void ssv_state::srmp4(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(srmp4_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::srmp4_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::srmp7)
+void ssv_state::srmp7(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(srmp7_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::srmp7_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0xfd - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0xfd - 0x0e)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::stmblade)
+void ssv_state::stmblade(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(drifto94_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::drifto94_map);
 
-	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
-	MCFG_DEVICE_DATA_MAP(dsp_data_map)
+	UPD96050(config, m_dsp, 10000000);
+	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
+	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::survarts)
+void ssv_state::survarts(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(survarts_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::survarts_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::dynagear)
+void ssv_state::dynagear(machine_config &config)
+{
 	survarts(config);
 
-	/* basic machine hardware */
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::eaglshot)
+void ssv_state::eaglshot(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(eaglshot_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::eaglshot_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2805,114 +2777,105 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_eaglshot)
+	m_screen->set_visarea(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1);
+	m_screen->set_screen_update(FUNC(ssv_state::screen_update_eaglshot));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_eaglshot)
+	m_gfxdecode->set_info(gfx_eaglshot);
+
 	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(ssv_state::sxyreact)
+void ssv_state::sxyreact(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-MACHINE_CONFIG_START(ssv_state::sxyreac2)
+void ssv_state::sxyreac2(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-MACHINE_CONFIG_START(ssv_state::cairblad)
+void ssv_state::cairblad(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::sxyreact_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
-MACHINE_CONFIG_START(ssv_state::twineag2)
+void ssv_state::twineag2(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(twineag2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::twineag2_map);
 
-	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
-	MCFG_DEVICE_DATA_MAP(dsp_data_map)
+	UPD96050(config, m_dsp, 10000000);
+	m_dsp->set_addrmap(AS_PROGRAM, &ssv_state::dsp_prg_map);
+	m_dsp->set_addrmap(AS_DATA, &ssv_state::dsp_data_map);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1);
+}
 
-
-MACHINE_CONFIG_START(ssv_state::ultrax)
+void ssv_state::ultrax(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ultrax_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::ultrax_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1);
+}
 
-MACHINE_CONFIG_START(ssv_state::jsk)
+void ssv_state::jsk(machine_config &config)
+{
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jsk_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssv_state::jsk_map);
 
-	MCFG_DEVICE_ADD("sub", V810,25000000)
-	MCFG_DEVICE_PROGRAM_MAP(jsk_v810_mem)
+	V810(config, "sub", 25000000).set_addrmap(AS_PROGRAM, &ssv_state::jsk_v810_mem);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xca - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, (0xca - 0x22)*2-1, 0, (0xfe - 0x0e)-1);
+}
 
 
 /***************************************************************************

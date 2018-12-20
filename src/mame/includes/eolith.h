@@ -12,12 +12,12 @@ class eolith_state : public driver_device
 public:
 	eolith_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_qs1000(*this, "qs1000")
-		, m_eepromoutport(*this, "EEPROMOUT")
 		, m_maincpu(*this, "maincpu")
-		, m_soundcpu(*this, "soundcpu")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_qs1000(*this, "qs1000")
+		, m_eepromoutport(*this, "EEPROMOUT")
+		, m_soundcpu(*this, "soundcpu")
 		, m_in0(*this, "IN0")
 		, m_penxport(*this, "PEN_X_P%u", 1)
 		, m_penyport(*this, "PEN_Y_P%u", 1)
@@ -46,6 +46,9 @@ public:
 
 protected:
 
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	optional_device<qs1000_device> m_qs1000;
 	optional_ioport m_eepromoutport;
 	TIMER_DEVICE_CALLBACK_MEMBER(eolith_speedup);
@@ -78,10 +81,7 @@ private:
 
 	void patch_mcu_protection(uint32_t address);
 
-	required_device<cpu_device> m_maincpu;
 	optional_device<i8032_device> m_soundcpu;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 
 	optional_ioport m_in0; // klondkp doesn't have it
 	optional_ioport_array<2> m_penxport;

@@ -192,8 +192,8 @@ MACHINE_CONFIG_START(jonos_state::jonos)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jonos)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(jonos_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(jonos_state::kbd_put));
 MACHINE_CONFIG_END
 
 

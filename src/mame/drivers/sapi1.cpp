@@ -27,6 +27,8 @@ ToDo:
 
 Unable to proceed due to no info available (& in English).
 
+ZPS stands for "Základní Počítačová Sestava" (basic computer system).
+
 ****************************************************************************/
 
 
@@ -623,7 +625,7 @@ void sapi1_state::init_sapizps3b()
 /* Machine driver */
 MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_DEVICE_ADD(m_maincpu, I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_DEVICE_PROGRAM_MAP(sapi1_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
@@ -642,14 +644,15 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sapi1_state::sapi2)
+void sapi1_state::sapi2(machine_config &config)
+{
 	sapi1(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sapi2_mem)
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi2_mem);
+
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(sapi1_state::kbd_put));
+}
 
 MACHINE_CONFIG_START(sapi1_state::sapi3)
 	sapi2(config);

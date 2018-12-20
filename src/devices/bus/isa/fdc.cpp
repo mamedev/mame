@@ -111,7 +111,7 @@ isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const ch
 
 void isa8_fdc_smc_device::device_add_mconfig(machine_config &config)
 {
-	smc37c78_device &smc(SMC37C78(config, m_fdc));
+	smc37c78_device &smc(SMC37C78(config, m_fdc, 24'000'000));
 	smc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	smc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
@@ -124,7 +124,7 @@ isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const ch
 
 void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
 {
-	n82077aa_device &n82077aa(N82077AA(config, m_fdc, n82077aa_device::MODE_PS2));
+	n82077aa_device &n82077aa(N82077AA(config, m_fdc, 24'000'000, n82077aa_device::MODE_PS2));
 	n82077aa.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	n82077aa.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);
@@ -137,7 +137,7 @@ isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, 
 
 void isa8_fdc_superio_device::device_add_mconfig(machine_config &config)
 {
-	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, m_fdc));
+	pc_fdc_superio_device &superio(PC_FDC_SUPERIO(config, m_fdc, 24'000'000));
 	superio.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
 	superio.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats);

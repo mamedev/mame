@@ -97,7 +97,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<mb8841_cpu_device> m_mcu;
 	required_device_array<sn76496_device, 2> m_sn;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;

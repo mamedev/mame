@@ -486,15 +486,20 @@ void pgm_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(pgm_state::pgm)
+void pgm_state::pgm(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL); /* 20 mhz! verified on real board */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_state::basic_mem);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, interrupt, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_state::pgm_basic_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(pgm_state::irq6_line_hold));
+	TIMER(config, "scantimer").configure_scanline(FUNC(pgm_state::pgm_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 33.8688_MHz_XTAL/4)
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
+	Z80(config, m_soundcpu, 33.8688_MHz_XTAL/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &pgm_state::pgm_z80_mem);
+	m_soundcpu->set_addrmap(AS_IO, &pgm_state::pgm_z80_io);
+
+	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
@@ -511,8 +516,9 @@ MACHINE_CONFIG_START(pgm_state::pgm)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pgm);
-	MCFG_PALETTE_ADD_INIT_BLACK(m_palette, 0x1200/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette, 0x1200/2);
+  m_palette->set_init("palette", FUNC(palette_device::palette_init_all_black));
+	m_palette->set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
 
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -521,11 +527,10 @@ MACHINE_CONFIG_START(pgm_state::pgm)
 	GENERIC_LATCH_8(config, "soundlatch2");
 	GENERIC_LATCH_8(config, m_soundlatch3);
 
-	MCFG_ICS2115_ADD("ics", 0)//33.8688_MHz_XTAL
-	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_CONFIG_END
-
+	ICS2115(config, m_ics, 0);//33.8688_MHz_XTAL
+	m_ics->irq().set_inputline("soundcpu", 0);
+	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+}
 
 /*** Rom Loading *************************************************************/
 

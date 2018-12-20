@@ -120,7 +120,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_rtc(*this, "rtc"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void mjdiplob(machine_config &config);
@@ -153,6 +154,7 @@ public:
 	void init_dynax();
 	void init_jansou();
 	void init_suzume();
+	void init_jongshin();
 	void init_ippatsu();
 	void init_mjifb();
 	void init_tontonb();
@@ -174,6 +176,8 @@ private:
 
 	DECLARE_READ8_MEMBER(suzume_dsw_r);
 	DECLARE_WRITE8_MEMBER(suzume_bank_w);
+
+	DECLARE_WRITE8_MEMBER(jongshin_bank_w);
 
 	DECLARE_WRITE8_MEMBER(mjapinky_bank_w);
 	DECLARE_WRITE8_MEMBER(mjapinky_palbank_w);
@@ -294,6 +298,7 @@ private:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<msm6242_device> m_rtc;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_memory_bank m_mainbank;
 
 	// used by most games
 	uint8_t m_input_port_select;
@@ -505,7 +510,7 @@ READ8_MEMBER(royalmah_state::suzume_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::tahjong_bank_w)
 {
-	membank("mainbank")->set_entry(data & 0x01);
+	m_mainbank->set_entry(data & 0x01);
 }
 
 
@@ -517,15 +522,21 @@ WRITE8_MEMBER(royalmah_state::suzume_bank_w)
 
 	/* bits 6, 4 and 3 used for something input related? */
 
-	membank("mainbank")->set_entry(data & 0x07);
+	m_mainbank->set_entry(data & 0x07);
 }
 
+WRITE8_MEMBER(royalmah_state::jongshin_bank_w)
+{
+	logerror("%04x: bank %02x\n",m_maincpu->pc(),data);
+
+	m_mainbank->set_entry((data & 0x07) >> 1);
+}
 
 WRITE8_MEMBER(royalmah_state::mjapinky_bank_w)
 {
 	m_rombank = data;
 
-	membank("mainbank")->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
@@ -548,7 +559,7 @@ WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
 
 	if (data == 0) return;  // tontonb fix?
 
-	membank("mainbank")->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & 0x0f);
 }
 
 
@@ -559,7 +570,7 @@ WRITE8_MEMBER(royalmah_state::dynax_bank_w)
 
 	m_dsw_select = data & 0x60;
 
-	membank("mainbank")->set_entry(data & 0x1f);
+	m_mainbank->set_entry(data & 0x1f);
 }
 
 READ8_MEMBER(royalmah_state::daisyari_dsw_r)
@@ -585,7 +596,7 @@ WRITE8_MEMBER(royalmah_state::daisyari_bank_w)
 	address = 0x10000 + ((data & 0x30)>>4) * 0x10000 + (data & 0x1) * 0x8000;
 //  printf("%08x %02x\n",address,data);
 
-	membank("mainbank")->set_base(&rom[address]);
+	m_mainbank->set_base(&rom[address]);
 
 	/* bit 1 used too but unknown purpose. */
 }
@@ -607,7 +618,7 @@ WRITE8_MEMBER(royalmah_state::mjclub_bank_w)
 {
 	m_dsw_select = data & 0xc0;
 
-	membank("mainbank")->set_entry(data & 0x0f);
+	m_mainbank->set_entry(data & 0x0f);
 
 	/* bit 5 used too but unknown purpose. */
 }
@@ -617,7 +628,7 @@ void royalmah_state::royalmah_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom().nopw();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).bankr("mainbank");    // banked ROMs not present in royalmah
+	map(0x8000, 0xffff).bankr(m_mainbank);    // banked ROMs not present in royalmah
 	map(0x8000, 0xffff).writeonly().share("videoram");
 }
 
@@ -626,7 +637,7 @@ void royalmah_state::mjapinky_map(address_map &map)
 	map(0x0000, 0x6fff).rom().nopw();
 	map(0x7000, 0x77ff).ram().share("nvram");
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr(m_mainbank);
 	map(0x8000, 0xffff).writeonly().share("videoram");
 	map(0x8000, 0x8000).r(FUNC(royalmah_state::mjapinky_dsw_r));
 }
@@ -634,7 +645,7 @@ void royalmah_state::mjapinky_map(address_map &map)
 void royalmah_state::tahjong_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();
-	map(0x4000, 0x6fff).bankr("mainbank");
+	map(0x4000, 0x6fff).bankr(m_mainbank);
 	map(0x7000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xffff).writeonly().share("videoram");
 }
@@ -720,7 +731,7 @@ void royalmah_state::jongshin_iomap(address_map &map)
 	// map(0x80, 0x80).w(FUNC(royalmah_state::???)); // set to 1 at start-up, then never changed?
 	map(0x81, 0x81).portr("DSW2");
 	map(0x82, 0x82).portr("DSW3");
-	map(0xc0, 0xc0).w(FUNC(royalmah_state::suzume_bank_w));
+	map(0xc0, 0xc0).w(FUNC(royalmah_state::jongshin_bank_w));
 }
 
 void royalmah_state::mjyarou_iomap(address_map &map)
@@ -984,7 +995,7 @@ void royalmah_state::janptr96_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).bankrw("bank3").share("nvram");    // nvram
 	map(0x7000, 0x7fff).bankrw("rambank");  // banked nvram
-	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr(m_mainbank);
 	map(0x8000, 0xffff).writeonly().share("videoram");
 }
 
@@ -1007,7 +1018,7 @@ READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 
 WRITE8_MEMBER(royalmah_state::janptr96_rombank_w)
 {
-	membank("mainbank")->set_entry(data & 0x3f);
+	m_mainbank->set_entry(data & 0x3f);
 }
 
 WRITE8_MEMBER(royalmah_state::janptr96_rambank_w)
@@ -1216,7 +1227,7 @@ READ8_MEMBER(royalmah_state::mjtensin_p3_r)
 
 void royalmah_state::mjtensin_update_rombank()
 {
-	membank("mainbank")->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
+	m_mainbank->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::mjtensin_p4_w)
 {
@@ -1242,7 +1253,7 @@ void royalmah_state::mjtensin_map(address_map &map)
 	map(0x6ff1, 0x6ff1).w(FUNC(royalmah_state::mjderngr_palbank_w));
 	map(0x6ff3, 0x6ff3).w(FUNC(royalmah_state::mjtensin_6ff3_w));
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr(m_mainbank);
 	map(0x8000, 0xffff).writeonly().share("videoram");
 }
 
@@ -1253,7 +1264,7 @@ void royalmah_state::mjtensin_map(address_map &map)
 
 void royalmah_state::cafetime_update_rombank()
 {
-	membank("mainbank")->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
+	m_mainbank->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::cafetime_p4_w)
 {
@@ -1308,7 +1319,7 @@ void royalmah_state::cafetime_map(address_map &map)
 	map(0x7fe3, 0x7fe3).w(FUNC(royalmah_state::cafetime_7fe3_w));
 	map(0x7fe4, 0x7fe4).r(FUNC(royalmah_state::cafetime_7fe4_r));
 	map(0x7ff0, 0x7fff).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x8000, 0xffff).bankr("mainbank");
+	map(0x8000, 0xffff).bankr(m_mainbank);
 	map(0x8000, 0xffff).writeonly().share("videoram");
 }
 
@@ -3997,9 +4008,9 @@ ROM_START( jongshin )
 	ROM_LOAD( "js5.p5",     0x04000, 0x1000, CRC(4631153f) SHA1(d31e15de3d54118905946836e72b4794dae89004) )
 	ROM_LOAD( "js6.p6",     0x05000, 0x1000, CRC(ed32bd57) SHA1(6d5d1ae959e07207146197c7c370810306dca462) )
 	/* bank switched ROMs follow */
-	ROM_LOAD( "dyna 3.6c",       0x10000, 0x04000, CRC(b716f2e1) SHA1(f29617185771a43f057dff062a2493bcf281c85a) ) // 27128
-	ROM_LOAD( "dyna 1.8c",       0x18000, 0x08000, CRC(d2cea54a) SHA1(16143974731d3b81ad377ebe58c9253c127e5588) ) // 27256
-	ROM_LOAD( "dyna 2.7c",       0x20000, 0x08000, CRC(9d7c62ff) SHA1(92de7bb84f6f64b887b5500a54ff6f0b84e0b07d) ) // 27256
+	ROM_LOAD( "dyna 1.8c",       0x10000, 0x08000, CRC(d2cea54a) SHA1(16143974731d3b81ad377ebe58c9253c127e5588) ) // 27256
+	ROM_LOAD( "dyna 2.7c",       0x18000, 0x08000, CRC(9d7c62ff) SHA1(92de7bb84f6f64b887b5500a54ff6f0b84e0b07d) ) // 27256
+	ROM_LOAD( "dyna 3.6c",       0x20000, 0x04000, CRC(b716f2e1) SHA1(f29617185771a43f057dff062a2493bcf281c85a) ) // 27128
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.6k",   0x0000, 0x0020, CRC(faa20ce5) SHA1(408e90c13d5bd5fefdd9767a7643808a3cd9c111) )
@@ -5250,7 +5261,7 @@ ROM_END
 
 void royalmah_state::init_tahjong()
 {
-	membank("mainbank")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 void royalmah_state::init_jansou()
@@ -5266,19 +5277,24 @@ void royalmah_state::init_jansou()
 
 void royalmah_state::init_dynax()
 {
-	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x8000);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
 void royalmah_state::init_ippatsu()
 {
-	membank("mainbank")->set_base(memregion("maincpu")->base() + 0x8000 );
+	m_mainbank->set_base(memregion("maincpu")->base() + 0x8000 );
 }
 
 void royalmah_state::init_suzume()
 {
-	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x8000);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_suzume_bank));
+}
+
+void royalmah_state::init_jongshin()
+{
+	m_mainbank->configure_entries(0, 3, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
 void royalmah_state::init_mjifb()
@@ -5288,12 +5304,12 @@ void royalmah_state::init_mjifb()
 
 void royalmah_state::init_tontonb()
 {
-	membank("mainbank")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x8000);
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
 void royalmah_state::init_janptr96()
 {
-	membank("mainbank")->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x8000);
+	m_mainbank->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	m_janptr96_nvram = std::make_unique<uint8_t[]>(0x1000 * 9);
 	membank("bank3")->set_base(m_janptr96_nvram.get());
@@ -5320,7 +5336,7 @@ GAME( 1986,  jangtaku, 0,        jansou,   jansou,   royalmah_state, init_jansou
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, init_ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
-GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     0 )
+GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_jongshin, ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     0 )
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, royalmah_state, empty_init,    ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, empty_init,    ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown

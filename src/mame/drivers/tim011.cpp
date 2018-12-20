@@ -140,8 +140,8 @@ MACHINE_CONFIG_START(tim011_state::tim011)
 
 //  MCFG_DEVICE_ADD("keyboard",CDP1802, XTAL(1'750'000)) // CDP1802, unknown clock
 
-	// FDC9266 location U43 XTAL(8'000'000)
-	UPD765A(config, m_fdc, true, true);
+	// FDC9266 location U43
+	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	/* floppy drives */

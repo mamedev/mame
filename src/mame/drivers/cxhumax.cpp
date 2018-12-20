@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
+	GENERIC_TERMINAL(config, m_terminal, 0);
 MACHINE_CONFIG_END
 
 ROM_START( hxhdci2k )

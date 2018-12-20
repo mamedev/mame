@@ -312,7 +312,7 @@ void zrt80_state::zrt80(machine_config &config)
 	m_8250->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(KEYBOARDCB_PUT(zrt80_state, kbd_put));
+	keyboard.set_keyboard_callback(FUNC(zrt80_state::kbd_put));
 }
 
 /* ROM definition */

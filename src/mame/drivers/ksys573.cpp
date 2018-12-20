@@ -386,6 +386,8 @@ public:
 		m_psxirq(*this, "maincpu:irq"),
 		m_ata(*this, "ata"),
 		m_image(*this, "ata:0:cr589"),
+		m_pccard1(*this, "pccard1"),
+		m_pccard2(*this, "pccard2"),
 		m_h8_response(*this, "h8_response"),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
@@ -557,6 +559,8 @@ private:
 
 	required_device<ata_interface_device> m_ata;
 	optional_device<atapi_hle_device> m_image;
+	required_device<pccard_slot_device> m_pccard1;
+	required_device<pccard_slot_device> m_pccard2;
 	cdrom_file *m_available_cdroms[ 2 ];
 	emu_timer *m_atapi_timer;
 	int m_atapi_xferbase;
@@ -2081,54 +2085,51 @@ double ksys573_state::analogue_inputs_callback(uint8_t input)
 
 void ksys573_state::cr589_config(device_t *device)
 {
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 1.0 )
 }
 
-MACHINE_CONFIG_START(ksys573_state::konami573)
+void ksys573_state::konami573(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( konami573_map )
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573_map);
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, this));
 
-	subdevice<ram_device>( "maincpu:ram" )->set_default_size( "4M" );
+	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, this ) )
+	MCFG_MACHINE_RESET_OVERRIDE(ksys573_state, konami573)
 
-	MCFG_MACHINE_RESET_OVERRIDE( ksys573_state, konami573 )
+	MB89371(config, m_duart, 0);
 
-	MCFG_DEVICE_ADD( m_duart, MB89371, 0 )
-
-	MCFG_DEVICE_ADD( m_ata, ATA_INTERFACE, 0 )
-	m_ata->irq_handler().set( FUNC( ksys573_state::ata_interrupt ) );
-
-	MCFG_DEVICE_MODIFY( "ata:0" )
-	MCFG_SLOT_OPTION_ADD( "cr589", CR589 )
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cr589", cr589_config )
-	MCFG_SLOT_DEFAULT_OPTION( "cr589" )
+	ATA_INTERFACE(config, m_ata, 0);
+	m_ata->irq_handler().set(FUNC(ksys573_state::ata_interrupt));
+	m_ata->slot(0).option_add("cr589", CR589);
+	m_ata->slot(0).set_option_machine_config("cr589", cr589_config);
+	m_ata->slot(0).set_default_option("cr589");
 
 	konami573_cassette_slot_device &cassette(KONAMI573_CASSETTE_SLOT(config, "cassette", 0));
 	cassette.dsr_handler().set("maincpu:sio1", FUNC(psxsio1_device::write_dsr));
 
 	// onboard flash
-	FUJITSU_29F016A( config, "29f016a.31m" );
-	FUJITSU_29F016A( config, "29f016a.27m" );
-	FUJITSU_29F016A( config, "29f016a.31l" );
-	FUJITSU_29F016A( config, "29f016a.27l" );
-	FUJITSU_29F016A( config, "29f016a.31j" );
-	FUJITSU_29F016A( config, "29f016a.27j" );
-	FUJITSU_29F016A( config, "29f016a.31h" );
-	FUJITSU_29F016A( config, "29f016a.27h" );
+	FUJITSU_29F016A(config, "29f016a.31m");
+	FUJITSU_29F016A(config, "29f016a.27m");
+	FUJITSU_29F016A(config, "29f016a.31l");
+	FUJITSU_29F016A(config, "29f016a.27l");
+	FUJITSU_29F016A(config, "29f016a.31j");
+	FUJITSU_29F016A(config, "29f016a.27j");
+	FUJITSU_29F016A(config, "29f016a.31h");
+	FUJITSU_29F016A(config, "29f016a.27h");
 
-	MCFG_DEVICE_ADD( "pccard1", PCCARD_SLOT, 0 )
-	MCFG_DEVICE_ADD( "pccard2", PCCARD_SLOT, 0 )
+	PCCARD_SLOT(config, m_pccard1, 0);
+	PCCARD_SLOT(config, m_pccard2, 0);
 
-	ADDRESS_MAP_BANK( config, m_flashbank ).set_map( &ksys573_state::flashbank_map ).set_options( ENDIANNESS_LITTLE, 16, 32, 0x400000 );
+	ADDRESS_MAP_BANK(config, m_flashbank ).set_map( &ksys573_state::flashbank_map ).set_options( ENDIANNESS_LITTLE, 16, 32, 0x400000);
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, m_maincpu.target()).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(ksys573_state::sys573_vblank));
 
@@ -2136,15 +2137,15 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
+	spu.add_route(0, "lspeaker", 1.0);
+	spu.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
+	M48T58(config, "m48t58", 0);
 
 	adc0834_device &adc(ADC0834(config, "adc0834", 0));
 	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
-MACHINE_CONFIG_END
+}
 
 // Variants with additional digital sound board
 void ksys573_state::k573d(machine_config &config)
@@ -2161,29 +2162,29 @@ void ksys573_state::k573a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573a_map);
 }
 
-MACHINE_CONFIG_START(ksys573_state::pccard1_16mb)
-	MCFG_DEVICE_MODIFY( "pccard1" )
-	MCFG_SLOT_OPTION_ADD( "16mb", LINEAR_FLASH_PCCARD_16MB )
-	MCFG_SLOT_DEFAULT_OPTION( "16mb" )
-MACHINE_CONFIG_END
+void ksys573_state::pccard1_16mb(machine_config &config)
+{
+	m_pccard1->option_add("16mb", LINEAR_FLASH_PCCARD_16MB);
+	m_pccard1->set_default_option("16mb");
+}
 
-MACHINE_CONFIG_START(ksys573_state::pccard1_32mb)
-	MCFG_DEVICE_MODIFY( "pccard1" )
-	MCFG_SLOT_OPTION_ADD( "32mb", LINEAR_FLASH_PCCARD_32MB )
-	MCFG_SLOT_DEFAULT_OPTION( "32mb" )
-MACHINE_CONFIG_END
+void ksys573_state::pccard1_32mb(machine_config &config)
+{
+	m_pccard1->option_add("32mb", LINEAR_FLASH_PCCARD_32MB);
+	m_pccard1->set_default_option("32mb");
+}
 
-MACHINE_CONFIG_START(ksys573_state::pccard2_32mb)
-	MCFG_DEVICE_MODIFY( "pccard2" )
-	MCFG_SLOT_OPTION_ADD( "32mb", LINEAR_FLASH_PCCARD_32MB )
-	MCFG_SLOT_DEFAULT_OPTION( "32mb" )
-MACHINE_CONFIG_END
+void ksys573_state::pccard2_32mb(machine_config &config)
+{
+	m_pccard2->option_add("32mb", LINEAR_FLASH_PCCARD_32MB);
+	m_pccard2->set_default_option("32mb");
+}
 
-MACHINE_CONFIG_START(ksys573_state::pccard2_64mb)
-	MCFG_DEVICE_MODIFY( "pccard2" )
-	MCFG_SLOT_OPTION_ADD( "64mb", LINEAR_FLASH_PCCARD_64MB )
-	MCFG_SLOT_DEFAULT_OPTION( "64mb" )
-MACHINE_CONFIG_END
+void ksys573_state::pccard2_64mb(machine_config &config)
+{
+	m_pccard2->option_add("64mb", LINEAR_FLASH_PCCARD_64MB);
+	m_pccard2->set_default_option("64mb");
+}
 
 // Security eeprom variants
 //
@@ -2248,13 +2249,14 @@ void ksys573_state::ddr(machine_config &config)
 	cassx(config);
 }
 
-MACHINE_CONFIG_START(ksys573_state::ddr2ml)
+void ksys573_state::ddr2ml(machine_config &config)
+{
 	k573a(config);
-	MCFG_DEVICE_ADD( "k573mcr", KONAMI_573_MEMORY_CARD_READER, 0 )
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0);
 
 	pccard1_16mb(config);
 	cassx(config);
-MACHINE_CONFIG_END
+}
 
 void ksys573_state::ddr3m(machine_config &config)
 {
@@ -2365,14 +2367,15 @@ void ksys573_state::drmn2m(machine_config &config)
 	cassxzi(config);
 }
 
-MACHINE_CONFIG_START(ksys573_state::drmn4m)
+void ksys573_state::drmn4m(machine_config &config)
+{
 	k573d(config);
 	subdevice<k573dio_device>("k573dio")->output_callback().set(FUNC(ksys573_state::drmn_output_callback));
 
 	casszi(config);
 
-	MCFG_DEVICE_ADD( "k573msu", KONAMI_573_MULTI_SESSION_UNIT, 0 )
-MACHINE_CONFIG_END
+	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+}
 
 // Guitar Freaks
 
@@ -2410,10 +2413,11 @@ void ksys573_state::gtrfrk7m(machine_config &config)
 	pccard1_32mb(config);
 }
 
-MACHINE_CONFIG_START(ksys573_state::gtfrk10mb)
+void ksys573_state::gtfrk10mb(machine_config &config)
+{
 	gtrfrk7m(config);
-	MCFG_DEVICE_ADD( "k573npu", KONAMI_573_NETWORK_PCB_UNIT, 0 )
-MACHINE_CONFIG_END
+	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+}
 
 // Miscellaneous
 
@@ -2508,10 +2512,11 @@ void ksys573_state::mamboagg(machine_config &config)
 	casszi(config);
 }
 
-MACHINE_CONFIG_START(ksys573_state::mamboagga)
+void ksys573_state::mamboagga(machine_config &config)
+{
 	mamboagg(config);
-	MCFG_DEVICE_ADD( "k573npu", KONAMI_573_NETWORK_PCB_UNIT, 0 )
-MACHINE_CONFIG_END
+	KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+}
 
 
 static INPUT_PORTS_START( konami573 )

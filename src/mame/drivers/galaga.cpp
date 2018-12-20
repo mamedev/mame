@@ -1585,17 +1585,17 @@ WRITE_LINE_MEMBER(galaga_state::vblank_irq)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(bosco_state::bosco)
-
+void bosco_state::bosco(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bosco_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bosco_state::bosco_map);
 
-	MCFG_DEVICE_ADD("sub", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bosco_map)
+	Z80(config, m_subcpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &bosco_state::bosco_map);
 
-	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bosco_map)
+	Z80(config, m_subcpu2, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &bosco_state::bosco_map);
 
 	ls259_device &misclatch(LS259(config, "misclatch")); // 3C on CPU board
 	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
@@ -1650,8 +1650,8 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	//m_videolatch->q_out_cb<7>().append("52xx", FUNC(namco_52xx_device, reset_w));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
-							/* synchronization of the CPUs */
+
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1661,35 +1661,35 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
 	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bosco)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4+4+64)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
-	MCFG_PALETTE_INIT_OWNER(bosco_state,bosco)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bosco);
+	PALETTE(config, m_palette, 64*4+64*4+4+64);
+	m_palette->set_indirect_entries(32+64);
+	m_palette->set_init(FUNC(bosco_state::palette_init_bosco));
+
 	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE, bosco_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", bosco_discrete).add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-MACHINE_CONFIG_START(galaga_state::galaga)
-
+void galaga_state::galaga(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(galaga_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaga_state::galaga_map);
 
-	MCFG_DEVICE_ADD("sub", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(galaga_map)
+	Z80(config, m_subcpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &galaga_state::galaga_map);
 
-	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(galaga_map)
+	Z80(config, m_subcpu2, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &galaga_state::galaga_map);
 
 	ls259_device &misclatch(LS259(config, "misclatch")); // 3C on CPU board
 	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
@@ -1722,8 +1722,8 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	m_videolatch->q_out_cb<7>().set(FUNC(galaga_state::flip_screen_w));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
-							/* synchronization of the CPUs */
+
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1733,25 +1733,26 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	m_screen->screen_vblank().append(FUNC(galaga_state::vblank_irq));
 	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaga)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4+64)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
-	MCFG_PALETTE_INIT_OWNER(galaga_state,galaga)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaga);
+	PALETTE(config, m_palette, 64*4+64*4+64);
+	m_palette->set_indirect_entries(32+64);
+	m_palette->set_init(FUNC(galaga_state::palette_init_galaga));
+
 	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE, galaga_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", galaga_discrete).add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-MACHINE_CONFIG_START(galaga_state::galagab)
+void galaga_state::galagab(machine_config &config)
+{
 	galaga(config);
 
 	/* basic machine hardware */
@@ -1765,33 +1766,33 @@ MACHINE_CONFIG_START(galaga_state::galagab)
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
-	MCFG_DEVICE_ADD("sub3", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(galaga_mem4)
+	z80_device &sub3(Z80(config, "sub3", MASTER_CLOCK/6));   /* 3.072 MHz */
+	sub3.set_addrmap(AS_PROGRAM, &galaga_state::galaga_mem4);
 
 	/* sound hardware */
 	config.device_remove("discrete");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(galaga_state::gatsbee)
+void galaga_state::gatsbee(machine_config &config)
+{
 	galaga(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gatsbee_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaga_state::gatsbee_main_map);
 
 	ls259_device &extralatch(LS259(config, "extralatch"));
 	extralatch.q_out_cb<0>().set(FUNC(galaga_state::gatsbee_bank_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(xevious_state::xevious)
-
+void xevious_state::xevious(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(xevious_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);  /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xevious_state::xevious_map);
 
-	MCFG_DEVICE_ADD("sub", Z80,MASTER_CLOCK/6) /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(xevious_map)
+	Z80(config, m_subcpu, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &xevious_state::xevious_map);
 
-	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(xevious_map)
+	Z80(config, m_subcpu2, MASTER_CLOCK/6);  /* 3.072 MHz */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &xevious_state::xevious_map);
 
 	ls259_device &misclatch(LS259(config, "misclatch")); // 5K
 	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
@@ -1825,35 +1826,36 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* 1000 CPU slices per frame - an high value to ensure proper */
-							/* synchronization of the CPUs */
+
+	config.m_minimum_quantum = attotime::from_hz(60000); /* 1000 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(xevious_state, screen_update_xevious)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
+	m_screen->set_screen_update(FUNC(xevious_state::screen_update_xevious));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(galaga_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xevious)
-	MCFG_PALETTE_ADD("palette", 128*4+64*8+64*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128+1)
-	MCFG_PALETTE_INIT_OWNER(xevious_state,xevious)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xevious);
+	PALETTE(config, m_palette, 128*4+64*8+64*2);
+	m_palette->set_indirect_entries(128+1);
+	m_palette->set_init(FUNC(xevious_state::palette_init_xevious));
+
 	MCFG_VIDEO_START_OVERRIDE(xevious_state,xevious)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE, galaga_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", galaga_discrete).add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
-MACHINE_CONFIG_START(battles_state::battles)
+void battles_state::battles(machine_config &config)
+{
 	xevious(config);
 
 	/* basic machine hardware */
@@ -1867,33 +1869,33 @@ MACHINE_CONFIG_START(battles_state::battles)
 	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
 	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
-	MCFG_DEVICE_ADD("sub3", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(battles_mem4)
+	Z80(config, m_subcpu3, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_subcpu3->set_addrmap(AS_PROGRAM, &battles_state::battles_mem4);
 
 	m_screen->screen_vblank().append(FUNC(battles_state::interrupt_4));
 
-	MCFG_TIMER_DRIVER_ADD("nmi", battles_state, nmi_generate)
+	TIMER(config, "nmi").configure_generic(FUNC(battles_state::nmi_generate));
 
 	/* sound hardware */
 	config.device_remove("discrete");
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(battles_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(battles_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(digdug_state::digdug)
-
+void digdug_state::digdug(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(digdug_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &digdug_state::digdug_map);
 
-	MCFG_DEVICE_ADD("sub", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(digdug_map)
+	Z80(config, m_subcpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &digdug_state::digdug_map);
 
-	MCFG_DEVICE_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(digdug_map)
+	Z80(config, m_subcpu2, MASTER_CLOCK/6);   /* 3.072 MHz */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &digdug_state::digdug_map);
 
 	ls259_device &misclatch(LS259(config, "misclatch")); // 8R
 	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
@@ -1935,42 +1937,43 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	m_videolatch->q_out_cb<3>().set(FUNC(digdug_state::bg_disable_w));
 	m_videolatch->q_out_cb<7>().set(FUNC(digdug_state::flip_screen_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
-							/* synchronization of the CPUs */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(digdug_state, screen_update_digdug)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
+	m_screen->set_screen_update(FUNC(digdug_state::screen_update_digdug));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(galaga_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_digdug)
-	MCFG_PALETTE_ADD("palette", 16*2+64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(digdug_state,digdug)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_digdug);
+	PALETTE(config, m_palette, 16*2+64*4+64*4);
+	m_palette->set_indirect_entries(32);
+	m_palette->set_init(FUNC(digdug_state::palette_init_digdug));
+
 	MCFG_VIDEO_START_OVERRIDE(digdug_state,digdug)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
-MACHINE_CONFIG_END
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
+}
 
-MACHINE_CONFIG_START(digdug_state::dzigzag)
+void digdug_state::dzigzag(machine_config &config)
+{
 	digdug(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_ADD("sub3", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(dzigzag_mem4)
-MACHINE_CONFIG_END
+	z80_device &sub3(Z80(config, "sub3", MASTER_CLOCK/6));   /* 3.072 MHz */
+	sub3.set_addrmap(AS_PROGRAM, &digdug_state::dzigzag_mem4);
+}
 
 
 

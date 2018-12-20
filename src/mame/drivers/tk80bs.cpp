@@ -194,8 +194,8 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	m_ppi->in_pa_callback().set(FUNC(tk80bs_state::port_a_r));
 	m_ppi->in_pb_callback().set(FUNC(tk80bs_state::port_b_r));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(tk80bs_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(tk80bs_state::kbd_put));
 MACHINE_CONFIG_END
 
 

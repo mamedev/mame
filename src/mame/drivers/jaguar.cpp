@@ -1838,19 +1838,19 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(jaguar_state::cojagr3k)
-
+void jaguar_state::cojagr3k(machine_config &config)
+{
 	/* basic machine hardware */
 	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
-	MCFG_DEVICE_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(gpu_map)
+	JAGUARGPU(config, m_gpu, COJAG_CLOCK/2);
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::gpu_map);
 
-	MCFG_DEVICE_ADD("dsp", JAGUARDSP, COJAG_CLOCK/2)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(dsp_map)
+	JAGUARDSP(config, m_dsp, COJAG_CLOCK/2);
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::dsp_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1860,108 +1860,106 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 	m_ide->irq_handler().set(FUNC(jaguar_state::external_int));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
-	MCFG_SCREEN_UPDATE_DRIVER(jaguar_state,screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257);
+	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(jaguar_state::cojagr3k_rom)
+void jaguar_state::cojagr3k_rom(machine_config &config)
+{
 	cojagr3k(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(r3000_rom_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_rom_map);
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::gpu_rom_map);
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::dsp_rom_map);
 
-	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_DEVICE_PROGRAM_MAP(gpu_rom_map)
+	m_ide->slot(0).set_default_option(nullptr);
+}
 
-	MCFG_DEVICE_MODIFY("dsp")
-	MCFG_DEVICE_PROGRAM_MAP(dsp_rom_map)
-
-	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(jaguar_state::cojag68k)
+void jaguar_state::cojag68k(machine_config &config)
+{
 	cojagr3k(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68EC020, M68K_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(m68020_map)
-MACHINE_CONFIG_END
+	M68EC020(config.replace(), m_maincpu, M68K_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::m68020_map);
+}
 
-
-MACHINE_CONFIG_START(jaguar_state::jaguar)
-
+void jaguar_state::jaguar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(jaguar_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jaguar_state,jaguar_irq_callback)
+	M68000(config, m_maincpu, JAGUAR_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(jaguar_state::jaguar_irq_callback));
 
-	MCFG_DEVICE_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jag_gpu_map)
+	JAGUARGPU(config, m_gpu, JAGUAR_CLOCK);
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_map);
 
-	MCFG_DEVICE_ADD("dsp", JAGUARDSP, JAGUAR_CLOCK)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jag_dsp_map)
+	JAGUARDSP(config, m_dsp, JAGUAR_CLOCK);
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::jag_dsp_map);
 
 //  MCFG_NVRAM_HANDLER(jaguar)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257)
-	MCFG_SCREEN_UPDATE_DRIVER(jaguar_state,screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
+	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jaguar_state, jaguar, "abs,bin,cof,jag,prg", 2)
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jaguar_state, jaguar), this), "abs,bin,cof,jag,prg", 0);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "jaguar_cart")
-	MCFG_GENERIC_EXTENSIONS("j64,rom,bin")
-	MCFG_GENERIC_LOAD(jaguar_state, jaguar_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));
+	cartslot.set_device_load(device_image_load_delegate(&jaguar_state::device_image_load_jaguar_cart, this));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
+	SOFTWARE_LIST(config, "cart_list").set_original("jaguar");
 
-	EEPROM_93C46_16BIT(config, "eeprom");
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, m_eeprom);
+}
 
-MACHINE_CONFIG_START(jaguar_state::jaguarcd)
+void jaguar_state::jaguarcd(machine_config &config)
+{
 	jaguar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jaguarcd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguarcd_map);
 
-	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jagcd_gpu_map)
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::jagcd_gpu_map);
 
-	MCFG_DEVICE_MODIFY("dsp")
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jagcd_dsp_map)
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::jagcd_dsp_map);
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("jag_cdrom")
-MACHINE_CONFIG_END
+	CDROM(config, "cdrom").set_interface("jag_cdrom");
+}
 
 /*************************************
  *

@@ -94,7 +94,7 @@ NOTE: Mask ROMs from Power Flipper Pinball Shooting have not been dumped, but as
 
 TIMER_DEVICE_CALLBACK_MEMBER(gcpinbal_state::scanline_cb)
 {
-	
+
 	if (param>=16)
 		m_screen->update_partial(m_screen->vpos()-1);
 
@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
-	
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gcpinbal_state, scanline_cb, "screen", 0, 1)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -385,15 +385,15 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_RESET_HANDLER(INPUTLINE("maincpu", 3))
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	ES8712(config, m_essnd, 0);
+	m_essnd->reset_handler().set_inputline("maincpu", 3);
+	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
+	m_essnd->set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL)
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL));
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm6585_device::S40); /* 16 kHz */
+	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

@@ -41,7 +41,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
 	required_device<hd44780_device> m_lcdc1;
 	required_device<nvram_device> m_nvram;
@@ -433,10 +433,10 @@ void alphasmart_state::machine_reset()
 
 MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
-	MCFG_DEVICE_PROGRAM_MAP(alphasmart_mem)
-	MCFG_DEVICE_IO_MAP(alphasmart_io)
-	MCFG_MC68HC11_CONFIG(0, 192, 0x00)
+	MC68HC11(config, m_maincpu, XTAL(8'000'000)/2);  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
+	m_maincpu->set_addrmap(AS_IO, &alphasmart_state::alphasmart_io);
+	m_maincpu->set_config(0, 192, 0x00);
 
 	MCFG_KS0066_F05_ADD("ks0066_0")
 	MCFG_HD44780_LCD_SIZE(2, 40)

@@ -71,7 +71,7 @@ public:
 	void mm1m7(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8212_device> m_iop;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;

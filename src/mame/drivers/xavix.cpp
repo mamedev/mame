@@ -794,34 +794,34 @@ static GFXDECODE_START( gfx_xavix )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(xavix_state::xavix)
-
+void xavix_state::xavix(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",XAVIX,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
-	MCFG_DEVICE_ADDRESS_MAP(5, xavix_lowbus_map)
-	MCFG_DEVICE_ADDRESS_MAP(6, xavix_extbus_map)
-	MCFG_M6502_DISABLE_CACHE()
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state, interrupt)
-	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+	XAVIX(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xavix_state::xavix_map);
+	m_maincpu->set_addrmap(5, &xavix_state::xavix_lowbus_map);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_extbus_map);
+	m_maincpu->disable_cache();
+	m_maincpu->set_vblank_int("screen", FUNC(xavix_state::interrupt));
+	m_maincpu->set_vector_callback(FUNC(xavix_state::get_vectors));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
 	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(xavix_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(xavix_state::screen_update));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_palette(m_palette);
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xavix);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 256)
+	PALETTE(config, m_palette, 256).set_init("palette", FUNC(palette_device::palette_init_all_black));
 
 	/* sound hardware */
 
@@ -835,83 +835,81 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	//m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_sound->add_route(0, "lspeaker", 1.0);
 	m_sound->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24lc04)
+void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
+{
 	xavix(config);
 
 	// according to http://ww1.microchip.com/downloads/en/devicedoc/21708k.pdf 'the master transmits up to 16 data bytes' however this breaks the Nostalgia games
 	// of note Galplus Phalanx on Namco Nostalgia 2, which will hang between stages unable to properly access the device, but with no page support it doesn't hang and scores save
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24c08)
+void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
+{
 	xavix(config);
 
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x400); // 24C08 (Excite Fishing DX)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(xavix_state::xavixp)
+void xavix_state::xavixp(machine_config &config)
+{
+	xavix(config);
+	m_screen->set_refresh_hz(50);
+}
+
+void xavix_state::xavix2000(machine_config &config)
+{
 	xavix(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-MACHINE_CONFIG_END
+	XAVIX2000(config.replace(), m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xavix_state::xavix_map);
+	m_maincpu->set_addrmap(5, &xavix_state::superxavix_lowbus_map);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_extbus_map);
+	m_maincpu->disable_cache();
+	m_maincpu->set_vblank_int("screen", FUNC(xavix_state::interrupt));
+	m_maincpu->set_vector_callback(FUNC(xavix_state::get_vectors));
 
-MACHINE_CONFIG_START(xavix_state::xavix2000)
-	xavix(config);
+	m_palette->set_entries(512);
+}
 
-	MCFG_DEVICE_REMOVE("maincpu")
-
-	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
-	MCFG_DEVICE_ADDRESS_MAP(5, superxavix_lowbus_map)
-	MCFG_DEVICE_ADDRESS_MAP(6, xavix_extbus_map)
-	MCFG_M6502_DISABLE_CACHE()
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state, interrupt)
-	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
-
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
-
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(xavix_i2c_state::xavix2000_i2c_24c04)
+void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
+{
 	xavix2000(config);
 
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(xavix_i2c_state::xavix2000_i2c_24c02)
+void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
+{
 	xavix2000(config);
 
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrk)
+void xavix_mtrk_state::xavix_mtrk(machine_config &config)
+{
 	xavix(config);
 
 	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
 	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrkp)
+void xavix_mtrk_state::xavix_mtrkp(machine_config &config)
+{
 	xavix_mtrk(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50);
+}
 
-MACHINE_CONFIG_START(xavix_madfb_state::xavix_madfb)
+void xavix_madfb_state::xavix_madfb(machine_config &config)
+{
 	xavix(config);
 
 	XAVIX_MADFB_BALL(config, m_ball, 0);
 	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
-
-MACHINE_CONFIG_END
+}
 
 DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
 {
@@ -926,18 +924,17 @@ DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(xavix_ekara_state::xavix_ekara)
+void xavix_ekara_state::xavix_ekara(machine_config &config)
+{
 	xavix(config);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ekara_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM8_WIDTH)
-	MCFG_GENERIC_LOAD(xavix_ekara_state, ekara_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ekara_cart", "bin"));
+	m_cart->set_width(GENERIC_ROM8_WIDTH);
+	cartslot.set_device_load(device_image_load_delegate(&xavix_ekara_state::device_image_load_ekara_cart, this));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","ekara")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara");
+}
 
 void xavix_state::init_xavix()
 {

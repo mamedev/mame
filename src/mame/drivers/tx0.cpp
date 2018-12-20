@@ -1540,22 +1540,20 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 MACHINE_CONFIG_START(tx0_state::tx0_64kw)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
-	MCFG_DEVICE_ADD("maincpu", TX0_64KW, 166667)
-	MCFG_TX0_CONFIG(
-		WRITELINE( *this, tx0_state, tx0_io_cpy ),
-		WRITELINE( *this, tx0_state, tx0_io_r1l ),
-		WRITELINE( *this, tx0_state, tx0_io_dis ),
-		WRITELINE( *this, tx0_state, tx0_io_r3l ),
-		WRITELINE( *this, tx0_state, tx0_io_prt ),
-		NOOP,
-		WRITELINE( *this, tx0_state, tx0_io_p6h ),
-		WRITELINE( *this, tx0_state, tx0_io_p7h ),
-		WRITELINE( *this, tx0_state, tx0_sel ),
-		WRITELINE( *this, tx0_state, tx0_io_reset_callback )
-	)
-	MCFG_DEVICE_PROGRAM_MAP(tx0_64kw_map)
+	TX0_64KW(config, m_maincpu, 166667);
+	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
+	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
+	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
+	m_maincpu->r3l().set(FUNC(tx0_state::tx0_io_r3l));
+	m_maincpu->prt().set(FUNC(tx0_state::tx0_io_prt));
+	m_maincpu->rsv().set_nop();
+	m_maincpu->p6h().set(FUNC(tx0_state::tx0_io_p6h));
+	m_maincpu->p7h().set(FUNC(tx0_state::tx0_io_p7h));
+	m_maincpu->sel().set(FUNC(tx0_state::tx0_sel));
+	m_maincpu->res().set(FUNC(tx0_state::tx0_io_reset_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_64kw_map);
 	/* dummy interrupt: handles input */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tx0_state,  tx0_interrupt)
+	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)

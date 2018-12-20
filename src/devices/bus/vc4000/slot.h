@@ -6,10 +6,7 @@
 #include "softlist_dev.h"
 
 
-/***************************************************************************
- TYPE DEFINITIONS
- ***************************************************************************/
-
+#define VC4000SLOT_ROM_REGION_TAG ":cart:rom"
 
 /* PCB */
 enum
@@ -62,6 +59,15 @@ class vc4000_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const *dflt)
+		: vc4000_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	vc4000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vc4000_cart_slot_device();
 
@@ -111,6 +117,15 @@ class h21_cart_slot_device : public vc4000_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const *dflt)
+		: h21_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~h21_cart_slot_device();
 
@@ -120,20 +135,5 @@ public:
 // device type definition
 DECLARE_DEVICE_TYPE(VC4000_CART_SLOT, vc4000_cart_slot_device)
 DECLARE_DEVICE_TYPE(H21_CART_SLOT,    h21_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define VC4000SLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_VC4000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, VC4000_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_H21_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, H21_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif // MAME_BUS_VC4000_SLOT_H

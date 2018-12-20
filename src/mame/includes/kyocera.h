@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
@@ -100,7 +99,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 	optional_device<im6402_device> m_uart;
 	required_device<hd44102_device> m_lcdc0;
@@ -220,7 +219,7 @@ public:
 		m_y(*this, "Y%u", 0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
 	required_device<hd61830_device> m_lcdc;
 	required_device<centronics_device> m_centronics;

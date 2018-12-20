@@ -269,12 +269,12 @@ static const char *const tankbatt_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(tankbatt_state::tankbatt)
-
+void tankbatt_state::tankbatt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) /* 1 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tankbatt_state,  interrupt)
+	M6502(config, m_maincpu, 1000000); /* 1 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tankbatt_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tankbatt_state::interrupt));
 
 	cd4099_device &mainlatch(CD4099(config, "mainlatch")); // latches at 4H and 5H (are the empty 4J and 5J locations for LS259 substitution?)
 	mainlatch.q_out_cb<0>().set_nop(); //coin counter mirror?
@@ -292,27 +292,27 @@ MACHINE_CONFIG_START(tankbatt_state::tankbatt)
 	outlatch.q_out_cb<3>().set(FUNC(tankbatt_state::coinlockout_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tankbatt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tankbatt_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tankbatt)
-	MCFG_PALETTE_ADD("palette", 256*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(tankbatt_state, tankbatt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tankbatt);
+	PALETTE(config, m_palette, 256*2);
+	m_palette->set_indirect_entries(256);
+	m_palette->set_init(FUNC(tankbatt_state::palette_init_tankbatt));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(tankbatt_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(tankbatt_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

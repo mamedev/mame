@@ -186,36 +186,35 @@ void hcastle_state::machine_reset()
 	m_old_pf2 = -1;
 }
 
-MACHINE_CONFIG_START(hcastle_state::hcastle)
-
+void hcastle_state::hcastle(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */
-	MCFG_DEVICE_PROGRAM_MAP(hcastle_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hcastle_state,  irq0_line_hold)
+	KONAMI(config, m_maincpu, 3000000);    /* Derived from 24 MHz clock */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hcastle_state::hcastle_map);
+	m_maincpu->set_vblank_int("screen", FUNC(hcastle_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 3579545);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hcastle_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
-	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
+	BUFFERED_SPRITERAM8(config, m_spriteram2);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second verified by comparison with real board */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hcastle_state, screen_update_hcastle)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* frames per second verified by comparison with real board */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(hcastle_state::screen_update_hcastle));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hcastle)
-	MCFG_PALETTE_ADD("palette", 2*8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(hcastle_state, hcastle)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hcastle);
+	PALETTE(config, m_palette, 2*8*16*16);
+	m_palette->set_indirect_entries(128);
+	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	m_palette->set_init(FUNC(hcastle_state::palette_init_hcastle));
 
 	K007121(config, m_k007121_1, 0);
 	m_k007121_1->set_palette_tag(m_palette);
@@ -227,18 +226,17 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, hcastle_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "mono", 0.44)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(hcastle_state::volume_callback));
+	m_k007232->add_route(0, "mono", 0.44);
+	m_k007232->add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI)) /* from schematic; NMI handler is just a retn */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI); /* from schematic; NMI handler is just a retn */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.70);
 
-	MCFG_K051649_ADD("k051649", 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	K051649(config, "k051649", 3579545/2).add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
 /***************************************************************************/
 

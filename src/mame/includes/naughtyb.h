@@ -25,6 +25,7 @@ public:
 		m_scrollreg(*this, "scrollreg")
 	{ }
 
+	void naughtyb_base(machine_config &config);
 	void popflame(machine_config &config);
 	void naughtyb(machine_config &config);
 

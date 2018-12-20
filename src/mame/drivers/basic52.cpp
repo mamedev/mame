@@ -117,7 +117,7 @@ void basic52_state::basic31(machine_config &config)
 
 	/* video hardware */
 	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(KEYBOARDCB_PUT(basic52_state, kbd_put));
+	m_terminal->set_keyboard_callback(FUNC(basic52_state::kbd_put));
 
 	I8255(config, "ppi8255", 0);
 }

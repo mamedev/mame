@@ -21,6 +21,7 @@ public:
 
 	void set_capacitors(double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
 	template <class Object> devcb_base &set_gate_handler_callback(Object &&cb) { return m_gate_handler_cb.set_callback(std::forward<Object>(cb)); }
+	auto gate() { return m_gate_handler_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	void set_clock(int clock);

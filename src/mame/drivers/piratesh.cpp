@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /**************************************************************************
     Pirate Ship
 
@@ -597,35 +598,35 @@ void piratesh_state::machine_reset()
 
 }
 
-MACHINE_CONFIG_START(piratesh_state::piratesh)
-
+void piratesh_state::piratesh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(piratesh_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", piratesh_state, piratesh_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &piratesh_state::piratesh_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(piratesh_state::piratesh_interrupt), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
 	m_k053252->set_offsets(40, 16); // TODO
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, "hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // TODO
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(piratesh_state, screen_update_piratesh)
+	screen.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // TODO
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
+	screen.set_screen_update(FUNC(piratesh_state::screen_update_piratesh));
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(BGRX)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	palette_device &palette(PALETTE(config, "palette", 2048));
+	palette.set_format(PALETTE_FORMAT_BGRX);
+	palette.enable_shadows();
+	palette.enable_hilights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback), this);
@@ -653,11 +654,11 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, piratesh_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539, XTAL(18'432'000));
+	m_k054539->timer_handler().set(FUNC(piratesh_state::k054539_nmi_gen));
+	m_k054539->add_route(0, "lspeaker", 0.2);
+	m_k054539->add_route(1, "rspeaker", 0.2);
+}
 
 
 
