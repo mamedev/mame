@@ -20,9 +20,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_sn1(*this, "sn1"),
-		m_sn2(*this, "sn2"),
-		m_sn3(*this, "sn3"),
+		m_sn(*this, "sn%u", 1U),
 		m_scrollram(*this, "scrollram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -63,9 +61,7 @@ private:
 	required_device<i8035_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<sn76496_device> m_sn1;
-	required_device<sn76496_device> m_sn2;
-	required_device<sn76496_device> m_sn3;
+	required_device_array<sn76496_device, 3> m_sn;
 
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_videoram;
