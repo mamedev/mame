@@ -1535,11 +1535,11 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_EPSON_SIO_PIN(WRITELINE(*this, px4_state, sio_pin_w))
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, px4_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, px4_state, rs232_dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, px4_state, rs232_dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, px4_state, rs232_cts_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(px4_state::rs232_rx_w));
+	m_rs232->dcd_handler().set(FUNC(px4_state::rs232_dcd_w));
+	m_rs232->dsr_handler().set(FUNC(px4_state::rs232_dsr_w));
+	m_rs232->cts_handler().set(FUNC(px4_state::rs232_cts_w));
 
 	// rom capsules
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px4_cart")

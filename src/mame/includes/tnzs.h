@@ -1,21 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, Mirko Buffoni, Takahiro Nogi
-
-#pragma once
-
 #ifndef MAME_INCLUDES_TNZS_H
 #define MAME_INCLUDES_TNZS_H
 
-#include "sound/dac.h"
-#include "sound/samples.h"
-#include "video/seta001.h"
+#pragma once
+
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
+#include "sound/dac.h"
+#include "sound/samples.h"
+#include "video/seta001.h"
 #include "emupal.h"
-
-#define MAX_SAMPLES 0x2f        /* max samples */
+#include "screen.h"
 
 class tnzs_base_state : public driver_device
 {
@@ -26,14 +25,14 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_seta001(*this, "spritegen")
 		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 		, m_mainbank(*this, "mainbank")
 		, m_subbank(*this, "subbank")
 	{ }
 
 	void tnzs_base(machine_config &config);
 	void tnzs_mainbank(machine_config &config);
-
-	DECLARE_PALETTE_INIT(prompalette);
 
 protected:
 	virtual void machine_start() override;
@@ -42,6 +41,7 @@ protected:
 
 	DECLARE_WRITE8_MEMBER(ramrom_bankswitch_w);
 
+	DECLARE_PALETTE_INIT(prompalette);
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tnzs);
 
@@ -54,6 +54,8 @@ protected:
 	optional_device<cpu_device> m_subcpu;
 	optional_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	optional_device<address_map_bank_device> m_mainbank; /* FIXME: optional because of reuse from cchance.cpp */
 	optional_memory_bank m_subbank; /* FIXME: optional because of reuse from cchance.cpp */
 
@@ -185,9 +187,12 @@ public:
 
 	void init_kageki();
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
+	static constexpr unsigned MAX_SAMPLES = 0x2f;
 
 	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
 
@@ -222,9 +227,10 @@ public:
 
 	void jpopnics(machine_config &config);
 
-private:
+protected:
 	virtual void machine_reset() override;
 
+private:
 	DECLARE_WRITE8_MEMBER(subbankswitch_w);
 
 	void jpopnics_main_map(address_map &map);
@@ -284,9 +290,10 @@ public:
 
 	void kabukiz(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 
+private:
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
 	void kabukiz_cpu2_map(address_map &map);

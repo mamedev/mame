@@ -11,6 +11,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -515,7 +516,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	m_pio->out_pb_callback().set(FUNC(nanos_state::port_b_w));
 
 	/* UPD765 */
-	MCFG_UPD765A_ADD(m_fdc, false, true)
+	UPD765A(config, m_fdc, 8'000'000, false, true);
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats)
 
 	/* internal ram */

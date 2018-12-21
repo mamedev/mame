@@ -1005,15 +1005,16 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32)  /* 53.333 Hz. guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", CLK_1/8));    /* guess */
+	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
@@ -1056,11 +1057,11 @@ MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_REPLACE("aysnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("oki", okim6295_device, read))   // read B
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("oki", okim6295_device, write))   // write B
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2203_device &aysnd(YM2203(config.replace(), "aysnd", 3000000));
+	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
+	aysnd.port_b_read_callback().set("oki", FUNC(okim6295_device::read));
+	aysnd.port_b_write_callback().set("oki", FUNC(okim6295_device::write));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 MACHINE_CONFIG_END
 
 ROM_START( kingdrby )

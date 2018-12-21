@@ -42,7 +42,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8021_device> m_maincpu;
 	required_ioport_array<13> m_y;
 
 	devcb_write_line   m_kbrdy_cb;

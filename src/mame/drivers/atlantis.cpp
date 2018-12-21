@@ -809,8 +809,8 @@ DEVICE_INPUT_DEFAULTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atlantis_state::mwskins)
-
+void atlantis_state::mwskins(machine_config &config)
+{
 	/* basic machine hardware */
 	VR4310LE(config, m_maincpu, 166666666);
 	m_maincpu->set_icache_size(16384);
@@ -841,11 +841,11 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	m_zeus->set_float_mode(1);
 	m_zeus->irq_callback().set(FUNC(atlantis_state::zeus_irq));
 	m_zeus->vblank_callback().set(FUNC(atlantis_state::vblank_irq));
-	m_zeus->set_screen("screen");
+	m_zeus->set_screen(m_screen);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);
+	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	/* sound hardware */
 	DCS2_AUDIO_DENVER_2CH(config, m_dcs, 0);
@@ -860,8 +860,8 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	m_ioasic->set_auto_ack(1);
 	if DEBUG_CONSOLE {
 		m_ioasic->serial_tx_handler().set(m_uart0, FUNC(generic_terminal_device::write));
-		MCFG_DEVICE_ADD(m_uart0, GENERIC_TERMINAL, 0)
-		MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("ioasic", midway_ioasic_device, serial_rx_w))
+		GENERIC_TERMINAL(config, m_uart0, 0);
+		m_uart0->set_keyboard_callback("ioasic", FUNC(midway_ioasic_device::serial_rx_w));
 	}
 
 	// TL16C552 UART
@@ -891,7 +891,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	com2.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
 	com2.ri_handler().set(m_uart2, FUNC(ins8250_uart_device::ri_w));
 	com2.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

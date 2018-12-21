@@ -920,16 +920,17 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 	MCFG_DEVICE_ADD(m_soundbrd, MONSTERB_SOUND, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segag80r_state::monster2)
+void segag80r_state::monster2(machine_config &config)
+{
 	monsterb(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
-	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_maincpu, VIDEO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &segag80r_state::main_map);
+	maincpu.set_addrmap(AS_IO, &segag80r_state::main_ppi8255_portmap);
+	maincpu.set_vblank_int("screen", FUNC(segag80r_state::segag80r_vblank_start));
+	maincpu.set_irq_acknowledge_callback(FUNC(segag80r_state::segag80r_irq_ack));
+	maincpu.set_addrmap(AS_OPCODES, &segag80r_state::sega_315_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 MACHINE_CONFIG_START(segag80r_state::pignewt)
 	g80r_base(config);
@@ -945,7 +946,7 @@ MACHINE_CONFIG_START(segag80r_state::pignewt)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	MCFG_SEGAUSB_ADD("usbsnd", "maincpu")
+	SEGAUSB(config, m_usbsnd, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -953,12 +954,12 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	g80r_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(sindbadm_portmap)
-	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	sega_315_5028_device &maincpu(SEGA_315_5028(config.replace(), m_maincpu, VIDEO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &segag80r_state::main_map);
+	maincpu.set_addrmap(AS_IO, &segag80r_state::sindbadm_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &segag80r_state::sega_315_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(segag80r_state::sindbadm_vblank_start));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pb_callback().set_ioport("FC");
@@ -973,9 +974,9 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	MCFG_DEVICE_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(sindbadm_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
+	Z80(config, m_audiocpu, SINDBADM_SOUND_CLOCK/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &segag80r_state::sindbadm_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(segag80r_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */

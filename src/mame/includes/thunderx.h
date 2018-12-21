@@ -5,19 +5,24 @@
     Super Contra / Thunder Cross
 
 *************************************************************************/
-#include "cpu/m6809/konami.h"
+#ifndef MAME_INCLUDES_THUNDERX_H
+#define MAME_INCLUDES_THUNDERX_H
+
+#pragma once
+
+#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
-#include "video/k052109.h"
 #include "video/k051960.h"
+#include "video/k052109.h"
 #include "video/konami_helper.h"
 #include "emupal.h"
 
 class thunderx_state : public driver_device
 {
 public:
-	thunderx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	thunderx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank5800(*this, "bank5800"),
@@ -26,7 +31,8 @@ public:
 		m_k051960(*this, "k051960"),
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank"),
-		m_pmcram(*this, "pmcram") { }
+		m_pmcram(*this, "pmcram")
+	{ }
 
 	void scontra(machine_config &config);
 	void gbusters(machine_config &config);
@@ -41,7 +47,7 @@ private:
 	};
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank5800;
 	optional_device<k007232_device> m_k007232;
@@ -95,3 +101,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_THUNDERX_H

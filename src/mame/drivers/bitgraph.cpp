@@ -505,33 +505,33 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	ACIA6850(config, m_acia0, 0);
 	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
-	m_acia0->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
+	m_acia0->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD(RS232_H_TAG, RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA0_TAG, acia6850_device, write_cts))
+	rs232_port_device &rs232h(RS232_PORT(config, RS232_H_TAG, default_rs232_devices, "null_modem"));
+	rs232h.rxd_handler().set(m_acia0, FUNC(acia6850_device::write_rxd));
+	rs232h.dcd_handler().set(m_acia0, FUNC(acia6850_device::write_dcd));
+	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
 	ACIA6850(config, m_acia1, 0);
 	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
-	m_acia1->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
+	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD(RS232_K_TAG, RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA1_TAG, acia6850_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
+	rs232_port_device &rs232k(RS232_PORT(config, RS232_K_TAG, default_rs232_devices, "keyboard"));
+	rs232k.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	rs232k.dcd_handler().set(m_acia1, FUNC(acia6850_device::write_dcd));
+	rs232k.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
+	rs232k.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
 
 	ACIA6850(config, m_acia2, 0);
 	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia2->rts_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_rts));
-	m_acia2->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
+	m_acia2->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD(RS232_D_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA2_TAG, acia6850_device, write_cts))
+	rs232_port_device &rs232d(RS232_PORT(config, RS232_D_TAG, default_rs232_devices, nullptr));
+	rs232d.rxd_handler().set(m_acia2, FUNC(acia6850_device::write_rxd));
+	rs232d.dcd_handler().set(m_acia2, FUNC(acia6850_device::write_dcd));
+	rs232d.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
 	// XXX actual part may be something else
 	COM8116(config, m_dbrga, 5.0688_MHz_XTAL);
@@ -553,17 +553,17 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_DEVICE_ADD(EAROM_TAG, ER2055, 0)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(PSG_TAG, AY8912, XTAL(1'294'400))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bitgraph_state, earom_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8912(config, m_psg, XTAL(1'294'400));
+	m_psg->port_a_write_callback().set(FUNC(bitgraph_state::earom_write));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
 MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
-	MCFG_DEVICE_ADD(PPU_TAG, I8035, XTAL(6'900'000))
-	MCFG_DEVICE_IO_MAP(ppu_io)
-//  MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, bitgraph_state, ppu_t0_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	i8035_device &ppu(I8035(config, PPU_TAG, XTAL(6'900'000)));
+	ppu.set_addrmap(AS_IO, &bitgraph_state::ppu_io);
+//  ppu.t0_in_cb().set(FUNC(bitgraph_state::ppu_t0_r));
+	ppu.prog_out_cb().set("i8243", FUNC(i8243_device::prog_w));
 
 	i8243_device &i8243(I8243(config, "i8243"));
 	i8243.read_handler().set_nop();
@@ -581,40 +581,40 @@ MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
 MACHINE_CONFIG_END
 #endif
 
-MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
-	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(6'900'000))
-	MCFG_DEVICE_PROGRAM_MAP(bitgrapha_mem)
+void bitgraph_state::bitgrpha(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(6'900'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &bitgraph_state::bitgrapha_mem);
 
 	bg_motherboard(config);
 
-	MCFG_DEVICE_ADD("system_clock", CLOCK, 40)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bitgraph_state, system_clock_write))
+	CLOCK(config, "system_clock", 40).signal_handler().set(FUNC(bitgraph_state::system_clock_write));
 
 	ACIA6850(config, m_acia3, 0);
 	m_acia3->txd_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia3->rts_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia3->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD(RS232_M_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA3_TAG, acia6850_device, write_cts))
+	rs232_port_device &rs232m(RS232_PORT(config, RS232_M_TAG, default_rs232_devices, nullptr));
+	rs232m.rxd_handler().set(m_acia3, FUNC(acia6850_device::write_rxd));
+	rs232m.dcd_handler().set(m_acia3, FUNC(acia6850_device::write_dcd));
+	rs232m.cts_handler().set(m_acia3, FUNC(acia6850_device::write_cts));
 
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
-	MCFG_DEVICE_ADD(M68K_TAG, M68000, XTAL(6'900'000))
-	MCFG_DEVICE_PROGRAM_MAP(bitgraphb_mem)
+void bitgraph_state::bitgrphb(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(6'900'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &bitgraph_state::bitgraphb_mem);
 
 	bg_motherboard(config);
 //  bg_ppu(config);
 
-	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bitgraph_state, system_clock_write))
+	CLOCK(config, "system_clock", 1040).signal_handler().set(FUNC(bitgraph_state::system_clock_write));
 
 	RAM(config, RAM_TAG).set_default_size("512K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( bitgrpha )

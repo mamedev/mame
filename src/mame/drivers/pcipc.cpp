@@ -26,10 +26,11 @@
 #include "machine/i82371sb.h"
 #include "video/mga2064w.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
-#include "bus/rs232/terminal.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "machine/fdc37c93x.h"
 
 class pcipc_state : public driver_device
@@ -50,6 +51,8 @@ public:
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 private:
+	void pcipc_map(address_map &map);
+	void pcipc_map_io(address_map &map);
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_w);
 	DECLARE_WRITE8_MEMBER(boot_state_phoenix_ver40_rev6_w);
 	DECLARE_WRITE8_MEMBER(boot_state_award_w);
@@ -479,10 +482,14 @@ static void isa_internal_devices(device_slot_interface &device)
 
 static void isa_com(device_slot_interface &device)
 {
-	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
 void pcipc_state::superio_config(device_t *device)
@@ -501,13 +508,26 @@ void pcipc_state::superio_config(device_t *device)
 	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
-MACHINE_CONFIG_START(pcipc_state::pcipc)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 90000000)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
-	MCFG_I386_SMIACT(WRITELINE("pci:00.0", i82439hx_host_device, smi_act_w))
+void pcipc_state::pcipc_map(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-	MCFG_DEVICE_ADD(      ":pci",      PCI_ROOT, 0)
-	MCFG_DEVICE_ADD(      ":pci:00.0", I82439HX, 0, "maincpu", 256*1024*1024)
+void pcipc_state::pcipc_map_io(address_map &map)
+{
+	map.unmap_value_high();
+}
+
+void pcipc_state::pcipc(machine_config &config)
+{
+	pentium_device &maincpu(PENTIUM(config, "maincpu", 90000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pcipc_state::pcipc_map);
+	maincpu.set_addrmap(AS_IO, &pcipc_state::pcipc_map_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
+
+	PCI_ROOT(config, ":pci", 0);
+	I82439HX(config, ":pci:00.0", 0, "maincpu", 256*1024*1024);
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_phoenix_ver40_rev6_w));
@@ -518,39 +538,41 @@ MACHINE_CONFIG_START(pcipc_state::pcipc)
 	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq15_w));
 //  MCFG_DEVICE_ADD(      ":pci:12.0", MGA2064W, 0)
 
-	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc37c93x", superio_config)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, "svga_et4k", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "microsoft_mouse")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd1_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd1_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr1_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, nri1_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ncts1_w))
-	MCFG_DEVICE_ADD("serport1", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd2_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd2_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr2_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, nri2_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ncts2_w))
-MACHINE_CONFIG_END
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-MACHINE_CONFIG_START(pcipc_state::pcipctx)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
+	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
+	serport0.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri1_w));
+	serport0.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts1_w));
 
-	MCFG_DEVICE_ADD(      ":pci",      PCI_ROOT, 0)
-	MCFG_DEVICE_ADD(      ":pci:00.0", I82439TX, 0, ":maincpu", 256*1024*1024)
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd2_w));
+	serport1.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
+	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
+	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
+}
+
+void pcipc_state::pcipctx(machine_config &config)
+{
+	pentium_device &maincpu(PENTIUM(config, "maincpu", 60000000));
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	PCI_ROOT(config, ":pci", 0);
+	I82439TX(config, ":pci:00.0", 0, ":maincpu", 256*1024*1024);
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
-//  MCFG_DEVICE_ADD(      ":pci:07.1", IDE_PCI, 0, 0x80867010, 0x03, 0x00000000)
-	MCFG_DEVICE_ADD(      ":pci:12.0", MGA2064W, 0)
-MACHINE_CONFIG_END
+//  IDE_PCI(config, ":pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
+	MGA2064W(config, ":pci:12.0", 0);
+}
 
 ROM_START(pcipc)
 	ROM_REGION32_LE(0x40000, ":pci:07.0", 0) /* PC bios */

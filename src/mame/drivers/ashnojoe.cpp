@@ -333,13 +333,13 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_a))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_b))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(ashnojoe_state::ym2203_write_a));
+	ymsnd.port_b_write_callback().set(FUNC(ashnojoe_state::ym2203_write_b));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ashnojoe_state, ashnojoe_vclk_cb))

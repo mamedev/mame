@@ -113,7 +113,7 @@ public:
 
 	void size(int &width, int &height)
 	{
-		static const int size_table[4][4][2] =
+		static int const size_table[4][4][2] =
 		{
 			{ { 8,   8 }, { 16, 16 }, { 32, 32 }, { 64, 64 } }, // square
 			{ { 16,  8 }, { 32,  8 }, { 32, 16 }, { 64, 32 } }, // horizontal rect
@@ -207,7 +207,7 @@ inline uint32_t gba_lcd_device::bg_screen_base(uint16_t bgxcnt)
 
 inline void gba_lcd_device::bg_screen_size(uint16_t bgxcnt, bool text, int &width, int &height)
 {
-	static const int size_table[2][4][2] =
+	static int const size_table[2][4][2] =
 	{
 		{ { 256, 256 }, { 512, 256 }, { 256, 512 }, { 512,   512 } }, // text mode
 		{ { 128, 128 }, { 256, 256 }, { 512, 512 }, { 1024, 1024 } }  // rotation/scaling (roz) mode
@@ -1466,7 +1466,7 @@ inline bool gba_lcd_device::is_in_window_v(int y, int window)
 	return false;
 }
 
-static const int coeff[32] = {
+static int const coeff[32] = {
 	0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
@@ -1536,7 +1536,7 @@ inline uint32_t gba_lcd_device::decrease_brightness(uint32_t color)
 	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
 }
 
-static const char *reg_names[] = {
+static char const *const reg_names[] = {
 	/* LCD I/O Registers */
 	"DISPCNT", "GRNSWAP",  "DISPSTAT", "VCOUNT",
 	"BG0CNT",  "BG1CNT",   "BG2CNT",   "BG3CNT",

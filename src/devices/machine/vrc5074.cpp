@@ -143,18 +143,19 @@ void vrc5074_device::target1_map(address_map &map)
 	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc5074_device::target1_r), FUNC(vrc5074_device::target1_w));
 }
 
-MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
-	ns16550_device &uart(NS16550(config, "uart", DERIVED_CLOCK(1, 12)));
-	uart.out_int_callback().set(FUNC(vrc5074_device::uart_irq_callback));
-	uart.out_tx_callback().set("ttys00", FUNC(rs232_port_device::write_txd));
-	uart.out_dtr_callback().set("ttys00", FUNC(rs232_port_device::write_dtr));
-	uart.out_rts_callback().set("ttys00", FUNC(rs232_port_device::write_rts));
+void vrc5074_device::device_add_mconfig(machine_config &config)
+{
+	NS16550(config, m_uart, DERIVED_CLOCK(1, 12));
+	m_uart->out_int_callback().set(FUNC(vrc5074_device::uart_irq_callback));
+	m_uart->out_tx_callback().set("ttys00", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("ttys00", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("ttys00", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("ttys00", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(uart, ns16550_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(uart, ns16550_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(uart, ns16550_device, cts_w))
-MACHINE_CONFIG_END
+	rs232_port_device &ttys00(RS232_PORT(config, "ttys00", default_rs232_devices, nullptr));
+	ttys00.rxd_handler().set(m_uart, FUNC(ns16550_device::rx_w));
+	ttys00.dcd_handler().set(m_uart, FUNC(ns16550_device::dcd_w));
+	ttys00.cts_handler().set(m_uart, FUNC(ns16550_device::cts_w));
+}
 
 vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_host_device(mconfig, VRC5074, tag, owner, clock),
@@ -965,7 +966,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
 			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
-			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, ATTOSECONDS_TO_HZ(attotime::from_double(m_timer_period[which]).as_attoseconds()));
+			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, attotime::from_double(m_timer_period[which]).as_hz());
 		}
 
 		/* timer disabled? */

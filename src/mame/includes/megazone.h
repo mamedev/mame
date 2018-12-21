@@ -5,15 +5,20 @@
     Megazone
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MEGAZONE_H
+#define MAME_INCLUDES_MEGAZONE_H
 
+#pragma once
+
+#include "cpu/mcs48/mcs48.h"
 #include "sound/flt_rc.h"
 #include "emupal.h"
 
 class megazone_state : public driver_device
 {
 public:
-	megazone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	megazone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scrolly(*this, "scrolly"),
 		m_scrollx(*this, "scrollx"),
 		m_videoram(*this, "videoram"),
@@ -51,7 +56,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_daccpu;
+	required_device<i8039_device> m_daccpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device_array<filter_rc_device, 3> m_filter;
@@ -77,3 +82,5 @@ private:
 	void megazone_sound_io_map(address_map &map);
 	void megazone_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MEGAZONE_H

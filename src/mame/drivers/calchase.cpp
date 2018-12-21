@@ -695,10 +695,9 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	/* video hardware */
 	pcvideo_trident_vga(config);
 
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
+	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

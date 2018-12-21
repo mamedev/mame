@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device, "ps2gs", "Playstation 2 GS")
 
-/*static*/ const size_t ps2_gs_device::FORMAT_PIXEL_WIDTHS[] = {
+/*static*/ size_t const ps2_gs_device::FORMAT_PIXEL_WIDTHS[] = {
 	32, 24, 16, 0,  0,  0,  0,  0,
 	0,  0,  16, 0,  0,  0,  0,  0,
 	0,  0,  0,  8,  4,  0,  0,  0,
@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device, "ps2gs", "Playstation 2 GS")
 	0,  0,  16, 0,  0,  0,  0,  0
 };
 
-/*static*/ const char* ps2_gs_device::FORMAT_NAMES[] = {
+/*static*/ char const *const ps2_gs_device::FORMAT_NAMES[] = {
 	"PSMCT32",  "PSMCT24",  "PSMCT16",  "Unknown",  "Unknown",  "Unknown",  "Unknown",  "Unknown",
 	"Unknown",  "Unknown",  "PCMCT16S", "Unknown",  "Unknown",  "Unknown",  "Unknown",  "Unknown",
 	"Unknown",  "Unknown",  "Unknown",  "PSMT8",    "PSMT4",    "Unknown",  "Unknown",  "Unknown",
@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device, "ps2gs", "Playstation 2 GS")
 	"Unknown",  "Unknown",  "PSMZ16S",  "Unknown",  "Unknown",  "Unknown",  "Unknown",  "Unknown"
 };
 
-/*static*/ const uint32_t ps2_gs_device::KICK_COUNTS[] = {
+/*static*/ uint32_t const ps2_gs_device::KICK_COUNTS[] = {
 	1, 2, 2, 3, 3, 3, 2, 1
 };
 
@@ -442,10 +442,10 @@ void ps2_gs_device::write_packed(const uint8_t reg, const uint64_t hi, const uin
 
 WRITE64_MEMBER(ps2_gs_device::regs_w)
 {
-	static const char* dir_strs[4] = {
+	static char const *const dir_strs[4] = {
 		"Host->Local", "Local->Host", "Local->Local", "None"
 	};
-	static const char* prim_strs[8] = {
+	static char const *const prim_strs[8] = {
 		"Point", "Line", "Line Strip", "Tri", "Tri Strip", "Tri Fan", "Sprite", "Invalid"
 	};
 

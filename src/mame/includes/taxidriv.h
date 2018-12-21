@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_TAXIDRIV_H
+#define MAME_INCLUDES_TAXIDRIV_H
+
+#pragma once
 
 #include "emupal.h"
 
 class taxidriv_state : public driver_device
 {
 public:
-	taxidriv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taxidriv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -19,9 +23,13 @@ public:
 		m_vram5(*this, "vram5"),
 		m_vram6(*this, "vram6"),
 		m_vram7(*this, "vram7"),
-		m_scroll(*this, "scroll")  { }
+		m_scroll(*this, "scroll")
+	{ }
 
 	void taxidriv(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +77,6 @@ private:
 	DECLARE_WRITE8_MEMBER(p8910_0b_w);
 	DECLARE_WRITE8_MEMBER(spritectrl_w);
 
-	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(taxidriv);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -78,3 +85,5 @@ private:
 	void cpu3_port_map(address_map &map);
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAXIDRIV_H

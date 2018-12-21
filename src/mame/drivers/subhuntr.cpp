@@ -50,7 +50,7 @@ private:
 	void subhuntr_io_map(address_map &map);
 	void subhuntr_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 };
 
 
@@ -141,41 +141,39 @@ static GFXDECODE_START( gfx_subhuntr )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(subhuntr_state::subhuntr)
-
+void subhuntr_state::subhuntr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, 14318180/4/2)
-	MCFG_DEVICE_PROGRAM_MAP(subhuntr_map)
-	MCFG_DEVICE_IO_MAP(subhuntr_io_map)
-	MCFG_DEVICE_DATA_MAP(subhuntr_data_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	S2650(config, m_maincpu, 14318180/4/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &subhuntr_state::subhuntr_map);
+	m_maincpu->set_addrmap(AS_IO, &subhuntr_state::subhuntr_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &subhuntr_state::subhuntr_data_map);
+	m_maincpu->set_vblank_int("screen", FUNC(subhuntr_state::subhuntr_interrupt));
+	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 
-//  MCFG_DEVICE_ADD("s2636", S2636, 0)
-//  MCFG_S2636_WORKRAM_SIZE(0x100)
-//  MCFG_S2636_OFFSETS(3, -21)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	s2636_device &s2636(S2636(config, "s2636", 0));
+	s2636.set_offsets(3, -21);
+	s2636.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subhuntr_state, screen_update_subhuntr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(1*8, 29*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(subhuntr_state::screen_update_subhuntr));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subhuntr)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_subhuntr);
 
-	MCFG_PALETTE_ADD("palette", 26)
-	MCFG_PALETTE_INIT_OWNER(subhuntr_state, subhuntr)
+	PALETTE(config, "palette", 26).set_init(FUNC(subhuntr_state::palette_init_subhuntr));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* discrete sound */
-MACHINE_CONFIG_END
+}
 
 
 

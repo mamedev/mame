@@ -24,6 +24,7 @@ Issues:
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/7474.h"
 #include "machine/am9517a.h"
@@ -77,6 +78,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	DECLARE_PALETTE_INIT(rc702);
 	void kbd_put(u8 data);
 
 	void rc702_io(address_map &map);
@@ -241,10 +243,11 @@ WRITE8_MEMBER( rc702_state::port1c_w )
 }
 
 // monitor is orange even when powered off
-static const rgb_t our_palette[2] = {
-	rgb_t(0xc0, 0x60, 0x00), // off
-	rgb_t(0xff, 0xb4, 0x00), // on
-};
+PALETTE_INIT_MEMBER(rc702_state, rc702)
+{
+	palette.set_pen_color(0, rgb_t(0xc0, 0x60, 0x00));
+	palette.set_pen_color(1, rgb_t(0xff, 0xb4, 0x00));
+}
 
 void rc702_state::init_rc702()
 {
@@ -253,7 +256,6 @@ void rc702_state::init_rc702()
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
-	m_palette->set_pen_colors(0, our_palette, ARRAY_LENGTH(our_palette));
 }
 
 I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
@@ -360,15 +362,15 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(rc702_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(rc702_state::kbd_put));
 
 	TTL7474(config, m_7474, 0);
 	m_7474->output_cb().set(FUNC(rc702_state::q_w));
@@ -388,6 +390,7 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	crtc.irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
 	crtc.drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(rc702_state, rc702)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

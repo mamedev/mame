@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(ax20_state::ax20)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ax20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_I8272A_ADD("fdc", true)
+	I8272A(config, m_fdc, 8'000'000, true);
 
 	/* Devices */
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats)

@@ -39,7 +39,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_latch(*this, "latch"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_samples(*this, "samples")
 	{ }
 
 	void gridlee(machine_config &config);
@@ -72,6 +73,7 @@ private:
 	required_device<ls259_device> m_latch;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<samples_device> m_samples;
 
 	uint8_t m_last_analog_input[2];
 	uint8_t m_last_analog_output[2];

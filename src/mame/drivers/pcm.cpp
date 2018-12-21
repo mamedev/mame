@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_K7659_KEYBOARD_ADD()
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
 	MCFG_CASSETTE_ADD("cassette")
 
 	Z80PIO(config, m_pio_u, XTAL(10'000'000)/4);

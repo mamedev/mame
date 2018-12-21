@@ -162,7 +162,7 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	m_ctc->zc_callback<1>().set(FUNC(cchasm_state::ctc_timer_1_w));
 	m_ctc->zc_callback<2>().set(FUNC(cchasm_state::ctc_timer_2_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -175,16 +175,14 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch3);
+	GENERIC_LATCH_8(config, m_soundlatch4);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1818182)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	AY8910(config, "ay1", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1818182)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	AY8910(config, "ay2", 1818182).add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

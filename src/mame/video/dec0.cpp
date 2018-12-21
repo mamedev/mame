@@ -12,12 +12,6 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dec0_state::dec0_update_sprites_w)
-{
-	memcpy(m_buffered_spriteram,m_spriteram,0x800);
-}
-
-
 /******************************************************************************/
 
 
@@ -248,7 +242,7 @@ uint32_t dec0_automat_state::screen_update_secretab(screen_device &screen, bitma
 	m_spritegen->draw_sprites_bootleg(bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
-	if (m_pri&0x80)
+	if (m_pri & 0x80)
 		m_tilegen[1]->deco_bac06_pf_draw(bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
 
 	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -316,7 +310,7 @@ uint32_t dec0_state::screen_update_slyspy(screen_device &screen, bitmap_ind16 &b
 	m_spritegen->draw_sprites(bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
-	if (m_pri&0x80)
+	if (m_pri & 0x80)
 		m_tilegen[1]->deco_bac06_pf_draw(bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
 
 	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -368,7 +362,7 @@ uint32_t dec0_state::screen_update_midres(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE16_MEMBER(dec0_state::dec0_priority_w)
+WRITE16_MEMBER(dec0_state::priority_w)
 {
 	COMBINE_DATA(&m_pri);
 }
@@ -376,14 +370,14 @@ WRITE16_MEMBER(dec0_state::dec0_priority_w)
 VIDEO_START_MEMBER(dec0_state,dec0_nodma)
 {
 	save_item(NAME(m_pri));
-	m_buffered_spriteram = m_spriteram;
+	m_buffered_spriteram = m_spriteram->live();
 	save_pointer(NAME(m_buffered_spriteram), 0x800/2);
 }
 
 VIDEO_START_MEMBER(dec0_state,dec0)
 {
 	save_item(NAME(m_pri));
-	m_buffered_spriteram = auto_alloc_array(machine(), uint16_t, 0x800/2);
+	m_buffered_spriteram = m_spriteram->buffer();
 	save_pointer(NAME(m_buffered_spriteram), 0x800/2);
 }
 

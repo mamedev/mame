@@ -330,7 +330,7 @@ void atari_cage_device::update_serial()
 	m_serial_period_per_word = bit_clock_period * (8 * (((m_tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
 
 	/* compute the step value to stretch this to the sample_rate */
-	freq = ATTOSECONDS_TO_HZ(m_serial_period_per_word.attoseconds()) / DAC_BUFFER_CHANNELS;
+	freq = m_serial_period_per_word.as_hz() / DAC_BUFFER_CHANNELS;
 	if (freq > 0 && freq < 100000)
 	{
 		for (int i = 0; i < 4; i++)
@@ -402,7 +402,7 @@ WRITE32_MEMBER( atari_cage_device::tms32031_io_w )
 
 		case SPORT_DATA_TX:
 #if (DAC_BUFFER_CHANNELS == 4)
-			if ((int)ATTOSECONDS_TO_HZ(m_serial_period_per_word.attoseconds()) == 22050*4 && (m_tms32031_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
+			if (int(m_serial_period_per_word.as_hz()) == 22050*4 && (m_tms32031_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
 				m_tms32031_io_regs[SPORT_RX_CTL] ^= 0x800;
 #endif
 			break;
@@ -615,9 +615,9 @@ void atari_cage_seattle_device::cage_map_seattle(address_map &map)
 MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu", TMS32031, 33868800)
-	MCFG_DEVICE_PROGRAM_MAP(cage_map)
-	MCFG_TMS3203X_MCBL(true)
+	TMS32031(config, m_cpu, 33868800);
+	m_cpu->set_addrmap(AS_PROGRAM, &atari_cage_device::cage_map);
+	m_cpu->set_mcbl_mode(true);
 
 	MCFG_TIMER_DEVICE_ADD("cage_dma_timer", DEVICE_SELF, atari_cage_device, dma_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("cage_timer0", DEVICE_SELF, atari_cage_device, cage_timer_callback)
@@ -627,7 +627,7 @@ MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 
 #if (DAC_BUFFER_CHANNELS == 4)
 	MCFG_DEVICE_ADD("dac1", DMADAC)

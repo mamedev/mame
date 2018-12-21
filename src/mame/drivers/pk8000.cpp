@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(pk8000_state::pk8000)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
+	MCFG_PALETTE_INIT_OWNER(pk8000_state, pk8000)
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	ppi1.out_pa_callback().set(FUNC(pk8000_state::_80_porta_w));

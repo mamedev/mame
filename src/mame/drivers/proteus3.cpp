@@ -402,8 +402,8 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(proteus3_state::kbd_put));
 
 	/* cassette */
 	ACIA6850(config, m_acia1, 0);
@@ -421,27 +421,27 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	m_acia2->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia2->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set(m_acia2, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
 	/* Bit Rate Generator */
-	MCFG_DEVICE_ADD ("brg", MC14411, XTAL(1'843'200)) // crystal needs verification but is the likely one
-	MCFG_MC14411_F1_CB(WRITELINE (*this, proteus3_state, write_f1_clock))
-	MCFG_MC14411_F2_CB(WRITELINE (*this, proteus3_state, write_f2_clock))
-	MCFG_MC14411_F3_CB(WRITELINE (*this, proteus3_state, write_f3_clock))
-	MCFG_MC14411_F4_CB(WRITELINE (*this, proteus3_state, write_f4_clock))
-	MCFG_MC14411_F5_CB(WRITELINE (*this, proteus3_state, write_f5_clock))
-	MCFG_MC14411_F6_CB(WRITELINE (*this, proteus3_state, write_f6_clock))
-	MCFG_MC14411_F7_CB(WRITELINE (*this, proteus3_state, write_f7_clock))
-	MCFG_MC14411_F8_CB(WRITELINE (*this, proteus3_state, write_f8_clock))
-	MCFG_MC14411_F9_CB(WRITELINE (*this, proteus3_state, write_f9_clock))
-	MCFG_MC14411_F10_CB(WRITELINE (*this, proteus3_state, write_f10_clock))
-	MCFG_MC14411_F11_CB(WRITELINE (*this, proteus3_state, write_f11_clock))
-	MCFG_MC14411_F12_CB(WRITELINE (*this, proteus3_state, write_f12_clock))
-	MCFG_MC14411_F13_CB(WRITELINE (*this, proteus3_state, write_f13_clock))
-	MCFG_MC14411_F14_CB(WRITELINE (*this, proteus3_state, write_f14_clock))
-	MCFG_MC14411_F15_CB(WRITELINE (*this, proteus3_state, write_f15_clock))
+	MC14411(config, m_brg, XTAL(1'843'200)); // crystal needs verification but is the likely one
+	m_brg->out_f<1>().set(FUNC(proteus3_state::write_f1_clock));
+	m_brg->out_f<2>().set(FUNC(proteus3_state::write_f2_clock));
+	m_brg->out_f<3>().set(FUNC(proteus3_state::write_f3_clock));
+	m_brg->out_f<4>().set(FUNC(proteus3_state::write_f4_clock));
+	m_brg->out_f<5>().set(FUNC(proteus3_state::write_f5_clock));
+	m_brg->out_f<6>().set(FUNC(proteus3_state::write_f6_clock));
+	m_brg->out_f<7>().set(FUNC(proteus3_state::write_f7_clock));
+	m_brg->out_f<8>().set(FUNC(proteus3_state::write_f8_clock));
+	m_brg->out_f<9>().set(FUNC(proteus3_state::write_f9_clock));
+	m_brg->out_f<10>().set(FUNC(proteus3_state::write_f10_clock));
+	m_brg->out_f<11>().set(FUNC(proteus3_state::write_f11_clock));
+	m_brg->out_f<12>().set(FUNC(proteus3_state::write_f12_clock));
+	m_brg->out_f<13>().set(FUNC(proteus3_state::write_f13_clock));
+	m_brg->out_f<14>().set(FUNC(proteus3_state::write_f14_clock));
+	m_brg->out_f<15>().set(FUNC(proteus3_state::write_f15_clock));
 MACHINE_CONFIG_END
 
 

@@ -21,33 +21,6 @@ enum
 	V25_PENDING
 };
 
-
-#define MCFG_V25_CONFIG(_table) \
-	downcast<v25_common_device &>(*device).set_decryption_table(_table);
-
-
-#define MCFG_V25_PORT_PT_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_pt_in_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P0_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p0_in_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P1_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p1_in_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P2_READ_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p2_in_cb(DEVCB_##_devcb);
-
-
-#define MCFG_V25_PORT_P0_WRITE_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p0_out_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P1_WRITE_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p1_out_cb(DEVCB_##_devcb);
-
-#define MCFG_V25_PORT_P2_WRITE_CB(_devcb) \
-	downcast<v25_common_device &>(*device).set_p2_out_cb(DEVCB_##_devcb);
-
 class v25_common_device : public cpu_device
 {
 public:
@@ -74,7 +47,7 @@ public:
 
 protected:
 	// construction/destruction
-	v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+	v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -105,17 +78,11 @@ protected:
 
 private:
 	address_space_config m_program_config;
+	address_space_config m_data_config;
 	address_space_config m_io_config;
 
 	/* internal RAM and register banks */
-	union internalram
-	{
-		uint16_t w[128];
-		uint8_t  b[256];
-	};
-
-	internalram m_ram;
-	offs_t  m_fetch_xor;
+	required_shared_ptr<uint16_t> m_internal_ram;
 
 	uint16_t  m_ip;
 
@@ -146,10 +113,13 @@ private:
 
 	/* system control */
 	uint8_t   m_RAMEN, m_TB, m_PCK; /* PRC register */
+	uint8_t   m_RFM;
+	uint16_t  m_WTC;
 	uint32_t  m_IDB;
 
 	address_space *m_program;
 	std::function<u8 (offs_t address)> m_dr8;
+	address_space *m_data;
 	address_space *m_io;
 	int     m_icount;
 
@@ -194,12 +164,60 @@ private:
 	void nec_bankswitch(unsigned bank_num);
 	void nec_trap();
 	void external_int();
+
+	void ida_sfr_map(address_map &map);
 	uint8_t read_irqcontrol(int /*INTSOURCES*/ source, uint8_t priority);
-	uint8_t read_sfr(unsigned o);
-	uint16_t read_sfr_word(unsigned o);
 	void write_irqcontrol(int /*INTSOURCES*/ source, uint8_t d);
-	void write_sfr(unsigned o, uint8_t d);
-	void write_sfr_word(unsigned o, uint16_t d);
+	uint8_t p0_r();
+	void p0_w(uint8_t d);
+	void pm0_w(uint8_t d);
+	void pmc0_w(uint8_t d);
+	uint8_t p1_r();
+	void p1_w(uint8_t d);
+	void pm1_w(uint8_t d);
+	void pmc1_w(uint8_t d);
+	uint8_t p2_r();
+	void p2_w(uint8_t d);
+	void pm2_w(uint8_t d);
+	void pmc2_w(uint8_t d);
+	uint8_t pt_r();
+	void pmt_w(uint8_t d);
+	uint8_t exic0_r();
+	void exic0_w(uint8_t d);
+	uint8_t exic1_r();
+	void exic1_w(uint8_t d);
+	uint8_t exic2_r();
+	void exic2_w(uint8_t d);
+	uint16_t tm0_r();
+	void tm0_w(uint16_t d);
+	uint16_t md0_r();
+	void md0_w(uint16_t d);
+	uint16_t tm1_r();
+	void tm1_w(uint16_t d);
+	uint16_t md1_r();
+	void md1_w(uint16_t d);
+	void tmc0_w(uint8_t d);
+	void tmc1_w(uint8_t d);
+	uint8_t tmic0_r();
+	void tmic0_w(uint8_t d);
+	uint8_t tmic1_r();
+	void tmic1_w(uint8_t d);
+	uint8_t tmic2_r();
+	void tmic2_w(uint8_t d);
+	uint8_t rfm_r();
+	void rfm_w(uint8_t d);
+	uint16_t wtc_r();
+	void wtc_w(offs_t a, uint16_t d, uint16_t m);
+	uint8_t flag_r();
+	void flag_w(uint8_t d);
+	uint8_t prc_r();
+	void prc_w(uint8_t d);
+	uint8_t tbic_r();
+	void tbic_w(uint8_t d);
+	uint8_t irqs_r();
+	uint8_t ispr_r();
+	uint8_t idb_r();
+	void idb_w(uint8_t d);
 	uint8_t v25_read_byte(unsigned a);
 	uint16_t v25_read_word(unsigned a);
 	void v25_write_byte(unsigned a, uint8_t d);

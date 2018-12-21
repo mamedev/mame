@@ -6,9 +6,9 @@
 
     driver by Mike Appolo
 
-    Modified 10/08/2006 by Jess M. Askey to include support for Speech which was not stuffed on production
-    Major Havoc PCB's. However, the hardware if stuffed is functional. Speech is used in Major Havoc Return
-    to Vaxx.
+    Modified 10/08/2006 by Jess M. Askey to include support for Speech which was not used on production
+    Major Havoc PCB's. However, the hardware if used is functional. Speech is used in Major Havoc Return
+    to Vax.
 
     Games supported:
         * Alpha One
@@ -516,31 +516,31 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mhavoc_state::mhavoc)
-
+void mhavoc_state::mhavoc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(alpha_map)
+	M6502(config, m_alpha, MHAVOC_CLOCK_2_5M);     /* 2.5 MHz */
+	m_alpha->set_addrmap(AS_PROGRAM, &mhavoc_state::alpha_map);
 
-	MCFG_DEVICE_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)    /* 1.25 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gamma_map)
+	M6502(config, m_gamma, MHAVOC_CLOCK_1_25M);    /* 1.25 MHz */
+	m_gamma->set_addrmap(AS_PROGRAM, &mhavoc_state::gamma_map);
 
 	EEPROM_2804(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("5k_timer", mhavoc_state, mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
+	TIMER(config, "5k_timer").configure_periodic(FUNC(mhavoc_state::mhavoc_cpu_irq_clock), attotime::from_hz(MHAVOC_CLOCK_5K));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(50);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 300, 0, 260);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("avg", AVG_MHAVOC, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -551,54 +551,52 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 	 * ==> DISCRETE emulation, below is just an approximation.
 	 */
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[0], MHAVOC_CLOCK_1_25M);
+	m_pokey[0]->allpot_r().set_ioport("DSW1");
+	m_pokey[0]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[1], MHAVOC_CLOCK_1_25M);
+	m_pokey[1]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	POKEY(config, m_pokey[2], MHAVOC_CLOCK_1_25M);
+	m_pokey[2]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey[3], MHAVOC_CLOCK_1_25M);
+	m_pokey[3]->set_output_opamp(RES_K(1), CAP_U(0.001), 5.0);
+	m_pokey[3]->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-
-MACHINE_CONFIG_START(mhavoc_state::mhavocrv)
+void mhavoc_state::mhavocrv(machine_config &config)
+{
 	mhavoc(config);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	TMS5220(config, m_tms, MHAVOC_CLOCK/2/9);
+	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(mhavoc_state::alphaone)
+void mhavoc_state::alphaone(machine_config &config)
+{
 	mhavoc(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("alpha")
-	MCFG_DEVICE_PROGRAM_MAP(alphaone_map)
-	MCFG_DEVICE_REMOVE("gamma")
+	m_alpha->set_addrmap(AS_PROGRAM, &mhavoc_state::alphaone_map);
+	config.device_remove("gamma");
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
+	subdevice<screen_device>("screen")->set_visarea(0, 580, 0, 500);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	POKEY(config.replace(), m_pokey[0], MHAVOC_CLOCK_1_25M);
+	m_pokey[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	POKEY(config.replace(), m_pokey[1], MHAVOC_CLOCK_1_25M);
+	m_pokey[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_REMOVE("pokey3")
-	MCFG_DEVICE_REMOVE("pokey4")
-MACHINE_CONFIG_END
+	config.device_remove("pokey3");
+	config.device_remove("pokey4");
+}
 
 
 
@@ -620,7 +618,7 @@ MACHINE_CONFIG_END
 
 ROM_START( mhavoc )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )   /* 152KB for ROMs */
+	ROM_REGION( 0x18000, "alpha", 0 )   /* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -633,8 +631,9 @@ ROM_START( mhavoc )
 	ROM_LOAD( "136025.318",   0x14000, 0x4000, CRC(ba935067) SHA1(05ad81e7a1982b9d8fddb48502546f48b5dc21b7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.107",   0x4000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
@@ -648,7 +647,7 @@ ROM_END
 
 ROM_START( mhavoc2 )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.110",   0x05000, 0x2000, CRC(16eef583) SHA1(277252bd716dd96d5b98ec5e33a3a6a3bc1a9abf) )
 
@@ -661,8 +660,9 @@ ROM_START( mhavoc2 )
 	ROM_LOAD( "136025.109",   0x14000, 0x4000, CRC(4d766827) SHA1(7697bf6f92bff0e62850ed75ff66008a08583ef7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.107",   0x4000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -678,7 +678,7 @@ ROM_END
 
 ROM_START( mhavocrv )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )   /* 152KB for ROMs */
+	ROM_REGION( 0x18000, "alpha", 0 )   /* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -691,8 +691,9 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.918",   0x14000, 0x4000, CRC(84735445) SHA1(21aacd862ce8911d257c6f48ead119ee5bb0b60d) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.907",   0x1c000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.106",   0x0000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.907",   0x4000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -708,7 +709,7 @@ ROM_END
 
 ROM_START( mhavocp )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.010",   0x05000, 0x2000, CRC(3050c0e6) SHA1(f19a9538996d949cdca7e6abd4f04e8ff6e0e2c1) )
 
@@ -721,8 +722,9 @@ ROM_START( mhavocp )
 	ROM_LOAD( "136025.018",   0x14000, 0x4000, CRC(a8c35ccd) SHA1(c243a5407557390a64c6560d857f5031f839973f) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.006",   0x18000, 0x4000, CRC(e272ed41) SHA1(0de395d1c4300a64da7f45746d7b550779e36a21) )
-	ROM_LOAD( "136025.007",   0x1c000, 0x4000, CRC(e152c9d8) SHA1(79d0938fa9ad262c7f28c5a8ad21004a4dec9ed8) )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "136025.006",   0x0000, 0x4000, CRC(e272ed41) SHA1(0de395d1c4300a64da7f45746d7b550779e36a21) )
+	ROM_LOAD( "136025.007",   0x4000, 0x4000, CRC(e152c9d8) SHA1(79d0938fa9ad262c7f28c5a8ad21004a4dec9ed8) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -737,7 +739,7 @@ ROM_END
 
 
 ROM_START( alphaone )
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -752,8 +754,9 @@ ROM_START( alphaone )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "vec_pg01.tw",  0x18000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
-	ROM_LOAD( "vec_pg23.tw",  0x1c000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "vec_pg01.tw",  0x0000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
+	ROM_LOAD( "vec_pg23.tw",  0x4000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -764,7 +767,7 @@ ROM_END
 
 
 ROM_START( alphaonea )
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x18000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -779,8 +782,9 @@ ROM_START( alphaonea )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "vec_pg01.tw",  0x18000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
-	ROM_LOAD( "vec_pg23.tw",  0x1c000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
+	ROM_REGION( 0x8000, "avgdvg", 0 )
+	ROM_LOAD( "vec_pg01.tw",  0x0000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
+	ROM_LOAD( "vec_pg23.tw",  0x4000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -799,7 +803,7 @@ ROM_END
 
 GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, init_mhavocrv, ROT0, "Atari / JMA (hack/homebrew)",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, init_mhavocrv, ROT0, "hack (JMA)",    "Major Havoc - Return to Vax", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, empty_init,    ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, empty_init,    ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, empty_init,    ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )

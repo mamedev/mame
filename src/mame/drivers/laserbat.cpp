@@ -80,7 +80,6 @@
 #include "includes/laserbat.h"
 
 #include "cpu/m6800/m6800.h"
-#include "cpu/s2650/s2650.h"
 
 #include "machine/clock.h"
 
@@ -177,9 +176,9 @@ void laserbat_state_base::laserbat_map(address_map &map)
 	map(0x7800, 0x7bff).rom();
 
 	map(0x1400, 0x14ff).mirror(0x6000).nopw();
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_pvi1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(m_pvi2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(m_pvi3, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_pvi[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(m_pvi[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(m_pvi[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(laserbat_state_base::videoram_w));
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 }
@@ -463,85 +462,81 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 }
 
 
-MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
-
+void laserbat_state_base::laserbat_base(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, S2650, XTAL(14'318'181)/4)
-	MCFG_DEVICE_PROGRAM_MAP(laserbat_map)
-	MCFG_DEVICE_IO_MAP(laserbat_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
-	MCFG_S2650_SENSE_INPUT(READLINE(m_screen, screen_device, vblank))
+	S2650(config, m_maincpu, XTAL(14'318'181)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &laserbat_state_base::laserbat_map);
+	m_maincpu->set_addrmap(AS_IO, &laserbat_state_base::laserbat_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(laserbat_state_base::laserbat_interrupt));
+	m_maincpu->sense_handler().set(m_screen, FUNC(screen_device::vblank));
 
 	// video hardware
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), 227*4, 43*4-1, 227*4-1, 312, 8, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state_base, screen_update_laserbat)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(14'318'181), 227*4, 43*4-1, 227*4-1, 312, 8, 255);
+	m_screen->set_screen_update(FUNC(laserbat_state_base::screen_update_laserbat));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PLS100_ADD(m_gfxmix)
+	PLS100(config, m_gfxmix);
 
-	MCFG_DEVICE_ADD(m_pvi1, S2636, XTAL(14'318'181)/3)
-	MCFG_S2636_OFFSETS(-8, -16)
-	MCFG_S2636_DIVIDER(3)
+	S2636(config, m_pvi[0], XTAL(14'318'181)/3);
+	m_pvi[0]->set_offsets(-8, -16);
+	m_pvi[0]->set_divider(3);
 
-	MCFG_DEVICE_ADD(m_pvi2, S2636, XTAL(14'318'181)/3)
-	MCFG_S2636_OFFSETS(-8, -16)
-	MCFG_S2636_DIVIDER(3)
+	S2636(config, m_pvi[1], XTAL(14'318'181)/3);
+	m_pvi[1]->set_offsets(-8, -16);
+	m_pvi[1]->set_divider(3);
 
-	MCFG_DEVICE_ADD(m_pvi3, S2636, XTAL(14'318'181)/3)
-	MCFG_S2636_OFFSETS(-8, -16)
-	MCFG_S2636_DIVIDER(3)
+	S2636(config, m_pvi[2], XTAL(14'318'181)/3);
+	m_pvi[2]->set_offsets(-8, -16);
+	m_pvi[2]->set_divider(3);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_laserbat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_laserbat);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(laserbat_state::laserbat)
+void laserbat_state::laserbat(machine_config &config)
+{
 	laserbat_base(config);
 
 	// video hardware
-	MCFG_PALETTE_ADD(m_palette, 256)
-	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
+	PALETTE(config, m_palette, 256).set_init(FUNC(laserbat_state::palette_init_laserbat));
 
 	// sound board devices
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD(m_csg, SN76477) // audio output not used
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(270), CAP_P(1000)) // R21, switchable R30/R23/R24/R25/R29/R28/R27/R26, C21
-	MCFG_SN76477_DECAY_RES(RES_INF)                 // NC
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_INF)          // NC, NC
-	MCFG_SN76477_AMP_RES(RES_K(47))                 // R26 47k
-	MCFG_SN76477_FEEDBACK_RES(RES_INF)              // NC
-	MCFG_SN76477_VCO_PARAMS(5.0 * RES_VOLTAGE_DIVIDER(RES_K(4.7), RES_K(2.2)), 0, RES_K(47)) // R22/R19, NC, switchable R47/R40/R41/R42/R46/R45/R44/R43
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                 // tied to Vreg
-	MCFG_SN76477_SLF_PARAMS(CAP_U(4.7), RES_INF)    // C24, switchable NC/R54/R53/R52/R51
-	MCFG_SN76477_ONESHOT_PARAMS(0, RES_INF)         // NC, NC
-	MCFG_SN76477_VCO_MODE(1)                        // BIT15
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)              // GND, VCO/NOISE, GND
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)              // GND, Vreg
-	MCFG_SN76477_ENABLE(0)                          // AB SOUND
+	SN76477(config, m_csg); // audio output not used
+	m_csg->set_noise_params(RES_K(47), RES_K(270), CAP_P(1000)); // R21, switchable R30/R23/R24/R25/R29/R28/R27/R26, C21
+	m_csg->set_decay_res(RES_INF);                  // NC
+	m_csg->set_attack_params(0, RES_INF);           // NC, NC
+	m_csg->set_amp_res(RES_K(47));                  // R26 47k
+	m_csg->set_feedback_res(RES_INF);               // NC
+	m_csg->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(4.7), RES_K(2.2)), 0, RES_K(47)); // R22/R19, NC, switchable R47/R40/R41/R42/R46/R45/R44/R43
+	m_csg->set_pitch_voltage(5.0);                  // tied to Vreg
+	m_csg->set_slf_params(CAP_U(4.7), RES_INF);     // C24, switchable NC/R54/R53/R52/R51
+	m_csg->set_oneshot_params(0, RES_INF);          // NC, NC
+	m_csg->set_vco_mode(1);                         // BIT15
+	m_csg->set_mixer_params(0, 0, 0);               // GND, VCO/NOISE, GND
+	m_csg->set_envelope_params(0, 1);               // GND, Vreg
+	m_csg->set_enable(0);                           // AB SOUND
 
-	MCFG_TMS3615_ADD(m_synth_low, 4_MHz_XTAL/16/2) // from the other one's /2 clock output
-	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
+	TMS3615(config, m_synth_low, 4_MHz_XTAL/16/2); // from the other one's /2 clock output
+	m_synth_low->add_route(tms3615_device::FOOTAGE_8, "speaker", 1.0);
 
-	MCFG_TMS3615_ADD(m_synth_high, 4_MHz_XTAL/16) // 4MHz divided down with a 74LS161
-	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
+	TMS3615(config, m_synth_high, 4_MHz_XTAL/16); // 4MHz divided down with a 74LS161
+	m_synth_high->add_route(tms3615_device::FOOTAGE_8, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(catnmous_state::catnmous)
+void catnmous_state::catnmous(machine_config &config)
+{
 	laserbat_base(config);
 
 	// video hardware
-	MCFG_PALETTE_ADD(m_palette, 256)
-	MCFG_PALETTE_INIT_OWNER(catnmous_state, catnmous)
+	PALETTE(config, m_palette, 256).set_init(FUNC(catnmous_state::palette_init_catnmous));
 
 	// sound board devices
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD(m_audiopcb, ZACCARIA_1B11107)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-MACHINE_CONFIG_END
+	ZACCARIA_1B11107(config, m_audiopcb).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 ROM_START( laserbat )
@@ -620,7 +615,7 @@ ROM_END
 /*
 Zaccaria "Cat 'N Mouse" 1982
 
-similar to "Quasar" execept it uses an 82s100 for color table lookup
+similar to "Quasar" except it uses an 82s100 for color table lookup
 and has a larger program prom
 
 

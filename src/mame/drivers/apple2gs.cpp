@@ -149,6 +149,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2GS_CPU_TAG),
 		m_screen(*this, "screen"),
+		m_scantimer(*this, "scantimer"),
 		m_adbmicro(*this, A2GS_ADBMCU_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
@@ -205,6 +206,7 @@ public:
 
 	required_device<g65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<timer_device> m_scantimer;
 	required_device<m5074x_device> m_adbmicro;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_rom;
@@ -2225,16 +2227,16 @@ READ8_MEMBER(apple2gs_state::c000_r)
 			return m_speed;
 
 		case 0x38:  // SCCBREG
-			return m_scc->cb_r(space, 0);
+			return m_scc->cb_r(0);
 
 		case 0x39:  // SCCAREG
-			return m_scc->ca_r(space, 0);
+			return m_scc->ca_r(0);
 
 		case 0x3a:  // SCCBDATA
-			return m_scc->db_r(space, 0);
+			return m_scc->db_r(0);
 
 		case 0x3b:  // SCCADATA
-			return m_scc->da_r(space, 0);
+			return m_scc->da_r(0);
 
 		case 0x3c:  // SOUNDCTL
 			return m_sndglu_ctrl;
@@ -2547,19 +2549,19 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 			break;
 
 		case 0x38:  // SCCBREG
-			m_scc->cb_w(space, 0, data);
+			m_scc->cb_w(0, data);
 			break;
 
 		case 0x39:  // SCCAREG
-			m_scc->ca_w(space, 0, data);
+			m_scc->ca_w(0, data);
 			break;
 
 		case 0x3a:  // SCCBDATA
-			m_scc->db_w(space, 0, data);
+			m_scc->db_w(0, data);
 			break;
 
 		case 0x3b:  // SCCADATA
-			m_scc->da_w(space, 0, data);
+			m_scc->da_w(0, data);
 			break;
 
 		case 0x3c:  // SOUNDCTL
@@ -4530,23 +4532,25 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("pcxport", A2BUS_PCXPORTER); /* Applied Engineering PC Transporter */
 }
 
-MACHINE_CONFIG_START( apple2gs_state::apple2gs )
+void apple2gs_state::apple2gs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", G65816, A2GS_MASTER_CLOCK/10)
-	MCFG_DEVICE_PROGRAM_MAP(apple2gs_map)
-	MCFG_DEVICE_ADDRESS_MAP(g65816_device::AS_VECTORS, vectors_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2gs_state, apple2_interrupt, "screen", 0, 1)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
+	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
+	TIMER(config, m_scantimer, 0);
+	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_DEVICE_ADD(A2GS_ADBMCU_TAG, M50741, A2GS_MASTER_CLOCK/8)
-	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
-	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p0_out))
-	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p1_in))
-	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p1_out))
-	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p2_in))
-	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p2_out))
-	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p3_in))
-	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p3_out))
+	M50741(config, m_adbmicro, A2GS_MASTER_CLOCK/8);
+	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));
+	m_adbmicro->write_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_out));
+	m_adbmicro->read_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_in));
+	m_adbmicro->write_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_out));
+	m_adbmicro->read_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_in));
+	m_adbmicro->write_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_out));
+	m_adbmicro->read_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_in));
+	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 
 #if !RUN_ADB_MICRO
 	/* keyboard controller */
@@ -4566,37 +4570,35 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	m_ay3600->ako().set(FUNC(apple2gs_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2gs_state, ay3600_repeat, attotime::from_hz(15))
+	TIMER(config, "repttmr").configure_periodic(FUNC(apple2gs_state::ay3600_repeat), attotime::from_hz(15));
 #endif
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD(A2GS_VIDEO_TAG, APPLE2_VIDEO, A2GS_14M)
+	APPLE2_VIDEO(config, m_video, A2GS_14M);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(704, 262)  // 640+32+32 for the borders
-	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
-	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(704, 262);  // 640+32+32 for the borders
+	m_screen->set_visarea(0,703,0,230);
+	m_screen->set_screen_update(FUNC(apple2gs_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
+	palette_device &palette(PALETTE(config, "palette", 256));
+	palette.set_init(DEVICE_SELF, FUNC(apple2gs_state::palette_init_apple2gs));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(A2GS_SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_ES5503_ADD(A2GS_DOC_TAG, A2GS_7M)
-	MCFG_ES5503_OUTPUT_CHANNELS(2)
-	MCFG_DEVICE_ADDRESS_MAP(0, a2gs_es5503_map)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, apple2gs_state, doc_irq_w))
-	MCFG_ES5503_ADC_FUNC(READ8(*this, apple2gs_state, doc_adc_read))
-
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ES5503(config, m_doc, A2GS_7M);
+	m_doc->set_channels(2);
+	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
+	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
+	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
+	m_doc->add_route(0, "lspeaker", 1.0);
+	m_doc->add_route(1, "rspeaker", 1.0);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
@@ -4670,22 +4672,22 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	m_scc->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
-	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2gs_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2gs_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2gs_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_cputag("maincpu");
+	m_a2bus->irq_w().set(FUNC(apple2gs_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));
+	m_a2bus->inh_w().set(FUNC(apple2gs_state::a2bus_inh_w));
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4694,29 +4696,35 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	MCFG_IWM_ADD(A2GS_IWM_TAG, apple2_fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","apple2gs")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop525_list", "apple2")
-MACHINE_CONFIG_END
+	IWM(config, m_iwm, &apple2_fdc_interface);
 
-MACHINE_CONFIG_START( apple2gs_state::apple2gsr1 )
+	FLOPPY_APPLE(config, FLOPPY_0, &apple2gs_floppy525_floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &apple2gs_floppy525_floppy_interface, 15, 16);
+
+	FLOPPY_SONY(config, FLOPPY_2, &apple2gs_floppy35_floppy_interface);
+	FLOPPY_SONY(config, FLOPPY_3, &apple2gs_floppy35_floppy_interface);
+
+	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
+	SOFTWARE_LIST(config, "flop525_list").set_compatible("apple2");
+}
+
+void apple2gs_state::apple2gsr1(machine_config &config)
+{
 	apple2gs(config);
 
 	// 256K on board + 1M in the expansion slot was common for ROM 01
 	m_ram->set_default_size("1280K").set_extra_options("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
 
-	MCFG_DEVICE_REPLACE(A2GS_ADBMCU_TAG, M50740, A2GS_MASTER_CLOCK/8)
-	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
-	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p0_out))
-	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p1_in))
-	MCFG_M5074X_PORT1_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p1_out))
-	MCFG_M5074X_PORT2_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p2_in))
-	MCFG_M5074X_PORT2_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p2_out))
-	MCFG_M5074X_PORT3_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p3_in))
-	MCFG_M5074X_PORT3_WRITE_CALLBACK(WRITE8(*this, apple2gs_state, adbmicro_p3_out))
-MACHINE_CONFIG_END
+	M50740(config.replace(), m_adbmicro, A2GS_MASTER_CLOCK/8);
+	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));
+	m_adbmicro->write_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_out));
+	m_adbmicro->read_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_in));
+	m_adbmicro->write_p<1>().set(FUNC(apple2gs_state::adbmicro_p1_out));
+	m_adbmicro->read_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_in));
+	m_adbmicro->write_p<2>().set(FUNC(apple2gs_state::adbmicro_p2_out));
+	m_adbmicro->read_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_in));
+	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
+}
 
 /***************************************************************************
 

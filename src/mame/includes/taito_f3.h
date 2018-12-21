@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_TAITO_F3_H
+#define MAME_INCLUDES_TAITO_F3_H
+
+#pragma once
 
 #include "audio/taito_en.h"
 #include "machine/eepromser.h"
@@ -409,3 +413,5 @@ protected:
 	void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
+
+#endif // MAME_INCLUDES_TAITO_F3_H

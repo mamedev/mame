@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+#ifndef MAME_INCLUDES_WARPWARP_H
+#define MAME_INCLUDES_WARPWARP_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/watchdog.h"
@@ -10,8 +14,8 @@
 class warpwarp_state : public driver_device
 {
 public:
-	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -119,3 +123,5 @@ private:
 	void geebee_port_map(address_map &map);
 	void warpwarp_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_WARPWARP_H

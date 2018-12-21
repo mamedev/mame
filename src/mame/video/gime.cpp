@@ -86,6 +86,7 @@
 
 
 
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -97,6 +98,7 @@
 #define LOG_INT_MASKING         0
 #define LOG_GIME                0
 #define LOG_TIMER               0
+#define LOG_PALETTE             0
 
 
 
@@ -552,11 +554,14 @@ void gime_device::update_memory(int bank)
 		// we're in ROM
 		static const uint8_t rom_map[4][4] =
 		{
-			{ 0, 1, 6, 7 },
-			{ 0, 1, 6, 7 },
+			{ 0, 1, 4, 5 },
+			{ 0, 1, 4, 5 },
 			{ 0, 1, 2, 3 },
-			{ 4, 5, 6, 7 }
+			{ 6, 7, 4, 5 }
 		};
+
+		// Pin ROM page to MMU slot
+		block = (block & 0xfc) | (bank & 0x03);
 
 		// look up the block in the ROM map
 		block = rom_map[m_gime_registers[0] & 3][(block & 0x3F) - 0x3C];
@@ -1004,6 +1009,10 @@ inline void gime_device::write_mmu_register(offs_t offset, uint8_t data)
 inline void gime_device::write_palette_register(offs_t offset, uint8_t data)
 {
 	offset &= 0x0F;
+
+	// perform logging
+	if (LOG_PALETTE)
+		logerror("%s: CoCo3 Palette: $%04x <== $%02x\n", describe_context(), offset + 0xffB0, data);
 
 	/* has this entry changed? */
 	if (m_palette_rotated[m_palette_rotated_position][offset] != data)

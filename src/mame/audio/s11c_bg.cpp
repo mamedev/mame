@@ -23,13 +23,14 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 	, m_hc55516(*this, "hc55516_bg")
 	, m_pia40(*this, "pia40")
 	, m_cpubank(*this, "bgbank")
+	, m_rom(*this, finder_base::DUMMY_TAG)
 {
 }
 
 void s11c_bg_device::s11c_bg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x2001).mirror(0x1ffe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x6000, 0x67ff).w(FUNC(s11c_bg_device::bg_speech_digit_w));
 	map(0x6800, 0x6fff).w(FUNC(s11c_bg_device::bg_speech_clock_w));
@@ -62,9 +63,9 @@ MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545)) // "3.58 MHz" on schematics and parts list
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, s11c_bg_device, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
+	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
+	m_ym2151->irq_handler().set(FUNC(s11c_bg_device::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.25);
 
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -76,7 +77,7 @@ MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
 	PIA6821(config, m_pia40, 0);
 	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pia40->writepb_handler().set(FUNC(s11c_bg_device::pia40_pb_w));
-	m_pia40->ca2_handler().set("ym2151", FUNC(ym2151_device::reset_w));
+	m_pia40->ca2_handler().set(m_ym2151, FUNC(ym2151_device::reset_w));
 	m_pia40->cb2_handler().set(FUNC(s11c_bg_device::pia40_cb2_w));
 	m_pia40->irqa_handler().set_inputline("bgcpu", M6809_FIRQ_LINE);
 	m_pia40->irqb_handler().set_inputline("bgcpu", INPUT_LINE_NMI);
@@ -88,11 +89,7 @@ void s11c_bg_device::device_start()
 
 void s11c_bg_device::device_reset()
 {
-	uint8_t* ROM;
-
-	m_rom = memregion(m_regiontag);
-	ROM = m_rom->base();
-	m_cpubank->configure_entries(0, 8, &ROM[0x10000], 0x8000);
+	m_cpubank->configure_entries(0, 8, &m_rom[0x10000], 0x8000);
 	m_cpubank->set_entry(0);
 	// reset the CPU again, so that the CPU are starting with the right vectors (otherwise sound may die on reset)
 	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);

@@ -513,15 +513,14 @@ void jongkyo_state::machine_reset()
 MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(jongkyo_memmap)
-	MCFG_DEVICE_IO_MAP(jongkyo_portmap)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_SIZE(0x6c00)
-	MCFG_SEGACRPT_SET_NUMBANKS(8)
-	MCFG_SEGACRPT_SET_BANKSIZE(0x400)
-	//  sega_decode(rom, opcodes, 0x6c00, convtable, 8, 0x400);
+	sega_315_5084_device &maincpu(SEGA_315_5084(config, m_maincpu, JONGKYO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &jongkyo_state::jongkyo_memmap);
+	maincpu.set_addrmap(AS_IO, &jongkyo_state::jongkyo_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &jongkyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(jongkyo_state::irq0_line_hold));
+	maincpu.set_size(0x6c00);
+	maincpu.set_numbanks(8);
+	maincpu.set_banksize(0x400);
 
 
 	/* video hardware */
@@ -537,10 +536,10 @@ MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 	MCFG_PALETTE_INIT_OWNER(jongkyo_state, jongkyo)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jongkyo_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jongkyo_state, input_2p_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8910_device &aysnd(AY8910(config, "aysnd", JONGKYO_CLOCK/8));
+	aysnd.port_a_read_callback().set(FUNC(jongkyo_state::input_1p_r));
+	aysnd.port_b_read_callback().set(FUNC(jongkyo_state::input_2p_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 

@@ -974,7 +974,7 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
+	PCE220SERIAL(config, m_serial, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcg850v_state::pcg815)
@@ -1008,7 +1008,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
+	PCE220SERIAL(config, m_serial, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcg850v_state::pcg850v)
@@ -1042,7 +1042,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
+	PCE220SERIAL(config, m_serial, 0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

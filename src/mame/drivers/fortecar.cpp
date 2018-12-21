@@ -687,8 +687,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_DEVICE_PROGRAM_MAP(fortecar_map)
 	MCFG_DEVICE_IO_MAP(fortecar_ports)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* guess */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -711,23 +710,24 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	fcppi0.in_pc_callback().set(FUNC(fortecar_state::ppi0_portc_r));
 	fcppi0.out_pc_callback().set(FUNC(fortecar_state::ppi0_portc_w));
 
-	MCFG_V3021_ADD("rtc")
+	V3021(config, "rtc");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fortecar)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 1.5 MHz, measured */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* 1.5 MHz, measured */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortecar_state, ayporta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortecar_state, ayportb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));   /* 1.5 MHz, measured */
+	aysnd.port_a_write_callback().set(FUNC(fortecar_state::ayporta_w));
+	aysnd.port_b_write_callback().set(FUNC(fortecar_state::ayportb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

@@ -170,71 +170,69 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 }
 
 
-MACHINE_CONFIG_START(ajax_state::ajax)
-
+void ajax_state::ajax(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 12/4 MHz*/
-	MCFG_DEVICE_PROGRAM_MAP(ajax_main_map)
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4);    /* 052001 12/4 MHz*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_main_map);
 
-	MCFG_DEVICE_ADD("sub", HD6309E, 3000000) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(ajax_sub_map)
+	HD6309E(config, m_subcpu, 3000000); /* ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_sub_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)  /* 3.58 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ajax_sound_map)
+	Z80(config, m_audiocpu, 3579545);  /* 3.58 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 108, 412, 256, 16, 240)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000)/3, 528, 108, 412, 256, 16, 240);
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_screen_update(FUNC(ajax_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette, 2048);
+	m_palette->enable_shadows();
+	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(ajax_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(ajax_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(ajax_state, sprite_callback)
-	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(ajax_state::sprite_callback), this);
+	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(7)
-	MCFG_K051316_CB(ajax_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_bpp(7);
+	m_k051316->set_zoom_callback(FUNC(ajax_state::zoom_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, ajax_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	K007232(config, m_k007232_1, 3579545);
+	m_k007232_1->port_write().set(FUNC(ajax_state::volume_callback0));
+	m_k007232_1->add_route(0, "lspeaker", 0.20);
+	m_k007232_1->add_route(0, "rspeaker", 0.20);
+	m_k007232_1->add_route(1, "lspeaker", 0.20);
+	m_k007232_1->add_route(1, "rspeaker", 0.20);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, ajax_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, 3579545);
+	m_k007232_2->port_write().set(FUNC(ajax_state::volume_callback1));
+	m_k007232_2->add_route(0, "lspeaker", 0.50);
+	m_k007232_2->add_route(1, "rspeaker", 0.50);
+}
 
 
 /*

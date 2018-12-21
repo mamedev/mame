@@ -301,8 +301,9 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 
 	// temporary until things are cleaned up
-	MCFG_DEVICE_ADD("tempcdc", LC89510_TEMP, 0) // cd controller
-	MCFG_SEGACD_HACK_SET_CDC_DO_DMA( sega_segacd_device, SegaCD_CDC_Do_DMA ) // hack
+	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
+	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA), this); // hack
+
 
 	MCFG_TIMER_ADD_NONE("sw_timer") //stopwatch timer
 	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, stamp_timer_callback)

@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
 	MCFG_DEVICE_PROGRAM_MAP(rockrage_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -269,15 +269,15 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rockrage_state, vblank_irq))
 
-	MCFG_K007342_ADD("k007342")
-	MCFG_K007342_GFXNUM(0)
-	MCFG_K007342_CALLBACK_OWNER(rockrage_state, rockrage_tile_callback)
-	MCFG_K007342_GFXDECODE("gfxdecode")
+	K007342(config, m_k007342, 0);
+	m_k007342->set_gfxnum(0);
+	m_k007342->set_tile_callback(FUNC(rockrage_state::rockrage_tile_callback), this);
+	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_K007420_ADD("k007420")
-	MCFG_K007420_BANK_LIMIT(0x3ff)
-	MCFG_K007420_CALLBACK_OWNER(rockrage_state, rockrage_sprite_callback)
-	MCFG_K007420_PALETTE("palette")
+	K007420(config, m_k007420, 0);
+	m_k007420->set_bank_limit(0x3ff);
+	m_k007420->set_sprite_callback(FUNC(rockrage_state::rockrage_sprite_callback), this);
+	m_k007420->set_palette_tag(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rockrage)
 	MCFG_PALETTE_ADD("palette", 16*16*3)
@@ -290,11 +290,9 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
 
 	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
 	MCFG_DEVICE_ADDRESS_MAP(0, rockrage_vlm_map)

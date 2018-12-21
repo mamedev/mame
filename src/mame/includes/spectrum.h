@@ -17,6 +17,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
@@ -105,6 +106,8 @@ public:
 	void spectrum_128(machine_config &config);
 
 	void init_spectrum();
+	void init_spec128();
+	void init_timex();
 	void init_plus2();
 	void init_plus3();
 

@@ -79,7 +79,6 @@
 #include "includes/foodf.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/adc0808.h"
-#include "machine/atarigen.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "speaker.h"
@@ -127,7 +126,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 	   mystery yet */
 
 	/* INT 1 is on 32V */
-	scanline_int_gen(*m_maincpu);
+	m_scanline_int_state = true;
+	update_interrupts();
 
 	/* advance to the next interrupt */
 	scanline += 64;
@@ -139,9 +139,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 }
 
 
+WRITE_LINE_MEMBER(foodf_state::video_int_write_line)
+{
+	if (state)
+	{
+		m_video_int_state = true;
+		update_interrupts();
+	}
+}
+
+
 void foodf_state::machine_start()
 {
-	atarigen_state::machine_start();
+	m_scanline_int_state = false;
+	m_video_int_state = false;
+
+	save_item(NAME(m_scanline_int_state));
+	save_item(NAME(m_video_int_state));
+
 	m_leds.resolve();
 }
 
@@ -165,10 +180,16 @@ WRITE8_MEMBER(foodf_state::digital_w)
 
 	m_nvram->store(data & 0x02);
 
-	if (!(data & 0x04))
-		scanline_int_ack_w(space,0,0);
-	if (!(data & 0x08))
-		video_int_ack_w(space,0,0);
+	if (!BIT(data, 2))
+	{
+		m_scanline_int_state = false;
+		update_interrupts();
+	}
+	if (!BIT(data, 3))
+	{
+		m_video_int_state = false;
+		update_interrupts();
+	}
 
 	m_leds[0] = BIT(data, 4);
 	m_leds[1] = BIT(data, 5);
@@ -316,11 +337,11 @@ READ8_MEMBER(foodf_state::pot_r)
  *
  *************************************/
 
-MACHINE_CONFIG_START(foodf_state::foodf)
-
+void foodf_state::foodf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &foodf_state::main_map);
 
 	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK/16));
 	adc.in_callback<0>().set_ioport("STICK1_Y");
@@ -330,42 +351,41 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 
 	X2212(config, "nvram").set_auto_save(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	MCFG_TIMER_DRIVER_ADD(m_scan_timer, foodf_state, scanline_update_timer)
+	TIMER(config, m_scan_timer).configure_generic(FUNC(foodf_state::scanline_update_timer));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_foodf)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_foodf);
+	PALETTE(config, m_palette, 256);
 
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield", "gfxdecode", 2, foodf_state, get_playfield_tile_info, 8,8, SCAN_COLS, 32,32, 0)
+	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_COLS, 32,32, 0).set_info_callback(FUNC(foodf_state::get_playfield_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(foodf_state, screen_update_foodf)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, foodf_state, video_int_write_line))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224);
+	m_screen->set_screen_update(FUNC(foodf_state::screen_update_foodf));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(foodf_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
-	MCFG_POKEY_POT0_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_POKEY_POT1_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_POKEY_POT2_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_POKEY_POT3_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_POKEY_POT4_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_POKEY_POT5_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_POKEY_POT6_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_POKEY_POT7_R_CB(READ8(*this, foodf_state, pot_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/2/10));
+	pokey1.pot_r<0>().set(FUNC(foodf_state::pot_r));
+	pokey1.pot_r<1>().set(FUNC(foodf_state::pot_r));
+	pokey1.pot_r<2>().set(FUNC(foodf_state::pot_r));
+	pokey1.pot_r<3>().set(FUNC(foodf_state::pot_r));
+	pokey1.pot_r<4>().set(FUNC(foodf_state::pot_r));
+	pokey1.pot_r<5>().set(FUNC(foodf_state::pot_r));
+	pokey1.pot_r<6>().set(FUNC(foodf_state::pot_r));
+	pokey1.pot_r<7>().set(FUNC(foodf_state::pot_r));
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/2/10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/2/10));
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_ADD("pokey3", POKEY, MASTER_CLOCK/2/10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	pokey_device &pokey3(POKEY(config, "pokey3", MASTER_CLOCK/2/10));
+	pokey3.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 

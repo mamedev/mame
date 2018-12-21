@@ -192,6 +192,7 @@ Beeper Circuit, all ICs shown:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -706,11 +707,11 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 	// T0 is the key matrix return
 	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-	MCFG_DEVICE_ADD("kbdmcu", I8741, 6_MHz_XTAL)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, itt3030_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, itt3030_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, itt3030_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, itt3030_state, kbd_port2_w))
+	I8741(config, m_kbdmcu, 6_MHz_XTAL);
+	m_kbdmcu->t0_in_cb().set(FUNC(itt3030_state::kbd_matrix_r));
+	m_kbdmcu->p1_out_cb().set(FUNC(itt3030_state::kbd_matrix_w));
+	m_kbdmcu->p2_in_cb().set(FUNC(itt3030_state::kbd_port2_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(itt3030_state::kbd_port2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -724,8 +725,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	/* devices */
 	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
 
-	MCFG_DEVICE_ADD("crt5027", CRT5027, 6_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5027(config, m_crtc, 6_MHz_XTAL / 8).set_char_width(8);
 
 	FD1791(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(itt3030_state::fdcirq_w));

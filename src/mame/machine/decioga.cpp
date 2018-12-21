@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /******************************************************************************
 *
-*   MIPS DECstation I/O Gate Array emulation
+*   MIPS DECstation and AlphaStation I/O Gate Array emulation
 *   This IC contains some address decoding, an interrupt controller, and
 *   a multi-channel DMA engine.
 */
@@ -20,12 +20,15 @@ void dec_ioga_device::map(address_map &map)
 }
 
 dec_ioga_device::dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECSTATION_IOGA, tag, owner, clock)
+	: device_t(mconfig, DECSTATION_IOGA, tag, owner, clock),
+	m_irq_out_cb(*this)
 {
 }
 
 void dec_ioga_device::device_start()
 {
+	m_irq_out_cb.resolve_safe();
+
 	save_item(NAME(m_csr));
 	save_item(NAME(m_intr));
 	save_item(NAME(m_imsk));
@@ -58,8 +61,19 @@ READ32_MEMBER(dec_ioga_device::intr_r)
 {
 	uint32_t rv = m_intr;
 	m_intr &= ~0x20;        // 5000/133 boot ROM tests that reading clears this bit
-	//printf("m_intr = %08x\n", m_intr);
 	return rv;
+}
+
+void dec_ioga_device::recalc_irq()
+{
+	if ((m_intr & m_imsk) != 0)
+	{
+		m_irq_out_cb(ASSERT_LINE);
+	}
+	else
+	{
+		m_irq_out_cb(CLEAR_LINE);
+	}
 }
 
 WRITE32_MEMBER(dec_ioga_device::intr_w)
@@ -83,4 +97,44 @@ WRITE_LINE_MEMBER(dec_ioga_device::rtc_irq_w)
 	{
 		m_intr |= 0x20; // tested by 5000/133 boot ROM circa BFC027C8
 	}
+	recalc_irq();
+}
+
+WRITE_LINE_MEMBER(dec_ioga_device::lance_irq_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_intr |= 0x100;
+	}
+	else
+	{
+		m_intr &= ~0x100;
+	}
+	recalc_irq();
+}
+
+WRITE_LINE_MEMBER(dec_ioga_device::scc0_irq_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_intr |= 0x40;
+	}
+	else
+	{
+		m_intr &= ~0x40;
+	}
+	recalc_irq();
+}
+
+WRITE_LINE_MEMBER(dec_ioga_device::scc1_irq_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_intr |= 0x80;
+	}
+	else
+	{
+		m_intr &= ~0x80;
+	}
+	recalc_irq();
 }

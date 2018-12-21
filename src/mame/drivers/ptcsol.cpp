@@ -205,7 +205,7 @@ private:
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
@@ -736,58 +736,57 @@ void sol20_state::kbd_put(u8 data)
 	}
 }
 
-MACHINE_CONFIG_START(sol20_state::sol20)
+void sol20_state::sol20(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080A, 14.318181_MHz_XTAL / 7) // divider selectable as 5, 6 or 7 through jumpers
-	MCFG_DEVICE_PROGRAM_MAP(sol20_mem)
-	MCFG_DEVICE_IO_MAP(sol20_io)
-	MCFG_I8085A_INTE(WRITELINE("speaker", speaker_sound_device, level_w))
+	I8080A(config, m_maincpu, 14.318181_MHz_XTAL / 7); // divider selectable as 5, 6 or 7 through jumpers
+	m_maincpu->set_addrmap(AS_PROGRAM, &sol20_state::sol20_mem);
+	m_maincpu->set_addrmap(AS_IO, &sol20_state::sol20_io);
+	m_maincpu->out_inte_func().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(14.318181_MHz_XTAL, 918, 0, 576, 260, 0, 208)
-	MCFG_SCREEN_UPDATE_DRIVER(sol20_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(14.318181_MHz_XTAL, 918, 0, 576, 260, 0, 208);
+	m_screen->set_screen_update(FUNC(sol20_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sol20)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sol20);
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 2.00); // music board
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
-	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
+	WAVE(config, "wave", m_cass1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave2", m_cass2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(sol20_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sol20_cass")
+	CASSETTE(config, m_cass1).set_formats(sol20_cassette_formats);
+	m_cass1->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass1->set_interface("sol20_cass");
 
-	MCFG_CASSETTE_ADD("cassette2")
-	MCFG_CASSETTE_FORMATS(sol20_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sol20_cass")
+	CASSETTE(config, m_cass2).set_formats(sol20_cassette_formats);
+	m_cass2->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cass2->set_interface("sol20_cass");
 
 	AY51013(config, m_uart); // TMS6011NC
 	m_uart->set_tx_clock(4800.0);
 	m_uart->set_rx_clock(4800.0);
 	m_uart->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	AY51013(config, m_uart_s); // TMS6011NC
-	m_uart_s->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
-	m_uart_s->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart_s->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart_s->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart_s->set_tx_clock(4800.0);
 	m_uart_s->set_rx_clock(4800.0);
 	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(sol20_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(sol20_state::kbd_put));
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "sol20_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("sol20_cass");
+}
 
 /* ROM definition */
 ROM_START( sol20 )

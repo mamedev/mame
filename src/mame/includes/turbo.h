@@ -5,6 +5,10 @@
     Sega Z80-3D system
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TURBO_H
+#define MAME_INCLUDES_TURBO_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -214,3 +218,5 @@ private:
 	void subroc3d_map(address_map &map);
 	void turbo_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TURBO_H

@@ -152,8 +152,8 @@ MACHINE_CONFIG_START(mes_state::mes)
 	Z80PIO(config, "pio", 0);
 	Z80SIO(config, "sio", 0);
 
-	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(mes_state, kbd_put))
+	generic_keyboard_device &keybd(GENERIC_KEYBOARD(config, "keybd", 0));
+	keybd.set_keyboard_callback(FUNC(mes_state::kbd_put));
 MACHINE_CONFIG_END
 
 

@@ -724,12 +724,13 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, 12.48_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, trs80m2_state, de_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
+	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));
+	m_crtc->out_vsync_callback().set(FUNC(trs80m2_state::vsync_w));
 
 	// devices
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
@@ -773,10 +774,10 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
-	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, trs80m2_state, kb_clock_w))
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
+	TRS80M2_KEYBOARD(config, m_kb, 0);
+	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
@@ -812,12 +813,13 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, 12.48_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(trs80m2_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, trs80m2_state, de_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
+	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));
+	m_crtc->out_vsync_callback().set(FUNC(trs80m2_state::vsync_w));
 
 	// devices
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
@@ -864,10 +866,10 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
-	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, trs80m2_state, kb_clock_w))
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
+	TRS80M2_KEYBOARD(config, m_kb, 0);
+	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");

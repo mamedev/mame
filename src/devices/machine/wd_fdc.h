@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "imagedev/floppy.h"
 #include "fdc_pll.h"
+
+class floppy_image_device;
 
 /*
  * The Western Digital floppy controller family

@@ -410,7 +410,7 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 	// d1: HD44780 R/W
 	// d2: HD44780 E
 	if (m_lcd_control & ~data & 4 && ~data & 2)
-		m_lcd->write(space, m_lcd_control & 1, m_lcd_data);
+		m_lcd->write(m_lcd_control & 1, m_lcd_data);
 	m_lcd_control = data & 7;
 }
 

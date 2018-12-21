@@ -41,7 +41,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
 	required_device<hd44780_device> m_lcdc1;
 	required_device<nvram_device> m_nvram;
@@ -62,7 +62,7 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_READ8_MEMBER(port_d_r);
 	DECLARE_WRITE8_MEMBER(port_d_w);
-	void update_lcdc(address_space &space, bool lcdc0, bool lcdc1);
+	void update_lcdc(bool lcdc0, bool lcdc1);
 
 	void alphasmart_io(address_map &map);
 	void alphasmart_mem(address_map &map);
@@ -128,17 +128,17 @@ READ8_MEMBER(alphasmart_state::port_a_r)
 	return (m_port_a & 0xfd) | (m_battery_status->read() << 1);
 }
 
-void alphasmart_state::update_lcdc(address_space &space, bool lcdc0, bool lcdc1)
+void alphasmart_state::update_lcdc(bool lcdc0, bool lcdc1)
 {
 	if (m_matrix[1] & 0x04)
 	{
 		uint8_t lcdc_data = 0;
 
 		if (lcdc0)
-			lcdc_data |= m_lcdc0->read(space, BIT(m_matrix[1], 1));
+			lcdc_data |= m_lcdc0->read(BIT(m_matrix[1], 1));
 
 		if (lcdc1)
-			lcdc_data |= m_lcdc1->read(space, BIT(m_matrix[1], 1));
+			lcdc_data |= m_lcdc1->read(BIT(m_matrix[1], 1));
 
 		m_port_d = (m_port_d & 0xc3) | (lcdc_data>>2);
 	}
@@ -147,17 +147,17 @@ void alphasmart_state::update_lcdc(address_space &space, bool lcdc0, bool lcdc1)
 		uint8_t lcdc_data = (m_port_d<<2) & 0xf0;
 
 		if (lcdc0)
-			m_lcdc0->write(space, BIT(m_matrix[1], 1), lcdc_data);
+			m_lcdc0->write(BIT(m_matrix[1], 1), lcdc_data);
 
 		if (lcdc1)
-			m_lcdc1->write(space, BIT(m_matrix[1], 1), lcdc_data);
+			m_lcdc1->write(BIT(m_matrix[1], 1), lcdc_data);
 	}
 }
 
 WRITE8_MEMBER(alphasmart_state::port_a_w)
 {
 	uint8_t changed = (m_port_a ^ data) & data;
-	update_lcdc(space, changed & 0x80, changed & 0x20);
+	update_lcdc(changed & 0x80, changed & 0x20);
 	m_rambank->set_entry(((data>>3) & 0x01) | ((data>>4) & 0x02));
 	m_port_a = data;
 }
@@ -207,7 +207,7 @@ WRITE8_MEMBER(asma2k_state::io_w)
 	else if (offset == 0x4000)
 	{
 		uint8_t changed = (m_lcd_ctrl ^ data) & data;
-		update_lcdc(space, changed & 0x01, changed & 0x02);
+		update_lcdc(changed & 0x01, changed & 0x02);
 		m_lcd_ctrl = data;
 	}
 
@@ -433,10 +433,10 @@ void alphasmart_state::machine_reset()
 
 MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
-	MCFG_DEVICE_PROGRAM_MAP(alphasmart_mem)
-	MCFG_DEVICE_IO_MAP(alphasmart_io)
-	MCFG_MC68HC11_CONFIG(0, 192, 0x00)
+	MC68HC11(config, m_maincpu, XTAL(8'000'000)/2);  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
+	m_maincpu->set_addrmap(AS_IO, &alphasmart_state::alphasmart_io);
+	m_maincpu->set_config(0, 192, 0x00);
 
 	MCFG_KS0066_F05_ADD("ks0066_0")
 	MCFG_HD44780_LCD_SIZE(2, 40)

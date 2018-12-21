@@ -111,7 +111,6 @@ DIP locations verified for:
 #include "includes/baraduke.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
@@ -194,20 +193,6 @@ void baraduke_state::mcu_map(address_map &map)
 	map(0x8800, 0x8800).nopw();                        /* irq acknoledge? */
 	map(0xc000, 0xc7ff).ram();                             /* RAM */
 	map(0xf000, 0xffff).rom();                             /* MCU internal ROM */
-}
-
-
-READ8_MEMBER(baraduke_state::readFF)
-{
-	return 0xff;
-}
-
-void baraduke_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).r(FUNC(baraduke_state::inputport_r));         /* input ports read */
-	map(M6801_PORT1, M6801_PORT1).w(FUNC(baraduke_state::inputport_select_w)); /* input port select */
-	map(M6801_PORT2, M6801_PORT2).r(FUNC(baraduke_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(FUNC(baraduke_state::baraduke_lamps_w));       /* lamps */
 }
 
 
@@ -378,38 +363,41 @@ void baraduke_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(baraduke_state::baraduke)
-
+void baraduke_state::baraduke(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) // 68A09E
-	MCFG_DEVICE_PROGRAM_MAP(baraduke_map)
+	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); // 68A09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &baraduke_state::baraduke_map);
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8);
+	m_mcu->set_addrmap(AS_PROGRAM, &baraduke_state::mcu_map);
+	m_mcu->in_p1_cb().set(FUNC(baraduke_state::inputport_r));         /* input ports read */
+	m_mcu->out_p1_cb().set(FUNC(baraduke_state::inputport_select_w)); /* input port select */
+	m_mcu->in_p2_cb().set_constant(0xff);                             /* leds won't work otherwise */
+	m_mcu->out_p2_cb().set(FUNC(baraduke_state::baraduke_lamps_w));   /* lamps */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* we need heavy synch */
+	config.m_minimum_quantum = attotime::from_hz(6000);      /* we need heavy synch */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 0, 36*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, baraduke_state, screen_vblank_baraduke))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(49'152'000)/8, 384, 0, 36*8, 264, 2*8, 30*8);
+	screen.set_screen_update(FUNC(baraduke_state::screen_update_baraduke));
+	screen.screen_vblank().set(FUNC(baraduke_state::screen_vblank_baraduke));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_baraduke)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_INIT_OWNER(baraduke_state, baraduke)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_baraduke);
+	PALETTE(config, m_palette, 2048);
+	m_palette->set_init(FUNC(baraduke_state::palette_init_baraduke));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
+	m_cus30->set_voices(8);
+	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

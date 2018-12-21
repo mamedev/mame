@@ -312,10 +312,11 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2000000) /* comes out of ULA - needs to be measured */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(7)
-	MCFG_MC6845_UPDATE_ROW_CB(kaypro_state, kaypro484_update_row)
+	MC6845(config, m_crtc, 2000000); /* comes out of ULA - needs to be measured */
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(7);
+	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
 
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 

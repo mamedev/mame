@@ -84,7 +84,7 @@ void newbrain_fdc_device::newbrain_fdc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x71);
-	map(0x00, 0x01).mirror(0x10).m(UPD765_TAG, FUNC(upd765a_device::map));
+	map(0x00, 0x01).mirror(0x10).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x20, 0x20).mirror(0x11).w(FUNC(newbrain_fdc_device::fdc_auxiliary_w));
 	map(0x40, 0x40).mirror(0x11).r(FUNC(newbrain_fdc_device::fdc_control_r));
 }
@@ -109,8 +109,8 @@ MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(newbrain_fdc_mem)
 	MCFG_DEVICE_IO_MAP(newbrain_fdc_io)
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, newbrain_fdc_device, fdc_int_w))
+	UPD765A(config, m_fdc, 8'000'000, false, true);
+	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

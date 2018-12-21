@@ -2034,30 +2034,29 @@ void aristmk5_state::machine_reset()
 	memset(m_spi_data, 0, sizeof(m_spi_data));
 }
 
+void aristmk5_state::aristmk5(machine_config &config)
+{
+	ARM(config, m_maincpu, MASTER_CLOCK/6); // 12000000
+	m_maincpu->set_addrmap(AS_PROGRAM, &aristmk5_state::aristmk5_drame_map);
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5)
-	MCFG_DEVICE_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
-	MCFG_DEVICE_PROGRAM_MAP(aristmk5_drame_map)
-
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2));  /* 1.6 - 2 seconds */
 
 	/* TODO: this isn't supposed to access a keyboard ... */
-	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
+	AAKART(config, m_kart, 12000000/128); // TODO: frequency
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 640-1, 0, 400-1);
+	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette, 0x200);
 
-	EEPROM_93C56_16BIT(config, "eeprom0");
-	EEPROM_93C56_16BIT(config, "eeprom1");
+	EEPROM_93C56_16BIT(config, m_eeprom[0]);
+	EEPROM_93C56_16BIT(config, m_eeprom[1]);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	// TL16C452FN U71
 	ns16450_device &uart0a(NS16450(config, "uart_0a", MASTER_CLOCK / 9));
@@ -2083,55 +2082,53 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 	NS16450(config, "uart_3b", MASTER_CLOCK / 9);
 //  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, FUNC(input_merger_device::in_w<7>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("uart_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, aristmk5_state, uart_irq_callback))
+	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(FUNC(aristmk5_state::uart_irq_callback));
 
-	MCFG_DEVICE_ADD("rtc", DS1302, 32.768_kHz_XTAL)
+	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	for (int i = 0; i < 8; i++)
+	{
+		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, "speaker", 0.1); // unknown DAC
+	}
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac0", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac7", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
+void aristmk5_state::aristmk5_touch(machine_config &config)
+{
 	aristmk5(config);
-	subdevice<ns16450_device>("uart_0a")
-			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	subdevice<ns16450_device>("uart_0a")->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
-MACHINE_CONFIG_END
+	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", 2400));
+	microtouch.stx().set("uart_0a", FUNC(ins8250_uart_device::rx_w));
+}
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa)
+void aristmk5_state::aristmk5_usa(machine_config &config)
+{
 	aristmk5(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aristmk5_usa_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &aristmk5_state::aristmk5_usa_map);
+}
 
-MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
+void aristmk5_state::aristmk5_usa_touch(machine_config &config)
+{
 	aristmk5_usa(config);
-	subdevice<ns16450_device>("uart_0a")
-			->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	subdevice<ns16450_device>("uart_0a")->out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
-MACHINE_CONFIG_END
+	microtouch_device &microtouch(MICROTOUCH(config, "microtouch", 2400));
+	microtouch.stx().set("uart_0a", FUNC(ins8250_uart_device::rx_w));
+}
 
 #define ARISTOCRAT_MK5_BIOS \
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \

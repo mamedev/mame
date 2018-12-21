@@ -13,6 +13,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "imagedev/floppy.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -94,6 +95,7 @@ public:
 			m_cart(*this, "cartslot"),
 			m_ram(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
+			m_ymsnd(*this, YM2149_TAG),
 			m_p31(*this, "P31"),
 			m_p32(*this, "P32"),
 			m_p33(*this, "P33"),
@@ -136,6 +138,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
+	required_device<ym2149_device> m_ymsnd;
 	required_ioport m_p31;
 	required_ioport m_p32;
 	required_ioport m_p33;
@@ -330,11 +333,13 @@ public:
 	required_device<screen_device> m_screen;
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
+	void common(machine_config &config);
 	void st(machine_config &config);
-	void ikbd_io_map(address_map &map);
 	void ikbd_map(address_map &map);
 	void st_map(address_map &map);
 protected:
+	void keyboard(machine_config &config);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;

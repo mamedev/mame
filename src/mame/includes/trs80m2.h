@@ -11,6 +11,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
+#include "imagedev/floppy.h"
 #include "machine/am9519.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
@@ -39,8 +40,8 @@
 class trs80m2_state : public driver_device
 {
 public:
-	trs80m2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	trs80m2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
 		m_dmac(*this, Z80DMA_TAG),

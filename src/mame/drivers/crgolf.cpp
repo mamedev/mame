@@ -485,11 +485,9 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	mainlatch.q_out_cb<6>().set(FUNC(crgolf_state::screenb_enable_w));
 	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screena_enable_w));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch1").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 
 	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
@@ -509,8 +507,7 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, "aysnd", MASTER_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

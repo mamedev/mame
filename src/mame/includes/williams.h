@@ -5,7 +5,10 @@
     Driver for early Williams games
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_WILLIAMS_H
+#define MAME_INCLUDES_WILLIAMS_H
 
+#pragma once
 
 #include "audio/williams.h"
 #include "cpu/m6800/m6800.h"
@@ -40,7 +43,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "paletteram"),
-		m_pia(*this, "pia_%u", 0U) { }
+		m_pia(*this, "pia_%u", 0U)
+	{ }
 
 	void playball(machine_config &config);
 	void defender(machine_config &config);
@@ -155,7 +159,8 @@ class spdball_state : public williams_state
 {
 public:
 	spdball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag) { }
+		williams_state(mconfig, type, tag)
+	{ }
 
 	void spdball(machine_config &config);
 
@@ -173,7 +178,8 @@ public:
 		m_soundcpu_b(*this, "soundcpu_b"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
 		m_blaster_scanline_control(*this, "blaster_scan"),
-		m_blaster_bankb(*this, "blaster_bankb") { }
+		m_blaster_bankb(*this, "blaster_bankb")
+	{ }
 
 	void blastkit(machine_config &config);
 	void blaster(machine_config &config);
@@ -212,11 +218,12 @@ private:
 class williams2_state : public williams_state
 {
 public:
-	williams2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams_state(mconfig, type, tag),
+	williams2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams_state(mconfig, type, tag),
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_williams2_tileram(*this, "williams2_tile") { }
+		m_williams2_tileram(*this, "williams2_tile")
+	{ }
 
 	void williams2(machine_config &config);
 	void mysticm(machine_config &config);
@@ -274,7 +281,8 @@ public:
 		m_grenade_lamp(*this, "Grenade_lamp"),
 		m_gun_lamp(*this, "Gun_lamp"),
 		m_p1_gun_recoil(*this, "Player1_Gun_Recoil"),
-		m_feather_blower(*this, "Feather_Blower") { }
+		m_feather_blower(*this, "Feather_Blower")
+	{ }
 
 	void tshoot(machine_config &config);
 
@@ -296,9 +304,10 @@ private:
 class joust2_state : public williams2_state
 {
 public:
-	joust2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams2_state(mconfig, type, tag),
-		m_cvsd_sound(*this, "cvsd") { }
+	joust2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams2_state(mconfig, type, tag),
+		m_cvsd_sound(*this, "cvsd")
+	{ }
 
 	void joust2(machine_config &config);
 
@@ -324,3 +333,5 @@ private:
 #define WILLIAMS_TILEMAP_MYSTICM    0       /* IC79 is a 74LS85 comparator */
 #define WILLIAMS_TILEMAP_TSHOOT     1       /* IC79 is a 74LS157 selector jumpered to be enabled */
 #define WILLIAMS_TILEMAP_JOUST2     2       /* IC79 is a 74LS157 selector jumpered to be disabled */
+
+#endif // MAME_INCLUDES_WILLIAMS_H

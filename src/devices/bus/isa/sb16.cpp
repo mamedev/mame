@@ -409,27 +409,28 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 	return ROM_NAME( sb16 );
 }
 
-MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("sb16_cpu", I80C52, XTAL(24'000'000))
-	MCFG_DEVICE_IO_MAP(sb16_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, sb16_lle_device, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sb16_lle_device, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, sb16_lle_device, p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, sb16_lle_device, p2_w))
+void sb16_lle_device::device_add_mconfig(machine_config &config)
+{
+	I80C52(config, m_cpu, XTAL(24'000'000));
+	m_cpu->set_addrmap(AS_IO, &sb16_lle_device::sb16_io);
+	m_cpu->port_in_cb<1>().set(FUNC(sb16_lle_device::p1_r));
+	m_cpu->port_out_cb<1>().set(FUNC(sb16_lle_device::p1_w));
+	m_cpu->port_in_cb<2>().set(FUNC(sb16_lle_device::p2_r));
+	m_cpu->port_out_cb<2>().set(FUNC(sb16_lle_device::p2_w));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
+	ymf262.add_route(0, "lspeaker", 1.00);
+	ymf262.add_route(1, "rspeaker", 1.00);
+	ymf262.add_route(2, "lspeaker", 1.00);
+	ymf262.add_route(3, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
-	MCFG_PC_JOY_ADD("pc_joy")
-MACHINE_CONFIG_END
+	PC_JOY(config, m_joy);
+}
 
 READ8_MEMBER( sb16_lle_device::host_data_r )
 {

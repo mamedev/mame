@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "imagedev/floppy.h"
 #include "fdc_pll.h"
+
+class floppy_image_device;
 
 
 /***************************************************************************
@@ -23,6 +24,8 @@ public:
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
 	auto opt_wr_callback() { return opt_cb.bind(); }
 
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER (data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 

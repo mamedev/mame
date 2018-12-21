@@ -180,16 +180,16 @@ MACHINE_CONFIG_START(gamate_state::gamate)
 	MCFG_DEVICE_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
 	MCFG_DEVICE_PROGRAM_MAP(gamate_mem)
 
-	MCFG_GAMATE_VIDEO_ADD("video")
+	GAMATE_VIDEO(config, "video", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left(); // Stereo headphone output
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ay8910", AY8910, 4433000 / 4) // AY compatible, no actual AY chip present
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
+	AY8910(config, m_ay, 4433000 / 4); // AY compatible, no actual AY chip present
+	m_ay->add_route(0, "lspeaker", 0.5);
+	m_ay->add_route(1, "rspeaker", 0.5);
+	m_ay->add_route(2, "lspeaker", 0.25);
+	m_ay->add_route(2, "rspeaker", 0.25);
 
 	MCFG_GAMATE_CARTRIDGE_ADD("cartslot", gamate_cart, nullptr)
 

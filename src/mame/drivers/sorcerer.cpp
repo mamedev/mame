@@ -434,8 +434,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	m_uart->set_rx_clock(ES_UART_CLOCK);
 	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, "rs232", default_rs232_devices, "null_modem").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "covox")
@@ -485,8 +484,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
-	MCFG_DEVICE_ADD(m_fdc, MICROPOLIS, 0)
-	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS
+	MICROPOLIS(config, m_fdc, 0);
+	m_fdc->set_default_drive_tags();
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 
 	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
@@ -548,6 +547,12 @@ ROM_START(sorcerer2)
 	ROM_SYSTEM_BIOS(2, "dwmon", "DWMON 2.2C")
 	ROMX_LOAD("dwmon.1e",    0xe000, 0x0800, CRC(a22db498) SHA1(ebedbce7454007f5a02fafe449fd09169173d7b3), ROM_BIOS(2) )
 	ROMX_LOAD("dwmon.2e",    0xe800, 0x0800, CRC(7b22b65a) SHA1(7f23dd308f34b6d795d6df06f2387dfd17f69edd), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3, "ddmon", "DDMON 1.3")
+	ROMX_LOAD("ddmon.1e",    0xe000, 0x0800, CRC(6ce481da) SHA1(c927762b29a281b7c13d59bb17ea56494c64569b), ROM_BIOS(3) )
+	ROMX_LOAD("ddmon.2e",    0xe800, 0x0800, CRC(50069b13) SHA1(0808018830fac15cceaed8ff2b19900f77447470), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(4, "adsmon", "ADSMON") // This requires an unemulated 80-column card. You can type 64 to get 64-columns, but it's mostly off the side.
+	ROMX_LOAD("adsmon.1e",   0xe000, 0x0800, CRC(460f981a) SHA1(bdae1d87b9e8ae2cae11663acd349b9ed2387094), ROM_BIOS(4) )
+	ROMX_LOAD("adsmon.2e",   0xe800, 0x0800, CRC(cb3f1dda) SHA1(3fc14306e83d73b9b9afd9b543566e52ba3e008f), ROM_BIOS(4) )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */

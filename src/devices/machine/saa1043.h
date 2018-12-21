@@ -32,69 +32,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-// NB: This is effectively an aggregate of the X and Y inputs.
-#define MCFG_SAA1043_TYPE(_type) \
-	&downcast<saa1043_device &>(*device).set_type(_type);
-
-#define MCFG_SAA1043_BC_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_bc_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_FH2_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_fh2_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_FH3_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_fh3_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_FH80_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_fh80_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_PH_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_ph_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_NS_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_ns_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_RI_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_ri_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_WMP_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_wmp_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_RR_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_rr_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_V1_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_v1_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_V2_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_v2_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_CLP_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_clp_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_DL_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_dl_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_H1_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_h1_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_H2_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_h2_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_CB_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_cb_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_CS_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_cs_callback(DEVCB_##_write);
-
-#define MCFG_SAA1043_ID_CALLBACK(_write) \
-	downcast<saa1043_device &>(*device).set_id_callback(DEVCB_##_write);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -141,24 +78,24 @@ public:
 
 	void set_type(signal_type type) { m_type = type; }
 
-	template <class Object> devcb_base &set_bc_callback(Object &&cb)   { m_outputs_hooked[BC] = true;   return m_outputs[BC].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fh2_callback(Object &&cb)  { m_outputs_hooked[FH2] = true;  return m_outputs[FH2].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fh3_callback(Object &&cb)  { m_outputs_hooked[FH3] = true;  return m_outputs[FH3].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fh80_callback(Object &&cb) { m_outputs_hooked[FH80] = true; return m_outputs[FH80].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ph_callback(Object &&cb)   { m_outputs_hooked[PH] = true;   return m_outputs[PH].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ns_callback(Object &&cb)   { m_outputs_hooked[NS] = true;   return m_outputs[NS].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ri_callback(Object &&cb)   { m_outputs_hooked[RI] = true;   return m_outputs[RI].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_wmp_callback(Object &&cb)  { m_outputs_hooked[WMP] = true;  return m_outputs[WMP].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rr_callback(Object &&cb)   { m_outputs_hooked[RR] = true;   return m_outputs[RR].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_v1_callback(Object &&cb)   { m_outputs_hooked[V1] = true;   return m_outputs[V1].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_v2_callback(Object &&cb)   { m_outputs_hooked[V2] = true;   return m_outputs[V2].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_clp_callback(Object &&cb)  { m_outputs_hooked[CLP] = true;  return m_outputs[CLP].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dl_callback(Object &&cb)   { m_outputs_hooked[DL] = true;   return m_outputs[DL].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_h1_callback(Object &&cb)   { m_outputs_hooked[H1] = true;   return m_outputs[H1].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_h2_callback(Object &&cb)   { m_outputs_hooked[H2] = true;   return m_outputs[H2].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cb_callback(Object &&cb)   { m_outputs_hooked[CB] = true;   return m_outputs[CB].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cs_callback(Object &&cb)   { m_outputs_hooked[CS] = true;   return m_outputs[CS].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_id_callback(Object &&cb)   { m_outputs_hooked[ID] = true;   return m_outputs[ID].set_callback(std::forward<Object>(cb)); }
+	auto bc_callback()   { m_outputs_hooked[BC] = true;   return m_outputs[BC].bind(); }
+	auto fh2_callback()  { m_outputs_hooked[FH2] = true;  return m_outputs[FH2].bind(); }
+	auto fh3_callback()  { m_outputs_hooked[FH3] = true;  return m_outputs[FH3].bind(); }
+	auto fh80_callback() { m_outputs_hooked[FH80] = true; return m_outputs[FH80].bind(); }
+	auto ph_callback()   { m_outputs_hooked[PH] = true;   return m_outputs[PH].bind(); }
+	auto ns_callback()   { m_outputs_hooked[NS] = true;   return m_outputs[NS].bind(); }
+	auto ri_callback()   { m_outputs_hooked[RI] = true;   return m_outputs[RI].bind(); }
+	auto wmp_callback()  { m_outputs_hooked[WMP] = true;  return m_outputs[WMP].bind(); }
+	auto rr_callback()   { m_outputs_hooked[RR] = true;   return m_outputs[RR].bind(); }
+	auto v1_callback()   { m_outputs_hooked[V1] = true;   return m_outputs[V1].bind(); }
+	auto v2_callback()   { m_outputs_hooked[V2] = true;   return m_outputs[V2].bind(); }
+	auto clp_callback()  { m_outputs_hooked[CLP] = true;  return m_outputs[CLP].bind(); }
+	auto dl_callback()   { m_outputs_hooked[DL] = true;   return m_outputs[DL].bind(); }
+	auto h1_callback()   { m_outputs_hooked[H1] = true;   return m_outputs[H1].bind(); }
+	auto h2_callback()   { m_outputs_hooked[H2] = true;   return m_outputs[H2].bind(); }
+	auto cb_callback()   { m_outputs_hooked[CB] = true;   return m_outputs[CB].bind(); }
+	auto cs_callback()   { m_outputs_hooked[CS] = true;   return m_outputs[CS].bind(); }
+	auto id_callback()   { m_outputs_hooked[ID] = true;   return m_outputs[ID].bind(); }
 
 protected:
 	// device-level overrides

@@ -5,9 +5,10 @@
  * includes/vector06.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_VECTOR06_H
 #define MAME_INCLUDES_VECTOR06_H
+
+#pragma once
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -15,12 +16,12 @@
 #include "cpu/i8085/i8085.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
-#include "machine/ram.h"
-#include "machine/wd_fdc.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
 
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
@@ -31,8 +32,8 @@
 class vector06_state : public driver_device
 {
 public:
-	vector06_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vector06_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
@@ -86,7 +87,7 @@ private:
 	void vector06_io(address_map &map);
 	void vector06_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;

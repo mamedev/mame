@@ -16,7 +16,6 @@
 #include "includes/nes.h"
 
 #include "cpu/m6502/n2a03.h"
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -49,120 +48,115 @@ static INPUT_PORTS_START( famicom )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(nes_state::nes)
+void nes_state::nes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(nes_map)
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.0988)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.0988);
 	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine
 	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2
 	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
 	// cycles for the actual vblank period.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_nes)
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	m_screen->set_size(32*8, 262);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nes_state::screen_update_nes));
 
-	MCFG_PPU2C02_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_2C02(config, m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	// note APU sound level here was specified as 0.90, not 0.50 like the others
 	// not sure how to adjust it when it's inside the CPU?
 
-	MCFG_NES_CONTROL_PORT_ADD("ctrl1", nes_control_port1_devices, "joypad")
-	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
-	MCFG_NES_CONTROL_PORT_ADD("ctrl2", nes_control_port2_devices, "joypad")
-	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
+	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
+	m_ctrl1->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
+	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
+	m_ctrl2->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
 
-	MCFG_DEVICE_ADD("nes_slot", NES_CART_SLOT, NTSC_APU_CLOCK, nes_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
-	MCFG_SOFTWARE_LIST_ADD("ade_list", "nes_ade")         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
-	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom")      // Sunsoft Nantettate! Baseball mini-carts
-	MCFG_SOFTWARE_LIST_ADD("kstudio_list", "nes_kstudio") // Bandai Karaoke Studio expansion carts
-	MCFG_SOFTWARE_LIST_ADD("datach_list", "nes_datach")   // Bandai Datach Joint ROM System mini-carts
-MACHINE_CONFIG_END
+	NES_CART_SLOT(config, m_cartslot, NTSC_APU_CLOCK, nes_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("nes");
+	SOFTWARE_LIST(config, "ade_list").set_original("nes_ade");         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
+	SOFTWARE_LIST(config, "ntb_list").set_original("nes_ntbrom");      // Sunsoft Nantettate! Baseball mini-carts
+	SOFTWARE_LIST(config, "kstudio_list").set_original("nes_kstudio"); // Bandai Karaoke Studio expansion carts
+	SOFTWARE_LIST(config, "datach_list").set_original("nes_datach");   // Bandai Datach Joint ROM System mini-carts
+}
 
-MACHINE_CONFIG_START(nes_state::nespal)
+void nes_state::nespal(machine_config &config)
+{
 	nes(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(PAL_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(nes_map)
+	m_maincpu->set_clock(PAL_APU_CLOCK);
 
-	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_PPU2C07_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_2C07(config.replace(), m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_MODIFY("nes_slot")
-	MCFG_DEVICE_CLOCK(PAL_APU_CLOCK)
+	m_cartslot->set_clock(PAL_APU_CLOCK);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
-	MCFG_SCREEN_SIZE(32*8, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	m_screen->set_size(32*8, 312);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+}
 
-MACHINE_CONFIG_START(nes_state::famicom)
+void nes_state::famicom(machine_config &config)
+{
 	nes(config);
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
-	MCFG_NES_CONTROL_PORT_ADD("ctrl2", fc_control_port2_devices, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("exp", fc_expansion_devices, nullptr)
-	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
+	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
+	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
+	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
+	m_exp->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "famicom_flop")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("famicom_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
+}
 
-MACHINE_CONFIG_START(nes_state::nespalc)
+void nes_state::nespalc(machine_config &config)
+{
 	nespal(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_CLOCK(PALC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(nes_map)
+	m_maincpu->set_clock(PALC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
 	/* UMC 6538 and friends -- extends time for rendering dummy scanlines */
-	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_PPUPALC_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_PALC(config.replace(), m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_MODIFY("nes_slot")
-	MCFG_DEVICE_CLOCK(PALC_APU_CLOCK)
+	m_cartslot->set_clock(PALC_APU_CLOCK);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)))
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) *
+	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)));
+}
 
-MACHINE_CONFIG_START(nes_state::famipalc)
+void nes_state::famipalc(machine_config &config)
+{
 	nespalc(config);
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
-	MCFG_NES_CONTROL_PORT_ADD("ctrl2", fc_control_port2_devices, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("exp", fc_expansion_devices, nullptr)
-	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
+	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
+	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
+	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
+	m_exp->set_brightpixel_callback(FUNC(nes_state::bright_pixel));
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
+}
 
-MACHINE_CONFIG_START(nes_state::suborkbd)
+void nes_state::suborkbd(machine_config &config)
+{
 	famipalc(config);
 	/* TODO: emulate the parallel port bus! */
-	MCFG_DEVICE_MODIFY("exp")
-	MCFG_SLOT_DEFAULT_OPTION("subor_keyboard")
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+	m_exp->set_default_option("subor_keyboard");
+	m_exp->set_fixed(true);
+}
 
 void nes_state::setup_disk(nes_disksys_device *slot)
 {
@@ -192,7 +186,6 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 	}
 }
 
-
 MACHINE_START_MEMBER( nes_state, fds )
 {
 	m_ciram = std::make_unique<uint8_t[]>(0x800);
@@ -213,22 +206,23 @@ MACHINE_RESET_MEMBER( nes_state, fds )
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(nes_state::fds)
+void nes_state::fds(machine_config &config)
+{
 	famicom(config);
-	MCFG_MACHINE_START_OVERRIDE( nes_state, fds )
-	MCFG_MACHINE_RESET_OVERRIDE( nes_state, fds )
 
-	MCFG_DEVICE_REMOVE("nes_slot")
-	MCFG_DEVICE_ADD("disk", NES_DISKSYS, 0)
+	MCFG_MACHINE_START_OVERRIDE(nes_state, fds)
+	MCFG_MACHINE_RESET_OVERRIDE(nes_state, fds)
 
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_DEVICE_REMOVE("cass_list")
-	MCFG_DEVICE_REMOVE("ade_list")
-	MCFG_DEVICE_REMOVE("ntb_list")
-	MCFG_DEVICE_REMOVE("kstudio_list")
-	MCFG_DEVICE_REMOVE("datach_list")
-MACHINE_CONFIG_END
+	config.device_remove("nes_slot");
+	NES_DISKSYS(config, "disk", 0);
 
+	config.device_remove("cart_list");
+	config.device_remove("cass_list");
+	config.device_remove("ade_list");
+	config.device_remove("ntb_list");
+	config.device_remove("kstudio_list");
+	config.device_remove("datach_list");
+}
 
 MACHINE_START_MEMBER( nes_state, famitwin )
 {
@@ -258,17 +252,17 @@ MACHINE_RESET_MEMBER( nes_state, famitwin )
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(nes_state::famitwin)
+void nes_state::famitwin(machine_config &config)
+{
 	famicom(config);
 
 	MCFG_MACHINE_START_OVERRIDE( nes_state, famitwin )
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitwin )
 
-	MCFG_DEVICE_MODIFY("nes_slot")
-	MCFG_NES_CARTRIDGE_NOT_MANDATORY
+	m_cartslot->set_must_be_loaded(false);
 
-	MCFG_DEVICE_ADD("disk", NES_DISKSYS, 0)
-MACHINE_CONFIG_END
+	NES_DISKSYS(config, "disk", 0);
+}
 
 
 

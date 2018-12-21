@@ -1240,24 +1240,23 @@ void videopkr_state::machine_start()
 MACHINE_CONFIG_START(videopkr_state::videopkr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8039, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
-	MCFG_DEVICE_IO_MAP(i8039_io_port)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, videopkr_state, videopkr_p1_data_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, videopkr_state, videopkr_p1_data_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, videopkr_p2_data_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, videopkr_p2_data_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, videopkr_state, prog_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, videopkr_state, videopkr_t0_latch))
+	i8039_device &maincpu(I8039(config, m_maincpu, CPU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8039_map);
+	maincpu.set_addrmap(AS_IO, &videopkr_state::i8039_io_port);
+	maincpu.p1_in_cb().set(FUNC(videopkr_state::videopkr_p1_data_r));
+	maincpu.p1_out_cb().set(FUNC(videopkr_state::videopkr_p1_data_w));
+	maincpu.p2_in_cb().set(FUNC(videopkr_state::videopkr_p2_data_r));
+	maincpu.p2_out_cb().set(FUNC(videopkr_state::videopkr_p2_data_w));
+	maincpu.prog_out_cb().set(FUNC(videopkr_state::prog_w));
+	maincpu.t0_in_cb().set(FUNC(videopkr_state::videopkr_t0_latch));
+	maincpu.set_vblank_int("screen", FUNC(videopkr_state::irq0_line_assert));
 
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", videopkr_state,  irq0_line_assert)
-
-	MCFG_DEVICE_ADD("soundcpu", I8039, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(i8039_sound_mem)
-	MCFG_DEVICE_IO_MAP(i8039_sound_port)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
+	i8039_device &soundcpu(I8039(config, m_soundcpu, SOUND_CLOCK));
+	soundcpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8039_sound_mem);
+	soundcpu.set_addrmap(AS_IO, &videopkr_state::i8039_sound_port);
+	soundcpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	soundcpu.p2_in_cb().set(FUNC(videopkr_state::sound_p2_r));
+	soundcpu.p2_out_cb().set(FUNC(videopkr_state::sound_p2_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1265,10 +1264,8 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(5*8, 31*8-1, 3*8, 29*8-1)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(2080)
 	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
@@ -1302,8 +1299,7 @@ MACHINE_CONFIG_START(videopkr_state::videodad)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
+	m_maincpu->set_clock(CPU_CLOCK_ALT);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1319,17 +1315,17 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
+	m_maincpu->set_clock(CPU_CLOCK_ALT);
+
 	/* most likely romless or eprom */
-	MCFG_DEVICE_REPLACE("soundcpu", I8031, CPU_CLOCK )
-	MCFG_DEVICE_PROGRAM_MAP(i8051_sound_mem)
-	MCFG_DEVICE_IO_MAP(i8051_sound_port)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, videopkr_state, baby_sound_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, videopkr_state, baby_sound_p1_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p3_w))
+	i8031_device &soundcpu(I8031(config.replace(), m_soundcpu, CPU_CLOCK));
+	soundcpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8051_sound_mem);
+	soundcpu.set_addrmap(AS_IO, &videopkr_state::i8051_sound_port);
+	soundcpu.port_in_cb<0>().set(FUNC(videopkr_state::baby_sound_p0_r));
+	soundcpu.port_out_cb<0>().set(FUNC(videopkr_state::baby_sound_p0_w));
+	soundcpu.port_in_cb<1>().set(FUNC(videopkr_state::baby_sound_p1_r));
+	soundcpu.port_out_cb<2>().set("dac", FUNC(dac_byte_interface::data_w));
+	soundcpu.port_out_cb<3>().set(FUNC(videopkr_state::baby_sound_p3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1341,16 +1337,14 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_aysnd, CPU_CLOCK / 6).add_route(ALL_OUTPUTS, "speaker", 0.3); /* no ports used */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(videopkr_state::fortune1)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
+	m_maincpu->set_clock(CPU_CLOCK_ALT);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
@@ -1358,12 +1352,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(videopkr_state::bpoker)
 	babypkr(config);
-	MCFG_DEVICE_REPLACE("maincpu", I8751, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(i8751_map)
-	MCFG_DEVICE_IO_MAP(i8751_io_port)
-	MCFG_MCS51_PORT_P0_IN_CB(CONSTANT(0)) // ???
-	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
-	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???
+	i8751_device &maincpu(I8751(config.replace(), m_maincpu, XTAL(6'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8751_map);
+	maincpu.set_addrmap(AS_IO, &videopkr_state::i8751_io_port);
+	maincpu.port_in_cb<0>().set_constant(0); // ???
+	maincpu.port_in_cb<1>().set_constant(0); // ???
+	maincpu.port_out_cb<1>().set_nop(); // ???
 
 	I8255A(config, "ppi");
 	//ppi.out_pa_callback()

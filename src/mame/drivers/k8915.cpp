@@ -14,7 +14,6 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
-#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
@@ -152,10 +151,8 @@ MACHINE_CONFIG_START(k8915_state::k8915)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'915'200) / 2)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
-
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(4'915'200) / 2));
+	ctc.set_clk<2>(XTAL(4'915'200) / 2);
 	ctc.zc_callback<2>().set("sio", FUNC(z80sio_device::rxtxcb_w));
 
 	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'915'200) / 2));
@@ -163,10 +160,10 @@ MACHINE_CONFIG_START(k8915_state::k8915)
 	sio.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
+	rs232.dcd_handler().set("sio", FUNC(z80sio_device::dcdb_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 MACHINE_CONFIG_END
 
 

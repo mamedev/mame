@@ -174,10 +174,8 @@ void ksm_state::ksm_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x5e, 0x5f).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x6e, 0x6e).rw(m_i8251kbd, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x6f, 0x6f).rw(m_i8251kbd, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x76, 0x76).rw(m_i8251line, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x77, 0x77).rw(m_i8251line, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x6e, 0x6f).rw(m_i8251kbd, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x76, 0x77).rw(m_i8251line, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x78, 0x7b).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -437,8 +435,8 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// D30
 	i8255_device &ppi(I8255(config, "ppi8255"));
@@ -449,22 +447,22 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 
 	// D42 - serial connection to host
 	I8251(config, m_i8251line, 0);
-	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_i8251line->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
+	m_i8251line->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_i8251line->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
+	m_rs232->rxd_handler().set(m_i8251line, FUNC(i8251_device::write_rxd));
+	m_rs232->cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
+	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
 	// D41 - serial connection to MS7004 keyboard
 	I8251(config, m_i8251kbd, 0);
-	m_i8251kbd->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
+	m_i8251kbd->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir1_w));
 	m_i8251kbd->rts_handler().set(FUNC(ksm_state::write_brga));
 	m_i8251kbd->dtr_handler().set(FUNC(ksm_state::write_brgb));
 
-	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
+	MS7004(config, m_ms7004, 0);
+	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)

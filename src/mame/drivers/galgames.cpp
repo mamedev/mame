@@ -185,13 +185,14 @@ protected:
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
 
-MACHINE_CONFIG_START(galgames_starpak2_cart_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
-	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
+void galgames_starpak2_cart_device::device_add_mconfig(machine_config &config)
+{
+	pic16c56_device &pic(PIC16C56(config, "pic", XTAL(4'000'000)));  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
+	pic.read_b().set(FUNC(galgames_cart_device::int_pic_data_r));
+	pic.write_b().set(FUNC(galgames_cart_device::int_pic_data_w));
 
 	EEPROM_93C76_8BIT(config, "eeprom");
-MACHINE_CONFIG_END
+}
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK2_CART, 0) \
@@ -216,14 +217,15 @@ protected:
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
 
-MACHINE_CONFIG_START(galgames_starpak3_cart_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, galgames_cart_device, int_pic_bank_w))
-	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
+void galgames_starpak3_cart_device::device_add_mconfig(machine_config &config)
+{
+	pic16c56_device &pic(PIC16C56(config, "pic", XTAL(4'000'000)));
+	pic.write_a().set(FUNC(galgames_cart_device::int_pic_bank_w));
+	pic.read_b().set(FUNC(galgames_cart_device::int_pic_data_r));
+	pic.write_b().set(FUNC(galgames_cart_device::int_pic_data_w));
 
 	EEPROM_93C76_8BIT(config, "eeprom");
-MACHINE_CONFIG_END
+}
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK3_CART, 0) \
@@ -983,7 +985,7 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_GALGAMES_SLOT_ADD("slot")
 	MCFG_GALGAMES_BIOS_CART_ADD( "cart0", 0)

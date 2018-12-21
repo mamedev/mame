@@ -48,17 +48,17 @@ WRITE8_MEMBER(tank8_state::int_reset_w)
 
 WRITE8_MEMBER(tank8_state::crash_w)
 {
-	m_discrete->write(space, TANK8_CRASH_EN, data);
+	m_discrete->write(TANK8_CRASH_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::explosion_w)
 {
-	m_discrete->write(space, TANK8_EXPLOSION_EN, data);
+	m_discrete->write(TANK8_EXPLOSION_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bugle_w)
 {
-	m_discrete->write(space, TANK8_BUGLE_EN, data);
+	m_discrete->write(TANK8_BUGLE_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bug_w)
@@ -66,20 +66,20 @@ WRITE8_MEMBER(tank8_state::bug_w)
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
 		case 0:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 		case 1:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,7.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,7.0);
 			break;
 		case 2:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,2.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,2.0);
 			break;
 		case 3:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,16.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,16.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 	}
 
@@ -87,12 +87,12 @@ WRITE8_MEMBER(tank8_state::bug_w)
 
 WRITE8_MEMBER(tank8_state::attract_w)
 {
-	m_discrete->write(space, TANK8_ATTRACT_EN, data);
+	m_discrete->write(TANK8_ATTRACT_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::motor_w)
 {
-	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
+	m_discrete->write(NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
 void tank8_state::tank8_cpu_map(address_map &map)

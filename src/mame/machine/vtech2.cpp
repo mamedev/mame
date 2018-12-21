@@ -18,8 +18,6 @@
 #include "emu.h"
 #include "includes/vtech2.h"
 
-#include "imagedev/flopdrv.h"
-
 /* public */
 
 /* static */

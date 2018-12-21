@@ -303,9 +303,9 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'288'000)/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'288'000)/4)); /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
+	ymsnd.port_a_read_callback().set_ioport("DSW");
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mosaic_state::gfire2)

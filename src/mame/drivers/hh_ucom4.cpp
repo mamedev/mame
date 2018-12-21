@@ -331,16 +331,16 @@ static const s16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 MACHINE_CONFIG_START(ufombs_state::ufombs)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, ufombs_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, ufombs_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, ufombs_state, speaker_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, ufombs_state, grid_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, ufombs_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, ufombs_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, ufombs_state, plate_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(ufombs_state::plate_w));
+	m_maincpu->write_d().set(FUNC(ufombs_state::plate_w));
+	m_maincpu->write_e().set(FUNC(ufombs_state::speaker_w));
+	m_maincpu->write_f().set(FUNC(ufombs_state::grid_w));
+	m_maincpu->write_g().set(FUNC(ufombs_state::grid_w));
+	m_maincpu->write_h().set(FUNC(ufombs_state::grid_w));
+	m_maincpu->write_i().set(FUNC(ufombs_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -477,16 +477,16 @@ static const s16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 MACHINE_CONFIG_START(ssfball_state::ssfball)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.3"))
-	MCFG_UCOM4_READ_B_CB(READ8(*this, ssfball_state, input_b_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, ssfball_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, ssfball_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, ssfball_state, plate_w))
+	NEC_D553(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.3");
+	m_maincpu->read_b().set(FUNC(ssfball_state::input_b_r));
+	m_maincpu->write_c().set(FUNC(ssfball_state::grid_w));
+	m_maincpu->write_d().set(FUNC(ssfball_state::grid_w));
+	m_maincpu->write_e().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_f().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_g().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_h().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_i().set(FUNC(ssfball_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -604,16 +604,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bmsoccer_state::bmsoccer)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(READ8(*this, bmsoccer_state, input_a_r))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, bmsoccer_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, bmsoccer_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, bmsoccer_state, plate_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set(FUNC(bmsoccer_state::input_a_r));
+	m_maincpu->read_b().set_ioport("IN.2");
+	m_maincpu->write_c().set(FUNC(bmsoccer_state::grid_w));
+	m_maincpu->write_d().set(FUNC(bmsoccer_state::grid_w));
+	m_maincpu->write_e().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_f().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_g().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_h().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_i().set(FUNC(bmsoccer_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -711,15 +711,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bmsafari_state::bmsafari)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, bmsafari_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, bmsafari_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, bmsafari_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, bmsafari_state, speaker_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, bmsafari_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, bmsafari_state, plate_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(bmsafari_state::grid_w));
+	m_maincpu->write_d().set(FUNC(bmsafari_state::grid_w));
+	m_maincpu->write_e().set(FUNC(bmsafari_state::plate_w));
+	m_maincpu->write_g().set(FUNC(bmsafari_state::speaker_w));
+	m_maincpu->write_h().set(FUNC(bmsafari_state::plate_w));
+	m_maincpu->write_i().set(FUNC(bmsafari_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -860,16 +860,16 @@ static const s16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 MACHINE_CONFIG_START(splasfgt_state::splasfgt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.4"))
-	MCFG_UCOM4_READ_B_CB(READ8(*this, splasfgt_state, input_b_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, splasfgt_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, splasfgt_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, splasfgt_state, grid_w))
+	NEC_D553(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.4");
+	m_maincpu->read_b().set(FUNC(splasfgt_state::input_b_r));
+	m_maincpu->write_c().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_d().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_e().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_f().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_g().set(FUNC(splasfgt_state::grid_w));
+	m_maincpu->write_h().set(FUNC(splasfgt_state::grid_w));
+	m_maincpu->write_i().set(FUNC(splasfgt_state::grid_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -963,16 +963,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bcclimbr_state::bcclimbr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, bcclimbr_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, bcclimbr_state, grid_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_e().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_f().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_g().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_h().set(FUNC(bcclimbr_state::grid_w));
+	m_maincpu->write_i().set(FUNC(bcclimbr_state::grid_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1085,13 +1085,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tactix_state::tactix)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D557L, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(READ8(*this, tactix_state, input_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tactix_state, input_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tactix_state, leds_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tactix_state, input_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tactix_state, leds_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tactix_state, speaker_w))
+	NEC_D557L(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set(FUNC(tactix_state::input_r));
+	m_maincpu->write_c().set(FUNC(tactix_state::input_w));
+	m_maincpu->write_d().set(FUNC(tactix_state::leds_w));
+	m_maincpu->write_e().set(FUNC(tactix_state::input_w));
+	m_maincpu->write_f().set(FUNC(tactix_state::leds_w));
+	m_maincpu->write_g().set(FUNC(tactix_state::speaker_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_tactix);
@@ -1179,16 +1179,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(invspace_state::invspace)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, invspace_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, invspace_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, invspace_state, grid_w))
+	NEC_D552(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(invspace_state::grid_w));
+	m_maincpu->write_d().set(FUNC(invspace_state::grid_w));
+	m_maincpu->write_e().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_f().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_g().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_h().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_i().set(FUNC(invspace_state::grid_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1294,16 +1294,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(efball_state::efball)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_READ_C_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, efball_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, efball_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, efball_state, grid_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, efball_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, efball_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, efball_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->read_c().set_ioport("IN.2");
+	m_maincpu->write_d().set(FUNC(efball_state::plate_w));
+	m_maincpu->write_e().set(FUNC(efball_state::plate_w));
+	m_maincpu->write_f().set(FUNC(efball_state::grid_w));
+	m_maincpu->write_g().set(FUNC(efball_state::grid_w));
+	m_maincpu->write_h().set(FUNC(efball_state::grid_w));
+	m_maincpu->write_i().set(FUNC(efball_state::plate_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_efball);
@@ -1394,16 +1394,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(galaxy2_state::galaxy2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, galaxy2_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, galaxy2_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, galaxy2_state, grid_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, galaxy2_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, galaxy2_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, galaxy2_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, galaxy2_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(galaxy2_state::grid_w));
+	m_maincpu->write_d().set(FUNC(galaxy2_state::grid_w));
+	m_maincpu->write_e().set(FUNC(galaxy2_state::grid_w));
+	m_maincpu->write_f().set(FUNC(galaxy2_state::plate_w));
+	m_maincpu->write_g().set(FUNC(galaxy2_state::plate_w));
+	m_maincpu->write_h().set(FUNC(galaxy2_state::plate_w));
+	m_maincpu->write_i().set(FUNC(galaxy2_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1512,16 +1512,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(astrocmd_state::astrocmd)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, astrocmd_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, astrocmd_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, astrocmd_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(astrocmd_state::grid_w));
+	m_maincpu->write_d().set(FUNC(astrocmd_state::grid_w));
+	m_maincpu->write_e().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_f().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_g().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_h().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_i().set(FUNC(astrocmd_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1607,16 +1607,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(edracula_state::edracula)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, edracula_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, edracula_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, edracula_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(edracula_state::grid_w));
+	m_maincpu->write_d().set(FUNC(edracula_state::grid_w));
+	m_maincpu->write_e().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_f().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_g().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_h().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_i().set(FUNC(edracula_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1694,10 +1694,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mcompgin_state::mcompgin)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D650, 400_kHz_XTAL) // TDK FCR400K
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, mcompgin_state, lcd_w))
+	NEC_D650(config, m_maincpu, 400_kHz_XTAL); // TDK FCR400K
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_e().set(FUNC(mcompgin_state::lcd_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("lcd", HLCD0530, 500) // C=0.01uF
@@ -1791,16 +1791,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mvbfree_state::mvbfree)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, mvbfree_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, mvbfree_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, mvbfree_state, speaker_w))
+	NEC_D553(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(mvbfree_state::plate_w));
+	m_maincpu->write_d().set(FUNC(mvbfree_state::plate_w));
+	m_maincpu->write_e().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_f().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_g().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_h().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_i().set(FUNC(mvbfree_state::speaker_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_mvbfree);
@@ -1910,12 +1910,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(grobot9_state::grobot9)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D557L, 160000) // approximation
-	MCFG_UCOM4_READ_A_CB(READ8(*this, grobot9_state, input_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, grobot9_state, input_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, grobot9_state, lamps_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, grobot9_state, lamps_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, grobot9_state, lamps_w))
+	NEC_D557L(config, m_maincpu, 160000); // approximation
+	m_maincpu->read_a().set(FUNC(grobot9_state::input_r));
+	m_maincpu->write_c().set(FUNC(grobot9_state::input_w));
+	m_maincpu->write_d().set(FUNC(grobot9_state::lamps_w));
+	m_maincpu->write_e().set(FUNC(grobot9_state::lamps_w));
+	m_maincpu->write_f().set(FUNC(grobot9_state::lamps_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_grobot9);
@@ -2000,15 +2000,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tccombat_state::tccombat)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tccombat_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tccombat_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tccombat_state, grid_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->write_c().set(FUNC(tccombat_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tccombat_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tccombat_state::grid_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2156,16 +2156,16 @@ void tmtennis_state::machine_reset()
 MACHINE_CONFIG_START(tmtennis_state::tmtennis)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 360000) // see set_clock
-	MCFG_UCOM4_READ_A_CB(READ8(*this, tmtennis_state, input_r))
-	MCFG_UCOM4_READ_B_CB(READ8(*this, tmtennis_state, input_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tmtennis_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tmtennis_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tmtennis_state, port_e_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tmtennis_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tmtennis_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tmtennis_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tmtennis_state, grid_w))
+	NEC_D552(config, m_maincpu, 360000); // see set_clock
+	m_maincpu->read_a().set(FUNC(tmtennis_state::input_r));
+	m_maincpu->read_b().set(FUNC(tmtennis_state::input_r));
+	m_maincpu->write_c().set(FUNC(tmtennis_state::plate_w));
+	m_maincpu->write_d().set(FUNC(tmtennis_state::plate_w));
+	m_maincpu->write_e().set(FUNC(tmtennis_state::port_e_w));
+	m_maincpu->write_f().set(FUNC(tmtennis_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tmtennis_state::grid_w));
+	m_maincpu->write_h().set(FUNC(tmtennis_state::grid_w));
+	m_maincpu->write_i().set(FUNC(tmtennis_state::grid_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2264,16 +2264,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmpacman_state::tmpacman)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 430_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tmpacman_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tmpacman_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tmpacman_state, plate_w))
+	NEC_D553(config, m_maincpu, 430_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(tmpacman_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tmpacman_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tmpacman_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2366,16 +2366,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmscramb_state::tmscramb)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tmscramb_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tmscramb_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tmscramb_state, grid_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(tmscramb_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tmscramb_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tmscramb_state::grid_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2465,15 +2465,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tcaveman_state::tcaveman)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tcaveman_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tcaveman_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tcaveman_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->write_c().set(FUNC(tcaveman_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tcaveman_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tcaveman_state::plate_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2596,16 +2596,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(alnchase_state::alnchase)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(READ8(*this, alnchase_state, input_r))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, alnchase_state, output_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set(FUNC(alnchase_state::input_r));
+	m_maincpu->read_b().set_ioport("IN.2");
+	m_maincpu->write_c().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_d().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_e().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_f().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_g().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_h().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_i().set(FUNC(alnchase_state::output_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")

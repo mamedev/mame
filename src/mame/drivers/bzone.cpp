@@ -16,7 +16,7 @@
 
     Battlezone memory map (preliminary)
 
-    0000-04ff RAM
+    0000-03ff RAM
     0800      IN0
     0a00      IN1
     0c00      IN2
@@ -214,7 +214,6 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/pokey.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "bzone.lh"
@@ -569,66 +568,61 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(bzone_state::bzone_base)
-
+void bzone_state::bzone_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
+	M6502(config, m_maincpu, BZONE_MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bzone_map);
+	m_maincpu->set_periodic_int(FUNC(bzone_state::bzone_interrupt), attotime::from_hz(BZONE_CLOCK_3KHZ / 12));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(BZONE_CLOCK_3KHZ / 12 / 6)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 6);
+	m_screen->set_size(400, 300);
+	m_screen->set_visarea(0, 580, 0, 400);
+	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("avg", AVG_BZONE, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_BZONE(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	/* Drivers */
-	MCFG_MATHBOX_ADD("mathbox")
+	MATHBOX(config, m_mathbox, 0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bzone_state::bzone)
+void bzone_state::bzone(machine_config &config)
+{
 	bzone_base(config);
 
 	/* sound hardware */
 	bzone_audio(config);
+}
 
-MACHINE_CONFIG_END
-
-
-
-MACHINE_CONFIG_START(redbaron_state::redbaron)
+void redbaron_state::redbaron(machine_config &config)
+{
 	bzone_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(redbaron_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &redbaron_state::redbaron_map);
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(BZONE_CLOCK_3KHZ / 12 / 4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
+	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 4);
+	m_screen->set_visarea(0, 520, 0, 400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, 1500000)
-	MCFG_POKEY_ALLPOT_R_CB(READ8(*this, redbaron_state, redbaron_joy_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	pokey_device &pokey(POKEY(config, "pokey", 1500000));
+	pokey.allpot_r().set(FUNC(redbaron_state::redbaron_joy_r));
+	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("custom", REDBARON, 0)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	REDBARON(config, m_redbaronsound, 0);
+	m_redbaronsound->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -669,7 +663,7 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
 	/* Vector Generator ROMs */
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
-	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )
+	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -699,7 +693,7 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
 	/* Vector Generator ROMs */
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
-	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )
+	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )

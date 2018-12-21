@@ -183,7 +183,7 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (m_interrupt_enable & 4)
-				scanline_int_gen(*m_maincpu);
+				scanline_int_write_line(1);
 	}
 }
 
@@ -700,7 +700,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_w)
 {
 	if (m_tms5220.found())
 	{
-		m_tms5220->data_w(space, 0, data);
+		m_tms5220->data_w(data);
 	}
 }
 
@@ -736,7 +736,7 @@ void atarisy2_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x11ff).mirror(0x0200).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x1000, 0x11ff).mirror(0x0200).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x1400, 0x1400).mirror(0x007e).r("adc", FUNC(adc0808_device::data_r));
 	map(0x1400, 0x1403).mirror(0x007c).w(FUNC(atarisy2_state::bankselect_w));
 	map(0x1480, 0x148f).mirror(0x0070).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
@@ -1182,16 +1182,16 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarisy2_state::atarisy2)
-
+void atarisy2_state::atarisy2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", T11, MASTER_CLOCK/2)
-	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	T11(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_initial_mode(0x36ff); /* initial mode word has DAL15,14,11,8 pulled low */
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy2_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
+	M6502(config, m_audiocpu, SOUND_CLOCK/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy2_state::sound_map);
+	m_audiocpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(MASTER_CLOCK/2/16/16/16/10));
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
@@ -1208,90 +1208,94 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	EEPROM_2804(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy2)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT_CLASS(2, atarisy2_state, RRRRGGGGBBBBIIII)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_atarisy2);
+	PALETTE(config, "palette", 256).set_format(raw_to_rgb_converter(2, &atarisy2_state::RRRRGGGGBBBBIIII_decoder));
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarisy2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
+	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 128,64).set_info_callback(FUNC(atarisy2_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 64,48, 0).set_info_callback(FUNC(atarisy2_state::get_alpha_tile_info));
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", atarisy2_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy2_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
-	MCFG_SCREEN_UPDATE_DRIVER(atarisy2_state, screen_update_atarisy2)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy2_state, vblank_int))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_raw(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384);
+	screen.set_screen_update(FUNC(atarisy2_state::screen_update_atarisy2));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(atarisy2_state::vblank_int));
 
 	ADDRESS_MAP_BANK(config, "vrambank").set_map(&atarisy2_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000);
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu").int_callback().set_nop();
+	ATARI_SOUND_COMM(config, m_soundcomm, m_audiocpu).int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ym2151, SOUND_CLOCK/4);
+	m_ym2151->add_route(0, "lspeaker", 0.60);
+	m_ym2151->add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, SOUND_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.35)
+	POKEY(config, m_pokey[0], SOUND_CLOCK/8);
+	m_pokey[0]->allpot_r().set_ioport("DSW0");
+	m_pokey[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.35);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, SOUND_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.35)
+	POKEY(config, m_pokey[1], SOUND_CLOCK/8);
+	m_pokey[1]->allpot_r().set_ioport("DSW1");
+	m_pokey[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.35);
 
-	MCFG_DEVICE_ADD("tms", TMS5220C, MASTER_CLOCK/4/4/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	TMS5220C(config, m_tms5220, MASTER_CLOCK/4/4/2);
+	m_tms5220->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_tms5220->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::paperboy)
+void atarisy2_state::paperboy(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 105, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 105, false);
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::_720)
+void atarisy2_state::_720(machine_config &config)
+{
 	atarisy2(config);
 	/* without the default EEPROM, 720 hangs at startup due to communication
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 107, false);
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::ssprint)
+void atarisy2_state::ssprint(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 108, false)
+	SLAPSTIC(config, m_slapstic, 108, false);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("tms")
-MACHINE_CONFIG_END
+	config.device_remove("tms");
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::csprint)
+void atarisy2_state::csprint(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 109, false)
+	SLAPSTIC(config, m_slapstic, 109, false);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("tms")
-MACHINE_CONFIG_END
+	config.device_remove("tms");
+}
 
 
-MACHINE_CONFIG_START(atarisy2_state::apb)
+void atarisy2_state::apb(machine_config &config)
+{
 	atarisy2(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 110, false)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic, 110, false);
+}
 
 
 /*************************************
@@ -1300,7 +1304,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( paperboy )
+ROM_START( paperboy ) // ALL of these roms should be 136034-xxx but the correct labels aren't known per game rev!
 	ROM_REGION( 0x90000, "maincpu", 0 ) /* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "cpu_l07.rv3", 0x008000, 0x004000, CRC(4024bb9b) SHA1(9030ce5a6a1a3d769c699a92b32a55013f9766aa) )
 	ROM_LOAD16_BYTE( "cpu_n07.rv3", 0x008001, 0x004000, CRC(0260901a) SHA1(39d786f5c440ca1fd529ee73e2a4d2406cd1db8f) )

@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_DEVICE_PROGRAM_MAP(galpanic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -256,9 +256,9 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx) // fg palette ram, bit 0 seems to be a transparency flag for the front bitmap
 	MCFG_PALETTE_INIT_OWNER(galpanic_state, galpanic)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_OFFSETS(0, -16)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_offsets(0, -16);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -275,12 +275,10 @@ MACHINE_CONFIG_START(galpanic_state::galpanica)
 	MCFG_DEVICE_PROGRAM_MAP(galpanica_map)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 

@@ -2108,25 +2108,25 @@ void hng64_state::init_io()
 
 MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_DEVICE_PROGRAM_MAP(hng_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
+	VR4300BE(config, m_maincpu, HNG64_MASTER_CLOCK);     // actually R4300
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hng64_state::hng_map);
+
+	TIMER(config, "scantimer", 0).configure_scanline(FUNC(hng64_state::hng64_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL(32'768))
+	RTC62423(config, m_rtc, XTAL(32'768));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hng64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hng64);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hng64_state, screen_vblank_hng64))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(hng64_state::screen_update_hng64));
+	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_palette, 0x1000).set_format(PALETTE_FORMAT_XRGB);
 
 	hng64_audio(config);
 	hng64_network(config);
@@ -2161,11 +2161,12 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	iomcu.serial0_out_cb().set(FUNC(hng64_state::sio0_w));
 	//iomcu.serial1_out_cb().set(FUNC(hng64_state::sio1_w)); // not initialized / used
 
-	MCFG_DEVICE_ADD("dt71321_dpram", IDT71321, 0)
+	IDT71321(config, "dt71321_dpram", 0);
 	//MCFG_MB8421_INTL_AN0R(INPUTLINE("xxx", 0)) // I don't think the IRQs are connected
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hng64_state::hng64_default)
+void hng64_state::hng64_default(machine_config &config)
+{
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
@@ -2177,31 +2178,34 @@ MACHINE_CONFIG_START(hng64_state::hng64_default)
 	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_default_lamps5_w));
 	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_default_lamps6_w));
 	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_default_lamps7_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hng64_state::hng64_drive)
+void hng64_state::hng64_drive(machine_config &config)
+{
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_drive_lamps5_w)); // force feedback steering
 	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_drive_lamps6_w)); // lamps + coin counter
 	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_drive_lamps7_w)); // lamps
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hng64_state::hng64_shoot)
+void hng64_state::hng64_shoot(machine_config &config)
+{
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some misisng?!)
 	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hng64_state::hng64_fight)
+void hng64_state::hng64_fight(machine_config &config)
+{
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
 	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_fight_lamps6_w)); // coin counters
-MACHINE_CONFIG_END
+}
 
 
 #define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \

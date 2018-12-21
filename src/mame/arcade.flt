@@ -388,6 +388,7 @@ firefox.cpp
 firetrap.cpp
 firetrk.cpp
 fitfight.cpp
+flashbeats.cpp
 flicker.cpp
 flipjack.cpp
 flkatck.cpp
@@ -742,6 +743,7 @@ mikie.cpp
 mil4000.cpp
 miniboy7.cpp
 minivadr.cpp
+minivideo.cpp
 mirage.cpp
 mirax.cpp
 missb2.cpp
@@ -817,6 +819,8 @@ namcos11.cpp
 namcos12.cpp
 namcos2.cpp
 namcos21.cpp
+namcos21_c67.cpp
+namcos21_de.cpp
 namcos22.cpp
 namcos23.cpp
 namcos86.cpp
@@ -994,6 +998,7 @@ route16.cpp
 rowamet.cpp
 royalmah.cpp
 rpunch.cpp
+rulechan.cpp
 runaway.cpp
 rungun.cpp
 s11.cpp
@@ -1315,6 +1320,7 @@ vendetta.cpp
 vertigo.cpp
 vicdual.cpp
 victory.cpp
+video21.cpp
 videopin.cpp
 videopkr.cpp
 videosaa.cpp

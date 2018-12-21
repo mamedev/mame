@@ -28,6 +28,7 @@ ToDo: (both)
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
@@ -282,35 +283,36 @@ void jupiter3_state::machine_reset()
 //  MACHINE_CONFIG( jupiter )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(jupiter2_state::jupiter2)
+void jupiter2_state::jupiter2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MCM6571AP_TAG, M6800, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(jupiter2_mem)
+	M6800(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jupiter2_state::jupiter2_mem);
 
 	// devices
 	FD1771(config, INS1771N1_TAG, 1000000);
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	ACIA6850(config, m_acia0, XTAL(2'000'000)); // unknown frequency
 	m_acia0->txd_handler().set("serial0", FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set("serial0", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("serial0", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia0", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia0", acia6850_device, write_cts))
+	rs232_port_device &serial0(RS232_PORT(config, "serial0", default_rs232_devices, "terminal"));
+	serial0.rxd_handler().set(m_acia0, FUNC(acia6850_device::write_rxd));
+	serial0.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
 	ACIA6850(config, m_acia1, XTAL(2'000'000)); // unknown frequency
 	m_acia1->txd_handler().set("serial1", FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("serial1", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
+	rs232_port_device &serial1(RS232_PORT(config, "serial1", default_rs232_devices, "terminal"));
+	serial1.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	serial1.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -339,8 +341,8 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(jupiter3_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

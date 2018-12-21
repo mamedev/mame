@@ -327,6 +327,7 @@ Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?  
 Ferrari F355 Challenge (twin/deluxe, preview)   no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * other ROM board we've seen had 2x flashroms PCB instead of IC22 EEPROM, contents is the same.
 /Ferrari F355 Challenge 2 - International
 \Course Edition (twin/deluxe, prototype)        no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
+Mushiking (MUSHIUSA '04 1ST, Prototype)       no sticker none    11*(64Mb)   present  315-6206  not present   * only first 7 flash roms contain game data, PCB have label 840-0150B-FLS.
 Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 Samba de Amigo (prototype)                      no cart  *       21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, instead of EPROM have tiny PCB with 2 flashroms on it
 Shootout Pool Prize Ver.B -P                  840-0136C  **      21*(64Mb)   present  317-6206  not present   * only first 4 flash roms contain game data, ** instead of EPROM have tiny PCB with 2 flashroms on it
@@ -360,7 +361,7 @@ PFSB 64M Mask ROM board
 |----------------------------------------------------------|
 Notes:
       The other side of the cart PCB just has more locations for
-      SOP44 MASKROMs... IC12S to IC21S (ROM12 to ROM21)
+      SOP44 mask ROMs... IC12S to IC21S (ROM12 to ROM21)
 
   IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
@@ -373,7 +374,7 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
-                                                Sticker      EPROM   MASKROMs    X76F100     XC9536    315-5881
+                                                Sticker      EPROM   mask ROMs   X76F100     XC9536    315-5881
 Game                                            on cart      IC22#   # of SOP44  IC37#       IC41#     IC42#          Notes
 ------------------------------------------------------------------------------------------------------------------------------
 18 Wheeler (deluxe) (Rev A)                     840-0023C    22185A  20 (64Mb)   present     315-6213  317-0273-COM
@@ -537,7 +538,7 @@ from NAOMI side it read as X76F100-type, probably simulated by ACTEL FPGA.
 Actual data is shuffled, address bits 3 to 6 have reversed order, i.e. 8 7 3 4 5 6 2 1 0.
 
 Games known to use this PCB include....
-                                                             Sticker      EPROM   MASKROMs    25LC040  A54SX32
+                                                             Sticker      EPROM   mask ROMs   25LC040  A54SX32
 Game                                                         on cart      IC11#   # of SOP44  IC13S#   IC1#          Notes
 -----------------------------------------------------------------------------------------------------------------------------------------------
 Club Kart: European Session (2003, Rev A)                    840-0139C    24173A  18 (64Mb)   present  317-0382-COM
@@ -590,7 +591,7 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                                Sticker    EPROM   MASKROMs    EPM7032    XC9536    315-5881      X76F100
+                                                Sticker    EPROM   mask ROMs   EPM7032    XC9536    315-5881      X76F100
 Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         IC46#        Notes
 -----------------------------------------------------------------------------------------------------------------------------------------
 Alien Front (Rev A)                             840-0048C  23586A   5 (128Mb)  315-6319A  315-6213  317-0293-COM  present
@@ -722,7 +723,7 @@ Notes:
               Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
          2K - NAODEC1B (QFP100) Altera MAX EPM7064S. Silkscreened NAODEC1A
          3J - oscillator 28.000MHz
-4B-4N,6B-6P - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+4B-4N,6B-6P - mask ROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
       4P,5P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
@@ -778,7 +779,7 @@ Notes:
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
 2B,2C,2D,2F - DA28F640J5 FlashROM (SSOP56), either 32Mb or 64Mb. Not all positions are populated.
               Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
-4B-4M,6B-6N - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+4B-4M,6B-6N - mask ROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
       4N,4P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
@@ -1287,7 +1288,7 @@ Notes:
       XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
                game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = MASKROM
+               F01 = CPLD/protection device and M01 = mask ROM
 
                Game (sorted by code)                 Code
                -----------------------------------------------
@@ -1369,7 +1370,7 @@ Notes:
    XCR3128XL - Xilinx XCR3128XL in-system programmable 128 Macro-cell CPLD (TQFP100)
                stamped with a game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = MASKROM
+               F01 = CPLD/protection device and M01 = mask ROM
 
                Game (sorted by code)                 Code
                -----------------------------------------------
@@ -1441,6 +1442,7 @@ Notes:
                Animal Basket                         VM2001F01  -
                Block Pong-Pong                       VM2001F01  -
                WaiWai Drive                          VM2001F01  -
+               Faster Than Speed 837-14681           315-6248   -         (not dumped, known to exists)
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
@@ -2894,53 +2896,56 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  */
 
  // TODO: merge with Dreamcast base machine
-MACHINE_CONFIG_START(dc_state::naomi_aw_base)
+void dc_state::naomi_aw_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(CPU_CLOCK)
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
+	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_state::dc_audio_map);
 
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
+	MAPLE_DC(config, m_maple, 0, m_maincpu);
+	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
-	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480); /* TODO: where does pclk actually come from? */
+	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
+	PALETTE(config, "palette", 0x1000);
+	POWERVR2(config, m_powervr2, 0);
+	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
+	m_aica->set_master(true);
+	m_aica->irq().set(FUNC(dc_state::aica_irq));
+	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->add_route(0, "lspeaker", 2.0);
+	m_aica->add_route(1, "rspeaker", 2.0);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(naomi_state::naomi_base)
+void naomi_state::naomi_base(machine_config &config)
+{
 	naomi_aw_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi_map)
-	MCFG_DEVICE_IO_MAP(naomi_port)
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_state::naomi_map);
+	m_maincpu->set_addrmap(AS_IO, &naomi_state::naomi_port);
 
 	EEPROM_93C46_16BIT(config, "main_eeprom").default_value(0);
 
@@ -2950,80 +2955,141 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	// - using UART as timer - 13.260MHz,
 	// - unrolled NOPs then GPIO toggle - 12.76MHz (or 3.19M NOP instructions per second)
 	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
-	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
-	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+	mie_device &mie(MIE(config, "mie" "_maple", 16000000, m_maple, 0, "mie"));
+	mie.set_gpio_name<3>("MIE.3");
+	mie.set_gpio_name<5>("MIE.5");
+	MIE_JVS(config, "mie", 16000000);
+
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
+	sega837.set_port_tag<0>("TILT");
+	sega837.set_port_tag<1>("P1");
+	sega837.set_port_tag<2>("P2");
+	sega837.set_port_tag<3>("A0");
+	sega837.set_port_tag<4>("A1");
+	sega837.set_port_tag<5>("A2");
+	sega837.set_port_tag<6>("A3");
+	sega837.set_port_tag<7>("A4");
+	sega837.set_port_tag<8>("A5");
+	sega837.set_port_tag<9>("A6");
+	sega837.set_port_tag<10>("A7");
+	sega837.set_port_tag<11>("OUTPUT");
+
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
-	MCFG_M3COMM_ADD("comm_board")
+	M3COMM(config, "comm_board", 0);
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 /*
  * Naomi 1, unprotected ROM sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomi)
+void naomi_state::naomi(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi_state::naomigd)
+void naomi_state::naomigd(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, "naomibd_eeprom", ":gdrom", "pic"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M1 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim1)
+void naomi_state::naomim1(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m1_board &rom_board(NAOMI_M1_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim2)
+void naomi_state::naomim2(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m2_board &rom_board(NAOMI_M2_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M4 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim4)
+void naomi_state::naomim4(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", 0, "naomibd_eeprom", "pic_readout"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi M2 with Keyboard controllers
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim2_kb)
+void naomi_state::naomim2_kb(machine_config &config)
+{
 	naomim2(config);
-	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
-	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
-MACHINE_CONFIG_END
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dcctrl0.set_port_tag<0>("P1.M");
+	dcctrl0.set_port_tag<1>("P1.LD");
+	dcctrl0.set_port_tag<2>("P1.KC1");
+	dcctrl0.set_port_tag<3>("P1.KC2");
+	dcctrl0.set_port_tag<4>("P1.KC3");
+	dcctrl0.set_port_tag<5>("P1.KC4");
+	dcctrl0.set_port_tag<6>("P1.KC5");
+	dcctrl0.set_port_tag<7>("P1.KC6");
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dcctrl1.set_port_tag<0>("P2.M");
+	dcctrl1.set_port_tag<1>("P2.LD");
+	dcctrl1.set_port_tag<2>("P2.KC1");
+	dcctrl1.set_port_tag<3>("P2.KC2");
+	dcctrl1.set_port_tag<4>("P2.KC3");
+	dcctrl1.set_port_tag<5>("P2.KC4");
+	dcctrl1.set_port_tag<6>("P2.KC5");
+	dcctrl1.set_port_tag<7>("P2.KC6");
+}
 
 /*
  * Naomi GD with Keyboard controllers
  */
 
-MACHINE_CONFIG_START(naomi_state::naomigd_kb)
+void naomi_state::naomigd_kb(machine_config &config)
+{
 	naomigd(config);
-	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
-	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
-MACHINE_CONFIG_END
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dcctrl0.set_port_tag<0>("P1.M");
+	dcctrl0.set_port_tag<1>("P1.LD");
+	dcctrl0.set_port_tag<2>("P1.KC1");
+	dcctrl0.set_port_tag<3>("P1.KC2");
+	dcctrl0.set_port_tag<4>("P1.KC3");
+	dcctrl0.set_port_tag<5>("P1.KC4");
+	dcctrl0.set_port_tag<6>("P1.KC5");
+	dcctrl0.set_port_tag<7>("P1.KC6");
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dcctrl1.set_port_tag<0>("P2.M");
+	dcctrl1.set_port_tag<1>("P2.LD");
+	dcctrl1.set_port_tag<2>("P2.KC1");
+	dcctrl1.set_port_tag<3>("P2.KC2");
+	dcctrl1.set_port_tag<4>("P2.KC3");
+	dcctrl1.set_port_tag<5>("P2.KC4");
+	dcctrl1.set_port_tag<6>("P2.KC5");
+	dcctrl1.set_port_tag<7>("P2.KC6");
+}
 
 /*
  * Naomi 2
@@ -3040,80 +3106,117 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2_base)
-	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(*this, dc_state, pvr_irq))
+void naomi2_state::naomi2_base(machine_config &config)
+{
+	POWERVR2(config, m_powervr2_slave, 0);
+	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	// TODO: ELAN device
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(naomi2_state::naomi2gd)
+void naomi2_state::naomi2gd(machine_config &config)
+{
 	naomigd(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Naomi 2, M1 sub-board
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2m1)
+void naomi2_state::naomi2m1(machine_config &config)
+{
 	naomim1(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Naomi 2, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2m2)
+void naomi2_state::naomi2m2(machine_config &config)
+{
 	naomim2(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Atomiswave
  */
 
-MACHINE_CONFIG_START(atomiswave_state::aw_base)
+void atomiswave_state::aw_base(machine_config &config)
+{
 	naomi_aw_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aw_map)
-	MCFG_DEVICE_IO_MAP(aw_port)
+	m_maincpu->set_addrmap(AS_PROGRAM, &atomiswave_state::aw_map);
+	m_maincpu->set_addrmap(AS_IO, &atomiswave_state::aw_port);
 	MACRONIX_29L001MC(config, "awflash");
-	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
+	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0, "rom_key"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(atomiswave_state::aw1c)
+void atomiswave_state::aw1c(machine_config &config)
+{
 	aw_base(config);
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1.0");
+	dcctrl0.set_port_tag<1>("P1.1");
+	dcctrl0.set_port_tag<2>("P1.A0");
+	dcctrl0.set_port_tag<3>("P1.A1");
+	dcctrl0.set_port_tag<4>("P1.A2");
+	dcctrl0.set_port_tag<5>("P1.A3");
+	dcctrl0.set_port_tag<6>("P1.A4");
+	dcctrl0.set_port_tag<7>("P1.A5");
 	// TODO: isn't it supposed to be just one controller?
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
-MACHINE_CONFIG_END
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2.0");
+	dcctrl1.set_port_tag<1>("P2.1");
+	dcctrl1.set_port_tag<2>("P2.A0");
+	dcctrl1.set_port_tag<3>("P2.A1");
+	dcctrl1.set_port_tag<4>("P2.A2");
+	dcctrl1.set_port_tag<5>("P2.A3");
+	dcctrl1.set_port_tag<6>("P2.A4");
+	dcctrl1.set_port_tag<7>("P2.A5");
+}
 
-MACHINE_CONFIG_START(atomiswave_state::aw2c)
+void atomiswave_state::aw2c(machine_config &config)
+{
 	aw_base(config);
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
-MACHINE_CONFIG_END
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1.0");
+	dcctrl0.set_port_tag<1>("P1.1");
+	dcctrl0.set_port_tag<2>("P1.A0");
+	dcctrl0.set_port_tag<3>("P1.A1");
+	dcctrl0.set_port_tag<4>("P1.A2");
+	dcctrl0.set_port_tag<5>("P1.A3");
+	dcctrl0.set_port_tag<6>("P1.A4");
+	dcctrl0.set_port_tag<7>("P1.A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2.0");
+	dcctrl1.set_port_tag<1>("P2.1");
+	dcctrl1.set_port_tag<2>("P2.A0");
+	dcctrl1.set_port_tag<3>("P2.A1");
+	dcctrl1.set_port_tag<4>("P2.A2");
+	dcctrl1.set_port_tag<5>("P2.A3");
+	dcctrl1.set_port_tag<6>("P2.A4");
+	dcctrl1.set_port_tag<7>("P2.A5");
+}
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 /* BIOS info:
 
-Revisions through C supports only motherboards with X76F100 seral number eeprom
+Revisions through C supports only motherboards with X76F100 serial number eeprom
 Revisions through D can handle game carts only
 Revisions C and later can also handle Multi-board
 Revisions E and later can also handle DIMM board
@@ -3424,8 +3527,8 @@ EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
 USA, Korea and Australia is missing.
 
 EPR-21604  - No known dumps (Development BOOT ROM)
-EPR-21609  - No known dumps (Korea)
-EPR-21610  - No known dumps (Australia)
+EPR-?????  - No known dumps (Korea)
+EPR-?????  - No known dumps (Australia)
 
 EPR-23605B, EPR-23607B & EPR-23608B all differ by 8 bytes:
 
@@ -4799,6 +4902,32 @@ ROM_START( mushike )
 
 	// 840-0150    2003     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
+ROM_END
+
+// Prototype or location test version. Cartridge case have no game name sticker, PCB have label 840-0150B-FLS
+// Built about month before final ver, have no Management Chip protection, supports 6x less Beetle cards, uses License cards from Japan ver.
+ROM_START( mushikep )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x6000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "rom1.ic1s",    0x0800000, 0x800000, CRC(9cdc8dcb) SHA1(78da615a061487efbb0d641f52cf5b01447abec9) )
+	ROM_LOAD( "rom2.ic2s",    0x1000000, 0x800000, CRC(7b637bb6) SHA1(55d34fbe9fd202a34df72ee258492778f399b50a) )
+	ROM_LOAD( "rom3.ic3s",    0x1800000, 0x800000, CRC(6c6ddfbf) SHA1(3a3abe42b84cb3cefc4a59353cab770c11a703a7) )
+	ROM_LOAD( "rom4.ic4s",    0x2000000, 0x800000, CRC(a427002d) SHA1(7a058955a60e045e0434b9bf467a37ebcc7947f1) )
+	ROM_LOAD( "rom5.ic5s",    0x2800000, 0x800000, CRC(7076a50e) SHA1(555239e162acfd61f3ddfc5fd56d11ab6ae129e2) )
+	ROM_LOAD( "rom6.ic6s",    0x3000000, 0x800000, CRC(d7143066) SHA1(427d28630461664cd927a4fa5f3b847acf492d7b) )
+	ROM_LOAD( "rom7.ic7s",    0x3800000, 0x800000, CRC(98839bab) SHA1(314bd59c4c735a38f0ab6b23beb039121a05463c) )
+	// not used, contain random garbage
+	// ROM_LOAD( "rom8.ic8s",    0x4000000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+	// ROM_LOAD( "rom9.ic9s",    0x4800000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+	// ROM_LOAD( "rom10.ic10s",  0x5000000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+	// ROM_LOAD( "rom11.ic11s",  0x5800000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD("sflash.ic37", 0x000000, 0x000084, CRC(88f1db52) SHA1(5ebfa6c45abf2fa6f560832f366ed03ca91709a5) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
 ROM_START( mushi2k4 )
@@ -10867,6 +10996,7 @@ ROM_END
 /* 0136    */ GAME( 2004, shootplmp, shootplm, naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B (prototype)", GAME_FLAGS ) // Build: 15 Dec 2003
 /* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
 /* 0150    */ GAME( 2004, mushike,   naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND, World)", GAME_FLAGS ) // not for Japan
+/* 0150-FLS*/ GAME( 2004, mushikep,  mushike,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (MUSHIUSA '04 1ST, Prototype)", GAME_FLAGS )
 /* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
 /* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.

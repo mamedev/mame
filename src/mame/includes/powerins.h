@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#include "machine/nmk112.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -16,7 +15,8 @@ public:
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram(*this, "vram_%u", 0U),
 		m_spriteram(*this, "spriteram"),
-		m_okibank(*this, "okibank") { }
+		m_okibank(*this, "okibank")
+	{ }
 
 	void powerinsa(machine_config &config);
 	void powerinsb(machine_config &config);

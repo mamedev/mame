@@ -9,6 +9,8 @@ driver by smf and R. Belmont
 TODO:
 
 dvd check for bmiidx, bmiidxa, bmiidxc & bmiidxca
+ - 1st style (all variants, including club kit) connected over the mini-din8 (CN7) and dvd check requires RTS->CTS
+ - substream and above switched to standard serial connection (CN5)
 The first 128k of RF5C400 bank 0 is uploaded by the 68000, the rest is unused. It may be using 16J & 18J
 emulate dvd player and video mixing
 16seg led font
@@ -21,21 +23,26 @@ The following games are known to exist on this hardware (there may be more)
                                                                   Video CD      Security
 Game Title                            Year     Program CD       6/7/8 use DVD   Dongle      HDD label
 -----------------------------------------------------------------------------------------------------
-beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      *863 A02     ?
-beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      *863 A02     ?
-beatmania IIDX + DDR Club Kit         1999     896 JA ABM       *?             *?           ?
-beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       *?             *?           ?
-beatmania IIDX Substream              1999     *?               GC983 A04      *?           ?
-beatmania IIDX Club Version 2         1999     GE984 A01(BM)    *?             *984 A02     ?
+beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      *863 A02    863 HDD A01
+beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      *863 A02    863 HDD A01
+beatmania IIDX + DDR Club Kit         1999     896 JA ABM       GQ863 A04      *863 A02    863 HDD A01
+                                             + 896 JA A01
+beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       GQ863 A04      *863 A02    863 HDD A01
+                                             + 896 JA A01
+beatmania IIDX Substream              1999     GC983 A01        GC983 A04      *983 A02    983 HDD A01
+beatmania IIDX Substream (Asia)       1999     GC983-AA A01     GC983 A04      *983A A02   983 HDD A01
+beatmania IIDX Club Version 2         1999     GE984 A01(BM)    GC983 A04      *984 A02    983 HDD A01
                                              + GE984 A01(DDR)
-beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *?          *985 HDD A01
-beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   *?          *992 HDD A01
-beatmania IIDX 3rd Style(newer)       2000     GC992-JA C01     GC992-JA A04   *?          *992 HDD A01
+beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *985        985 HDD A01
+beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   *992        992 HDD A01
+beatmania IIDX 3rd Style(newer)       2000     GC992-JA B01     GC992-JA A04   *992        992 HDD A01
+beatmania IIDX 3rd Style(newest)      2000     GC992-JA C01     GC992-JA A04   *992        992 HDD A01
 beatmania IIDX 4th Style              2000     A03 JA A01       A03 JA A02     A03         A03 JA A03
-beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     A17         *A17 JA A03
-beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *?          B4U JA A03
-beatmania IIDX 6th Style(newer)       2001     B4U JA B01       B4U JA A02     *?          B4U JA A03
-beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *?          B44 JA A03
+beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     A17         A17 JA A03
+beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *B4U        B4U JA A03
+beatmania IIDX 6th Style(newer)       2001     B4U JA B01       B4U JA A02     *B4U        B4U JA A03
+beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *B44        B44 JA A03
+beatmania IIDX 7th Style(newer)       2002     B44 JA B01       B44 JA A02     *B44        B44 JA A03
 beatmania IIDX 8th Style              2002     C44 JA A01       C44 JA A02     *C44        C44 JA A03
 
 * = Not dumped.
@@ -245,6 +252,7 @@ Notes:
 #include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include "bmiidx.lh"
@@ -1067,32 +1075,30 @@ void twinkle_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, in
 
 void twinkle_state::cdrom_config(device_t *device)
 {
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakerleft", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakerright", 1.0);
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^speakerleft", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^speakerright", 1.0 )
 }
 
-MACHINE_CONFIG_START(twinkle_state::twinkle)
+void twinkle_state::twinkle(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( main_map )
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &twinkle_state::main_map);
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this));
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
+	M68000(config, m_audiocpu, 32000000/2);    /* 16.000 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &twinkle_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(twinkle_state::irq1_line_assert), attotime::from_hz(60));
+	m_audiocpu->set_periodic_int(FUNC(twinkle_state::irq2_line_assert), attotime::from_hz(60));
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&twinkle_state::scsi_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&twinkle_state::scsi_dma_write, this ) )
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200)); /* check TD pin on LTC1232 */
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP( sound_map )
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq1_line_assert, 60)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(twinkle_state, irq2_line_assert, 60)
-
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
-
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	AM53CF96(config, m_am53cf96, 0);
 	m_am53cf96->set_scsi_port("scsi");
@@ -1102,19 +1108,19 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
 	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
-	MCFG_DEVICE_ADD("fdc37c665gt", FDC37C665GT, XTAL(24'000'000))
+	FDC37C665GT(config, "fdc37c665gt", XTAL(24'000'000));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, 0)
-	MCFG_SLOT_OPTION_ADD("xvd701", JVC_XVD701)
-//  MCFG_SLOT_OPTION_ADD("xvs1100", JVC_XVS1100) // 8th mix only
-	MCFG_SLOT_DEFAULT_OPTION("xvd701")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", 0));
+	rs232.option_add("xvd701", JVC_XVD701);
+//  rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
+	rs232.set_default_option("xvd701");
+	rs232.rxd_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::cts_w));
 
 	ns16550_device &uart(*subdevice<ns16550_device>("fdc37c665gt:uart2"));
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -1122,21 +1128,23 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speakerleft").front_left();
 	SPEAKER(config, "speakerright").front_right();
 
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "speakerleft", 0.75 )
-	MCFG_SOUND_ROUTE( 1, "speakerright", 0.75 )
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
+	spu.add_route(0, "speakerleft", 0.75);
+	spu.add_route(1, "speakerright", 0.75);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2);
-	MCFG_DEVICE_ADDRESS_MAP(0, rf5c400_map)
-	MCFG_SOUND_ROUTE(0, "speakerleft", 1.0)
-	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
-MACHINE_CONFIG_END
+	rf5c400_device &rf5c400(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
+	rf5c400.set_addrmap(0, &twinkle_state::rf5c400_map);
+	rf5c400.add_route(0, "speakerleft", 1.0);
+	rf5c400.add_route(1, "speakerright", 1.0);
+}
 
 void twinkle_state::twinklex(machine_config &config)
 {

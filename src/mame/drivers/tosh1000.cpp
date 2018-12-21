@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
+	TC8521(config, "rtc", XTAL(32'768));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 
-	MCFG_TOSH1000_BRAM_ADD("bram")
+	TOSH1000_BRAM(config, m_bram, 0);
 MACHINE_CONFIG_END
 
 

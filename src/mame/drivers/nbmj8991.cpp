@@ -1335,7 +1335,7 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv1) // galkoku
 	MCFG_DEVICE_IO_MAP(galkoku_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8991_state, irq0_line_hold)
 
-	MCFG_NB1413M3_ADD("nb1413m3")
+	NB1413M3(config, m_nb1413m3, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1350,8 +1350,7 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv1) // galkoku
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("fmsnd", YM3812, 25000000/10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
+	YM3812(config, "fmsnd", 25000000/10).add_route(ALL_OUTPUTS, "speaker", 0.7);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1367,7 +1366,7 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv2) // pstadium
 	MCFG_DEVICE_IO_MAP(pstadium_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8991_state, irq0_line_hold)
 
-	MCFG_NB1413M3_ADD("nb1413m3")
+	NB1413M3(config, m_nb1413m3, 0);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)                  /* 4.00 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(nbmj8991_sound_map)
@@ -1388,7 +1387,7 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv2) // pstadium
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("fmsnd", YM3812, 25000000/6.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
@@ -1401,28 +1400,26 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv2) // pstadium
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv3)
+void nbmj8991_state::nbmjdrv3(machine_config &config)
+{
 	nbmjdrv1(config);
 
-	/* basic machine hardware */
-
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
-MACHINE_CONFIG_END
+	ay8910_device &fmsnd(AY8910(config.replace(), "fmsnd", 1250000));
+	fmsnd.port_a_read_callback().set_ioport("DSWA");
+	fmsnd.port_b_read_callback().set_ioport("DSWB");
+	fmsnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
+}
 
 
 // ---------------------------------------------------------------------
 
-MACHINE_CONFIG_START(nbmj8991_state::galkoku)
+void nbmj8991_state::galkoku(machine_config &config)
+{
 	nbmjdrv1(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_GALKOKU )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_GALKOKU);
+}
 
 
 MACHINE_CONFIG_START(nbmj8991_state::galkaika)
@@ -1432,8 +1429,7 @@ MACHINE_CONFIG_START(nbmj8991_state::galkaika)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(galkaika_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_GALKAIKA )
+	m_nb1413m3->set_type(NB1413M3_GALKAIKA);
 MACHINE_CONFIG_END
 
 
@@ -1444,8 +1440,7 @@ MACHINE_CONFIG_START(nbmj8991_state::tokyogal)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(tokyogal_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_TOKYOGAL )
+	m_nb1413m3->set_type(NB1413M3_TOKYOGAL);
 MACHINE_CONFIG_END
 
 
@@ -1456,29 +1451,26 @@ MACHINE_CONFIG_START(nbmj8991_state::tokimbsj)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(galkaika_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_TOKIMBSJ )
+	m_nb1413m3->set_type(NB1413M3_TOKIMBSJ);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(nbmj8991_state::mcontest)
+void nbmj8991_state::mcontest(machine_config &config)
+{
 	nbmjdrv1(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MCONTEST )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_MCONTEST);
+}
 
 
-MACHINE_CONFIG_START(nbmj8991_state::uchuuai)
+void nbmj8991_state::uchuuai(machine_config &config)
+{
 	nbmjdrv1(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_UCHUUAI )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_UCHUUAI);
+}
 
 
 MACHINE_CONFIG_START(nbmj8991_state::hyouban)
@@ -1488,20 +1480,18 @@ MACHINE_CONFIG_START(nbmj8991_state::hyouban)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(hyouban_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_HYOUBAN )
+	m_nb1413m3->set_type(NB1413M3_HYOUBAN);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(nbmj8991_state::pstadium)
+void nbmj8991_state::pstadium(machine_config &config)
+{
 	nbmjdrv2(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_PSTADIUM )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_PSTADIUM);
+}
 
 
 MACHINE_CONFIG_START(nbmj8991_state::triplew1)
@@ -1511,8 +1501,7 @@ MACHINE_CONFIG_START(nbmj8991_state::triplew1)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(triplew1_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_TRIPLEW1 )
+	m_nb1413m3->set_type(NB1413M3_TRIPLEW1);
 MACHINE_CONFIG_END
 
 
@@ -1523,18 +1512,16 @@ MACHINE_CONFIG_START(nbmj8991_state::triplew2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(triplew2_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_TRIPLEW2 )
+	m_nb1413m3->set_type(NB1413M3_TRIPLEW2);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(nbmj8991_state::ntopstar)
+void nbmj8991_state::ntopstar(machine_config &config)
+{
 	nbmjdrv2(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_NTOPSTAR )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_NTOPSTAR);
+}
 
 
 MACHINE_CONFIG_START(nbmj8991_state::mjlstory)
@@ -1544,38 +1531,34 @@ MACHINE_CONFIG_START(nbmj8991_state::mjlstory)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mjlstory_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MJLSTORY )
+	m_nb1413m3->set_type(NB1413M3_MJLSTORY);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(nbmj8991_state::vanilla)
+void nbmj8991_state::vanilla(machine_config &config)
+{
 	nbmjdrv2(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_VANILLA )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_VANILLA);
+}
 
 
 MACHINE_CONFIG_START(nbmj8991_state::finalbny)
 	nbmjdrv2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_FINALBNY )
+	m_nb1413m3->set_type(NB1413M3_FINALBNY);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(nbmj8991_state::qmhayaku)
+void nbmj8991_state::qmhayaku(machine_config &config)
+{
 	nbmjdrv2(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_QMHAYAKU )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_QMHAYAKU);
+}
 
 
 MACHINE_CONFIG_START(nbmj8991_state::mjgottub)
@@ -1585,8 +1568,7 @@ MACHINE_CONFIG_START(nbmj8991_state::mjgottub)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(triplew1_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_MJGOTTUB )
+	m_nb1413m3->set_type(NB1413M3_MJGOTTUB);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -1600,8 +1582,7 @@ MACHINE_CONFIG_START(nbmj8991_state::av2mj1bb)
 	MCFG_DEVICE_PROGRAM_MAP(av2mj1bb_map)
 	MCFG_DEVICE_IO_MAP(av2mj1bb_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_AV2MJ1BB )
+	m_nb1413m3->set_type(NB1413M3_AV2MJ1BB);
 MACHINE_CONFIG_END
 
 
@@ -1613,8 +1594,7 @@ MACHINE_CONFIG_START(nbmj8991_state::av2mj2rg)
 	MCFG_DEVICE_PROGRAM_MAP(av2mj2rg_map)
 	MCFG_DEVICE_IO_MAP(av2mj1bb_io_map)
 
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_AV2MJ2RG )
+	m_nb1413m3->set_type(NB1413M3_AV2MJ2RG);
 MACHINE_CONFIG_END
 
 

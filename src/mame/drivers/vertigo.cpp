@@ -127,18 +127,18 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vertigo_state, v_irq4_w))
-	MCFG_PIT8253_CLK1(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vertigo_state, v_irq3_w))
-	MCFG_PIT8253_CLK2(24_MHz_XTAL / 100)
+	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit.set_clk<0>(24_MHz_XTAL / 100);
+	pit.out_handler<0>().set(FUNC(vertigo_state::v_irq4_w));
+	pit.set_clk<1>(24_MHz_XTAL / 100);
+	pit.out_handler<1>().set(FUNC(vertigo_state::v_irq3_w));
+	pit.set_clk<2>(24_MHz_XTAL / 100);
 
 	TTL74148(config, m_ttl74148, 0);
 	m_ttl74148->out_cb().set(FUNC(vertigo_state::update_irq));
 
 	/* motor controller */
-	MCFG_DEVICE_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
+	M68705P3(config, "motorcpu", 24_MHz_XTAL / 6);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

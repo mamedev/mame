@@ -222,26 +222,27 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 *                 Machine Driver                 *
 *************************************************/
 
-MACHINE_CONFIG_START(tonton_state::tonton)
-
+void tonton_state::tonton(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
-	MCFG_DEVICE_PROGRAM_MAP(tonton_map)
-	MCFG_DEVICE_IO_MAP(tonton_io)
+	Z80(config, m_maincpu, CPU_CLOCK);  /* Guess. According to other MSX2 based gambling games */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tonton_state::tonton_map);
+	m_maincpu->set_addrmap(AS_IO, &tonton_state::tonton_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	V9938(config, m_v9938, MAIN_CLOCK);
+	m_v9938->set_screen_ntsc("screen");
+	m_v9938->set_vram_size(0x20000);
+	m_v9938->int_cb().set_inputline(m_maincpu, 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
+	ym2149_device &aysnd(YM2149(config, "aysnd", YM2149_CLOCK));   /* Guess. According to other MSX2 based gambling games */
 	/*
 	  AY8910: Port A out: FF
 	  AY8910: Port B out: FF
@@ -250,10 +251,10 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	  AY8910: Port A out: 00
 	  AY8910: Port B out: 00
 	*/
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tonton_state, ay_aout_w))    /* Write all bits twice, and then reset them at boot */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tonton_state, ay_bout_w))     /* Write all bits twice, and then reset them at boot */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	aysnd.port_a_write_callback().set(FUNC(tonton_state::ay_aout_w));    /* Write all bits twice, and then reset them at boot */
+	aysnd.port_b_write_callback().set(FUNC(tonton_state::ay_bout_w));    /* Write all bits twice, and then reset them at boot */
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
 
 /***************************************************************************

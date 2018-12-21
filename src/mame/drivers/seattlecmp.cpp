@@ -83,8 +83,7 @@ void seattle_comp_state::io_map(address_map &map)
 	map(0xf0, 0xf1).rw("pic1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw("pic2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf4, 0xf5).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
-	map(0xf6, 0xf6).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf7, 0xf7).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf6, 0xf7).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	//AM_RANGE(0xfc, 0xfd) Parallel data, status, serial DCD
 	//AM_RANGE(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
 }
@@ -134,11 +133,11 @@ MACHINE_CONFIG_START(seattle_comp_state::seattle)
 	uart.rxrdy_handler().set("pic2", FUNC(pic8259_device::ir1_w));
 	uart.txrdy_handler().set("pic2", FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 MACHINE_CONFIG_END
 
 /* ROM definition */

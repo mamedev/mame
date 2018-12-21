@@ -313,11 +313,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(mquake_state::mquake)
-
+void mquake_state::mquake(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mquake_state::main_map);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -326,8 +326,8 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(mquake_state,amiga)
+	PALETTE(config, m_palette, 4096);
+	m_palette->set_init(FUNC(mquake_state::palette_init_amiga));
 
 	MCFG_VIDEO_START_OVERRIDE(mquake_state,amiga)
 
@@ -343,19 +343,19 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
-	MCFG_ES5503_ADD("es5503", amiga_state::CLK_7M_NTSC)       /* ES5503 is likely mono due to channel strobe used as bank select */
-	MCFG_ES5503_OUTPUT_CHANNELS(1)
-	MCFG_DEVICE_ADDRESS_MAP(0, mquake_es5503_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
+	ES5503(config, m_es5503, amiga_state::CLK_7M_NTSC); /* ES5503 is likely mono due to channel strobe used as bank select */
+	m_es5503->set_channels(1);
+	m_es5503->set_addrmap(0, &mquake_state::mquake_es5503_map);
+	m_es5503->add_route(0, "lspeaker", 0.50);
+	m_es5503->add_route(0, "rspeaker", 0.50);
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_rd_callback().set_ioport("CIA0PORTA");
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
-MACHINE_CONFIG_END
+}
 
 
 

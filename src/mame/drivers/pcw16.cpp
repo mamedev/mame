@@ -91,8 +91,8 @@ TODO:
 
 #include "emu.h"
 #include "includes/pcw16.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1007,7 +1007,7 @@ INPUT_PORTS_END
 
 static void pcw16_com(device_slot_interface &device)
 {
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 }
 
 MACHINE_CONFIG_START(pcw16_state::pcw16)
@@ -1023,12 +1023,12 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	uart1.out_rts_callback().set("serport1", FUNC(rs232_port_device::write_rts));
 	uart1.out_int_callback().set(FUNC(pcw16_state::pcw16_com_interrupt_1));
 
-	MCFG_DEVICE_ADD( "serport1", RS232_PORT, pcw16_com, "msystems_mouse" )
-	MCFG_RS232_RXD_HANDLER(WRITELINE(uart1, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(uart1, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(uart1, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(uart1, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(uart1, ins8250_uart_device, cts_w))
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", pcw16_com, "msystems_mouse"));
+	serport1.rxd_handler().set(uart1, FUNC(ins8250_uart_device::rx_w));
+	serport1.dcd_handler().set(uart1, FUNC(ins8250_uart_device::dcd_w));
+	serport1.dsr_handler().set(uart1, FUNC(ins8250_uart_device::dsr_w));
+	serport1.ri_handler().set(uart1, FUNC(ins8250_uart_device::ri_w));
+	serport1.cts_handler().set(uart1, FUNC(ins8250_uart_device::cts_w));
 
 	NS16550(config, m_uart2, XTAL(1'843'200));     /* TODO: Verify uart model */
 	m_uart2->out_tx_callback().set("serport2", FUNC(rs232_port_device::write_txd));
@@ -1036,11 +1036,11 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	m_uart2->out_rts_callback().set("serport2", FUNC(rs232_port_device::write_rts));
 	m_uart2->out_int_callback().set(FUNC(pcw16_state::pcw16_com_interrupt_2));
 
-	MCFG_DEVICE_ADD( "serport2", RS232_PORT, pcw16_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart2, ins8250_uart_device, cts_w))
+	rs232_port_device &serport2(RS232_PORT(config, "serport2", pcw16_com, nullptr));
+	serport2.rxd_handler().set(m_uart2, FUNC(ins8250_uart_device::rx_w));
+	serport2.dcd_handler().set(m_uart2, FUNC(ins8250_uart_device::dcd_w));
+	serport2.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
+	serport2.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1060,11 +1060,11 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set_inputline(m_maincpu, 0);
 
-	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw16_state, fdc_interrupt))
+	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 

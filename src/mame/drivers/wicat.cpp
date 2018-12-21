@@ -22,6 +22,7 @@ Wicat - various systems.
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/am9517a.h"
@@ -392,7 +393,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,true,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -403,7 +404,7 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,false,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}

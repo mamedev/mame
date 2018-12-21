@@ -78,7 +78,7 @@ protected:
 	uint8_t m_video;
 	uint8_t m_hsync_q;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c32_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -90,7 +90,7 @@ void cardline_state::machine_start()
 	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
-	for (int i=0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
 	save_item(NAME(m_video));
 	save_item(NAME(m_hsync_q));
@@ -325,13 +325,13 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C32, MASTER_CLOCK)
-	MCFG_MCS51_PORT1_CONFIG(0x10)
-	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
-	MCFG_DEVICE_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cardline_state, hsync_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, cardline_state, video_w))
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
+	I80C32(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_port_forced_input(1, 0x10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cardline_state::mem_prg);
+	m_maincpu->set_addrmap(AS_IO, &cardline_state::mem_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(cardline_state::hsync_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(cardline_state::video_w));
+	//m_maincpu->set_vblank_int("screen", FUNC(cardline_state::irq1_line_hold));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -347,13 +347,14 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)   /* divisor guessed - result is 56 Hz */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(cardline_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(cardline_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, cardline_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, cardline_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8));   /* divisor guessed - result is 56 Hz */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_begin_update_callback(FUNC(cardline_state::crtc_begin_update), this);
+	crtc.set_update_row_callback(FUNC(cardline_state::crtc_update_row), this);
+	crtc.out_hsync_callback().set(FUNC(cardline_state::hsync_changed));
+	crtc.out_vsync_callback().set(FUNC(cardline_state::vsync_changed));
 
 	config.set_default_layout(layout_cardline);
 

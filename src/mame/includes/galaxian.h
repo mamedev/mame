@@ -5,6 +5,10 @@
     Galaxian hardware family
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_GALAXIAN_H
+#define MAME_INCLUDES_GALAXIAN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -171,6 +175,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scorpion_digitalker_control_w);
 	DECLARE_WRITE8_MEMBER(kingball_dac_w);
 	DECLARE_WRITE8_MEMBER(moonwar_port_select_w);
+	void init_fourplay();
+	void init_videight();
 	void init_galaxian();
 	void init_nolock();
 	void init_azurian();
@@ -310,6 +316,7 @@ public:
 	void gmgalax(machine_config &config);
 	void tenspot(machine_config &config);
 	void froggers(machine_config &config);
+	void froggervd(machine_config &config);
 	void mshuttle(machine_config &config);
 	void anteateruk(machine_config &config);
 	void monsterz(machine_config &config);
@@ -340,9 +347,8 @@ public:
 	void skybase(machine_config &config);
 	void kong(machine_config &config);
 	void scorpnmc(machine_config &config);
-
-	void galaxian_audio(machine_config &config);
-	void mooncrst_audio(machine_config &config);
+	void fourplay(machine_config &config);
+	void videight(machine_config &config);
 
 protected:
 	void amigo2_map(address_map &map);
@@ -357,6 +363,7 @@ protected:
 	void frogf_map(address_map &map);
 	void frogg_map(address_map &map);
 	void frogger_map(address_map &map);
+	void froggervd_map(address_map &map);
 	void frogger_sound_map(address_map &map);
 	void frogger_sound_portmap(address_map &map);
 	void froggeram_map(address_map &map);
@@ -470,4 +477,14 @@ protected:
 	uint8_t m_stars_blink_state;
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5];
+
+	DECLARE_WRITE8_MEMBER(fourplay_rombank_w);
+	DECLARE_WRITE8_MEMBER(videight_rombank_w);
+	DECLARE_WRITE8_MEMBER(videight_gfxbank_w);
+	void videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x);
+	void videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+	void fourplay_map(address_map &map);
+	void videight_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALAXIAN_H

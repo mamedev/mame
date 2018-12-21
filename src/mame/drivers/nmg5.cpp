@@ -236,13 +236,11 @@ Stephh's notes (based on the games M68000 code and some tests) :
 class nmg5_state : public driver_device
 {
 public:
-	nmg5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nmg5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scroll_ram(*this, "scroll_ram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bitmap(*this, "bitmap"),
+		m_vram(*this, "vram.%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_oki(*this, "oki"),
@@ -266,13 +264,11 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_scroll_ram;
-	required_shared_ptr<uint16_t> m_bg_videoram;
-	required_shared_ptr<uint16_t> m_fg_videoram;
-	required_shared_ptr<uint16_t> m_bitmap;
+	required_shared_ptr_array<uint16_t, 2> m_vram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
+	tilemap_t  *m_tilemap[2];
+	std::unique_ptr<bitmap_ind16> m_pixmap;
 
 	/* misc */
 	uint8_t m_prot_val;
@@ -288,21 +284,20 @@ private:
 	optional_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
+	DECLARE_READ8_MEMBER(pixmap_r);
+	DECLARE_WRITE8_MEMBER(pixmap_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(soundlatch_w);
 	DECLARE_READ16_MEMBER(prot_r);
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_bitmap( bitmap_ind16 &bitmap );
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nmg5_map(address_map &map);
 	void nmg5_sound_map(address_map &map);
 	void pclubys_map(address_map &map);
@@ -312,25 +307,34 @@ private:
 
 
 
-WRITE16_MEMBER(nmg5_state::fg_videoram_w)
+READ8_MEMBER(nmg5_state::pixmap_r)
 {
-	COMBINE_DATA(&m_fg_videoram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
+	int const sy = offset >> 8;
+	int const sx = (offset & 0xff) << 1;
+
+	return ((m_pixmap->pix16(sy & 0xff, sx & ~1) & 0xf) << 4) | (m_pixmap->pix16(sy & 0xff, sx |  1) & 0xf);
 }
 
-WRITE16_MEMBER(nmg5_state::bg_videoram_w)
+WRITE8_MEMBER(nmg5_state::pixmap_w)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
+	int const sy = offset >> 8;
+	int const sx = (offset & 0xff) << 1;
+
+	m_pixmap->pix16(sy & 0xff, sx & ~1) = 0x300 + ((data & 0xf0) >> 4);
+	m_pixmap->pix16(sy & 0xff, sx |  1) = 0x300 + (data & 0x0f);
 }
 
-WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
+template<int Layer>
+WRITE16_MEMBER(nmg5_state::vram_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(nmg5_state::soundlatch_w)
+{
+	m_soundlatch->write(space, 0, data);
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ16_MEMBER(nmg5_state::prot_r)
@@ -377,7 +381,7 @@ void nmg5_state::nmg5_map(address_map &map)
 	map(0x120000, 0x12ffff).ram();
 	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram");
-	map(0x180000, 0x180001).w(FUNC(nmg5_state::nmg5_soundlatch_w));
+	map(0x180001, 0x180001).w(FUNC(nmg5_state::soundlatch_w));
 	map(0x180002, 0x180003).nopw();
 	map(0x180004, 0x180005).rw(FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
 	map(0x180006, 0x180007).w(FUNC(nmg5_state::gfx_bank_w));
@@ -387,9 +391,9 @@ void nmg5_state::nmg5_map(address_map &map)
 	map(0x18000e, 0x18000f).w(FUNC(nmg5_state::priority_reg_w));
 	map(0x300002, 0x300009).writeonly().share("scroll_ram");
 	map(0x30000a, 0x30000f).nopw();
-	map(0x320000, 0x321fff).ram().w(FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
-	map(0x322000, 0x323fff).ram().w(FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
-	map(0x800000, 0x80ffff).ram().share("bitmap");
+	map(0x320000, 0x321fff).ram().w(FUNC(nmg5_state::vram_w<0>)).share("vram.0");
+	map(0x322000, 0x323fff).ram().w(FUNC(nmg5_state::vram_w<1>)).share("vram.1");
+	map(0x800000, 0x80ffff).rw(FUNC(nmg5_state::pixmap_r), FUNC(nmg5_state::pixmap_w));
 }
 
 void nmg5_state::pclubys_map(address_map &map)
@@ -398,7 +402,7 @@ void nmg5_state::pclubys_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x440000, 0x4407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x460000, 0x4607ff).ram().share("spriteram");
-	map(0x480000, 0x480001).w(FUNC(nmg5_state::nmg5_soundlatch_w));
+	map(0x480001, 0x480001).w(FUNC(nmg5_state::soundlatch_w));
 	map(0x480002, 0x480003).nopw();
 	map(0x480004, 0x480005).rw(FUNC(nmg5_state::prot_r), FUNC(nmg5_state::prot_w));
 	map(0x480006, 0x480007).w(FUNC(nmg5_state::gfx_bank_w));
@@ -407,9 +411,9 @@ void nmg5_state::pclubys_map(address_map &map)
 	map(0x48000c, 0x48000d).portr("INPUTS");
 	map(0x48000e, 0x48000f).w(FUNC(nmg5_state::priority_reg_w));
 	map(0x500002, 0x500009).writeonly().share("scroll_ram");
-	map(0x520000, 0x521fff).ram().w(FUNC(nmg5_state::bg_videoram_w)).share("bg_videoram");
-	map(0x522000, 0x523fff).ram().w(FUNC(nmg5_state::fg_videoram_w)).share("fg_videoram");
-	map(0x800000, 0x80ffff).ram().share("bitmap");
+	map(0x520000, 0x521fff).ram().w(FUNC(nmg5_state::vram_w<0>)).share("vram.0");
+	map(0x522000, 0x523fff).ram().w(FUNC(nmg5_state::vram_w<1>)).share("vram.1");
+	map(0x800000, 0x80ffff).rw(FUNC(nmg5_state::pixmap_r), FUNC(nmg5_state::pixmap_w));
 }
 
 /*******************************************************************
@@ -849,84 +853,63 @@ static INPUT_PORTS_START( wondstck )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
-TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
+template<int Layer>
+TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ SET_TILE_INFO_MEMBER(0, m_vram[Layer][tile_index] | (m_gfx_bank << 16), Layer ^ 1, 0);}
 
 void nmg5_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap->set_transparent_pen(0);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1]->set_transparent_pen(0);
+
+	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);
+
+	const rectangle pixmap_rect(0,511,0,255);
+	m_pixmap->fill(0x300, pixmap_rect);
+
+	save_item(NAME(*m_pixmap));
 }
 
 
-
-void nmg5_state::draw_bitmap( bitmap_ind16 &bitmap )
+uint32_t nmg5_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int yyy = 256;
-	int xxx = 512 / 4;
-	uint16_t x, y, count;
-	int xoff = -12;
-	int yoff = -9;
-	int pix;
+	int const xoff = -12;
+	int const yoff = -9;
+	m_tilemap[0]->set_scrolly(0, m_scroll_ram[3] + 9);
+	m_tilemap[0]->set_scrollx(0, m_scroll_ram[2] + 3);
+	m_tilemap[1]->set_scrolly(0, m_scroll_ram[1] + 9);
+	m_tilemap[1]->set_scrollx(0, m_scroll_ram[0] - 1);
 
-	count = 0;
-	for (y = 0; y < yyy; y++)
-	{
-		for (x = 0; x < xxx; x++)
-		{
-			pix = (m_bitmap[count] & 0xf000) >> 12;
-			if (pix) bitmap.pix16(y + yoff, x * 4 + 0 + xoff) = pix + 0x300;
-			pix = (m_bitmap[count] & 0x0f00) >> 8;
-			if (pix) bitmap.pix16(y + yoff, x * 4 + 1 + xoff) = pix + 0x300;
-			pix = (m_bitmap[count] & 0x00f0) >> 4;
-			if (pix) bitmap.pix16(y + yoff, x * 4 + 2 + xoff) = pix + 0x300;
-			pix = (m_bitmap[count] & 0x000f) >> 0;
-			if (pix) bitmap.pix16(y + yoff, x * 4 + 3 + xoff) = pix + 0x300;
-
-			count++;
-		}
-	}
-}
-
-
-uint32_t nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->set_scrolly(0, m_scroll_ram[3] + 9);
-	m_bg_tilemap->set_scrollx(0, m_scroll_ram[2] + 3);
-	m_fg_tilemap->set_scrolly(0, m_scroll_ram[1] + 9);
-	m_fg_tilemap->set_scrollx(0, m_scroll_ram[0] - 1);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (m_priority_reg == 0)
 	{
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		draw_bitmap(bitmap);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		copybitmap_trans(bitmap, *m_pixmap, 0, 0, xoff, yoff, cliprect, 0x300);
 	}
 	else if (m_priority_reg == 1)
 	{
-		draw_bitmap(bitmap);
+		copybitmap_trans(bitmap, *m_pixmap, 0, 0, xoff, yoff, cliprect, 0x300);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 2)
 	{
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		draw_bitmap(bitmap);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		copybitmap_trans(bitmap, *m_pixmap, 0, 0, xoff, yoff, cliprect, 0x300);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 3)
 	{
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		draw_bitmap(bitmap);
+		copybitmap_trans(bitmap, *m_pixmap, 0, 0, xoff, yoff, cliprect, 0x300);
 	}
 	else if (m_priority_reg == 7)
 	{
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		draw_bitmap(bitmap);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		copybitmap_trans(bitmap, *m_pixmap, 0, 0, xoff, yoff, cliprect, 0x300);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	}
 	return 0;
@@ -968,12 +951,12 @@ static const gfx_layout layout_16x16x5 =
 
 static GFXDECODE_START( gfx_nmg5 )
 	GFXDECODE_ENTRY( "gfx1", 0, nmg5_layout_8x8x8, 0x000,  2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,   0x200, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,    0x200, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_pclubys )
 	GFXDECODE_ENTRY( "gfx1", 0, pclubys_layout_8x8x8, 0x000,  2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,      0x200, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x5,       0x200, 16 )
 GFXDECODE_END
 
 
@@ -1004,32 +987,31 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	MCFG_DEVICE_PROGRAM_MAP(nmg5_sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update_nmg5)
+	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nmg5)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(1)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_FLIPALLX(1)
-	MCFG_DECO_SPRITE_OFFSETS(0, 8)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(1);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_flipallx(1);
+	m_sprgen->set_offsets(0, 8);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

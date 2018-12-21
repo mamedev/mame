@@ -934,24 +934,20 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0x8, 256, 224)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2_0);
+	m_view2_0->set_gfx_region(1);
+	m_view2_0->set_offset(0x5b, 0x8, 256, 224);
+	m_view2_0->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_PRIORITIES(8,8,8,8) // above all (not verified)
-	MCFG_KANEKO16_SPRITE_OFFSETS(0, -0x40)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)
+	m_kaneko_spr->set_offsets(0, -0x40);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
-
-
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -969,20 +965,18 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(fantasia_map)
 
-	MCFG_DEVICE_REMOVE("calc1_mcu")
+	config.device_remove("calc1_mcu");
 
-	MCFG_DEVICE_MODIFY("view2_0")
 	// these values might not be correct, behavior differs from original boards
-	MCFG_KANEKO_TMAP_INVERT_FLIP(1)
-	MCFG_KANEKO_TMAP_OFFSET(-256, -216, 256, 224)
+	m_view2_0->set_invert_flip(1);
+	m_view2_0->set_offset(-256, -216, 256, 224);
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::comad_noview2)
 	comad(config);
-	MCFG_DEVICE_REMOVE("view2_0")
+	config.device_remove("view2_0");
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_expro02_noview2)
 MACHINE_CONFIG_END

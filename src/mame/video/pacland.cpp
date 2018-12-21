@@ -59,55 +59,53 @@ sprite color 0x7f will erase the tilemap and force it to be transparent.
 
 void pacland_state::switch_palette()
 {
-	int i;
 	const uint8_t *color_prom = m_color_prom + 256 * m_palette_bank;
 
-	for (i = 0;i < 256;i++)
+	for (int i = 0; i < 256; i++)
 	{
 		int bit0,bit1,bit2,bit3;
-		int r,g,b;
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[1024] >> 0) & 0x01;
-		bit1 = (color_prom[1024] >> 1) & 0x01;
-		bit2 = (color_prom[1024] >> 2) & 0x01;
-		bit3 = (color_prom[1024] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		bit3 = BIT(color_prom[0], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[0], 4);
+		bit1 = BIT(color_prom[0], 5);
+		bit2 = BIT(color_prom[0], 6);
+		bit3 = BIT(color_prom[0], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[1024], 0);
+		bit1 = BIT(color_prom[1024], 1);
+		bit2 = BIT(color_prom[1024], 2);
+		bit3 = BIT(color_prom[1024], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		color_prom++;
 
-		m_palette->set_indirect_color(i,rgb_t(r,g,b));
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
 	}
 }
 
 PALETTE_INIT_MEMBER(pacland_state, pacland)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = &m_color_prom[0];
 
-	m_color_prom = color_prom;  /* we'll need this later */
-	/* skip the palette data, it will be initialized later */
+	// skip the palette data, it will be initialized later
 	color_prom += 2 * 0x400;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
-	for (i = 0;i < 0x400;i++)
+	for (int i = 0; i < 0x400; i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++);
 
-	/* Background */
-	for (i = 0;i < 0x400;i++)
+	// Background
+	for (int i = 0; i < 0x400; i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++);
 
-	/* Sprites */
-	for (i = 0;i < 0x400;i++)
+	// Sprites
+	for (int i = 0; i < 0x400; i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i, *color_prom++);
 
 	m_palette_bank = 0;
@@ -117,15 +115,13 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 	m_transmask[0] = std::make_unique<uint32_t[]>(64);
 	m_transmask[1] = std::make_unique<uint32_t[]>(64);
 	m_transmask[2] = std::make_unique<uint32_t[]>(64);
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
-		int palentry;
-
 		/* start with no transparency */
-		m_transmask[0][i] = m_transmask[1][i] =  m_transmask[2][i] = 0;
+		m_transmask[0][i] = m_transmask[1][i] = m_transmask[2][i] = 0;
 
 		/* iterate over all palette entries except the last one */
-		for (palentry = 0; palentry < 0x100; palentry++)
+		for (int palentry = 0; palentry < 0x100; palentry++)
 		{
 			uint32_t mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
 
@@ -189,8 +185,7 @@ TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
 
 void pacland_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_sprite1_bitmap);
-	m_screen->register_screen_bitmap(m_sprite2_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_screen->register_screen_bitmap(m_fg_bitmap);
 	m_fg_bitmap.fill(0xffff);
@@ -380,32 +375,30 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	draw_fg(screen, bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	m_sprite1_bitmap.fill(0, cliprect);
-	draw_sprites(screen, m_sprite1_bitmap, cliprect, flip, 1);
-	copybitmap_trans(bitmap, m_sprite1_bitmap, 0, 0, 0, 0, cliprect, 0);
+	draw_sprites(screen, bitmap, cliprect, flip, 1);
+
+	/* draw sprite pixels in a temporary bitmap with colortable values >= 0xf0 */
+	m_sprite_bitmap.fill(0, cliprect);
+	draw_sprites(screen, m_sprite_bitmap, cliprect, flip, 2);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint16_t *spr = &m_sprite_bitmap.pix16(y);
+		uint16_t *bmp = &bitmap.pix16(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			/* clear to 0 if "m_sprite_bitmap" and "bitmap" are different,
+			   because not redraw pixels that are not visible in "bitmap"
+			   in this way, keep sprite-sprite priorities intact */
+			if (spr[x] != 0 && spr[x] != bmp[x])
+				spr[x] = 0;
+		}
+	}
 
 	/* draw high priority fg tiles */
 	draw_fg(screen, bitmap, cliprect, 1);
 
-	/* draw sprite pixels with colortable values >= 0xf0, which have priority over all fg tiles */
-	m_sprite2_bitmap.fill(0, cliprect);
-	draw_sprites(screen, m_sprite2_bitmap, cliprect, flip, 2);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		uint16_t *src1 = &m_sprite1_bitmap.pix16(y);
-		uint16_t *src2 = &m_sprite2_bitmap.pix16(y);
-		uint16_t *dst = &bitmap.pix16(y);
-
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			/* only copy if "m_sprite1_bitmap" and "m_sprite2_bitmap" are same value,
-			   because not redraw pixels that are not visible in "m_sprite1_bitmap" */
-			uint16_t pix1 = src1[x];
-			uint16_t pix2 = src2[x];
-			if (pix2 != 0 && dst[x] < 0x800 && pix1 == pix2)
-				dst[x] = pix2;
-		}
-	}
+	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
+	copybitmap_trans(bitmap, m_sprite_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }

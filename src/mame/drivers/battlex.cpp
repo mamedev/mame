@@ -314,8 +314,7 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'000'000)/8)   // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "ay1", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40);   // ?
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(battlex_state::dodgeman)
@@ -326,8 +325,7 @@ MACHINE_CONFIG_START(battlex_state::dodgeman)
 
 	MCFG_VIDEO_START_OVERRIDE(battlex_state, dodgeman)
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'000'000)/8)   // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "ay2", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40);   // ?
 MACHINE_CONFIG_END
 
 

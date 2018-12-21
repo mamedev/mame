@@ -236,48 +236,49 @@ void ultrsprt_state::machine_reset()
 
 /*****************************************************************************/
 
-MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
+void ultrsprt_state::ultrsprt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GA, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(ultrsprt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
+	PPC403GA(config, m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::ultrsprt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ultrsprt_state::irq1_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	M68000(config, m_audiocpu, 8000000); // Unconfirmed
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::sound_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P1X")
-	MCFG_UPD4701_PORTY("P1Y")
+	UPD4701A(config, m_upd[0]);
+	m_upd[0]->set_portx_tag("P1X");
+	m_upd[0]->set_porty_tag("P1Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P2X")
-	MCFG_UPD4701_PORTY("P2Y")
+	UPD4701A(config, m_upd[1]);
+	m_upd[1]->set_portx_tag("P2X");
+	m_upd[1]->set_porty_tag("P2Y");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // TODO: Determine correct timings
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
-	MCFG_SCREEN_UPDATE_DRIVER(ultrsprt_state, screen_update_ultrsprt)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60); // TODO: Determine correct timings
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 511, 0, 399);
+	screen.set_screen_update(FUNC(ultrsprt_state::screen_update_ultrsprt));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette, 8192);
+	m_palette->set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
 
 	/* sound hardware */
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_6);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_5))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set_inputline("audiocpu", M68K_IRQ_5);
+	k054539.add_route(0, "lspeaker", 1.0);
+	k054539.add_route(1, "rspeaker", 1.0);
+}
 
 
 /*****************************************************************************/

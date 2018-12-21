@@ -41,6 +41,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
@@ -852,18 +853,20 @@ MACHINE_CONFIG_START(applix_state::applix)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 30_MHz_XTAL / 4) // MC68000-P10 @ 7.5 MHz
 	MCFG_DEVICE_PROGRAM_MAP(applix_mem)
+
 	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 2) // Z80H
 	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
 	MCFG_DEVICE_IO_MAP(subcpu_io)
-	MCFG_DEVICE_ADD("kbdcpu", I8051, 11060250)
-	MCFG_DEVICE_PROGRAM_MAP(keytronic_pc3270_program)
-	MCFG_DEVICE_IO_MAP(keytronic_pc3270_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, applix_state, p1_read))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, applix_state, p1_write))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, applix_state, p2_read))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, applix_state, p2_write))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, applix_state, p3_read))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, applix_state, p3_write))
+
+	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
+	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
+	kbdcpu.set_addrmap(AS_IO, &applix_state::keytronic_pc3270_io);
+	kbdcpu.port_in_cb<1>().set(FUNC(applix_state::p1_read));
+	kbdcpu.port_out_cb<1>().set(FUNC(applix_state::p1_write));
+	kbdcpu.port_in_cb<2>().set(FUNC(applix_state::p2_read));
+	kbdcpu.port_out_cb<2>().set(FUNC(applix_state::p2_write));
+	kbdcpu.port_in_cb<3>().set(FUNC(applix_state::p3_read));
+	kbdcpu.port_out_cb<3>().set(FUNC(applix_state::p3_write));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -887,11 +890,13 @@ MACHINE_CONFIG_START(applix_state::applix)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 30_MHz_XTAL / 16) // MC6545 @ 1.875 MHz
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, applix_state, vsync_w))
+	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
+
 
 	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));

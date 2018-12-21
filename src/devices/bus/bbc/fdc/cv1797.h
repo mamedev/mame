@@ -13,6 +13,7 @@
 #pragma once
 
 #include "fdc.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"
 #include "formats/fsd_dsk.h"
@@ -24,7 +25,6 @@
 class bbc_cv1797_device :
 	public device_t,
 	public device_bbc_fdc_interface
-
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::DISK; }
@@ -35,22 +35,19 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_READ8_MEMBER(fd1797l_read);
-	DECLARE_WRITE8_MEMBER(fd1797l_write);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 
-	required_memory_region m_dfs_rom;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;

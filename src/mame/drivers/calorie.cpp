@@ -494,26 +494,24 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay3", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(calorie_state::caloriee)
+void calorie_state::caloriee(machine_config &config)
+{
 	calorie(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_317_0004_device &maincpu(SEGA_317_0004(config.replace(), m_maincpu, 4000000));         /* 4 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
+	maincpu.set_addrmap(AS_OPCODES, &calorie_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(calorie_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *

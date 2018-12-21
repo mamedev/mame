@@ -1,8 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_NAMCOS86_H
+#define MAME_INCLUDES_NAMCOS86_H
+
+#pragma once
+
+#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
-#include "sound/namco.h"
 #include "sound/n63701x.h"
+#include "sound/namco.h"
 #include "emupal.h"
 
 class namcos86_state : public driver_device
@@ -12,6 +18,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu1(*this, "cpu1")
 		, m_cpu2(*this, "cpu2")
+		, m_mcu(*this, "mcu")
 		, m_watchdog(*this, "watchdog")
 		, m_cus30(*this, "namco")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -45,7 +52,6 @@ private:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(cus115_w);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_WRITE8_MEMBER(videoram1_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(tilebank_select_w);
@@ -74,7 +80,6 @@ private:
 	void genpeitd_mcu_map(address_map &map);
 	void hopmappy_cpu2_map(address_map &map);
 	void hopmappy_mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 	void roishtar_cpu2_map(address_map &map);
 	void roishtar_mcu_map(address_map &map);
 	void rthunder_cpu2_map(address_map &map);
@@ -87,6 +92,7 @@ private:
 
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
+	required_device<hd63701_cpu_device> m_mcu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -111,3 +117,5 @@ private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
 	void set_scroll(int layer);
 };
+
+#endif // MAME_INCLUDES_NAMCOS86_H

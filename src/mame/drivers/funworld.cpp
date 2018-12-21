@@ -49,6 +49,7 @@
   * Pool 10 (Italian, set 7),                                   C.M.C.,             1997.
   * Pool 10 (Italian, set 8),                                   C.M.C.,             1997.
   * Pool 10 (Italian, set 9),                                   bootleg (R.B.),     1996.
+  * New Biliard 98 (Pool 10 hack),                              bootleg,            1998.
   * Pool 10 (Italian, Dino 4 hardware, encrypted),              C.M.C.,             1997.
   * Royal (Pool 10 hack),                                       unknown,            2001.
   * Tortuga Family (Italian),                                   C.M.C.,             1997.
@@ -3098,18 +3099,19 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 2MHz, veryfied on jollycrd & royalcrd */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* 2MHz, verified on jollycrd & royalcrd */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_a_w))  /* portA out */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_b_w))  /* portB out */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)  /* analyzed to avoid clips */
+	ay8910_device &ay8910(AY8910(config, "ay8910", SND_CLOCK));    /* 2MHz */
+	ay8910.port_a_write_callback().set(FUNC(funworld_state::funworld_lamp_a_w));
+	ay8910.port_b_write_callback().set(FUNC(funworld_state::funworld_lamp_b_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 2.5);  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
 
@@ -3127,12 +3129,10 @@ MACHINE_CONFIG_START(funworld_state::funquiz)
 //  fw2ndpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funquiz_map)
-	MCFG_DEVICE_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, funworld_state, funquiz_ay8910_a_r)) /* portA in  */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, funworld_state, funquiz_ay8910_b_r)) /* portB in  */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_a_w))  /* portA out */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_b_w))  /* portB out */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
+
+
+	subdevice<ay8910_device>("ay8910")->port_a_read_callback().set(FUNC(funworld_state::funquiz_ay8910_a_r));
+	subdevice<ay8910_device>("ay8910")->port_b_read_callback().set(FUNC(funworld_state::funquiz_ay8910_b_r));
 MACHINE_CONFIG_END
 
 
@@ -3142,17 +3142,12 @@ MACHINE_CONFIG_START(funworld_state::magicrd2)
 	MCFG_DEVICE_PROGRAM_MAP(magicrd2_map)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, magicrd2)
 
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_VISAREA_ADJUST(0, -56, 0, 0)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	subdevice<mc6845_device>("crtc")->set_visarea_adjust(0, -56, 0, 0);
 
-	MCFG_DEVICE_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_a_w))  /* portA out */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_b_w))  /* portB out */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)  /* analyzed to avoid clips */
+	ay8910_device &ay8910(AY8910(config.replace(), "ay8910", SND_CLOCK));    /* 2MHz */
+	ay8910.port_a_write_callback().set(FUNC(funworld_state::funworld_lamp_a_w));
+	ay8910.port_b_write_callback().set(FUNC(funworld_state::funworld_lamp_b_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.5);  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
 
@@ -4517,6 +4512,61 @@ ROM_START( pool10j )
 	ROM_LOAD( "palce20v8h.u22",  0x0200, 0x0157, NO_DUMP )
 	ROM_LOAD( "palce20v8h.u23",  0x0400, 0x0157, NO_DUMP )
 ROM_END
+
+/*
+  New Biliard 98
+
+  CPUs:
+  1x 	R65C02P2 	u1 	8-bit Microprocessor - main
+  1x 	MC68B45P 	u8 	CRT Controller (CRTC)
+  2x 	MC68B21CP 	u29, u30 	Peripheral Interface Adapter
+  1x 	89C10 		u34 	Programmable Sound Generator - sound
+  1x 	TDA2003 	u33 	Audio Amplifier - sound
+  1x 	oscillator 	16.000000MHz 	os1 	
+
+  ROMs:
+  3x 	27C256 	u2, u20, u21 	dumped
+  1x 	AM27S29PC 	u25 	dumped
+
+  RAMs:
+  1x 	KM6264BL-10L-12 u13
+  1x 	GM76C28A-10 	u3
+
+  PLDs:
+  2x 	GAL20V8A-25LP 	u22, u23  read protected
+  1x 	PALCE16V8H-15PC/4 	u5 	  read protected
+
+  Others:
+  1x 28x2 JAMMA edge connector
+  1x trimmer (TR1, volume)
+  1x 8 DIP switches bank (SW1)
+  1x battery 3.6V
+
+  Notes:
+  PCB is marked: "top" and "C.M.C. POOL 10" on component side
+  PCB is marked: "bottom" and "POOL 10 C.M.C" on solder side 
+
+*/
+ROM_START( biliard )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "biliard-a.u2", 0x8000, 0x8000, CRC(3b20348b) SHA1(002b9b8581adc1b253ee3babf0e4c1aad4a2f017) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "cmcpool10-b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
+	ROM_LOAD( "biliard-c.u20",   0x8000, 0x8000, CRC(b15d10ec) SHA1(9b0f32ff791063cfb2d8339a4e8041e034e73eb7) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "biliard_nvram.bin",  0x0000, 0x0800, CRC(2f2fab43) SHA1(f815b70c171bad99fa6a60c256e4fdc85dd6b290) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29pc.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h-25pc-4.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "gal20v8a-25lp.u22",  0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "gal20v8a-25lp.u23",  0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
+ROM_END
+
 
 /*
   Royal...
@@ -7124,6 +7174,7 @@ GAMEL( 1996, pool10g,   pool10,   cuoreuno, cuoreuno,  funworld_state, empty_ini
 GAMEL( 1996, pool10h,   pool10,   cuoreuno, pool10,    funworld_state, empty_init,    ROT0, "C.M.C.",          "Pool 10 (Italian, set 7)",                        0,                       layout_jollycrd )
 GAMEL( 1997, pool10i,   pool10,   cuoreuno, pool10,    funworld_state, empty_init,    ROT0, "C.M.C.",          "Pool 10 (Italian, set 8)",                        0,                       layout_jollycrd )
 GAMEL( 1996, pool10j,   pool10,   cuoreuno, pool10,    funworld_state, empty_init,    ROT0, "bootleg (R.B.)",  "Pool 10 (Italian, set 9)",                        0,                       layout_jollycrd )
+GAMEL( 1998, biliard,   pool10,   cuoreuno, pool10,    funworld_state, empty_init,    ROT0, "bootleg",         "New Biliard 98 (Pool 10 hack)",                   0,                       layout_jollycrd )
 GAMEL( 2001, royal,     pool10,   royalcd1, royal,     funworld_state, empty_init,    ROT0, "<unknown>",       "Royal (Pool 10 hack)",                            0,                       layout_jollycrd )
 GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Tortuga Family (Italian)",                        0,                       layout_jollycrd )
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  funworld_state, empty_init,    ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )

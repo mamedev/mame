@@ -393,11 +393,12 @@ static const char *const natodef_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(thief_state::thief)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(thief_main_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(thief_state, iack)
+void thief_state::thief(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &thief_state::thief_main_map);
+	m_maincpu->set_addrmap(AS_IO, &thief_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(thief_state::iack));
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(thief_state::thief_input_select_w));
@@ -405,48 +406,45 @@ MACHINE_CONFIG_START(thief_state::thief)
 	ppi.out_pc_callback().set(FUNC(thief_state::tape_control_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4, 320, 0, 256, 272, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(20'000'000)/4, 320, 0, 256, 272, 0, 256);
+	m_screen->set_screen_update(FUNC(thief_state::screen_update_thief));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("tms", TMS9927, XTAL(20'000'000)/4/8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_VSYN_CALLBACK(ASSERTLINE("maincpu", 0))
-	MCFG_PALETTE_ADD("palette", 16)
+	TMS9927(config, m_tms, XTAL(20'000'000)/4/8);
+	m_tms->set_char_width(8);
+	m_tms->vsyn_callback().set_inputline("maincpu", 0, ASSERT_LINE);
+
+	PALETTE(config, m_palette, 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(8'000'000)/2/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay1", XTAL(8'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(8'000'000)/2/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay2", XTAL(8'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(thief_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(thief_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(thief_state::sharkatt)
+void thief_state::sharkatt(machine_config &config)
+{
 	thief(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sharkatt_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thief_state::sharkatt_main_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
 
-	MCFG_DEVICE_MODIFY("samples")
-	MCFG_SAMPLES_NAMES(sharkatt_sample_names)
-MACHINE_CONFIG_END
+	m_samples->set_samples_names(sharkatt_sample_names);
+}
 
-MACHINE_CONFIG_START(thief_state::natodef)
+void thief_state::natodef(machine_config &config)
+{
 	thief(config);
-	MCFG_DEVICE_MODIFY("samples")
-	MCFG_SAMPLES_NAMES(natodef_sample_names)
-MACHINE_CONFIG_END
+	m_samples->set_samples_names(natodef_sample_names);
+}
 
 
 /**********************************************************/

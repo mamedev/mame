@@ -93,7 +93,7 @@ private:
 	required_shared_ptr<uint16_t> m_vidram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<at89c4051_device> m_mcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -570,10 +570,10 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_DEVICE_PROGRAM_MAP(rbmk_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
-	MCFG_DEVICE_PROGRAM_MAP(mcu_mem)
-	MCFG_DEVICE_IO_MAP(mcu_io)
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, rbmk_state, mcu_io_mux_w))
+	AT89C4051(config, m_mcu, 22000000 / 4); // frequency isn't right
+	m_mcu->set_addrmap(AS_PROGRAM, &rbmk_state::mcu_mem);
+	m_mcu->set_addrmap(AS_IO, &rbmk_state::mcu_io);
+	m_mcu->port_out_cb<3>().set(FUNC(rbmk_state::mcu_io_mux_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbmk)
 
@@ -597,9 +597,9 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 22000000 / 8)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ymsnd, 22000000 / 8);
+	m_ymsnd->add_route(0, "lspeaker", 0.60);
+	m_ymsnd->add_route(1, "rspeaker", 0.60);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rbmk_state::rbspm)

@@ -195,15 +195,15 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	m_timeout_time = machine().time() + duration;
 
-	m_discrete->write(space, HITME_DOWNCOUNT_VAL, data);
-	m_discrete->write(space, HITME_OUT0, 1);
+	m_discrete->write(HITME_DOWNCOUNT_VAL, data);
+	m_discrete->write(HITME_OUT0, 1);
 }
 
 
 WRITE8_MEMBER(hitme_state::output_port_1_w)
 {
-	m_discrete->write(space, HITME_ENABLE_VAL, data);
-	m_discrete->write(space, HITME_OUT1, 1);
+	m_discrete->write(HITME_ENABLE_VAL, data);
+	m_discrete->write(HITME_OUT1, 1);
 }
 
 

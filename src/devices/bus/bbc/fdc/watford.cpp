@@ -68,8 +68,9 @@ ROM_END
 void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 {
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
-	m_fdc->intrq_wr_callback().set(FUNC(bbc_weddb2_device::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(bbc_weddb2_device::fdc_drq_w));
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
@@ -77,8 +78,9 @@ void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 void bbc_weddb3_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
-	m_fdc->intrq_wr_callback().set(FUNC(bbc_weddb3_device::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(bbc_weddb3_device::fdc_drq_w));
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 }
@@ -102,27 +104,27 @@ const tiny_rom_entry *bbc_weddb3_device::device_rom_region() const
 //  bbc_watfordfdc_device - constructor
 //-------------------------------------------------
 
-bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_bbc_fdc_interface(mconfig, *this)
+bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_bbc_fdc_interface(mconfig, *this)
 {
 }
 
 bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_watfordfdc_device(mconfig, BBC_WEDDB2, tag, owner, clock),
-	m_dfs_rom(*this, "dfs_rom"),
-	m_fdc(*this, "wd1772"),
-	m_floppy0(*this, "wd1772:0"),
-	m_floppy1(*this, "wd1772:1")
+	: bbc_watfordfdc_device(mconfig, BBC_WEDDB2, tag, owner, clock)
+	, m_fdc(*this, "wd1772")
+	, m_floppy0(*this, "wd1772:0")
+	, m_floppy1(*this, "wd1772:1")
+	, m_drive_control(0)
 {
 }
 
 bbc_weddb3_device::bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_watfordfdc_device(mconfig, BBC_WEDDB3, tag, owner, clock),
-	m_dfs_rom(*this, "dfs_rom"),
-	m_fdc(*this, "wd1770"),
-	m_floppy0(*this, "wd1770:0"),
-	m_floppy1(*this, "wd1770:1")
+	: bbc_watfordfdc_device(mconfig, BBC_WEDDB3, tag, owner, clock)
+	, m_fdc(*this, "wd1770")
+	, m_floppy0(*this, "wd1770:0")
+	, m_floppy1(*this, "wd1770:1")
+	, m_drive_control(0)
 {
 }
 
@@ -132,36 +134,12 @@ bbc_weddb3_device::bbc_weddb3_device(const machine_config &mconfig, const char *
 
 void bbc_weddb2_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfe80, 0xfe83, read8_delegate(FUNC(bbc_weddb2_device::wd177xl_read), this), write8_delegate(FUNC(bbc_weddb2_device::wd177xl_write), this));
-	space.install_readwrite_handler(0xfe84, 0xfe8f, read8sm_delegate(FUNC(wd_fdc_device_base::read), m_fdc.target()), write8sm_delegate(FUNC(wd_fdc_device_base::write), m_fdc.target()));
+	save_item(NAME(m_drive_control));
 }
 
 void bbc_weddb3_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfe80, 0xfe83, read8_delegate(FUNC(bbc_weddb3_device::wd177xl_read), this), write8_delegate(FUNC(bbc_weddb3_device::wd177xl_write), this));
-	space.install_readwrite_handler(0xfe84, 0xfe8f, read8sm_delegate(FUNC(wd_fdc_device_base::read), m_fdc.target()), write8sm_delegate(FUNC(wd_fdc_device_base::write), m_fdc.target()));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_weddb2_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
-}
-
-void bbc_weddb3_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
+	save_item(NAME(m_drive_control));
 }
 
 
@@ -169,67 +147,91 @@ void bbc_weddb3_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_weddb2_device::wd177xl_read)
+READ8_MEMBER(bbc_weddb2_device::read)
 {
-	return m_drive_control;
+	uint8_t data;
+
+	if (offset & 0x04)
+	{
+		data = m_fdc->read(offset & 0x03);
+	}
+	else
+	{
+		data = m_drive_control;
+	}
+	return data;
 }
 
-WRITE8_MEMBER(bbc_weddb2_device::wd177xl_write)
+WRITE8_MEMBER(bbc_weddb2_device::write)
 {
-	floppy_image_device *floppy = nullptr;
+	if (offset & 0x04)
+	{
+		m_fdc->write(offset & 0x03, data);
+	}
+	else
+	{
+		floppy_image_device *floppy = nullptr;
 
-	m_drive_control = data;
+		m_drive_control = data;
 
-	// bit 2: drive select
-	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
-	floppy = (BIT(data, 2) ? floppy1 : floppy0);
-	m_fdc->set_floppy(floppy);
+		// bit 2: drive select
+		floppy_image_device *floppy0 = m_floppy0->get_device();
+		floppy_image_device *floppy1 = m_floppy1->get_device();
+		floppy = (BIT(data, 2) ? floppy1 : floppy0);
+		m_fdc->set_floppy(floppy);
 
-	// bit 0: density
-	m_fdc->dden_w(BIT(data, 0));
+		// bit 0: density
+		m_fdc->dden_w(BIT(data, 0));
 
-	// bit 1: side select
-	if (floppy)
-		floppy->ss_w(BIT(data, 1));
+		// bit 1: side select
+		if (floppy)
+			floppy->ss_w(BIT(data, 1));
 
-	// bit 3: reset
-	if (!BIT(data, 3)) m_fdc->soft_reset();
+		// bit 3: reset
+		if (!BIT(data, 3)) m_fdc->soft_reset();
+	}
 }
 
-READ8_MEMBER(bbc_weddb3_device::wd177xl_read)
+READ8_MEMBER(bbc_weddb3_device::read)
 {
-	return m_drive_control;
+	uint8_t data;
+
+	if (offset & 0x04)
+	{
+		data = m_fdc->read(offset & 0x03);
+	}
+	else
+	{
+		data = m_drive_control;
+	}
+	return data;
 }
 
-WRITE8_MEMBER(bbc_weddb3_device::wd177xl_write)
+WRITE8_MEMBER(bbc_weddb3_device::write)
 {
-	floppy_image_device *floppy = nullptr;
+	if (offset & 0x04)
+	{
+		m_fdc->write(offset & 0x03, data);
+	}
+	else
+	{
+		floppy_image_device *floppy = nullptr;
 
-	m_drive_control = data;
+		m_drive_control = data;
 
-	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = m_fdc->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_fdc->subdevice<floppy_connector>("1")->get_device();
-	m_fdc->set_floppy(floppy);
+		// bit 0, 1: drive select
+		if (BIT(data, 0)) floppy = m_floppy0->get_device();
+		if (BIT(data, 1)) floppy = m_floppy1->get_device();
+		m_fdc->set_floppy(floppy);
 
-	// bit 2: side select
-	if (floppy)
-		floppy->ss_w(BIT(data, 2));
+		// bit 2: side select
+		if (floppy)
+			floppy->ss_w(BIT(data, 2));
 
-	// bit 3: density
-	m_fdc->dden_w(BIT(data, 3));
+		// bit 3: density
+		m_fdc->dden_w(BIT(data, 3));
 
-	// bit 5: reset
-	if (!BIT(data, 5)) m_fdc->soft_reset();
-}
-
-WRITE_LINE_MEMBER(bbc_watfordfdc_device::fdc_intrq_w)
-{
-	m_slot->intrq_w(state);
-}
-
-WRITE_LINE_MEMBER(bbc_watfordfdc_device::fdc_drq_w)
-{
-	m_slot->drq_w(state);
+		// bit 5: reset
+		if (!BIT(data, 5)) m_fdc->soft_reset();
+	}
 }

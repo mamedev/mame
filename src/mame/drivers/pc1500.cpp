@@ -38,7 +38,7 @@ public:
 	void pc1500(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<lh5801_cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
 	required_shared_ptr<uint8_t> m_lcd_data;
@@ -270,23 +270,23 @@ PALETTE_INIT_MEMBER(pc1500_state, pc1500)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-MACHINE_CONFIG_START(pc1500_state::pc1500)
-	MCFG_DEVICE_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
-	MCFG_DEVICE_PROGRAM_MAP( pc1500_mem )
-	MCFG_DEVICE_IO_MAP( pc1500_mem_io )
-	MCFG_LH5801_IN(READ8(*this, pc1500_state,pc1500_kb_r))
+void pc1500_state::pc1500(machine_config &config)
+{
+	LH5801(config, m_maincpu, 1300000); // 1.3 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1500_state::pc1500_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1500_state::pc1500_mem_io);
+	m_maincpu->in_func().set(FUNC(pc1500_state::pc1500_kb_r));
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_UPDATE_DRIVER(pc1500_state, screen_update)
-	MCFG_SCREEN_SIZE(156, 8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	screen.set_screen_update(FUNC(pc1500_state::screen_update));
+	screen.set_size(156, 8);
+	screen.set_visarea(0, 156-1, 0, 7-1);
+	screen.set_palette("palette");
 
 	config.set_default_layout(layout_pc1500);
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
+	PALETTE(config, "palette", 2).set_init(FUNC(pc1500_state::palette_init_pc1500));
 
 	lh5810_device &ioports(LH5810(config, "lh5810"));
 	ioports.porta_r().set(FUNC(pc1500_state::port_a_r));
@@ -295,8 +295,8 @@ MACHINE_CONFIG_START(pc1500_state::pc1500)
 	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
 	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
-	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
-MACHINE_CONFIG_END
+	UPD1990A(config, m_rtc);
+}
 
 
 ROM_START( pc1500 )

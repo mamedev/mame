@@ -175,8 +175,8 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( abc800_state::pling_r )
 {
-	m_discrete->write(space, NODE_01, 0);
-	m_discrete->write(space, NODE_01, 1);
+	m_discrete->write(NODE_01, 0);
+	m_discrete->write(NODE_01, 1);
 
 	return 0xff;
 }
@@ -1087,15 +1087,15 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CASSETTE_TAG, abc800_state, cassette_input_tick, attotime::from_hz(44100))
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_dart, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_dart, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_sio, z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_sio, z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
 	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, nullptr)
 	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))

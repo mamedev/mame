@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Roberto Fresca
+#ifndef MAME_INCLUDES_TEHKANWC_H
+#define MAME_INCLUDES_TEHKANWC_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
@@ -8,8 +12,8 @@
 class tehkanwc_state : public driver_device
 {
 public:
-	tehkanwc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tehkanwc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -30,12 +34,18 @@ public:
 
 	void init_teedoff();
 
-private:
+protected:
 	enum
 	{
 		TIMER_RESET
 	};
 
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
@@ -89,9 +99,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led,int player);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -100,6 +107,6 @@ private:
 	void sound_mem(address_map &map);
 	void sound_port(address_map &map);
 	void sub_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_TEHKANWC_H

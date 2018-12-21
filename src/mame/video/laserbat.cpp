@@ -231,19 +231,19 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	// update the PVIs
 	if (!y)
 	{
-		m_pvi1->render_first_line();
-		m_pvi2->render_first_line();
-		m_pvi3->render_first_line();
+		m_pvi[0]->render_first_line();
+		m_pvi[1]->render_first_line();
+		m_pvi[2]->render_first_line();
 	}
 	else
 	{
-		m_pvi1->render_next_line();
-		m_pvi2->render_next_line();
-		m_pvi3->render_next_line();
+		m_pvi[0]->render_next_line();
+		m_pvi[1]->render_next_line();
+		m_pvi[2]->render_next_line();
 	}
-	uint16_t const *const pvi1_row = &m_pvi1->bitmap().pix16(y);
-	uint16_t const *const pvi2_row = &m_pvi2->bitmap().pix16(y);
-	uint16_t const *const pvi3_row = &m_pvi3->bitmap().pix16(y);
+	uint16_t const *const pvi1_row = &m_pvi[0]->bitmap().pix16(y);
+	uint16_t const *const pvi2_row = &m_pvi[1]->bitmap().pix16(y);
+	uint16_t const *const pvi3_row = &m_pvi[2]->bitmap().pix16(y);
 
 	// don't draw outside the visible area
 	m_bitmap.plot_box(0, y, m_bitmap.width(), 1, 0);

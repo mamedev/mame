@@ -564,8 +564,8 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(16)
 
-	MCFG_DECO146_ADD(m_deco146)
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+	DECO146PROT(config, m_deco146, 0);
+	m_deco146->set_use_magic_read_address_xor(true);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -603,7 +603,7 @@ custom DE156 encrypted CPU.
 Notes:
       - SH2 (QFP144) clock: 21.000MHz (42 / 2)
       - All ROMs SD* are 4M x 16bit EPROMS (27C4096)
-      - All MCG* ROMs are surface mounted 16M MASK ROMs
+      - All MCG* ROMs are surface mounted 16M mask ROMs
       - (mcg-01.1d read in 8 bit mode because this ROM had fixed bits when read in 16 bit
         mode, reading as 8 bit gave a good read. Others read in 16 bit mode)
 */

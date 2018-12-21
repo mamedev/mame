@@ -576,26 +576,22 @@ PALETTE_INIT_MEMBER(gb_state, gbp)
 
 PALETTE_INIT_MEMBER(gb_state, sgb)
 {
-	int r, g, b;
-
 	for (int i = 0; i < 32768; i++)
 	{
-		r = (i & 0x1F) << 3;
-		g = ((i >> 5) & 0x1F) << 3;
-		b = ((i >> 10) & 0x1F) << 3;
+		int r = (i & 0x1F) << 3;
+		int g = ((i >> 5) & 0x1F) << 3;
+		int b = ((i >> 10) & 0x1F) << 3;
 		palette.set_pen_color(i, r, g, b);
 	}
 }
 
 PALETTE_INIT_MEMBER(gb_state, gbc)
 {
-	int r, g, b;
-
 	for (int i = 0; i < 32768; i++)
 	{
-		r = (i & 0x1F) << 3;
-		g = ((i >> 5) & 0x1F) << 3;
-		b = ((i >> 10) & 0x1F) << 3;
+		int r = (i & 0x1F) << 3;
+		int g = ((i >> 5) & 0x1F) << 3;
+		int b = ((i >> 10) & 0x1F) << 3;
 		palette.set_pen_color(i, r, g, b);
 	}
 }
@@ -607,51 +603,50 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 }
 
 
-MACHINE_CONFIG_START(gb_state::gameboy)
-
+void gb_state::gameboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304))
-	MCFG_DEVICE_PROGRAM_MAP(gameboy_map)
-	MCFG_LR35902_TIMER_CB( WRITE8( *this, gb_state, gb_timer_callback ) )
-	MCFG_LR35902_HALT_BUG
+	LR35902(config, m_maincpu, XTAL(4'194'304));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gb_state::gameboy_map);
+	m_maincpu->timer_cb().set(FUNC(gb_state::gb_timer_callback));
+	m_maincpu->set_halt_bug(true);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 //  screen.set_size(20*8, 18*8);
 	screen.set_size(458, 154);
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
+	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
+	PALETTE(config, m_palette, 4).set_init(FUNC(gb_state::palette_init_gb));
 
-	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
+	DMG_PPU(config, m_ppu, m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	DMG_APU(config, m_apu, XTAL(4'194'304));
+	m_apu->add_route(0, "lspeaker", 0.50);
+	m_apu->add_route(1, "rspeaker", 0.50);
 
 	/* cartslot */
-	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
+	GB_CART_SLOT(config, m_cartslot, gb_cart, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
+	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
+}
 
-
-MACHINE_CONFIG_START(gb_state::supergb)
+void gb_state::supergb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
-	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
-	MCFG_LR35902_HALT_BUG
+	LR35902(config, m_maincpu, 4295454); /* 4.295454 MHz, derived from SNES xtal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gb_state::sgb_map);
+	m_maincpu->timer_cb().set(FUNC(gb_state::gb_timer_callback));
+	m_maincpu->set_halt_bug(true);
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
@@ -662,36 +657,34 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	screen.set_refresh_hz(SGB_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.set_size(32*8, 28*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
+	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
+	PALETTE(config, m_palette, 32768).set_init(FUNC(gb_state::palette_init_sgb));
 
-	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
+	SGB_PPU(config, m_ppu, m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("apu", DMG_APU, 4295454)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	DMG_APU(config, m_apu, 4295454);
+	m_apu->add_route(0, "lspeaker", 0.50);
+	m_apu->add_route(1, "rspeaker", 0.50);
 
 	/* cartslot */
-	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
+	GB_CART_SLOT(config, m_cartslot, gb_cart, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
+	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
+}
 
-
-MACHINE_CONFIG_START(gb_state::supergb2)
+void gb_state::supergb2(machine_config &config)
+{
 	gameboy(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gb_state::sgb_map);
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
@@ -702,32 +695,28 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	screen.set_size(32*8, 28*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32768)
-	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
+	m_palette->set_entries(32768);
+	m_palette->set_init(FUNC(gb_state::palette_init_sgb));
 
-	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
-MACHINE_CONFIG_END
+	SGB_PPU(config.replace(), m_ppu, m_maincpu);
+}
 
-
-MACHINE_CONFIG_START(gb_state::gbpocket)
+void gb_state::gbpocket(machine_config &config)
+{
 	gameboy(config);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
+	m_palette->set_init(FUNC(gb_state::palette_init_gbp));
 
-	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_DEVICE_ADD("ppu", MGB_PPU, "maincpu")
-MACHINE_CONFIG_END
+	MGB_PPU(config.replace(), m_ppu, m_maincpu);
+}
 
-MACHINE_CONFIG_START(gb_state::gbcolor)
-
+void gb_state::gbcolor(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304)) // todo XTAL(8'388'000)
-	MCFG_DEVICE_PROGRAM_MAP(gbc_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
+	LR35902(config, m_maincpu, XTAL(4'194'304)); // todo XTAL(8'388'000)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gb_state::gbc_map);
+	m_maincpu->timer_cb().set(FUNC(gb_state::gb_timer_callback));
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
@@ -737,73 +726,71 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 //  screen.set_size(20*8, 18*8);
 	screen.set_size(458, 154);
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
+	PALETTE(config, m_palette, 32768).set_init(FUNC(gb_state::palette_init_gbc));
 
-	MCFG_DEVICE_ADD("ppu", CGB_PPU, "maincpu")
+	CGB_PPU(config, m_ppu, m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("apu", CGB04_APU, XTAL(4'194'304))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	CGB04_APU(config, m_apu, XTAL(4'194'304));
+	m_apu->add_route(0, "lspeaker", 0.50);
+	m_apu->add_route(1, "rspeaker", 0.50);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K"); /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 
 	/* cartslot */
-	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
+	GB_CART_SLOT(config, "gbslot", gb_cart, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gbcolor")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gbcolor");
+	SOFTWARE_LIST(config, "gb_list").set_compatible("gameboy");
+}
 
-MACHINE_CONFIG_START(megaduck_state::megaduck)
-
+void megaduck_state::megaduck(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304)) /* 4.194304 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megaduck_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
-	MCFG_LR35902_HALT_BUG
+	LR35902(config, m_maincpu, XTAL(4'194'304)); /* 4.194304 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &megaduck_state::megaduck_map);
+	m_maincpu->timer_cb().set(FUNC(gb_state::gb_timer_callback));
+	m_maincpu->set_halt_bug(true);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.set_size(20*8, 18*8);
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck)
 	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
+	PALETTE(config, m_palette, 4).set_init(FUNC(megaduck_state::palette_init_megaduck));
 
-	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
+	DMG_PPU(config, m_ppu, m_maincpu);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	DMG_APU(config, m_apu, XTAL(4'194'304));
+	m_apu->add_route(0, "lspeaker", 0.50);
+	m_apu->add_route(1, "rspeaker", 0.50);
 
 	/* cartslot */
-	MCFG_MEGADUCK_CARTRIDGE_ADD("duckslot", megaduck_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "megaduck")
-MACHINE_CONFIG_END
+	MEGADUCK_CART_SLOT(config, m_cartslot, megaduck_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("megaduck");
+}
 
 /***************************************************************************
 

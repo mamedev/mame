@@ -5,9 +5,10 @@
  * includes/pmd85.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PMD85_H
 #define MAME_INCLUDES_PMD85_H
+
+#pragma once
 
 #include "machine/i8251.h"
 #include "machine/pit8253.h"

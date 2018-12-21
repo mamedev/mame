@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -826,21 +827,21 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	ppi.out_pb_callback().set(FUNC(mz3500_state::mz3500_pb_w));
 	ppi.out_pc_callback().set(FUNC(mz3500_state::mz3500_pc_w));
 
-	MCFG_UPD765A_ADD("upd765a", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
-	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
+	UPD7220(config, m_hgdc1, MAIN_CLOCK/5);
+	m_hgdc1->set_addrmap(0, &mz3500_state::upd7220_1_map);
+	m_hgdc1->set_draw_text_callback(FUNC(mz3500_state::hgdc_draw_text), this);
+	m_hgdc1->vsync_wr_callback().set(m_hgdc2, FUNC(upd7220_device::ext_sync_w));
 
-	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz3500_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc2, MAIN_CLOCK/5);
+	m_hgdc2->set_addrmap(0, &mz3500_state::upd7220_2_map);
+	m_hgdc2->set_display_pixels_callback(FUNC(mz3500_state::hgdc_display_pixels), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

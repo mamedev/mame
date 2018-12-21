@@ -59,7 +59,7 @@ private:
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	void galaxygame_map(address_map &map);
 };
@@ -325,26 +325,25 @@ void galaxygame_state::machine_reset()
 	m_interrupt = 0;
 }
 
-MACHINE_CONFIG_START(galaxygame_state::galaxygame)
-
-	MCFG_DEVICE_ADD("maincpu", T11, 3000000 )
-	MCFG_DEVICE_PROGRAM_MAP(galaxygame_map)
-	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxygame_state,galaxygame_irq_callback)
+void galaxygame_state::galaxygame(machine_config &config)
+{
+	T11(config, m_maincpu, 3000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxygame_state::galaxygame_map);
+	m_maincpu->set_initial_mode(5 << 13);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxygame_state::galaxygame_irq_callback));
+	m_maincpu->set_periodic_int(FUNC(galaxygame_state::galaxygame_irq), attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 511)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxygame_state, screen_update_galaxygame)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 511, 0, 511);
+	screen.set_screen_update(FUNC(galaxygame_state::screen_update_galaxygame));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+}
 
 ROM_START(galgame)
 	// Original Galaxy Game listing, the one used in the 2nd hardware revision (blue dual cabinet)

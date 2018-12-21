@@ -37,6 +37,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
+#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 #include "speaker.h"
@@ -313,7 +314,7 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -325,9 +326,9 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(powerins_state::powerinsa)
@@ -351,7 +352,7 @@ MACHINE_CONFIG_START(powerins_state::powerinsa)
 
 	MCFG_DEVICE_REMOVE("oki2")
 	MCFG_DEVICE_REMOVE("ym2203")
-	MCFG_DEVICE_REMOVE("nmk112")
+	config.device_remove("nmk112");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(powerins_state::powerinsb)
@@ -423,9 +424,9 @@ Notes:
       ROMs -
             -1, -2   : 27C1001 EPROM
             -3, -4   : 27C4096 EPROM
-            -5, -6   : 8M 42 pin MASKROM (578200)
-            -7       : 4M 40 pin MASKROM (574200)
-            -8 to -19: 8M 42 pin MASKROM (578200)
+            -5, -6   : 8M 42 pin mask ROM (578200)
+            -7       : 4M 40 pin mask ROM (574200)
+            -8 to -19: 8M 42 pin mask ROM (578200)
             20       : 82S129 PROM
             21       : 82S135 PROM
             22       : 82S123 PROM
@@ -624,9 +625,9 @@ Power Instinct
 Atlus, 1993
 
 This is a bootleg US version with different sound hardware to the existing bootleg set.
-The PCB is very large and has 2 plug-in daughterboards and many MASK ROMs.
-The addition of the contents of the MASK ROMs would probably equal the contents of presumably
-larger MASK ROMs found on the original PCB....
+The PCB is very large and has 2 plug-in daughterboards and many mask ROMs.
+The addition of the contents of the mask ROMs would probably equal the contents of presumably
+larger mask ROMs found on the original PCB....
 
 PCB Layout
 
@@ -662,7 +663,7 @@ Notes:
       M6295 clock:  4.000MHz (both); sample rate = 4000000/165 (both)
       VSync      :  60Hz
 
-      ROMs 1F and 6N are 1M MASK (MX27C1000), all other ROMs are 4M MASK (MX27C4000).
+      ROMs 1F and 6N are 1M mask (MX27C1000), all other ROMs are 4M mask (MX27C4000).
       ROMS at 5* are located on a plug-in daughterboard.
       ROMS at 11*, 12*, 13G, 13P and 14* are located on a plug-in daughterboard.
       82S123 and 82S147 are PROMs.

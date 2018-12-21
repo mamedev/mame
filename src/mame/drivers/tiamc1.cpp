@@ -372,10 +372,10 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
-	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, tiamc1_state, pit8253_2_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(PIXEL_CLOCK / 4);
+	pit8253.set_clk<2>(SND_CLOCK);                // guess
+	pit8253.out_handler<2>().set(FUNC(tiamc1_state::pit8253_2_w));
 MACHINE_CONFIG_END
 
 

@@ -4,6 +4,7 @@
 #define MAME_INCLUDES_M5_H
 
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
 #include "cpu/z80/z80.h"

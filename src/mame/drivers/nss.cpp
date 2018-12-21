@@ -850,9 +850,9 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_DEVICE_IO_MAP(bios_io_map)
 
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
-	MCFG_S3520CF_ADD("s3520cf") /* RTC */
-	MCFG_RP5H01_ADD("rp5h01")
-	MCFG_M6M80011AP_ADD("m6m80011ap")
+	S3520CF(config, m_s3520cf); /* RTC */
+	RP5H01(config, m_rp5h01, 0);
+	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -871,7 +871,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
 
-	SNES_PPU(config, m_ppu, 0);
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 

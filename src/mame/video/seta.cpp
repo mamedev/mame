@@ -142,7 +142,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "screen.h"
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
-static const game_offset game_offsets[] =
+static const seta_state::game_offset game_offsets[] =
 {
 	// x offsets
 	// "game",    {spr, spr_flip}, {tmap, tmap_flip}

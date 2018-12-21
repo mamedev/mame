@@ -32,16 +32,14 @@
 class backfire_state : public driver_device
 {
 public:
-	backfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	backfire_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_left_priority(*this, "left_priority"),
 		m_right_priority(*this, "right_priority"),
-		m_sprgen(*this, "spritegen"),
-		m_sprgen2(*this, "spritegen2"),
 		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_deco_tilegen2(*this, "tilegen2"),
+		m_sprgen(*this, "spritegen%u", 1U),
+		m_deco_tilegen(*this, "tilegen%u", 1U),
 		m_eeprom(*this, "eeprom"),
 		m_adc(*this, "adc"),
 		m_palette(*this, "palette"),
@@ -53,18 +51,10 @@ public:
 
 private:
 	DECLARE_READ32_MEMBER(control2_r);
-	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
-	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
-	DECLARE_READ32_MEMBER(pf3_rowscroll_r);
-	DECLARE_READ32_MEMBER(pf4_rowscroll_r);
-	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf3_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf4_rowscroll_w);
-	DECLARE_READ32_MEMBER(spriteram1_r);
-	DECLARE_WRITE32_MEMBER(spriteram1_w);
-	DECLARE_READ32_MEMBER(spriteram2_r);
-	DECLARE_WRITE32_MEMBER(spriteram2_w);
+	template<int Layer> DECLARE_READ32_MEMBER(pf_rowscroll_r);
+	template<int Layer> DECLARE_WRITE32_MEMBER(pf_rowscroll_w);
+	template<int Chip> DECLARE_READ32_MEMBER(spriteram_r);
+	template<int Chip> DECLARE_WRITE32_MEMBER(spriteram_w);
 	DECLARE_READ32_MEMBER(backfire_speedup_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(pot_select_r);
@@ -72,7 +62,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(deco32_vbl_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vbl_interrupt);
 	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	void descramble_sound();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -81,34 +71,22 @@ private:
 	void backfire_map(address_map &map);
 
 	/* memory pointers */
-	std::unique_ptr<uint16_t[]>  m_spriteram_1;
-	std::unique_ptr<uint16_t[]>  m_spriteram_2;
+	std::unique_ptr<uint16_t[]>  m_spriteram[2];
+	std::unique_ptr<uint16_t[]>  m_pf_rowscroll[4];
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_left_priority;
 	required_shared_ptr<uint32_t> m_right_priority;
-	optional_device<decospr_device> m_sprgen;
-	optional_device<decospr_device> m_sprgen2;
-
-	/* video related */
-	std::unique_ptr<bitmap_ind16>  m_left;
-	std::unique_ptr<bitmap_ind16>  m_right;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<deco16ic_device> m_deco_tilegen2;
+	required_device_array<decospr_device, 2> m_sprgen;
+	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<adc0808_device> m_adc;
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_lscreen;
-
-	/* memory */
-	uint16_t    m_pf1_rowscroll[0x0800/2];
-	uint16_t    m_pf2_rowscroll[0x0800/2];
-	uint16_t    m_pf3_rowscroll[0x0800/2];
-	uint16_t    m_pf4_rowscroll[0x0800/2];
 };
 
 //uint32_t *backfire_180010, *backfire_188010;
@@ -116,23 +94,22 @@ private:
 /* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
 void backfire_state::video_start()
 {
-	m_spriteram_1 = std::make_unique<uint16_t[]>(0x2000/2);
-	m_spriteram_2 = std::make_unique<uint16_t[]>(0x2000/2);
+	m_spriteram[0] = std::make_unique<uint16_t[]>(0x2000/4);
+	m_spriteram[1] = std::make_unique<uint16_t[]>(0x2000/4);
 
 	/* and register the allocated ram so that save states still work */
-	save_item(NAME(m_pf1_rowscroll));
-	save_item(NAME(m_pf2_rowscroll));
-	save_item(NAME(m_pf3_rowscroll));
-	save_item(NAME(m_pf4_rowscroll));
+	m_pf_rowscroll[0] = std::make_unique<uint16_t[]>(0x1000/4);
+	m_pf_rowscroll[1] = std::make_unique<uint16_t[]>(0x1000/4);
+	m_pf_rowscroll[2] = std::make_unique<uint16_t[]>(0x1000/4);
+	m_pf_rowscroll[3] = std::make_unique<uint16_t[]>(0x1000/4);
 
-	m_left =  std::make_unique<bitmap_ind16>(80*8, 32*8);
-	m_right = std::make_unique<bitmap_ind16>(80*8, 32*8);
+	save_pointer(NAME(m_spriteram[0]), 0x2000/4);
+	save_pointer(NAME(m_spriteram[1]), 0x2000/4);
 
-	save_pointer(NAME(m_spriteram_1), 0x2000/2);
-	save_pointer(NAME(m_spriteram_2), 0x2000/2);
-
-	save_item(NAME(*m_left));
-	save_item(NAME(*m_right));
+	save_pointer(NAME(m_pf_rowscroll[0]), 0x1000/4);
+	save_pointer(NAME(m_pf_rowscroll[1]), 0x1000/4);
+	save_pointer(NAME(m_pf_rowscroll[2]), 0x1000/4);
+	save_pointer(NAME(m_pf_rowscroll[3]), 0x1000/4);
 }
 
 
@@ -140,27 +117,27 @@ void backfire_state::video_start()
 uint32_t backfire_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// sprites are flipped relative to tilemaps
-	m_sprgen->set_flip_screen(true);
+	m_sprgen[0]->set_flip_screen(true);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
-	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
+	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
+	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
 
 	screen.priority().fill(0);
 	bitmap.fill(0x100, cliprect);
 
 	if (m_left_priority[0] == 0)
 	{
-		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
+		m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0x2000/4);
 	}
 	else if (m_left_priority[0] == 2)
 	{
-		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800);
+		m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+		m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0x2000/4);
 	}
 	else
 		popmessage( "unknown left priority %08x", m_left_priority[0]);
@@ -171,27 +148,27 @@ uint32_t backfire_state::screen_update_left(screen_device &screen, bitmap_ind16 
 uint32_t backfire_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// sprites are flipped relative to tilemaps
-	m_sprgen2->set_flip_screen(true);
+	m_sprgen[1]->set_flip_screen(true);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
-	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
+	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
+	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
 
 	screen.priority().fill(0);
 	bitmap.fill(0x500, cliprect);
 
 	if (m_right_priority[0] == 0)
 	{
-		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
-		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 0x2000/4);
 	}
 	else if (m_right_priority[0] == 2)
 	{
-		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 0x2000/4);
 	}
 	else
 		popmessage( "unknown right priority %08x", m_right_priority[0]);
@@ -211,14 +188,8 @@ WRITE8_MEMBER(backfire_state::eeprom_w)
 
 /* map 32-bit writes to 16-bit */
 
-READ32_MEMBER(backfire_state::pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(backfire_state::pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(backfire_state::pf3_rowscroll_r){ return m_pf3_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(backfire_state::pf4_rowscroll_r){ return m_pf4_rowscroll[offset] ^ 0xffff0000; }
-WRITE32_MEMBER(backfire_state::pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER(backfire_state::pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(backfire_state::pf3_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf3_rowscroll[offset]); }
-WRITE32_MEMBER(backfire_state::pf4_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf4_rowscroll[offset]); }
+template<int Layer> READ32_MEMBER(backfire_state::pf_rowscroll_r){ return m_pf_rowscroll[Layer][offset] ^ 0xffff0000; }
+template<int Layer> WRITE32_MEMBER(backfire_state::pf_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[Layer][offset]); }
 
 
 READ32_MEMBER(backfire_state::pot_select_r)
@@ -228,54 +199,41 @@ READ32_MEMBER(backfire_state::pot_select_r)
 	return 0;
 }
 
-
-READ32_MEMBER(backfire_state::spriteram1_r)
+template<int Chip>
+READ32_MEMBER(backfire_state::spriteram_r)
 {
-	return m_spriteram_1[offset] ^ 0xffff0000;
+	return m_spriteram[Chip][offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(backfire_state::spriteram1_w)
-{
-	data &= 0x0000ffff;
-	mem_mask &= 0x0000ffff;
-
-	COMBINE_DATA(&m_spriteram_1[offset]);
-}
-
-READ32_MEMBER(backfire_state::spriteram2_r)
-{
-	return m_spriteram_2[offset] ^ 0xffff0000;
-}
-
-WRITE32_MEMBER(backfire_state::spriteram2_w)
+template<int Chip>
+WRITE32_MEMBER(backfire_state::spriteram_w)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&m_spriteram_2[offset]);
+	COMBINE_DATA(&m_spriteram[Chip][offset]);
 }
-
 
 
 void backfire_state::backfire_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x110000, 0x111fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x114000, 0x115fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x120000, 0x120fff).rw(FUNC(backfire_state::pf1_rowscroll_r), FUNC(backfire_state::pf1_rowscroll_w));
-	map(0x124000, 0x124fff).rw(FUNC(backfire_state::pf2_rowscroll_r), FUNC(backfire_state::pf2_rowscroll_w));
-	map(0x130000, 0x13001f).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x140000, 0x141fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x144000, 0x145fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x150000, 0x150fff).rw(FUNC(backfire_state::pf3_rowscroll_r), FUNC(backfire_state::pf3_rowscroll_w));
-	map(0x154000, 0x154fff).rw(FUNC(backfire_state::pf4_rowscroll_r), FUNC(backfire_state::pf4_rowscroll_w));
+	map(0x100000, 0x10001f).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x110000, 0x111fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x114000, 0x115fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x120000, 0x120fff).rw(FUNC(backfire_state::pf_rowscroll_r<0>), FUNC(backfire_state::pf_rowscroll_w<0>));
+	map(0x124000, 0x124fff).rw(FUNC(backfire_state::pf_rowscroll_r<1>), FUNC(backfire_state::pf_rowscroll_w<1>));
+	map(0x130000, 0x13001f).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x140000, 0x141fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x144000, 0x145fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x150000, 0x150fff).rw(FUNC(backfire_state::pf_rowscroll_r<2>), FUNC(backfire_state::pf_rowscroll_w<2>));
+	map(0x154000, 0x154fff).rw(FUNC(backfire_state::pf_rowscroll_r<3>), FUNC(backfire_state::pf_rowscroll_w<3>));
 	map(0x160000, 0x161fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x170000, 0x177fff).ram().share("mainram");// main ram
 	map(0x180010, 0x180013).nopw(); // always 180010 ?
-	map(0x184000, 0x185fff).rw(FUNC(backfire_state::spriteram1_r), FUNC(backfire_state::spriteram1_w));
+	map(0x184000, 0x185fff).rw(FUNC(backfire_state::spriteram_r<0>), FUNC(backfire_state::spriteram_w<0>));
 	map(0x188010, 0x188013).nopw(); // always 188010 ?
-	map(0x18c000, 0x18dfff).rw(FUNC(backfire_state::spriteram2_r), FUNC(backfire_state::spriteram2_w));
+	map(0x18c000, 0x18dfff).rw(FUNC(backfire_state::spriteram_r<1>), FUNC(backfire_state::spriteram_w<1>));
 	map(0x190000, 0x190003).portr("IN0");
 	map(0x194000, 0x194003).portr("IN1");
 	map(0x1a4000, 0x1a4000).w(FUNC(backfire_state::eeprom_w));
@@ -341,22 +299,9 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8    /* every char takes 8 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
+	8*8*2    /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
@@ -365,25 +310,23 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
+	16*16*2
 };
 
 
 static GFXDECODE_START( gfx_backfire )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 )   /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 )   /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 128 )   /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,      0, 128 )   /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,    0x200, 32 )    /* Sprites 16x16 (screen 1) */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,    0x600, 32 )    /* Sprites 16x16 (screen 2) */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 128 )   /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,     0, 128 )   /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 128 )   /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 128 )   /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x200,  32 )   /* Sprites 16x16 (screen 1) */
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x600,  32 )   /* Sprites 16x16 (screen 2) */
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(backfire_state::deco32_vbl_interrupt)
+WRITE_LINE_MEMBER(backfire_state::vbl_interrupt)
 {
 	if (state)
 		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
@@ -446,7 +389,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, backfire_state, deco32_vbl_interrupt))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, backfire_state, vbl_interrupt))
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -456,52 +399,51 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SET_SCREEN("lscreen")
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x40)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_screen(m_lscreen);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x40);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SET_SCREEN("lscreen")
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x10)
-	MCFG_DECO16IC_PF2_COL_BANK(0x50)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(2)
-	MCFG_DECO16IC_PF12_16X16_BANK(3)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_screen(m_lscreen);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x10);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x50);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
+	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_VIDEO_SET_SCREEN("lscreen")
-	MCFG_DECO_SPRITE_GFX_REGION(4)
-	MCFG_DECO_SPRITE_PRIORITY_CB(backfire_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_screen(m_lscreen);
+	m_sprgen[0]->set_gfx_region(4);
+	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback), this);
+	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	MCFG_VIDEO_SET_SCREEN("rscreen")
-	MCFG_DECO_SPRITE_GFX_REGION(5)
-	MCFG_DECO_SPRITE_PRIORITY_CB(backfire_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-
+	DECO_SPRITE(config, m_sprgen[1], 0);
+	m_sprgen[1]->set_screen("rscreen");
+	m_sprgen[1]->set_gfx_region(5);
+	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback), this);
+	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -586,12 +528,12 @@ ROM_START( backfire )
 	ROM_LOAD( "mbz-02.12a",    0x000000, 0x100000, CRC(2bd2b0a1) SHA1(8fcb37728f3248ad55e48f2d398b014b36c9ec05) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites 1 */
-	ROM_LOAD16_BYTE( "mbz-03.15a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
-	ROM_LOAD16_BYTE( "mbz-04.16a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
+	ROM_LOAD( "mbz-03.15a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
+	ROM_LOAD( "mbz-04.16a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
 	ROM_REGION( 0x400000, "gfx4", 0 ) /* Sprites 2 */
-	ROM_LOAD16_BYTE( "mbz-03.18a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
-	ROM_LOAD16_BYTE( "mbz-04.19a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
+	ROM_LOAD( "mbz-03.18a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
+	ROM_LOAD( "mbz-04.19a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASEFF ) /* samples */
 	ROM_LOAD( "mbz-05.17l",    0x000000, 0x200000,  CRC(947c1da6) SHA1(ac36006e04dc5e3990f76539763cc76facd08376) )
@@ -603,6 +545,7 @@ ROM_START( backfire )
 	ROM_LOAD( "gal16v8b.12n", 0x0400, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
+// different test mode font color
 ROM_START( backfirea )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "rb-00h.h2",    0x000002, 0x080000, CRC(60973046) SHA1(e70d9be9cb172920da2a2ac9d317768b1438c59d) )
@@ -622,12 +565,12 @@ ROM_START( backfirea )
 	ROM_LOAD( "mbz-02.12a",    0x000000, 0x100000, CRC(2bd2b0a1) SHA1(8fcb37728f3248ad55e48f2d398b014b36c9ec05) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* Sprites 1 */
-	ROM_LOAD16_BYTE( "mbz-03.15a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
-	ROM_LOAD16_BYTE( "mbz-04.16a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
+	ROM_LOAD( "mbz-03.15a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
+	ROM_LOAD( "mbz-04.16a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
 	ROM_REGION( 0x400000, "gfx4", 0 ) /* Sprites 2 */
-	ROM_LOAD16_BYTE( "mbz-03.18a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
-	ROM_LOAD16_BYTE( "mbz-04.19a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
+	ROM_LOAD( "mbz-03.18a",    0x000000, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
+	ROM_LOAD( "mbz-04.19a",    0x200000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASEFF ) /* samples */
 	ROM_LOAD( "mbz-05.17l",    0x000000, 0x200000,  CRC(947c1da6) SHA1(ac36006e04dc5e3990f76539763cc76facd08376) )
@@ -679,5 +622,5 @@ void backfire_state::init_backfire()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32_delegate(FUNC(backfire_state::backfire_speedup_r), this));
 }
 
-GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play
+GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play

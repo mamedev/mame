@@ -72,7 +72,6 @@ Dumped by Chack'n
 ****************************************************************************************************/
 
 #include "emu.h"
-#include "machine/tait8741.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -994,13 +993,13 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(18'000'000)/12)
-//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, cyclemb_state, ym_irq))
-//  MCFG_AY8910_PORT_B_READ_CB(IOPORT("UNK")) /* port B read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(18'000'000)/12));
+//  ymsnd.irq_handler().set(FUNC(cyclemb_state::ym_irq));
+//  ymsnd.port_b_read_callback().set_ioport("UNK");
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cyclemb_state::skydest)

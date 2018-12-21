@@ -1190,11 +1190,11 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE(m_maincpu, SEGA_315_5018, XTAL(18'432'000)/3/2)  /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(yamato_map)
-	MCFG_DEVICE_IO_MAP(yamato_portmap)
-	MCFG_DEVICE_OPCODES_MAP(yamato_decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::yamato_map);
+	maincpu.set_addrmap(AS_IO, &cclimber_state::yamato_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::yamato_decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
 	MCFG_DEVICE_PROGRAM_MAP(yamato_audio_map)
@@ -1210,24 +1210,22 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* 1.536 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)  /* 1.536 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(cclimber_state::toprollr)
 	cclimber(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, SEGA_315_5018, XTAL(18'432'000)/3/2)  /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(toprollr_map)
-	MCFG_DEVICE_IO_MAP(cclimber_portmap)
-	MCFG_DEVICE_OPCODES_MAP(toprollr_decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_SIZE(0)
-	MCFG_SEGACRPT_SET_NUMBANKS(3)
-	MCFG_SEGACRPT_SET_BANKSIZE(0x6000)
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::toprollr_map);
+	maincpu.set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::toprollr_decrypted_opcodes_map);
+	maincpu.set_size(0);
+	maincpu.set_numbanks(3);
+	maincpu.set_banksize(0x6000);
 
 	m_mainlatch->q_out_cb<5>().set(FUNC(cclimber_state::toprollr_rombank_w));
 	m_mainlatch->q_out_cb<6>().set(FUNC(cclimber_state::toprollr_rombank_w));
@@ -1281,13 +1279,11 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay2", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 MACHINE_CONFIG_END
 
 void cclimber_state::guzzler(machine_config &config)

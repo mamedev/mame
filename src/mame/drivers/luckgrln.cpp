@@ -867,9 +867,10 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_DEVICE_IO_MAP(luckgrln_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", luckgrln_state, irq)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", 6000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, 0)
 

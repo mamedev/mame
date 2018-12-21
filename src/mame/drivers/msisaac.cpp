@@ -446,66 +446,61 @@ void msisaac_state::machine_reset()
 #endif
 }
 
-MACHINE_CONFIG_START(msisaac_state::msisaac)
-
+void msisaac_state::msisaac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(msisaac_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msisaac_state::msisaac_map);
+	m_maincpu->set_vblank_int("screen", FUNC(msisaac_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(msisaac_sound_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &msisaac_state::msisaac_sound_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(msisaac_state::irq0_line_hold));    /* source of IRQs is unknown */
 
 #ifdef USE_MCU
-	MCFG_DEVICE_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(buggychl_mcu_map)
-	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+	M68705(config, "mcu", 8000000/2).set_addrmap(AS_PROGRAM, &msisaac_state::buggychl_mcu_map);  /* 4 MHz */
+	BUGGYCHL_MCU(config, m_bmcu, 0);
 #endif
 
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(msisaac_state, screen_update_msisaac)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(msisaac_state::screen_update_msisaac));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msisaac)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msisaac);
+	PALETTE(config, m_palette, 1024);
+	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_TA7630_ADD("ta7630")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	TA7630(config, m_ta7630);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
 	// port A/B likely to be TA7630 filters
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
 	// port A/B likely to be TA7630 filters
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
-	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
+	MSM5232(config, m_msm, 2000000);
+	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
+	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
+	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1
+	m_msm->add_route(3, "mono", 1.0);   // pin 31 16'-1
+	m_msm->add_route(4, "mono", 1.0);   // pin 36  2'-2
+	m_msm->add_route(5, "mono", 1.0);   // pin 35  4'-2
+	m_msm->add_route(6, "mono", 1.0);   // pin 34  8'-2
+	m_msm->add_route(7, "mono", 1.0);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
-MACHINE_CONFIG_END
+}
 
 
 /*******************************************************************************/

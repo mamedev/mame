@@ -203,14 +203,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			return m_uart->status_r(space, 0) << 8;
-		}
-		else
-		{
-			return m_uart->data_r(space, 0) << 8;
-		}
+		return m_uart->read(offset & 1) << 8;
 	}
 }
 
@@ -221,14 +214,7 @@ WRITE16_MEMBER( compis_state::pcs6_2_3_w )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			m_uart->control_w(space, 0, data >> 8);
-		}
-		else
-		{
-			m_uart->data_w(space, 0, data >> 8);
-		}
+		m_uart->write(offset & 1, data >> 8);
 	}
 }
 
@@ -422,11 +408,11 @@ void compis_state::compis_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(MM58174A_TAG, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
-	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
+	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
+	map(0x0180, 0x01ff) /* PCS3 */ .rw(m_graphics, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
-	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(I80130_TAG, FUNC(i80130_device::io_map));
+	map(0x0280, 0x028f) /* PCS5 */ .mirror(0x70).m(m_osp, FUNC(i80130_device::io_map));
 	map(0x0300, 0x030f).rw(FUNC(compis_state::pcs6_0_1_r), FUNC(compis_state::pcs6_0_1_w));
 	map(0x0310, 0x031f).rw(FUNC(compis_state::pcs6_2_3_r), FUNC(compis_state::pcs6_2_3_w));
 	map(0x0320, 0x032f).rw(FUNC(compis_state::pcs6_4_5_r), FUNC(compis_state::pcs6_4_5_w));
@@ -751,28 +737,29 @@ void compis_state::machine_reset()
 //  MACHINE_CONFIG( compis )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_state::compis)
+void compis_state::compis(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(I80186_TAG, I80186, 15.36_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(compis_mem)
-	MCFG_DEVICE_IO_MAP(compis_io)
-	MCFG_80186_IRQ_SLAVE_ACK(READ8(DEVICE_SELF, compis_state, compis_irq_callback))
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE(DEVICE_SELF, compis_state, tmr0_w))
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE(DEVICE_SELF, compis_state, tmr1_w))
+	I80186(config, m_maincpu, 15.36_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &compis_state::compis_mem);
+	m_maincpu->set_addrmap(AS_IO, &compis_state::compis_io);
+	m_maincpu->read_slave_ack_callback().set(FUNC(compis_state::compis_irq_callback));
+	m_maincpu->tmrout0_handler().set(FUNC(compis_state::tmr0_w));
+	m_maincpu->tmrout1_handler().set(FUNC(compis_state::tmr1_w));
 
 	// devices
 	I80130(config, m_osp, 15.36_MHz_XTAL/2);
-	m_osp->irq().set(I80186_TAG, FUNC(i80186_cpu_device::int0_w));
-	m_osp->systick().set(I80130_TAG, FUNC(i80130_device::ir3_w));
-	m_osp->delay().set(I80130_TAG, FUNC(i80130_device::ir7_w));
+	m_osp->irq().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	m_osp->systick().set(m_osp, FUNC(i80130_device::ir3_w));
+	m_osp->delay().set(m_osp, FUNC(i80130_device::ir7_w));
 	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_mpsc, i8274_device, rxtxcb_w))
-	MCFG_PIT8253_CLK1(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_CLK2(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<0>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
+	m_pit->set_clk<1>(15.36_MHz_XTAL/8);
+	m_pit->set_clk<2>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<2>().set(FUNC(compis_state::tmr5_w));
 
 	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
@@ -781,11 +768,11 @@ MACHINE_CONFIG_START(compis_state::compis)
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(COMPIS_KEYBOARD_TAG, FUNC(compis_keyboard_device::si_w));
-	m_uart->rxrdy_handler().set(I80130_TAG, FUNC(i80130_device::ir2_w));
-	m_uart->txrdy_handler().set(I80186_TAG, FUNC(i80186_cpu_device::int1_w));
+	m_uart->rxrdy_handler().set(m_osp, FUNC(i80130_device::ir2_w));
+	m_uart->txrdy_handler().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
-	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
-	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	compis_keyboard_device &kb(COMPIS_KEYBOARD(config, COMPIS_KEYBOARD_TAG, 0));
+	kb.out_tx_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
 	I8274(config, m_mpsc, 15.36_MHz_XTAL/4);
 	m_mpsc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -796,63 +783,64 @@ MACHINE_CONFIG_START(compis_state::compis)
 	m_mpsc->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
 
-	MCFG_DEVICE_ADD(MM58174A_TAG, MM58274C, 32.768_kHz_XTAL)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	MM58274C(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_mode24(1); // 24 hour
+	m_rtc->set_day1(1);   // monday
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
+	TIMER(config, "tape").configure_periodic(FUNC(compis_state::tape_tick), attotime::from_hz(44100));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, compis_state, write_centronics_select))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(compis_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(compis_state::write_centronics_select));
 
-	MCFG_COMPIS_GRAPHICS_SLOT_ADD(GRAPHICS_TAG, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir0_w))
-	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE(I80186_TAG, i80186_cpu_device, drq0_w))
-	MCFG_ISBX_SLOT_ADD(ISBX_1_TAG, 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir6_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir5_w))
-	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE(I80186_TAG, i80186_cpu_device, drq1_w))
+	COMPIS_GRAPHICS_SLOT(config, m_graphics, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg");
+
+	ISBX_SLOT(config, m_isbx0, 0, isbx_cards, "fdc");
+	m_isbx0->mintr0().set(m_osp, FUNC(i80130_device::ir1_w));
+	m_isbx0->mintr1().set(m_osp, FUNC(i80130_device::ir0_w));
+	m_isbx0->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
+	ISBX_SLOT(config, m_isbx1, 0, isbx_cards, nullptr);
+	m_isbx1->mintr0().set(m_osp, FUNC(i80130_device::ir6_w));
+	m_isbx1->mintr1().set(m_osp, FUNC(i80130_device::ir5_w));
+	m_isbx1->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")
+	SOFTWARE_LIST(config, "flop_list").set_original("compis");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( compis2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_state::compis2)
+void compis_state::compis2(machine_config &config)
+{
 	compis(config);
-	// basic machine hardware
-	MCFG_DEVICE_MODIFY(I80186_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(compis2_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &compis_state::compis2_mem);
 	// TODO 8087
 
 	// internal ram
 	m_ram->set_default_size("256K").set_extra_options("512K,768K");
-MACHINE_CONFIG_END
+}
 
 
 

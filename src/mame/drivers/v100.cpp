@@ -22,7 +22,7 @@
 #include "screen.h"
 
 // character matrix is supposed to be only 7x7, but 15 produces correct timings
-#define CHAR_WIDTH 15
+#define V100_CH_WIDTH 15
 
 class v100_state : public driver_device
 {
@@ -83,8 +83,8 @@ u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	unsigned row0 = cliprect.top() / 10;
 	unsigned x0 = cliprect.left();
-	unsigned px0 = x0 % CHAR_WIDTH;
-	unsigned columns = screen.visible_area().width() / CHAR_WIDTH;
+	unsigned px0 = x0 % V100_CH_WIDTH;
+	unsigned columns = screen.visible_area().width() / V100_CH_WIDTH;
 
 	u16 start = 0;
 	unsigned y = 0;
@@ -116,7 +116,7 @@ u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 					px++;
 					if ((px & 1) == 0)
 						gfxdata <<= 1;
-					if (px >= CHAR_WIDTH)
+					if (px >= V100_CH_WIDTH)
 					{
 						addr = (addr + 1) & 0xfff;
 						gfxdata = m_p_chargen[((m_videoram[addr] & 0x7f) << 4) | scan];
@@ -218,10 +218,8 @@ void v100_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x0f).w(m_vtac, FUNC(crt5037_device::write));
 	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
-	map(0x12, 0x12).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x13, 0x13).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x14, 0x14).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x15, 0x15).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x12, 0x13).rw("usart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x14, 0x15).rw("usart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x16, 0x16).w("brg2", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x20).r(FUNC(v100_state::earom_r));
 	map(0x30, 0x30).w(FUNC(v100_state::port30_w));
@@ -364,15 +362,15 @@ MACHINE_CONFIG_START(v100_state::v100)
 	brg2.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * CHAR_WIDTH, 0, 132 * CHAR_WIDTH, 312, 0, 240)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * V100_CH_WIDTH, 0, 80 * V100_CH_WIDTH, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * V100_CH_WIDTH, 0, 132 * V100_CH_WIDTH, 312, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
 
-	CRT5037(config, m_vtac, XTAL(47'736'000) / CHAR_WIDTH);
-	m_vtac->set_char_width(CHAR_WIDTH);
+	CRT5037(config, m_vtac, XTAL(47'736'000) / V100_CH_WIDTH);
+	m_vtac->set_char_width(V100_CH_WIDTH);
 	m_vtac->set_screen("screen");
-	m_vtac->hsyn_wr_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
-	m_vtac->vsyn_wr_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
+	m_vtac->hsyn_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
+	m_vtac->vsyn_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
 
 	I8214(config, m_picu, XTAL(47'736'000) / 12);
 	m_picu->int_wr_callback().set_inputline(m_maincpu, 0, ASSERT_LINE);
@@ -385,7 +383,7 @@ MACHINE_CONFIG_START(v100_state::v100)
 	ppi.out_pc_callback().set(m_earom, FUNC(er1400_device::data_w)).bit(6).invert();
 	ppi.out_pc_callback().append(m_earom, FUNC(er1400_device::clock_w)).bit(0).invert();
 
-	ER1400(config, m_earom, 0);
+	ER1400(config, m_earom);
 MACHINE_CONFIG_END
 
 

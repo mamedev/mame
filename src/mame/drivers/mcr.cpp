@@ -1749,60 +1749,58 @@ static const char *const twotiger_sample_names[] =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_90009)
-
+void mcr_state::mcr_90009(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_OSC_MCR_I/8);
 	m_maincpu->set_daisy_config(mcr_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90009_map);
 	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90009_portmap);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr_state::mcr_interrupt), "screen", 0, 1);
 
 	Z80CTC(config, m_ctc, MAIN_OSC_MCR_I/8 /* same as "maincpu" */);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(30);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*16, 30*16);
+	screen.set_visarea(0*16, 32*16-1, 0*16, 30*16-1);
+	screen.set_screen_update(FUNC(mcr_state::screen_update_mcr));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr);
+	PALETTE(config, m_palette, 32).set_format(PALETTE_FORMAT_xxxxRRRRBBBBGGGG);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ssio", MIDWAY_SSIO)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
+	MIDWAY_SSIO(config, m_ssio);
+	m_ssio->add_route(0, "lspeaker", 1.0);
+	m_ssio->add_route(1, "rspeaker", 1.0);
+}
 
 /* as above, but in a casino cabinet */
-MACHINE_CONFIG_START(mcr_dpoker_state::mcr_90009_dp)
+void mcr_dpoker_state::mcr_90009_dp(machine_config &config)
+{
 	mcr_90009(config);
 
 	/* basic machine hardware */
-	MCFG_TIMER_DRIVER_ADD("coinin", mcr_dpoker_state, coin_in_callback)
-	MCFG_TIMER_DRIVER_ADD("hopper", mcr_dpoker_state, hopper_callback)
-MACHINE_CONFIG_END
-
+	TIMER(config, "coinin").configure_generic(FUNC(mcr_dpoker_state::coin_in_callback));
+	TIMER(config, "hopper").configure_generic(FUNC(mcr_dpoker_state::hopper_callback));
+}
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_90010)
+void mcr_state::mcr_90010(machine_config &config)
+{
 	mcr_90009(config);
 
 	/* basic machine hardware */
@@ -1810,41 +1808,39 @@ MACHINE_CONFIG_START(mcr_state::mcr_90010)
 	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90010_portmap);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
-MACHINE_CONFIG_END
-
+	m_palette->set_entries(64);
+	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRBBBBGGGG);
+}
 
 /* as above, plus 8-track tape */
-MACHINE_CONFIG_START(mcr_state::mcr_90010_tt)
+void mcr_state::mcr_90010_tt(machine_config &config)
+{
 	mcr_90010(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(twotiger_sample_names)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-MACHINE_CONFIG_END
-
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(twotiger_sample_names);
+	m_samples->add_route(0, "lspeaker", 0.25);
+	m_samples->add_route(1, "rspeaker", 0.25);
+}
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-MACHINE_CONFIG_START(mcr_state::mcr_91475)
+void mcr_state::mcr_91475(machine_config &config)
+{
 	mcr_90010(config);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
+	m_palette->set_entries(128);
+	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRBBBBGGGG);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(journey_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(journey_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_samples->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
@@ -1862,18 +1858,20 @@ void mcr_state::mcr_91490(machine_config & config)
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490_snt)
+void mcr_state::mcr_91490_snt(machine_config &config)
+{
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("snt", MIDWAY_SQUAWK_N_TALK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_SQUAWK_N_TALK(config, m_squawk_n_talk);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
+void mcr_nflfoot_state::mcr_91490_ipu(machine_config &config)
+{
 	mcr_91490_snt(config);
 
 	/* basic machine hardware */
@@ -1882,8 +1880,7 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 	m_ipu->set_addrmap(AS_PROGRAM, &mcr_nflfoot_state::ipu_91695_map);
 	m_ipu->set_addrmap(AS_IO, &mcr_nflfoot_state::ipu_91695_portmap);
 
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mcr_nflfoot_state, ipu_interrupt)
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mcr_nflfoot_state::ipu_interrupt));
 
 	Z80CTC(config, m_ipu_ctc, 7372800/2 /* same as "ipu" */);
 	m_ipu_ctc->intr_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
@@ -1898,18 +1895,19 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 	m_ipu_sio->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 	m_ipu_sio->out_txda_callback().set(FUNC(mcr_nflfoot_state::sio_txda_w));
 	m_ipu_sio->out_txdb_callback().set(FUNC(mcr_nflfoot_state::sio_txdb_w));
-MACHINE_CONFIG_END
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490_tcs)
+void mcr_state::mcr_91490_tcs(machine_config &config)
+{
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 

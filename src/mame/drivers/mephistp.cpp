@@ -34,6 +34,7 @@ public:
 	{ }
 
 	void mephisto(machine_config &config);
+	void sport2k(machine_config &config);
 
 private:
 	DECLARE_WRITE8_MEMBER(shift_load_w);
@@ -132,13 +133,12 @@ void mephisto_pinball_state::mephisto_8051_io(address_map &map)
 	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::data_w));
 }
 
-#ifdef UNUSED_DEFINITION
 void mephisto_pinball_state::sport2k_8051_io(address_map &map)
 {
-	mephisto_8051_data(map);
+	mephisto_8051_io(map);
 	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
-#endif
+
 
 static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
@@ -180,20 +180,20 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	//i8155_device &i8155_2(I8155(config, "ic9", XTAL(18'000'000)/6));
 	//i8155_2.out_to_callback().set(FUNC(mephisto_pinball_state::clk_shift_w));
 
-	MCFG_DEVICE_ADD("soundcpu", I8051, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM
-	MCFG_DEVICE_IO_MAP(mephisto_8051_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, mephisto_pinball_state, ay8910_read))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, mephisto_pinball_state, ay8910_write))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, mephisto_pinball_state, t0_t1_w))
-	MCFG_MCS51_SERIAL_RX_CB(CONSTANT(0)) // from MUART
+	i8051_device &soundcpu(I8051(config, "soundcpu", XTAL(12'000'000)));
+	soundcpu.set_addrmap(AS_PROGRAM, &mephisto_pinball_state::mephisto_8051_map); // EA tied high for external program ROM
+	soundcpu.set_addrmap(AS_IO, &mephisto_pinball_state::mephisto_8051_io);
+	soundcpu.port_in_cb<1>().set(FUNC(mephisto_pinball_state::ay8910_read));
+	soundcpu.port_out_cb<1>().set(FUNC(mephisto_pinball_state::ay8910_write));
+	soundcpu.port_out_cb<3>().set(FUNC(mephisto_pinball_state::t0_t1_w));
+	soundcpu.serial_rx_cb().set_constant(0); // from MUART
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mephisto_pinball_state, ay8910_columns_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mephisto_pinball_state, ay8910_inputs_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, m_aysnd, XTAL(12'000'000)/8);
+	m_aysnd->port_a_write_callback().set(FUNC(mephisto_pinball_state::ay8910_columns_w));
+	m_aysnd->port_b_read_callback().set(FUNC(mephisto_pinball_state::ay8910_inputs_r));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MCFG_DEVICE_ADD("dac", DAC08, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -201,8 +201,8 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-#ifdef UNUSED_DEFINITION
-static MACHINE_CONFIG_START(sport2k)
+
+MACHINE_CONFIG_START(mephisto_pinball_state::sport2k)
 	mephisto(config);
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_IO_MAP(sport2k_8051_io)
@@ -210,7 +210,6 @@ static MACHINE_CONFIG_START(sport2k)
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
-#endif
 
 /*-------------------------------------------------------------------
 / Mephisto
@@ -251,7 +250,22 @@ ROM_START(mephistp1)
 	ROM_LOAD("ic19_f", 0x78000, 0x8000, CRC(cc4bb629) SHA1(db46be2a8034bbd106b7dd80f50988c339684b5e))
 ROM_END
 
+ROM_START(sport2k)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u1_256.bin", 0x00000, 0x8000, CRC(403f9000) SHA1(376dc17355c9569bd1ed9b19dbc322bfd69bf938))
+	ROM_LOAD("u2_256.bin", 0x08000, 0x8000, CRC(4a88cc10) SHA1(591568dc60c40cc058f45a144c098faccb4e970c))
+
+	ROM_REGION(0x08000, "soundcpu", 0)
+	ROM_LOAD("c541_256.bin", 0x00000, 0x8000, CRC(7ca4a952) SHA1(6b01f7f79fa88c4ae71a6a19341760fa256b9958))
+
+	ROM_REGION(0x50000, "sound1", 0)
+	ROM_LOAD("s117_512.bin", 0x00000, 0x10000, CRC(035d302e) SHA1(f207ea239e5a34839366cc19a569ab5f3d1e1a60))
+	ROM_LOAD("s211_512.bin", 0x10000, 0x10000, CRC(61cf84f9) SHA1(4c5680fbf48f30fbe0e15f4194ab708955df7721))
+	ROM_LOAD("s311_512.bin", 0x20000, 0x10000, CRC(162cd1ff) SHA1(4d9ad7a839cc16e74abfc77c92674608ccba8cc3))
+	ROM_LOAD("s411_512.bin", 0x30000, 0x10000, CRC(4deffaa0) SHA1(98a20a01437ea060ac5c6fb52f4da892fee1fb75))
+	ROM_LOAD("s511_512.bin", 0x40000, 0x10000, CRC(ca9afa80) SHA1(6f219bdc1ad06e340b2930610897b70369a43684))
+ROM_END
 
 GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
-//GAME(1988,  sport2k,    0,         sport2k,   sport2k,  mephisto_pinball_state, empty_init, ROT0,  "Unidesa",     "Cirsa Sport 2000",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_pinball_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",              MACHINE_IS_SKELETON_MECHANICAL)

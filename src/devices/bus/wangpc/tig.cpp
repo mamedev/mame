@@ -124,15 +124,15 @@ MACHINE_CONFIG_START(wangpc_tig_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD(UPD7720_0_TAG, UPD7220, XTAL(52'832'000)/28)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_0_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(wangpc_tig_device, hgdc_draw_text)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD7220(config, m_hgdc0, XTAL(52'832'000)/28);
+	m_hgdc0->set_addrmap(0, &wangpc_tig_device::upd7220_0_map);
+	m_hgdc0->set_draw_text_callback(FUNC(wangpc_tig_device::hgdc_draw_text), this);
+	m_hgdc0->set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD(UPD7720_1_TAG, UPD7220, XTAL(52'832'000)/28)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(wangpc_tig_device, hgdc_display_pixels)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD7220(config, m_hgdc1, XTAL(52'832'000)/28);
+	m_hgdc1->set_addrmap(0, &wangpc_tig_device::upd7220_1_map);
+	m_hgdc1->set_display_pixels_callback(FUNC(wangpc_tig_device::hgdc_display_pixels), this);
+	m_hgdc1->set_screen(SCREEN_TAG);
 MACHINE_CONFIG_END
 
 

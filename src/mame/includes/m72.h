@@ -11,10 +11,11 @@
 #pragma once
 
 #include "audio/m72.h"
-#include "sound/dac.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -91,7 +92,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	optional_device<mb8421_mb8431_16_device> m_dpram;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;
@@ -154,7 +155,6 @@ private:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_sample_r);
 	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(mcu_low_w);
 	DECLARE_WRITE8_MEMBER(mcu_high_w);
 	DECLARE_READ8_MEMBER(snd_cpu_sample_r);
@@ -202,7 +202,6 @@ private:
 	DECLARE_MACHINE_START(kengo);
 	DECLARE_MACHINE_RESET(kengo);
 
-	INTERRUPT_GEN_MEMBER(mcu_int);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	TIMER_CALLBACK_MEMBER(synch_callback);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);

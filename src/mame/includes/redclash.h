@@ -36,6 +36,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_redclash);
 	DECLARE_WRITE8_MEMBER(redclash_videoram_w);
@@ -47,9 +52,6 @@ private:
 	DECLARE_PALETTE_INIT(redclash);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redclash_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redclash_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);

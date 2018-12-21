@@ -197,8 +197,8 @@ MACHINE_CONFIG_START(modellot_state::modellot)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(modellot_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(modellot_state::kbd_put));
 MACHINE_CONFIG_END
 
 /* ROM definition */

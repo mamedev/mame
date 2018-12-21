@@ -73,7 +73,7 @@ private:
 	u8 irl3pend0, irl3en0;
 	u8 irl3pend1, irl3en1;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<sh4_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
@@ -331,41 +331,41 @@ INPUT_PORTS_END
 static constexpr XTAL ARISTMK6_CPU_CLOCK = 200_MHz_XTAL;
 // ?
 
-MACHINE_CONFIG_START(aristmk6_state::aristmk6)
+void aristmk6_state::aristmk6(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, ARISTMK6_CPU_CLOCK)
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(ARISTMK6_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(aristmk6_map)
-	MCFG_DEVICE_IO_MAP(aristmk6_port)
-	MCFG_MMU_HACK_TYPE(2)
-	MCFG_CPU_FORCE_NO_DRC()
-//  MCFG_DEVICE_DISABLE()
+	SH4LE(config, m_maincpu, ARISTMK6_CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(ARISTMK6_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aristmk6_state::aristmk6_map);
+	m_maincpu->set_addrmap(AS_IO, &aristmk6_state::aristmk6_port);
+	m_maincpu->set_mmu_hacktype(2);
+	m_maincpu->set_force_no_drc(true);
+//  m_maincpu->set_disable();
 
-	MCFG_DEVICE_ADD( "uart0", NS16550, 8_MHz_XTAL )
-	MCFG_DEVICE_ADD( "uart1", NS16550, 8_MHz_XTAL )
+	NS16550(config, "uart0", 8_MHz_XTAL);
+	NS16550(config, "uart1", 8_MHz_XTAL);
 
 	EEPROM_93C56_16BIT(config, m_eeprom0).default_value(0xff);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(aristmk6_state, screen_update_aristmk6)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(aristmk6_state::screen_update_aristmk6));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, 0x1000);
+}
 
 #define ROM_LOAD32_WORD_BIOS(bios, name, offset, length, hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(bios))

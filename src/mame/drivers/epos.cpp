@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 	MCFG_DEVICE_IO_MAP(epos_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -480,8 +480,7 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(11'000'000)/16) /*  0.6875 MHz, confirmed from schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8912(config, "aysnd", XTAL(11'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0); /*  0.6875 MHz, confirmed from schematics */
 MACHINE_CONFIG_END
 
 
@@ -505,7 +504,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(epos_state, epos)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -517,11 +516,11 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(22'118'400)/32)    /* 0.6912 MHz (measured) */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, epos_state, ay_porta_mpx_r))
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(22'118'400)/32)); /* 0.6912 MHz (measured) */
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	aysnd.port_a_read_callback().set(FUNC(epos_state::ay_porta_mpx_r));
 	// port a writes?
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, epos_state, flip_screen_w)) // flipscreen and ay port a multiplex control
+	aysnd.port_b_write_callback().set(FUNC(epos_state::flip_screen_w)); // flipscreen and ay port a multiplex control
 MACHINE_CONFIG_END
 
 

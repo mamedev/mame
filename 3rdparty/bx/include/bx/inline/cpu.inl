@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -8,6 +8,10 @@
 #endif // BX_CPU_H_HEADER_GUARD
 
 #if BX_COMPILER_MSVC
+#	if BX_PLATFORM_WINRT
+#		include <windows.h>
+#	endif // BX_PLATFORM_WINRT
+
 #	include <emmintrin.h> // _mm_fence
 
 extern "C" void _ReadBarrier();
@@ -31,8 +35,23 @@ extern "C" long _InterlockedCompareExchange(long volatile* _ptr, long _exchange,
 extern "C" int64_t _InterlockedCompareExchange64(int64_t volatile* _ptr, int64_t _exchange, int64_t _comparand);
 #	pragma intrinsic(_InterlockedCompareExchange64)
 
+#if (_MSC_VER == 1800) && !defined(FIXED_592562) && defined (_M_IX86) && !defined (_M_CEE_PURE)
+
+extern "C" long _InterlockedExchange(long volatile* _ptr, long _value);
+#	pragma intrinsic(_InterlockedExchange)
+
+__forceinline static void * _InterlockedExchangePointer_impl(void * volatile * _Target, void * _Value)
+{
+    return (void *)_InterlockedExchange((long volatile *) _Target, (long) _Value);
+}
+#define _InterlockedExchangePointer(p,v)  _InterlockedExchangePointer_impl(p,v)
+
+#else
+
 extern "C" void* _InterlockedExchangePointer(void* volatile* _ptr, void* _value);
 #	pragma intrinsic(_InterlockedExchangePointer)
+
+#endif
 
 #	if BX_PLATFORM_WINRT
 #		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64

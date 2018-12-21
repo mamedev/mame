@@ -114,10 +114,44 @@ submission 11-232 but much of the early DECUS stuff has been lost, so I've not b
 FORTH kernel was implemented. I do have the Caltech writeup on it though,
 http://bitsavers.org/pdf/caltech/ovro/Caltech-OVRO_Forth_Manual_Jun78.pdf
 
+First, ^T to boot the boot portion of Terse from Blocks 1 through 4.
+The Command "5 LOAD" will boot full Terse.
+The disk label says:  220 LOAD (which also boots full Terse I think?)
+and then: 158 LOAD, which loads the Gorf binary into RAM
+
+You can also use:
+250 0 DIR (for example)
+to see the "first line comments" for a range of blocks.  There is some stuff related to cross-compiling there I haven't tried yet.
+
+Note: Blocks in Terse start with 1, not 0.
+
+The "Fasterse" content on the disk is the Source for the "binary-only" version of Terse in the commercial games.  You can see that
+is exactly the same as the code in the low memory of Gorf.
+
+Also, this disk is hand-labelled 7-Feb-81.
+The Gorf binary on the disk is the same as the release, except for an embedded date code - it is 18-Feb-81 on the disk.
+It is 24-Feb-81 in the commercial release gorf roms.
+
+
+My Forth is extremely rusty and I happen to look at disks with problems. If you try to do 5 LOAD with the FORLANG disk it comes
+up with a Read Error? message.. Argh. There could be a fault in the IMD. Not sure. Great that other disks work.
+
+Disks like 611ROTO have a disk backup system or something, and when you boot it up with ^T it hangs. I've narrowed it down to a
+BUSY wait which never exits (at $308a eventually).
+
+I think it's a quirk of the FD1771 chip thats not emulated accurately causing this. The first track of data is read using the
+READ (multiple) in a loop reading 10 consecutive sectors which occurs fine, and when it's finished reading the sectors an INTERRUPT
+command is issued to stop the FD1171 feeding data. According to all the datasheets I've looked at, the BUSY flag should get set to
+0 immediately once the INTERRUPT command is executed (and the mame code does this), but the code in this case calls a subroutine
+which waits until the BUSY flag is ON and then waits until the flag is OFF. This works elsewhere as it's used to wait until the
+SEEK command is completed.
+
+
 ******************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/com8116.h"
 #include "bus/rs232/rs232.h"
@@ -169,10 +203,8 @@ void icebox_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xe0, 0xe0).rw(m_uart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe1, 0xe1).rw(m_uart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xe2, 0xe2).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe3, 0xe3).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe0, 0xe1).rw(m_uart0, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xe2, 0xe3).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe4, 0xe7).lrw8("fdc_usage",
 					[this](offs_t offset) { return m_fdc->read(offset^3); },
 					[this](offs_t offset, u8 data) { m_fdc->write(offset^3, data); });

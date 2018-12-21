@@ -2214,7 +2214,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 //  copyline_palette16
 //============================================================
 
-static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
+inline void texture_info::copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*src];
@@ -2229,7 +2229,7 @@ static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int wi
 //  copyline_palettea16
 //============================================================
 
-static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
+inline void texture_info::copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (xborderpix)
 		*dst++ = palette[*src];
@@ -2244,7 +2244,7 @@ static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int w
 //  copyline_rgb32
 //============================================================
 
-static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
+inline void texture_info::copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (palette != nullptr)
 	{
@@ -2280,7 +2280,7 @@ static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width,
 //  copyline_argb32
 //============================================================
 
-static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
+inline void texture_info::copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (palette != nullptr)
 	{
@@ -2317,7 +2317,7 @@ static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width
 //  copyline_yuy16_to_yuy2
 //============================================================
 
-static inline void copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+inline void texture_info::copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 
@@ -2348,7 +2348,7 @@ static inline void copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, in
 //  copyline_yuy16_to_uyvy
 //============================================================
 
-static inline void copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+inline void texture_info::copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 
@@ -2375,7 +2375,7 @@ static inline void copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, in
 //  copyline_yuy16_to_argb
 //============================================================
 
-static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+inline void texture_info::copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 

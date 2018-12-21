@@ -48,13 +48,13 @@ PALETTE_INIT_MEMBER(lvcards_state, lvcards)//Ever so slightly different, but dif
 	}
 }
 
-WRITE8_MEMBER(lvcards_state::lvcards_videoram_w)
+WRITE8_MEMBER(lvcards_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lvcards_state::lvcards_colorram_w)
+WRITE8_MEMBER(lvcards_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

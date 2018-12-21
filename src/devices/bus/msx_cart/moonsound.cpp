@@ -36,20 +36,21 @@ void msx_cart_moonsound_device::ymf278b_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(msx_cart_moonsound_device::device_add_mconfig)
+void msx_cart_moonsound_device::device_add_mconfig(machine_config &config)
+{
 	// The moonsound cartridge has a separate stereo output.
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymf278b", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_DEVICE_ADDRESS_MAP(0, ymf278b_map)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(*this, msx_cart_moonsound_device, irq_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(4, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(5, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	YMF278B(config, m_ymf278b, YMF278B_STD_CLOCK);
+	m_ymf278b->set_addrmap(0, &msx_cart_moonsound_device::ymf278b_map);
+	m_ymf278b->irq_handler().set(FUNC(msx_cart_moonsound_device::irq_w));
+	m_ymf278b->add_route(0, "lspeaker", 0.50);
+	m_ymf278b->add_route(1, "rspeaker", 0.50);
+	m_ymf278b->add_route(2, "lspeaker", 0.40);
+	m_ymf278b->add_route(3, "rspeaker", 0.40);
+	m_ymf278b->add_route(4, "lspeaker", 0.40);
+	m_ymf278b->add_route(5, "rspeaker", 0.40);
+}
 
 
 ROM_START( msx_cart_moonsound )

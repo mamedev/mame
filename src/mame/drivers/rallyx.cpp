@@ -198,7 +198,6 @@ TODO:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "screen.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    XTAL(18'432'000)
@@ -814,12 +813,12 @@ WRITE_LINE_MEMBER(rallyx_state::jungler_vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(rallyx_state::rallyx)
-
+void rallyx_state::rallyx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(rallyx_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rallyx_state::rallyx_map);
+	m_maincpu->set_addrmap(AS_IO, &rallyx_state::io_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 259 at 12M or 4099 at 11M on Logic Board I
 	mainlatch.q_out_cb<0>().set(FUNC(rallyx_state::bang_w)); // BANG
@@ -831,47 +830,47 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_lockout_w));
 	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::coin_counter_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_rallyx)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, rallyx_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.606060);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(36*8, 32*8);
+	m_screen->set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_rallyx));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(rallyx_state::rallyx_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallyx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rallyx);
 
-	MCFG_PALETTE_ADD("palette", 64*4+4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_INIT_OWNER(rallyx_state,rallyx)
+	PALETTE(config, m_palette, 64*4+4);
+	m_palette->set_indirect_entries(32);
+	m_palette->enable_shadows();
+	m_palette->set_init(FUNC(rallyx_state::palette_init_rallyx));
+
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32) /* 96 KHz */
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32); /* 96 KHz */
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(rallyx_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(rallyx_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::jungler)
-
+void rallyx_state::jungler(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(jungler_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rallyx_state::jungler_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1C on Loco-Motion
 	mainlatch.q_out_cb<0>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w)); // SOUNDON
@@ -883,69 +882,61 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_counter_2_w)); // OUT3
 	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::stars_enable_w)); // STARSON
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_jungler)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, jungler_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* frames per second, vblank duration */
+	m_screen->set_size(36*8, 32*8);
+	m_screen->set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_jungler));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(rallyx_state::jungler_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jungler)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jungler);
 
-	MCFG_PALETTE_ADD("palette", 64*4+4+64)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_INIT_OWNER(rallyx_state,jungler)
+	PALETTE(config, m_palette, 64*4+4+64);
+	m_palette->set_indirect_entries(32+64);
+	m_palette->enable_shadows();
+	m_palette->set_init(FUNC(rallyx_state::palette_init_jungler));
+
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("timeplt_audio", LOCOMOTN_AUDIO)
-MACHINE_CONFIG_END
+	LOCOMOTN_AUDIO(config, "timeplt_audio");
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::tactcian)
+void rallyx_state::tactcian(machine_config &config)
+{
 	jungler(config);
 
-	/* basic machine hardware */
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_locomotn));
 
-	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::locomotn)
+void rallyx_state::locomotn(machine_config &config)
+{
 	jungler(config);
 
-	/* basic machine hardware */
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_locomotn));
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::commsega)
+void rallyx_state::commsega(machine_config &config)
+{
 	jungler(config);
 
-	/* basic machine hardware */
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_locomotn));
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,commsega)
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

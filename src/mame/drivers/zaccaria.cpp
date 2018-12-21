@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3G on 1B1141 I/O (Z80) board
 	mainlatch.q_out_cb<0>().set(FUNC(zaccaria_state::flip_screen_x_w)); // VCMA

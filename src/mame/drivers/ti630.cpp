@@ -64,7 +64,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -137,31 +137,32 @@ static GFXDECODE_START( gfx_ti630 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, ti630_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ti630_state::ti630)
+void ti630_state::ti630(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, ti630_state, i80c31_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, ti630_state, i80c31_p1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, ti630_state, i80c31_p3_w))
+	I80C31(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti630_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &ti630_state::i80c31_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(ti630_state::i80c31_p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(ti630_state::i80c31_p1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(ti630_state::i80c31_p3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(ti630_state, ti630)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ti630)
+	PALETTE(config, "palette", 2).set_init(FUNC(ti630_state::palette_init_ti630));
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ti630);
+
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
+}
 
 ROM_START( ti630 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

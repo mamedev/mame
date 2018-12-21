@@ -15,7 +15,7 @@
 #pragma once
 
 #include "bml3bus.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
 

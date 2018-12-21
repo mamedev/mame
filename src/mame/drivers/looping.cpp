@@ -621,8 +621,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(looping_state::looping)
-
+void looping_state::looping(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::looping_map);
@@ -630,17 +630,17 @@ MACHINE_CONFIG_START(looping_state::looping)
 	m_maincpu->set_vblank_int("screen", FUNC(looping_state::looping_interrupt));
 
 	// CPU TMS9980A for audio subsystem; no line connections
-	TMS9980A(config, m_audiocpu, SOUND_CLOCK/4);
+	TMS9980A(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
 
-	MCFG_DEVICE_ADD("mcu", COP420, COP_CLOCK)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, looping_state, cop_l_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_G_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_IN_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_SI_CB(READLINE(*this, looping_state, cop_serial_r))
+	cop420_cpu_device &cop(COP420(config, "mcu", COP_CLOCK));
+	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	cop.write_l().set(FUNC(looping_state::cop_l_w));
+	cop.read_l().set(FUNC(looping_state::cop_unk_r));
+	cop.read_g().set(FUNC(looping_state::cop_unk_r));
+	cop.read_in().set(FUNC(looping_state::cop_unk_r));
+	cop.read_si().set(FUNC(looping_state::cop_serial_r));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C9 on CPU board
 	// Q0 = A16
@@ -652,18 +652,17 @@ MACHINE_CONFIG_START(looping_state::looping)
 	mainlatch.q_out_cb<6>().set(FUNC(looping_state::main_irq_ack_w));
 	mainlatch.q_out_cb<7>().set(FUNC(looping_state::watchdog_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(looping_state::screen_update_looping));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_looping)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_looping);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
+	PALETTE(config, m_palette, 32).set_init(FUNC(looping_state::palette_init_looping));
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // E2 on video board
 	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_set));
@@ -673,19 +672,21 @@ MACHINE_CONFIG_START(looping_state::looping)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	AY8910(config, m_aysnd, SOUND_CLOCK/4);
+	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, TMS_CLOCK)
-	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, looping_state, looping_spcint))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	TMS5220(config, m_tms, TMS_CLOCK);
+	m_tms->irq_cb().set(FUNC(looping_state::looping_spcint));
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	ls259_device &sen0(LS259(config, "sen0")); // B3 on sound board
 	sen0.q_out_cb<0>().set(FUNC(looping_state::looping_souint_clr));
@@ -695,7 +696,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	sen1.q_out_cb<0>().set(FUNC(looping_state::ay_enable_w));
 	sen1.q_out_cb<1>().set(FUNC(looping_state::speech_enable_w));
 	sen1.q_out_cb<2>().set(FUNC(looping_state::ballon_enable_w));
-MACHINE_CONFIG_END
+}
 
 
 

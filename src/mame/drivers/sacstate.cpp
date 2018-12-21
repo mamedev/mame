@@ -106,7 +106,6 @@ void sacstate_state::sacstate_mem(address_map &map)
 void sacstate_state::sacstate_io(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(sacstate_state::port00_r));
 	map(0x01, 0x01).r(FUNC(sacstate_state::port01_r));
 	map(0x04, 0x04).r(FUNC(sacstate_state::port04_r));
@@ -134,16 +133,17 @@ void sacstate_state::machine_reset()
 	m_val = ioport("CONFIG")->read();
 }
 
-MACHINE_CONFIG_START(sacstate_state::sacstate)
+void sacstate_state::sacstate(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
-	MCFG_DEVICE_PROGRAM_MAP(sacstate_mem)
-	MCFG_DEVICE_IO_MAP(sacstate_io)
+	I8008(config, m_maincpu, 800000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sacstate_state::sacstate_mem);
+	m_maincpu->set_addrmap(AS_IO, &sacstate_state::sacstate_io);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sacstate_state, kbd_put))
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(sacstate_state::kbd_put));
+}
 
 /* ROM definition */
 ROM_START( sacstate )

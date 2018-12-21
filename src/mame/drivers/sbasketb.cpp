@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	mainlatch.q_out_cb<5>().set(FUNC(sbasketb_state::spriteram_select_w)); // OBJ CHE
 	mainlatch.q_out_cb<6>().set_nop(); // END - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 

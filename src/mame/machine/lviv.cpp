@@ -136,7 +136,7 @@ READ8_MEMBER(lviv_state::io_r)
 		{
 		case 0:
 		case 1:
-			return m_ppi[switch_val]->read(space, offset & 3);
+			return m_ppi[switch_val]->read(offset & 3);
 
 		case 2:
 		case 3:
@@ -173,7 +173,7 @@ WRITE8_MEMBER(lviv_state::io_w)
 		{
 		case 0:
 		case 1:
-			m_ppi[switch_val]->write(space, offset & 3, data);
+			m_ppi[switch_val]->write(offset & 3, data);
 			break;
 
 		case 2:

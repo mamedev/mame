@@ -13,6 +13,7 @@
 
 #include "isbx.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
 

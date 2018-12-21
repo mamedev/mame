@@ -285,58 +285,57 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(quantum_state::quantum)
-
+void quantum_state::quantum(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
+	M68000(config, m_maincpu, MASTER_CLOCK / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &quantum_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(quantum_state::irq1_line_hold), attotime::from_hz(CLOCK_3KHZ / 12));
 
 	X2212(config, "nvram"); // "137288-001" in parts list and schematic diagram
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 900, 0, 600)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(60);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 900, 0, 600);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("avg", AVG_QUANTUM, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	AVG_QUANTUM(config, m_avg, 0);
+	m_avg->set_vector_tag("vector");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, 600000)
-	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_1_r))
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
+	pokey_device &pokey1(POKEY(config, "pokey1", 600000));
+	pokey1.pot_r<0>().set(FUNC(quantum_state::input_1_r));
+	pokey1.pot_r<1>().set(FUNC(quantum_state::input_1_r));
+	pokey1.pot_r<2>().set(FUNC(quantum_state::input_1_r));
+	pokey1.pot_r<3>().set(FUNC(quantum_state::input_1_r));
+	pokey1.pot_r<4>().set(FUNC(quantum_state::input_1_r));
+	pokey1.pot_r<5>().set(FUNC(quantum_state::input_1_r));
+	pokey1.pot_r<6>().set(FUNC(quantum_state::input_1_r));
+	pokey1.pot_r<7>().set(FUNC(quantum_state::input_1_r));
+	pokey1.set_output_opamp(RES_K(1), 0.0, 5.0);
+	pokey1.add_route(0, "discrete", 1.0, 0);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, 600000)
-	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_2_r))
-	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
+	pokey_device &pokey2(POKEY(config, "pokey2", 600000));
+	pokey2.pot_r<0>().set(FUNC(quantum_state::input_2_r));
+	pokey2.pot_r<1>().set(FUNC(quantum_state::input_2_r));
+	pokey2.pot_r<2>().set(FUNC(quantum_state::input_2_r));
+	pokey2.pot_r<3>().set(FUNC(quantum_state::input_2_r));
+	pokey2.pot_r<4>().set(FUNC(quantum_state::input_2_r));
+	pokey2.pot_r<5>().set(FUNC(quantum_state::input_2_r));
+	pokey2.pot_r<6>().set(FUNC(quantum_state::input_2_r));
+	pokey2.pot_r<7>().set(FUNC(quantum_state::input_2_r));
+	pokey2.set_output_opamp(RES_K(1), 0.0, 5.0);
+	pokey2.add_route(0, "discrete", 1.0, 1);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, quantum_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", quantum_discrete).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

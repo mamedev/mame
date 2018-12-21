@@ -8,7 +8,7 @@ driver by Angelo Salese
 
 Notes:
 -The name of this hardware is "Alba ZG board",a newer revision of the
- "Alba ZC board" used by Hanaroku (albazc.c driver). Test mode says clearly that this is
+ "Alba ZC board" used by Hanaroku (albazc.cpp driver). Test mode says clearly that this is
  from 1991.
 
 TODO:
@@ -369,8 +369,7 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.out_pa_callback().set(FUNC(albazg_state::mux_w));
@@ -386,9 +385,10 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	MCFG_SCREEN_UPDATE_DRIVER(albazg_state, screen_update_yumefuda)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16)   /* hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", MASTER_CLOCK/16));   /* hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yumefuda )
 	MCFG_PALETTE_ADD("palette", 0x80)
@@ -398,11 +398,11 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, albazg_state, yumefuda_output_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/16)); /* guessed to use the same xtal as the crtc */
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.port_a_write_callback().set(FUNC(albazg_state::yumefuda_output_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /***************************************************************************************/

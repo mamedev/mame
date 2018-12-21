@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -44,7 +45,7 @@ void skullxbo_state::update_interrupts()
 
 TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
 {
-	scanline_int_gen(*m_maincpu);
+	scanline_int_write_line(1);
 }
 
 
@@ -115,7 +116,7 @@ void skullxbo_state::main_map(address_map &map)
 	map(0xff1e80, 0xff1eff).w(FUNC(skullxbo_state::skullxbo_xscroll_w));
 	map(0xff1f00, 0xff1f7f).w(FUNC(skullxbo_state::scanline_int_ack_w));
 	map(0xff1f80, 0xff1fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xff2000, 0xff2fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff2000, 0xff2fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff4000, 0xff47ff).w(FUNC(skullxbo_state::skullxbo_yscroll_w)).share("yscroll");
 	map(0xff4800, 0xff4fff).w(FUNC(skullxbo_state::skullxbo_mobwr_w));
 	map(0xff5001, 0xff5001).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
@@ -235,7 +236,7 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skullxbo)
@@ -244,8 +245,9 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, skullxbo_state, get_playfield_tile_info, 16,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, skullxbo_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", skullxbo_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, skullxbo_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -259,9 +261,10 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_JSA_TEST_PORT("FF5802", 7)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_jsa->test_read_cb().set_ioport("FF5802").bit(7);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

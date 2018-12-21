@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+	virtual DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
 
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
@@ -141,6 +141,8 @@ public:
 	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+
+	virtual DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed ) override;
 
 protected:
 	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -111,22 +111,22 @@ void scramble_state::ckongs_map(address_map &map)
 
 READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
 {
-	return m_ppi8255_0->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_0->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 READ8_MEMBER(scramble_state::mars_ppi8255_1_r)
 {
-	return m_ppi8255_1->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_1->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_0_w)
 {
-	m_ppi8255_0->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_0->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
 {
-	m_ppi8255_1->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_1->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 void scramble_state::mars_map(address_map &map)
@@ -1324,7 +1324,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,scramble)
 
@@ -1334,7 +1334,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
 	I8255A(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
@@ -1355,15 +1355,14 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, 14318000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	AY8910(config, "8910.1", 14318000/8).add_route(ALL_OUTPUTS, "mono", 0.16);
 
-	MCFG_DEVICE_ADD("8910.2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	ay8910_device &ay2(AY8910(config, "8910.2", 14318000/8));
+	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay2.port_b_read_callback().set(FUNC(scramble_state::scramble_portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.16);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::mars)
@@ -1373,7 +1372,7 @@ MACHINE_CONFIG_START(scramble_state::mars)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
@@ -1420,7 +1419,7 @@ MACHINE_CONFIG_START(scramble_state::mrkougb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mrkougar_map)
 
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::mrkougar_sh_irqtrigger_w));
 	m_ppi8255_1->in_pc_callback().set_constant(0);
 
@@ -1472,15 +1471,12 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	MCFG_DEVICE_MODIFY("8910.1")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	subdevice<ay8910_device>("8910.1")->reset_routes();
+	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_MODIFY("8910.2")
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	subdevice<ay8910_device>("8910.2")->port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
+	subdevice<ay8910_device>("8910.2")->reset_routes();
+	subdevice<ay8910_device>("8910.2")->add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::cavelon)
@@ -1553,11 +1549,11 @@ MACHINE_CONFIG_START(scramble_state::hunchbks)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", S2650, 18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(hunchbks_map)
-	MCFG_DEVICE_IO_MAP(hunchbks_readport)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
+	s2650_device &maincpu(S2650(config.replace(), m_maincpu, 18432000/6));
+	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
+	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
+	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -1595,7 +1591,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
@@ -1636,13 +1632,12 @@ MACHINE_CONFIG_START(scramble_state::harem)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
 	/* extra AY8910 with I/O ports */
-	MCFG_DEVICE_ADD("8910.3", AY8910, 14318000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, scramble_state, harem_digitalker_control_w))
+	ay8910_device &ay3(AY8910(config, "8910.3", 14318000/8));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.16);
+	ay3.port_a_write_callback().set(m_digitalker, FUNC(digitalker_device::digitalker_data_w));
+	ay3.port_b_write_callback().set(FUNC(scramble_state::harem_digitalker_control_w));
 
-	MCFG_DIGITALKER_ADD("digitalker", 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	DIGITALKER(config, m_digitalker, 4000000).add_route(ALL_OUTPUTS, "mono", 0.16);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2293,7 +2288,7 @@ GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, init_mariner
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1981, 800fatha, mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, init_ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, empty_init,        ROT90, "bootleg",             "Crazy Kong (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                               MACHINE_SUPPORTS_SAVE )
 

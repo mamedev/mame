@@ -107,10 +107,11 @@ MACHINE_CONFIG_START(vic20_video_pak_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vic20_video_pak)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, H46505, MC6845_SCREEN_TAG, XTAL(14'318'181) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(vic20_video_pak_device, crtc_update_row)
+	H46505(config, m_crtc, XTAL(14'318'181) / 8);
+	m_crtc->set_screen(MC6845_SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(vic20_video_pak_device::crtc_update_row), this);
 MACHINE_CONFIG_END
 
 
@@ -169,14 +170,12 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 			if (!blk1)
 			{
 				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | offset;
-
 				data = m_ram[addr];
 			}
 
 			if (!blk2)
 			{
 				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | 0x2000 | offset;
-
 				data = m_ram[addr];
 			}
 		}
@@ -185,21 +184,18 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 			if (!blk1)
 			{
 				offs_t addr = m_bank_msb << 15 | offset;
-
 				data = m_ram[addr];
 			}
 
 			if (!blk2)
 			{
 				offs_t addr = m_bank_msb << 15 | 0x2000 | offset;
-
 				data = m_ram[addr];
 			}
 
 			if (!blk3)
 			{
 				offs_t addr = m_bank_msb << 15 | 0x4000 | offset;
-
 				data = m_ram[addr];
 			}
 		}
@@ -210,7 +206,8 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 		switch ((offset >> 11) & 0x03)
 		{
 		case 0:
-			data = m_blk5[offset & 0x7ff];
+			if (m_blk5)
+				data = m_blk5[offset & 0x7ff];
 			break;
 
 		case 3:

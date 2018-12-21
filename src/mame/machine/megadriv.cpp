@@ -882,15 +882,15 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(md_base_state::md_ntsc)
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
 
 	/* IRQs are handled via the timers */
 
-	MCFG_DEVICE_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_z80_map)
-	MCFG_DEVICE_IO_MAP(megadriv_z80_io_map)
+	Z80(config, m_z80snd, MASTER_CLOCK_NTSC / 15); /* 3.58 MHz */
+	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
+	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
@@ -937,14 +937,14 @@ MACHINE_CONFIG_END
 /************ PAL hardware has a different master clock *************/
 
 MACHINE_CONFIG_START(md_base_state::md_pal)
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
 	/* IRQs are handled via the timers */
 
-	MCFG_DEVICE_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_z80_map)
-	MCFG_DEVICE_IO_MAP(megadriv_z80_io_map)
+	Z80(config, m_z80snd, MASTER_CLOCK_PAL / 15); /* 3.58 MHz */
+	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
+	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)

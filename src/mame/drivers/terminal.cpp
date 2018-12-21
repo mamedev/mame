@@ -13,7 +13,7 @@ http://oldcomputer.info/terminal/
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 
 
 class terminal_state : public driver_device
@@ -35,7 +35,6 @@ private:
 
 void terminal_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0xffff).rom();
 }
 
@@ -47,7 +46,7 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START( terminal_state::terminal )
-	MCFG_DEVICE_ADD("maincpu", Z80, 4'000'000)
+	MCFG_DEVICE_ADD("maincpu", I8031, 12'000'000)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
@@ -61,30 +60,6 @@ ROM_START( alcat258 ) // MSM80C154 (+ TS9347// 8k ram // b&w
 
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "serial.bin",   0x0000, 0x0100, CRC(f0b99b8f) SHA1(906c285fd327eba2ba9798695acc456535b84570) )
-ROM_END
-
-
-ROM_START( alcat7100 ) // Z80  // 256k ram // b&w  // looks like it needs a boot floppy to start
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom.u117",                  0x0000, 0x0800, CRC(9c0debf7) SHA1(a042db34090656224ede41d8190f22f719d1a634) )
-	ROM_LOAD( "906_513601_012gd2.u110",    0x0800, 0x0800, CRC(9346a41c) SHA1(6f7a2946494adac4d34874da9d5e475c99457000) ) // keyboard?
-
-	ROM_REGION( 0x1000, "chargen", 0 ) // first half blank
-	ROM_LOAD( "906_513301_rev00_ba6d.u20", 0x0000, 0x1000, CRC(143cfdfc) SHA1(4d924d1f16c30d72e1fdbb786488156bb9961442) )
-ROM_END
-
-
-ROM_START( facit4440 ) // Z80 (+HD46505SP, 2x Z80ADART // 16k ram // b&w
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom7.bin",     0x0000, 0x4000, CRC(a8da2b11) SHA1(4436ef14c29ae299f7bc338748158771c02d02a9) )
-	ROM_LOAD( "rom5.bin",     0xa000, 0x2000, CRC(715d02b6) SHA1(e304718dbdc8867ac01909fd2d027e5014a8c4f9) )
-
-	ROM_REGION( 0x8000, "chargen", 0 ) // order unknown
-	ROM_LOAD( "rom2.bin",     0x0000, 0x0800, CRC(9e1a190c) SHA1(fb08ee806f1056bcdfb5b08ea85995e1d3d01298) )
-	ROM_LOAD( "rom1.bin",     0x0800, 0x1000, CRC(b503c173) SHA1(209bf59e2e9953179d04c4e768fc41574e039d36) )
-	ROM_LOAD( "rom3.bin",     0x1800, 0x1000, CRC(a55a25d9) SHA1(c0d321e65f214adee01bf5f8c495b2518fa31b7b) )
-	ROM_LOAD( "rom4.bin",     0x2800, 0x1000, CRC(52004ef8) SHA1(50d6e2eb48f60db3a3c9d206fc40d3294b6adc0e) )
-	ROM_LOAD( "rom6.bin",     0x3800, 0x4000, CRC(790b7642) SHA1(688a80cbf011e5c14f501e11fe0e3bf64a85bbd7) )
 ROM_END
 
 
@@ -112,10 +87,10 @@ ROM_END
 
 ROM_START( t3210 ) // order unknown // i8031, 8742 // 4+2k ram onboard; 24kb in battery-backed expansion // b&w
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "s22723_r121-c2-2.d11",     0x00000, 0x0800, CRC(f0eda00e) SHA1(6b0d9f5e9d99644c3be16cbf0c0d3b1ea05aabee) )
-	ROM_LOAD( "d8742_s22723_r118-c1.d16", 0x00800, 0x0800, CRC(f334a2a3) SHA1(c1cd4d775c2984252e6869a4c8f99d56646b89e9) )
-	ROM_LOAD( "s22723_r115-c1-6_ct.d6",   0x01000, 0x8000, CRC(d09fea94) SHA1(52168060093dfe964c0316d9ff335cd59da01d48) )
-	ROM_LOAD( "s22723_r115-c2-6_ct.d7",   0x09000, 0x8000, CRC(6e1eaacd) SHA1(cfda25dbbeddc7c75379c4b0dc97addb602d79ef) )
+	ROM_LOAD( "s22723_r115-c1-6_ct.d6",   0x00000, 0x8000, CRC(d09fea94) SHA1(52168060093dfe964c0316d9ff335cd59da01d48) )
+	ROM_LOAD( "s22723_r115-c2-6_ct.d7",   0x08000, 0x8000, CRC(6e1eaacd) SHA1(cfda25dbbeddc7c75379c4b0dc97addb602d79ef) )
+	ROM_LOAD( "s22723_r121-c2-2.d11",     0x10000, 0x0800, CRC(f0eda00e) SHA1(6b0d9f5e9d99644c3be16cbf0c0d3b1ea05aabee) )
+	ROM_LOAD( "d8742_s22723_r118-c1.d16", 0x10800, 0x0800, CRC(f334a2a3) SHA1(c1cd4d775c2984252e6869a4c8f99d56646b89e9) )
 	ROM_LOAD( "prom_s22723_r120-c1.bin",  0x11000, 0x0100, CRC(4460cd50) SHA1(fe36d758d64493cb5f8217fe51bbbe8203424fbe) )
 ROM_END
 
@@ -137,13 +112,6 @@ ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppe
 ROM_END
 
 
-ROM_START( ikt5a ) // order unknown // 80C51 (+xtal 15.000) // 8k ram // RGB external, uses XT keyboard
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "g26.bin",      0x0000, 0x2000, CRC(657668be) SHA1(212a9eb1fb9b9c16f3cc606c6befbd913ddfa395) )
-	ROM_LOAD( "ver_ih.bin",   0x2000, 0x4000, CRC(5a15b4e8) SHA1(cc0336892279b730f1596f31e129c5a898ecdc8f) )
-ROM_END
-
-
 ROM_START( teleguide ) // order unknown // i8051, i8031 (layout very similar to loewed) // 64k ram + battery-backed nvram // b&w
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "cardreader_17044-068_349-1163.bin", 0x00000, 0x10000, CRC(3c980c0d) SHA1(9904ffd283a11defbe3daf2cb9029bcead8b02d0) )
@@ -157,13 +125,10 @@ ROM_END
 
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY             FULLNAME                     FLAGS */
 COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_IS_SKELETON )
-COMP( 1984, alcat7100, 0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminal 7100",          MACHINE_IS_SKELETON )
-COMP( 1986, facit4440, 0,      0,      terminal, terminal, terminal_state, empty_init, "Facit",              "Terminal 4440 (30M-F1)", MACHINE_IS_SKELETON )
 COMP( 1986, itt9216,   0,      0,      terminal, terminal, terminal_state, empty_init, "ITT",                "Courier 9216-X",         MACHINE_IS_SKELETON )
 COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multitel D",             MACHINE_IS_SKELETON )
 COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multicom 715L",          MACHINE_IS_SKELETON )
 COMP( 1986, t3210,     0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Bitel T3210",            MACHINE_IS_SKELETON )
 COMP( 1986, feap90,    0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Multitel Fe Ap 90-1.1",  MACHINE_IS_SKELETON )
 COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_IS_SKELETON )
-COMP( 1993, ikt5a,     0,      0,      terminal, terminal, terminal_state, empty_init, "Creator / Fura Elektronik", "IKT-5A",          MACHINE_IS_SKELETON )
 COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )

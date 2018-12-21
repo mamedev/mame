@@ -67,7 +67,7 @@ private:
 	uint16_t m_video_ram[0x0400];
 	uint8_t m_color_ram[0x0400];
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8039_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ay8912_device> m_aysnd;
 	required_memory_bank m_mainbank;
@@ -457,23 +457,21 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, I8039, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, drw80pkr_state, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, drw80pkr_state, t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, drw80pkr_state, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, drw80pkr_state, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, drw80pkr_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, drw80pkr_state, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, drw80pkr_state, prog_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, drw80pkr_state, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, drw80pkr_state, bus_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drw80pkr_state, irq0_line_hold)
-
+	I8039(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &drw80pkr_state::map);
+	m_maincpu->set_addrmap(AS_IO, &drw80pkr_state::io_map);
+	m_maincpu->t0_in_cb().set(FUNC(drw80pkr_state::t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(drw80pkr_state::t1_r));
+	m_maincpu->p1_in_cb().set(FUNC(drw80pkr_state::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(drw80pkr_state::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(drw80pkr_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(drw80pkr_state::p2_w));
+	m_maincpu->prog_out_cb().set(FUNC(drw80pkr_state::prog_w));
+	m_maincpu->bus_in_cb().set(FUNC(drw80pkr_state::bus_r));
+	m_maincpu->bus_out_cb().set(FUNC(drw80pkr_state::bus_w));
+	m_maincpu->set_vblank_int("screen", FUNC(drw80pkr_state::irq0_line_hold));
 
 	// video hardware
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -491,8 +489,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_aysnd, AY8912, 20000000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	AY8912(config, m_aysnd, 20000000/12).add_route(ALL_OUTPUTS, "mono", 0.75);
 MACHINE_CONFIG_END
 
 /*************************

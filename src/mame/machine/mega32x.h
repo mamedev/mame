@@ -114,6 +114,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const override { return 32*32*32; }

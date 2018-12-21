@@ -24,10 +24,9 @@ topcat_device::topcat_device(const machine_config &mconfig, const char *tag, dev
 
 void topcat_device::device_start()
 {
+	m_int_write_func.resolve_safe();
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(topcat_device::cursor_callback), this));
 	m_cursor_timer->adjust(attotime::from_hz(3));
-
-	m_int_write_func.resolve_safe();
 
 	save_item(NAME(m_vblank));
 	save_item(NAME(m_wmove_active));
@@ -46,14 +45,18 @@ void topcat_device::device_start()
 	save_item(NAME(m_dst_y_pixel));
 	save_item(NAME(m_block_mover_pixel_width));
 	save_item(NAME(m_block_mover_pixel_height));
-	save_item(NAME(m_fb_width));
-	save_item(NAME(m_fb_height));
-	save_item(NAME(m_read_enable));
-	save_item(NAME(m_write_enable));
-	save_item(NAME(m_fb_enable));
 	save_item(NAME(m_unknown_reg4a));
 	save_item(NAME(m_unknown_reg4c));
 	save_item(NAME(m_cursor_state));
+	save_item(NAME(m_cursor_x_pos));
+	save_item(NAME(m_cursor_y_pos));
+	save_item(NAME(m_cursor_width));
+	save_item(NAME(m_fb_width));
+	save_item(NAME(m_fb_height));
+	save_item(NAME(m_plane_mask));
+	save_item(NAME(m_read_enable));
+	save_item(NAME(m_write_enable));
+	save_item(NAME(m_fb_enable));
 	save_item(NAME(m_changed));
 }
 
@@ -72,10 +75,10 @@ READ16_MEMBER(topcat_device::vram_r)
 	uint16_t ret = 0;
 
 	if (mem_mask & m_plane_mask)
-		ret |= m_vram[offset*2+1] ? m_plane_mask : 0;
+		ret |= m_vram[offset*2+1] & m_plane_mask;
 
 	if (mem_mask & m_plane_mask << 8)
-		ret |= m_vram[offset*2] ? m_plane_mask << 8 : 0;
+		ret |= (m_vram[offset*2] & m_plane_mask) << 8;
 	//LOG("%s: %04X: %04X (mask %04X)\n", __FUNCTION__, offset, ret, mem_mask);
 	return ret;
 }
@@ -355,7 +358,6 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 	m_changed = true;
 	switch (offset) {
 	case TOPCAT_REG_VBLANK:
-		m_vblank = data;
 		break;
 	case TOPCAT_REG_WMOVE_ACTIVE:
 		break;
@@ -384,10 +386,12 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		update_int();
 		break;
 	case TOPCAT_REG_START_WMOVE:
-		window_move();
-		if (m_unknown_reg4a) {
-			m_wmove_intrq = m_plane_mask << 8;
-			update_int();
+		if (data & (m_plane_mask << 8)) {
+			window_move();
+			if (m_unknown_reg4a) {
+				m_wmove_intrq = m_plane_mask << 8;
+				update_int();
+			}
 		}
 		break;
 	case TOPCAT_REG_ENABLE_BLINK_PLANES:
@@ -436,7 +440,7 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		m_cursor_width = data;
 		break;
 	default:
-		logerror("unknown register: %02X = %04x\n", offset, data, mem_mask);
+		logerror("unknown register write: %02X = %04x (mask %04X)\n", offset, data, mem_mask);
 		break;
 	}
 }

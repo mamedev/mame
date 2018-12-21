@@ -52,15 +52,16 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_corvfdc02_device::device_add_mconfig)
-	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, intrq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":0", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":1", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":2", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":3", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-MACHINE_CONFIG_END
+void a2bus_corvfdc02_device::device_add_mconfig(machine_config &config)
+{
+	UPD765A(config, m_fdc, 8'000'000, true, false);
+	m_fdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc02_device::intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(a2bus_corvfdc02_device::drq_w));
+	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con2, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con3, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con4, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -2,7 +2,7 @@
 // copyright-holders:Grull Osgo, Roberto Fresca
 /***********************************************************************************
 
-    re900.c
+    re900.cpp
 
     Ruleta RE-900 - Entretenimientos GEMINIS & GENATRON (C) 1993
 
@@ -388,13 +388,13 @@ INPUT_PORTS_END
 *      Machine Driver      *
 ***************************/
 
-MACHINE_CONFIG_START(re900_state::re900)
-
+void re900_state::re900(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8051, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
-	MCFG_DEVICE_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, re900_state, cpu_port_0_w))
+	i8051_device &maincpu(I8051(config, m_maincpu, MAIN_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &re900_state::mem_prg);
+	maincpu.set_addrmap(AS_IO, &re900_state::mem_io);
+	maincpu.port_out_cb<0>().set(FUNC(re900_state::cpu_port_0_w));
 
 	/* video hardware */
 	tms9128_device &vdp(TMS9128(config, "tms9128", VDP_CLOCK));   /* TMS9128NL on the board */
@@ -407,24 +407,25 @@ MACHINE_CONFIG_START(re900_state::re900)
 
 	/* sound hardware   */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay_re900", AY8910, TMS_CLOCK) /* From TMS9128NL - Pin 37 (GROMCLK) */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, re900_state, re_psg_portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, re900_state, re_psg_portB_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, re900_state, re_mux_port_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, re900_state, re_mux_port_B_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	ay8910_device &ay_re900(AY8910(config, "ay_re900", TMS_CLOCK)); /* From TMS9128NL - Pin 37 (GROMCLK) */
+	ay_re900.port_a_read_callback().set(FUNC(re900_state::re_psg_portA_r));
+	ay_re900.port_b_read_callback().set(FUNC(re900_state::re_psg_portB_r));
+	ay_re900.port_a_write_callback().set(FUNC(re900_state::re_mux_port_A_w));
+	ay_re900.port_b_write_callback().set(FUNC(re900_state::re_mux_port_B_w));
+	ay_re900.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(re900_state::bs94)
+void re900_state::bs94(machine_config &config)
+{
 	re900(config);
 
 	/* sound hardware   */
-	MCFG_DEVICE_MODIFY("ay_re900")
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(NOOP)
-	MCFG_AY8910_PORT_B_WRITE_CB(NOOP)
-MACHINE_CONFIG_END
+	auto &ay_re900(*subdevice<ay8910_device>("ay_re900"));
+	ay_re900.port_a_read_callback().set_ioport("IN0");
+	ay_re900.port_b_read_callback().set_ioport("IN1");
+	ay_re900.port_a_write_callback().set_nop();
+	ay_re900.port_b_write_callback().set_nop();
+}
 
 
 /*************************

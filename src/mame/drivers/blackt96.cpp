@@ -482,12 +482,12 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_DEVICE_PROGRAM_MAP(blackt96_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 8000000) /* ? */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_a_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, blackt96_state, blackt96_soundio_port_b_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_b_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, blackt96_state, blackt96_soundio_port_c_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_c_w))
+	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8000000)); /* ? */
+	audiocpu.write_a().set(FUNC(blackt96_state::blackt96_soundio_port_a_w));
+	audiocpu.read_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_r));
+	audiocpu.write_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_w));
+	audiocpu.read_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_r));
+	audiocpu.write_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
 
@@ -503,10 +503,10 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
-	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
-	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
-	MCFG_SNK68_SPR_NO_PARTIAL
+	SNK68_SPR(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag(m_gfxdecode);
+	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback), this);
+	m_sprites->set_no_partial();
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

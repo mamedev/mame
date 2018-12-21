@@ -1748,67 +1748,57 @@ const rom_entry *sega_32x_device::device_rom_region() const
 // some games appear to dislike 'perfect' levels of interleave, probably due to
 // non-emulated cache, ram waitstates and other issues?
 #define _32X_INTERLEAVE_LEVEL \
-	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
+	config.m_minimum_quantum = attotime::from_hz(1800000);
 
-MACHINE_CONFIG_START(sega_32x_ntsc_device::device_add_mconfig)
-
+void sega_32x_device::device_add_mconfig(machine_config &config)
+{
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
-	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
-	MCFG_SH2_IS_SLAVE(0)
-	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
+	SH2(config, m_master_cpu, DERIVED_CLOCK(1, 1));
+	m_master_cpu->set_is_slave(0);
+	m_master_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 #endif
 
-	MCFG_DEVICE_ADD("32x_slave_sh2", SH2, DERIVED_CLOCK(1, 1) )
-	MCFG_DEVICE_PROGRAM_MAP(sh2_slave_map)
-	MCFG_SH2_IS_SLAVE(1)
-	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
+	SH2(config, m_slave_cpu, DERIVED_CLOCK(1, 1));
+	m_slave_cpu->set_is_slave(1);
+	m_slave_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
-	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
-	MCFG_SH2_IS_SLAVE(0)
-	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
+	SH2(config, m_master_cpu, DERIVED_CLOCK(1, 1));
+	m_master_cpu->set_is_slave(0);
+	m_master_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 #endif
 
-	MCFG_DEVICE_ADD("ldac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	_32X_INTERLEAVE_LEVEL
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(sega_32x_pal_device::device_add_mconfig)
+void sega_32x_ntsc_device::device_add_mconfig(machine_config &config)
+{
+	sega_32x_device::device_add_mconfig(config);
 
-#ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
-	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
-	MCFG_SH2_IS_SLAVE(0)
-	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
-#endif
+	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_main_map);
+	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_slave_map);
 
-	MCFG_DEVICE_ADD("32x_slave_sh2", SH2, DERIVED_CLOCK(1, 1) )
-	MCFG_DEVICE_PROGRAM_MAP(sh2_slave_map)
-	MCFG_SH2_IS_SLAVE(1)
-	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
+	DAC_12BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, ":lspeaker", 0.4); // unknown DAC
+	DAC_12BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, ":rspeaker", 0.4); // unknown DAC
+}
 
-#ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MCFG_DEVICE_ADD("32x_master_sh2", SH2, DERIVED_CLOCK(1, 1) )
-	MCFG_DEVICE_PROGRAM_MAP(sh2_main_map)
-	MCFG_SH2_IS_SLAVE(0)
-	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
-#endif
+void sega_32x_pal_device::device_add_mconfig(machine_config &config)
+{
+	sega_32x_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_main_map);
+	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_slave_map);
 
-	_32X_INTERLEAVE_LEVEL
-MACHINE_CONFIG_END
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, ":lspeaker", 0.4); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, ":rspeaker", 0.4); // unknown DAC
+}
 
 
 void sega_32x_device::device_start()

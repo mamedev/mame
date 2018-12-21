@@ -11,17 +11,16 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define MAX_STARS           250
-
-struct star {
-	float x,y;
-	int col,set;
-};
-
-
 class gaplus_base_state : public driver_device
 {
 public:
+	static constexpr unsigned MAX_STARS = 250;
+
+	struct star {
+		float x,y;
+		int col,set;
+	};
+
 	enum
 	{
 		TIMER_NAMCOIO0_RUN,

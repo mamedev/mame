@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    midway.c
+    midway.cpp
 
     Functions to emulate general the various Midway sound cards.
 
@@ -410,22 +410,23 @@ const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(midway_ssio_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu", Z80, DERIVED_CLOCK(1, 2*4))
-	MCFG_DEVICE_PROGRAM_MAP(ssio_map)
+void midway_ssio_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_cpu, DERIVED_CLOCK(1, 2*4));
+	m_cpu->set_addrmap(AS_PROGRAM, &midway_ssio_device::ssio_map);
 	if (clock())
-		MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, clock() / (2*16*10))
+		m_cpu->set_periodic_int(DEVICE_SELF, FUNC(midway_ssio_device::clock_14024), attotime::from_hz(clock() / (2*16*10)));
 
-	MCFG_DEVICE_ADD("ay0", AY8910, DERIVED_CLOCK(1, 2*4))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, midway_ssio_device, porta0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, midway_ssio_device, portb0_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 0)
+	AY8910(config, m_ay0, DERIVED_CLOCK(1, 2*4));
+	m_ay0->port_a_write_callback().set(FUNC(midway_ssio_device::porta0_w));
+	m_ay0->port_b_write_callback().set(FUNC(midway_ssio_device::portb0_w));
+	m_ay0->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 0);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, DERIVED_CLOCK(1, 2*4))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, midway_ssio_device, porta1_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, midway_ssio_device, portb1_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 1)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay1, DERIVED_CLOCK(1, 2*4));
+	m_ay1->port_a_write_callback().set(FUNC(midway_ssio_device::porta1_w));
+	m_ay1->port_b_write_callback().set(FUNC(midway_ssio_device::portb1_w));
+	m_ay1->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 1);
+}
 
 
 //-------------------------------------------------
@@ -879,7 +880,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// write strobe -- pass the current command to the TMS5200
 	if (((data ^ m_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		m_tms5200->data_w(space, offset, m_tms_command);
+		m_tms5200->data_w(m_tms_command);
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -889,7 +890,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->write_porta(m_tms5200->status_r(space, offset));
+		m_pia1->write_porta(m_tms5200->status_r());
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);

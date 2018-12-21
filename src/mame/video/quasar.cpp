@@ -2,7 +2,7 @@
 // copyright-holders:Mike Coates, Pierpaolo Prazzoli
 /***************************************************************************
 
-  video\quasar.c
+  video\quasar.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 }
 
 
-VIDEO_START_MEMBER(quasar_state,quasar)
+void quasar_state::video_start()
 {
 	m_effectram = std::make_unique<uint8_t[]>(0x400);
 
@@ -142,9 +142,9 @@ uint32_t quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 
 	}
 
 	/* update the S2636 chips */
-	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
-	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
-	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636[2]->update(cliprect);
 
 	/* Bullet Hardware */
 	for (offs = 8; offs < 256; offs++ )

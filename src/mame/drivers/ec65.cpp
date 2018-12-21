@@ -188,25 +188,26 @@ MACHINE_CONFIG_START(ec65_state::ec65)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(ec65_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, MC6845_TAG, XTAL(16'000'000) / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8); /*?*/
+	crtc.set_update_row_callback(FUNC(ec65_state::crtc_update_row), this);
 
 	/* devices */
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
+	PIA6821(config, PIA6821_TAG, 0);
 
-	MCFG_DEVICE_ADD(ACIA6850_TAG, ACIA6850, 0)
+	ACIA6850(config, ACIA6850_TAG, 0);
 
-	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL(4'000'000) / 4)
+	VIA6522(config, m_via_0, XTAL(4'000'000) / 4);
 
-	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL(4'000'000) / 4)
+	VIA6522(config, m_via_1, XTAL(4'000'000) / 4);
 
 	mos6551_device &acia(MOS6551(config, ACIA6551_TAG, 0));
 	acia.set_xtal(XTAL(1'843'200));
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(ec65_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(ec65_state::kbd_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ec65k_state::ec65k)
@@ -226,9 +227,10 @@ MACHINE_CONFIG_START(ec65k_state::ec65k)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
+	mc6845_device &crtc(MC6845(config, MC6845_TAG, XTAL(16'000'000) / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8); /*?*/
 MACHINE_CONFIG_END
 
 /* ROM definition */

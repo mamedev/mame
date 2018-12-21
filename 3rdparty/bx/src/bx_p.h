@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -40,5 +40,6 @@
 				BX_MACRO_BLOCK_END
 
 #include <bx/bx.h>
+#include <bx/debug.h>
 
 #endif // BX_P_H_HEADER_GUARD

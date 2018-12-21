@@ -47,6 +47,7 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_cheap_squeak_deluxe(*this, "csd"),
 		m_bg_tilemap(nullptr),
@@ -56,8 +57,8 @@ public:
 	void zwackery(machine_config &config);
 
 private:
-	DECLARE_VIDEO_START(zwackery);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	virtual void video_start() override;
+	DECLARE_WRITE32_MEMBER(scanline_cb);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(spriteram_r);
 	DECLARE_WRITE8_MEMBER(spriteram_w);
@@ -87,6 +88,7 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
 
@@ -115,7 +117,7 @@ void zwackery_state::zwackery_map(address_map &map)
 	map(0x108000, 0x108007).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
 	map(0x10c000, 0x10c007).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
 	map(0x800000, 0x800fff).ram().w(FUNC(zwackery_state::videoram_w)).share("videoram");
-	map(0x802000, 0x803fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x802000, 0x803fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).rw(FUNC(zwackery_state::spriteram_r), FUNC(zwackery_state::spriteram_w)).umask16(0x00ff);
 }
 
@@ -185,7 +187,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-VIDEO_START_MEMBER( zwackery_state, zwackery )
+void zwackery_state::video_start()
 {
 	const uint8_t *colordatabase = (const uint8_t *)memregion("bg_color")->base();
 	gfx_element *gfx0 = m_gfxdecode->gfx(0);
@@ -245,9 +247,9 @@ VIDEO_START_MEMBER( zwackery_state, zwackery )
 	gfx2->set_raw_layout(m_srcdata2.get(), gfx2->width(), gfx2->height(), gfx2->elements(), 8 * gfx2->width(), 8 * gfx2->width() * gfx2->height());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( zwackery_state::scanline_cb )
+WRITE32_MEMBER(zwackery_state::scanline_cb)
 {
-	switch (param)
+	switch (data)
 	{
 	case 0:
 		// VSYNC
@@ -494,12 +496,13 @@ void zwackery_state::machine_start()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(zwackery_state::zwackery)
+void zwackery_state::zwackery(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
-	MCFG_DEVICE_PROGRAM_MAP(zwackery_map)
+	M68000(config, m_maincpu, 7652400);    // based on counter usage, should be XTAL(16'000'000)/2
+	m_maincpu->set_addrmap(AS_PROGRAM, &zwackery_state::zwackery_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	PTM6840(config, m_ptm, 7652400 / 10);
 	m_ptm->irq_callback().set_inputline("maincpu", 6);
@@ -514,34 +517,33 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 	m_pia1->readpa_handler().set(FUNC(zwackery_state::pia1_porta_r));
 	m_pia1->writepa_handler().set(FUNC(zwackery_state::pia1_porta_w));
 	m_pia1->readpb_handler().set(FUNC(zwackery_state::pia1_portb_r));
-	m_pia1->ca2_handler().set("csd", FUNC(midway_cheap_squeak_deluxe_device::sirq_w));
+	m_pia1->ca2_handler().set(m_cheap_squeak_deluxe, FUNC(midway_cheap_squeak_deluxe_device::sirq_w));
 
 	PIA6821(config, m_pia2, 0);
 	m_pia2->readpa_handler().set(FUNC(zwackery_state::pia2_porta_r));
 	m_pia2->readpb_handler().set_ioport("DSW");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(zwackery_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_size(32*16, 30*16);
+	m_screen->set_visarea(0, 32*16-1, 0, 30*16-1);
+	m_screen->set_screen_update(FUNC(zwackery_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->scanline().set(FUNC(zwackery_state::scanline_cb));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", zwackery_state, scanline_cb, "screen", 0, 1)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_zwackery);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zwackery)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
-
-	MCFG_VIDEO_START_OVERRIDE(zwackery_state, zwackery)
+	PALETTE(config, m_palette, 4096);
+	m_palette->set_format(PALETTE_FORMAT_xRRRRRBBBBBGGGGG_inverted);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+
+	MIDWAY_CHEAP_SQUEAK_DELUXE(config, m_cheap_squeak_deluxe);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 //**************************************************************************

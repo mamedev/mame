@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(dangarj_state::dangarj)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(dangarj_io_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)) // divided by 2 maybe
+	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galivan_state::ninjemak)
@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

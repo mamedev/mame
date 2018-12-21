@@ -1,19 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Lee Taylor
 // thanks-to:John Clegg,Tomasz Slanina
+#ifndef MAME_INCLUDES_TRAVRUSA_H
+#define MAME_INCLUDES_TRAVRUSA_H
+
+#pragma once
 
 #include "emupal.h"
 
 class travrusa_state : public driver_device
 {
 public:
-	travrusa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	travrusa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void shtrider(machine_config &config);
 	void travrusa(machine_config &config);
@@ -42,7 +47,7 @@ private:
 	DECLARE_PALETTE_INIT(travrusa);
 	DECLARE_PALETTE_INIT(shtrider);
 	uint32_t screen_update_travrusa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_scroll(  );
+	void set_scroll();
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -50,3 +55,5 @@ private:
 
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TRAVRUSA_H

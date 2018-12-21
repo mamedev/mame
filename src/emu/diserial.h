@@ -188,6 +188,16 @@ class device_buffered_serial_interface : public device_serial_interface
 protected:
 	using device_serial_interface::device_serial_interface;
 
+	void interface_post_start() override
+	{
+		device_serial_interface::interface_post_start();
+
+		device().save_item(NAME(m_fifo));
+		device().save_item(NAME(m_head));
+		device().save_item(NAME(m_tail));
+		device().save_item(NAME(m_empty));
+	}
+
 	virtual void tra_complete() override
 	{
 		assert(!m_empty || (m_head == m_tail));
@@ -236,20 +246,14 @@ protected:
 		}
 	}
 
+	bool fifo_empty() const
+	{
+		return m_empty;
+	}
+
 	bool fifo_full() const
 	{
 		return !m_empty && (m_head == m_tail);
-	}
-
-protected:
-	void interface_post_start() override
-	{
-		device_serial_interface::interface_post_start();
-
-		device().save_item(NAME(m_fifo));
-		device().save_item(NAME(m_head));
-		device().save_item(NAME(m_tail));
-		device().save_item(NAME(m_empty));
 	}
 
 private:

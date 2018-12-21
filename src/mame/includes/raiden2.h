@@ -1,5 +1,10 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
+#ifndef MAME_INCLUDES_RAIDEN2_H
+#define MAME_INCLUDES_RAIDEN2_H
+
+#pragma once
+
 #include "audio/seibu.h"
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
@@ -9,34 +14,33 @@ class raiden2_state : public driver_device
 {
 public:
 	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			sprites(*this, "sprites") ,
-			m_maincpu(*this, "maincpu"),
-			m_seibu_sound(*this, "seibu_sound"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
+		: driver_device(mconfig, type, tag)
+		, sprites(*this, "sprites")
+		, m_maincpu(*this, "maincpu")
+		, m_seibu_sound(*this, "seibu_sound")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 
-			bg_bank(0),
-			fg_bank(0),
-			mid_bank(0),
-			tx_bank(0),
-			raiden2_tilemap_enable(0),
-			prg_bank(0),
-			cop_bank(0),
+		, bg_bank(0)
+		, fg_bank(0)
+		, mid_bank(0)
+		, tx_bank(0)
+		, raiden2_tilemap_enable(0)
+		, prg_bank(0)
+		, cop_bank(0)
 
-			sprite_prot_x(0),
-			sprite_prot_y(0),
-			dst1(0),
-			cop_spr_maxx(0),
-			cop_spr_off(0),
+		, sprite_prot_x(0)
+		, sprite_prot_y(0)
+		, dst1(0)
+		, cop_spr_maxx(0)
+		, cop_spr_off(0)
 
-			tile_buffer(320, 256),
-			sprite_buffer(320, 256),
-			m_raiden2cop(*this, "raiden2cop")
+		, tile_buffer(320, 256)
+		, sprite_buffer(320, 256)
+		, m_raiden2cop(*this, "raiden2cop")
 	{
 		memset(scrollvals, 0, sizeof(uint16_t)*6);
 		memset(sprite_prot_src_addr, 0, sizeof(uint16_t)*2);
-
 	}
 
 	std::unique_ptr<uint16_t[]> m_back_data;
@@ -160,3 +164,5 @@ public:
 protected:
 	virtual void machine_start() override;
 };
+
+#endif // MAME_INCLUDES_RAIDEN2_H

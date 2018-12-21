@@ -911,8 +911,8 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_sub_map)
 	MCFG_DEVICE_IO_MAP(nekkyoku_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -928,16 +928,15 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 14318180 / 2) // clock not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, 14318181 / 2); // clock not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/6) // type not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15); // type not verified
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
@@ -957,8 +956,8 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
 	MCFG_DEVICE_IO_MAP(idolmj_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -974,16 +973,15 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
@@ -1003,8 +1001,8 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
 	MCFG_DEVICE_IO_MAP(fromance_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -1020,8 +1018,8 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 

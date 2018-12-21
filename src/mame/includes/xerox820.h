@@ -22,6 +22,7 @@
 #include "machine/z80dart.h"
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "emupal.h"
 

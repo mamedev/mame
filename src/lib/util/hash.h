@@ -46,9 +46,9 @@ public:
 	static constexpr char HASH_SHA1 = 'S';
 
 	// common combinations for requests
-	static const char *HASH_TYPES_CRC;
-	static const char *HASH_TYPES_CRC_SHA1;
-	static const char *HASH_TYPES_ALL;
+	static char const *const HASH_TYPES_CRC;
+	static char const *const HASH_TYPES_CRC_SHA1;
+	static char const *const HASH_TYPES_ALL;
 
 	// flags are identified by punctuation marks
 	static constexpr char FLAG_NO_DUMP = '!';

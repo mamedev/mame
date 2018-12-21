@@ -35,6 +35,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/74123.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -136,8 +137,7 @@ void excali64_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).r(FUNC(excali64_state::port00_r));
-	map(0x10, 0x10).mirror(0x0e).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x20, 0x23).mirror(0x0c).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -564,12 +564,12 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(16_MHz_XTAL / 16) /* Timer 0: tone gen for speaker */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
-	//MCFG_PIT8253_CLK1(16_MHz_XTAL / 16) /* Timer 1: baud rate gen for 8251 */
-	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, excali64_state, write_uart_clock))
-	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 16) /* Timer 2: not used */
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(16_MHz_XTAL / 16); /* Timer 0: tone gen for speaker */
+	pit.out_handler<0>().set("speaker", FUNC(speaker_sound_device::level_w));
+	//pit.set_clk<1>(16_MHz_XTAL / 16); /* Timer 1: baud rate gen for 8251 */
+	//pit.out_handler<1>().set(FUNC(excali64_state::write_uart_clock));
+	//pit.set_clk<2>(16_MHz_XTAL / 16); /* Timer 2: not used */
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w)); // parallel port
@@ -592,12 +592,13 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_PALETTE_ADD("palette", 40)
 	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excali64)
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 16_MHz_XTAL / 16) // 1MHz for lowres; 2MHz for highres
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(excali64_state, update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, excali64_state, crtc_hs))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, excali64_state, crtc_vs))
+	MC6845(config, m_crtc, 16_MHz_XTAL / 16); // 1MHz for lowres; 2MHz for highres
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(excali64_state::update_row), this);
+	m_crtc->out_hsync_callback().set(FUNC(excali64_state::crtc_hs));
+	m_crtc->out_vsync_callback().set(FUNC(excali64_state::crtc_vs));
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )

@@ -270,13 +270,13 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	int const max_y   =   0xf0;
 
 	int startcol = 0;
-	
+
 	if (ctrl & 0x01)
 		startcol += 0x4;
 
 	if (ctrl & 0x02)
 		startcol += 0x8;
-	
+
 	xoffs = flip ? m_bg_flipxoffs : m_bg_noflipxoffs;
 	yoffs = flip ? m_bg_flipyoffs : m_bg_noflipyoffs;
 

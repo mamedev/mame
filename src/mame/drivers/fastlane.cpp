@@ -199,47 +199,48 @@ void fastlane_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-MACHINE_CONFIG_START(fastlane_state::fastlane)
-
+void fastlane_state::fastlane(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(24'000'000)/2) // 3MHz(XTAL(24'000'000)/8) internally
-	MCFG_DEVICE_PROGRAM_MAP(fastlane_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastlane_state, fastlane_scanline, "screen", 0, 1)
+	HD6309(config, m_maincpu, XTAL(24'000'000)/2); // 3MHz(XTAL(24'000'000)/8) internally
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastlane_state::fastlane_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(fastlane_state::fastlane_scanline), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17) // measured
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(37*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fastlane_state, screen_update_fastlane)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.17); // measured
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(37*8, 32*8);
+	m_screen->set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(fastlane_state::screen_update_fastlane));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastlane)
-	MCFG_PALETTE_ADD("palette", 1024*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(fastlane_state, fastlane)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fastlane);
+	PALETTE(config, m_palette, 1024*16);
+	m_palette->set_indirect_entries(0x400);
+	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	m_palette->set_init(FUNC(fastlane_state::palette_init_fastlane));
 
-	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K051733_ADD("k051733")
+	K007121(config, m_k007121, 0);
+	m_k007121->set_palette_tag(m_palette);
+
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, fastlane_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	K007232(config, m_k007232_1, XTAL(3'579'545));
+	m_k007232_1->port_write().set(FUNC(fastlane_state::volume_callback0));
+	m_k007232_1->add_route(0, "mono", 0.50);
+	m_k007232_1->add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, fastlane_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, XTAL(3'579'545));
+	m_k007232_2->port_write().set(FUNC(fastlane_state::volume_callback1));
+	m_k007232_2->add_route(0, "mono", 0.50);
+	m_k007232_2->add_route(1, "mono", 0.50);
+}
 
 
 /***************************************************************************

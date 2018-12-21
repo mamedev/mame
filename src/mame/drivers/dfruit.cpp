@@ -394,8 +394,8 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_gfxdecode_tag("gfxdecode");
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set_ioport("IN0");
@@ -404,10 +404,10 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2203_device &opn(YM2203(config, "opn", MASTER_CLOCK/4));
+	opn.port_a_read_callback().set_ioport("IN4");
+	opn.port_b_read_callback().set_ioport("IN5");
+	opn.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 /***************************************************************************

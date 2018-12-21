@@ -122,11 +122,12 @@ MACHINE_CONFIG_START(a2bus_videx80_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD(VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx80_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, a2bus_videx80_device, vsync_changed))
+	MC6845(config, m_crtc, MDA_CLOCK/9);
+	m_crtc->set_screen(VIDEOTERM_SCREEN_NAME);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(a2bus_videx80_device::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(a2bus_videx80_device::vsync_changed));
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

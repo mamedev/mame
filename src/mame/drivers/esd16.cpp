@@ -653,12 +653,12 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	MCFG_SCREEN_UPDATE_DRIVER(esd16_state, screen_update_hedpanic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_PRIORITY_CB(esd16_state, hedpanic_pri_callback)
-	MCFG_DECO_SPRITE_FLIPALLX(1)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_pri_callback(FUNC(esd16_state::hedpanic_pri_callback), this);
+	m_sprgen->set_flipallx(1);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esd16)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -711,11 +711,11 @@ MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
-MACHINE_CONFIG_START(esd16_state::hedpanic)
+void esd16_state::hedpanic(machine_config &config)
+{
 	hedpanio(config);
-	MCFG_DEVICE_MODIFY("spritegen")
-	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
-MACHINE_CONFIG_END
+	m_sprgen->set_offsets(-0x18, -0x100);
+}
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 
@@ -859,7 +859,7 @@ ROM_START( multchmpk )
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
 ROM_END
 
-ROM_START( multchmpa )
+ROM_START( multchmpa ) /* Also found on a ESD 10-10-98 PCB which looks identical to the ESD 11-09-98 PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(bfd39198) SHA1(11c0cb7a865daa1be9301ddfa5f5d2014e8f9908) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(cd769077) SHA1(741cca679393dab031691834874c96fee791241e) )
@@ -1573,10 +1573,10 @@ Notes:
               Filename      Type                                      Use
               ---------------------------------------------------------------------------
               68K_PRG.BIN   Hitachi HN27C4096 256K x16 EPROM          68000 Program
-              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Z80 Program
-              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Oki M6295 Samples
-              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Background Graphics
-              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Sprite Graphics
+              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Z80 Program
+              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Oki M6295 Samples
+              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Background Graphics
+              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Sprite Graphics
 
               Note there are no IC locations on the PCB, so the extension of the ROMs is just 'BIN'
 

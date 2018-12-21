@@ -340,9 +340,9 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= m_ppi8255_0->read(space, offset);
+		result &= m_ppi8255_0->read(offset);
 	if (!(offset & 8))
-		result &= m_ppi8255_1->read(space, offset);
+		result &= m_ppi8255_1->read(offset);
 	return result;
 }
 
@@ -351,9 +351,9 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		m_ppi8255_0->write(space, offset, data);
+		m_ppi8255_0->write(offset, data);
 	if (!(offset & 8))
-		m_ppi8255_1->write(space, offset, data);
+		m_ppi8255_1->write(offset, data);
 }
 
 
@@ -668,12 +668,12 @@ static const char *const astinvad_sample_names[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(astinvad_state::kamikaze)
-
+void astinvad_state::kamikaze(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kamikaze_map)
-	MCFG_DEVICE_IO_MAP(kamikaze_portmap)
+	Z80(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astinvad_state::kamikaze_map);
+	m_maincpu->set_addrmap(AS_IO, &astinvad_state::kamikaze_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
@@ -688,23 +688,24 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 	m_ppi8255_1->out_pb_callback().set(FUNC(astinvad_state::kamikaze_sound2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_astinvad)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256);
+	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_astinvad));
 
-	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+	PALETTE(config, m_palette, 8);
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(astinvad_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(astinvad_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(astinvad_state::spcking2)
+void astinvad_state::spcking2(machine_config &config)
+{
 	kamikaze(config);
 
 	/* basic machine hardware */
@@ -713,19 +714,17 @@ MACHINE_CONFIG_START(astinvad_state::spcking2)
 	m_ppi8255_1->out_pc_callback().set(FUNC(astinvad_state::spcking2_sound3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_spcking2)
-MACHINE_CONFIG_END
+	m_screen->set_raw(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240);
+	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_spcking2));
+}
 
-
-MACHINE_CONFIG_START(astinvad_state::spaceint)
-
+void astinvad_state::spaceint(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
-	MCFG_DEVICE_PROGRAM_MAP(spaceint_map)
-	MCFG_DEVICE_IO_MAP(spaceint_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astinvad_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK);        /* a guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &astinvad_state::spaceint_map);
+	m_maincpu->set_addrmap(AS_IO, &astinvad_state::spaceint_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(astinvad_state::irq0_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, spaceint)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, spaceint)
@@ -733,22 +732,23 @@ MACHINE_CONFIG_START(astinvad_state::spaceint)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(astinvad_state, spaceint)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_spaceint)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_spaceint));
 
-	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+	PALETTE(config, m_palette, 8);
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(astinvad_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(astinvad_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -853,6 +853,8 @@ void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
+
+	save_item(NAME(m_player));
 }
 
 

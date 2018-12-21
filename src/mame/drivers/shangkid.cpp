@@ -424,10 +424,10 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shangkid_state, chinhero_ay8910_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shangkid_state, ay8910_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	AY8910(config, m_aysnd, XTAL(18'432'000)/12); /* verified on pcb */
+	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::chinhero_ay8910_porta_w));
+	m_aysnd->port_b_write_callback().set(FUNC(shangkid_state::ay8910_portb_w));
+	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.1);
 MACHINE_CONFIG_END
 
 
@@ -452,9 +452,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)
 
-	MCFG_DEVICE_MODIFY("aysnd")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shangkid_state, shangkid_ay8910_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shangkid_state, ay8910_portb_w))
+	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::shangkid_ay8910_porta_w));
 MACHINE_CONFIG_END
 
 
@@ -511,8 +509,7 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	AY8910(config, m_aysnd, 2000000).add_route(ALL_OUTPUTS, "speaker", 0.1);
 MACHINE_CONFIG_END
 
 /***************************************************************************************/

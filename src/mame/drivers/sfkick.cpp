@@ -167,7 +167,6 @@ class sfkick_state : public driver_device
 public:
 	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_region_bios(*this, "bios"),
@@ -215,7 +214,6 @@ private:
 	int m_bank[8];
 	int m_input_mux;
 
-	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -486,7 +484,7 @@ void sfkick_state::sfkick_io_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xa0, 0xa7).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb4, 0xb5).ram(); /* loopback ? req by sfkicka (MSX Bios leftover)*/
 }
@@ -605,9 +603,11 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 	MCFG_DEVICE_PROGRAM_MAP(sfkick_sound_map)
 	MCFG_DEVICE_IO_MAP(sfkick_sound_io_map)
 
-	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(0x80000);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(sfkick_state::ppi_port_a_w));
@@ -616,7 +616,7 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/6)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, sfkick_state, irqhandler))

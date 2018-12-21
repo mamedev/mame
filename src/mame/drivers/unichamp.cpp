@@ -65,7 +65,7 @@ public:
 	void init_unichamp();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<cp1610_cpu_device> m_maincpu;
 	required_device<gic_device> m_gic;
 	required_device<generic_slot_device> m_cart;
 
@@ -238,47 +238,41 @@ WRITE16_MEMBER( unichamp_state::unichamp_trapl_w )
 	logerror("trapl_w(%x) = %x\n",offset,data);
 }
 
-MACHINE_CONFIG_START(unichamp_state::unichamp)
+void unichamp_state::unichamp(machine_config &config)
+{
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
 	//MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
 	//But since it is only running 7752/29868 th's of the time...
-	//TODO find a more accurate method? (the emulation will me the same though)
-	MCFG_DEVICE_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
+	//TODO find a more accurate method? (the emulation will be the same though)
+	CP1610(config, m_maincpu, (7752.0/29868.0)*XTAL(3'579'545)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unichamp_state::unichamp_mem);
+	m_maincpu->bext().set(FUNC(unichamp_state::bext_r));
 
-	MCFG_DEVICE_PROGRAM_MAP(unichamp_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_CP1610_BEXT_CALLBACK(READ8(*this, unichamp_state, bext_r))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(3'579'545),
-							gic_device::LINE_CLOCKS,
-							gic_device::START_ACTIVE_SCAN,
-							gic_device::END_ACTIVE_SCAN,
-							gic_device::LINES,
-							gic_device::START_Y,
-							gic_device::START_Y + gic_device::SCREEN_HEIGHT )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(3'579'545),
+		gic_device::LINE_CLOCKS, gic_device::START_ACTIVE_SCAN, gic_device::END_ACTIVE_SCAN,
+		gic_device::LINES,       gic_device::START_Y,           gic_device::START_Y + gic_device::SCREEN_HEIGHT);
+	screen.set_screen_update(FUNC(unichamp_state::screen_update_unichamp));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_UPDATE_DRIVER(unichamp_state, screen_update_unichamp)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(unichamp_state, unichamp)
+	PALETTE(config, "palette", 4).set_init(FUNC(unichamp_state::palette_init_unichamp));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(*this, unichamp_state, unichamp_gicram_r) )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	GIC(config, m_gic, XTAL(3'579'545));
+	m_gic->set_screen("screen");
+	m_gic->ram_callback().set(FUNC(unichamp_state::unichamp_gicram_r));
+	m_gic->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "unichamp_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "unichamp")
-
-MACHINE_CONFIG_END
-
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "unichamp_cart", "bin,rom");
+	SOFTWARE_LIST(config, "cart_list").set_original("unichamp");
+}
 
 ROM_START(unichamp)
 	ROM_REGION(0x1000,"maincpu", ROMREGION_ERASEFF)

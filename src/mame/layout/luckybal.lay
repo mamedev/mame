@@ -132,7 +132,7 @@
 		<screen index="0">
 			<bounds left="300" top="96" right="1432" bottom="1072" />
 		</screen>
-		
+
 		<bezel element="circle_dark">
 			<bounds x="3.35077282082" y="465.840100248669" width="270" height="270" />
 		</bezel>

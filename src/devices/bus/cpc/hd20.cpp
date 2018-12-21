@@ -55,10 +55,8 @@ cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag,
 
 void cpc_hd20_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
-
+	address_space &space = m_slot->cpu().space(AS_IO);
 	space.install_write_handler(0xfbe0,0xfbe4,write8_delegate(FUNC(cpc_hd20_device::hdc_w),this));
 	space.install_read_handler(0xfbe0,0xfbe4,read8_delegate(FUNC(cpc_hd20_device::hdc_r),this));
 }

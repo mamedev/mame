@@ -82,7 +82,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( alinvade_state::sound_w )
 {
-	m_discrete->write(space, NODE_01, (data^0x3f)<<2);
+	m_discrete->write(NODE_01, (data^0x3f)<<2);
 }
 
 WRITE8_MEMBER( alinvade_state::sounden_w )

@@ -162,6 +162,32 @@ sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int
 
 
 //-------------------------------------------------
+//  input_gain - return the gain on the given
+//  input index of the device
+//-------------------------------------------------
+
+float device_sound_interface::input_gain(int inputnum) const
+{
+	int stream_inputnum;
+	sound_stream *stream = input_to_stream_input(inputnum, stream_inputnum);
+	return (stream != nullptr) ? stream->input_gain(stream_inputnum) : 0.0f;
+}
+
+
+//-------------------------------------------------
+//  output_gain - return the gain on the given
+//  output index of the device
+//-------------------------------------------------
+
+float device_sound_interface::output_gain(int outputnum) const
+{
+	int stream_outputnum;
+	sound_stream *stream = output_to_stream_output(outputnum, stream_outputnum);
+	return (stream != nullptr) ? stream->output_gain(stream_outputnum) : 0.0f;
+}
+
+
+//-------------------------------------------------
 //  set_input_gain - set the gain on the given
 //  input index of the device
 //-------------------------------------------------
@@ -310,13 +336,13 @@ void device_sound_interface::interface_post_start()
 						int streamoutputnum;
 						sound_stream *const outputstream = sound.output_to_stream_output(outputnum, streamoutputnum);
 						if (!outputstream)
-							fatalerror("Sound device '%s' specifies route for non-existent output #%d\n", sound.device().tag(), outputnum);
+							fatalerror("Sound device '%s' specifies route for nonexistent output #%d\n", sound.device().tag(), outputnum);
 
 						// find the input stream to connect to
 						int streaminputnum;
 						sound_stream *const inputstream = input_to_stream_input(inputnum++, streaminputnum);
 						if (!inputstream)
-							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d\n", sound.device().tag(), outputnum, m_device.tag(), inputnum - 1);
+							fatalerror("Sound device '%s' targeted output #%d to nonexistent device '%s' input %d\n", sound.device().tag(), outputnum, m_device.tag(), inputnum - 1);
 
 						// set the input
 						inputstream->set_input(streaminputnum, outputstream, streamoutputnum, route.m_gain);

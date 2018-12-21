@@ -107,11 +107,11 @@ void apple3_state::apple3_write_charmem()
 		{
 			addr = 0x7f & space.read_byte(screen_hole_map[i] + 0x400 + j + 0);
 			val = space.read_byte(screen_hole_map[i] + j + 0);
-			m_char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x3ff] = val;
+			m_char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x7ff] = val;
 
 			addr = 0x7f & space.read_byte(screen_hole_map[i] + 0x400 + j + 4);
 			val = space.read_byte(screen_hole_map[i] + j + 4);
-			m_char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x3ff] = val;
+			m_char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x7ff] = val;
 		}
 	}
 }

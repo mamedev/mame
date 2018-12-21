@@ -20,23 +20,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MEPHISTO_SENSORS_BOARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_SENSORS_BOARD, 0) \
-
-#define MCFG_MEPHISTO_BUTTONS_BOARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_BUTTONS_BOARD, 0) \
-
-#define MCFG_MEPHISTO_BOARD_DISABLE_LEDS(_val) \
-	downcast<mephisto_board_device &>(*device).set_disable_leds(_val);
-
-#define MCFG_MEPHISTO_DISPLAY_MODUL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_DISPLAY_MODUL, 0)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

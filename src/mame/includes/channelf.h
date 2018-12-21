@@ -5,9 +5,10 @@
  * includes/channelf.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_CHANNELF_H
 #define MAME_INCLUDES_CHANNELF_H
+
+#pragma once
 
 #include "cpu/f8/f8.h"
 #include "audio/channelf.h"
@@ -22,10 +23,10 @@ class channelf_state : public driver_device
 {
 public:
 	channelf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_custom(*this,"custom"),
-			m_cart(*this, "cartslot")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_custom(*this,"custom")
+		, m_cart(*this, "cartslot")
 	{ }
 
 	DECLARE_READ8_MEMBER(port_0_r);

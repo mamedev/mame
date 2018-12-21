@@ -17,8 +17,11 @@
         * WWF Wrestlemania
         * Rampage World Tour
 
-    Known bugs:
+    TODO:
         * WWF has an unimplemented and not Y2K compatible real-time clock
+
+    BTANB:
+        * umk3 Scorpion's "Get Over Here" sample gets cut off, ROM dumps confirmed good
 
     NOTE: There is known to exist (currently not dumped) a Wrestlemania PCB with the following labels:
           Wrestlemania 1.0 U63 #8549    &    Wrestlemania 1.0 U54 #40C7
@@ -112,7 +115,7 @@ Notes:
 
 void midwunit_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).rw(FUNC(midwunit_state::midtunit_vram_r), FUNC(midwunit_state::midtunit_vram_w));
+	map(0x00000000, 0x003fffff).rw(m_video, FUNC(midwunit_video_device::midtunit_vram_r), FUNC(midwunit_video_device::midtunit_vram_w));
 	map(0x01000000, 0x013fffff).ram().share("mainram");
 	map(0x01400000, 0x0145ffff).rw(FUNC(midwunit_state::midwunit_cmos_r), FUNC(midwunit_state::midwunit_cmos_w)).share("nvram");
 	map(0x01480000, 0x014fffff).w(FUNC(midwunit_state::midwunit_cmos_enable_w));
@@ -120,9 +123,9 @@ void midwunit_state::main_map(address_map &map)
 	map(0x01680000, 0x0168001f).rw(FUNC(midwunit_state::midwunit_sound_r), FUNC(midwunit_state::midwunit_sound_w));
 	map(0x01800000, 0x0187ffff).rw(FUNC(midwunit_state::midwunit_io_r), FUNC(midwunit_state::midwunit_io_w));
 	map(0x01880000, 0x018fffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x01a00000, 0x01a000ff).mirror(0x00080000).rw(FUNC(midwunit_state::midtunit_dma_r), FUNC(midwunit_state::midtunit_dma_w));
-	map(0x01b00000, 0x01b0001f).rw(FUNC(midwunit_state::midwunit_control_r), FUNC(midwunit_state::midwunit_control_w));
-	map(0x02000000, 0x06ffffff).r(FUNC(midwunit_state::midwunit_gfxrom_r));
+	map(0x01a00000, 0x01a000ff).mirror(0x00080000).rw(m_video, FUNC(midwunit_video_device::midtunit_dma_r), FUNC(midwunit_video_device::midtunit_dma_w));
+	map(0x01b00000, 0x01b0001f).rw(m_video, FUNC(midwunit_video_device::midwunit_control_r), FUNC(midwunit_video_device::midwunit_control_w));
+	map(0x02000000, 0x06ffffff).r(m_video, FUNC(midwunit_video_device::midwunit_gfxrom_r));
 	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -621,53 +624,52 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midwunit_state::wunit)
+void midwunit_state::wunit(machine_config &config)
+{
+	MIDWUNIT_VIDEO(config, m_video, m_maincpu, m_palette, m_gfxrom);
 
-	MCFG_DEVICE_ADD("maincpu", TMS34010, 50000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(midtunit_state, scanline_update)       /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, 50000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midwunit_state::main_map);
+	m_maincpu->set_halt_on_reset(false);	 /* halt on reset */
+	m_maincpu->set_pixel_clock(PIXEL_CLOCK); /* pixel clock */
+	m_maincpu->set_pixels_per_clock(1);		 /* pixels per clock */
+	m_maincpu->set_scanline_ind16_callback("video", FUNC(midtunit_video_device::scanline_update));	/* scanline updater (indexed16) */
+	m_maincpu->set_shiftreg_in_callback("video", FUNC(midtunit_video_device::to_shiftreg));			/* write to shiftreg function */
+	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));		/* read from shiftreg function */
+	m_maincpu->set_screen("screen");
 
-	MCFG_MACHINE_RESET_OVERRIDE(midwunit_state,midwunit)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// from TMS340 registers
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(midwunit_state,midwunit)
+	screen.set_raw(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
-MACHINE_CONFIG_END
+	DCS_AUDIO_8K(config, m_dcs, 0);
+}
 
-MACHINE_CONFIG_START(midwunit_state::wunit_picsim)
+void midwunit_state::wunit_picsim(machine_config &config)
+{
 	wunit(config);
-	MCFG_DEVICE_ADD("serial_security_sim", MIDWAY_SERIAL_PIC, 0)
-	MCFG_MIDWAY_SERIAL_PIC_UPPER(528); // this is actually a generic code all games check for in addition to their own game specific code!
-MACHINE_CONFIG_END
+	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
+	m_midway_serial_pic->set_upper(528); // this is actually a generic code all games check for in addition to their own game specific code!
+}
 
-
-MACHINE_CONFIG_START(midwunit_state::wunit_picemu)
+void midwunit_state::wunit_picemu(machine_config &config)
+{
 	wunit(config);
-	MCFG_DEVICE_ADD("serial_security", MIDWAY_SERIAL_PIC_EMU, 0)
+	MIDWAY_SERIAL_PIC_EMU(config, m_midway_serial_pic_emu, 0);
 
 	// todo, REMOVE once the emulated PIC above works!
 	// this just allows it to fall through to the simulation for now
-	MCFG_DEVICE_ADD("serial_security_sim", MIDWAY_SERIAL_PIC, 0)
-	MCFG_MIDWAY_SERIAL_PIC_UPPER(528);
-
-MACHINE_CONFIG_END
+	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
+	m_midway_serial_pic->set_upper(528);
+}
 
 
 
@@ -1435,9 +1437,9 @@ GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk
 GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, init_umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, init_umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
 // Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
 GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )

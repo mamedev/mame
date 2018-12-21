@@ -148,9 +148,9 @@ WRITE8_MEMBER(dribling_state::shr_w)
 READ8_MEMBER(dribling_state::ioread)
 {
 	if (offset & 0x08)
-		return m_ppi8255_0->read(space, offset & 3);
+		return m_ppi8255_0->read(offset & 3);
 	else if (offset & 0x10)
-		return m_ppi8255_1->read(space, offset & 3);
+		return m_ppi8255_1->read(offset & 3);
 	return 0xff;
 }
 
@@ -158,9 +158,9 @@ READ8_MEMBER(dribling_state::ioread)
 WRITE8_MEMBER(dribling_state::iowrite)
 {
 	if (offset & 0x08)
-		m_ppi8255_0->write(space, offset & 3, data);
+		m_ppi8255_0->write(offset & 3, data);
 	else if (offset & 0x10)
-		m_ppi8255_1->write(space, offset & 3, data);
+		m_ppi8255_1->write(offset & 3, data);
 	else if (offset & 0x40)
 	{
 		m_dr = m_ds;
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(dribling_state::dribling)
 	m_ppi8255_1->in_pc_callback().set_ioport("IN0");
 	m_ppi8255_1->out_pc_callback().set(FUNC(dribling_state::shr_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

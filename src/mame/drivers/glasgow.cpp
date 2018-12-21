@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(glasgow_state::glasgow)
 	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(glasgow_mem)
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
+	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
 	/* video hardware */
 	config.set_default_layout(layout_glasgow);

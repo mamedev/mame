@@ -1315,14 +1315,14 @@ void mappy_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(mappy_state::superpac_common)
-
+void mappy_state::superpac_common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(superpac_cpu1_map)
+	MC6809E(config, m_maincpu, PIXEL_CLOCK/4);  /* 1.536 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::superpac_cpu1_map);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(superpac_cpu2_map)
+	MC6809E(config, m_subcpu, PIXEL_CLOCK/4);   /* 1.536 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::superpac_cpu2_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2M on CPU board
 	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
@@ -1332,36 +1332,35 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
 	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+
+	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
 	dipmux.a_in_callback().set_ioport("DSW2");
 	dipmux.b_in_callback().set_ioport("DSW2").rshift(4);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superpac)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superpac);
+	PALETTE(config, m_palette, 64*4+64*4);
+	m_palette->set_indirect_entries(32);
+	m_palette->set_init(FUNC(mappy_state::palette_init_superpac));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_superpac)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(mappy_state::screen_update_superpac));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(mappy_state::vblank_irq));   // cause IRQs on both CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
+	NAMCO_15XX(config, m_namco_15xx, 18432000/768);
+	m_namco_15xx->set_voices(8);
+	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 void mappy_state::superpac(machine_config &config)
 {
@@ -1400,9 +1399,8 @@ void mappy_state::pacnpal(machine_config &config)
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
 }
 
-
-MACHINE_CONFIG_START(mappy_state::grobda)
-
+void mappy_state::grobda(machine_config &config)
+{
 	superpac_common(config);
 
 	NAMCO_58XX(config, m_namcoio[0], 0);
@@ -1419,23 +1417,24 @@ MACHINE_CONFIG_START(mappy_state::grobda)
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // alternate route to 15XX-related DAC?
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_BINARY_WEIGHTED(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275); // alternate route to 15XX-related DAC?
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-
-MACHINE_CONFIG_START(mappy_state::phozon)
-
+void mappy_state::phozon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)  /* MAIN CPU */
-	MCFG_DEVICE_PROGRAM_MAP(phozon_cpu1_map)
+	MC6809E(config, m_maincpu, PIXEL_CLOCK/4);  /* MAIN CPU */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::phozon_cpu1_map);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)  /* SOUND CPU */
-	MCFG_DEVICE_PROGRAM_MAP(phozon_cpu2_map)
+	MC6809E(config, m_subcpu, PIXEL_CLOCK/4);  /* SOUND CPU */
+	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::phozon_cpu2_map);
 
-	MCFG_DEVICE_ADD("sub2", MC6809E, PIXEL_CLOCK/4)  /* SUB CPU */
-	MCFG_DEVICE_PROGRAM_MAP(phozon_cpu3_map)
+	MC6809E(config, m_subcpu2, PIXEL_CLOCK/4); /* SUB CPU */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &mappy_state::phozon_cpu3_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5C
 	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
@@ -1447,9 +1446,9 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 	mainlatch.q_out_cb<6>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+
+	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
 	NAMCO_58XX(config, m_namcoio[0], 0);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
@@ -1469,36 +1468,35 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	dipmux.b_in_callback().set_ioport("DSW2").rshift(4);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phozon)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phozon);
+	PALETTE(config, m_palette, 64*4+64*4);
+	m_palette->set_indirect_entries(32);
+	m_palette->set_init(FUNC(mappy_state::palette_init_phozon));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_phozon)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on all three CPUs; also update the custom I/O chips
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(mappy_state::screen_update_phozon));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(mappy_state::vblank_irq));   // cause IRQs on all three CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_15XX(config, m_namco_15xx, 18432000/768);
+	m_namco_15xx->set_voices(8);
+	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(mappy_state::mappy_common)
-
+void mappy_state::mappy_common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mappy_cpu1_map)
+	MC6809E(config, m_maincpu, PIXEL_CLOCK/4);  /* 1.536 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::mappy_cpu1_map);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mappy_cpu2_map)
+	MC6809E(config, m_subcpu, PIXEL_CLOCK/4);   /* 1.536 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::mappy_cpu2_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2M on CPU board
 	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
@@ -1509,35 +1507,35 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
 	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+
+	config.m_minimum_quantum = attotime::from_hz(6000);    // 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs
 
 	ls157_device &dipmux(LS157(config, "dipmux"));
 	dipmux.a_in_callback().set_ioport("DSW2");
 	dipmux.b_in_callback().set_ioport("DSW2").rshift(4);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mappy)
-	MCFG_PALETTE_ADD("palette", 64*4+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mappy);
+	PALETTE(config, m_palette, 64*4+16*16);
+	m_palette->set_indirect_entries(32);
+	m_palette->set_init(FUNC(mappy_state::palette_init_mappy));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_mappy)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(mappy_state::screen_update_mappy));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(mappy_state::vblank_irq));   // cause IRQs on both CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_15XX(config, m_namco_15xx, 18432000/768);
+	m_namco_15xx->set_voices(8);
+	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 void mappy_state::mappy(machine_config &config)
 {
@@ -1557,12 +1555,11 @@ void mappy_state::mappy(machine_config &config)
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
 }
 
-MACHINE_CONFIG_START(mappy_state::digdug2)
-
+void mappy_state::digdug2(machine_config &config)
+{
 	mappy_common(config);
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
+	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 0);
 
 	NAMCO_58XX(config, m_namcoio[0], 0);
 	m_namcoio[0]->in_callback<0>().set_ioport("COINS");
@@ -1576,16 +1573,16 @@ MACHINE_CONFIG_START(mappy_state::digdug2)
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
 	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mappy_state::todruaga)
+void mappy_state::todruaga(machine_config &config)
+{
 	digdug2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_todruaga)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64*4+64*16)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_todruaga);
+	m_palette->set_entries(64*4+64*16);
+}
 
 void mappy_state::motos(machine_config &config)
 {
