@@ -5,7 +5,7 @@
 
 /******************************************************************************/
 
-void deco32_state::pri_w(u32 data, u32 mem_mask)
+void deco32_state::pri_w(u32 data)
 {
 	m_pri = data;
 }
@@ -30,7 +30,7 @@ only updated on a DMA call */
 WRITE32_MEMBER( deco32_state::buffered_palette_w )
 {
 	COMBINE_DATA(&m_paletteram[offset]);
-	m_dirty_palette[offset]=1;
+	m_dirty_palette[offset] = 1;
 }
 
 WRITE32_MEMBER( deco32_state::palette_dma_w )
@@ -41,9 +41,9 @@ WRITE32_MEMBER( deco32_state::palette_dma_w )
 		{
 			m_dirty_palette[i] = 0;
 
-			uint8_t b = (m_paletteram[i] >> 16) & 0xff;
-			uint8_t g = (m_paletteram[i] >>  8) & 0xff;
-			uint8_t r = (m_paletteram[i] >>  0) & 0xff;
+			u8 b = (m_paletteram[i] >> 16) & 0xff;
+			u8 g = (m_paletteram[i] >>  8) & 0xff;
+			u8 r = (m_paletteram[i] >>  0) & 0xff;
 
 			m_palette->set_pen_color(i,rgb_t(r,g,b));
 		}
@@ -59,24 +59,24 @@ void deco32_state::video_start()
 
 void deco32_state::allocate_spriteram(int chip)
 {
-	m_spriteram16[chip] = std::make_unique<uint16_t[]>(0x2000/4);
-	m_spriteram16_buffered[chip] = std::make_unique<uint16_t[]>(0x2000/4);
+	m_spriteram16[chip] = std::make_unique<u16[]>(0x2000/4);
+	m_spriteram16_buffered[chip] = std::make_unique<u16[]>(0x2000/4);
 	save_pointer(NAME(m_spriteram16[chip]), 0x2000/4, chip);
 	save_pointer(NAME(m_spriteram16_buffered[chip]), 0x2000/4, chip);
 }
 
 void deco32_state::allocate_buffered_palette()
 {
-	m_dirty_palette = make_unique_clear<uint8_t[]>(2048);
+	m_dirty_palette = make_unique_clear<u8[]>(2048);
 	save_pointer(NAME(m_dirty_palette), 2048);
 }
 
 void deco32_state::allocate_rowscroll(int size1, int size2, int size3, int size4)
 {
-	m_pf_rowscroll[0] = make_unique_clear<uint16_t[]>(size1);
-	m_pf_rowscroll[1] = make_unique_clear<uint16_t[]>(size2);
-	m_pf_rowscroll[2] = make_unique_clear<uint16_t[]>(size3);
-	m_pf_rowscroll[3] = make_unique_clear<uint16_t[]>(size4);
+	m_pf_rowscroll[0] = make_unique_clear<u16[]>(size1);
+	m_pf_rowscroll[1] = make_unique_clear<u16[]>(size2);
+	m_pf_rowscroll[2] = make_unique_clear<u16[]>(size3);
+	m_pf_rowscroll[3] = make_unique_clear<u16[]>(size4);
 	save_pointer(NAME(m_pf_rowscroll[0]), size1);
 	save_pointer(NAME(m_pf_rowscroll[1]), size2);
 	save_pointer(NAME(m_pf_rowscroll[2]), size3);
@@ -128,10 +128,10 @@ void dragngun_state::video_start()
 
 /******************************************************************************/
 
-uint32_t captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen[0]->pf_control_r(space, 0, 0xffff);
+	u16 flip = m_deco_tilegen[0]->pf_control_r(space, 0, 0xffff);
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen[0]->set_flip_screen(BIT(flip, 7));
 
@@ -143,7 +143,7 @@ uint32_t captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// pf4 not used (because pf3 is in 8bpp mode)
 
-	if ((m_pri&1)==0)
+	if ((m_pri & 1) == 0)
 	{
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
@@ -162,7 +162,7 @@ uint32_t captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-uint32_t dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x400), cliprect); // Palette index not confirmed
@@ -194,7 +194,7 @@ uint32_t dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 }
 
 
-uint32_t fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x300), cliprect); // Palette index not confirmed
@@ -249,20 +249,20 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 
 	/* Mix sprites into main bitmap, based on priority & alpha */
 	for (y=8; y<248; y++) {
-		uint8_t* tilemapPri=&screen.priority().pix8(y);
-		uint16_t* sprite0=&sprite0_mix_bitmap.pix16(y);
-		uint16_t* sprite1=&sprite1_mix_bitmap.pix16(y);
-		uint32_t* destLine=&bitmap.pix32(y);
-		uint16_t* alphaTilemap=&m_tilemap_alpha_bitmap->pix16(y);
+		u8* tilemapPri=&screen.priority().pix8(y);
+		u16* sprite0=&sprite0_mix_bitmap.pix16(y);
+		u16* sprite1=&sprite1_mix_bitmap.pix16(y);
+		u32* destLine=&bitmap.pix32(y);
+		u16* alphaTilemap=&m_tilemap_alpha_bitmap->pix16(y);
 
 		for (x=0; x<320; x++) {
-			uint16_t priColAlphaPal0=sprite0[x];
-			uint16_t priColAlphaPal1=sprite1[x];
-			uint16_t pri0=(priColAlphaPal0&0x6000)>>13;
-			uint16_t pri1=(priColAlphaPal1&0x6000)>>13;
-			uint16_t col0=((priColAlphaPal0&0x1f00)>>8) % gfx0->colors();
-			uint16_t col1=((priColAlphaPal1&0x0f00)>>8) % gfx1->colors();
-			uint16_t alpha1=priColAlphaPal1&0x8000;
+			u16 priColAlphaPal0=sprite0[x];
+			u16 priColAlphaPal1=sprite1[x];
+			u16 pri0=(priColAlphaPal0&0x6000)>>13;
+			u16 pri1=(priColAlphaPal1&0x6000)>>13;
+			u16 col0=((priColAlphaPal0&0x1f00)>>8) % gfx0->colors();
+			u16 col1=((priColAlphaPal1&0x0f00)>>8) % gfx1->colors();
+			u16 alpha1=priColAlphaPal1&0x8000;
 
 			// Apply sprite bitmap 0 according to priority rules
 			if ((priColAlphaPal0&0xff)!=0)
@@ -347,7 +347,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 			/* Optionally mix in alpha tilemap */
 			if (mixAlphaTilemap)
 			{
-				uint16_t p=alphaTilemap[x];
+				u16 p=alphaTilemap[x];
 				if (p&0xf)
 				{
 					/* Alpha tilemap under top two sprite 0 priorities */
@@ -367,7 +367,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 	}
 }
 
-uint32_t nslasher_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 nslasher_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int alphaTilemap=0;
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());

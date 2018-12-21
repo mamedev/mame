@@ -63,7 +63,7 @@ protected:
 	template<int Chip> DECLARE_READ32_MEMBER(spriteram_r);
 	template<int Chip> DECLARE_WRITE32_MEMBER(spriteram_w);
 	template<int Chip> DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
-	void pri_w(u32 data, u32 mem_mask);
+	void pri_w(u32 data);
 
 	// all but captaven
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);
@@ -90,16 +90,16 @@ protected:
 
 	virtual void video_start() override;
 
-	std::unique_ptr<uint8_t[]> m_dirty_palette; // all but captaven
-	int m_pri; // all but dragngun
-	std::unique_ptr<uint16_t[]> m_spriteram16[2]; // all but dragngun
-	std::unique_ptr<uint16_t[]> m_spriteram16_buffered[2]; // all but dragngun
-	std::unique_ptr<uint16_t[]> m_pf_rowscroll[4]; // common
+	std::unique_ptr<u8[]> m_dirty_palette; // all but captaven
+	u32 m_pri; // all but dragngun
+	std::unique_ptr<u16[]> m_spriteram16[2]; // all but dragngun
+	std::unique_ptr<u16[]> m_spriteram16_buffered[2]; // all but dragngun
+	std::unique_ptr<u16[]> m_pf_rowscroll[4]; // common
 
 private:
 	// we use the pointers below to store a 32-bit copy..
-	required_shared_ptr_array<uint32_t, 4> m_pf_rowscroll32;
-	optional_shared_ptr<uint32_t> m_paletteram;
+	required_shared_ptr_array<u32, 4> m_pf_rowscroll32;
+	optional_shared_ptr<u32> m_paletteram;
 };
 
 class captaven_state : public deco32_state
@@ -107,6 +107,7 @@ class captaven_state : public deco32_state
 public:
 	captaven_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag)
+		, m_dsw_io(*this, "DSW%u", 1U)
 	{ }
 
 	void captaven(machine_config &config);
@@ -114,18 +115,15 @@ public:
 	void init_captaven();
 
 private:
+	required_ioport_array<3> m_dsw_io;
 	DECLARE_READ32_MEMBER(_71_r);
-	DECLARE_READ8_MEMBER(captaven_dsw1_r);
-	DECLARE_READ8_MEMBER(captaven_dsw2_r);
-	DECLARE_READ8_MEMBER(captaven_dsw3_r);
-	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	void captaven_map(address_map &map);
 };
@@ -135,6 +133,7 @@ class fghthist_state : public deco32_state
 public:
 	fghthist_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag)
+		, m_in_io(*this, "IN%u", 0U)
 	{ }
 
 	void fghthist(machine_config &config);
@@ -144,14 +143,12 @@ public:
 	void init_fghthist();
 
 private:
-	DECLARE_WRITE32_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(fghthist_in0_r);
-	DECLARE_READ16_MEMBER(fghthist_in1_r);
+	required_ioport_array<3> m_in_io;
 	DECLARE_READ32_MEMBER(unk_status_r);
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
@@ -185,7 +182,7 @@ private:
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(port_b_tattass);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -199,7 +196,7 @@ private:
 
 	int m_tattass_eprom_bit;
 	int m_last_clock;
-	uint32_t m_buffer;
+	u32 m_buffer;
 	int m_buf_ptr;
 	int m_pending_command;
 	int m_read_bit_count;
@@ -234,12 +231,12 @@ private:
 	required_device<deco_zoomspr_device> m_sprgenzoom;
 	required_device<buffered_spriteram32_device> m_spriteram;
 
-	required_shared_ptr_array<uint32_t, 2> m_sprite_layout_ram;
-	required_shared_ptr_array<uint32_t, 2> m_sprite_lookup_ram;
+	required_shared_ptr_array<u32, 2> m_sprite_layout_ram;
+	required_shared_ptr_array<u32, 2> m_sprite_lookup_ram;
 	required_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
-	uint32_t m_sprite_ctrl;
+	u32 m_sprite_ctrl;
 	int m_lightgun_port;
 	int m_oki2_bank; // lockload
 	bitmap_rgb32 m_temp_render_bitmap;
@@ -249,7 +246,6 @@ private:
 	DECLARE_WRITE32_MEMBER(sprite_control_w);
 	DECLARE_WRITE32_MEMBER(spriteram_dma_w);
 	DECLARE_WRITE32_MEMBER(gun_irq_ack_w);
-	DECLARE_READ32_MEMBER(unk_video_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
 
@@ -264,7 +260,7 @@ private:
 	virtual void video_start() override;
 	void dragngun_init_common();
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);

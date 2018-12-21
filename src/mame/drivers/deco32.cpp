@@ -394,10 +394,12 @@ void captaven_state::captaven_map(address_map &map)
 	map(0x130000, 0x131fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x148000, 0x14800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
 	map(0x160000, 0x167fff).ram(); /* Extra work RAM */
-	map(0x168000, 0x168000).r(FUNC(captaven_state::captaven_dsw1_r));
-	map(0x168001, 0x168001).r(FUNC(captaven_state::captaven_dsw2_r));
-	map(0x168002, 0x168002).r(FUNC(captaven_state::captaven_dsw3_r));
-	map(0x168003, 0x168003).r(FUNC(captaven_state::captaven_soundcpu_status_r));
+	map(0x168000, 0x168000).lr8("dsw1_r", [this]() -> u8 { return m_dsw_io[0]->read(); });
+	map(0x168001, 0x168001).lr8("dsw2_r", [this]() -> u8 { return m_dsw_io[1]->read(); });
+	map(0x168002, 0x168002).lr8("dsw3_r", [this]() -> u8 { return m_dsw_io[2]->read(); });
+	// 7-------  sound cpu status (0 = busy)
+	// -6543210  unknown
+	map(0x168003, 0x168003).lr8("sound_busy_r", []() -> u8 { return 0xff; });
 	map(0x178000, 0x178003).w(FUNC(captaven_state::pri_w));
 	map(0x180000, 0x18001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
 	map(0x190000, 0x191fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
@@ -410,39 +412,6 @@ void captaven_state::captaven_map(address_map &map)
 	map(0x1d4000, 0x1d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
 	map(0x1e0000, 0x1e3fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
 	map(0x1e4000, 0x1e5fff).ram().w(FUNC(captaven_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
-}
-
-void fghthist_state::fghthist_map(address_map &map)
-{
-	map.unmap_value_high();
-//  map(0x000000, 0x001fff).rom().w(FUNC(fghthist_state::pf1_data_w)); // wtf??
-	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x11ffff).ram();
-	map(0x120020, 0x120021).r(FUNC(fghthist_state::fghthist_in0_r));
-	map(0x120024, 0x120025).r(FUNC(fghthist_state::fghthist_in1_r));
-	map(0x120028, 0x120028).r(FUNC(fghthist_state::eeprom_r));
-	map(0x12002c, 0x12002c).w(FUNC(fghthist_state::eeprom_w));
-	map(0x12002d, 0x12002d).w(FUNC(fghthist_state::volume_w));
-	map(0x1201fc, 0x1201fc).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x140000, 0x140003).w(FUNC(fghthist_state::vblank_ack_w));
-	map(0x168000, 0x169fff).ram().w(FUNC(fghthist_state::buffered_palette_w)).share("paletteram");
-	map(0x16c008, 0x16c00b).w(FUNC(fghthist_state::palette_dma_w));
-	map(0x16c010, 0x16c013).r(FUNC(fghthist_state::unk_status_r));
-	map(0x178000, 0x179fff).rw(FUNC(fghthist_state::spriteram_r<0>), FUNC(fghthist_state::spriteram_w<0>));
-	map(0x17c010, 0x17c013).w(FUNC(fghthist_state::buffer_spriteram_w<0>));
-	map(0x17c020, 0x17c023).r(FUNC(fghthist_state::unk_status_r));
-	map(0x182000, 0x183fff).rw("tilegen1", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x184000, 0x185fff).rw("tilegen1", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x192000, 0x193fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<0>)).share("pf1_rowscroll32");
-	map(0x194000, 0x195fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<1>)).share("pf2_rowscroll32");
-	map(0x1a0000, 0x1a001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x1c2000, 0x1c3fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x1c4000, 0x1c5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x1d2000, 0x1d3fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
-	map(0x1d4000, 0x1d5fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32");
-	map(0x1e0000, 0x1e001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x200000, 0x207fff).rw(FUNC(fghthist_state::ioprot_r), FUNC(fghthist_state::ioprot_w)).umask32(0xffff0000).share("prot32ram"); // only maps on 16-bits
-	map(0x208800, 0x208803).nopw(); /* ? */
 }
 
 void fghthist_state::fghthsta_memmap(address_map &map)
@@ -469,6 +438,21 @@ void fghthist_state::fghthsta_memmap(address_map &map)
 	map(0x1d4000, 0x1d5fff).ram().w(FUNC(fghthist_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32");
 	map(0x1e0000, 0x1e001f).rw("tilegen2", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
 	map(0x200000, 0x207fff).rw(FUNC(fghthist_state::ioprot_r), FUNC(fghthist_state::ioprot_w)).umask32(0xffff0000).share("prot32ram"); // only maps on 16-bits
+}
+
+void fghthist_state::fghthist_map(address_map &map)
+{
+	fghthsta_memmap(map);
+	map.unmap_value_high();
+//  map(0x000000, 0x001fff).rom().w(FUNC(fghthist_state::pf1_data_w)); // wtf??
+	map(0x120020, 0x120021).lr16("in0_r", [this]() -> u16 { return m_in_io[0]->read(); });
+	map(0x120024, 0x120025).lr16("in1_r", [this]() -> u16 { return m_in_io[1]->read(); });
+	map(0x120028, 0x120028).r(FUNC(fghthist_state::eeprom_r));
+	map(0x12002c, 0x12002c).w(FUNC(fghthist_state::eeprom_w));
+	map(0x12002d, 0x12002d).w(FUNC(fghthist_state::volume_w));
+	map(0x1201fc, 0x1201fc).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x150000, 0x150003).noprw();
+	map(0x208800, 0x208803).nopw(); /* ? */
 }
 
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
@@ -517,7 +501,7 @@ void dragngun_state::dragngun_map(address_map &map)
 	map(0x0440000, 0x0440003).portr("IN2");
 	map(0x0500000, 0x0500003).w(FUNC(dragngun_state::sprite_control_w));
 	// this is clearly the dvi video related area
-	map(0x1000000, 0x1000007).r(FUNC(dragngun_state::unk_video_r));
+	map(0x1000000, 0x1000007).lr32("unk_video_r", [this]() -> u32 { return machine().rand(); });
 	map(0x1000100, 0x1007fff).ram();
 	map(0x10b0000, 0x10b01ff).ram();
 	map(0x1400000, 0x1ffffff).rom().region("dvi", 0x00000); // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are                                                                 // as a result it ends up writing what looks like pointers to the frame data in the ram area above
@@ -698,7 +682,7 @@ READ16_MEMBER( deco32_state::ioprot_r )
 {
 	offs_t real_address = 0 + (offset *2);
 	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
+	u8 cs = 0;
 
 	return m_ioprot->read_data( deco146_addr, mem_mask, cs );
 }
@@ -707,7 +691,7 @@ WRITE16_MEMBER( deco32_state::ioprot_w )
 {
 	offs_t real_address = 0 + (offset *2);
 	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
+	u8 cs = 0;
 
 	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -720,20 +704,12 @@ WRITE16_MEMBER( deco32_state::ioprot_w )
 WRITE8_MEMBER( deco32_state::volume_w )
 {
 	// TODO: assume linear with a 0.0-1.0 dB scale for now
-	uint8_t raw_vol = 0xff - data;
+	u8 raw_vol = 0xff - data;
 	float vol_output = ((float)raw_vol) / 255.0f;
 
 	m_ym2151->set_output_gain(ALL_OUTPUTS, vol_output);
 	m_oki[0]->set_output_gain(ALL_OUTPUTS, vol_output);
 	m_oki[1]->set_output_gain(ALL_OUTPUTS, vol_output);
-}
-
-READ8_MEMBER( captaven_state::captaven_soundcpu_status_r )
-{
-	// 7-------  sound cpu status (0 = busy)
-	// -6543210  unknown
-
-	return 0xff;
 }
 
 WRITE32_MEMBER( dragngun_state::volume_w )
@@ -788,7 +764,7 @@ WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
 {
 	if (state)
 	{
-		uint8_t data = m_ioprot->soundlatch_r(machine().dummy_space(), 0);
+		u8 data = m_ioprot->soundlatch_r(machine().dummy_space(), 0);
 		// Swap bits 0 and 3 to correct for design error from BSMT schematic
 		data = bitswap<8>(data, 7, 6, 5, 4, 0, 2, 1, 3);
 		m_decobsmt->bsmt_comms_w(machine().dummy_space(), 0, data);
@@ -849,12 +825,7 @@ WRITE32_MEMBER(deco32_state::buffer_spriteram_w)
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
 template <int TileMap> WRITE32_MEMBER( deco32_state::pf_rowscroll_w ) { COMBINE_DATA(&m_pf_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[TileMap][offset]); }
 
-READ32_MEMBER( dragngun_state::unk_video_r)
-{
-	return machine().rand();
-}
-
-DECOSPR_PRIORITY_CB_MEMBER( captaven_state::captaven_pri_callback )
+DECOSPR_PRIORITY_CB_MEMBER( captaven_state::pri_callback )
 {
 	if ((pri & 0x60) == 0x00)
 	{
@@ -906,13 +877,6 @@ DECO16IC_BANK_CB_MEMBER( nslasher_state::bank_callback )
 //  INPUTS
 //**************************************************************************
 
-READ8_MEMBER( captaven_state::captaven_dsw1_r ) { return ioport("DSW1")->read(); }
-READ8_MEMBER( captaven_state::captaven_dsw2_r ) { return ioport("DSW2")->read(); }
-READ8_MEMBER( captaven_state::captaven_dsw3_r ) { return ioport("DSW3")->read(); }
-
-READ16_MEMBER( fghthist_state::fghthist_in0_r ) { return ioport("IN0")->read(); }
-READ16_MEMBER( fghthist_state::fghthist_in1_r ) { return ioport("IN1")->read(); }
-
 // TODO: probably clears both player 1 and player 2
 WRITE32_MEMBER( dragngun_state::gun_irq_ack_w )
 {
@@ -959,7 +923,7 @@ WRITE32_MEMBER( dragngun_state::lightgun_w )
 
 INPUT_CHANGED_MEMBER( dragngun_state::lockload_gun_trigger )
 {
-	switch ((uint8_t)(uintptr_t)param)
+	switch ((u8)(uintptr_t)param)
 	{
 	case 0: m_deco_irq->lightgun1_trigger_w(!newval); break;
 	case 1: m_deco_irq->lightgun2_trigger_w(!newval); break;
@@ -990,7 +954,7 @@ WRITE8_MEMBER( deco32_state::eeprom_w )
 	m_eeprom->di_write(BIT(data, 4));
 	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
-	pri_w(data & 0x03, 0xffffffff);
+	pri_w(data & 0x03);
 }
 
 WRITE8_MEMBER( dragngun_state::eeprom_w )
@@ -1130,7 +1094,7 @@ WRITE32_MEMBER( nslasher_state::tattass_control_w )
 	}
 
 	/* Playfield control - Only written in full word memory accesses */
-	pri_w(data & 0x3, 0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
+	pri_w(data & 0x3); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 
 	/* Sound board reset control */
 	if (BIT(data, 7))
@@ -1178,12 +1142,12 @@ void captaven_state::init_captaven()
 	deco56_decrypt_gfx(machine(), "gfx2");
 }
 
-extern void process_dvi_data(device_t *device,uint8_t* dvi_data, int offset, int regionsize);
+extern void process_dvi_data(device_t *device,u8* dvi_data, int offset, int regionsize);
 
 void dragngun_state::dragngun_init_common()
 {
-	const uint8_t *SRC_RAM = memregion("gfx1")->base();
-	uint8_t *DST_RAM = memregion("gfx2")->base();
+	const u8 *SRC_RAM = memregion("gfx1")->base();
+	u8 *DST_RAM = memregion("gfx2")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -1194,7 +1158,7 @@ void dragngun_state::dragngun_init_common()
 
 #if 0
 	{
-		uint8_t *ROM = memregion("dvi")->base();
+		u8 *ROM = memregion("dvi")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -1222,7 +1186,7 @@ void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -1230,7 +1194,7 @@ void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -1242,7 +1206,7 @@ void fghthist_state::init_fghthist()
 
 void dragngun_state::init_lockload()
 {
-//  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+//  u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -1257,8 +1221,8 @@ void dragngun_state::init_lockload()
 
 void nslasher_state::init_tattass()
 {
-	uint8_t *RAM = memregion("gfx1")->base();
-	std::vector<uint8_t> tmp(0x80000);
+	u8 *RAM = memregion("gfx1")->base();
+	std::vector<u8> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
@@ -1284,8 +1248,8 @@ void nslasher_state::init_tattass()
 
 void nslasher_state::init_nslasher()
 {
-	uint8_t *RAM = memregion("gfx1")->base();
-	std::vector<uint8_t> tmp(0x80000);
+	u8 *RAM = memregion("gfx1")->base();
+	std::vector<u8> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
@@ -1913,7 +1877,7 @@ void captaven_state::captaven(machine_config &config)
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(captaven_state::captaven_pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(captaven_state::pri_callback), this);
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
