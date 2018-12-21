@@ -7,7 +7,7 @@ Skeleton driver for "third generation" TeleVideo terminals (905, 955, 9220).
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/input_merger.h"
@@ -24,14 +24,20 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_hostuart(*this, "hostuart")
+		, m_mainport(*this, "mainport")
+		, m_printer(*this, "printer")
 		, m_chargen(*this, "chargen")
 	{ }
 
 	void tv955(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
 private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	DECLARE_WRITE8_MEMBER(control_latch_w);
+	void control_latch_w(u8 data);
 
 	void mem_map(address_map &map);
 	void char_map(address_map &map);
@@ -40,12 +46,21 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2674_device> m_crtc;
 	required_device<mos6551_device> m_hostuart;
+	required_device<rs232_port_device> m_mainport;
+	required_device<rs232_port_device> m_printer;
 	required_region_ptr<u8> m_chargen;
 };
 
+void tv955_state::machine_reset()
+{
+	m_printer->write_rts(0);
+	m_printer->write_dtr(0);
+}
+
 SCN2674_DRAW_CHARACTER_MEMBER(tv955_state::draw_character)
 {
-	u16 dots = m_chargen[charcode << 4 | linecount] << 2;
+	u16 dots = m_chargen[charcode << 4 | linecount] << 1;
+	dots |= (BIT(dots, 1) && BIT(charcode, 7) ? 1 : 0) | (dots & 0x100) << 1;
 
 	for (int i = 0; i < 9; i++)
 	{
@@ -54,9 +69,10 @@ SCN2674_DRAW_CHARACTER_MEMBER(tv955_state::draw_character)
 	}
 }
 
-WRITE8_MEMBER(tv955_state::control_latch_w)
+void tv955_state::control_latch_w(u8 data)
 {
-	m_hostuart->set_xtal(BIT(data, 1) ? 3.6864_MHz_XTAL : 3.6864_MHz_XTAL / 2);
+	m_mainport->write_dtr(BIT(data, 0));
+	m_hostuart->set_xtal(3.6864_MHz_XTAL / (BIT(data, 1) ? 1 : 2));
 
 	// CPU clock is inverted relative to character clock (and divided by two for 132-column mode)
 	if (BIT(data, 7))
@@ -113,6 +129,7 @@ void tv955_state::tv955(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + 3.2V battery
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
 	screen.set_raw(19.3396_MHz_XTAL, 846, 0, 720, 381, 0, 364);
 	//screen.set_raw(31.684_MHz_XTAL, 1386, 0, 1188, 381, 0, 364);
 	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));
@@ -130,14 +147,28 @@ void tv955_state::tv955(machine_config &config)
 	MOS6551(config, m_hostuart, 0);
 	m_hostuart->set_xtal(3.6864_MHz_XTAL);
 	m_hostuart->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_hostuart->txd_handler().set(m_mainport, FUNC(rs232_port_device::write_txd));
+	m_hostuart->rts_handler().set(m_mainport, FUNC(rs232_port_device::write_rts));
+	m_hostuart->dtr_handler().set(m_mainport, FUNC(rs232_port_device::write_dtr));
 
 	mos6551_device &printuart(MOS6551(config, "printuart", 0));
 	printuart.set_xtal(3.6864_MHz_XTAL / 2);
 	printuart.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	printuart.txd_handler().set(m_printer, FUNC(rs232_port_device::write_txd));
 
 	mos6551_device &keybuart(MOS6551(config, "keybuart", 0));
 	keybuart.set_xtal(3.6864_MHz_XTAL / 2);
 	keybuart.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
+
+	RS232_PORT(config, m_mainport, default_rs232_devices, nullptr); // DTE
+	m_mainport->rxd_handler().set(m_hostuart, FUNC(mos6551_device::write_rxd));
+	m_mainport->cts_handler().set(m_hostuart, FUNC(mos6551_device::write_cts));
+	m_mainport->dsr_handler().set(m_hostuart, FUNC(mos6551_device::write_dsr));
+	m_mainport->dcd_handler().set(m_hostuart, FUNC(mos6551_device::write_dcd));
+
+	RS232_PORT(config, m_printer, default_rs232_devices, nullptr); // DCE
+	m_printer->rxd_handler().set("printuart", FUNC(mos6551_device::write_rxd)); // pin 2
+	m_printer->dsr_handler().set("printuart", FUNC(mos6551_device::write_dsr)); // pin 20 or pin 11
 }
 
 /**************************************************************************************************************
