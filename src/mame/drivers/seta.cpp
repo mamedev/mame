@@ -1777,8 +1777,8 @@ void seta_state::calibr50_map(address_map &map)
 	map(0xa00000, 0xa00001).portr("P1");                 // X1-004
 	map(0xa00002, 0xa00003).portr("P2");                 // X1-004
 	map(0xa00008, 0xa00009).portr("COINS");              // X1-004
-	map(0xa00010, 0xa00017).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xa00019, 0xa00019).r(m_upd4701, FUNC(upd4701_device::reset_xy_r));
+	map(0xa00010, 0xa00017).r("upd4701", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xa00019, 0xa00019).r("upd4701", FUNC(upd4701_device::reset_xy_r));
 
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
@@ -1795,7 +1795,7 @@ void seta_state::calibr50_map(address_map &map)
                                 U.S. Classic
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::usclssic_dsw_r)
+uint16_t usclssic_state::dsw_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1807,23 +1807,23 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_x_r)
+CUSTOM_INPUT_MEMBER(usclssic_state::trackball_x_r)
 {
-	return m_track_x[m_usclssic_port_select ? 1 : 0]->read();
+	return m_track_x[m_port_select ? 1 : 0]->read();
 }
 
-CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_y_r)
+CUSTOM_INPUT_MEMBER(usclssic_state::trackball_y_r)
 {
-	return m_track_y[m_usclssic_port_select ? 1 : 0]->read();
+	return m_track_y[m_port_select ? 1 : 0]->read();
 }
 
 
-WRITE8_MEMBER(seta_state::usclssic_lockout_w)
+void usclssic_state::lockout_w(uint8_t data)
 {
 	int tiles_offset = BIT(data, 4) ? 0x4000: 0;
 
-	m_usclssic_port_select = BIT(data, 6);
-	m_buttonmux->select_w(m_usclssic_port_select);
+	m_port_select = BIT(data, 6);
+	m_buttonmux->select_w(m_port_select);
 
 	m_upd4701->resetx_w(BIT(data, 7));
 	m_upd4701->resety_w(BIT(data, 7));
@@ -1836,7 +1836,7 @@ WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 }
 
 
-void seta_state::usclssic_map(address_map &map)
+void usclssic_state::usclssic_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                 // ROM
 	map(0xff0000, 0xffffff).ram();                                 // RAM
@@ -1846,15 +1846,15 @@ void seta_state::usclssic_map(address_map &map)
 	map(0xa00000, 0xa00005).ram().share("vctrl_0");         // VRAM Ctrl
 	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
 	map(0xb40000, 0xb40007).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xb40001, 0xb40001).w(FUNC(seta_state::usclssic_lockout_w));  // Coin Lockout + Tiles Banking
-	map(0xb4000a, 0xb4000b).w(FUNC(seta_state::ipl1_ack_w));
+	map(0xb40001, 0xb40001).w(FUNC(usclssic_state::lockout_w));  // Coin Lockout + Tiles Banking
+	map(0xb4000a, 0xb4000b).w(FUNC(usclssic_state::ipl1_ack_w));
 	map(0xb40010, 0xb40011).portr("COINS");                  // Coins
 	map(0xb40011, 0xb40011).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
-	map(0xb40018, 0xb4001f).r(FUNC(seta_state::usclssic_dsw_r));                // 2 DSWs
+	map(0xb40018, 0xb4001f).r(FUNC(usclssic_state::dsw_r));                // 2 DSWs
 	map(0xb40018, 0xb40019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xb80000, 0xb80001).r(FUNC(seta_state::ipl2_ack_r));
+	map(0xb80000, 0xb80001).r(FUNC(usclssic_state::ipl2_ack_r));
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));         // Sprites Code + X + Attr
-	map(0xd00000, 0xd03fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM
+	map(0xd00000, 0xd03fff).ram().w(FUNC(usclssic_state::vram_w<0>)).share("vram_0"); // VRAM
 	map(0xd04000, 0xd04fff).ram();                                 //
 	map(0xe00000, 0xe00fff).ram();                                 // NVRAM? (odd bytes)
 }
@@ -1970,7 +1970,7 @@ void seta_state::blandiap_map(address_map &map)
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-double seta_state::zombraid_adc_cb(uint8_t input)
+double zombraid_state::adc_cb(uint8_t input)
 {
 	if (input == ADC083X_AGND)
 		return 0.0;
@@ -1980,13 +1980,13 @@ double seta_state::zombraid_adc_cb(uint8_t input)
 		return m_gun_inputs[input - ADC083X_CH0]->read() / 255.0;
 }
 
-READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
+uint16_t zombraid_state::gun_r()// Serial interface
 {
 	return m_adc->do_read();
 }
 
 // Bit 0 is clock, 1 is data, 2 is reset
-WRITE16_MEMBER(seta_state::zombraid_gun_w)
+void zombraid_state::gun_w(uint16_t data)
 {
 	m_adc->cs_write(BIT(data, 2));
 	m_adc->di_write(BIT(data, 1));
@@ -2042,15 +2042,15 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0xf00000, 0xf00001).nopw();                        // ? Sound  IRQ Ack
 }
 
-void seta_state::zombraid_map(address_map &map)
+void zombraid_state::zombraid_map(address_map &map)
 {
 	wrofaero_map(map);
 	map(0x300000, 0x30ffff).ram().share("nvram");           // actually 8K x8 SRAM
-	map(0xf00000, 0xf00001).w(FUNC(seta_state::zombraid_gun_w));
-	map(0xf00002, 0xf00003).r(FUNC(seta_state::zombraid_gun_r));
+	map(0xf00000, 0xf00001).w(FUNC(zombraid_state::gun_w));
+	map(0xf00002, 0xf00003).r(FUNC(zombraid_state::gun_r));
 }
 
-void seta_state::zombraid_x1_map(address_map &map)
+void zombraid_state::zombraid_x1_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0xfffff).bankr("x1_bank");
@@ -2858,12 +2858,12 @@ void seta_state::triplfun_map(address_map &map)
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::kiwame_row_select_w)
+void kiwame_state::row_select_w(uint16_t data)
 {
 	m_kiwame_row_select = data & 0x001f;
 }
 
-READ16_MEMBER(seta_state::kiwame_input_r)
+uint16_t kiwame_state::input_r(offs_t offset)
 {
 	int row_select = m_kiwame_row_select;
 	int i;
@@ -2885,7 +2885,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 	}
 }
 
-void seta_state::kiwame_map(address_map &map)
+void kiwame_state::kiwame_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram().share("nvram");                            // RAM
@@ -2895,9 +2895,9 @@ void seta_state::kiwame_map(address_map &map)
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xd00000, 0xd00009).r(FUNC(seta_state::kiwame_input_r));            // mahjong panel
-	map(0xe00000, 0xe00003).r(FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0xfffc00, 0xffffff).rw("tmp68301", FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
+	map(0xd00000, 0xd00009).r(FUNC(kiwame_state::input_r));                 // mahjong panel
+	map(0xe00000, 0xe00003).r(FUNC(kiwame_state::seta_dsw_r));              // DSW
+	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
 
 
@@ -6415,10 +6415,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( usclssic )
 	PORT_START("TRACKX")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_x_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, usclssic_state, trackball_x_r, nullptr)
 
 	PORT_START("TRACKY")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_y_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, usclssic_state, trackball_y_r, nullptr)
 
 	PORT_START("TRACK1_X")     /* muxed port 0 */
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
@@ -8011,24 +8011,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 }
 
 
-MACHINE_START_MEMBER(seta_state, usclssic)
+void usclssic_state::machine_start()
 {
 	m_buttonmux->write_ab(0xff);
 }
 
 
-MACHINE_CONFIG_START(seta_state::usclssic)
+MACHINE_CONFIG_START(usclssic_state::usclssic)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", usclssic_state, calibr50_interrupt, "screen", 0, 1)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", usclssic_state, irq0_line_assert)
 
 	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("TRACKX");
@@ -8039,12 +8039,11 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::right_w)).bit(1);
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::left_w)).bit(2);
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
-	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
+	MCFG_MACHINE_RESET_OVERRIDE(usclssic_state,calibr50)
 
 	SETA001_SPRITE(config, m_seta001, 0);
 	m_seta001->set_gfxdecode_tag(m_gfxdecode);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
+	m_seta001->set_gfxbank_callback(FUNC(usclssic_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8052,16 +8051,16 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
+	MCFG_SCREEN_UPDATE_DRIVER(usclssic_state, screen_update_usclssic)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usclssic)
 
 	MCFG_PALETTE_ADD("palette", 16*32 + 64*32*2)        /* sprites, layer */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_INIT_OWNER(seta_state,usclssic) /* layer is 6 planes deep */
+	MCFG_PALETTE_INIT_OWNER(usclssic_state,usclssic) /* layer is 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8099,9 +8098,9 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
 
-	UPD4701A(config, m_upd4701);
-	m_upd4701->set_portx_tag("ROT1");
-	m_upd4701->set_porty_tag("ROT2");
+	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
+	upd4701.set_portx_tag("ROT1");
+	upd4701.set_porty_tag("ROT2");
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -8759,21 +8758,19 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta_state,zombraid) { m_gun_recoil.resolve(); }
+void zombraid_state::machine_start() { m_gun_recoil.resolve(); }
 
-MACHINE_CONFIG_START(seta_state::zombraid)
+MACHINE_CONFIG_START(zombraid_state::zombraid)
 	gundhara(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zombraid_map)
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state, zombraid)
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	adc0834_device &adc(ADC0834(config, "adc", 0));
-	adc.set_input_callback(FUNC(seta_state::zombraid_adc_cb));
+	adc.set_input_callback(FUNC(zombraid_state::adc_cb));
 
 	MCFG_DEVICE_MODIFY("x1snd")
 	MCFG_DEVICE_ADDRESS_MAP(0, zombraid_x1_map)
@@ -9254,13 +9251,13 @@ MACHINE_CONFIG_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(seta_state::kiwame_vblank)
+WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
 {
 	if (state)
 		m_tmp68301->external_interrupt_0();
 }
 
-MACHINE_CONFIG_START(seta_state::kiwame)
+MACHINE_CONFIG_START(kiwame_state::kiwame)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD(m_maincpu, M68000, 16000000)   /* 16 MHz */
@@ -9269,13 +9266,13 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 
 	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
 	tmp68301.set_cputag(m_maincpu);
-	tmp68301.out_parallel_callback().set(FUNC(seta_state::kiwame_row_select_w));
+	tmp68301.out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SETA001_SPRITE(config, m_seta001, 0);
 	m_seta001->set_gfxdecode_tag(m_gfxdecode);
-	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback), this);
+	m_seta001->set_gfxbank_callback(FUNC(kiwame_state::setac_gfxbank_callback), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9283,14 +9280,14 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_UPDATE_DRIVER(kiwame_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, kiwame_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kiwame_state, kiwame_vblank))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(kiwame_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -12013,17 +12010,6 @@ void seta_state::init_eightfrc()
 	init_bankx1();
 }
 
-void seta_state::init_kiwame()
-{
-	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
-
-	/* WARNING: This game writes to the interrupt vector
-	   table. Lev 1 routine address is stored at $100 */
-
-	RAM[0x64/2] = 0x0000;
-	RAM[0x66/2] = 0x0dca;
-}
-
 void seta_state::init_rezon()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
@@ -12037,7 +12023,7 @@ void seta_state::init_pairlove()
 	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
 }
 
-void seta_state::init_zombraid()
+void zombraid_state::init_zombraid()
 {
 	/* bank 1 is never explicitly selected, 0 is used in its place */
 	m_x1_bank->configure_entry(0, memregion("x1snd")->base() + 0x80000);
@@ -12110,7 +12096,7 @@ GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     init_down
 GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
 GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 
-GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
 GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
@@ -12189,7 +12175,7 @@ GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_ini
 
 GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     init_eightfrc,  ROT90,  "Tecmo",                     "Eight Forces", 0 )
 
-GAME( 1994, kiwame,    0,        kiwame,    kiwame,    seta_state,     init_kiwame,    ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
+GAME( 1994, kiwame,    0,        kiwame,    kiwame,    kiwame_state,   empty_init,     ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
 
 GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     empty_init,     ROT270, "American Sammy",            "Krazy Bowl", 0 )
 
@@ -12207,8 +12193,8 @@ GAME( 1995, gundharac, gundhara, gundhara,  gundhara,  seta_state,     empty_ini
 
 GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid,  0,        zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     init_crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -590,7 +590,7 @@ PALETTE_INIT_MEMBER(setaroul_state,setaroul)
 	PALETTE_INIT_NAME(palette_init_RRRRRGGGGGBBBBB_proms)(palette);
 }
 
-PALETTE_INIT_MEMBER(seta_state,usclssic)
+PALETTE_INIT_MEMBER(usclssic_state,usclssic)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int color, pen;
@@ -651,7 +651,7 @@ void seta_state::set_pens()
 }
 
 
-void seta_state::usclssic_set_pens()
+void usclssic_state::usclssic_set_pens()
 {
 	offs_t i;
 
@@ -937,7 +937,7 @@ uint32_t seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-uint32_t seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t usclssic_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	usclssic_set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);
