@@ -3299,6 +3299,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tv965.cpp",
 	MAME_DIR .. "src/mame/drivers/tv990.cpp",
 	MAME_DIR .. "src/mame/drivers/ts3000.cpp",
+	MAME_DIR .. "src/mame/machine/tv955kb.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "tem")
