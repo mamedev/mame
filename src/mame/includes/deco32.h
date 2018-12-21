@@ -63,7 +63,7 @@ protected:
 	template<int Chip> DECLARE_READ32_MEMBER(spriteram_r);
 	template<int Chip> DECLARE_WRITE32_MEMBER(spriteram_w);
 	template<int Chip> DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
-	void pri_w(u32 data, u32 mem_mask);
+	void pri_w(u32 data);
 
 	// all but captaven
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);

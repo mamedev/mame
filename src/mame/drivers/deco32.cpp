@@ -990,7 +990,7 @@ WRITE8_MEMBER( deco32_state::eeprom_w )
 	m_eeprom->di_write(BIT(data, 4));
 	m_eeprom->cs_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
-	pri_w(data & 0x03, 0xffffffff);
+	pri_w(data & 0x03);
 }
 
 WRITE8_MEMBER( dragngun_state::eeprom_w )
@@ -1130,7 +1130,7 @@ WRITE32_MEMBER( nslasher_state::tattass_control_w )
 	}
 
 	/* Playfield control - Only written in full word memory accesses */
-	pri_w(data & 0x3, 0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
+	pri_w(data & 0x3); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 
 	/* Sound board reset control */
 	if (BIT(data, 7))

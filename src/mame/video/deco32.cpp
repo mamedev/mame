@@ -5,7 +5,7 @@
 
 /******************************************************************************/
 
-void deco32_state::pri_w(u32 data, u32 mem_mask)
+void deco32_state::pri_w(u32 data)
 {
 	m_pri = data;
 }
