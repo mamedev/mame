@@ -78,7 +78,7 @@ MACHINE_CONFIG_START(bbc_ieee488_device::device_add_mconfig)
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_dev", 0, cbm_ieee488_devices, nullptr)
 
-	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
 MACHINE_CONFIG_END
