@@ -2091,7 +2091,7 @@ void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
 
 	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
-	UPD7759(config, m_upd7759, 0);
+	UPD7759(config, m_upd7759);
 	m_upd7759->md_w(0);
 	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
 	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);

@@ -3822,7 +3822,7 @@ void snk_state::fitegolf(machine_config &config)
 
 	/* basic machine hardware */
 	// xtal is 4MHz instead of 8MHz/2 but the end result is the same
-	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::YM3812_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3812_sound_map);
 
 	/* sound hardware */
 	ym3812_device &ym1(YM3812(config.replace(), "ym1", XTAL(4'000'000))); /* verified on pcb */
