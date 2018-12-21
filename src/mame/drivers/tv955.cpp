@@ -24,7 +24,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_hostuart(*this, "hostuart")
-		, m_p_chargen(*this, "chargen")
+		, m_chargen(*this, "chargen")
 	{ }
 
 	void tv955(machine_config &config);
@@ -34,15 +34,24 @@ private:
 	DECLARE_WRITE8_MEMBER(control_latch_w);
 
 	void mem_map(address_map &map);
+	void char_map(address_map &map);
+	void attr_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2674_device> m_crtc;
 	required_device<mos6551_device> m_hostuart;
-	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_chargen;
 };
 
 SCN2674_DRAW_CHARACTER_MEMBER(tv955_state::draw_character)
 {
+	u16 dots = m_chargen[charcode << 4 | linecount] << 2;
+
+	for (int i = 0; i < 9; i++)
+	{
+		bitmap.pix32(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
+		dots <<= 1;
+	}
 }
 
 WRITE8_MEMBER(tv955_state::control_latch_w)
@@ -79,6 +88,16 @@ void tv955_state::mem_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("system", 0);
 }
 
+void tv955_state::char_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("charram");
+}
+
+void tv955_state::attr_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("attrram");
+}
+
 static INPUT_PORTS_START( tv955 )
 INPUT_PORTS_END
 
@@ -102,6 +121,8 @@ void tv955_state::tv955(machine_config &config)
 	// Character clock is 31.684_MHz_XTAL / 9 in 132-column mode
 	// Character cells are 9 pixels wide by 14 pixels high
 	m_crtc->set_character_width(9);
+	m_crtc->set_addrmap(0, &tv955_state::char_map);
+	m_crtc->set_addrmap(1, &tv955_state::attr_map);
 	m_crtc->set_display_callback(FUNC(tv955_state::draw_character));
 	m_crtc->intr_callback().set_inputline(m_maincpu, m6502_device::NMI_LINE);
 	m_crtc->set_screen("screen");
