@@ -8,6 +8,14 @@
 
 	AX208 SoC
 
+
+
+	Notes:
+
+	AX208:
+	The CPU has a bootloader that sets a few things up + copies data to RAM
+	from the Flash meomry.  This will need to be simulated.
+
  *****************************************************************************/
 
 #include "emu.h"
