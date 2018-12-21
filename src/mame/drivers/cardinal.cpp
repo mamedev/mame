@@ -27,10 +27,14 @@ public:
 	cardinal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_eeprom(*this, "eeprom")
+		, m_address_select(false)
 	{
 	}
 
 	void cardinal(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -38,13 +42,23 @@ private:
 	u8 p1_r();
 	void p1_w(u8 data);
 
+	u8 vtlc_r();
+	void vtlc_w(u8 data);
+
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	//required_device<crt9028_device> m_vtlc;
+
+	bool m_address_select;
 };
 
+
+void cardinal_state::machine_start()
+{
+	save_item(NAME(m_address_select));
+}
 
 u32 cardinal_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -58,10 +72,21 @@ u8 cardinal_state::p1_r()
 
 void cardinal_state::p1_w(u8 data)
 {
-	// FIXME: this doesn't quite work
 	m_eeprom->cs_write(BIT(data, 0));
 	m_eeprom->di_write(BIT(data, 4));
 	m_eeprom->clk_write(BIT(data, 3));
+
+	m_address_select = BIT(data, 1);
+}
+
+u8 cardinal_state::vtlc_r()
+{
+	return 0xff;
+}
+
+void cardinal_state::vtlc_w(u8 data)
+{
+	logerror("%s: Writing %02X to CRT9028 %s register\n", machine().describe_context(), data, m_address_select ? "address" : "data");
 }
 
 void cardinal_state::prog_map(address_map &map)
@@ -71,7 +96,7 @@ void cardinal_state::prog_map(address_map &map)
 
 void cardinal_state::ext_map(address_map &map)
 {
-	map(0xff00, 0xff00).nopr();
+	map(0xff00, 0xff00).mirror(0xff).rw(FUNC(cardinal_state::vtlc_r), FUNC(cardinal_state::vtlc_w));
 }
 
 
