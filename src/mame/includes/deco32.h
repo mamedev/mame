@@ -143,7 +143,7 @@ public:
 	void init_fghthist();
 
 private:
-	required_ioport_array<3> m_in_io;
+	required_ioport_array<2> m_in_io;
 	DECLARE_READ32_MEMBER(unk_status_r);
 
 	virtual void video_start() override;
