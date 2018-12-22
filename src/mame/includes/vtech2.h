@@ -106,6 +106,7 @@ private:
 	int m_cassette_bit;
 	int m_laser_bg_mode;
 	int m_laser_two_color;
+	u8 m_language;
 
 	memory_region *m_cart_rom;
 };

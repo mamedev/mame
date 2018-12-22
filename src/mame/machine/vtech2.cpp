@@ -90,6 +90,8 @@ void vtech2_state::laser_machine_init(int bank_mask, int video_mask)
 
 	for (int i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
 		laser_bank_select_w(m_maincpu->space(AS_PROGRAM), i, 0);
+
+	m_language = m_io_keyboard[5]->read() & 0x30;
 }
 
 void vtech2_state::machine_reset()
