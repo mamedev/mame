@@ -22,14 +22,16 @@ class vtech2_state : public driver_device
 {
 public:
 	vtech2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette"),
-		m_cart(*this, "cartslot"),
-		m_laser_file(*this, {FLOPPY_0, FLOPPY_1}),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_cart(*this, "cartslot")
+		, m_laser_file(*this, {FLOPPY_0, FLOPPY_1})
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROWD", "ROWC", "ROWB", "ROWA"})
+	{ }
 
 	void laser350(machine_config &config);
 	void laser700(machine_config &config);
@@ -79,6 +81,7 @@ private:
 	optional_device_array<legacy_floppy_image_device, 2> m_laser_file;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_ioport_array<12> m_io_keyboard;
 
 	uint8_t *m_videoram;
 	int m_laser_latch;
@@ -101,10 +104,6 @@ private:
 	int m_laser_fdc_latch;
 	int m_level_old;
 	int m_cassette_bit;
-	int m_row_a;
-	int m_row_b;
-	int m_row_c;
-	int m_row_d;
 	int m_laser_bg_mode;
 	int m_laser_two_color;
 

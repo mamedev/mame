@@ -192,67 +192,20 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
  ************************************************/
 int vtech2_state::mra_bank(int bank, int offs)
 {
-	uint8_t data = 0x7f;
+	u8 data = 0x7f;
 
-	/* Laser 500/700 only: keyboard rows A through D */
-	if( (offs & 0x00ff) == 0x00ff )
+	offs = ~offs & 0x7ff;
+	if (BIT(offs, 10))
 	{
-		if( (offs & 0x0300) == 0x0000 ) /* keyboard row A */
-		{
-			if( ioport("ROWA")->read() != m_row_a )
-			{
-				m_row_a = ioport("ROWA")->read();
-				data &= m_row_a;
-			}
-		}
-		if( (offs & 0x0300) == 0x0100 ) /* keyboard row B */
-		{
-			if( ioport("ROWB")->read() != m_row_b )
-			{
-				m_row_b = ioport("ROWB")->read();
-				data &= m_row_b;
-			}
-		}
-		if( (offs & 0x0300) == 0x0200 ) /* keyboard row C */
-		{
-			if( ioport("ROWC")->read() != m_row_c )
-			{
-				m_row_c = ioport("ROWC")->read();
-				data &= m_row_c;
-			}
-		}
-		if( (offs & 0x0300) == 0x0300 ) /* keyboard row D */
-		{
-			if( ioport("ROWD")->read() != m_row_d )
-			{
-				m_row_d = ioport("ROWD")->read();
-				data &= m_row_d;
-			}
-		}
+		offs = (offs >> 8) & 3;
+		data &= m_io_keyboard[offs + 8]->read();     // ROW A-D
 	}
 	else
-	{
-		/* All Lasers keyboard rows 0 through 7 */
-		if( !(offs & 0x01) )
-			data &= ioport("ROW0")->read();
-		if( !(offs & 0x02) )
-			data &= ioport("ROW1")->read();
-		if( !(offs & 0x04) )
-			data &= ioport("ROW2")->read();
-		if( !(offs & 0x08) )
-			data &= ioport("ROW3")->read();
-		if( !(offs & 0x10) )
-			data &= ioport("ROW4")->read();
-		if( !(offs & 0x20) )
-			data &= ioport("ROW5")->read();
-		if( !(offs & 0x40) )
-			data &= ioport("ROW6")->read();
-		if( !(offs & 0x80) )
-			data &= ioport("ROW7")->read();
-	}
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(offs, i))
+			data &= m_io_keyboard[i]->read();    // ROW 0-7
 
 	/* BIT 7 - tape input */
-
 	data |= (m_cassette->input() > +0.02) ? 0x80 : 0;
 
 	return data;

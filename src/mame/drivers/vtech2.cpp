@@ -170,7 +170,7 @@ static INPUT_PORTS_START( laser500 )
 	PORT_START("ROW7") /* KEY ROW 7 */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.') PORT_CHAR('>')
@@ -210,10 +210,10 @@ static INPUT_PORTS_START( laser500 )
 	PORT_START("ROWD") /* KEY ROW D */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xCE\xBC  \xC2\xA3") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0xa3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xCE\xBC  \xC2\xA3") PORT_CODE(KEYCODE_END) PORT_CHAR(0xa3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)             PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_INSERT)          PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
@@ -273,11 +273,11 @@ INPUT_PORTS_END
 static const gfx_layout charlayout_80 =
 {
 	8,8,                    /* 8 x 8 characters */
-	256,                    /* 256 characters */
+	1024,                    /* characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
 	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* y offsets */
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	8*8                     /* every char takes 8 bytes */
@@ -286,11 +286,11 @@ static const gfx_layout charlayout_80 =
 static const gfx_layout charlayout_40 =
 {
 	8*2,8,                  /* 8*2 x 8 characters */
-	256,                    /* 256 characters */
+	1024,                    /* characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
 	/* x offsets */
-	{ 0,0, 1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7 },
+	{ 7,7, 6,6, 5,5, 4,4, 3,3, 2,2, 1,1, 0,0 },
 	/* y offsets */
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	8*8                     /* every char takes 8 bytes */
@@ -481,8 +481,8 @@ MACHINE_CONFIG_END
 ROM_START(laser350)
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
-	ROM_REGION(0x00800,"gfx1",0)
-	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
 	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
@@ -492,8 +492,8 @@ ROM_START(laser500) // based on the picture at http://www.8bit-museum.de/hardwar
 // There should be two roms, one 0x2000 long for the font at u10, and one longer one for the os rom at u6.
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("27-0401-00-00.u6", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1)) // may be dumped at wrong size; label is: "VTL 27-0401-00-00 // 6133-7081 // 8611MAK"
-	ROM_REGION(0x00800,"gfx1",0)
-	ROM_LOAD("27-393-00.u10",   0x00000, 0x00800, BAD_DUMP CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87)) // dumped at wrong size; correct size is 0x2000; label is "TMS 2364-25NL // D8614L // ZA234015 // 27-393-00/VT 85 // SINGAPORE"
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) ) // label is "TMS 2364-25NL // D8614L // ZA234015 // 27-393-00/VT 85 // SINGAPORE"
 	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
@@ -501,8 +501,8 @@ ROM_END
 ROM_START(laser700)
 	ROM_REGION(0x40000,"maincpu",0)
 	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
-	ROM_REGION(0x00800,"gfx1",0)
-	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
 	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
