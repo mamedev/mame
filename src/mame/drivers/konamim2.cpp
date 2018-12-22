@@ -1134,8 +1134,8 @@ INPUT_PORTS_END
 
 void konamim2_state::cr589_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 1.0);
-	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 0.2);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 0.2);
 	device = device->subdevice("cdda");
 }
 
