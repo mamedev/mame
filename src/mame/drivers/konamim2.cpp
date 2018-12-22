@@ -1301,7 +1301,7 @@ ROM_START( polystar )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
 	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(2d8d1594) SHA1(b7bae873a6487023bdacdd09e7a5724e18efa30b) )
 
 	DISK_REGION( "cdrom" )
@@ -1322,6 +1322,7 @@ ROM_START( btltryst )
 	DISK_IMAGE( "636jac02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
 
+#if 0
 ROM_START( btltrysta )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
@@ -1332,6 +1333,7 @@ ROM_START( btltrysta )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "636jaa02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
+#endif
 
 ROM_START( heatof11 )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )  /* boot rom */
