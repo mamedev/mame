@@ -1217,7 +1217,7 @@ ROM_END
 
 ROM_START( berzerk1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "berzerk_rc28_1c.rom0.1c", 0x0000, 0x0800, CRC(5b7eb77d) SHA1(8de488e279036fe40d6fb4c0dde16075309342fd) ) /* is this set RC32 ? */
+	ROM_LOAD( "berzerk_rc28_1c.rom0.1c", 0x0000, 0x0800, CRC(5b7eb77d) SHA1(8de488e279036fe40d6fb4c0dde16075309342fd) )
 	ROM_LOAD( "berzerk_rc28_1d.rom1.1d", 0x1000, 0x0800, CRC(e58c8678) SHA1(a11f08448b457d690b270512c9f02fcf1e41d9e0) )
 	ROM_LOAD( "berzerk_rc28_3d.rom2.3d", 0x1800, 0x0800, CRC(705bb339) SHA1(845191df90cd7d80f8fed3d2b69305301d921549) )
 	ROM_LOAD( "berzerk_rc28_5d.rom3.5d", 0x2000, 0x0800, CRC(6a1936b4) SHA1(f1635e9d2f25514c35559d2a247c3bc4b4034c19) )
