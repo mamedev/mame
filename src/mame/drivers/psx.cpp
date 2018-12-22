@@ -542,8 +542,8 @@ void psx1_state::psx_base(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
-    spu.add_route(0, "lspeaker", 1.00);
-    spu.add_route(1, "rspeaker", 1.00);
+	spu.add_route(0, "lspeaker", 1.00);
+	spu.add_route(1, "rspeaker", 1.00);
 
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
 	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(psx1_state, psx_exe_load), this), "cpe,exe,psf,psx", 0);

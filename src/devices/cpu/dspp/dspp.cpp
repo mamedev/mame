@@ -33,7 +33,7 @@ enum
 #define SINGLE_INSTRUCTION_MODE         (0)
 
 
-#define CACHE_SIZE	(4 * 1024 * 1024) // FIXME
+#define CACHE_SIZE  (4 * 1024 * 1024) // FIXME
 // FIXME!!!
 /* compilation boundaries -- how far back/forward does the analysis extend? */
 #define COMPILE_BACKWARDS_BYTES         128
@@ -54,46 +54,46 @@ enum
 //  MACROS
 //**************************************************************************
 
-//#define DSPI_FLAG_CC_CARRY					0x0001
-//#define DSPI_FLAG_CC_ZERO					0x0002
-//#define DSPI_FLAG_CC_NEG					0x0004
-//#define DSPI_FLAG_CC_OVER					0x0008
-//#define DSPI_FLAG_CC_EXACT					0x0010
-//#define DSPI_FLAG_AUDLOCK					0x0020
-//#define DSPI_FLAG_SLEEP						0x0040
-//#define DSPI_FLAG_CC_MASK					0x001f
+//#define DSPI_FLAG_CC_CARRY                    0x0001
+//#define DSPI_FLAG_CC_ZERO                 0x0002
+//#define DSPI_FLAG_CC_NEG                  0x0004
+//#define DSPI_FLAG_CC_OVER                 0x0008
+//#define DSPI_FLAG_CC_EXACT                    0x0010
+//#define DSPI_FLAG_AUDLOCK                 0x0020
+//#define DSPI_FLAG_SLEEP                       0x0040
+//#define DSPI_FLAG_CC_MASK                 0x001f
 
-#define DSPX_CONTROL_GWILLING				0x0001
-#define DSPX_CONTROL_STEP_CYCLE				0x0002
-#define DSPX_CONTROL_STEP_PC				0x0004
-#define DSPX_CONTROL_SNOOP					0x0008
+#define DSPX_CONTROL_GWILLING               0x0001
+#define DSPX_CONTROL_STEP_CYCLE             0x0002
+#define DSPX_CONTROL_STEP_PC                0x0004
+#define DSPX_CONTROL_SNOOP                  0x0008
 
-#define DSPX_RESET_DSPP						0x0001
-#define DSPX_RESET_INPUT					0x0002
-#define DSPX_RESET_OUTPUT					0x0004
+#define DSPX_RESET_DSPP                     0x0001
+#define DSPX_RESET_INPUT                    0x0002
+#define DSPX_RESET_OUTPUT                   0x0004
 
-#define DSPX_F_DMA_NEXTVALID				0x0001
-#define DSPX_F_DMA_GO_FOREVER				0x0002
-#define DSPX_F_INT_DMANEXT_EN				0x0004
-#define DSPX_F_SHADOW_SET_DMANEXT			0x00040000
-#define DSPX_F_SHADOW_SET_FOREVER			0x00020000
-#define DSPX_F_SHADOW_SET_NEXTVALID			0x00010000
-#define DSPX_F_SHADOW_SET_ADDRESS_COUNT		0x80000000
+#define DSPX_F_DMA_NEXTVALID                0x0001
+#define DSPX_F_DMA_GO_FOREVER               0x0002
+#define DSPX_F_INT_DMANEXT_EN               0x0004
+#define DSPX_F_SHADOW_SET_DMANEXT           0x00040000
+#define DSPX_F_SHADOW_SET_FOREVER           0x00020000
+#define DSPX_F_SHADOW_SET_NEXTVALID         0x00010000
+#define DSPX_F_SHADOW_SET_ADDRESS_COUNT     0x80000000
 
-#define DSPX_F_INT_TIMER					0x00000100
-#define DSPX_F_INT_INPUT_UNDER				0x00000080
-#define DSPX_F_INT_INPUT_OVER				0x00000040
-#define DSPX_F_INT_OUTPUT_UNDER				0x00000020
-#define DSPX_F_INT_OUTPUT_OVER				0x00000010
-#define DSPX_F_INT_UNDEROVER				0x00000008
-#define DSPX_F_INT_CONSUMED					0x00000002
-#define DSPX_F_INT_DMANEXT					0x00000001
+#define DSPX_F_INT_TIMER                    0x00000100
+#define DSPX_F_INT_INPUT_UNDER              0x00000080
+#define DSPX_F_INT_INPUT_OVER               0x00000040
+#define DSPX_F_INT_OUTPUT_UNDER             0x00000020
+#define DSPX_F_INT_OUTPUT_OVER              0x00000010
+#define DSPX_F_INT_UNDEROVER                0x00000008
+#define DSPX_F_INT_CONSUMED                 0x00000002
+#define DSPX_F_INT_DMANEXT                  0x00000001
 
-#define DSPX_F_INT_ALL_DMA					(DSPX_F_INT_DMANEXT | DSPX_F_INT_CONSUMED | DSPX_F_INT_UNDEROVER)
+#define DSPX_F_INT_ALL_DMA                  (DSPX_F_INT_DMANEXT | DSPX_F_INT_CONSUMED | DSPX_F_INT_UNDEROVER)
 
-#define DSPX_FLD_INT_SOFT_WIDTH				16          /* width of the field and the number of interrupts */
-#define DSPX_FLD_INT_SOFT_SHIFT				16
-#define DSPX_FLD_INT_SOFT_MASK				(0xffff0000)
+#define DSPX_FLD_INT_SOFT_WIDTH             16          /* width of the field and the number of interrupts */
+#define DSPX_FLD_INT_SOFT_SHIFT             16
+#define DSPX_FLD_INT_SOFT_MASK              (0xffff0000)
 
 
 
@@ -378,14 +378,14 @@ void dspp_device::state_string_export(const device_state_entry &entry, std::stri
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%c.%c%c%c%c%c",
-                            m_core->m_flag_audlock	? 'A' : '.',
-                            m_core->m_flag_sleep	? 'S' : '.',
-							m_core->m_flag_carry	? 'C' : '.',
-							m_core->m_flag_zero		? 'Z' : '.',
-                            m_core->m_flag_neg		? 'N' : '.',
-                            m_core->m_flag_over		? 'V' : '.',
-                            m_core->m_flag_exact	? 'E' : '.');
-            break;
+							m_core->m_flag_audlock  ? 'A' : '.',
+							m_core->m_flag_sleep    ? 'S' : '.',
+							m_core->m_flag_carry    ? 'C' : '.',
+							m_core->m_flag_zero     ? 'Z' : '.',
+							m_core->m_flag_neg      ? 'N' : '.',
+							m_core->m_flag_over     ? 'V' : '.',
+							m_core->m_flag_exact    ? 'E' : '.');
+			break;
 	}
 }
 
@@ -732,7 +732,7 @@ void dspp_device::execute_run()
 		return;
 	}
 
-    bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	do
 	{
@@ -742,8 +742,8 @@ void dspp_device::execute_run()
 		// Only run if enabled
 		if (m_dspx_control & DSPX_CONTROL_GWILLING)
 		{
-            if (check_debugger)
-                debugger_instruction_hook(m_core->m_pc);
+			if (check_debugger)
+				debugger_instruction_hook(m_core->m_pc);
 
 			m_core->m_op = read_op(m_core->m_pc);
 			update_pc();
@@ -775,7 +775,7 @@ inline void dspp_device::exec_super_special()
 
 	switch (sel)
 	{
-		case 1:	// BAC
+		case 1: // BAC
 		{
 			m_core->m_pc = m_core->m_acc >> 4;
 			break;
@@ -1116,70 +1116,70 @@ inline void dspp_device::exec_arithmetic()
 
 	switch (alu_op)
 	{
-		case 0:	// _TRA
+		case 0: // _TRA
 		{
 			alu_res = alu_a;
 			m_core->m_flag_over = 0;
 			m_core->m_flag_carry = 0;
 			break;
 		}
-		case 1:	// _NEG
+		case 1: // _NEG
 		{
 			alu_res = -alu_b;
 			m_core->m_flag_over = 0;
 			m_core->m_flag_carry = 0;
 			break;
 		}
-		case 2:	// _+
+		case 2: // _+
 		{
 			alu_res = alu_a + alu_b;
 			m_core->m_flag_over = (((alu_a & 0x80000) == (alu_b & 0x80000) && (alu_a & 0x80000) != (alu_res & 0x80000)));
 			m_core->m_flag_carry = (alu_res & 0x00100000) != 0;
 			break;
 		}
-		case 3:	// _+C
+		case 3: // _+C
 		{
 			alu_res = alu_a + (m_core->m_flag_carry << 4);
 			m_core->m_flag_over = 0;
 			m_core->m_flag_carry = (alu_res & 0x00100000) != 0;
 			break;
 		}
-		case 4:	// _-
+		case 4: // _-
 		{
 			alu_res = alu_a - alu_b;
 			m_core->m_flag_over = ((alu_a & 0x80000) == (~alu_b & 0x80000) && (alu_a & 0x80000) != (alu_res & 0x80000));
 			m_core->m_flag_carry = (alu_res & 0x00100000) != 0;
 			break;
 		}
-		case 5:	// _-B
+		case 5: // _-B
 		{
 			alu_res = alu_a - (m_core->m_flag_carry << 4);
 			m_core->m_flag_over = 0;
 			m_core->m_flag_carry = (alu_res & 0x00100000) != 0;
 			break;
 		}
-		case 6:	// _++
+		case 6: // _++
 		{
 			alu_res = alu_a + 1;
 			m_core->m_flag_over = !(alu_a & 0x80000) && (alu_res & 0x80000);
 			m_core->m_flag_carry = 0;
 			break;
 		}
-		case 7:	// _--
+		case 7: // _--
 		{
 			alu_res = alu_a - 1;
 			m_core->m_flag_over = (alu_a & 0x80000) && !(alu_res & 0x80000);
 			m_core->m_flag_carry = 0;
 			break;
 		}
-		case 8:	// _TRL
+		case 8: // _TRL
 		{
 			alu_res = alu_a;
 			m_core->m_flag_over = 0;
 			m_core->m_flag_carry = 0;
 			break;
 		}
-		case 9:	// _NOT
+		case 9: // _NOT
 		{
 			alu_res = ~alu_a;
 			m_core->m_flag_over = 0;
@@ -2630,17 +2630,17 @@ void dspp_device::dump_state()
 	printf("DSPX_CHANNEL_SQXD:      %08X %s\n", m_dspx_channel_sqxd, GetBinary(buffer, m_dspx_channel_sqxd, 32));
 
 #if 0
-	uint32_t	m_dspx_shadow_current_addr;
-	uint32_t	m_dspx_shadow_current_count;
-	uint32_t	m_dspx_shadow_next_addr;
-	uint32_t	m_dspx_shadow_next_count;
-	uint32_t	m_dspx_dmanext_int;
-	uint32_t	m_dspx_dmanext_enable;
-	uint32_t	m_dspx_consumed_int;
-	uint32_t	m_dspx_consumed_enable;
-	uint32_t	m_dspx_underover_int;
-	uint32_t	m_dspx_underover_enable;
-	uint32_t	m_dspx_audio_time;
-	uint16_t	m_dspx_audio_duration;
+	uint32_t    m_dspx_shadow_current_addr;
+	uint32_t    m_dspx_shadow_current_count;
+	uint32_t    m_dspx_shadow_next_addr;
+	uint32_t    m_dspx_shadow_next_count;
+	uint32_t    m_dspx_dmanext_int;
+	uint32_t    m_dspx_dmanext_enable;
+	uint32_t    m_dspx_consumed_int;
+	uint32_t    m_dspx_consumed_enable;
+	uint32_t    m_dspx_underover_int;
+	uint32_t    m_dspx_underover_enable;
+	uint32_t    m_dspx_audio_time;
+	uint16_t    m_dspx_audio_duration;
 #endif
 }

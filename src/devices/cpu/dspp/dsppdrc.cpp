@@ -23,7 +23,7 @@ using namespace uml;
 // map variables
 #define MAPVAR_PC                       M0
 #define MAPVAR_CYCLES                   M1
-#define MAPVAR_ACC						M2
+#define MAPVAR_ACC                      M2
 
 // exit codes
 #define EXECUTE_OUT_OF_CYCLES           0
@@ -59,8 +59,8 @@ static void cfunc_unimplemented(void *param)
 
 void dspp_device::cfunc_unimplemented()
 {
-//	uint64_t op = m_core->m_arg0;
-//	fatalerror("PC=%08X: Unimplemented op %04X%08X\n", m_core->m_pc, (uint32_t)(op >> 32), (uint32_t)(op));
+//  uint64_t op = m_core->m_arg0;
+//  fatalerror("PC=%08X: Unimplemented op %04X%08X\n", m_core->m_pc, (uint32_t)(op >> 32), (uint32_t)(op));
 }
 
 
@@ -408,7 +408,7 @@ void dspp_device::static_generate_entry_point()
 
 	/* forward references */
 	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
-//	alloc_handle(m_drcuml.get(), &m_exception[EXCEPTION_INTERRUPT], "exception_interrupt");
+//  alloc_handle(m_drcuml.get(), &m_exception[EXCEPTION_INTERRUPT], "exception_interrupt");
 
 	alloc_handle(m_drcuml.get(), &m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                                                            // handle  entry
@@ -427,11 +427,11 @@ void dspp_device::static_generate_entry_point()
 	UML_JMPc(block, COND_Z, skip);                                                      // jz      skip
 #endif
 
-//	UML_MOV(block, I0, mem(&m_core->m_pc));                                               // mov     i0,nextpc
-//	UML_MOV(block, I1, 0);                                                              // mov     i1,0
-//	UML_CALLH(block, *m_exception[EXCEPTION_INTERRUPT]);                                // callh   m_exception[EXCEPTION_INTERRUPT]
+//  UML_MOV(block, I0, mem(&m_core->m_pc));                                               // mov     i0,nextpc
+//  UML_MOV(block, I1, 0);                                                              // mov     i1,0
+//  UML_CALLH(block, *m_exception[EXCEPTION_INTERRUPT]);                                // callh   m_exception[EXCEPTION_INTERRUPT]
 
-//	UML_LABEL(block, skip);
+//  UML_LABEL(block, skip);
 
 	/* generate a hash jump via the current mode and PC */
 	UML_HASHJMP(block, 0, mem(&m_core->m_pc), *m_nocode);   // hashjmp <mode>,<pc>,nocode
@@ -516,7 +516,7 @@ void dspp_device::generate_sequence_instruction(drcuml_block &block, compiler_st
 		{
 			UML_MOV(block, mem(&m_core->m_pc), desc->pc);                                     // mov     [pc],desc->pc
 			UML_DMOV(block, mem(&m_core->m_arg0), desc->opptr.q[0]);                         // dmov    [m_arg0],*desc->opptr.q // FIXME
-//			UML_CALLC(block, cfunc_unimplemented, this);                                    // callc   cfunc_unimplemented,ppc
+//          UML_CALLC(block, cfunc_unimplemented, this);                                    // callc   cfunc_unimplemented,ppc
 		}
 	}
 }
@@ -657,7 +657,7 @@ void adsp21062_device::generate_jump(drcuml_block &block, compiler_state *compil
 	compiler->labelnum = compiler_temp.labelnum;
 
 	/* reset the mapvar to the current cycles and account for skipped slots */
-//	compiler->cycles += desc->skipslots;
+//  compiler->cycles += desc->skipslots;
 	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                                 // mapvar  CYCLES,compiler->cycles
 }
 
@@ -667,8 +667,8 @@ bool dspp_device::generate_complex_branch_opcode(drcuml_block &block, compiler_s
 
 	code_label skip_label = compiler->labelnum++;
 
-//	generate_branch_target(block, compiler, desc, op & 0x3ff, ef2);
-//	generate_condition(block, compiler, desc, ef1, true, skip_label, true);
+//  generate_branch_target(block, compiler, desc, op & 0x3ff, ef2);
+//  generate_condition(block, compiler, desc, ef1, true, skip_label, true);
 	generate_branch(block, compiler, desc);
 	UML_LABEL(block, skip_label);
 
@@ -775,93 +775,93 @@ bool dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 	// ACC_RESULT = I1?
 	switch (alu_op)
 	{
-		case 0:	// _TRA
+		case 0: // _TRA
 			// alu_res = alu_a;
 			UML_MOV(block, I2, I0);
 			break;
 
-		case 1:	// _NEG
+		case 1: // _NEG
 			// alu_res = -alu_b;
 			UML_SUB(block, I2, 0, I1);
 			break;
 
-		case 2:	// _+
+		case 2: // _+
 			// alu_res = alu_a + alu_b;
 			UML_ADD(block, I2, I0, I1);
 
 			// if ((alu_a & 0x80000) == (alu_b & 0x80000) &&
-			//	  (alu_a & 0x80000) != (alu_res & 0x80000))
-			//				m_core->m_flags |= DSPI_FLAG_CC_OVER;
+			//    (alu_a & 0x80000) != (alu_res & 0x80000))
+			//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
-			//			if (alu_res & 0x00100000)
-			//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+			//          if (alu_res & 0x00100000)
+			//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
-			//			CC_V_MODIFIED(desc);
-			//			CC_C_MODIFIED(desc);
+			//          CC_V_MODIFIED(desc);
+			//          CC_C_MODIFIED(desc);
 			break;
 
-		case 3:	// _+C
+		case 3: // _+C
 			UML_ADD(block, I2, I0, mew);
-			//			alu_res = alu_a + (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
+			//          alu_res = alu_a + (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
 
-			//			if (alu_res & 0x00100000)
-			//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+			//          if (alu_res & 0x00100000)
+			//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
 			CC_C_USED(desc);
 			CC_C_MODIFIED(desc);
 			break;
 
-		case 4:	// _-
-			//			alu_res = alu_a - alu_b;
+		case 4: // _-
+			//          alu_res = alu_a - alu_b;
 			UML_SUB(block, I2, I0, I1);
 
-			//			if ((alu_a & 0x80000) == (~alu_b & 0x80000) &&
-			//				(alu_a & 0x80000) != (alu_res & 0x80000))
-			//				m_core->m_flags |= DSPI_FLAG_CC_OVER;
+			//          if ((alu_a & 0x80000) == (~alu_b & 0x80000) &&
+			//              (alu_a & 0x80000) != (alu_res & 0x80000))
+			//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
-			//			if (alu_res & 0x00100000)
-			//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+			//          if (alu_res & 0x00100000)
+			//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
 			CC_C_MODIFIED(desc);
 			CC_V_MODIFIED(desc);
 			break;
 
-		case 5:	// _-B
-			//			alu_res = alu_a - (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
+		case 5: // _-B
+			//          alu_res = alu_a - (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
 
-			//			if (alu_res & 0x00100000)
-			//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+			//          if (alu_res & 0x00100000)
+			//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
 			CC_C_USED(desc);
 			CC_C_MODIFIED(desc);
 			break;
 
-		case 6:	// _++
+		case 6: // _++
 			UML_ADD(block, I2, I0, 1);
-			//			alu_res = alu_a + 1;
+			//          alu_res = alu_a + 1;
 
-			//			if (!(alu_a & 0x80000) && (alu_res & 0x80000))
-			//				m_core->m_flags |= DSPI_FLAG_CC_OVER;
+			//          if (!(alu_a & 0x80000) && (alu_res & 0x80000))
+			//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
 			CC_V_MODIFIED(desc);
 			break;
 
-		case 7:	// _--
+		case 7: // _--
 			// alu_res = alu_a - 1;
 			UML_SUB(block, I2, I0, 1);
 
 			// if ((alu_a & 0x80000) && !(alu_res & 0x80000))
-			//		m_core->m_flags |= DSPI_FLAG_CC_OVER;
+			//      m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
 			CC_V_MODIFIED(desc);
 			break;
 
-		case 8:	// _TRL
+		case 8: // _TRL
 			//alu_res = alu_a;
 			UML_MOV(block, I2, I0);
 			break;
 
-		case 9:	// _NOT
+		case 9: // _NOT
 			//alu_res = ~alu_a;
 			UML_XOR(block, I2, I0, 0xffff);
 			break;
@@ -919,7 +919,7 @@ bool dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 		if (alu_op < 8)
 		{
 			// Arithmetic
-//			m_core->m_acc = sign_extend20(alu_res) >> shift;
+//          m_core->m_acc = sign_extend20(alu_res) >> shift;
 
 			// TODO: Sign Extend to 20-bits
 			UML_SHR(block, I2, I2, shift);
@@ -928,7 +928,7 @@ bool dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 		else
 		{
 			// Logical
-//			m_core->m_acc = (alu_res & 0xfffff) >> shift;
+//          m_core->m_acc = (alu_res & 0xfffff) >> shift;
 			UML_AND(block, I2, 0xfffff);
 			UML_SHR(block, I2, I2, shift);
 			UML_MAPVAR(block, MAPVAR_ACC, I2);

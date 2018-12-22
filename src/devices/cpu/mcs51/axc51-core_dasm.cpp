@@ -2,11 +2,11 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
-	AXC51-CORE (AppoTech Inc.)
+    AXC51-CORE (AppoTech Inc.)
 
-	used in
+    used in
 
-	AX208 SoC
+    AX208 SoC
 
  *****************************************************************************/
 
@@ -17,12 +17,12 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 
 	// SFR Registers
 	//0x80  -
-	{ 0x81, "SP" }, // Stack Pointer 
+	{ 0x81, "SP" }, // Stack Pointer
 	//0x82  -
 	//0x83  -
 	//0x84  -
 	//0x85  -
-	{ 0x86, "DPCON" }, // Data Pointer Configure Register 
+	{ 0x86, "DPCON" }, // Data Pointer Configure Register
 	{ 0x87, "PCON0" }, // Power Control 0
 	//0x88  -
 	//0x89  -
@@ -37,7 +37,7 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	//0x92  -
 	//0x93  -
 	//0x94  -
-	{ 0x95, "IE2" }, // Interrupt Enable 2 
+	{ 0x95, "IE2" }, // Interrupt Enable 2
 	{ 0x96, "UARTBAUDH" }, // UART Baud (high)
 	{ 0x97, "PWKEN" }, // Port Wakeup Enable
 	{ 0x98, "PWKPND" }, //Port Wakeup Flag
@@ -54,14 +54,14 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	{ 0xA3, "GP2" }, // (General Purpose Register 2)
 	{ 0xA4, "GP3" }, // (General Purpose Register 3)
 	{ 0xA5, "DACCON" }, // DAC Control Register
-	{ 0xA6, "DACLCH" }, // DAC Left Channel 
+	{ 0xA6, "DACLCH" }, // DAC Left Channel
 	{ 0xA7, "DACRCH" }, // DAC Right Channel
 	{ 0xA8, "IE0" }, // Interrupt Enable 0
 	{ 0xA9, "IE1" }, // Interrupt Enable 1
 	//0xAA  -
 	//0xAB  -
-	{ 0xAC, "TMR3CON" }, // Timer3 Control 
-	{ 0xAD, "TMR3CNT" }, // Timer3 Counter 
+	{ 0xAC, "TMR3CON" }, // Timer3 Control
+	{ 0xAD, "TMR3CNT" }, // Timer3 Counter
 	{ 0xAE, "TMR3PR" }, // Timer3 Period
 	{ 0xAF, "TMR3PSR" }, // Timer3 Pre-scalar
 	//0xB0  -
@@ -87,25 +87,25 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	//0xC4  -
 	//0xC5  -
 	//0xC6  -
-	{ 0xC7, "LCDPR" }, // LCD CS Pulse Width Register 
-	{ 0xC8, "LCDTCON" }, // LCD WR Pulse Timing Control Register 
+	{ 0xC7, "LCDPR" }, // LCD CS Pulse Width Register
+	{ 0xC8, "LCDTCON" }, // LCD WR Pulse Timing Control Register
 	//0xC9  -
 	//0xCA  -
 	//0xCB  -
 	//0xCC  -
 	//0xCD  -
 	//0xCE  -
-	{ 0xCF, "MICCON" }, // MIC Control 
-	{ 0xD0, "PSW" }, // Processor Status Word 
+	{ 0xCF, "MICCON" }, // MIC Control
+	{ 0xD0, "PSW" }, // Processor Status Word
 	{ 0xD1, "PGCON" }, // Power Gate Control Register
-	{ 0xD2, "ADCCON" }, // SARADC Control 
+	{ 0xD2, "ADCCON" }, // SARADC Control
 	{ 0xD3, "PCON2" }, // Power Control 2
 	{ 0xD4, "ADCDATAL" }, // SARADC Buffer Low Byte Control
-	{ 0xD5, "ADCDATAH" }, // SARADC Buffer High Byte Control 
+	{ 0xD5, "ADCDATAH" }, // SARADC Buffer High Byte Control
 	{ 0xD6, "SPIDMAADDR" }, // SPI DMA Start Address
 	{ 0xD7, "SPIDMACNT" }, // SPI DMA counter
 	{ 0xD8, "SPICON" }, // SPI Control
-	{ 0xD9, "SPIBUF" }, // SPI Data Buffer 
+	{ 0xD9, "SPIBUF" }, // SPI Data Buffer
 	{ 0xDA, "SPIBAUD" }, // SPI Baud Rate
 	{ 0xDB, "CLKCON" }, // Clock Control
 	// 0xDC  -
@@ -122,7 +122,7 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	{ 0xE7, "ER01" }, // ER01 /
 	{ 0xE8, "ER10" }, // ER10 \- ER1 (16-bit)
 	{ 0xE9, "ER11" }, // ER11 /
-	{ 0XEA, "ER20" }, // ER20 \- ER2 (16-bit)
+	{ 0xEA, "ER20" }, // ER20 \- ER2 (16-bit)
 	{ 0xEB, "ER21" }, // ER21 /
 	{ 0xEC, "ER30" }, // ER30 \- ER3 (16-bit)
 	{ 0xED, "ER31" }, // ER31 /
@@ -138,12 +138,12 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 	{ 0xF7, "WDTCON" }, // Watchdog Control
 	{ 0xF8, "TMR0CON" }, // Timer0 Control
 	{ 0xF9, "TMR0CNT" }, // Timer0 Counter
-	{ 0xFA, "TMR0PR" }, // Timer0 Period 
+	{ 0xFA, "TMR0PR" }, // Timer0 Period
 	{ 0xFB, "TMR0PSR" }, // Timer0 Pre-scalar
-	{ 0xFC, "UARTSTA" }, // UART Status 
+	{ 0xFC, "UARTSTA" }, // UART Status
 	{ 0xFD, "UARTCON" }, // UART Control
 	{ 0xFE, "UARTBAUD" }, // UART Baud (low)
-	{ 0xFF, "UARTDATA" }, // UART Communication Data 
+	{ 0xFF, "UARTDATA" }, // UART Communication Data
 
 	// Upper Registers
 
@@ -163,7 +163,7 @@ const axc51core_disassembler::mem_info axc51core_disassembler::axc51core_names[]
 
 	{ 0x3040, "ADCBAUD" }, //S ARADC Baud
 
-	{ 0x3070, "DACPTR" }, // DAC DMA Pointer 
+	{ 0x3070, "DACPTR" }, // DAC DMA Pointer
 	{ 0x3071, "DACCNT" }, // DAC DMA Counter
 
 	{ -1 }
@@ -175,104 +175,104 @@ axc51core_disassembler::axc51core_disassembler() : mcs51_disassembler(axc51core_
 /* Extended 16-bit Opcodes
 
 Opcode/params        |    Operation                                        | Flags touched
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 INCDPi               |                                                     |
                      |    DPTRi = DPTRi + 1                                |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 DECDPi               |                                                     |
                      |    DPTRi = DPTRi - 1                                |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ADDDPi               |                                                     |
                      |    DPTRi = DPTRi + {R8, B}                          |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 SUBDPi               |                                                     |
                      |    DPTRi = DPTRi - {R8, B}                          |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 INC2DPi              |                                                     |
                      |    DPTRi = DPTRi + 2                                |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 DEC2DPi              |                                                     |
                      |    DPTRi = DPTRi - 2                                |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ROTR8                |                                                     |
 EACC, ER8            |    Rotate Right ACC by R8 &0x3 bits                 |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ROTL8                |                                                     |
 EACC, ER8            |    Rotate Left ACC by R8 &0x3 bits                  |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ADD16                |                                                     |
 ERp, DPTRi, ERn      |    ERp = XRAM + ERn + EC                            |    EZ, EC
 DPTRi, ERn, ERp      |    XRAM = ERn + ERp + EC                            |
 ERp, ERn, ERm        |    ERp = ERn + ERm + EC                             |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 SUB16                |                                                     |
 ERp, DPTRi, ERn      |    ERp = XRAM - ERn - EC                            |    EZ, EC
 DPTRi, ERn, ERp      |    XRAM = ERn - ERp - EC                            |
 ERp, ERn, ERm        |    ERp = ERn - ERm - EC                             |
-----------------------------------------------------------------------------------------                
+----------------------------------------------------------------------------------------
 NOT16                |                                                     |
 ERn                  |    ERn = ~ERn                                       |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 CLR16                |                                                     |
 ERn                  |    ERn = 0                                          |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 INC16                |                                                     |
 ERn                  |    ERn = ERn + 1                                    |    EZ
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 DEC16                |                                                     |
 ERn                  |    ERn = ERn - 1                                    |    EZ
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ANL16                |                                                     |
 ERn, DPTRi           |    ERn = XRAM & ERn                                 |    EZ
 DPTRi, ERn           |    XRAM = XRAM & ERn                                |
 ERn, ERm             |    ERn = ERn & ERm                                  |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ORL16                |                                                     |
 ERn, DPTRi           |    ERn = XRAM | ERn                                 |    EZ
 DPTRi, ERn           |    XRAM = XRAM | ERn                                |
 ERn, ERm             |    ERn = ERn | ERm                                  |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 XRL16                |                                                     |
 ERn, DPTRi           |    ERn = XRAM ^ ERn                                 |    EZ
 DPTRi, ERn           |    XRAM = XRAM ^ ERn                                |
 ERn, ERm             |    ERn = ERn ^ ERm                                  |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 MOV16                |                                                     |
 ERn, DPTRi           |    ERn = XRAM                                       |    EZ
 DPTRi, ERn           |    XRAM = ERn                                       |
 ERn, ERm             |    ERn = ERm                                        |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 MUL16 (signed)       |                                                     |
 ERn, ERm             |    {ERn, ERm} = ERn * ERm                           |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 MULS16 (sign, satur) |                                                     |
 ERn, ERm             |    {ERn, ERm} = ERn * ERm                           |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ROTR16               |                                                     |
 ERn, ER8             |    Rotate Right ERn by ER8 & 0xf bits               |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ROTL16               |                                                     |
 ERn, ER8             |    Rotate Left ERn by ER8 & 0xf bits                |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 SHIFTL   (lsl)       |                                                     |
 ERn, ER8             |    ERn = ERn >> (ER8 & 0xf)                         |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 SHIFTR   (asr)       |                                                     |
 ERn, ER8             |    ERn = ERn >> (ER8 & 0xf)                         |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 ADD16 (saturate)     |                                                     |
-ERp, DPTRi, ERn      |    ERp = XRAM + ERn + EC                            |    EZ, EC 
+ERp, DPTRi, ERn      |    ERp = XRAM + ERn + EC                            |    EZ, EC
 DPTRi, ERn, ERp      |    XRAM = ERn + ERp + EC                            |
 ERp, ERn, ERm        |    ERp = ERn + ERm + EC                             |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 SUB16 (saturate)     |                                                     |
-ERp, DPTRi, ERn      |    ERp = XRAM - ERn - EC                            |    EZ, EC         
+ERp, DPTRi, ERn      |    ERp = XRAM - ERn - EC                            |    EZ, EC
 DPTRi, ERn, ERp      |    XRAM = ERn - ERp - EC                            |
 ERp, ERn, ERm        |    ERp = ERn - ERm - EC                             |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 SWAP16               |                                                     |
 ERn                  |    Swap upper and lower 8-bits of ERn               |
-----------------------------------------------------------------------------------------            
+----------------------------------------------------------------------------------------
 
 access to 16-bit registers is mapped in SFR space, from 0xE6 (note, changing SFR bank does NOT update the actual registers)
 

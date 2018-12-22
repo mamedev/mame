@@ -2,7 +2,7 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-	3DO M2 Bulldog ASIC
+    3DO M2 Bulldog ASIC
 
 ***************************************************************************/
 
@@ -32,71 +32,71 @@ DEFINE_DEVICE_TYPE(M2_CDE, m2_cde_device, "m2cde", "3DO M2 CDE ASIC")
 //  VDU REGISTER DEFINITIONS
 //**************************************************************************
 
-#define	VDU_VLOC				0x00
-#define	VDU_VINT				0x04
-#define	VDU_VDC0				0x08
-#define	VDU_VDC1				0x0c
-#define	VDU_FV0A				0x10
-#define	VDU_FV1A				0x14
-#define	VDU_AVDI				0x1c
-#define	VDU_VDLI				0x20
-#define	VDU_VCFG				0x24
-#define	VDU_DMT0				0x28
-#define	VDU_DMT1				0x2c
-#define	VDU_LFSR				0x30
-#define	VDU_VRST				0x34
+#define VDU_VLOC                0x00
+#define VDU_VINT                0x04
+#define VDU_VDC0                0x08
+#define VDU_VDC1                0x0c
+#define VDU_FV0A                0x10
+#define VDU_FV1A                0x14
+#define VDU_AVDI                0x1c
+#define VDU_VDLI                0x20
+#define VDU_VCFG                0x24
+#define VDU_DMT0                0x28
+#define VDU_DMT1                0x2c
+#define VDU_LFSR                0x30
+#define VDU_VRST                0x34
 
 //-------------------------------------------------
 //  VLOC
 //-------------------------------------------------
-#define VDU_VLOC_VCOUNT_MASK	0x00003FF8
-#define VDU_VLOC_VCOUNT_SHIFT	3
-#define VDU_VLOC_VIDEOFIELD		0x00004000
-#define VDU_VLOC_RESERVED		0xFFFF8007
+#define VDU_VLOC_VCOUNT_MASK    0x00003FF8
+#define VDU_VLOC_VCOUNT_SHIFT   3
+#define VDU_VLOC_VIDEOFIELD     0x00004000
+#define VDU_VLOC_RESERVED       0xFFFF8007
 
 //-------------------------------------------------
 //  VINT
 //-------------------------------------------------
-#define VDU_VINT_VINT0			0x80000000
-#define VDU_VINT_VLINE0_MASK	0x7FF00000
-#define VDU_VINT_VLINE0_SHIFT	20
-#define VDU_VINT_VINT1			0x00008000
-#define VDU_VINT_VLINE1_MASK	0x00007FF0
-#define VDU_VINT_VLINE1_SHIFT	4
-#define VDU_VINT_RESERVED		0x000F000F
+#define VDU_VINT_VINT0          0x80000000
+#define VDU_VINT_VLINE0_MASK    0x7FF00000
+#define VDU_VINT_VLINE0_SHIFT   20
+#define VDU_VINT_VINT1          0x00008000
+#define VDU_VINT_VLINE1_MASK    0x00007FF0
+#define VDU_VINT_VLINE1_SHIFT   4
+#define VDU_VINT_RESERVED       0x000F000F
 
 //-------------------------------------------------
 //  VDC0/VDC1
 //-------------------------------------------------
-#define VDU_VDC_HINT			0x02000000
-#define VDU_VDC_VINT			0x01000000
-#define VDU_VDC_DITHER			0x00400000
-#define VDU_VDC_MTXBYP			0x00200000
-#define	VDU_VDC_RESERVED		0xFC9FFFFF
+#define VDU_VDC_HINT            0x02000000
+#define VDU_VDC_VINT            0x01000000
+#define VDU_VDC_DITHER          0x00400000
+#define VDU_VDC_MTXBYP          0x00200000
+#define VDU_VDC_RESERVED        0xFC9FFFFF
 
 //-------------------------------------------------
 //  AVDI
 //-------------------------------------------------
-#define VDU_AVDI_HSTART_MASK	0xFFE00000
-#define VDU_AVDI_HWIDTH_MASK	0x0003FF80
-#define VDU_AVDI_HDOUBLE		0x00000008
-#define VDU_AVDI_VDOUBLE		0x00000004
-#define VDU_AVDI_RESERVED		0x001C0073
-#define VDU_AVDI_HSTART_SHIFT	21
-#define VDU_AVDI_HWIDTH_SHIFT	7
+#define VDU_AVDI_HSTART_MASK    0xFFE00000
+#define VDU_AVDI_HWIDTH_MASK    0x0003FF80
+#define VDU_AVDI_HDOUBLE        0x00000008
+#define VDU_AVDI_VDOUBLE        0x00000004
+#define VDU_AVDI_RESERVED       0x001C0073
+#define VDU_AVDI_HSTART_SHIFT   21
+#define VDU_AVDI_HWIDTH_SHIFT   7
 
 //-------------------------------------------------
 //  VDLI
 //-------------------------------------------------
-#define VDU_VDLI_BYPASSTYPE		0x10000000
-#define VDU_VDLI_FBFORMAT		0x04000000
-#define VDU_VDLI_ONEVINTDIS		0x00400000
-#define VDU_VDLI_RANDOMDITHER	0x00200000
-#define VDU_VDLI_RESERVED		0xEB9FFFFF
-#define VDU_VDLI_BYPASSTYPE_MSB	0
-#define VDU_VDLI_BYPASSTYPE_LSB	0x10000000
-#define VDU_VDLI_FBFORMAT_16	0
-#define VDU_VDLI_FBFORMAT_32	0x04000000
+#define VDU_VDLI_BYPASSTYPE     0x10000000
+#define VDU_VDLI_FBFORMAT       0x04000000
+#define VDU_VDLI_ONEVINTDIS     0x00400000
+#define VDU_VDLI_RANDOMDITHER   0x00200000
+#define VDU_VDLI_RESERVED       0xEB9FFFFF
+#define VDU_VDLI_BYPASSTYPE_MSB 0
+#define VDU_VDLI_BYPASSTYPE_LSB 0x10000000
+#define VDU_VDLI_FBFORMAT_16    0
+#define VDU_VDLI_FBFORMAT_32    0x04000000
 
 //-------------------------------------------------
 //  VCFG
@@ -105,82 +105,82 @@ DEFINE_DEVICE_TYPE(M2_CDE, m2_cde_device, "m2cde", "3DO M2 CDE ASIC")
 //-------------------------------------------------
 //  VRST
 //-------------------------------------------------
-#define	VDU_VRST_DVERESET		0x00000002
-#define	VDU_VRST_VIDRESET		0x00000001
-#define	VDU_VRST_RESERVED		0xFFFFFFFC
+#define VDU_VRST_DVERESET       0x00000002
+#define VDU_VRST_VIDRESET       0x00000001
+#define VDU_VRST_RESERVED       0xFFFFFFFC
 
 
 //-------------------------------------------------
 //  VDL DMA CONTROL WORD
 //-------------------------------------------------
-#define VDL_DMA_MOD_MASK		0xFF000000
-#define VDL_DMA_ENABLE			0x00200000
-#define VDL_DMA_NOBUCKET		0x00020000
-#define VDL_DMA_LDLOWER			0x00010000
-#define VDL_DMA_LDUPPER			0x00008000
-#define VDL_DMA_NWORDS_MASK		0x00007E00
-#define VDL_DMA_NLINES_MASK		0x000001FF
-#define VDL_DMA_RESERVED		0x00DC0000
-#define VDL_DMA_NWORDS_SHIFT	9
-#define VDL_DMA_MOD_SHIFT		24
-#define VDL_DMA_NLINES_SHIFT	0
+#define VDL_DMA_MOD_MASK        0xFF000000
+#define VDL_DMA_ENABLE          0x00200000
+#define VDL_DMA_NOBUCKET        0x00020000
+#define VDL_DMA_LDLOWER         0x00010000
+#define VDL_DMA_LDUPPER         0x00008000
+#define VDL_DMA_NWORDS_MASK     0x00007E00
+#define VDL_DMA_NLINES_MASK     0x000001FF
+#define VDL_DMA_RESERVED        0x00DC0000
+#define VDL_DMA_NWORDS_SHIFT    9
+#define VDL_DMA_MOD_SHIFT       24
+#define VDL_DMA_NLINES_SHIFT    0
 
 //-------------------------------------------------
 //  VDL DC CONTROL WORD
 //-------------------------------------------------
-#define	VDL_DC					0x80000000
-#define	VDL_DC_0				0x00000000
-#define	VDL_DC_1				0x10000000
-#define	VDL_DC_HINTCTL_MASK		0x00060000
-#define	VDL_DC_HINTCTL_SHIFT	17
-#define	VDL_DC_VINTCTL_MASK		0x00018000
-#define	VDL_DC_VINTCTL_SHIFT	15
-#define	VDL_DC_DITHERCTL_MASK	0x00001800
-#define	VDL_DC_DITHERCTL_SHIFT	11
-#define	VDL_DC_MTXBYPCTL_MASK	0x00000600
-#define	VDL_DC_MTXBYPCTL_SHIFT	9
-#define	VDL_DC_RESERVED			0x0FF861FF
-#define	VDL_CTL_DISABLE			0
-#define	VDL_CTL_ENABLE			1
-#define	VDL_CTL_NOP				2
+#define VDL_DC                  0x80000000
+#define VDL_DC_0                0x00000000
+#define VDL_DC_1                0x10000000
+#define VDL_DC_HINTCTL_MASK     0x00060000
+#define VDL_DC_HINTCTL_SHIFT    17
+#define VDL_DC_VINTCTL_MASK     0x00018000
+#define VDL_DC_VINTCTL_SHIFT    15
+#define VDL_DC_DITHERCTL_MASK   0x00001800
+#define VDL_DC_DITHERCTL_SHIFT  11
+#define VDL_DC_MTXBYPCTL_MASK   0x00000600
+#define VDL_DC_MTXBYPCTL_SHIFT  9
+#define VDL_DC_RESERVED         0x0FF861FF
+#define VDL_CTL_DISABLE         0
+#define VDL_CTL_ENABLE          1
+#define VDL_CTL_NOP             2
 
 //-------------------------------------------------
 //  VDL AV CONTROL WORD
 //-------------------------------------------------
-#define VDL_AV					0xA0000000
-#define VDL_AV_HSTART_MASK		0x1FFC0000
-#define VDL_AV_HSTART_SHIFT		18
-#define VDL_AV_LD_HSTART		0x00020000
-#define VDL_AV_HWIDTH_MASK		0x0001FFC0
-#define VDL_AV_HWIDTH_SHIFT		6
-#define VDL_AV_LD_HWIDTH		0x00000020
-#define VDL_AV_HDOUBLE			0x00000010
-#define VDL_AV_VDOUBLE			0x00000008
-#define VDL_AV_LD_HDOUBLE		0x00000004
-#define VDL_AV_LD_VDOUBLE		0x00000002
-#define VDL_AV_RESERVED			0x00000001
+#define VDL_AV                  0xA0000000
+#define VDL_AV_HSTART_MASK      0x1FFC0000
+#define VDL_AV_HSTART_SHIFT     18
+#define VDL_AV_LD_HSTART        0x00020000
+#define VDL_AV_HWIDTH_MASK      0x0001FFC0
+#define VDL_AV_HWIDTH_SHIFT     6
+#define VDL_AV_LD_HWIDTH        0x00000020
+#define VDL_AV_HDOUBLE          0x00000010
+#define VDL_AV_VDOUBLE          0x00000008
+#define VDL_AV_LD_HDOUBLE       0x00000004
+#define VDL_AV_LD_VDOUBLE       0x00000002
+#define VDL_AV_RESERVED         0x00000001
 
 //-------------------------------------------------
 //  VDL LC CONTROL WORD
 //-------------------------------------------------
-#define	VDL_LC					0xC0000000
-#define	VDL_LC_BYPASSTYPE		0x02000000
-#define	VDL_LC_FBFORMAT			0x00800000
-#define	VDL_LC_ONEVINTDIS		0x00080000
-#define	VDL_LC_RANDOMDITHER		0x00040000
-#define	VDL_LC_LD_BYPASSTYPE	0x00002000
-#define	VDL_LC_LD_FBFORMAT		0x00001000
-#define	VDL_LC_RESERVED			0x1D73CFFF
-#define	VDL_LC_BYPASSTYPE_MSB	0x00000000
-#define	VDL_LC_BYPASSTYPE_LSB	0x02000000
-#define	VDL_LC_FBFORMAT_16		0x00000000
-#define	VDL_LC_FBFORMAT_32		0x00800000
+#define VDL_LC                  0xC0000000
+#define VDL_LC_BYPASSTYPE       0x02000000
+#define VDL_LC_FBFORMAT         0x00800000
+#define VDL_LC_ONEVINTDIS       0x00080000
+#define VDL_LC_RANDOMDITHER     0x00040000
+#define VDL_LC_LD_BYPASSTYPE    0x00002000
+#define VDL_LC_LD_FBFORMAT      0x00001000
+#define VDL_LC_RESERVED         0x1D73CFFF
+#define VDL_LC_BYPASSTYPE_MSB   0x00000000
+#define VDL_LC_BYPASSTYPE_LSB   0x02000000
+#define VDL_LC_FBFORMAT_16      0x00000000
+#define VDL_LC_FBFORMAT_32      0x00800000
 
 //-------------------------------------------------
 //  VDL DMA CONTROL WORD
 //-------------------------------------------------
 
-#define VDL_NOP					0xe1000000
+#define VDL_NOP                 0xe1000000
 
 
 
@@ -192,9 +192,9 @@ static void write_m2_reg(uint32_t &reg, uint32_t data, reg_wmode mode)
 {
 	switch (mode)
 	{
-		case REG_WRITE: reg = data;		break;
-		case REG_SET:	reg |= data;	break;
-		case REG_CLEAR:	reg &= ~data;	break;
+		case REG_WRITE: reg = data;     break;
+		case REG_SET:   reg |= data;    break;
+		case REG_CLEAR: reg &= ~data;   break;
 		default:
 			assert_always(false, "Bad register write mode");
 	}
@@ -278,7 +278,7 @@ void m2_bda_device::device_post_load()
 
 
 //-------------------------------------------------
-//	machine_config_fragment - declare sub-devices
+//  machine_config_fragment - declare sub-devices
 //-------------------------------------------------
 
 void m2_bda_device::device_add_mconfig(machine_config &config)
@@ -294,7 +294,7 @@ void m2_bda_device::device_add_mconfig(machine_config &config)
 	M2_CTRLPORT(config, m_ctrlport, DERIVED_CLOCK(1, 1));
 
 	M2_MPEG(config, m_mpeg, DERIVED_CLOCK(1, 1));
-//	m_mpeg->int_handler().set(m_powerbus, FUNC(m2_powerbus_device::int_line<BDAINT_MPEG_LINE>));
+//  m_mpeg->int_handler().set(m_powerbus, FUNC(m2_powerbus_device::int_line<BDAINT_MPEG_LINE>));
 
 	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
 	m_dspp->int_handler().set(m_powerbus, FUNC(m2_powerbus_device::int_line<BDAINT_DSP_LINE>));
@@ -469,15 +469,15 @@ void m2_bda_device::configure_ppc_address_map(address_space &space)
 	space.install_ram(TE_TRAM_BASE, TE_TRAM_BASE + TE_TRAM_MASK, m_te->tram_ptr());
 
 	// Install BDA sub-devices
-	space.install_readwrite_handler(POWERBUS_BASE,	POWERBUS_BASE + DEVICE_MASK,read32_delegate(FUNC(m2_powerbus_device::read),	&(*m_powerbus)),	write32_delegate(FUNC(m2_powerbus_device::write),	&(*m_powerbus)),	0xffffffffffffffffULL);
-	space.install_readwrite_handler(MEMCTL_BASE,	MEMCTL_BASE + DEVICE_MASK,	read32_delegate(FUNC(m2_memctl_device::read),	&(*m_memctl)),		write32_delegate(FUNC(m2_memctl_device::write),		&(*m_memctl)),		0xffffffffffffffffULL);
-	space.install_readwrite_handler(VDU_BASE,		VDU_BASE + DEVICE_MASK,		read32_delegate(FUNC(m2_vdu_device::read),		&(*m_vdu)),			write32_delegate(FUNC(m2_vdu_device::write),		&(*m_vdu)),			0xffffffffffffffffULL);
-	space.install_readwrite_handler(TE_BASE,		TE_BASE + DEVICE_MASK,		read32_delegate(FUNC(m2_te_device::read),		&(*m_te)),			write32_delegate(FUNC(m2_te_device::write),			&(*m_te)),			0xffffffffffffffffULL);
-	space.install_readwrite_handler(DSP_BASE,		DSP_BASE + DEVICE_MASK,		read32_delegate(FUNC(dspp_device::read),		&(*m_dspp)),		write32_delegate(FUNC(dspp_device::write),			&(*m_dspp)),		0xffffffffffffffffULL);
-	space.install_readwrite_handler(CTRLPORT_BASE,	CTRLPORT_BASE + DEVICE_MASK,read32_delegate(FUNC(m2_ctrlport_device::read),	&(*m_ctrlport)),	write32_delegate(FUNC(m2_ctrlport_device::write),	&(*m_ctrlport)),	0xffffffffffffffffULL);
-	space.install_readwrite_handler(MPEG_BASE,		MPEG_BASE + DEVICE_MASK,	read32_delegate(FUNC(m2_mpeg_device::read),		&(*m_mpeg)),		write32_delegate(FUNC(m2_mpeg_device::write),		&(*m_mpeg)),		0xffffffffffffffffULL);
+	space.install_readwrite_handler(POWERBUS_BASE,  POWERBUS_BASE + DEVICE_MASK,read32_delegate(FUNC(m2_powerbus_device::read), &(*m_powerbus)),    write32_delegate(FUNC(m2_powerbus_device::write),   &(*m_powerbus)),    0xffffffffffffffffULL);
+	space.install_readwrite_handler(MEMCTL_BASE,    MEMCTL_BASE + DEVICE_MASK,  read32_delegate(FUNC(m2_memctl_device::read),   &(*m_memctl)),      write32_delegate(FUNC(m2_memctl_device::write),     &(*m_memctl)),      0xffffffffffffffffULL);
+	space.install_readwrite_handler(VDU_BASE,       VDU_BASE + DEVICE_MASK,     read32_delegate(FUNC(m2_vdu_device::read),      &(*m_vdu)),         write32_delegate(FUNC(m2_vdu_device::write),        &(*m_vdu)),         0xffffffffffffffffULL);
+	space.install_readwrite_handler(TE_BASE,        TE_BASE + DEVICE_MASK,      read32_delegate(FUNC(m2_te_device::read),       &(*m_te)),          write32_delegate(FUNC(m2_te_device::write),         &(*m_te)),          0xffffffffffffffffULL);
+	space.install_readwrite_handler(DSP_BASE,       DSP_BASE + DEVICE_MASK,     read32_delegate(FUNC(dspp_device::read),        &(*m_dspp)),        write32_delegate(FUNC(dspp_device::write),          &(*m_dspp)),        0xffffffffffffffffULL);
+	space.install_readwrite_handler(CTRLPORT_BASE,  CTRLPORT_BASE + DEVICE_MASK,read32_delegate(FUNC(m2_ctrlport_device::read), &(*m_ctrlport)),    write32_delegate(FUNC(m2_ctrlport_device::write),   &(*m_ctrlport)),    0xffffffffffffffffULL);
+	space.install_readwrite_handler(MPEG_BASE,      MPEG_BASE + DEVICE_MASK,    read32_delegate(FUNC(m2_mpeg_device::read),     &(*m_mpeg)),        write32_delegate(FUNC(m2_mpeg_device::write),       &(*m_mpeg)),        0xffffffffffffffffULL);
 
-	space.install_readwrite_handler(CPUID_BASE,		CPUID_BASE + DEVICE_MASK,	read32_delegate(FUNC(m2_bda_device::cpu_id_r),	this),				write32_delegate(FUNC(m2_bda_device::cpu_id_w),		this),				0xffffffffffffffffULL);
+	space.install_readwrite_handler(CPUID_BASE,     CPUID_BASE + DEVICE_MASK,   read32_delegate(FUNC(m2_bda_device::cpu_id_r),  this),              write32_delegate(FUNC(m2_bda_device::cpu_id_w),     this),              0xffffffffffffffffULL);
 
 
 	// Find and install the CDE
@@ -954,7 +954,7 @@ WRITE32_MEMBER( m2_vdu_device::write )
 	uint32_t byte_offs = offset << 2;
 	reg_wmode wmode = byte_offs & 0x400 ? REG_CLEAR : REG_WRITE;
 
-//	logerror("%s: VDU WRITE: %03x %08x %x\n", machine().describe_context(), byte_offs, data, mem_mask);
+//  logerror("%s: VDU WRITE: %03x %08x %x\n", machine().describe_context(), byte_offs, data, mem_mask);
 	byte_offs &= ~0x400;
 	switch (byte_offs)
 	{
@@ -1132,8 +1132,8 @@ void m2_vdu_device::draw_scanline(uint32_t *dst, uint32_t srclower, uint32_t src
 	uint32_t hw = (m_avdi & VDU_AVDI_HWIDTH_MASK) >> VDU_AVDI_HWIDTH_SHIFT;
 
 	bool is32bpp = m_vdli & VDU_VDLI_FBFORMAT_32 ? true : false;
-//	bool bypassmsb = m_vdli & VDU_VDLI_BYPASSTYPE_MSB ? true : false;
-//	bool randomdith = m_vdli & VDU_VDLI_RANDOMDITHER ? true : false;
+//  bool bypassmsb = m_vdli & VDU_VDLI_BYPASSTYPE_MSB ? true : false;
+//  bool randomdith = m_vdli & VDU_VDLI_RANDOMDITHER ? true : false;
 
 	uint32_t h = 0;
 
@@ -1188,8 +1188,8 @@ void m2_vdu_device::draw_scanline_double(uint32_t *dst, uint32_t srclower, uint3
 	uint32_t hw = (m_avdi & VDU_AVDI_HWIDTH_MASK) >> VDU_AVDI_HWIDTH_SHIFT;
 
 	bool is32bpp = m_vdli & VDU_VDLI_FBFORMAT_32 ? true : false;
-//	bool bypassmsb = m_vdli & VDU_VDLI_BYPASSTYPE_MSB ? true : false;
-//	bool randomdith = m_vdli & VDU_VDLI_RANDOMDITHER ? true : false;
+//  bool bypassmsb = m_vdli & VDU_VDLI_BYPASSTYPE_MSB ? true : false;
+//  bool randomdith = m_vdli & VDU_VDLI_RANDOMDITHER ? true : false;
 
 	uint32_t h = 0;
 
@@ -1333,7 +1333,7 @@ uint32_t m2_vdu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			bool hdouble = m_avdi & VDU_AVDI_HDOUBLE ? true : false;
 			bool vdouble = m_avdi & VDU_AVDI_VDOUBLE ? true : false;
-//			bool onevintdis = m_vdli & VDU_VDLI_ONEVINTDIS ? true : false;
+//          bool onevintdis = m_vdli & VDU_VDLI_ONEVINTDIS ? true : false;
 
 			uint32_t srclower = lower;
 			uint32_t srcupper = upper;
@@ -1760,7 +1760,7 @@ WRITE32_MEMBER( m2_cde_device::write )
 	{
 		case CDE_SDBG_CNTL:
 		{
-			// ........ ........ xxxxxxxx xxxx....		Clock scaler (written with 33MHz/38400 = 868)
+			// ........ ........ xxxxxxxx xxxx....      Clock scaler (written with 33MHz/38400 = 868)
 			write_m2_reg(m_sdbg_cntl, data, wm_cw);
 			break;
 		}
@@ -1844,7 +1844,7 @@ WRITE32_MEMBER( m2_cde_device::write )
 			break;
 		}
 
-//		case CDE_SYSTEM_CONF:
+//      case CDE_SYSTEM_CONF:
 		case CDE_VISA_DIS:
 		{
 			write_m2_reg(m_visa_dis, data, wm_cw);
@@ -1941,7 +1941,7 @@ void m2_cde_device::start_dma(uint32_t ch)
 	// TODO: DMA timing is probably inaccurate
 	attotime delay = attotime::from_nsec(10);// * dma_ch.m_ccnt;
 
-//	attotime delay = clocks_to_attotime(4 * dma_ch.m_ccnt);
+//  attotime delay = clocks_to_attotime(4 * dma_ch.m_ccnt);
 	dma_ch.m_timer->adjust(delay);
 
 	if (dma_ch.m_cntl & CDE_DMA_DIRECTION)

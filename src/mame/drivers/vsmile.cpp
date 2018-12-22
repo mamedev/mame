@@ -10,18 +10,18 @@
 
     To-Do:
 
-		Proper UART support (SPG2xx) for controller
+        Proper UART support (SPG2xx) for controller
 
-	Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
+    Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
 
-		V.Smile by VTech, a system designed for children under the age of 10
-		V.Smile Pocket (2 versions)
-		V.Smile Cyber Pocket
-		V.Smile PC Pal
-		V-Motion Active Learning System
-		Leapster
-		V.Smile Baby Infant Development System
-		V.Flash
+        V.Smile by VTech, a system designed for children under the age of 10
+        V.Smile Pocket (2 versions)
+        V.Smile Cyber Pocket
+        V.Smile PC Pal
+        V-Motion Active Learning System
+        Leapster
+        V.Smile Baby Infant Development System
+        V.Flash
 
 *******************************************************************************/
 

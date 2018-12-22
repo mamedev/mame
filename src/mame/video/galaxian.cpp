@@ -1368,12 +1368,12 @@ void galaxian_state::jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx
  *
  *************************************/
 
-/* gfxbank[4] is used as a cpu bank number, and gfxbank[0] for graphics banking */ 
+/* gfxbank[4] is used as a cpu bank number, and gfxbank[0] for graphics banking */
 WRITE8_MEMBER( galaxian_state::fourplay_rombank_w )
 {
 	m_gfxbank[4] = (m_gfxbank[4] & (2 - offset)) | (data << offset);
 
-	m_gfxbank[0] = (m_gfxbank[4] == 3);	// 1 = true, 0 = false
+	m_gfxbank[0] = (m_gfxbank[4] == 3); // 1 = true, 0 = false
 
 	membank("bank1")->set_entry( m_gfxbank[4] );
 }

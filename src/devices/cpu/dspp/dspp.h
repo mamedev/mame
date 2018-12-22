@@ -105,9 +105,9 @@ private:
 	static const uint32_t OUTPUT_FIFO_MASK = OUTPUT_FIFO_DEPTH - 1;
 
 	// Handlers
-	devcb_write_line	m_int_handler;
-	devcb_read8			m_dma_read_handler;
-	devcb_write8		m_dma_write_handler;
+	devcb_write_line    m_int_handler;
+	devcb_read8         m_dma_read_handler;
+	devcb_write8        m_dma_write_handler;
 
 	// Internal functions
 	uint16_t read_op(offs_t pc);
@@ -157,8 +157,8 @@ private:
 	bool m_isdrc;
 
 	// Address spaces
-	const address_space_config	m_code_config;
-	const address_space_config	m_data_config;
+	const address_space_config  m_code_config;
+	const address_space_config  m_data_config;
 	address_space *     m_code;
 	address_space *     m_data;
 	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_code_cache;
@@ -167,26 +167,26 @@ private:
 	struct dspp_internal_state
 	{
 		// Internal state
-		int			m_icount;
-		uint16_t	m_pc;
-		uint16_t	m_stack[PC_STACK_DEPTH];
-		uint32_t	m_stack_ptr;
-		uint16_t	m_rbase[4];
-		uint32_t	m_acc;
-		uint32_t	m_tclock;
+		int         m_icount;
+		uint16_t    m_pc;
+		uint16_t    m_stack[PC_STACK_DEPTH];
+		uint32_t    m_stack_ptr;
+		uint16_t    m_rbase[4];
+		uint32_t    m_acc;
+		uint32_t    m_tclock;
 
-		uint32_t	m_flag_carry;
-		uint32_t	m_flag_zero;
-		uint32_t	m_flag_neg;
-		uint32_t	m_flag_over;
-		uint32_t	m_flag_exact;
-		uint32_t	m_flag_audlock;
-		uint32_t	m_flag_sleep;
+		uint32_t    m_flag_carry;
+		uint32_t    m_flag_zero;
+		uint32_t    m_flag_neg;
+		uint32_t    m_flag_over;
+		uint32_t    m_flag_exact;
+		uint32_t    m_flag_audlock;
+		uint32_t    m_flag_sleep;
 
-		uint32_t	m_partial_int;
-		uint16_t	m_op;
-		uint32_t	m_opidx;
-		int32_t		m_writeback;
+		uint32_t    m_partial_int;
+		uint16_t    m_op;
+		uint32_t    m_opidx;
+		int32_t     m_writeback;
 
 		const char *m_format;
 		uint32_t    m_arg0;
@@ -201,54 +201,54 @@ private:
 	// DMA
 	struct fifo_dma
 	{
-		uint32_t	m_current_addr;
-		int32_t		m_current_count;
-		uint32_t	m_next_addr;
-		uint32_t	m_next_count;
-		uint32_t	m_prev_value;
-		uint32_t	m_prev_current;
-		uint8_t		m_go_forever;
-		uint8_t		m_next_valid;
-		uint8_t		m_reserved;
-		uint16_t	m_fifo[DMA_FIFO_DEPTH];
-		uint32_t	m_dma_ptr;
-		uint32_t	m_dspi_ptr;
-		uint32_t	m_depth;
+		uint32_t    m_current_addr;
+		int32_t     m_current_count;
+		uint32_t    m_next_addr;
+		uint32_t    m_next_count;
+		uint32_t    m_prev_value;
+		uint32_t    m_prev_current;
+		uint8_t     m_go_forever;
+		uint8_t     m_next_valid;
+		uint8_t     m_reserved;
+		uint16_t    m_fifo[DMA_FIFO_DEPTH];
+		uint32_t    m_dma_ptr;
+		uint32_t    m_dspi_ptr;
+		uint32_t    m_depth;
 	} m_fifo_dma[NUM_DMA_CHANNELS];
 
 	// Oscillator
-	uint32_t	m_last_frame_clock;
-	uint32_t	m_last_osc_count;
-	uint32_t	m_osc_phase;
-	uint32_t	m_osc_freq;
+	uint32_t    m_last_frame_clock;
+	uint32_t    m_last_osc_count;
+	uint32_t    m_osc_phase;
+	uint32_t    m_osc_freq;
 
 	// Output FIFO
-	uint16_t	m_outputs[NUM_OUTPUTS];
-	uint16_t	m_output_fifo[OUTPUT_FIFO_DEPTH];
-	uint32_t	m_output_fifo_start;
-	uint32_t	m_output_fifo_count;
+	uint16_t    m_outputs[NUM_OUTPUTS];
+	uint16_t    m_output_fifo[OUTPUT_FIFO_DEPTH];
+	uint32_t    m_output_fifo_start;
+	uint32_t    m_output_fifo_count;
 
 	// External control registers
-	uint32_t	m_dspx_control;
-	uint32_t	m_dspx_reset;
-	uint32_t	m_dspx_int_enable;
-	uint32_t	m_dspx_channel_enable;
-	uint32_t	m_dspx_channel_complete;
-	uint32_t	m_dspx_channel_direction;
-	uint32_t	m_dspx_channel_8bit;
-	uint32_t	m_dspx_channel_sqxd;
-	uint32_t	m_dspx_shadow_current_addr;
-	uint32_t	m_dspx_shadow_current_count;
-	uint32_t	m_dspx_shadow_next_addr;
-	uint32_t	m_dspx_shadow_next_count;
-	uint32_t	m_dspx_dmanext_int;
-	uint32_t	m_dspx_dmanext_enable;
-	uint32_t	m_dspx_consumed_int;
-	uint32_t	m_dspx_consumed_enable;
-	uint32_t	m_dspx_underover_int;
-	uint32_t	m_dspx_underover_enable;
-	uint32_t	m_dspx_audio_time;
-	uint16_t	m_dspx_audio_duration;
+	uint32_t    m_dspx_control;
+	uint32_t    m_dspx_reset;
+	uint32_t    m_dspx_int_enable;
+	uint32_t    m_dspx_channel_enable;
+	uint32_t    m_dspx_channel_complete;
+	uint32_t    m_dspx_channel_direction;
+	uint32_t    m_dspx_channel_8bit;
+	uint32_t    m_dspx_channel_sqxd;
+	uint32_t    m_dspx_shadow_current_addr;
+	uint32_t    m_dspx_shadow_current_count;
+	uint32_t    m_dspx_shadow_next_addr;
+	uint32_t    m_dspx_shadow_next_count;
+	uint32_t    m_dspx_dmanext_int;
+	uint32_t    m_dspx_dmanext_enable;
+	uint32_t    m_dspx_consumed_int;
+	uint32_t    m_dspx_consumed_enable;
+	uint32_t    m_dspx_underover_int;
+	uint32_t    m_dspx_underover_enable;
+	uint32_t    m_dspx_audio_time;
+	uint16_t    m_dspx_audio_duration;
 
 	//
 	// DRC
@@ -256,11 +256,11 @@ private:
 
 	// Core state
 	/* internal stuff */
-	bool		m_cache_dirty;
-	drc_cache	m_cache;
-	std::unique_ptr<drcuml_state>	m_drcuml;
-	std::unique_ptr<dspp_frontend>	m_drcfe;
-	uint32_t	m_drcoptions;
+	bool        m_cache_dirty;
+	drc_cache   m_cache;
+	std::unique_ptr<drcuml_state>   m_drcuml;
+	std::unique_ptr<dspp_frontend>  m_drcfe;
+	uint32_t    m_drcoptions;
 
 	/* internal compiler state */
 	struct compiler_state
@@ -275,12 +275,12 @@ public: // TODO
 	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
-//	void arm7_drc_init();
-//	void arm7_drc_exit();
+//  void arm7_drc_init();
+//  void arm7_drc_exit();
 	void execute_run_drc();
-//	void arm7drc_set_options(uint32_t options);
-//	void arm7drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
-//	void arm7drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
+//  void arm7drc_set_options(uint32_t options);
+//  void arm7drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
+//  void arm7drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
 	void flush_cache();
 	void compile_block(offs_t pc);
 	void cfunc_get_cycles();

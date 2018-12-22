@@ -116,7 +116,7 @@ void minivideo_state::minivideo(machine_config &config)
 /*
 PCB is marked: "MINIVIDEO 1.3" on component side
 PCB is marked: "MINIVIDEO 1.3" and "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
-PCB is labelled: "LF1.3" on component side 
+PCB is labelled: "LF1.3" on component side
 */
 ROM_START( fiches )
 	ROM_REGION(0x8000, "maincpu", 0)
@@ -130,7 +130,7 @@ ROM_END
 
 /*
 PCB is marked: "MINIVIDEO 1.2" on component side
-PCB is marked: "MINIVIDEO 1.2" and "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side") 
+PCB is marked: "MINIVIDEO 1.2" and "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
 */
 ROM_START( fiches12 )
 	ROM_REGION(0x8000, "maincpu", 0)

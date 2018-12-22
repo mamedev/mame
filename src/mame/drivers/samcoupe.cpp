@@ -515,7 +515,7 @@ void samcoupe_state::samcoupe(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH,  0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT,
-	                                      SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
+										  SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
 	m_screen->set_screen_update(FUNC(samcoupe_state::screen_update));
 	m_screen->set_palette("palette");
 

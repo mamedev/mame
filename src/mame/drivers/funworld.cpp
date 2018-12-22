@@ -4517,24 +4517,24 @@ ROM_END
   New Biliard 98
 
   CPUs:
-  1x 	R65C02P2 	u1 	8-bit Microprocessor - main
-  1x 	MC68B45P 	u8 	CRT Controller (CRTC)
-  2x 	MC68B21CP 	u29, u30 	Peripheral Interface Adapter
-  1x 	89C10 		u34 	Programmable Sound Generator - sound
-  1x 	TDA2003 	u33 	Audio Amplifier - sound
-  1x 	oscillator 	16.000000MHz 	os1 	
+  1x    R65C02P2    u1  8-bit Microprocessor - main
+  1x    MC68B45P    u8  CRT Controller (CRTC)
+  2x    MC68B21CP   u29, u30    Peripheral Interface Adapter
+  1x    89C10       u34     Programmable Sound Generator - sound
+  1x    TDA2003     u33     Audio Amplifier - sound
+  1x    oscillator  16.000000MHz    os1
 
   ROMs:
-  3x 	27C256 	u2, u20, u21 	dumped
-  1x 	AM27S29PC 	u25 	dumped
+  3x    27C256  u2, u20, u21    dumped
+  1x    AM27S29PC   u25     dumped
 
   RAMs:
-  1x 	KM6264BL-10L-12 u13
-  1x 	GM76C28A-10 	u3
+  1x    KM6264BL-10L-12 u13
+  1x    GM76C28A-10     u3
 
   PLDs:
-  2x 	GAL20V8A-25LP 	u22, u23  read protected
-  1x 	PALCE16V8H-15PC/4 	u5 	  read protected
+  2x    GAL20V8A-25LP   u22, u23  read protected
+  1x    PALCE16V8H-15PC/4   u5    read protected
 
   Others:
   1x 28x2 JAMMA edge connector
@@ -4544,7 +4544,7 @@ ROM_END
 
   Notes:
   PCB is marked: "top" and "C.M.C. POOL 10" on component side
-  PCB is marked: "bottom" and "POOL 10 C.M.C" on solder side 
+  PCB is marked: "bottom" and "POOL 10 C.M.C" on solder side
 
 */
 ROM_START( biliard )

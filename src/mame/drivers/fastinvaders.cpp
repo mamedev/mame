@@ -129,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::scanline_timer)
     {
         //logerror("scanline\n");
         m_dma8257->dreq1_w(0x01);
-    	m_dma8257->hlda_w(1);
+        m_dma8257->hlda_w(1);
     }
     */
 }
@@ -204,7 +204,7 @@ WRITE8_MEMBER(fastinvaders_state::dark_2_clr)
 		m_dma8257->dreq2_w(0x00);
 	}
 /*  if (!data)
-	{
+    {
         m_dma1 = 0;
     }
     */

@@ -2,7 +2,7 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-	3DO M2 BDA Triangle Engine
+    3DO M2 BDA Triangle Engine
 
 ***************************************************************************/
 
@@ -10,19 +10,19 @@
 #include "3dom2.h"
 
 /*
-	TODO:
+    TODO:
 
-	VTX_FLAGS do not get passed to the TMAPPER: Should use master control
-	bits to disable shading and texturing.
+    VTX_FLAGS do not get passed to the TMAPPER: Should use master control
+    bits to disable shading and texturing.
 
-	- Evil Night attract mode sky is missing. Why?
-	- What is 1/w when 0?
-	- What do we do about RL flat-topped triangles?
-	- Heat of 11 color check has dodgy pixels <- HAS IT?
+    - Evil Night attract mode sky is missing. Why?
+    - What is 1/w when 0?
+    - What do we do about RL flat-topped triangles?
+    - Heat of 11 color check has dodgy pixels <- HAS IT?
     - Polystar blending is incorrect (intro)
 */
 
-#define TEST_TIMING		1
+#define TEST_TIMING     1
 
 #if TEST_TIMING
 enum
@@ -51,20 +51,20 @@ DEFINE_DEVICE_TYPE(M2_TE, m2_te_device, "m2te", "BDA Triangle Engine")
 
 
 
-//static const uint32_t fixed_bits	= 23;
+//static const uint32_t fixed_bits  = 23;
 
-static const uint32_t xy_bits		= 11;
-static const uint32_t color_bits	= 8;
-static const uint32_t text_bits[]	= { 10, 7, 4, 1 };
-static const int32_t depth_bits[]	= { 0, -3, -6, -9 };
+static const uint32_t xy_bits       = 11;
+static const uint32_t color_bits    = 8;
+static const uint32_t text_bits[]   = { 10, 7, 4, 1 };
+static const int32_t depth_bits[]   = { 0, -3, -6, -9 };
 
 // For right-aligning
-static const uint32_t xy_rshift		= 12;
-static const uint32_t color_rshift	= 4;
+static const uint32_t xy_rshift     = 12;
+static const uint32_t color_rshift  = 4;
 
 
 // 11.0 format
-static const uint32_t xy_one		= 1;
+static const uint32_t xy_one        = 1;
 
 
 /***************************************************************************
@@ -79,40 +79,40 @@ static const uint32_t xy_one		= 1;
 //-------------------------------------------------
 
 // Triangle Engine Master Mode
-#define TEMASTER_MODE_RESET				0x00000001
-#define TEMASTER_MODE_DTEXT				0x00000002
-#define TEMASTER_MODE_DSHADE			0x00000004
-#define TEMASTER_MODE_DBLEND			0x00000008
-#define TEMASTER_MODE_DZBUF				0x00000010
-#define TEMASTER_MODE_DDITH				0x00000020
+#define TEMASTER_MODE_RESET             0x00000001
+#define TEMASTER_MODE_DTEXT             0x00000002
+#define TEMASTER_MODE_DSHADE            0x00000004
+#define TEMASTER_MODE_DBLEND            0x00000008
+#define TEMASTER_MODE_DZBUF             0x00000010
+#define TEMASTER_MODE_DDITH             0x00000020
 
 // Triangle Engine Immediate Control
-#define TEICNTL_INT						0x00000001
-#define TEICNTL_STEP					0x00000002
-#define TEICNTL_STPL					0x00000004
-#define TEICNTL_STPI					0x00000008
-#define TEICNTL_RSTRT					0x00000010
-#define TEICNTL_STRT					0x00000020
+#define TEICNTL_INT                     0x00000001
+#define TEICNTL_STEP                    0x00000002
+#define TEICNTL_STPL                    0x00000004
+#define TEICNTL_STPI                    0x00000008
+#define TEICNTL_RSTRT                   0x00000010
+#define TEICNTL_STRT                    0x00000020
 
-#define TEDCNTL_TLD						0x00000001
-#define TEDCNTL_JA						0x00000002
-#define TEDCNTL_JR						0x00000004
-#define TEDCNTL_INT						0x00000008
-#define TEDCNTL_PSE						0x00000010
-#define TEDCNTL_SYNC					0x00000020
+#define TEDCNTL_TLD                     0x00000001
+#define TEDCNTL_JA                      0x00000002
+#define TEDCNTL_JR                      0x00000004
+#define TEDCNTL_INT                     0x00000008
+#define TEDCNTL_PSE                     0x00000010
+#define TEDCNTL_SYNC                    0x00000020
 
-#define INTSTAT_DEFERRED_INSTR			0x00000100
-#define INTSTAT_IMMEDIATE_INSTR			0x00000200
-#define INTSTAT_LIST_END				0x00000400
-#define INTSTAT_WINDOW_CLIP				0x00000800
-#define INTSTAT_SPECIAL_INSTR			0x00001000
-#define INTSTAT_UNIMPLEMENTED_INSTR		0x00002000
-#define INTSTAT_SUPERVISOR				0x00004000
-#define INTSTAT_ANY_RENDER				0x00008000
-#define INTSTAT_Z_FUNC					0x00010000
-#define INTSTAT_ALU_STATUS				0x00020000
-#define INTSTAT_FB_CLIP					0x00040000
-#define INTSTAT_IMMEDIATE				0x00080000
+#define INTSTAT_DEFERRED_INSTR          0x00000100
+#define INTSTAT_IMMEDIATE_INSTR         0x00000200
+#define INTSTAT_LIST_END                0x00000400
+#define INTSTAT_WINDOW_CLIP             0x00000800
+#define INTSTAT_SPECIAL_INSTR           0x00001000
+#define INTSTAT_UNIMPLEMENTED_INSTR     0x00002000
+#define INTSTAT_SUPERVISOR              0x00004000
+#define INTSTAT_ANY_RENDER              0x00008000
+#define INTSTAT_Z_FUNC                  0x00010000
+#define INTSTAT_ALU_STATUS              0x00020000
+#define INTSTAT_FB_CLIP                 0x00040000
+#define INTSTAT_IMMEDIATE               0x00080000
 
 // IWP
 // IRP
@@ -127,16 +127,16 @@ static const uint32_t xy_one		= 1;
 //-------------------------------------------------
 
 // Vertex State
-#define VERTEXSTATE_TSORT_MASK				0x00000007
-#define VERTEXSTATE_TSORT_OMN				0x00000001
-#define VERTEXSTATE_TSORT_MNO				0x00000002
-#define VERTEXSTATE_TSORT_ONM				0x00000003
-#define VERTEXSTATE_TSORT_NOM				0x00000004
-#define VERTEXSTATE_TSORT_MON				0x00000005
-#define VERTEXSTATE_TSORT_NMO				0x00000006
+#define VERTEXSTATE_TSORT_MASK              0x00000007
+#define VERTEXSTATE_TSORT_OMN               0x00000001
+#define VERTEXSTATE_TSORT_MNO               0x00000002
+#define VERTEXSTATE_TSORT_ONM               0x00000003
+#define VERTEXSTATE_TSORT_NOM               0x00000004
+#define VERTEXSTATE_TSORT_MON               0x00000005
+#define VERTEXSTATE_TSORT_NMO               0x00000006
 
-#define VERTEXSTATE_VCNT_SHIFT				3
-#define VERTEXSTATE_VCNT_MASK				0x00000018
+#define VERTEXSTATE_VCNT_SHIFT              3
+#define VERTEXSTATE_VCNT_MASK               0x00000018
 
 
 //-------------------------------------------------
@@ -144,9 +144,9 @@ static const uint32_t xy_one		= 1;
 //-------------------------------------------------
 
 // Edge and Span Walker Control
-#define	ESCNTL_DSPOFF						0x00000001
-#define	ESCNTL_DUSCAN						0x00000002
-#define	ESCNTL_PERSPECTIVEOFF				0x00000004
+#define ESCNTL_DSPOFF                       0x00000001
+#define ESCNTL_DUSCAN                       0x00000002
+#define ESCNTL_PERSPECTIVEOFF               0x00000004
 
 
 //-------------------------------------------------
@@ -154,148 +154,148 @@ static const uint32_t xy_one		= 1;
 //-------------------------------------------------
 
 // Texture Mapper Master Control (0x00046400)
-#define TXTCNTL_MMDMA_TRAM_ON				0x00000004
-#define TXTCNTL_MMDMA_PIP_ON				0x00000008
-#define TXTCNTL_SNOOP_ON					0x00000020
+#define TXTCNTL_MMDMA_TRAM_ON               0x00000004
+#define TXTCNTL_MMDMA_PIP_ON                0x00000008
+#define TXTCNTL_SNOOP_ON                    0x00000020
 
 // Texture Load Control (0x00046404)
-#define TXTLDCNTL_SRCBITOFFS				0x00000007
-#define TXTLDCNTL_LDMODE_MASK				0x00000300
-#define TXTLDCNTL_LDMODE_TEXLOAD			0x00000000
-#define TXTLDCNTL_LDMODE_MMDMA				0x00000100
-#define TXTLDCNTL_LDMODE_PIPLOAD			0x00000200
-#define TXTLDCNTL_LDMODE_RESERVED			0x00000300
-#define TXTLDCNTL_COMPRESSED				0x00000400
+#define TXTLDCNTL_SRCBITOFFS                0x00000007
+#define TXTLDCNTL_LDMODE_MASK               0x00000300
+#define TXTLDCNTL_LDMODE_TEXLOAD            0x00000000
+#define TXTLDCNTL_LDMODE_MMDMA              0x00000100
+#define TXTLDCNTL_LDMODE_PIPLOAD            0x00000200
+#define TXTLDCNTL_LDMODE_RESERVED           0x00000300
+#define TXTLDCNTL_COMPRESSED                0x00000400
 
 // Address Control (0x00046408)
-#define TXTADDRCNTL_LODMAX_MASK				0x0000000f
-#define TXTADDRCNTL_FILTERSEL_MASK			0x00000003
-#define TXTADDRCNTL_FILTERSEL_POINT			0x00000000
-#define TXTADDRCNTL_FILTERSEL_LINEAR		0x00000001
-#define TXTADDRCNTL_FILTERSEL_BILINEAR		0x00000002
-#define TXTADDRCNTL_FILTERSEL_QUASITRI		0x00000003
-#define TXTADDRCNTL_R12FILTERSEL_SHIFT		4
-#define TXTADDRCNTL_R3FILTERSEL_SHIFT		7
-#define TXTADDRCNTL_R45FILTERSEL_SHIFT		10
-#define TXTADDRCNTL_LOOKUP_EN				0x00002000
+#define TXTADDRCNTL_LODMAX_MASK             0x0000000f
+#define TXTADDRCNTL_FILTERSEL_MASK          0x00000003
+#define TXTADDRCNTL_FILTERSEL_POINT         0x00000000
+#define TXTADDRCNTL_FILTERSEL_LINEAR        0x00000001
+#define TXTADDRCNTL_FILTERSEL_BILINEAR      0x00000002
+#define TXTADDRCNTL_FILTERSEL_QUASITRI      0x00000003
+#define TXTADDRCNTL_R12FILTERSEL_SHIFT      4
+#define TXTADDRCNTL_R3FILTERSEL_SHIFT       7
+#define TXTADDRCNTL_R45FILTERSEL_SHIFT      10
+#define TXTADDRCNTL_LOOKUP_EN               0x00002000
 
 // PIP Control (0x0004640C)
-#define TXTPIPCNTL_INDEX_OFFSET				0x000000ff
-#define TXTPIPCNTL_COLORSEL_MASK			0x00000700
-#define TXTPIPCNTL_COLORSEL_SHIFT			8
-#define TXTPIPCNTL_ALPHASEL_MASK			0x00003800
-#define TXTPIPCNTL_ALPHASEL_SHIFT			11
-#define TXTPIPCNTL_SSBSEL_MASK				0x0001c000
-#define TXTPIPCNTL_SSBSEL_SHIFT				14
+#define TXTPIPCNTL_INDEX_OFFSET             0x000000ff
+#define TXTPIPCNTL_COLORSEL_MASK            0x00000700
+#define TXTPIPCNTL_COLORSEL_SHIFT           8
+#define TXTPIPCNTL_ALPHASEL_MASK            0x00003800
+#define TXTPIPCNTL_ALPHASEL_SHIFT           11
+#define TXTPIPCNTL_SSBSEL_MASK              0x0001c000
+#define TXTPIPCNTL_SSBSEL_SHIFT             14
 
-#define TXTPIPCNTL_SEL_CONSTANT				0
-#define TXTPIPCNTL_SEL_TRAM					1
-#define TXTPIPCNTL_SEL_PIP					2
+#define TXTPIPCNTL_SEL_CONSTANT             0
+#define TXTPIPCNTL_SEL_TRAM                 1
+#define TXTPIPCNTL_SEL_PIP                  2
 
 // Texture Application Control (0x00046410)
-#define TXTTABCNTL_C_ASEL_MASK				0x00000007
-#define TXTTABCNTL_C_ASEL_SHIFT				0
-#define TXTTABCNTL_C_BSEL_MASK				0x00000038
-#define TXTTABCNTL_C_BSEL_SHIFT				3
-#define TXTTABCNTL_C_TSEL_MASK				0x000001c0
-#define TXTTABCNTL_C_TSEL_SHIFT				6
+#define TXTTABCNTL_C_ASEL_MASK              0x00000007
+#define TXTTABCNTL_C_ASEL_SHIFT             0
+#define TXTTABCNTL_C_BSEL_MASK              0x00000038
+#define TXTTABCNTL_C_BSEL_SHIFT             3
+#define TXTTABCNTL_C_TSEL_MASK              0x000001c0
+#define TXTTABCNTL_C_TSEL_SHIFT             6
 
-#define TXTTABCNTL_C_ABTSEL_AITER			0
-#define TXTTABCNTL_C_ABTSEL_CITER			1
-#define TXTTABCNTL_C_ABTSEL_AT				2
-#define TXTTABCNTL_C_ABTSEL_CT				3
-#define TXTTABCNTL_C_ABTSEL_ACONST			4
-#define TXTTABCNTL_C_ABTSEL_CCONST			5
+#define TXTTABCNTL_C_ABTSEL_AITER           0
+#define TXTTABCNTL_C_ABTSEL_CITER           1
+#define TXTTABCNTL_C_ABTSEL_AT              2
+#define TXTTABCNTL_C_ABTSEL_CT              3
+#define TXTTABCNTL_C_ABTSEL_ACONST          4
+#define TXTTABCNTL_C_ABTSEL_CCONST          5
 
-#define TXTTABCNTL_C_OSEL_MASK				0x00000600
-#define TXTTABCNTL_C_OSEL_SHIFT				9
+#define TXTTABCNTL_C_OSEL_MASK              0x00000600
+#define TXTTABCNTL_C_OSEL_SHIFT             9
 
-#define TXTTABCNTL_CO_SEL_CITER				0
-#define TXTTABCNTL_CO_SEL_CT				1
-#define TXTTABCNTL_CO_SEL_BLEND				2
-#define TXTTABCNTL_CO_SEL_RESERVED			3
+#define TXTTABCNTL_CO_SEL_CITER             0
+#define TXTTABCNTL_CO_SEL_CT                1
+#define TXTTABCNTL_CO_SEL_BLEND             2
+#define TXTTABCNTL_CO_SEL_RESERVED          3
 
-#define TXTTABCNTL_A_ASEL_MASK				0x00001800
-#define TXTTABCNTL_A_ASEL_SHIFT				11
-#define TXTTABCNTL_A_BSEL_MASK				0x00006000
-#define TXTTABCNTL_A_BSEL_SHIFT				13
+#define TXTTABCNTL_A_ASEL_MASK              0x00001800
+#define TXTTABCNTL_A_ASEL_SHIFT             11
+#define TXTTABCNTL_A_BSEL_MASK              0x00006000
+#define TXTTABCNTL_A_BSEL_SHIFT             13
 
-#define TXTTABCNTL_A_ABSEL_AITER			0
-#define TXTTABCNTL_A_ABSEL_AT				1
-#define TXTTABCNTL_A_ABSEL_ACONST			2
+#define TXTTABCNTL_A_ABSEL_AITER            0
+#define TXTTABCNTL_A_ABSEL_AT               1
+#define TXTTABCNTL_A_ABSEL_ACONST           2
 
-#define TXTTABCNTL_A_OSEL_MASK				0x00018000
-#define TXTTABCNTL_A_OSEL_SHIFT				15
+#define TXTTABCNTL_A_OSEL_MASK              0x00018000
+#define TXTTABCNTL_A_OSEL_SHIFT             15
 
-#define TXTTABCNTL_AO_SEL_AITER				0
-#define TXTTABCNTL_AO_SEL_AT				1
-#define TXTTABCNTL_AO_SEL_BLEND				2
-#define TXTTABCNTL_AO_SEL_RESERVED			3
+#define TXTTABCNTL_AO_SEL_AITER             0
+#define TXTTABCNTL_AO_SEL_AT                1
+#define TXTTABCNTL_AO_SEL_BLEND             2
+#define TXTTABCNTL_AO_SEL_RESERVED          3
 
-#define TXTTABCNTL_BLENDOP_MASK				0x00010000
-#define TXTTABCNTL_BLENDOP_SHIFT			16
-#define TXTTABCNTL_BLENDOP_LERP				0
-#define TXTTABCNTL_BLENDOP_MULT				1
+#define TXTTABCNTL_BLENDOP_MASK             0x00010000
+#define TXTTABCNTL_BLENDOP_SHIFT            16
+#define TXTTABCNTL_BLENDOP_LERP             0
+#define TXTTABCNTL_BLENDOP_MULT             1
 
 // TAB Constants
-#define TXTTABCONST_BLUE					0x000000ff
-#define TXTTABCONST_BLUE_SHIFT				0
-#define TXTTABCONST_GREEN					0x0000ff00
-#define TXTTABCONST_GREEN_SHIFT				8
-#define TXTTABCONST_RED						0x00ff0000
-#define TXTTABCONST_RED_SHIFT				16
-#define TXTTABCONST_ALPHA					0x7f000000
-#define TXTTABCONST_ALPHA_SHIFT				24
-#define TXTTABCONST_SSB						0x80000000
+#define TXTTABCONST_BLUE                    0x000000ff
+#define TXTTABCONST_BLUE_SHIFT              0
+#define TXTTABCONST_GREEN                   0x0000ff00
+#define TXTTABCONST_GREEN_SHIFT             8
+#define TXTTABCONST_RED                     0x00ff0000
+#define TXTTABCONST_RED_SHIFT               16
+#define TXTTABCONST_ALPHA                   0x7f000000
+#define TXTTABCONST_ALPHA_SHIFT             24
+#define TXTTABCONST_SSB                     0x80000000
 
 // Texture Loader Destination Base (0x00046414)
-#define TXTLDDSTBASE_ADDR					0x00003ffc
+#define TXTLDDSTBASE_ADDR                   0x00003ffc
 
 // Texture Lod Base 0 (0x00046414)
 // Texture Lod Base 1 (0x00046418)
 // Texture Lod Base 2 (0x0004641C)
 // Texture Lod Base 3 (0x00046420)
-#define TXTLODBASE_MASK						0x00003ffc
+#define TXTLODBASE_MASK                     0x00003ffc
 
 // Texture Loader Source Base (0x00046424)
-#define TXTLDSRCBASE_ADDR					0x00003fff
+#define TXTLDSRCBASE_ADDR                   0x00003fff
 
 // Texture Loader Counts (0x00046428)
-#define TXTLDBYTECNT_COUNT					0x0fffffff
-#define TXTLDROWCNT_COUNT					0x0fffffff
-#define TXTLDTEXCNT_COUNT					0x0fffffff
+#define TXTLDBYTECNT_COUNT                  0x0fffffff
+#define TXTLDROWCNT_COUNT                   0x0fffffff
+#define TXTLDTEXCNT_COUNT                   0x0fffffff
 
 // Texture Loader Width (0x00046428)
-#define TxTLDWIDTH_SRCROW					0x0000ffff
-#define TxTLDWIDTH_DSTROW_SHIFT				16
-#define TxTLDWIDTH_DSTROW					0xffff0000
+#define TxTLDWIDTH_SRCROW                   0x0000ffff
+#define TxTLDWIDTH_DSTROW_SHIFT             16
+#define TxTLDWIDTH_DSTROW                   0xffff0000
 
 // Texture Size (0x0004642C)
-#define TXTUVMAX_VMAX_MASK					0x000003ff
-#define TXTUVMAX_VMAX_SHIFT					0
-#define TXTUVMAX_UMAX_MASK					0x03ff0000
-#define TXTUVMAX_UMAX_SHIFT					16
+#define TXTUVMAX_VMAX_MASK                  0x000003ff
+#define TXTUVMAX_VMAX_SHIFT                 0
+#define TXTUVMAX_UMAX_MASK                  0x03ff0000
+#define TXTUVMAX_UMAX_SHIFT                 16
 
 // Texture Mask (0x00046430)
-#define TXTUVMASK_VMASK_MASK				0x000003ff
-#define TXTUVMASK_VMASK_SHIFT				0
-#define TXTUVMASK_UMASK_MASK				0x03ff0000
-#define TXTUVMASK_UMASK_SHIFT				16
+#define TXTUVMASK_VMASK_MASK                0x000003ff
+#define TXTUVMASK_VMASK_SHIFT               0
+#define TXTUVMASK_UMASK_MASK                0x03ff0000
+#define TXTUVMASK_UMASK_SHIFT               16
 
 // TRAM Format (0x0004643C)
 // TODO: Expansion formats
-#define TXTEXPFORM_CDEPTH_MASK				0x0000000f
-#define TXTEXPFORM_CDEPTH_SHIFT				0
-#define TXTEXPFORM_IDEPTH_MASK				0x0000000f
-#define TXTEXPFORM_IDEPTH_SHIFT				0
-#define TXTEXPFORM_ADEPTH_MASK				0x000000f0
-#define TXTEXPFORM_ADEPTH_SHIFT				4
-#define TXTEXPFORM_TRANSPARENT				0x00000100
-#define TXTEXPFORM_SSBON					0x00000200
-#define TXTEXPFORM_COLORON					0x00000400
-#define TXTEXPFORM_INDEXON					0x00000400
-#define TXTEXPFORM_ALPHAON					0x00000800
-#define TXTEXPFORM_LITERAL					0x00001000
+#define TXTEXPFORM_CDEPTH_MASK              0x0000000f
+#define TXTEXPFORM_CDEPTH_SHIFT             0
+#define TXTEXPFORM_IDEPTH_MASK              0x0000000f
+#define TXTEXPFORM_IDEPTH_SHIFT             0
+#define TXTEXPFORM_ADEPTH_MASK              0x000000f0
+#define TXTEXPFORM_ADEPTH_SHIFT             4
+#define TXTEXPFORM_TRANSPARENT              0x00000100
+#define TXTEXPFORM_SSBON                    0x00000200
+#define TXTEXPFORM_COLORON                  0x00000400
+#define TXTEXPFORM_INDEXON                  0x00000400
+#define TXTEXPFORM_ALPHAON                  0x00000800
+#define TXTEXPFORM_LITERAL                  0x00001000
 
 
 // Format Registers
@@ -306,204 +306,204 @@ static const uint32_t xy_one		= 1;
 //-------------------------------------------------
 
 // Snoop (0x0048000)
-#define DBSNOOP_DESTWRSNOOP				0x00000001
-#define DBSNOOP_SRCRDSNOOP				0x00000002
-#define DBSNOOP_ZWRSNOOP				0x00000004
-#define DBSNOOP_ZRDSNOOP				0x00000008
+#define DBSNOOP_DESTWRSNOOP             0x00000001
+#define DBSNOOP_SRCRDSNOOP              0x00000002
+#define DBSNOOP_ZWRSNOOP                0x00000004
+#define DBSNOOP_ZRDSNOOP                0x00000008
 
 // Supervisor General Control (0x0048004)
-#define DBSUPERGENCTL_DESTOUTEN			0x00000001
-#define DBSUPERGENCTL_DESTWR16BEN		0x00000002
-#define DBSUPERGENCTL_ZWR16BEN			0x00000004
+#define DBSUPERGENCTL_DESTOUTEN         0x00000001
+#define DBSUPERGENCTL_DESTWR16BEN       0x00000002
+#define DBSUPERGENCTL_ZWR16BEN          0x00000004
 
 // User General Control (0x0048008)
-#define DBUSERGENCTL_DESTOUT_MASK		0x0000000f
-#define DBUSERGENCTL_DITHEREN			0x00000010
-#define DBUSERGENCTL_SRCINEN			0x00000020
-#define DBUSERGENCTL_BLENDEN			0x00000040
-#define DBUSERGENCTL_WCLIPOUTEN			0x00000080
-#define DBUSERGENCTL_WCLIPINEN			0x00000100
-#define DBUSERGENCTL_ZOUTEN				0x00000200
-#define DBUSERGENCTL_ZBUFEN				0x00000400
+#define DBUSERGENCTL_DESTOUT_MASK       0x0000000f
+#define DBUSERGENCTL_DITHEREN           0x00000010
+#define DBUSERGENCTL_SRCINEN            0x00000020
+#define DBUSERGENCTL_BLENDEN            0x00000040
+#define DBUSERGENCTL_WCLIPOUTEN         0x00000080
+#define DBUSERGENCTL_WCLIPINEN          0x00000100
+#define DBUSERGENCTL_ZOUTEN             0x00000200
+#define DBUSERGENCTL_ZBUFEN             0x00000400
 
 // Discard Control (0x004800C)
-#define DBDISCARDCTL_ADISEN				0x00000001
-#define DBDISCARDCTL_RGBDISEN			0x00000002
-#define DBDISCARDCTL_SSBDISEN			0x00000004
-#define DBDISCARDCTL_ZCLIPDISEN			0x00000008
+#define DBDISCARDCTL_ADISEN             0x00000001
+#define DBDISCARDCTL_RGBDISEN           0x00000002
+#define DBDISCARDCTL_SSBDISEN           0x00000004
+#define DBDISCARDCTL_ZCLIPDISEN         0x00000008
 
 // Status (0x0048010)
-#define DBSTATUS_ANYREND				0x00000001
-#define DBSTATUS_ZFUNC_GT				0x00000002
-#define DBSTATUS_ZFUNC_EQ				0x00000004
-#define DBSTATUS_ZFUNC_LT				0x00000008
-#define	DBSTATUS_ALUSTAT_BLUE_GT		0x00000010
-#define	DBSTATUS_ALUSTAT_BLUE_EQ		0x00000020
-#define	DBSTATUS_ALUSTAT_BLUE_LT		0x00000040
-#define	DBSTATUS_ALUSTAT_GREEN_GT		0x00000080
-#define	DBSTATUS_ALUSTAT_GREEN_EQ		0x00000100
-#define	DBSTATUS_ALUSTAT_GREEN_LT		0x00000200
-#define	DBSTATUS_ALUSTAT_RED_GT			0x00000400
-#define	DBSTATUS_ALUSTAT_RED_EQ			0x00000800
-#define	DBSTATUS_ALUSTAT_RED_LT			0x00001000
-#define DBSTATUS_ZCLIP					0x00002000
-#define DBSTATUS_WINCLIP				0x00004000
-#define DBSTATUS_FBCLIP					0x00008000
+#define DBSTATUS_ANYREND                0x00000001
+#define DBSTATUS_ZFUNC_GT               0x00000002
+#define DBSTATUS_ZFUNC_EQ               0x00000004
+#define DBSTATUS_ZFUNC_LT               0x00000008
+#define DBSTATUS_ALUSTAT_BLUE_GT        0x00000010
+#define DBSTATUS_ALUSTAT_BLUE_EQ        0x00000020
+#define DBSTATUS_ALUSTAT_BLUE_LT        0x00000040
+#define DBSTATUS_ALUSTAT_GREEN_GT       0x00000080
+#define DBSTATUS_ALUSTAT_GREEN_EQ       0x00000100
+#define DBSTATUS_ALUSTAT_GREEN_LT       0x00000200
+#define DBSTATUS_ALUSTAT_RED_GT         0x00000400
+#define DBSTATUS_ALUSTAT_RED_EQ         0x00000800
+#define DBSTATUS_ALUSTAT_RED_LT         0x00001000
+#define DBSTATUS_ZCLIP                  0x00002000
+#define DBSTATUS_WINCLIP                0x00004000
+#define DBSTATUS_FBCLIP                 0x00008000
 
 // Interrupt Control (0x00048014)
-#define DBINTCNTL_ZFUNCSTATINTEN_MASK	0x00000003
-#define DBINTCNTL_ZFUNCSTATINTEN_MASK	0x00000003
+#define DBINTCNTL_ZFUNCSTATINTEN_MASK   0x00000003
+#define DBINTCNTL_ZFUNCSTATINTEN_MASK   0x00000003
 
 // Framebuffer XY Clip Control (0x00048018)
-#define DBFBCLIP_YFBCLIP_MASK			0x000007ff
-#define DBFBCLIP_YFBCLIP_SHIFT			0
-#define DBFBCLIP_XFBCLIP_MASK			0x07ff0000
-#define DBFBCLIP_XFBCLIP_SHIFT			16
+#define DBFBCLIP_YFBCLIP_MASK           0x000007ff
+#define DBFBCLIP_YFBCLIP_SHIFT          0
+#define DBFBCLIP_XFBCLIP_MASK           0x07ff0000
+#define DBFBCLIP_XFBCLIP_SHIFT          16
 
 // Window X Clip Control (0x0004801C)
-#define DBFBXWINCLIP_XMAX_MASK			0x000007ff
-#define DBFBXWINCLIP_XMAX_SHIFT			0
-#define DBFBXWINCLIP_XMIN_MASK			0x07ff0000
-#define DBFBXWINCLIP_XMIN_SHIFT			16
+#define DBFBXWINCLIP_XMAX_MASK          0x000007ff
+#define DBFBXWINCLIP_XMAX_SHIFT         0
+#define DBFBXWINCLIP_XMIN_MASK          0x07ff0000
+#define DBFBXWINCLIP_XMIN_SHIFT         16
 
 // Window Y Clip Control (0x00048020)
-#define DBFBYWINCLIP_YMAX_MASK			0x000007ff
-#define DBFBYWINCLIP_YMAX_SHIFT			0
-#define DBFBYWINCLIP_YMIN_MASK			0x07ff0000
-#define DBFBYWINCLIP_YMIN_SHIFT			16
+#define DBFBYWINCLIP_YMAX_MASK          0x000007ff
+#define DBFBYWINCLIP_YMAX_SHIFT         0
+#define DBFBYWINCLIP_YMIN_MASK          0x07ff0000
+#define DBFBYWINCLIP_YMIN_SHIFT         16
 
 // Destination Write Control (0x0048024)
-#define DBDESTCNTL_32BPP				0x00000001
+#define DBDESTCNTL_32BPP                0x00000001
 
 // Destination Write Base Address (0x0048028)
 
 // Destination X Stride (0x004802C)
-#define DBDEST_XSTRIDE					0x000007ff
+#define DBDEST_XSTRIDE                  0x000007ff
 
 // Source Read Control (0x00048030)
-#define DBSRCCNTL_32BPP					0x00000001
-#define DBSRCCNTL_MSBREP				0x00000002
+#define DBSRCCNTL_32BPP                 0x00000001
+#define DBSRCCNTL_MSBREP                0x00000002
 
 // Source Read Base Address (0x00048034)
 
 // Source X Stride (0x00048038)
-#define DBSRCXSTRIDE					0x000007ff
+#define DBSRCXSTRIDE                    0x000007ff
 
 // Source XY Offset (0x0004803C)
-#define DBSRCOFFS_YOFFS_MASK			0x00000fff
-#define DBSRCOFFS_YOFFS_SHIFT			0
-#define DBSRCOFFS_XOFFS_MASK			0x0fff0000
-#define DBSRCOFFS_XOFFS_SHIFT			16
+#define DBSRCOFFS_YOFFS_MASK            0x00000fff
+#define DBSRCOFFS_YOFFS_SHIFT           0
+#define DBSRCOFFS_XOFFS_MASK            0x0fff0000
+#define DBSRCOFFS_XOFFS_SHIFT           16
 
 // Z Buffer Control (0x00048040)
-#define DBZCNTL_ZFUNCCNTL_MASK			0x0000003f
-#define DBZCNTL_ZPIXOUT_LT				0x00000001
-#define DBZCNTL_ZBUFOUT_LT				0x00000002
-#define DBZCNTL_ZPIXOUT_EQ				0x00000004
-#define DBZCNTL_ZBUFOUT_EQ				0x00000008
-#define DBZCNTL_ZPIXOUT_GT				0x00000010
-#define DBZCNTL_ZBUFOUT_GT				0x00000020
+#define DBZCNTL_ZFUNCCNTL_MASK          0x0000003f
+#define DBZCNTL_ZPIXOUT_LT              0x00000001
+#define DBZCNTL_ZBUFOUT_LT              0x00000002
+#define DBZCNTL_ZPIXOUT_EQ              0x00000004
+#define DBZCNTL_ZBUFOUT_EQ              0x00000008
+#define DBZCNTL_ZPIXOUT_GT              0x00000010
+#define DBZCNTL_ZBUFOUT_GT              0x00000020
 
 // Z Buffer Base Address (0x00048044)
-#define DBZBASEADDR_MASK				0x00ffffff
+#define DBZBASEADDR_MASK                0x00ffffff
 
 // Z Buffer XY Offset (0x00048048)
-#define DBZOFFS_YOFFS_MASK				0x00000fff
-#define DBZOFFS_YOFFS_SHIFT				0
-#define DBZOFFS_XOFFS_MASK				0x0fff0000
-#define DBZOFFS_XOFFS_SHIFT				16
+#define DBZOFFS_YOFFS_MASK              0x00000fff
+#define DBZOFFS_YOFFS_SHIFT             0
+#define DBZOFFS_XOFFS_MASK              0x0fff0000
+#define DBZOFFS_XOFFS_SHIFT             16
 
 // Z Buffer Clip (0x0004804C)
-#define DBZCLIP_YCLIP_MASK				0x000007ff
-#define DBZCLIP_YCLIP_SHIFT				0
-#define DBZCLIP_XCLIP_MASK				0x07ff0000
-#define DBZCLIP_XCLIP_SHIFT				16
+#define DBZCLIP_YCLIP_MASK              0x000007ff
+#define DBZCLIP_YCLIP_SHIFT             0
+#define DBZCLIP_XCLIP_MASK              0x07ff0000
+#define DBZCLIP_XCLIP_SHIFT             16
 
 // SSB/DSB Control (0x00048050)
-#define DBSSBDSBCNTL_DSBSELECT_MASK		0x00000007
-#define DBSSBDSBCNTL_DSBSELECT_SHIFT	0
-#define DBSSBDSBCNTL_DSBSELECT_SSB		0
-#define DBSSBDSBCNTL_DSBSELECT_CONSTANT	1
-#define DBSSBDSBCNTL_DSBSELECT_SRC		2
+#define DBSSBDSBCNTL_DSBSELECT_MASK     0x00000007
+#define DBSSBDSBCNTL_DSBSELECT_SHIFT    0
+#define DBSSBDSBCNTL_DSBSELECT_SSB      0
+#define DBSSBDSBCNTL_DSBSELECT_CONSTANT 1
+#define DBSSBDSBCNTL_DSBSELECT_SRC      2
 
-#define DBSSBDSBCNTL_DSBCONST			0x00000004
+#define DBSSBDSBCNTL_DSBCONST           0x00000004
 
 // RGB constants (0x00048054)
-#define DBCONSTIN_B_MASK				0x000000ff
-#define DBCONSTIN_B_SHIFT				0
-#define DBCONSTIN_G_MASK				0x0000ff00
-#define DBCONSTIN_G_SHIFT				8
-#define DBCONSTIN_R_MASK				0x00ff0000
-#define DBCONSTIN_R_SHIFT				16
+#define DBCONSTIN_B_MASK                0x000000ff
+#define DBCONSTIN_B_SHIFT               0
+#define DBCONSTIN_G_MASK                0x0000ff00
+#define DBCONSTIN_G_SHIFT               8
+#define DBCONSTIN_R_MASK                0x00ff0000
+#define DBCONSTIN_R_SHIFT               16
 
 // Texture Multiplication Control (0x00048058)
-#define DBTXTMULTCNTL_TXTRJUST					0x00000001
-#define DBTXTMULTCNTL_TXTCOEFCMP				0x00000002
+#define DBTXTMULTCNTL_TXTRJUST                  0x00000001
+#define DBTXTMULTCNTL_TXTCOEFCMP                0x00000002
 
-#define DBTXTMULTCNTL_TXTCONSTCNTL_MASK			0x0000000c
-#define DBTXTMULTCNTL_TXTCONSTCNTL_SHIFT		2
-#define DBTXTMULTCNTL_TXTCONSTCNTL_TEXSSB		0
-#define DBTXTMULTCNTL_TXTCONSTCNTL_SRCDSB		1
+#define DBTXTMULTCNTL_TXTCONSTCNTL_MASK         0x0000000c
+#define DBTXTMULTCNTL_TXTCONSTCNTL_SHIFT        2
+#define DBTXTMULTCNTL_TXTCONSTCNTL_TEXSSB       0
+#define DBTXTMULTCNTL_TXTCONSTCNTL_SRCDSB       1
 
-#define DBTXTMULTCNTL_COEFSEL_MASK				0x00000030
-#define DBTXTMULTCNTL_COEFSEL_SHIFT				4
-#define DBTXTMULTCNTL_COEFSEL_ATI				0
-#define DBTXTMULTCNTL_COEFSEL_ASRC				1
-#define DBTXTMULTCNTL_COEFSEL_CONSTANT			2
-#define DBTXTMULTCNTL_COEFSEL_CSRC				3
+#define DBTXTMULTCNTL_COEFSEL_MASK              0x00000030
+#define DBTXTMULTCNTL_COEFSEL_SHIFT             4
+#define DBTXTMULTCNTL_COEFSEL_ATI               0
+#define DBTXTMULTCNTL_COEFSEL_ASRC              1
+#define DBTXTMULTCNTL_COEFSEL_CONSTANT          2
+#define DBTXTMULTCNTL_COEFSEL_CSRC              3
 
-#define DBTXTMULTCNTL_INSEL_MASK				0x000000c0
-#define DBTXTMULTCNTL_INSEL_SHIFT				6
-#define DBTXTMULTCNTL_INSEL_CTI					0
-#define DBTXTMULTCNTL_INSEL_CONSTANT			1
-#define DBTXTMULTCNTL_INSEL_COMPSRC				2
-#define DBTXTMULTCNTL_INSEL_ATI					3
+#define DBTXTMULTCNTL_INSEL_MASK                0x000000c0
+#define DBTXTMULTCNTL_INSEL_SHIFT               6
+#define DBTXTMULTCNTL_INSEL_CTI                 0
+#define DBTXTMULTCNTL_INSEL_CONSTANT            1
+#define DBTXTMULTCNTL_INSEL_COMPSRC             2
+#define DBTXTMULTCNTL_INSEL_ATI                 3
 
 // Source Multiplication Control (0x00048058)
-#define DBSRCMULTCNTL_SRCRJUST					0x00000001
-#define DBSRCMULTCNTL_SRCCOEFCMP				0x00000002
+#define DBSRCMULTCNTL_SRCRJUST                  0x00000001
+#define DBSRCMULTCNTL_SRCCOEFCMP                0x00000002
 
-#define DBSRCMULTCNTL_SRCCONSTCNTL_MASK			0x0000000c
-#define DBSRCMULTCNTL_SRCCONSTCNTL_SHIFT		2
-#define DBSRCMULTCNTL_SRCCONSTCNTL_TEXSSB		0
-#define DBSRCMULTCNTL_SRCCONSTCNTL_SRCDSB		1
+#define DBSRCMULTCNTL_SRCCONSTCNTL_MASK         0x0000000c
+#define DBSRCMULTCNTL_SRCCONSTCNTL_SHIFT        2
+#define DBSRCMULTCNTL_SRCCONSTCNTL_TEXSSB       0
+#define DBSRCMULTCNTL_SRCCONSTCNTL_SRCDSB       1
 
-#define DBSRCMULTCNTL_COEFSEL_MASK				0x00000030
-#define DBSRCMULTCNTL_COEFSEL_SHIFT				4
-#define DBSRCMULTCNTL_COEFSEL_ATI				0
-#define DBSRCMULTCNTL_COEFSEL_ASRC				1
-#define DBSRCMULTCNTL_COEFSEL_CONSTANT			2
-#define DBSRCMULTCNTL_COEFSEL_CTI				3
+#define DBSRCMULTCNTL_COEFSEL_MASK              0x00000030
+#define DBSRCMULTCNTL_COEFSEL_SHIFT             4
+#define DBSRCMULTCNTL_COEFSEL_ATI               0
+#define DBSRCMULTCNTL_COEFSEL_ASRC              1
+#define DBSRCMULTCNTL_COEFSEL_CONSTANT          2
+#define DBSRCMULTCNTL_COEFSEL_CTI               3
 
-#define DBSRCMULTCNTL_INSEL_MASK				0x000000c0
-#define DBSRCMULTCNTL_INSEL_SHIFT				6
-#define DBSRCMULTCNTL_INSEL_SRC					0
-#define DBSRCMULTCNTL_INSEL_CONSTANT			1
-#define DBSRCMULTCNTL_INSEL_COMPCTI				2
-#define DBSRCMULTCNTL_INSEL_TEXALPHA			3
+#define DBSRCMULTCNTL_INSEL_MASK                0x000000c0
+#define DBSRCMULTCNTL_INSEL_SHIFT               6
+#define DBSRCMULTCNTL_INSEL_SRC                 0
+#define DBSRCMULTCNTL_INSEL_CONSTANT            1
+#define DBSRCMULTCNTL_INSEL_COMPCTI             2
+#define DBSRCMULTCNTL_INSEL_TEXALPHA            3
 
 // ALU Control (0x00048070) TODO
-#define DBALUCNTL_FINALDIVIDE_MASK				0x00000007
-#define DBALUCNTL_FINALDIVIDE_SHIFT				0
+#define DBALUCNTL_FINALDIVIDE_MASK              0x00000007
+#define DBALUCNTL_FINALDIVIDE_SHIFT             0
 
-#define DBALUCNTL_ALUOP_MASK					0x000000f8
-#define DBALUCNTL_ALUOP_SHIFT					5
+#define DBALUCNTL_ALUOP_MASK                    0x000000f8
+#define DBALUCNTL_ALUOP_SHIFT                   5
 
 // Source Alpha Control (0x00048074)
-#define DBDSTACNTL_ADESTSEL_MASK				0x00000003
-#define DBDSTACNTL_ADESTSEL_SHIFT				0
-#define DBDSTACNTL_ADESTCONSTCNTL_MASK			0x0000000c
-#define DBDSTACNTL_ADESTCONSTCNTL_SHIFT			2
+#define DBDSTACNTL_ADESTSEL_MASK                0x00000003
+#define DBDSTACNTL_ADESTSEL_SHIFT               0
+#define DBDSTACNTL_ADESTCONSTCNTL_MASK          0x0000000c
+#define DBDSTACNTL_ADESTCONSTCNTL_SHIFT         2
 
-#define DBDSTALPHACONST_CONST1_MASK				0x000000ff
-#define DBDSTALPHACONST_CONST1_SHIFT			0
-#define DBDSTALPHACONST_CONST0_MASK				0x00ff0000
-#define DBDSTALPHACONST_CONST0_SHIFT			16
+#define DBDSTALPHACONST_CONST1_MASK             0x000000ff
+#define DBDSTALPHACONST_CONST1_SHIFT            0
+#define DBDSTALPHACONST_CONST0_MASK             0x00ff0000
+#define DBDSTALPHACONST_CONST0_SHIFT            16
 
-#define DBSSBDSBCNTL_DSBSEL_MASK				0x00000003
-#define DBSSBDSBCNTL_DSBSEL_SHIFT				0
-#define DBSSBDSBCNTL_DSBCONST_MASK				0x00000004
-#define DBSSBDSBCNTL_DSBCONST_SHIFT				2
+#define DBSSBDSBCNTL_DSBSEL_MASK                0x00000003
+#define DBSSBDSBCNTL_DSBSEL_SHIFT               0
+#define DBSSBDSBCNTL_DSBCONST_MASK              0x00000004
+#define DBSSBDSBCNTL_DSBCONST_SHIFT             2
 
 
 
@@ -665,7 +665,7 @@ static const char *get_reg_name(uint32_t unit, uint32_t reg)
 		}
 		case 3:
 		{
-//			if (reg < sizeof(tm_regs))
+//          if (reg < sizeof(tm_regs))
 			{
 				sprintf(buffer, "TM:????");
 				return buffer;
@@ -836,7 +836,7 @@ WRITE32_MEMBER( m2_te_device::write )
 	uint32_t reg = offset & 0x1ff;
 	reg_wmode wmode = static_cast<reg_wmode>((offset >> 9) & 3);
 
-//	logerror("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
+//  logerror("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
 
 	switch (unit)
 	{
@@ -1184,7 +1184,7 @@ void m2_te_device::log_triangle(uint32_t flags)
 
 void m2_te_device::setup_triangle(uint32_t flags)
 {
-//	log_triangle(flags);
+//  log_triangle(flags);
 
 	se_vtx va = m_se.vertices[0];
 	se_vtx vb = m_se.vertices[1];
@@ -1362,24 +1362,24 @@ void m2_te_device::setup_triangle(uint32_t flags)
 	// Convert everything to fixed point and pass to the edge walker
 
 	/*
-		NOT SURE THESE ARE RIGHT. See P209
+	    NOT SURE THESE ARE RIGHT. See P209
 
-		XY 12.0
-		SL s12.0
-		RGBA 9.0
-		RGBA SLOPES = s9.11
-		TEX: 11.13
-		DEPTH: 1.23
-		TEX SLOPES: s11.13
-		DEPTH SLOPES: s1.23
-		AREA : s23.0
+	    XY 12.0
+	    SL s12.0
+	    RGBA 9.0
+	    RGBA SLOPES = s9.11
+	    TEX: 11.13
+	    DEPTH: 1.23
+	    TEX SLOPES: s11.13
+	    DEPTH SLOPES: s1.23
+	    AREA : s23.0
 
-		Numbers output to the edge walker are 24 bits
+	    Numbers output to the edge walker are 24 bits
 
-		IEE: 1.8.23
-		BDA: 1.7.24 (includes hidden bit)
+	    IEE: 1.8.23
+	    BDA: 1.7.24 (includes hidden bit)
 
-		However, we're using 23 bits.
+	    However, we're using 23 bits.
 	*/
 
 
@@ -2286,7 +2286,7 @@ void m2_te_device::texture_blend(
 	}
 }
 
-void m2_te_device::select_lerp(	uint32_t sel,
+void m2_te_device::select_lerp( uint32_t sel,
 								uint32_t ri, uint32_t gi, uint32_t bi, uint32_t ai,
 								uint32_t rt, uint32_t gt, uint32_t bt, uint32_t at, uint32_t ssbt,
 								uint32_t & ar, uint32_t & ag, uint32_t & ab )
@@ -2681,17 +2681,17 @@ void m2_te_device::destination_blend(uint32_t x, uint32_t y, uint32_t w, const r
 
 	// TODO: Status
 /*
-	{
-		fbClipStat = fbClipDis
-		winClipStat = winClipDis
-		zClipStat = zClipDis
-		alurstat
-		alugstat
-		alubstat
-		zFuncStat
-		anyRender
-		set_interrupt
-	}
+    {
+        fbClipStat = fbClipDis
+        winClipStat = winClipDis
+        zClipStat = zClipDis
+        alurstat
+        alugstat
+        alubstat
+        zFuncStat
+        anyRender
+        set_interrupt
+    }
 */
 }
 
@@ -2710,9 +2710,9 @@ void m2_te_device::select_tex_pixel()
 
 	switch (cntl)
 	{
-		case 0:	m_dbstate.texpath.a = m_dbstate.ti.a;	break;
-		case 1:	m_dbstate.texpath.a = 255;				break;
-		case 2:	m_dbstate.texpath.a = 0;				break;
+		case 0: m_dbstate.texpath.a = m_dbstate.ti.a;   break;
+		case 1: m_dbstate.texpath.a = 255;              break;
+		case 2: m_dbstate.texpath.a = 0;                break;
 	}
 
 	switch ((m_db.txt_mult_cntl & DBTXTMULTCNTL_INSEL_MASK) >> DBTXTMULTCNTL_INSEL_SHIFT)
@@ -2896,18 +2896,18 @@ uint8_t m2_te_device::get_src_coef(uint8_t cti, uint8_t dm2const0, uint8_t dm2co
 
 	switch ((m_db.src_mult_cntl & DBSRCMULTCNTL_SRCCONSTCNTL_MASK) >> DBSRCMULTCNTL_SRCCONSTCNTL_SHIFT)
 	{
-		case DBSRCMULTCNTL_SRCCONSTCNTL_TEXSSB: sel = m_dbstate.ssb;	break;
-		case DBSRCMULTCNTL_SRCCONSTCNTL_SRCDSB: sel = m_dbstate.dsb;	break;
+		case DBSRCMULTCNTL_SRCCONSTCNTL_TEXSSB: sel = m_dbstate.ssb;    break;
+		case DBSRCMULTCNTL_SRCCONSTCNTL_SRCDSB: sel = m_dbstate.dsb;    break;
 	}
 
 	cnst = sel ? dm2const1 : dm2const0;
 
 	switch ((m_db.src_mult_cntl & DBSRCMULTCNTL_COEFSEL_MASK) >> DBSRCMULTCNTL_COEFSEL_SHIFT)
 	{
-		case DBSRCMULTCNTL_COEFSEL_ATI:			coef = m_dbstate.texpath.a;		break;
-		case DBSRCMULTCNTL_COEFSEL_ASRC:		coef = m_dbstate.srcpath.a;		break;
-		case DBSRCMULTCNTL_COEFSEL_CONSTANT:	coef = cnst;					break;
-		case DBSRCMULTCNTL_COEFSEL_CTI:			coef = cti;						break;
+		case DBSRCMULTCNTL_COEFSEL_ATI:         coef = m_dbstate.texpath.a;     break;
+		case DBSRCMULTCNTL_COEFSEL_ASRC:        coef = m_dbstate.srcpath.a;     break;
+		case DBSRCMULTCNTL_COEFSEL_CONSTANT:    coef = cnst;                    break;
+		case DBSRCMULTCNTL_COEFSEL_CTI:         coef = cti;                     break;
 	}
 
 	if (m_db.src_mult_cntl & DBSRCMULTCNTL_SRCCOEFCMP)
@@ -2933,10 +2933,10 @@ uint8_t m2_te_device::get_tex_coef(uint8_t cs, uint8_t dm1const0, uint8_t dm1con
 
 	switch ((m_db.txt_mult_cntl & DBTXTMULTCNTL_COEFSEL_MASK) >> DBTXTMULTCNTL_COEFSEL_SHIFT)
 	{
-		case DBTXTMULTCNTL_COEFSEL_ATI:			coef = m_dbstate.texpath.a;		break;
-		case DBTXTMULTCNTL_COEFSEL_ASRC:		coef = m_dbstate.srcpath.a;		break;
-		case DBTXTMULTCNTL_COEFSEL_CONSTANT:	coef = cnst;					break;
-		case DBTXTMULTCNTL_COEFSEL_CSRC:		coef = cs;						break;
+		case DBTXTMULTCNTL_COEFSEL_ATI:         coef = m_dbstate.texpath.a;     break;
+		case DBTXTMULTCNTL_COEFSEL_ASRC:        coef = m_dbstate.srcpath.a;     break;
+		case DBTXTMULTCNTL_COEFSEL_CONSTANT:    coef = cnst;                    break;
+		case DBTXTMULTCNTL_COEFSEL_CSRC:        coef = cs;                      break;
 	}
 
 	if (m_db.txt_mult_cntl & DBTXTMULTCNTL_TXTCOEFCMP)
@@ -2954,8 +2954,8 @@ void m2_te_device::select_alpha_dsb()
 
 		switch ((m_db.dst_alpha_ctrl & DBDSTACNTL_ADESTCONSTCNTL_MASK) >> DBDSTACNTL_ADESTCONSTCNTL_SHIFT)
 		{
-			case 0: sel = m_dbstate.ssb;	break;
-			case 1: sel = m_dbstate.dsb;	break;
+			case 0: sel = m_dbstate.ssb;    break;
+			case 1: sel = m_dbstate.dsb;    break;
 		}
 
 		if (sel)
@@ -2965,17 +2965,17 @@ void m2_te_device::select_alpha_dsb()
 
 		switch ((m_db.dst_alpha_ctrl & DBDSTACNTL_ADESTSEL_MASK) >> DBDSTACNTL_ADESTSEL_SHIFT)
 		{
-			case 0: m_dbstate.dst.a = m_dbstate.texpath.a;	break;
-			case 1: m_dbstate.dst.a = aconst;				break;
-			case 2: m_dbstate.dst.a = m_dbstate.srcpath.a;	break;
-			case 3: m_dbstate.dst.a = m_dbstate.blend.r;	break;
+			case 0: m_dbstate.dst.a = m_dbstate.texpath.a;  break;
+			case 1: m_dbstate.dst.a = aconst;               break;
+			case 2: m_dbstate.dst.a = m_dbstate.srcpath.a;  break;
+			case 3: m_dbstate.dst.a = m_dbstate.blend.r;    break;
 		}
 
 		switch ((m_db.ssbdsb_ctrl & DBSSBDSBCNTL_DSBSEL_MASK) >> DBSSBDSBCNTL_DSBSEL_SHIFT)
 		{
-			case 0: m_dbstate.dsb = m_dbstate.ssb;		break;
-			case 1: m_dbstate.dsb = (m_db.ssbdsb_ctrl & DBSSBDSBCNTL_DSBCONST_MASK) >> DBSSBDSBCNTL_DSBCONST_SHIFT;	break;
-			case 2: m_dbstate.dsb = m_dbstate.dsb;		break;
+			case 0: m_dbstate.dsb = m_dbstate.ssb;      break;
+			case 1: m_dbstate.dsb = (m_db.ssbdsb_ctrl & DBSSBDSBCNTL_DSBCONST_MASK) >> DBSSBDSBCNTL_DSBCONST_SHIFT; break;
+			case 2: m_dbstate.dsb = m_dbstate.dsb;      break;
 		}
 	}
 	else
@@ -3048,10 +3048,10 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 
 			switch (j)
 			{
-				case 0: cinv |= (cntl & 1);			break;
-				case 1: cinv |= (cntl & 2) && 1;	break;
-				case 2: cinv |= (cntl & 4) && 1;	break;
-				case 3: cinv |= (cntl & 8) && 1;	break;
+				case 0: cinv |= (cntl & 1);         break;
+				case 1: cinv |= (cntl & 2) && 1;    break;
+				case 2: cinv |= (cntl & 4) && 1;    break;
+				case 3: cinv |= (cntl & 8) && 1;    break;
 			}
 
 			cinv <<= 1;
@@ -3075,13 +3075,13 @@ uint8_t m2_te_device::alu_calc(uint16_t a, uint16_t b)
 
 	switch ((m_db.alu_ctrl & DBALUCNTL_FINALDIVIDE_MASK) >> DBALUCNTL_FINALDIVIDE_SHIFT)
 	{
-		case 1:  blendout = result << 1;	break;
-		case 2:  blendout = result << 2;	break;
-		case 3:  blendout = result << 3;	break;
-		case 7:  blendout = result >> 1;	break;
-		case 6:  blendout = result >> 2;	break;
-		case 5:  blendout = result >> 3;	break;
-		default: blendout = result;			break;
+		case 1:  blendout = result << 1;    break;
+		case 2:  blendout = result << 2;    break;
+		case 3:  blendout = result << 3;    break;
+		case 7:  blendout = result >> 1;    break;
+		case 6:  blendout = result >> 2;    break;
+		case 5:  blendout = result >> 3;    break;
+		default: blendout = result;         break;
 	}
 
 	if (blendout > 255)
@@ -3139,22 +3139,22 @@ void m2_te_device::walk_span(uint32_t wrange, bool omit_right,
 	xe = scan_lr ? xe + 1 : xe - 1;
 
 	/*
-		Edge to Span walker
-		X/Y			11.0
-		RGBA		8.11
-		U/W, V/W	10.13
-		1/W			0.23
-		RGBA DDX	s8.11
-		UV DDX		s10.13
-		1/W DDX		s0.23
+	    Edge to Span walker
+	    X/Y         11.0
+	    RGBA        8.11
+	    U/W, V/W    10.13
+	    1/W         0.23
+	    RGBA DDX    s8.11
+	    UV DDX      s10.13
+	    1/W DDX     s0.23
 
-		To destination blender:
-		X/Y			11.0
-		W			0.16
+	    To destination blender:
+	    X/Y         11.0
+	    W           0.16
 
-		To texture mapper:
-		RGBA		8.0
-		UV			10.4
+	    To texture mapper:
+	    RGBA        8.0
+	    UV          10.4
 	*/
 
 	if (omit_right)
@@ -3478,22 +3478,22 @@ void m2_te_device::execute()
 
 #if TEST_TIMING
 /*
-	TESetup Engine: 600-700 triangles/sec (?)
+    TESetup Engine: 600-700 triangles/sec (?)
 
-	Pixel Rates:
-	Point - 132Mpix/s
-	Linear - 66Mpix/s
-	Bilin - 33Mpix
-	QTril - 22M
+    Pixel Rates:
+    Point - 132Mpix/s
+    Linear - 66Mpix/s
+    Bilin - 33Mpix
+    QTril - 22M
 
-	No blend, no Z - 120MPix
-	Zbuffer - 66-120M pix
-	Bend - 66 M pix
+    No blend, no Z - 120MPix
+    Zbuffer - 66-120M pix
+    Bend - 66 M pix
 */
 
 	uint32_t total_cycles = (g_statistics[STAT_TRIANGLES_PROCESSED] * 100) +
 							(g_statistics[STAT_TEXEL_READS]) +
-//							(g_statistics[STAT_PIXELS_PROCESSED]) +
+//                          (g_statistics[STAT_PIXELS_PROCESSED]) +
 							(g_statistics[STAT_PIXEL_LOADS]) +
 							(g_statistics[STAT_PIXEL_STORES]) +
 							(g_statistics[STAT_TEXEL_BYTES]/4) +

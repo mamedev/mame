@@ -1751,7 +1751,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/stlforce.cpp",
 	MAME_DIR .. "src/mame/includes/stlforce.h",
 	MAME_DIR .. "src/mame/video/edevices.cpp",
-	MAME_DIR .. "src/mame/video/edevices.h",	
+	MAME_DIR .. "src/mame/video/edevices.h",
 	MAME_DIR .. "src/mame/drivers/mugsmash.cpp",
 	MAME_DIR .. "src/mame/includes/mugsmash.h",
 	MAME_DIR .. "src/mame/video/mugsmash.cpp",

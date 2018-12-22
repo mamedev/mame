@@ -1356,7 +1356,7 @@ READ32_MEMBER(pgm2_state::ddpdojt_speedup_r)
 	/*
 	else
 	{
-		logerror("pc is %08x\n", pc);
+	    logerror("pc is %08x\n", pc);
 	}
 	*/
 
@@ -1375,7 +1375,7 @@ READ32_MEMBER(pgm2_state::ddpdojt_speedup2_r)
 	/*
 	else
 	{
-		logerror("pc is %08x\n", pc);
+	    logerror("pc is %08x\n", pc);
 	}
 	*/
 

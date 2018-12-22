@@ -578,7 +578,7 @@ static void cfunc_ppccom_mismatch(void *param)
 
 void ppc_device::ppc_cfunc_ppccom_mismatch()
 {
-//	printf("cfunc_ppccom_mismatch %08X\n", m_core->pc);
+//  printf("cfunc_ppccom_mismatch %08X\n", m_core->pc);
 }
 
 static void cfunc_ppccom_tlb_fill(void *param)

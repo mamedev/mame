@@ -2279,7 +2279,7 @@ ROM_END
 -Pin 11 : CHANNEL A
 -Pin 12 : CHANNEL B
 -Pin 13 : key (unused)
--Pin 14 : GND  
+-Pin 14 : GND
 */
 ROM_START( triviaes4 )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // all 27256, ROM loading order probably wrong

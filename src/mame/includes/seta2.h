@@ -124,7 +124,7 @@ protected:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intelfsh16_device> m_flash;
 	optional_device<ticket_dispenser_device> m_dispenser;
-	
+
 	optional_memory_bank_array<8> m_x1_bank;
 	optional_shared_ptr<uint16_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_spriteram;

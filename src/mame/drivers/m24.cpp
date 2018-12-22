@@ -3,14 +3,14 @@
 /****************************************************************************
 
     Olivetti M24 emulation
-	
-	http://olivettim24.hadesnet.org/index.html
-	https://sites.google.com/site/att6300shrine/Home
-	http://www.ti99.com/exelvision/website/index.php?page=logabax-persona-1600
-	
-	The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were badge
-	engineered Olivetti M24s.
-	
+
+    http://olivettim24.hadesnet.org/index.html
+    https://sites.google.com/site/att6300shrine/Home
+    http://www.ti99.com/exelvision/website/index.php?page=logabax-persona-1600
+
+    The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were badge
+    engineered Olivetti M24s.
+
 
 ****************************************************************************/
 
@@ -317,12 +317,12 @@ ROM_START( m24 )
 	ROM_SYSTEM_BIOS(1,"v1.21","v1.21")
 	ROMX_LOAD("m24_bios121h.rom",0x4001, 0x2000, CRC(93292715) SHA1(863eccfb3beca6e64c5b0cc070c64394bad7da82), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("m24_bios121l.rom", 0x4000, 0x2000, CRC(1acbc9d7) SHA1(d3696e38853cea31e70ffa4e13e127ec7551bf57), ROM_SKIP(1) | ROM_BIOS(1))
-	
+
 	ROM_SYSTEM_BIOS(2,"v1.36","v1.36")
 	ROMX_LOAD("m24_bios136h.rom",0x4001, 0x2000, CRC(25cbf8ba) SHA1(1ab90985852544d2c12b47bb7f20f9faccabdf88), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("m24_bios136l.rom", 0x4000, 0x2000, CRC(e2f738c0) SHA1(da9771325a5021cf9908997e0e0d14e47258125f), ROM_SKIP(1) | ROM_BIOS(2))
-	
-	ROM_SYSTEM_BIOS(3,"v1.43","v1.43")	
+
+	ROM_SYSTEM_BIOS(3,"v1.43","v1.43")
 	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0x4001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1) | ROM_BIOS(3))
 

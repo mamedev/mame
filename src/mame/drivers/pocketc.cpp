@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
 /******************************************************************************
-	Sharp pocket computers
-	PC1401/PC1403
-	PeT mess@utanet.at May 2000
+    Sharp pocket computers
+    PC1401/PC1403
+    PeT mess@utanet.at May 2000
 ******************************************************************************/
 
 #include "emu.h"

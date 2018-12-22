@@ -7,37 +7,37 @@
 
     driver by Phil Bennett
 
-	NOTE:
+    NOTE:
 
-	* All games are marked MACHINE_NOT_WORKING due to the rare case
-	  where the PowerPC DRC blows up, causing MAME to crash. In reality,
-	  there is a good chance of being able to play through a round or
-	  three with no issues on all of the parent sets.
+    * All games are marked MACHINE_NOT_WORKING due to the rare case
+      where the PowerPC DRC blows up, causing MAME to crash. In reality,
+      there is a good chance of being able to play through a round or
+      three with no issues on all of the parent sets.
 
-	TODO:
+    TODO:
 
-	* Fix DRC crashes
-		o  Crashes on DRC translation of 0x40028604
-	* Fix texture compression
-	* Sort out CD images
-	* Fix Polystars blending issues
-	* Fix PowerPC 602 Protection Only mode handling.
-	* Implement CDDA muting
+    * Fix DRC crashes
+        o  Crashes on DRC translation of 0x40028604
+    * Fix texture compression
+    * Sort out CD images
+    * Fix Polystars blending issues
+    * Fix PowerPC 602 Protection Only mode handling.
+    * Implement CDDA muting
 
-	DONE
- 	* Fix Polystars blending
-	* Fix missing music in Polystars
+    DONE
+    * Fix Polystars blending
+    * Fix missing music in Polystars
     * Fix music playing too early
-	* Fix missing music and sound in Hell Night/Evil Night
-	* Fix incorrect speed in Heat of 11 and Total Vice (partially)
+    * Fix missing music and sound in Hell Night/Evil Night
+    * Fix incorrect speed in Heat of 11 and Total Vice (partially)
 
-	// Polystars/Total Vice
-	if (pc == 0x40035958)
-		gpr[11] = 1;
+    // Polystars/Total Vice
+    if (pc == 0x40035958)
+        gpr[11] = 1;
 
-	// Everything else
-	if (pc == 0x400385c8)
-		gpr[11] = 0;
+    // Everything else
+    if (pc == 0x400385c8)
+        gpr[11] = 0;
 
 
 
@@ -243,9 +243,9 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#define M2_CLOCK		XTAL(66'666'700)
+#define M2_CLOCK        XTAL(66'666'700)
 
-#define ENABLE_SDBG		0
+#define ENABLE_SDBG     0
 
 
 /*************************************
@@ -323,7 +323,7 @@ public:
 	{
 		// 8000 = /Reset
 		// 4000 = C000 ... DOIO DMA ... 4000
-//		m_ata->write_dmack(data & 0x4000 ? ASSERT_LINE : CLEAR_LINE);
+//      m_ata->write_dmack(data & 0x4000 ? ASSERT_LINE : CLEAR_LINE);
 
 		if (!(data & 0x8000))
 		{
@@ -365,9 +365,9 @@ private:
 	cdrom_file *m_available_cdroms;
 
 	// Konami SIO
-	uint16_t	m_sio_data;
+	uint16_t    m_sio_data;
 
-	uint32_t	m_ata_int; // TEST
+	uint32_t    m_ata_int; // TEST
 	emu_timer *m_atapi_timer;
 
 	TIMER_CALLBACK_MEMBER( atapi_delay )
@@ -435,7 +435,7 @@ WRITE16_MEMBER( konamim2_state::rdac_out )
 
 WRITE_LINE_MEMBER( konamim2_state::ata_int )
 {
-//	m_atapi_timer->adjust( attotime::from_msec(10), state );
+//  m_atapi_timer->adjust( attotime::from_msec(10), state );
 	m_ata_int = state;
 }
 
@@ -448,14 +448,14 @@ WRITE_LINE_MEMBER( konamim2_state::ata_int )
 
 READ16_MEMBER( konamim2_state::konami_io0_r )
 {
-//	printf("IO R: %08X\n", offset);
+//  printf("IO R: %08X\n", offset);
 
 	switch (offset)
 	{
 		/*
-			0 =    160
+		    0 =    160
 		    1 =     32
-			2 =    -96
+		    2 =    -96
 		   10 =  -1888
 		   FF = -32480
 
@@ -503,7 +503,7 @@ READ16_MEMBER( konamim2_state::konami_io0_r )
 		case 5: return 0; // P2 Y
 		case 6: return 0; // P3 Y?
 		case 7: return 0; //??
-		case 8:	return ioport("P5")->read();
+		case 8: return ioport("P5")->read();
 	}
 
 	//return rand();
@@ -513,7 +513,7 @@ READ16_MEMBER( konamim2_state::konami_io0_r )
 WRITE16_MEMBER( konamim2_state::konami_io0_w )
 {
 	// 9: 0000, 0xFFF
-//	printf("IO W: %08x %08x\n", offset, data);
+//  printf("IO W: %08x %08x\n", offset, data);
 }
 
 /*
@@ -545,7 +545,7 @@ READ16_MEMBER( konamim2_state::konami_io1_r )
 {
 	uint16_t data = 0;
 
-//	printf("%s: PORT R: [%x] MASK:%.8x\n", machine().describe_context(), offset, mem_mask);
+//  printf("%s: PORT R: [%x] MASK:%.8x\n", machine().describe_context(), offset, mem_mask);
 
 	switch (offset)
 	{
@@ -609,13 +609,13 @@ WRITE16_MEMBER( konamim2_state::konami_io1_w )
 	// 0x8000 = ?
 	logerror("%s: PORT W: [%x] %x, MASK:%.8x\n", machine().describe_context(), offset, data, mem_mask);
 
-//	printf("CDDA is: %s\n", data & 0x2000 ? "ENABLED" : "MUTE");
+//  printf("CDDA is: %s\n", data & 0x2000 ? "ENABLED" : "MUTE");
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 11) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 12) & 1);
 
-//	m_cdda->set_output_gain(0, data & 0x2000 ? 1.0 : 0.0);
-//	m_cdda->set_output_gain(1, data & 0x2000 ? 1.0 : 0.0);
+//  m_cdda->set_output_gain(0, data & 0x2000 ? 1.0 : 0.0);
+//  m_cdda->set_output_gain(1, data & 0x2000 ? 1.0 : 0.0);
 }
 
 
@@ -762,7 +762,7 @@ void konamim2_state::m2_map(address_map &map)
 	map(0x37c00010, 0x37c0001f).rw(FUNC(konamim2_state::konami_sio_r), FUNC(konamim2_state::konami_sio_w));
 	map(0x37e00000, 0x37e0000f).rw(FUNC(konamim2_state::konami_io1_r), FUNC(konamim2_state::konami_io1_w));
 	map(0x3f000000, 0x3fffffff).rw(FUNC(konamim2_state::konami_ide_r), FUNC(konamim2_state::konami_ide_w)); // Endian flipped???
-//	map(0x3f000000, 0x3fffffff).rw("ata", FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+//  map(0x3f000000, 0x3fffffff).rw("ata", FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
 
 #if 0
 	map(0x36c00000, 0x36cfffff).rw(m48t58_r, m48t58_w)
@@ -770,10 +770,10 @@ void konamim2_state::m2_map(address_map &map)
 	map(0x37400000, 0x37400003).w(eeprom_w)
 	map(0x37600000, 0x37600000).w(atapi_dma_w)
 	map(0x37a00000, 0x37a0003f).rw(kacio_r, kacio_w)
-	map(0x37c00010, 0x37c0001f).rw(sio_r, sio_w)			// Konami 11k
-	map(0x37e00000, 0x37e0000f).rw(port_r, port_w)		// Konami? - 37e00006 = Read
-	map(0x3e000000, 0x3effffff).rw(ymz0_r, ymz0_w)			// Konami - Evil Night / Total Vice
-	map(0x3e900000, 0x3e9fffff).rw(ymz1_r, ymz1_w)			// Konami
+	map(0x37c00010, 0x37c0001f).rw(sio_r, sio_w)            // Konami 11k
+	map(0x37e00000, 0x37e0000f).rw(port_r, port_w)      // Konami? - 37e00006 = Read
+	map(0x3e000000, 0x3effffff).rw(ymz0_r, ymz0_w)          // Konami - Evil Night / Total Vice
+	map(0x3e900000, 0x3e9fffff).rw(ymz1_r, ymz1_w)          // Konami
 #endif
 }
 
@@ -1205,7 +1205,7 @@ void konamim2_state::konamim2(machine_config &config)
 
 void konamim2_state::set_ntsc(machine_config &config)
 {
-//	m_screen->set_raw(11750000, 766, 126, 126+640, 260, 20, 20+240); // TODO
+//  m_screen->set_raw(11750000, 766, 126, 126+640, 260, 20, 20+240); // TODO
 	m_screen->set_refresh_hz(59.360001);
 	m_screen->set_size(768, 262);
 	m_screen->set_visarea(126, 126+640-1, 20, 20+240-1);
@@ -1255,7 +1255,7 @@ void konamim2_state::totlvice(machine_config &config)
 {
 	konamim2(config);
 	add_ymz280b(config);
-//	set_arcres(config);
+//  set_arcres(config);
 	set_ntsc2(config);
 }
 
@@ -1353,8 +1353,8 @@ ROM_START( evilngt )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-    ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
-    ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(60ae825e) SHA1(fd61db9667c53dd12700a0fe202fcd1e3d35d206) )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(60ae825e) SHA1(fd61db9667c53dd12700a0fe202fcd1e3d35d206) )
 
 	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
 	ROM_LOAD( "m48t58y.9n", 0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) )
@@ -1489,7 +1489,7 @@ void konamim2_state::install_m48t58()
 void konamim2_state::install_ymz280b()
 {
 	read8_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
-	write8_delegate	write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
+	write8_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
@@ -1674,19 +1674,19 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 	task.t_DefaultMsgPort = cpu.read_dword(space, address + offsetof(Task, t_DefaultMsgPort), true);
 	task.pt_UserData = cpu.read_dword(space, address + offsetof(Task, pt_UserData), true);
 
-//	m2ptr       pt_ThreadTask;      /* I am a thread of what task?  */
-//	uint32_t     t_WaitBits;        /* signals being waited for     */
-//	uint32_t     t_SigBits;         /* signals received             */
-//	uint32_t     t_AllocatedSigs;   /* signals allocated            */
-//	m2ptr        pt_StackBase;       /* base of stack                */
-//	int32_t      t_StackSize;       /* size of stack                */
-//	uint32_t     t_MaxUSecs;        /* quantum length in usecs      */
-//	TimerTicks   t_ElapsedTime;     /* time spent running this task */
-//	uint32_t     t_NumTaskLaunch;   /* # times launched this task   */
-//	uint32_t     t_Flags;           /* task flags                   */
-//	Item         t_Module;          /* the module we live within    */
-//	Item         t_DefaultMsgPort;  /* default task msgport         */
-//	m2ptr         pt_UserData;        /* user-private data            */
+//  m2ptr       pt_ThreadTask;      /* I am a thread of what task?  */
+//  uint32_t     t_WaitBits;        /* signals being waited for     */
+//  uint32_t     t_SigBits;         /* signals received             */
+//  uint32_t     t_AllocatedSigs;   /* signals allocated            */
+//  m2ptr        pt_StackBase;       /* base of stack                */
+//  int32_t      t_StackSize;       /* size of stack                */
+//  uint32_t     t_MaxUSecs;        /* quantum length in usecs      */
+//  TimerTicks   t_ElapsedTime;     /* time spent running this task */
+//  uint32_t     t_NumTaskLaunch;   /* # times launched this task   */
+//  uint32_t     t_Flags;           /* task flags                   */
+//  Item         t_Module;          /* the module we live within    */
+//  Item         t_DefaultMsgPort;  /* default task msgport         */
+//  m2ptr         pt_UserData;        /* user-private data            */
 
 	con.printf("**** Task Info @ %08X ****\n", address);
 	con.printf("Next:        %08X\n", task.t.pn_Next);
@@ -1712,7 +1712,7 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 	con.printf("StackSize:   %08X\n", task.t_StackSize);
 	con.printf("MaxUSecs:    %08X\n", task.t_MaxUSecs);
 	con.printf("ElapsedTime: %016llu\n", (uint64_t)task.t_ElapsedTime.tt_Lo + ((uint64_t)task.t_ElapsedTime.tt_Hi << 32ull));
-	con.printf("NumTaskLaunch:	%u\n", task.t_NumTaskLaunch);
+	con.printf("NumTaskLaunch:  %u\n", task.t_NumTaskLaunch);
 	con.printf("Flags:          %08X\n", task.t_Flags);
 	con.printf("Module:         %08X\n", task.t_Module);
 	con.printf("DefaultMsgPort: %08X\n", task.t_DefaultMsgPort);

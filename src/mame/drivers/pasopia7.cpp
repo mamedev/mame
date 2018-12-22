@@ -16,7 +16,7 @@
     Reading fdc has been commented out, until the code can be modified to
     work with new upd765 (was causing a hang at boot).
 
-	Schematics: https://archive.org/details/Io19839/page/n331
+    Schematics: https://archive.org/details/Io19839/page/n331
 
 ***************************************************************************************************/
 

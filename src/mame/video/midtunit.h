@@ -16,7 +16,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "emupal.h"
 
-#define DEBUG_MIDTUNIT_BLITTER		(0)
+#define DEBUG_MIDTUNIT_BLITTER      (0)
 
 class midtunit_video_device : public device_t
 {
@@ -110,16 +110,16 @@ protected:
 	};
 
 	/* graphics-related variables */
-	uint16_t	m_midtunit_control;
-	bool		m_gfx_rom_large;
+	uint16_t    m_midtunit_control;
+	bool        m_gfx_rom_large;
 
 	/* videoram-related variables */
-	uint32_t	m_gfxbank_offset[2];
-	std::unique_ptr<uint16_t[]>	m_local_videoram;
-	uint8_t		m_videobank_select;
+	uint32_t    m_gfxbank_offset[2];
+	std::unique_ptr<uint16_t[]> m_local_videoram;
+	uint8_t     m_videobank_select;
 
 	/* DMA-related variables */
-	uint16_t	m_dma_register[18];
+	uint16_t    m_dma_register[18];
 	struct dma_state
 	{
 		uint8_t *     gfxrom;
@@ -145,7 +145,7 @@ protected:
 		uint16_t      xstep;          /* 8.8 fixed number scale x factor */
 		uint16_t      ystep;          /* 8.8 fixed number scale y factor */
 	};
-	dma_state	m_dma_state;
+	dma_state   m_dma_state;
 
 #if DEBUG_MIDTUNIT_BLITTER
 	virtual void device_reset() override;

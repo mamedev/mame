@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
@@ -9383,8 +9383,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="telefngp">
-		<!-- Notes: This game uses an accessory called "Power Antenna", which is just a LED light connected 
-				to the GB accessories port. It is used ingame to simulate a mobile phone. -->
+		<!-- Notes: This game uses an accessory called "Power Antenna", which is just a LED light connected
+		        to the GB accessories port. It is used ingame to simulate a mobile phone. -->
 		<description>Keitai Denjuu Telefang - Power Version (Jpn)</description>
 		<year>2000</year>
 		<publisher>Natsume</publisher>
@@ -12767,15 +12767,15 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="mobilglf">
 		<!-- Notes: GBC only.
-				This game is compatible with the "Mobile System GB", a connected gaming system which uses an external adaptor
-				for connecting to a mobile phone (named "Mobile Adaptor GB" [CGB-005]) and then to an external server. 
-				There are different models depending on the target cellular phone:
-					* Blue adapter can be used by the digital cellular phone terminal PDC. (MAX 9600bps)
-					* Yellow adapter can be used by the CDMAOne portable telephone. (MAX 14.4kbps)
-					* Red adapter can be used by the DDI Pocket Telephone. (MAX 36.6kbps)
-					* Green adapter (unreleased) can be used by the PHS (Astel, NTT DoCoMo).
-				Internally, the "Mobile Adaptor GB" features a ML7060-01P ARM (internal ROM, if any, is undumped), and was
-				manufactured by Mitsumi. -->
+		        This game is compatible with the "Mobile System GB", a connected gaming system which uses an external adaptor
+		        for connecting to a mobile phone (named "Mobile Adaptor GB" [CGB-005]) and then to an external server.
+		        There are different models depending on the target cellular phone:
+		            * Blue adapter can be used by the digital cellular phone terminal PDC. (MAX 9600bps)
+		            * Yellow adapter can be used by the CDMAOne portable telephone. (MAX 14.4kbps)
+		            * Red adapter can be used by the DDI Pocket Telephone. (MAX 36.6kbps)
+		            * Green adapter (unreleased) can be used by the PHS (Astel, NTT DoCoMo).
+		        Internally, the "Mobile Adaptor GB" features a ML7060-01P ARM (internal ROM, if any, is undumped), and was
+		        manufactured by Mitsumi. -->
 		<description>Mobile Golf (Jpn)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -12801,15 +12801,15 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	<!-- when it checks for the connection, it checks for a value of 06 in C27D -->
 	<software name="mobiltrn" supported="partial">
 		<!-- Notes: GBC only.
-			This game is compatible with the "Mobile System GB", a connected gaming system which uses an external adaptor
-			for connecting to a mobile phone (named "Mobile Adaptor GB" [CGB-005]) and then to an external server. 
-			There are different models depending on the target cellular phone:
-				* Blue adapter can be used by the digital cellular phone terminal PDC. (MAX 9600bps)
-				* Yellow adapter can be used by the CDMAOne portable telephone. (MAX 14.4kbps)
-				* Red adapter can be used by the DDI Pocket Telephone. (MAX 36.6kbps)
-				* Green adapter (unreleased) can be used by the PHS (Astel, NTT DoCoMo).
-			Internally, the "Mobile Adaptor GB" features a ML7060-01P ARM (internal ROM, if any, is undumped), and was
-			manufactured by Mitsumi. -->
+		    This game is compatible with the "Mobile System GB", a connected gaming system which uses an external adaptor
+		    for connecting to a mobile phone (named "Mobile Adaptor GB" [CGB-005]) and then to an external server.
+		    There are different models depending on the target cellular phone:
+		        * Blue adapter can be used by the digital cellular phone terminal PDC. (MAX 9600bps)
+		        * Yellow adapter can be used by the CDMAOne portable telephone. (MAX 14.4kbps)
+		        * Red adapter can be used by the DDI Pocket Telephone. (MAX 36.6kbps)
+		        * Green adapter (unreleased) can be used by the PHS (Astel, NTT DoCoMo).
+		    Internally, the "Mobile Adaptor GB" features a ML7060-01P ARM (internal ROM, if any, is undumped), and was
+		    manufactured by Mitsumi. -->
 		<description>Mobile Trainer (Jpn)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -13970,8 +13970,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="networka">
 		<!-- Notes: GBC only
-				This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently shaped plastic case),
-				which is just a LED light connected to the GB accessories port. -->
+		        This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently shaped plastic case),
+		        which is just a LED light connected to the GB accessories port. -->
 		<description>Network Boukenki Bugsite - Alpha Version (Jpn)</description>
 		<year>2001</year>
 		<publisher>Smilesoft</publisher>
@@ -13990,8 +13990,8 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="networkb">
 		<!-- Notes: GBC only
-				This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently shaped plastic case),
-				which is just a LED light connected to the GB accessories port. -->
+		        This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently shaped plastic case),
+		        which is just a LED light connected to the GB accessories port. -->
 		<description>Network Boukenki Bugsite - Beta Version (Jpn)</description>
 		<year>2001</year>
 		<publisher>Smilesoft</publisher>
@@ -14996,7 +14996,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="pockfam2">
 		<!-- Notes: GBC only.
-			The game cart has an integrated speaker and a replaceable battery (CR2025). -->
+		    The game cart has an integrated speaker and a replaceable battery (CR2025). -->
 		<description>Pocket Family GB2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
@@ -15055,7 +15055,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pockgtp" cloneof="pockrace">
 		<description>Pocket GT (Eur, Prototype?)</description>
 		<year>1999</year>
@@ -15686,7 +15686,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="pokecardj" cloneof="pokecard">
 		<!-- Notes: SGB enhanced.
-				This game uses an integrated (on-cart) IR port por connected multiplayer gameplay. -->
+		        This game uses an integrated (on-cart) IR port por connected multiplayer gameplay. -->
 		<description>Pokémon Card GB (Jpn)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
@@ -17687,11 +17687,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="robopspc">
-		<!-- Notes: GBC only.. 
-			Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-			multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-			port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-			The cart also has an integrated speaker (conns PE1 and PE2 on the PCB). -->
+		<!-- Notes: GBC only..
+		    Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		    The cart also has an integrated speaker (conns PE1 and PE2 on the PCB). -->
 		<description>Robot Ponkottsu - Comic Bom Bom Special Version (Jpn)</description>
 		<year>1999?</year>
 		<publisher>Hudson Soft</publisher>
@@ -17715,11 +17715,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="robopmon">
-		<!-- Notes: SGB enhanced. 
-			Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-			multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-			port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-			The cart also has an integrated speaker (conns PE1 and PE2 on the PCB). -->
+		<!-- Notes: SGB enhanced.
+		    Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		    The cart also has an integrated speaker (conns PE1 and PE2 on the PCB). -->
 		<description>Robot Ponkottsu - Moon Version (Jpn)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
@@ -17744,11 +17744,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="robopstr">
-		<!-- Notes: SGB enhanced. 
-			Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
-			multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
-			port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
-			The cart also has an integrated speaker (conns PE1 and PE2 on the PCB). -->
+		<!-- Notes: SGB enhanced.
+		    Supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+		    multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+		    port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+		    The cart also has an integrated speaker (conns PE1 and PE2 on the PCB). -->
 		<description>Robot Ponkottsu - Star Version (Jpn)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -18246,7 +18246,7 @@ Unreleased (music source code exists, possibly no prototypes exist)
 	</software>
 
 	<software name="sakura">
-		<!-- Notes: GBC only, 10 variant packs got released! 
+		<!-- Notes: GBC only, 10 variant packs got released!
 		            This game is compatible with an external pedometer named "Pocket Sakura" (same hardware as the Pokémon Pikachu Color / Pokémon Pikachu 2 GS pedometer)
 		            wich connects to the GBC via the console's IR port -->
 		<description>Sakura Taisen GB - Geki Hana Gumi Nyuutai! (Jpn)</description>
@@ -23511,11 +23511,11 @@ Unreleased (music source code exists, possibly no prototypes exist)
 
 	<software name="zokzok">
 		<!-- Notes: GBC only.
-			Zok Zok Heroes works with an external peripheral that acts like a motion controller.
-			Internally, this device has a weighted analog joystick that moves when you shake the device.
-			It has a Fujitsu MB89135L (undumped), four leds, a speaker and an IR emitter.
-			It connects with the Game Boy using the console IR, but just one way (device to console).
-			The peripheral device is named "Furu Changer". -->
+		    Zok Zok Heroes works with an external peripheral that acts like a motion controller.
+		    Internally, this device has a weighted analog joystick that moves when you shake the device.
+		    It has a Fujitsu MB89135L (undumped), four leds, a speaker and an IR emitter.
+		    It connects with the Game Boy using the console IR, but just one way (device to console).
+		    The peripheral device is named "Furu Changer". -->
 		<description>Zok Zok Heroes (Jpn)</description>
 		<year>2000</year>
 		<publisher>Media Factory</publisher>

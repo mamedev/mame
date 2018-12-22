@@ -12,26 +12,26 @@
 
     To-Do:
 
-		Proper driver_device inheritance to untangle the mess of members
+        Proper driver_device inheritance to untangle the mess of members
 
-	Detailed list of bugs:
+    Detailed list of bugs:
 
-		All systems:
-	  		Various inaccuracies in samples/envelopes.
+        All systems:
+            Various inaccuracies in samples/envelopes.
 
-		walle:
-			Game seems unhappy with NVRAM, clears contents on each boot.
-		rad_skat:
-			Palette issues on the High Score screen.
-		vii:
-			When loading a cart from file manager, sometimes MAME will crash.
-			The "MOTOR" option in the diagnostic menu does nothing when selected.
-			The "SPEECH IC" option in the diagnostic menu does nothing when selected.
-			On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys.
-			- This is not a bug per se, as the games are played with the controller physically rotated 90 degrees.
-			When entering a game in Basketball, MAME fatalerrors when starting the game due to jumping to invalid code.
-		zone60/wirels60:
-			When entering a game in Basketball, MAME fatalerrors when starting the game due to jumping to invalid code.
+        walle:
+            Game seems unhappy with NVRAM, clears contents on each boot.
+        rad_skat:
+            Palette issues on the High Score screen.
+        vii:
+            When loading a cart from file manager, sometimes MAME will crash.
+            The "MOTOR" option in the diagnostic menu does nothing when selected.
+            The "SPEECH IC" option in the diagnostic menu does nothing when selected.
+            On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys.
+            - This is not a bug per se, as the games are played with the controller physically rotated 90 degrees.
+            When entering a game in Basketball, MAME fatalerrors when starting the game due to jumping to invalid code.
+        zone60/wirels60:
+            When entering a game in Basketball, MAME fatalerrors when starting the game due to jumping to invalid code.
 
 *******************************************************************************/
 

@@ -2,19 +2,19 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
-	AXC51-CORE (AppoTech Inc.)
+    AXC51-CORE (AppoTech Inc.)
 
-	used in
+    used in
 
-	AX208 SoC
+    AX208 SoC
 
 
 
-	Notes:
+    Notes:
 
-	AX208:
-	The CPU has a bootloader that sets a few things up + copies data to RAM
-	from the Flash meomry.  This will need to be simulated.
+    AX208:
+    The CPU has a bootloader that sets a few things up + copies data to RAM
+    from the Flash meomry.  This will need to be simulated.
 
  *****************************************************************************/
 

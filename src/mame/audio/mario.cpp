@@ -638,9 +638,9 @@ void mario_state::masao_sound_map(address_map &map)
 void mario_state::mario_audio(machine_config &config)
 {
 #if USE_8039
-	i8039_device &audiocpu(I8039(config, "audiocpu", I8035_CLOCK));		/* 730 kHz */
+	i8039_device &audiocpu(I8039(config, "audiocpu", I8035_CLOCK));     /* 730 kHz */
 #else
-	m58715_device &audiocpu(M58715(config, m_audiocpu, I8035_CLOCK));	/* 730 kHz */
+	m58715_device &audiocpu(M58715(config, m_audiocpu, I8035_CLOCK));   /* 730 kHz */
 #endif
 	audiocpu.set_addrmap(AS_PROGRAM, &mario_state::mario_sound_map);
 	audiocpu.set_addrmap(AS_IO, &mario_state::mario_sound_io_map);

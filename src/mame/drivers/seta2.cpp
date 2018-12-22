@@ -4346,7 +4346,7 @@ ROM_START( telpacfl )
 	ROM_REGION( 0x800000, "unused", ROMREGION_ERASE00 )    // Sprites
 	// not decoding the bad ROM is better than loading corrupt gfx data
 	ROM_LOAD64_WORD( "mp3_cg-2__u21_v1.0.u21", 0x000004, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
-		
+
 	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x000000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
 	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x080000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )

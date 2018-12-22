@@ -17,19 +17,19 @@
         DAC (1 channel; can be used as tone generator)
     512KB or 1MB of RAM
     1MB of BIOS ROM (banked)
-		P/N 18-5301 ABD \\ HN62318BFC26
+        P/N 18-5301 ABD \\ HN62318BFC26
     LCD, 240x128 pixels (40x16 chars in MDA-compatible text mode)
 
     To do:
-	- blue on green LCD palette
-	- native keyboard
-	- 1MB model
-	- identify RTC core
+    - blue on green LCD palette
+    - native keyboard
+    - 1MB model
+    - identify RTC core
     - everything else
 
-	Technical info:
+    Technical info:
     - http://web.archive.org/web/20071012040320/http://www.daniel-hertrich.de/download/95lx_devguide.zip
-	- http://cd.textfiles.com/blackphilesii/PHILES/HP95/HP95DEV.ZIP
+    - http://cd.textfiles.com/blackphilesii/PHILES/HP95/HP95DEV.ZIP
 
     Useful links:
     - https://hermocom.com/hplx/view-all-hp-palmtop-articles/41-95lx
@@ -43,12 +43,12 @@
     - http://web.archive.org/web/20150423014908/http://www.sp.uconn.edu/~mchem1/HPLX.shtml
         HPLX-L mailing list archive
 
-	Software:
-	- http://www.retroisle.com/others/hp95lx/software.php
-	- http://www.mizj.com/
-	- http://www.hp200lx.net/
-	- http://www.nic.funet.fi/index/misc/hp95lx/Index
-	- http://cd.textfiles.com/blackphilesii/PHILES/HP95/
+    Software:
+    - http://www.retroisle.com/others/hp95lx/software.php
+    - http://www.mizj.com/
+    - http://www.hp200lx.net/
+    - http://www.nic.funet.fi/index/misc/hp95lx/Index
+    - http://cd.textfiles.com/blackphilesii/PHILES/HP95/
 
 ***************************************************************************/
 
@@ -614,12 +614,12 @@ WRITE8_MEMBER(hp95lx_state::video_register_w)
 		m_disp_start_addr = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff);
 		break;
 
-	case 0x0d: 
+	case 0x0d:
 		m_disp_start_addr = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00);
 		break;
 
 	case 0x0e:
-		m_cursor_addr = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff); 
+		m_cursor_addr = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff);
 		break;
 
 	case 0x0f:
@@ -699,9 +699,9 @@ void hp95lx_state::hp95lx_io(address_map &map)
 	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x004f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0063).rw(FUNC(hp95lx_state::keyboard_r), FUNC(hp95lx_state::keyboard_w));
-//	map(0x0090, 0x009f).w(FUNC(hp95lx_state::debug_w));
+//  map(0x0090, 0x009f).w(FUNC(hp95lx_state::debug_w));
 	map(0x03b0, 0x03bf).rw(FUNC(hp95lx_state::video_r), FUNC(hp95lx_state::video_w));
-//	map(0x0070, 0x007f)	RTC
+//  map(0x0070, 0x007f) RTC
 	map(0xd300, 0xd30f).rw(FUNC(hp95lx_state::d300_r), FUNC(hp95lx_state::d300_w));
 	map(0xe300, 0xe30f).rw(FUNC(hp95lx_state::e300_r), FUNC(hp95lx_state::e300_w));
 	map(0xf300, 0xf31f).rw(FUNC(hp95lx_state::f300_r), FUNC(hp95lx_state::f300_w));
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
-	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.  
+	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
 	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DRIVER(hp95lx_state, screen_update)

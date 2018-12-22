@@ -165,7 +165,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 			{ 0x0f,0 },   // 4: eagle shot 4bpp birdie text
 			{ 0xf0,4 },   // 5: eagle shot 4bpp Japanese text
 			{ 0x3f,0 },   // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking
-			{ 0xff,0 }	  // 7: common 8bpp case
+			{ 0xff,0 }    // 7: common 8bpp case
 		};
 
 		const uint8_t gfxbppmask = BPP_MASK_TABLE[gfx & 0x07].gfx_mask;
@@ -829,12 +829,12 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				// "Normal" Sprite
 				/*
-					hot spots:
-					"warning" in hypreac2 has mode & 0x0100 and is not 16x16
-					keithlcy high scores has mode & 0x0100 and y & 0x0c00 can be 0x0c00
-					drifto94 "you have proved yOur".. has mode & 0x0100 and x & 0x0c00 can be 0x0c00
-					ultrax (begin of lev1): 100010: 6b60 4280 0016 00a0
-											121400: 51a0 0042 6800 0c00 needs to be a normal sprite
+				    hot spots:
+				    "warning" in hypreac2 has mode & 0x0100 and is not 16x16
+				    keithlcy high scores has mode & 0x0100 and y & 0x0c00 can be 0x0c00
+				    drifto94 "you have proved yOur".. has mode & 0x0100 and x & 0x0c00 can be 0x0c00
+				    ultrax (begin of lev1): 100010: 6b60 4280 0016 00a0
+				                            121400: 51a0 0042 6800 0c00 needs to be a normal sprite
 				*/
 
 				int code = spritelist_local[0];  // code high bits

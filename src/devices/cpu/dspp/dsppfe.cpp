@@ -118,7 +118,7 @@ bool dspp_frontend::describe_special(uint16_t op, opcode_desc &desc)
 			// Super-special
 			switch ((op >> 7) & 7)
 			{
-				case 1:	// BAC - TODO: MERGE?
+				case 1: // BAC - TODO: MERGE?
 				{
 					//desc.regin[0] = m_acc;
 					desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
@@ -167,8 +167,8 @@ bool dspp_frontend::describe_special(uint16_t op, opcode_desc &desc)
 		case 3: // BFM
 		{
 			// TODO: What sort of branch is this?
-//			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-//			desc.targetpc = 0; // FIXME
+//          desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+//          desc.targetpc = 0; // FIXME
 			return false;
 		}
 		case 4: // MOVEREG
@@ -290,7 +290,7 @@ bool dspp_frontend::describe_arithmetic(uint16_t op, opcode_desc &desc)
 	// Does it read memory?
 	// Does it write memory?
 
-//	parse_operands(numops);
+//  parse_operands(numops);
 
 	if (muxa == 3 || muxb == 3)
 	{
@@ -349,94 +349,94 @@ bool dspp_frontend::describe_arithmetic(uint16_t op, opcode_desc &desc)
 
 	switch (alu_op)
 	{
-		case 0:	// _TRA
+		case 0: // _TRA
 		{
-//			alu_res = alu_a;
+//          alu_res = alu_a;
 			break;
 		}
-		case 1:	// _NEG
+		case 1: // _NEG
 		{
-//			alu_res = -alu_b;
+//          alu_res = -alu_b;
 			break;
 		}
-		case 2:	// _+
+		case 2: // _+
 		{
-//			alu_res = alu_a + alu_b;
+//          alu_res = alu_a + alu_b;
 
-//			if ((alu_a & 0x80000) == (alu_b & 0x80000) &&
-//				(alu_a & 0x80000) != (alu_res & 0x80000))
-//				m_core->m_flags |= DSPI_FLAG_CC_OVER;
+//          if ((alu_a & 0x80000) == (alu_b & 0x80000) &&
+//              (alu_a & 0x80000) != (alu_res & 0x80000))
+//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
-//			if (alu_res & 0x00100000)
-//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+//          if (alu_res & 0x00100000)
+//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
-//			CC_V_MODIFIED(desc);
-//			CC_C_MODIFIED(desc);
+//          CC_V_MODIFIED(desc);
+//          CC_C_MODIFIED(desc);
 			break;
 		}
-		case 3:	// _+C
+		case 3: // _+C
 		{
-//			alu_res = alu_a + (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
+//          alu_res = alu_a + (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
 
-//			if (alu_res & 0x00100000)
-//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+//          if (alu_res & 0x00100000)
+//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
 			CC_C_USED(desc);
 			CC_C_MODIFIED(desc);
 			break;
 		}
-		case 4:	// _-
+		case 4: // _-
 		{
-//			alu_res = alu_a - alu_b;
+//          alu_res = alu_a - alu_b;
 
-//			if ((alu_a & 0x80000) == (~alu_b & 0x80000) &&
-//				(alu_a & 0x80000) != (alu_res & 0x80000))
-//				m_core->m_flags |= DSPI_FLAG_CC_OVER;
+//          if ((alu_a & 0x80000) == (~alu_b & 0x80000) &&
+//              (alu_a & 0x80000) != (alu_res & 0x80000))
+//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
-//			if (alu_res & 0x00100000)
-//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+//          if (alu_res & 0x00100000)
+//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
 			CC_C_MODIFIED(desc);
 			CC_V_MODIFIED(desc);
 			break;
 		}
-		case 5:	// _-B
+		case 5: // _-B
 		{
-//			alu_res = alu_a - (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
+//          alu_res = alu_a - (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
 
-//			if (alu_res & 0x00100000)
-//				m_core->m_flags |= DSPI_FLAG_CC_CARRY;
+//          if (alu_res & 0x00100000)
+//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
 
 			CC_C_USED(desc);
 			CC_C_MODIFIED(desc);
 			break;
 		}
-		case 6:	// _++
+		case 6: // _++
 		{
-//			alu_res = alu_a + 1;
+//          alu_res = alu_a + 1;
 
-//			if (!(alu_a & 0x80000) && (alu_res & 0x80000))
-//				m_core->m_flags |= DSPI_FLAG_CC_OVER;
+//          if (!(alu_a & 0x80000) && (alu_res & 0x80000))
+//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
 			CC_V_MODIFIED(desc);
 			break;
 		}
-		case 7:	// _--
+		case 7: // _--
 		{
-//			alu_res = alu_a - 1;
+//          alu_res = alu_a - 1;
 
-//			if ((alu_a & 0x80000) && !(alu_res & 0x80000))
-//				m_core->m_flags |= DSPI_FLAG_CC_OVER;
+//          if ((alu_a & 0x80000) && !(alu_res & 0x80000))
+//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
 
 			CC_V_MODIFIED(desc);
 			break;
 		}
-		case 8:	// _TRL
+		case 8: // _TRL
 		{
 			//alu_res = alu_a;
 			break;
 		}
-		case 9:	// _NOT
+		case 9: // _NOT
 		{
 			//alu_res = ~alu_a;
 			break;
