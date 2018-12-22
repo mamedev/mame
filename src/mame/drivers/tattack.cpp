@@ -432,9 +432,9 @@ void tattack_state::tattack(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
 
 	/* Discrete ???? */
-//  MCFG_DEVICE_ADD("discrete", DISCRETE)
-//  MCFG_DISCRETE_INTF(tattack)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+//  DISCRETE(config, m_discrete);
+//  m_discrete->set_intf(tattack);
+//  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 /***************************************************************************

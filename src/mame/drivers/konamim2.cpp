@@ -1,8 +1,45 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde
-/*
-Konami M2 Hardware
-Preliminary driver by Ville Linde
+// copyright-holders:Phil Bennett
+
+/***************************************************************************
+
+    Konami M2 hardware
+
+    driver by Phil Bennett
+
+	NOTE:
+
+	* All games are marked MACHINE_NOT_WORKING due to the rare case
+	  where the PowerPC DRC blows up, causing MAME to crash. In reality,
+	  there is a good chance of being able to play through a round or
+	  three with no issues on all of the parent sets.
+
+	TODO:
+
+	* Fix DRC crashes
+		o  Crashes on DRC translation of 0x40028604
+	* Fix texture compression
+	* Sort out CD images
+	* Fix Polystars blending issues
+	* Fix PowerPC 602 Protection Only mode handling.
+	* Implement CDDA muting
+
+	DONE
+ 	* Fix Polystars blending
+	* Fix missing music in Polystars
+    * Fix music playing too early
+	* Fix missing music and sound in Hell Night/Evil Night
+	* Fix incorrect speed in Heat of 11 and Total Vice (partially)
+
+	// Polystars/Total Vice
+	if (pc == 0x40035958)
+		gpr[11] = 1;
+
+	// Everything else
+	if (pc == 0x400385c8)
+		gpr[11] = 0;
+
+
 
 
 Konami M2 Hardware Overview
@@ -12,14 +49,14 @@ This hardware is 3DO-based with two IBM Power PC CPUs.
 
 There were only 5 known games on this hardware. They include....
 
-Game                                                 Year    CD Codes                        Konami Part#
--------------------------------------------------------------------------------------------------
+Game                                                 Year    CD Codes                                  Konami Part#
+-------------------------------------------------------------------------------------------------------------------
 Battle Tryst                                         1998    636JAC02
 Evil Night                                           1998    810UBA02
 Hell Night (alt. Region title, same as Evil Night)   1998    810EAA02
 Heat Of Eleven '98                                   1998    703EAA02
-Tobe! Polystars                                      1997    623JAA02                        003894
-Total Vice                                           1997    639UAC01, 639JAD01, 639AAB01
+Tobe! Polystars                                      1997    623JAA02                                  003894
+Total Vice                                           1997    639UAC01, 639EAD01, 639JAD01, 639AAB01
 
 
 PCB Layouts
@@ -57,7 +94,7 @@ Notes:
       *2      - Motorola MC44200FT
       *3      - [M] BIG BODY 2 BU6244KS 704 157 (QFP56)
       *4      - Unknown BGA chip (Graphics Engine, with heatsink attached)
-      DSW     - 2 position dip switch
+      DSW     - 2 position DIP switch
 
 
 Bottom Board
@@ -81,15 +118,15 @@ PWB403045B (C) 1997 KONAMI CO., LTD.
 |                                                          |
 |----------------------------------------------------------|
 Notes:
-      056879     - Konami custom IC, location 10E (TQFP120)
-      058232     - Konami custom ceramic flat pack IC, DAC? (SIP14)
+      056879     - Konami custom IC, location 10E (QFP120)
+      058232     - Konami custom ceramic flat pack IC, DAC?
       003461     - Konami custom IC, location 11K (QFP100)
       CN16       - 4 pin connector for CD-DA in from CDROM
       CN15       - Standard (PC-compatible) 40 pin IDE CDROM flat cable connector and 4 pin power plug connector,
                    connected to Panasonic CR-583 8-speed CDROM drive.
       LA4705     - LA4705 Power Amplifier
       DSW        - 8 position dip switch
-      BOOTROM.8Q - 16MBit mask ROM. Location 8Q (DIP42)
+      BOOTROM.8Q - 16MBit MASKROM. Location 8Q (DIP42)
                    Battle Tryst       - 636A01.8Q
                    Evil Night         -       .8Q
                    Heat Of Eleven '98 -       .8Q
@@ -185,1170 +222,1087 @@ Notes:
       M48T58Y    - ST M48T58Y-70PC1 NonVolatile TimeKeeping RAM
       CN3        - 4-pin sound cable tied to CN16 (CD-DA Input) on main lower board
       CN4        - 4-pin sound cable tied to CDROM analog audio output connector
-*/
 
+***************************************************************************/
 
 #include "emu.h"
-#include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
-#include "imagedev/chd_cd.h"
-#include "machine/terminal.h"
-#include "emupal.h"
+#include "machine/3dom2.h"
+#include "machine/ataintf.h"
+#include "machine/cr589.h"
+#include "machine/eepromser.h"
+#include "machine/timekpr.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "sound/ymz280b.h"
+#include "cdrom.h"
+#include "debug/debugcon.h"
+#include "debug/debugcmd.h"
+#include "debugger.h"
 #include "romload.h"
-#include "softlist.h"
 #include "screen.h"
+#include "speaker.h"
 
-struct CDE_DMA
-{
-	uint32_t dst_addr;
-	int length;
-	uint32_t next_dst_addr;
-	int next_length;
-	int dma_done;
-};
+#define M2_CLOCK		XTAL(66'666'700)
+
+#define ENABLE_SDBG		0
+
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 class konamim2_state : public driver_device
 {
 public:
 	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_main_ram(*this, "main_ram"),
-		m_terminal(*this, "terminal"),
-		m_in_country(*this, "COUNTRY"),
-		m_in_card(*this, "CARD"),
-		m_in_monitor(*this, "MONITOR"),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_ppc1(*this, "ppc1"),
+		m_ppc2(*this, "ppc2"),
+		m_bda(*this, "bda"),
+		m_cde(*this, "cde"),
+		m_eeprom(*this, "eeprom"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
+		m_ata(*this, "ata"),
+		m_screen(*this, "screen"),
+		m_m48t58(*this, "m48t58"),
+		m_ymz280b(*this, "ymz")
+	{
+	}
 
-	void m2(machine_config &config);
-	void _3do_m2(machine_config &config);
+	void konamim2(machine_config &config);
+	void set_ntsc(machine_config &config);
+	void set_ntsc2(machine_config &config);
+	void set_arcres(machine_config &config);
+	void add_ymz280b(machine_config &config);
+	void add_mt48t58(machine_config &config);
+	void polystar(machine_config &config);
+	void totlvice(machine_config &config);
+	void btltryst(machine_config &config);
+	void heatof11(machine_config &config);
+	void evilngt(machine_config &config);
+	void hellngt(machine_config &config);
 
-	void init_m2();
+	static void cr589_config(device_t *device);
+
+	void m2_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void update_disc();
+
+public:
+	DECLARE_WRITE_LINE_MEMBER(ppc1_int);
+	DECLARE_WRITE_LINE_MEMBER(ppc2_int);
+
+	DECLARE_WRITE32_MEMBER(cde_sdbg_out);
+
+	DECLARE_WRITE16_MEMBER(ldac_out);
+	DECLARE_WRITE16_MEMBER(rdac_out);
+
+	DECLARE_WRITE_LINE_MEMBER(ata_int);
+
+	DECLARE_READ16_MEMBER(konami_io0_r);
+	DECLARE_WRITE16_MEMBER(konami_io0_w);
+	DECLARE_READ16_MEMBER(konami_sio_r);
+	DECLARE_WRITE16_MEMBER(konami_sio_w);
+	DECLARE_READ16_MEMBER(konami_io1_r);
+	DECLARE_WRITE16_MEMBER(konami_io1_w);
+	DECLARE_WRITE16_MEMBER(konami_eeprom_w);
+
+	void init_totlvice();
+	void init_btltryst();
+	void init_hellngt();
+
+	DECLARE_WRITE16_MEMBER(konami_atapi_unk_w)
+	{
+		// 8000 = /Reset
+		// 4000 = C000 ... DOIO DMA ... 4000
+//		m_ata->write_dmack(data & 0x4000 ? ASSERT_LINE : CLEAR_LINE);
+
+		if (!(data & 0x8000))
+		{
+			logerror("ATAPI RESET!\n");
+
+			// TODO: Do we need any of this?
+			update_disc();
+		}
+	}
+
+	DECLARE_READ16_MEMBER(konami_ide_r)
+	{
+		return swapendian_int16(m_ata->read_cs0(offset, mem_mask));
+	}
+
+	DECLARE_WRITE16_MEMBER(konami_ide_w)
+	{
+		m_ata->write_cs0(offset, swapendian_int16(data), mem_mask);
+	}
 
 private:
-	required_shared_ptr<uint64_t> m_main_ram;
-	required_device<generic_terminal_device> m_terminal;
-	required_ioport m_in_country;
-	required_ioport m_in_card;
-	required_ioport m_in_monitor;
+	void install_ymz280b();
+	void install_m48t58();
 
-	uint32_t m_vdl0_address;
-	uint32_t m_vdl1_address;
-	uint32_t m_irq_enable;
-	uint32_t m_irq_active;
-	uint64_t m_unk3;
-	uint32_t m_unk20004;
-	int m_counter1;
-	int m_cde_num_status_bytes;
-	uint32_t m_cde_status_bytes[16];
-	int m_cde_status_byte_ptr;
-	uint32_t m_cde_command_bytes[16];
-	int m_cde_command_byte_ptr;
-	int m_cde_response;
-	int m_cde_drive_state;
-	int m_cde_enable_qchannel_reports;
-	int m_cde_enable_seek_reports;
-	int m_cde_qchannel_offset;
-	cdrom_toc m_cde_toc;
-	CDE_DMA m_cde_dma[2];
-	DECLARE_READ64_MEMBER(irq_enable_r);
-	DECLARE_WRITE64_MEMBER(irq_enable_w);
-	DECLARE_READ64_MEMBER(irq_active_r);
-	DECLARE_READ64_MEMBER(unk1_r);
-	DECLARE_READ64_MEMBER(unk3_r);
-	DECLARE_READ64_MEMBER(unk4_r);
-	DECLARE_WRITE64_MEMBER(unk4_w);
-	DECLARE_READ64_MEMBER(unk30000_r);
-	DECLARE_READ64_MEMBER(unk30030_r);
-	DECLARE_WRITE64_MEMBER(video_w);
-	DECLARE_WRITE32_MEMBER(video_irq_ack_w);
-	DECLARE_READ64_MEMBER(unk4000280_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_WRITE64_MEMBER(unk4000418_w);
-	DECLARE_WRITE64_MEMBER(reset_w);
-	DECLARE_READ64_MEMBER(cde_r);
-	DECLARE_WRITE64_MEMBER(cde_w);
-	DECLARE_READ64_MEMBER(device2_r);
-	template<bool maincpu> DECLARE_READ64_MEMBER(cpu_r);
-	DECLARE_READ8_MEMBER(id3_r);
-	DECLARE_READ8_MEMBER(id4_r);
-	DECLARE_READ8_MEMBER(id5_r);
-	DECLARE_READ8_MEMBER(id6_r);
-	DECLARE_READ8_MEMBER(id7_r);
+	required_device<ppc602_device> m_ppc1;
+	optional_device<ppc602_device> m_ppc2;
+	required_device<m2_bda_device> m_bda;
+	required_device<m2_cde_device> m_cde;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
+	required_device<ata_interface_device> m_ata;
+	required_device<screen_device> m_screen;
 
-	virtual void video_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m2_irq);
-	void cde_init();
-	void cde_handle_command();
-	void cde_handle_reports();
-	void cde_dma_transfer(address_space &space, int channel, int next);
-	required_device<ppc602_device> m_maincpu;
-	required_device<ppc602_device> m_subcpu;
-	void _3do_m2_main(address_map &map);
-	void _3do_m2_main_m(address_map &map);
-	void _3do_m2_main_s(address_map &map);
-	void m2_main(address_map &map);
-	void m2_main_m(address_map &map);
-	void m2_main_s(address_map &map);
+	optional_device<m48t58_device> m_m48t58;
+	optional_device<ymz280b_device> m_ymz280b;
+
+	// ATAPI
+	cdrom_file *m_available_cdroms;
+
+	// Konami SIO
+	uint16_t	m_sio_data;
+
+	uint32_t	m_ata_int; // TEST
+	emu_timer *m_atapi_timer;
+
+	TIMER_CALLBACK_MEMBER( atapi_delay )
+	{
+		m_atapi_timer->adjust( attotime::never );
+		m_ata_int = param;
+	}
+
+	void debug_help_command(int ref, const std::vector<std::string> &params);
+	void debug_commands(int ref, const std::vector<std::string> &params);
+
+	void dump_task_command(int ref, const std::vector<std::string> &params);
 };
 
 
-void konamim2_state::video_start()
+
+/*************************************
+ *
+ *  Trampolines - Remove ME
+ *
+ *************************************/
+
+WRITE_LINE_MEMBER(konamim2_state::ppc1_int)
 {
+	m_ppc1->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-uint32_t konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+WRITE_LINE_MEMBER(konamim2_state::ppc2_int)
 {
-	int i, j;
-	uint32_t fb_start = 0xffffffff;
-	uint32_t fb_size;
-	//uint32_t config;
-	int height = 384,width = 512;
-
-	if (m_vdl0_address != 0)
-	{
-		uint32_t cur_vdl_address = screen.frame_number() & 1 ? m_vdl0_address : m_vdl1_address;
-		// TODO: this looks more likely to be a framebuffer copy, with parameters!
-		fb_start = *(uint32_t*)&m_main_ram[(cur_vdl_address - 0x40000000) / 8] - 0x40000000;
-		fb_size = m_main_ram[((cur_vdl_address - 0x40000000) / 8) + 2] >> 32;
-		//config = m_main_ram[(cur_vdl_address - 0x40000000) / 8] >> 32;
-		//popmessage("%08x",config);
-
-		height = fb_size & 0x1ff;
-		width = (fb_size >> 24) * 16;
-	}
-
-	if (fb_start <= 0x800000)
-	{
-		uint16_t *frame = (uint16_t*)&m_main_ram[fb_start/8];
-		for (j=0; j < height; j++)
-		{
-			uint16_t *fb = &frame[(j*width)];
-			uint16_t *d = &bitmap.pix16(j);
-			for (i=0; i < width; i++)
-			{
-				d[i^3] = *fb++ & 0x7fff;
-			}
-		}
-	}
-	else
-	{
-		bitmap.fill(0, cliprect);
-	}
-	return 0;
+	m_ppc2->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(konamim2_state::irq_enable_r)
+WRITE32_MEMBER(konamim2_state::cde_sdbg_out)
 {
-	uint64_t r = 0;
+	if (data == 0xd)
+		putc('\n', stdout);
+	else if (data != 0)
+		putc(data, stdout);
 
-	if (ACCESSING_BITS_32_63)
-	{
-		r |= (uint64_t)(m_irq_enable) << 32;
-	}
+	fflush(stdout);
 
-	return r;
-}
-
-WRITE64_MEMBER(konamim2_state::irq_enable_w)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		m_irq_enable |= (uint32_t)(data >> 32);
-	}
-}
-
-READ64_MEMBER(konamim2_state::irq_active_r)
-{
-	uint64_t r = 0;
-
-	if (ACCESSING_BITS_32_63)
-	{
-		r |= (uint64_t)(m_irq_active) << 32;
-	}
-
-	return r;
-}
-
-
-
-READ64_MEMBER(konamim2_state::unk1_r)
-{
-	return 0xffffffffffffffffU;
-	//return 0;
-}
-
-#ifdef UNUSED_FUNCTION
-READ64_MEMBER(konamim2_state::unk2_r)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		return (uint64_t)0xa5 << 32;
-	}
-	return 0;
-}
+#if ENABLE_SDBG
+	// Dummy write to enable serial out
+	if (data == 0x3c)
+		m_cde->sdbg_in(space, 0, 0xffffffff);
 #endif
-
-READ64_MEMBER(konamim2_state::unk3_r)
-{
-	//return 0xffffffffffffffffU;
-	return m_unk3;
 }
 
-READ64_MEMBER(konamim2_state::unk4_r)
+WRITE16_MEMBER( konamim2_state::ldac_out )
 {
-	uint64_t r = 0;
-//  logerror("unk4_r: %08X, %08X%08X %s\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), machine().describe_context());
+	m_ldac->write(data);
+}
 
-	if (ACCESSING_BITS_32_63)
+WRITE16_MEMBER( konamim2_state::rdac_out )
+{
+	m_rdac->write(data);
+}
+
+
+/*************************************
+ *
+ *  ATAPI (Temporary - remove)
+ *
+ *************************************/
+
+WRITE_LINE_MEMBER( konamim2_state::ata_int )
+{
+//	m_atapi_timer->adjust( attotime::from_msec(10), state );
+	m_ata_int = state;
+}
+
+
+/*************************************
+ *
+ *  Konami I/O
+ *
+ *************************************/
+
+READ16_MEMBER( konamim2_state::konami_io0_r )
+{
+//	printf("IO R: %08X\n", offset);
+
+	switch (offset)
 	{
-		// MCfg
-		r |= (uint64_t)((0 << 13) | (5 << 10)) << 32;
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		r |= m_unk20004 & ~0x800000;
-	}
-	return r;
-}
-
-WRITE64_MEMBER(konamim2_state::unk4_w)
-{
-//  logerror("unk4_w: %08X%08X, %08X, %08X%08X %s\n", (uint32_t)(data >> 32), (uint32_t)(data),
-//      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), machine().describe_context());
-
-	if (ACCESSING_BITS_0_31)
-	{
-		if (data & 0x800000)
-		{
-			m_subcpu->set_input_line(PPC_IRQ, ASSERT_LINE);
-		}
-
-		m_unk20004 = (uint32_t)(data);
-		return;
-	}
-}
-
-READ64_MEMBER(konamim2_state::unk30000_r)
-{
-	m_counter1++;
-	return (uint64_t)(m_counter1 & 0x7f) << 32;
-}
-
-READ64_MEMBER(konamim2_state::unk30030_r)
-{
-	if (ACCESSING_BITS_0_31)
-	{
-		return 1;
-	}
-	return 0;
-}
-
-WRITE64_MEMBER(konamim2_state::video_w)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		m_vdl0_address = (uint32_t)(data >> 32);
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		m_vdl1_address = (uint32_t)(data);
-	}
-}
-
-WRITE32_MEMBER(konamim2_state::video_irq_ack_w)
-{
-	if (data & 0x8000)
-	{
-		m_irq_active &= ~0x800000;
-		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
-	}
-}
-
-
-
-READ64_MEMBER(konamim2_state::unk4000280_r)
-{
-	// SysCfg
-
-	uint32_t sys_config = 0x03600000;
-
-	sys_config |= 0 << 0;  // Bit 0:       PAL/NTSC switch (default is selected by encoder)
-	sys_config |= 0 << 2;                         // Bit 2-3:     Video Encoder (0 = MEIENC, 1 = VP536, 2 = BT9103, 3 = DENC)
-	sys_config |= m_in_country->read() << 11;     // Bit 11-12:   Country
-									//              0 = ???
-									//              1 = UK
-									//              2 = Japan
-									//              3 = US
-	sys_config |= m_in_card->read() << 15;        // Bit 15-18:   0x8 = AC-DevCard
-									//              0xb = AC-CoreBoard
-									//              0xc = DevCard (not allowed)
-									//              0xe = Upgrade (not allowed)
-									//              0xf = Multiplayer (not allowed)
-	sys_config |= 3 << 29;          // Bit 29-30:   Audio chip (1 = CS4216, 3 = Asahi AK4309)
-
-	return ((uint64_t)(sys_config) << 32);
-
-}
-
-WRITE8_MEMBER(konamim2_state::serial_w)
-{
-	m_terminal->write(space,0,data & 0xff);
-}
-
-WRITE64_MEMBER(konamim2_state::unk4000418_w)
-{
-}
-
-WRITE64_MEMBER(konamim2_state::reset_w)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		if (data & 0x100000000U)
-		{
-			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-			m_unk3 = 0;
-		}
-	}
-}
-
-
-/*****************************************************************************/
-/* CDE */
-
-#define CDE_DRIVE_STATE_PAUSED          0x02
-#define CDE_DRIVE_STATE_SEEK_DONE       0x03
-
-
-
-
-
-
-
-
-
-void konamim2_state::cde_init()
-{
-	cdrom_file *cdfile = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
-
-	const cdrom_toc *toc = cdrom_get_toc(cdfile);
-
-	if (cdfile)
-	{
-		memcpy(&m_cde_toc, toc, sizeof(cdrom_toc));
-
 		/*
-		printf("%d tracks\n", toc->numtrks);
-		for (int i=0; i < toc->numtrks; i++)
-		{
-		    const cdrom_track_info *track = &toc->tracks[i];
-		    printf("Track %d: type %d, subtype %d, datasize %d, subsize %d, frames %d, extraframes %d, physframeofs %d\n",
-		            i, track->trktype, track->subtype, track->datasize, track->subsize,track->frames, track->extraframes, track->physframeofs);
-		}
-		*/
+			0 =    160
+		    1 =     32
+			2 =    -96
+		   10 =  -1888
+		   FF = -32480
 
-		cdrom_close(cdfile);
+		  100 =    160
+		  1FF = -32480
+
+		  200 =    159
+		  2FF = -32481
+
+		  300 =    159
+		  3FF = -32481
+
+		  400 =    158
+
+		  800 =    156
+
+		  C00 =    154
+
+		  E00
+		  F00 =    153
+
+		 1000 =    152
+		 2000 =    144
+		 4000 =    128
+		 8000 =     96
+
+		 E000 =     48
+		 F000 =     40
+		 FF00 =     33
+
+		 7FFF = -32543
+		 FFFF = -32607
+		 */
+		case 0:
+		{
+			return swapendian_int16((int16_t)ioport("GUNX1")->read());
+		}
+		case 1: return 0;
+		case 2: return 0; // P3 X?
+		case 3: return 0xffff; // ?
+		case 4:
+		{
+			return swapendian_int16((int16_t)ioport("GUNY1")->read());
+		}
+		case 5: return 0; // P2 Y
+		case 6: return 0; // P3 Y?
+		case 7: return 0; //??
+		case 8:	return ioport("P5")->read();
 	}
 
-	m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
-
-	m_cde_num_status_bytes = 0;
-	m_cde_status_byte_ptr = 0;
-	m_cde_command_byte_ptr = 0;
-
-	m_cde_response = 0;
-
-	m_cde_enable_qchannel_reports = 0;
-	m_cde_enable_seek_reports = 0;
-
-	m_cde_qchannel_offset = 0;
-}
-
-void konamim2_state::cde_handle_command()
-{
-	switch (m_cde_command_bytes[0])
-	{
-		case 0x04:      // Set Speed
-		{
-			m_cde_num_status_bytes = 1;
-
-			m_cde_status_bytes[0] = 0x04;
-			m_cde_status_byte_ptr = 0;
-
-//          osd_printf_debug("CDE: SET SPEED %02X, %02X\n", m_cde_command_bytes[1], m_cde_command_bytes[2]);
-			break;
-		}
-		case 0x06:      // Audio Format / Data Format
-		{
-			m_cde_num_status_bytes = 1;
-
-			m_cde_status_bytes[0] = 0x06;
-			m_cde_status_byte_ptr = 0;
-
-			if (m_cde_command_bytes[1] == 0x00)      // Audio Format
-			{
-//              osd_printf_debug("CDE: AUDIO FORMAT\n");
-			}
-			else if (m_cde_command_bytes[1] == 0x78) // Data Format
-			{
-//              osd_printf_debug("CDE: DATA FORMAT\n");
-			}
-			else
-			{
-				fatalerror("CDE: unknown command %02X, %02X\n", m_cde_command_bytes[0], m_cde_command_bytes[1]);
-			}
-			break;
-		}
-		case 0x08:      // Pause / Eject / Play
-		{
-			m_cde_num_status_bytes = 1;
-
-			m_cde_status_bytes[0] = 0x08;
-			m_cde_status_byte_ptr = 0;
-
-			if (m_cde_command_bytes[1] == 0x00)      // Eject
-			{
-//              osd_printf_debug("CDE: EJECT command\n");
-			}
-			else if (m_cde_command_bytes[1] == 0x02) // Pause
-			{
-//              osd_printf_debug("CDE: PAUSE command\n");
-				m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
-			}
-			else if (m_cde_command_bytes[1] == 0x03) // Play
-			{
-//              osd_printf_debug("CDE: PLAY command\n");
-			}
-			else
-			{
-				fatalerror("CDE: unknown command %02X, %02X\n", m_cde_command_bytes[0], m_cde_command_bytes[1]);
-			}
-			break;
-		}
-		case 0x09:      // Seek
-		{
-			m_cde_num_status_bytes = 1;
-
-			m_cde_status_bytes[0] = 0x1b;
-			m_cde_status_byte_ptr = 0;
-
-			m_cde_drive_state = CDE_DRIVE_STATE_SEEK_DONE;
-
-//          osd_printf_debug("CDE: SEEK %08X\n", (m_cde_command_bytes[1] << 16) | (m_cde_command_bytes[2] << 8) | (m_cde_command_bytes[3]));
-			break;
-		}
-		case 0x0b:      // Get Drive State
-		{
-			m_cde_num_status_bytes = 0x3;
-
-			m_cde_status_bytes[0] = 0x0b;
-			m_cde_status_bytes[1] = 0x1b;
-			m_cde_status_bytes[2] = m_cde_drive_state;
-			m_cde_status_byte_ptr = 0;
-
-			if (m_cde_command_bytes[1] & 0x02)
-			{
-				m_cde_enable_seek_reports = 1;
-			}
-			else
-			{
-				m_cde_enable_seek_reports = 0;
-			}
-
-//          osd_printf_debug("CDE: GET DRIVE STATE %02X\n", m_cde_command_bytes[1]);
-			break;
-		}
-		case 0x0c:      // ?
-		{
-			m_cde_num_status_bytes = 1;
-
-			m_cde_status_bytes[0] = 0x0c;
-			m_cde_status_byte_ptr = 0;
-
-			if (m_cde_command_bytes[1] == 0x02)
-			{
-				m_cde_enable_qchannel_reports = 1;
-				m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
-			}
-			else if (m_cde_command_bytes[0] == 0x00)
-			{
-				m_cde_enable_qchannel_reports = 0;
-			}
-
-//          osd_printf_debug("CDE: UNKNOWN CMD 0x0c %02X\n", m_cde_command_bytes[1]);
-			break;
-		}
-		case 0x0d:      // Get Switch State
-		{
-			m_cde_num_status_bytes = 0x4;
-
-			m_cde_status_bytes[0] = 0x0d;
-			m_cde_status_bytes[1] = 0x1d;
-			m_cde_status_bytes[2] = 0x02;
-			m_cde_status_byte_ptr = 0;
-
-//          osd_printf_debug("CDE: GET SWITCH STATE %02X\n", m_cde_command_bytes[1]);
-			break;
-		}
-		case 0x21:      // Mech type
-		{
-			m_cde_num_status_bytes = 0x8;
-
-			m_cde_status_bytes[0] = 0x21;
-			m_cde_status_bytes[1] = 0xff;
-			m_cde_status_bytes[2] = 0x08;        // Max Speed
-			m_cde_status_bytes[3] = 0xff;
-			m_cde_status_bytes[4] = 0xff;
-			m_cde_status_bytes[5] = 0xff;
-			m_cde_status_bytes[6] = 0xff;
-			m_cde_status_bytes[7] = 0xff;
-
-			m_cde_status_byte_ptr = 0;
-
-//          osd_printf_debug("CDE: MECH TYPE %02X, %02X, %02X\n", m_cde_command_bytes[1], m_cde_command_bytes[2], m_cde_command_bytes[3]);
-			break;
-		}
-		case 0x83:      // Read ID
-		{
-			m_cde_num_status_bytes = 0xc;
-
-			m_cde_status_bytes[0] = 0x03;
-			m_cde_status_bytes[1] = 0xff;
-			m_cde_status_bytes[2] = 0xff;
-			m_cde_status_bytes[3] = 0xff;
-			m_cde_status_bytes[4] = 0xff;
-			m_cde_status_bytes[5] = 0xff;
-			m_cde_status_bytes[6] = 0xff;
-			m_cde_status_bytes[7] = 0xff;
-			m_cde_status_bytes[8] = 0xff;
-			m_cde_status_bytes[9] = 0xff;
-			m_cde_status_bytes[10] = 0xff;
-			m_cde_status_bytes[11] = 0xff;
-
-			m_cde_status_byte_ptr = 0;
-
-//          osd_printf_debug("CDE: READ ID\n");
-			break;
-		}
-		default:
-		{
-			fatalerror("CDE: unknown command %08X\n", m_cde_command_bytes[0]);
-		}
-	}
-}
-
-void konamim2_state::cde_handle_reports()
-{
-	switch (m_cde_command_bytes[0])
-	{
-		case 0x09:
-		{
-			if (m_cde_enable_seek_reports)
-			{
-				m_cde_num_status_bytes = 0x2;
-				m_cde_status_bytes[0] = 0x02;
-
-				m_cde_status_byte_ptr = 0;
-
-				m_cde_command_bytes[0] = 0x0c;
-
-//              osd_printf_debug("CDE: SEEK REPORT\n");
-			}
-			break;
-		}
-
-		case 0x0b:
-		{
-			if (m_cde_enable_qchannel_reports)
-			{
-				int track, num_tracks;
-
-				num_tracks = m_cde_toc.numtrks;
-				track = m_cde_qchannel_offset % (num_tracks+3);
-
-				m_cde_num_status_bytes = 0xb;
-				m_cde_status_bytes[0] = 0x1c;
-
-				/*
-				m_cde_status_bytes[1] = 0x0;      // q-Mode
-				m_cde_status_bytes[2] = 0x0;      // TNO
-				m_cde_status_bytes[3] = 0x0;      // Index / Pointer
-				m_cde_status_bytes[4] = 0x0;      // Min
-				m_cde_status_bytes[5] = 0x0;      // Sec
-				m_cde_status_bytes[6] = 0x0;      // Frac
-				m_cde_status_bytes[7] = 0x0;      // Zero
-				m_cde_status_bytes[8] = 0x0;      // A-Min
-				m_cde_status_bytes[9] = 0x0;      // A-Sec
-				m_cde_status_bytes[10] = 0x0;     // A-Frac
-				*/
-
-				if (track < num_tracks)
-				{
-					int time = lba_to_msf(m_cde_toc.tracks[track].physframeofs);
-
-					m_cde_status_bytes[1] = 0x41;                    // q-Mode
-					m_cde_status_bytes[2] = 0x0;                 // TNO (Lead-in track)
-					m_cde_status_bytes[3] = track+1;             // Pointer
-					m_cde_status_bytes[4] = 0x0;                 // Min
-					m_cde_status_bytes[5] = 0x0;                 // Sec
-					m_cde_status_bytes[6] = 0x0;                 // Frac
-					m_cde_status_bytes[7] = 0x0;                 // Zero
-					m_cde_status_bytes[8] = (time >> 16) & 0xff; // P-Min
-					m_cde_status_bytes[9] = (time >>  8) & 0xff; // P-Sec
-					m_cde_status_bytes[10] = time & 0xff;            // P-Frac
-				}
-				else
-				{
-					if (track == num_tracks+0)
-					{
-						m_cde_status_bytes[1] = 0x41;                    // q-Mode / Control
-						m_cde_status_bytes[2] = 0x0;                 // TNO (Lead-in track)
-						m_cde_status_bytes[3] = 0xa0;                    // Pointer
-						m_cde_status_bytes[4] = 0x0;                 // Min
-						m_cde_status_bytes[5] = 0x0;                 // Sec
-						m_cde_status_bytes[6] = 0x0;                 // Frac
-						m_cde_status_bytes[7] = 0x0;                 // Zero
-						m_cde_status_bytes[8] = 1;                   // P-Min
-						m_cde_status_bytes[9] = 0x0;                 // P-Sec
-						m_cde_status_bytes[10] = 0x0;                    // P-Frac
-					}
-					else if (track == num_tracks+1)
-					{
-						m_cde_status_bytes[1] = 0x41;                    // q-Mode / Control
-						m_cde_status_bytes[2] = 0x0;                 // TNO (Lead-in track)
-						m_cde_status_bytes[3] = 0xa1;                    // Pointer
-						m_cde_status_bytes[4] = 0x0;                 // Min
-						m_cde_status_bytes[5] = 0x0;                 // Sec
-						m_cde_status_bytes[6] = 0x0;                 // Frac
-						m_cde_status_bytes[7] = 0x0;                 // Zero
-						m_cde_status_bytes[8] = num_tracks;          // P-Min
-						m_cde_status_bytes[9] = 0x0;                 // P-Sec
-						m_cde_status_bytes[10] = 0x0;                    // P-Frac
-					}
-					else
-					{
-						int leadout_lba = m_cde_toc.tracks[num_tracks-1].physframeofs + m_cde_toc.tracks[num_tracks-1].frames;
-						int leadout_time = lba_to_msf(leadout_lba);
-
-						m_cde_status_bytes[1] = 0x41;                    // q-Mode / Control
-						m_cde_status_bytes[2] = 0x0;                 // TNO (Lead-in track)
-						m_cde_status_bytes[3] = 0xa2;                    // Pointer
-						m_cde_status_bytes[4] = 0x0;                 // Min
-						m_cde_status_bytes[5] = 0x0;                 // Sec
-						m_cde_status_bytes[6] = 0x0;                 // Frac
-						m_cde_status_bytes[7] = 0x0;                 // Zero
-						m_cde_status_bytes[8] = (leadout_time >> 16) & 0xff; // P-Min
-						m_cde_status_bytes[9] = (leadout_time >>  8) & 0xff; // P-Sec
-						m_cde_status_bytes[10] = leadout_time & 0xff;            // P-Frac
-					}
-				}
-
-				m_cde_qchannel_offset++;
-
-				m_cde_status_byte_ptr = 0;
-				m_cde_command_bytes[0] = 0x0c;
-
-//              osd_printf_debug("CDE: QCHANNEL REPORT\n");
-				break;
-			}
-		}
-	}
-}
-
-void konamim2_state::cde_dma_transfer(address_space &space, int channel, int next)
-{
-	uint32_t address;
-	//int length;
-	int i;
-
-	if (next)
-	{
-		address = m_cde_dma[channel].next_dst_addr;
-		//length = m_cde_dma[channel].next_length;
-	}
-	else
-	{
-		address = m_cde_dma[channel].dst_addr;
-		//length = m_cde_dma[channel].length;
-	}
-
-	for (i=0; i < m_cde_dma[channel].next_length; i++)
-	{
-		space.write_byte(address, 0xff);        // TODO: do the real transfer...
-		address++;
-	}
-}
-
-READ64_MEMBER(konamim2_state::cde_r)
-{
-	uint32_t r = 0;
-	int reg = offset * 2;
-
-	if (ACCESSING_BITS_0_31)
-		reg++;
-
-	switch (reg)
-	{
-		case 0x000/4:
-		{
-			r = (0x01) << 16;   // Device identifier, 1 = CDE
-			break;
-		}
-		case 0x018/4:
-		{
-			r = 0x100038;
-
-			r |= m_cde_dma[0].dma_done ? 0x400 : 0;
-			r |= m_cde_dma[1].dma_done ? 0x800 : 0;
-			break;
-		}
-		case 0x02c/4:
-		{
-			r = m_cde_status_bytes[m_cde_status_byte_ptr++];
-
-			if (m_cde_status_byte_ptr <= m_cde_num_status_bytes)
-			{
-				r |= 0x100;
-			}
-			else
-			{
-				//if (cde_enable_reports &&
-				//  !m_cde_response &&
-				//  m_cde_command_bytes[0] != ((cde_report_type >> 8) & 0xff))
-
-				if (!m_cde_response)
-				{
-					cde_handle_reports();
-
-			//      m_cde_command_byte_ptr = 0;
-			//      m_cde_command_bytes[m_cde_command_byte_ptr++] = 0x1c;
-
-			//      m_cde_response = 1;
-				}
-			}
-
-	//      printf("status byte %d\n", m_cde_status_byte_ptr);
-			break;
-		}
-
-		case 0x2a0/4:
-		{
-			r = 0x20;
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-
-	if (reg & 1)
-	{
-		return (uint64_t)(r);
-	}
-	else
-	{
-		return (uint64_t)(r) << 32;
-	}
-}
-
-WRITE64_MEMBER(konamim2_state::cde_w)
-{
-	int reg = offset * 2;
-	uint32_t d;
-
-	if (ACCESSING_BITS_0_31)
-	{
-		reg++;
-		d = (uint32_t)(data);
-	}
-	else
-	{
-		d = (uint32_t)(data >> 32);
-	}
-
-	switch (reg)
-	{
-		case 0x028/4:       // Command write
-		{
-			if (d == 0x0180)
-			{
-				if (m_cde_response)
-				{
-					cde_handle_command();
-
-					m_cde_response = 0;
-				}
-
-				m_cde_command_byte_ptr = 0;
-			}
-			else if (m_cde_command_byte_ptr == 0)
-			{
-				m_cde_num_status_bytes = 1;
-
-				m_cde_status_bytes[0] = d & 0xff;
-				m_cde_status_byte_ptr = 0;
-
-				m_cde_response = 1;
-			}
-
-			if (d != 0x180)
-			{
-				m_cde_command_bytes[m_cde_command_byte_ptr++] = d;
-			}
-
-			break;
-		}
-
-		case 0x300/4:       // DMA Channel 0 enable
-		{
-//          osd_printf_debug("CDE: DMA0 enable %08X\n", d);
-
-			if (d & 0x20)
-			{
-				m_cde_dma[0].dma_done = 1;
-
-				cde_dma_transfer(space, 0, 0);
-			}
-			if (d & 0x40)
-			{
-				m_cde_dma[0].dma_done = 1;
-
-				cde_dma_transfer(space, 0, 1);
-			}
-			break;
-		}
-		case 0x308/4:       // DMA Channel 0 destination address
-		{
-//          osd_printf_debug("CDE: DMA0 dst addr %08X\n", d);
-
-			m_cde_dma[0].dst_addr = d;
-			break;
-		}
-		case 0x30c/4:       // DMA Channel 0 length?
-		{
-//          osd_printf_debug("CDE: DMA0 length %08X\n", d);
-
-			m_cde_dma[0].length = d;
-			break;
-		}
-		case 0x318/4:       // DMA Channel 0 next destination address
-		{
-//          osd_printf_debug("CDE: DMA0 next dst addr %08X\n", d);
-
-			m_cde_dma[0].next_dst_addr = d;
-			break;
-		}
-		case 0x31c/4:       // DMA Channel 0 next length?
-		{
-//          osd_printf_debug("CDE: DMA0 next length %08X\n", d);
-
-			m_cde_dma[0].next_length = d;
-			break;
-		}
-
-		case 0x320/4:       // DMA Channel 1 enable
-		{
-//          osd_printf_debug("CDE: DMA1 enable %08X\n", d);
-			break;
-		}
-		case 0x328/4:       // DMA Channel 1 destination address
-		{
-//          osd_printf_debug("CDE: DMA1 dst addr %08X\n", d);
-
-			m_cde_dma[1].dst_addr = d;
-			break;
-		}
-		case 0x32c/4:       // DMA Channel 1 length?
-		{
-//          osd_printf_debug("CDE: DMA1 length %08X\n", d);
-
-			m_cde_dma[1].length = d;
-			break;
-		}
-		case 0x338/4:       // DMA Channel 1 next destination address
-		{
-//          osd_printf_debug("CDE: DMA1 next dst addr %08X\n", d);
-
-			m_cde_dma[1].next_dst_addr = d;
-			break;
-		}
-		case 0x33c/4:       // DMA Channel 1 next length?
-		{
-//          osd_printf_debug("CDE: DMA1 next length %08X\n", d);
-
-			m_cde_dma[1].next_length = d;
-			break;
-		}
-
-		case 0x418/4:       // ???
-		{
-			if (d & 0x80000000)
-			{
-				m_irq_active &= ~0x8;
-			}
-			if (d & 0x60000000)
-			{
-				m_cde_dma[0].dma_done = 0;
-				m_cde_dma[1].dma_done = 0;
-			}
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-}
-
-READ64_MEMBER(konamim2_state::device2_r)
-{
-	uint32_t r = 0;
-	int reg = offset * 2;
-
-	if (ACCESSING_BITS_0_31)
-		reg++;
-
-	switch (reg)
-	{
-		case 0x000/4:
-		{
-			r = (0x02) << 16;   // Device identifier
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-
-	if (reg & 1)
-	{
-		return (uint64_t)(r);
-	}
-	else
-	{
-		return (uint64_t)(r) << 32;
-	}
-}
-
-template<bool maincpu> READ64_MEMBER(konamim2_state::cpu_r)
-{
-	uint64_t r = 0;
-
-	if (ACCESSING_BITS_32_63)
-	{
-		r = (uint64_t)(maincpu ? 0 : 0x80000000);
-		r |= m_in_monitor->read() << 30;
-		return r << 32;
-	}
-
+	//return rand();
 	return 0;
 }
 
-READ8_MEMBER(konamim2_state::id3_r)
+WRITE16_MEMBER( konamim2_state::konami_io0_w )
 {
-	return 0x03;
+	// 9: 0000, 0xFFF
+//	printf("IO W: %08x %08x\n", offset, data);
 }
 
-READ8_MEMBER(konamim2_state::id4_r)
+/*
+     FEDCBA98 76543210
+ 0: |........ ........|
+
+ 1: |........ ........|
+
+ 2: |........ ........|
+
+ 3: |........ .......x| Coin 1
+    |........ ......x.| Coin 2
+    |........ ....x...| Service coin
+    |.......x ........| EEPROM D0
+    |.....x.. ........| ADC
+    |...xx... ........| SIO related? (set to 3 NOTE: Total Vice doesn't like this!)
+    |..x..... ........| ATAPI/CD status?
+
+ 4: |........ ........| Player 1/2 inputs
+
+ 5: |........ ........| Unknown
+
+ 6: |........ ........| Unknown
+
+ 7: |........ ........| Unknown
+*/
+
+READ16_MEMBER( konamim2_state::konami_io1_r )
 {
-	return 0x04;
-}
+	uint16_t data = 0;
 
-READ8_MEMBER(konamim2_state::id5_r)
-{
-	return 0x05;
-}
+//	printf("%s: PORT R: [%x] MASK:%.8x\n", machine().describe_context(), offset, mem_mask);
 
-READ8_MEMBER(konamim2_state::id6_r)
-{
-	return 0x06;
-}
-
-READ8_MEMBER(konamim2_state::id7_r)
-{
-	return 0x07;
-}
-
-void konamim2_state::m2_main(address_map &map)
-{
-	map(0x00000000, 0x0000007f).ram(); // ???
-	map(0x00010040, 0x00010047).rw(FUNC(konamim2_state::irq_enable_r), FUNC(konamim2_state::irq_enable_w));
-	map(0x00010050, 0x00010057).r(FUNC(konamim2_state::irq_active_r));
-	map(0x00020000, 0x00020007).rw(FUNC(konamim2_state::unk4_r), FUNC(konamim2_state::unk4_w));
-	map(0x00020400, 0x000207ff).ram(); // ???
-	map(0x00020800, 0x00020807).ram(); // ???
-	map(0x00030000, 0x00030007).r(FUNC(konamim2_state::unk30000_r));
-	map(0x00030010, 0x00030017).w(FUNC(konamim2_state::video_w));
-	map(0x00030030, 0x00030037).r(FUNC(konamim2_state::unk30030_r));
-	map(0x00030404, 0x00030407).w(FUNC(konamim2_state::video_irq_ack_w));
-
-	map(0x01000000, 0x01000fff).rw(FUNC(konamim2_state::cde_r), FUNC(konamim2_state::cde_w));
-
-	map(0x02000000, 0x02000fff).r(FUNC(konamim2_state::device2_r));
-
-	map(0x03000001, 0x03000001).r(FUNC(konamim2_state::id3_r));
-
-	map(0x04000001, 0x04000001).r(FUNC(konamim2_state::id4_r));
-	map(0x04000017, 0x04000017).w(FUNC(konamim2_state::serial_w));
-	map(0x04000018, 0x0400001f).r(FUNC(konamim2_state::unk1_r)); // serial status
-	map(0x04000020, 0x04000027).w(FUNC(konamim2_state::reset_w));
-	map(0x04000418, 0x0400041f).w(FUNC(konamim2_state::unk4000418_w)); // serial status ack
-	map(0x04000208, 0x0400020f).r(FUNC(konamim2_state::unk3_r));
-	map(0x04000280, 0x04000287).r(FUNC(konamim2_state::unk4000280_r));
-
-	map(0x05000001, 0x05000001).r(FUNC(konamim2_state::id5_r));
-
-	map(0x06000001, 0x06000001).r(FUNC(konamim2_state::id6_r));
-
-	map(0x07000001, 0x07000001).r(FUNC(konamim2_state::id7_r));
-
-	map(0x10000008, 0x10001007).noprw();     // ???
-
-	map(0x20000000, 0x201fffff).rom().share("share2");
-	map(0x40000000, 0x407fffff).ram().share("main_ram");
-	map(0xfff00000, 0xffffffff).rom().region("boot", 0).share("share2");
-}
-
-void konamim2_state::m2_main_m(address_map &map)
-{
-	m2_main(map);
-	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<true>));
-}
-
-void konamim2_state::m2_main_s(address_map &map)
-{
-	m2_main(map);
-	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<false>));
-}
-
-void konamim2_state::_3do_m2_main(address_map &map)
-{
-//  ADDRESS_MAP_UNMAP_HIGH
-	m2_main(map);
-
-//  AM_RANGE(0x00000000, 0x000cffff) devices?
-}
-
-void konamim2_state::_3do_m2_main_m(address_map &map)
-{
-	_3do_m2_main(map);
-	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<true>));
-}
-
-void konamim2_state::_3do_m2_main_s(address_map &map)
-{
-	_3do_m2_main(map);
-	map(0x10000000, 0x10000007).r(FUNC(konamim2_state::cpu_r<false>));
-}
-
-
-static INPUT_PORTS_START( m2 )
-	// TODO: it's unknown if these are actual dip-switches or internal to something
-	PORT_START("COUNTRY")
-	PORT_CONFNAME( 0x03, 0x03, "Country" )
-	PORT_CONFSETTING(    0x00, "<Invalid>" )
-	PORT_CONFSETTING(    0x01, "UK" )
-	PORT_CONFSETTING(    0x02, "Japan" )
-	PORT_CONFSETTING(    0x03, "US" )
-
-	PORT_START("CARD")
-	PORT_CONFNAME( 0x0f, 0x0b, "Card Type" )
-	PORT_CONFSETTING(    0x08, "AC-DevCard" )
-	PORT_CONFSETTING(    0x0b, "AC-CoreBoard" )
-	PORT_CONFSETTING(    0x0c, "DevCard (not allowed)" )
-	PORT_CONFSETTING(    0x0e, "Upgrade (not allowed)" )
-	PORT_CONFSETTING(    0x0f, "Multiplayer (not allowed)" )
-
-	PORT_START("MONITOR")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
-	PORT_CONFSETTING(    0x01, "15 KHz" )
-	PORT_CONFSETTING(    0x00, "24 KHz" )
-INPUT_PORTS_END
-
-
-INTERRUPT_GEN_MEMBER(konamim2_state::m2_irq)
-{
-	/*
-	 0x000001
-	 0x000008
-	 0x200000
-	 0x800000 VBlank irq
-	 */
-
-	if (m_irq_enable & 0x800000)
+	switch (offset)
 	{
-		//m_irq_enable |= 0x800000;
-		m_irq_active |= 0x800000;
-		device.execute().set_input_line(PPC_IRQ, ASSERT_LINE);
+		case 0:
+			data = 0xffff;
+			break;
+
+		case 1:
+			data = 0xffff;
+			break;
+
+		case 2: // DIP switches
+			data = ioport("P2")->read();
+			break;
+
+		case 3:
+		{
+			data = ioport("P1")->read();
+#if M2_BAD_TIMING
+			static uint32_t d = 0;
+			data |= d;
+			d ^= 0x2000;
+#else
+			data |= m_ata_int ? 0x2000 : 0;
+#endif
+			data |= (1 << 10);
+			data |= (3 << 11); // TODO: 3 normally
+			break;
+		}
+
+		case 4: // Buttons
+			data = ioport("P4")->read();
+			break;
+
+		case 5: // Changing this has a tendency to stop evilngt from booting...
+			data = 0xffff;
+			break;
+
+		case 6: // Buttons
+			data = ioport("P6")->read();
+			break;
+
+		case 7:
+			data = 0xffff;
+			break;
+
+		default:
+			logerror("%s: Unknown read: %x\n", machine().describe_context(), offset);
+			break;
 	}
 
-	/*if (m_irq_enable & 0x8)
+	return data;
+}
+
+WRITE16_MEMBER( konamim2_state::konami_io1_w )
+{
+	// 0x0200 = ADC?
+	// 0x0800 = Coin counter 1
+	// 0x1000 = Coin counter 2
+	// 0x2000 = CD-MUTE
+	// 0x8000 = ?
+	logerror("%s: PORT W: [%x] %x, MASK:%.8x\n", machine().describe_context(), offset, data, mem_mask);
+
+//	printf("CDDA is: %s\n", data & 0x2000 ? "ENABLED" : "MUTE");
+
+	machine().bookkeeping().coin_counter_w(0, (data >> 11) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 12) & 1);
+
+//	m_cdda->set_output_gain(0, data & 0x2000 ? 1.0 : 0.0);
+//	m_cdda->set_output_gain(1, data & 0x2000 ? 1.0 : 0.0);
+}
+
+
+
+/**************************************
+ *
+ *  Konami 003461 SIO
+ *
+ *************************************/
+
+/*
+     FEDCBA98 76543210
+ 0: |xxxxxxxx xxxxxxxx| Data R/W
+
+ 1: |........ ........|
+
+ 2: |........ ........|
+
+ 3: |........ ........|
+
+ 4: |........ ........|
+
+ 5: |........ ..x.....| Transmit ready
+
+ 6: |........ ........|
+
+ 7: |xxxxxxxx xxxxxxxx| Register R/W
+*/
+
+READ16_MEMBER( konamim2_state::konami_sio_r )
+{
+	uint16_t data = 0;
+
+	switch (offset)
 	{
-	    m_irq_active |= 0x8;
-	}*/
+		case 7:
+			data = m_sio_data;
+			break;
+		//default:
+			//logerror("%s: SIO_R: %x %x\n", machine().describe_context(), offset, mem_mask);
+	}
+
+	return data;
+}
+
+WRITE16_MEMBER( konamim2_state::konami_sio_w )
+{
+	switch (offset)
+	{
+		case 7:
+			m_sio_data = data;
+			break;
+		//default:
+			//printf("%s: SIO_W: %x %x %x\n", machine().describe_context(), offset, data, mem_mask);
+	}
+}
+
+// TODO: Use output port
+WRITE16_MEMBER( konamim2_state::konami_eeprom_w )
+{
+	// 3 = CS
+	// 2 = CLK
+	// 1 = DATA
+	// 0 = ? (From Port)
+	m_eeprom->cs_write(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(data & 0x20 ? 1 : 0);
+	m_eeprom->clk_write(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
+}
 
 
+
+/*************************************
+ *
+ *  Machine initialization
+ *
+ *************************************/
+
+void konamim2_state::machine_start()
+{
+	m_ppc1->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+	m_ppc2->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+
+	// Breakpoints don't wortk with fast RAM
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	{
+		m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
+		m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
+	}
+
+	m_available_cdroms = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
+
+	// TODO: REMOVE
+	m_atapi_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( konamim2_state::atapi_delay ),this ) );
+	m_atapi_timer->adjust( attotime::never );
+
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 0, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1, _2));
+	}
 }
 
 void konamim2_state::machine_reset()
 {
-	m_unk3 = 0xffffffffffffffffU;
-	m_unk20004 = 0;
-	cde_init();
+	update_disc();
 }
 
-void konamim2_state::m2(machine_config &config)
+void konamim2_state::update_disc()
 {
-	/* basic machine hardware */
-	PPC602(config, m_maincpu, 66000000);
-	m_maincpu->set_bus_frequency(33000000);  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &konamim2_state::m2_main_m);
-	m_maincpu->set_vblank_int("screen", FUNC(konamim2_state::m2_irq));
+	cdrom_file *new_cdrom = m_available_cdroms;
 
-	PPC602(config, m_subcpu, 66000000);   /* actually PPC602, 66MHz */
-	m_subcpu->set_bus_frequency(33000000);  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	m_subcpu->set_addrmap(AS_PROGRAM, &konamim2_state::m2_main_s);
+	atapi_hle_device *image = subdevice<atapi_hle_device>("ata:0:cr589");
+	if (image != nullptr)
+	{
+		void *current_cdrom = nullptr;
+		image->GetDevice(&current_cdrom);
 
-	// TODO: declaring as second screen causes palette confusion (wants to use palette from the other screen?)
-	GENERIC_TERMINAL(config, m_terminal, 0);
+		if (current_cdrom != new_cdrom)
+		{
+			current_cdrom = new_cdrom;
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(704, 512);
-	screen.set_visarea(0, 511, 0, 383);
-	screen.set_screen_update(FUNC(konamim2_state::screen_update_m2));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", 32768).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
-
-	/*cd-rom*/
-	CDROM(config, "cdrom", 0).set_interface("3do_m2_cdrom");
+			image->SetDevice(new_cdrom);
+		}
+	}
+	else
+	{
+		abort();
+	}
 }
 
-void konamim2_state::_3do_m2(machine_config &config)
+/*************************************
+ *
+ *  Address map
+ *
+ *************************************/
+
+void konamim2_state::m2_map(address_map &map)
 {
-	m2(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &konamim2_state::_3do_m2_main_m);
-	m_subcpu->set_addrmap(AS_PROGRAM, &konamim2_state::_3do_m2_main_s);
+	map(0x20000000, 0x201fffff).rom().region("boot", 0); // BIOBUS Slot 0
+	map(0xfff00000, 0xffffffff).rom().region("boot", 0);
+	map(0x37400000, 0x37400007).w(FUNC(konamim2_state::konami_eeprom_w)).umask64(0xffff000000000000ULL);
+	map(0x37600000, 0x3760000f).w(FUNC(konamim2_state::konami_atapi_unk_w)).umask64(0xffff000000000000ULL);
+	map(0x37a00020, 0x37a0003f).rw(FUNC(konamim2_state::konami_io0_r), FUNC(konamim2_state::konami_io0_w));
+	map(0x37c00010, 0x37c0001f).rw(FUNC(konamim2_state::konami_sio_r), FUNC(konamim2_state::konami_sio_w));
+	map(0x37e00000, 0x37e0000f).rw(FUNC(konamim2_state::konami_io1_r), FUNC(konamim2_state::konami_io1_w));
+	map(0x3f000000, 0x3fffffff).rw(FUNC(konamim2_state::konami_ide_r), FUNC(konamim2_state::konami_ide_w)); // Endian flipped???
+//	map(0x3f000000, 0x3fffffff).rw("ata", FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
 
-	SOFTWARE_LIST(config, "cd_list").set_original("3do_m2");
+#if 0
+	map(0x36c00000, 0x36cfffff).rw(m48t58_r, m48t58_w)
+	map(0x37200000, 0x37200003).w(led_w)
+	map(0x37400000, 0x37400003).w(eeprom_w)
+	map(0x37600000, 0x37600000).w(atapi_dma_w)
+	map(0x37a00000, 0x37a0003f).rw(kacio_r, kacio_w)
+	map(0x37c00010, 0x37c0001f).rw(sio_r, sio_w)			// Konami 11k
+	map(0x37e00000, 0x37e0000f).rw(port_r, port_w)		// Konami? - 37e00006 = Read
+	map(0x3e000000, 0x3effffff).rw(ymz0_r, ymz0_w)			// Konami - Evil Night / Total Vice
+	map(0x3e900000, 0x3e9fffff).rw(ymz1_r, ymz1_w)			// Konami
+#endif
 }
 
+
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
+static INPUT_PORTS_START( konamim2 )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "Video Res" )
+	PORT_DIPSETTING(    0x00, "High Res" )
+	PORT_DIPSETTING(    0x01, "Low Res" )
+
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED ) // ATAPI?
+	PORT_BIT( 0xDE00, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( btltryst )
+	PORT_INCLUDE( konamim2 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Video Res" )
+	PORT_DIPSETTING(    0x00, "High Res" )
+	PORT_DIPSETTING(    0x01, "Low Res" )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("P4")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("P5")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P6")
+	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( polystar )
+	PORT_INCLUDE( konamim2 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Video Res" )
+	PORT_DIPSETTING(    0x00, "High Res" )
+	PORT_DIPSETTING(    0x01, "Low Res" )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x01, 0x01, "Sound Output" )
+	PORT_DIPSETTING(    0x01, "Mono" )
+	PORT_DIPSETTING(    0x00, "Stereo" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("P4")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("P5")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P6")
+	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( totlvice )
+	PORT_INCLUDE( konamim2 )
+
+	PORT_START("P2") // TODO: VERIFY
+	PORT_DIPNAME( 0x01, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x01, "Mono" )
+	PORT_DIPSETTING(    0x00, "Stereo" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("P4")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("GUNX1")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 640) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("GUNY1")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 240) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("P5") // Gun switches
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P6")
+	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( heatof11 )
+	PORT_INCLUDE( konamim2 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "Video Res" )
+	PORT_DIPSETTING(    0x00, "High Res" )
+	PORT_DIPSETTING(    0x01, "Low Res" )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("P4")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("P5")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P6")
+	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hellngt )
+	PORT_INCLUDE( konamim2 )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("P4")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("GUNX1")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 320*2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("GUNY1")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 240 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("P5") // Gun switches
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P6")
+	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+void konamim2_state::cr589_config(device_t *device)
+{
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 1.0);
+	device = device->subdevice("cdda");
+}
+
+void konamim2_state::konamim2(machine_config &config)
+{
+	// Basic machine hardware
+	PPC602(config, m_ppc1, M2_CLOCK);
+	m_ppc1->set_bus_frequency(M2_CLOCK / 2);
+	m_ppc1->set_addrmap(AS_PROGRAM, &konamim2_state::m2_map);
+
+	PPC602(config, m_ppc2, M2_CLOCK);
+	m_ppc2->set_bus_frequency(M2_CLOCK / 2);
+	m_ppc2->set_addrmap(AS_PROGRAM, &konamim2_state::m2_map);
+
+	// M2 hardware
+	M2_BDA(config, m_bda, M2_CLOCK, m_ppc1, m_ppc2);
+	m_bda->set_ram_size(m2_bda_device::RAM_8MB, m2_bda_device::RAM_8MB);
+	m_bda->subdevice<m2_powerbus_device>("powerbus")->int_handler().set(FUNC(konamim2_state::ppc1_int));
+	m_bda->subdevice<m2_memctl_device>("memctl")->gpio_out_handler<3>().set(FUNC(konamim2_state::ppc2_int)).invert();
+	m_bda->subdevice<m2_vdu_device>("vdu")->set_screen("screen");
+	m_bda->videores_in().set_ioport("DSW");
+	m_bda->ldac_handler().set(FUNC(konamim2_state::ldac_out));
+	m_bda->rdac_handler().set(FUNC(konamim2_state::rdac_out));
+
+	M2_CDE(config, m_cde, M2_CLOCK, m_ppc1);
+	m_cde->int_handler().set(":bda:powerbus", FUNC(m2_powerbus_device::int_line<BDAINT_EXTD4_LINE>));
+	m_cde->set_syscfg(SYSCONFIG_ARCADE);
+	m_cde->sdbg_out().set(FUNC(konamim2_state::cde_sdbg_out));
+
+	// Common devices
+	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	ATA_INTERFACE(config, m_ata, 0);
+	m_ata->irq_handler().set(FUNC(konamim2_state::ata_int));
+
+	m_ata->slot(0).option_add("cr589", CR589);
+	m_ata->slot(0).set_option_machine_config("cr589", cr589_config);
+	m_ata->slot(0).set_default_option("cr589");
+
+	// Video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update("bda:vdu", FUNC(m2_vdu_device::screen_update));
+
+	/* Sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	// TODO!
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 2.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 2.0); // FIXME
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
+
+
+/*************************************
+ *
+ *  Machine fragments
+ *
+ *************************************/
+
+void konamim2_state::set_ntsc(machine_config &config)
+{
+//	m_screen->set_raw(11750000, 766, 126, 126+640, 260, 20, 20+240); // TODO
+	m_screen->set_refresh_hz(59.360001);
+	m_screen->set_size(768, 262);
+	m_screen->set_visarea(126, 126+640-1, 20, 20+240-1);
+}
+
+void konamim2_state::set_ntsc2(machine_config &config)
+{
+	//m_screen->set_raw(11750000, 766, 126, 126+640, 260, 20, 20+240); // TODO
+	m_screen->set_refresh_hz(59.360001);
+	m_screen->set_size(768, 262*2); // TOTAL VICE ONLY WORKS WITH THIS!
+	m_screen->set_visarea(126, 126+640-1, 20, 20+240-1);
+}
+
+void konamim2_state::set_arcres(machine_config &config)
+{
+	m_screen->set_raw(16934500, 684, 104, 104+512, 416, 26, 26+384);
+}
+
+void konamim2_state::add_ymz280b(machine_config &config)
+{
+	YMZ280B(config, m_ymz280b, XTAL(16'934'400));
+	m_ymz280b->add_route(0, "lspeaker", 1.0);
+	m_ymz280b->add_route(1, "rspeaker", 1.0);
+}
+
+void konamim2_state::add_mt48t58(machine_config &config)
+{
+	M48T58(config, m_m48t58);
+}
+
+
+
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
+void konamim2_state::polystar(machine_config &config)
+{
+	konamim2(config);
+	m_bda->set_ram_size(m2_bda_device::RAM_4MB, m2_bda_device::RAM_4MB);
+	set_ntsc(config);
+}
+
+void konamim2_state::totlvice(machine_config &config)
+{
+	konamim2(config);
+	add_ymz280b(config);
+//	set_arcres(config);
+	set_ntsc2(config);
+}
+
+void konamim2_state::btltryst(machine_config &config)
+{
+	konamim2(config);
+	add_mt48t58(config);
+	set_ntsc(config);
+}
+
+void konamim2_state::heatof11(machine_config &config)
+{
+	konamim2(config);
+	add_mt48t58(config);
+	set_arcres(config);
+}
+
+void konamim2_state::evilngt(machine_config &config)
+{
+	konamim2(config);
+	add_mt48t58(config);
+	add_ymz280b(config);
+	set_ntsc(config);
+}
+
+void konamim2_state::hellngt(machine_config &config)
+{
+	konamim2(config);
+	add_mt48t58(config);
+	add_ymz280b(config);
+	set_arcres(config);
+}
+
+
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( polystar )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(66d02984) SHA1(d07c57d198c611b6ff67a783c20a3d038ba34cd1) )
+	ROM_REGION( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(2d8d1594) SHA1(b7bae873a6487023bdacdd09e7a5724e18efa30b) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "623jaa02", 0, SHA1(e7d9e628a3e0e085e084e4e3630fa5e3a7345547) )
@@ -1358,16 +1312,36 @@ ROM_START( btltryst )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(cc2c5640) SHA1(694cf2b3700f52ed80252b013052c90020e58ce6) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_LOAD( "m48t58", 0x000000, 0x002000, CRC(71ee073b) SHA1(cc8002d7ee8d1695aebbbb2a3a1e97a7e16948c1) )
+
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "636jac02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
+ROM_END
+
+ROM_START( btltrysta )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_LOAD( "m48t58y", 0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE( "636jaa02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
 
 ROM_START( heatof11 )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )  /* boot rom */
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x2000, "timekeep", 0 ) /* timekeeper SRAM */
-	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(e7029938) SHA1(ae41340dbcb600debe246629dc36fb371d1a5b05) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(5b74eafd) SHA1(afbf5f1f5a27407fd6f17c764bbb7fae4ab779f5) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "heatof11", 0, BAD_DUMP SHA1(5a0a2782cd8676d3f6dfad4e0f805b309e230d8b) )
@@ -1377,14 +1351,14 @@ ROM_START( evilngt )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x2000, "timekeep", 0 ) /* timekeeper SRAM */
-	ROM_LOAD( "m48t58y.9n",   0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) )
+	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_LOAD( "m48t58y.9n", 0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(d7ba2e5e) SHA1(d729557555c6fc1cd433b14017952cc63ec73573) )
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
-	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
-
-	ROM_REGION( 0x80, "eeprom", 0 ) /* EEPROM default contents */
-	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(d7ba2e5e) SHA1(d729557555c6fc1cd433b14017952cc63ec73573) )
+	ROM_LOAD( "810a03.16h", 0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "810uba02", 0, SHA1(e570470c1cbfe187d5bba8125616412f386264ba) )
@@ -1394,11 +1368,11 @@ ROM_START( evilngte )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x1000, "timekeep", 0 ) /* timekeeper SRAM */
-	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
+	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_LOAD( "m48t58y.u1", 0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
-	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
+	ROM_LOAD( "810a03.16h", 0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
 
 	// TODO: Add CHD
 ROM_END
@@ -1407,19 +1381,28 @@ ROM_START( hellngt )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
-	ROM_REGION( 0x1000, "timekeep", 0 ) /* timekeeper SRAM */
-	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(53b41f68) SHA1(f75f59808a5b04b1e49f2cca0592a2466b82f019) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 )
+	ROM_LOAD( "m48t58y.9n",  0x000000, 0x002000, CRC(ff8e78a1) SHA1(02e56f55264dd0bf3a08808726a6366e9cb6031e) )
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "810eaa02", 0, SHA1(d701b900eddc7674015823b2cb33e887bf107fa8) )
+	DISK_IMAGE_READONLY( "810eaa02", 0, SHA1(d701b900eddc7674015823b2cb33e887bf107fa8) )
 ROM_END
 
 ROM_START( totlvice )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* EEPROM default contents */
+	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(8cc7f9c0) SHA1(43b40fe420ebbec73eed09f55e52c5fe1445bdc5) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) /* timekeeper SRAM */
+	ROM_LOAD( "m48t58", 0x000000, 0x002000, CRC(4013176f) SHA1(8d0536e1c9a00696198f063f29c1640d811aeec0) )
 
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
@@ -1430,6 +1413,20 @@ ROM_START( totlvice )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "639eba01", 0, BAD_DUMP  SHA1(d95c13575e015169b126f7e8492d150bd7e5ebda) )
 ROM_END
+
+#if 0
+// NB: Dumped by Phil, hasn't been converted to CHD yet
+ROM_START( totlvicd )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
+
+	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "639ead01", 0, SHA1(9d1085281aeb14185e2e78f3f21e7004a591039c) )
+ROM_END
+#endif
 
 ROM_START( totlvicu )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
@@ -1464,21 +1461,259 @@ ROM_START( totlvicj )
 	DISK_IMAGE( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
 ROM_END
 
-ROM_START(3do_m2)
+#if 0 // FIXME
+ROM_START( 3do_m2 )
 	ROM_REGION64_BE( 0x100000, "boot", 0 )
 	ROM_SYSTEM_BIOS( 0, "panafz35", "Panasonic FZ-35S (3DO M2)" )
-	ROMX_LOAD( "fz35_jpn.bin", 0x000000, 0x100000, CRC(e1c5bfd3) SHA1(0a3e27d672be79eeee1d2dc2da60d82f6eba7934), ROM_BIOS(0) )
+	ROMX_LOAD( "fz35_jpn.bin", 0x000000, 0x100000, CRC(e1c5bfd3) SHA1(0a3e27d672be79eeee1d2dc2da60d82f6eba7934), ROM_BIOS(1) )
 ROM_END
+#endif
 
-GAME( 1997, polystar, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Tobe! Polystars (ver JAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver EBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvicu, totlvice, m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver UAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvicj, totlvice, m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver JAD)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Total Vice (ver AAB)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, btltryst, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Battle Tryst (ver JAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, heatof11, 0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Evil Night (ver UBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, empty_init, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
 
-CONS( 199?, 3do_m2, 0, 0,  _3do_m2, m2, konamim2_state, empty_init,    "3DO",    "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+void konamim2_state::install_m48t58()
+{
+	read8_delegate read_delegate(FUNC(m48t58_device::read), &(*m_m48t58));
+	write8_delegate write_delegate(FUNC(m48t58_device::write), &(*m_m48t58));
+
+	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
+	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
+}
+
+void konamim2_state::install_ymz280b()
+{
+	read8_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
+	write8_delegate	write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
+
+	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
+	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
+}
+
+void konamim2_state::init_totlvice()
+{
+	install_ymz280b();
+}
+
+void konamim2_state::init_btltryst()
+{
+	install_m48t58();
+}
+
+void konamim2_state::init_hellngt()
+{
+	install_m48t58();
+	install_ymz280b();
+}
+
+
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1997, polystar,  0,        polystar, polystar, konamim2_state, empty_init,    ROT0, "Konami", "Tobe! Polystars (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, totlvice,  0,        totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EBA)",         MACHINE_NOT_WORKING )
+//GAME( 1997, totlvicd, totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EAD)",         MACHINE_NOT_WORKING )
+GAME( 1997, totlvicj,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver JAD)",         MACHINE_NOT_WORKING )
+GAME( 1997, totlvica,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver AAB)",         MACHINE_NOT_WORKING )
+GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver UAC)",         MACHINE_NOT_WORKING )
+GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+//GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_NOT_WORKING )
+GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING )
+GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_NOT_WORKING )
+
+//CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+
+/*************************************
+ *
+ *  Debugging Aids
+ *
+ *************************************/
+
+void konamim2_state::debug_help_command(int ref, const std::vector<std::string> &params)
+{
+	debugger_console &con = machine().debugger().console();
+
+	con.printf("Available M2 commands:\n");
+	con.printf("  konm2 dump_task,<address> -- Dump task object at <address>\n");
+	con.printf("  konm2 dump_dspp,<address> -- Dump DSPP object at <address>\n");
+}
+
+void konamim2_state::debug_commands(int ref, const std::vector<std::string> &params)
+{
+	if (params.size() < 1)
+		return;
+
+	if (params[0] == "help")
+		debug_help_command(ref, params);
+	else if (params[0] == "dump_task")
+		dump_task_command(ref, params);
+	else if (params[0] == "dump_dspp")
+		subdevice<dspp_device>("bda:dspp")->dump_state();
+}
+
+void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &params)
+{
+	typedef uint32_t   Item;
+	typedef uint32_t   m2ptr;
+
+	typedef struct TimerTicks
+	{
+		uint32_t tt_Hi;
+		uint32_t tt_Lo;
+	} TimerTicks;
+
+	struct ItemNode
+	{
+		m2ptr pn_Next;    /* pointer to next in list              */ // 0
+		m2ptr pn_Prev;    /* pointer to previous in list          */ // 4
+		uint8_t     n_SubsysType;     /* what component manages this node     */ // 8
+		uint8_t     n_Type;           /* what type of node for the component  */ // 9
+		uint8_t     n_Priority;       /* queueing priority                    */ // A
+		uint8_t     n_Flags;          /* misc flags, see below                */ // B
+		int32_t     n_Size;           /* total size of node including hdr     */ // C
+		m2ptr    pn_Name;           /* name of item, or NULL                */ // 10
+		uint8_t     n_Version;        /* version of of this Item              */ // 14
+		uint8_t     n_Revision;       /* revision of this Item                */ // 15
+		uint8_t     n_Reserved0;      /* reserved for future use              */ // 16
+		uint8_t     n_ItemFlags;      /* additional system item flags         */ // 17
+		Item      n_Item;           /* Item number representing this struct */ //18
+		Item      n_Owner;          /* creator, present owner, disposer     */ // 1C
+		m2ptr     pn_Reserved1;      /* reserved for future use              */ // 20
+	};
+
+	struct Task
+	{
+		ItemNode     t;
+		m2ptr       pt_ThreadTask;      /* I am a thread of what task?  */
+		uint32_t     t_WaitBits;        /* signals being waited for     */
+		uint32_t     t_SigBits;         /* signals received             */
+		uint32_t     t_AllocatedSigs;   /* signals allocated            */
+		m2ptr        pt_StackBase;       /* base of stack                */
+		int32_t      t_StackSize;       /* size of stack                */
+		uint32_t     t_MaxUSecs;        /* quantum length in usecs      */
+		TimerTicks   t_ElapsedTime;     /* time spent running this task */
+		uint32_t     t_NumTaskLaunch;   /* # times launched this task   */
+		uint32_t     t_Flags;           /* task flags                   */
+		Item         t_Module;          /* the module we live within    */
+		Item         t_DefaultMsgPort;  /* default task msgport         */
+		m2ptr         pt_UserData;        /* user-private data            */
+	};
+
+	debugger_cpu &cpu = machine().debugger().cpu();
+	debugger_console &con = machine().debugger().console();
+	address_space &space = m_ppc1->space();
+	uint64_t addr;
+	offs_t address;
+
+	if (params.size() < 1)
+		return;
+
+	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+		return;
+
+	address = (offs_t)addr;
+	address = 0x40FB54E8;
+	if (!m_ppc1->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
+	{
+		con.printf("Address is unmapped.\n");
+		return;
+	}
+
+	Task task;
+
+	task.t.pn_Next = cpu.read_dword(space, address + offsetof(ItemNode, pn_Next), true);
+	task.t.pn_Prev = cpu.read_dword(space, address + offsetof(ItemNode, pn_Prev), true);
+	task.t.n_SubsysType = cpu.read_byte(space, address + offsetof(ItemNode, n_SubsysType), true);
+	task.t.n_Type = cpu.read_byte(space, address + offsetof(ItemNode, n_Type), true);
+	task.t.n_Priority = cpu.read_byte(space, address + offsetof(ItemNode, n_Priority), true);
+	task.t.n_Flags = cpu.read_byte(space, address + offsetof(ItemNode, n_Flags), true);
+	task.t.n_Size = cpu.read_dword(space, address + offsetof(ItemNode, n_Size), true);
+	task.t.pn_Name = cpu.read_dword(space, address + offsetof(ItemNode, pn_Name), true);
+
+	char name[128];
+	char *ptr = name;
+	uint32_t nameptr = task.t.pn_Name;
+
+	do
+	{
+		*ptr = cpu.read_byte(space, nameptr++, true);
+	} while (*ptr++ != 0);
+
+	task.t.n_Version = cpu.read_byte(space, address + offsetof(ItemNode, n_Version), true);
+	task.t.n_Revision = cpu.read_byte(space, address + offsetof(ItemNode, n_Revision), true);
+	task.t.n_Reserved0 = cpu.read_byte(space, address + offsetof(ItemNode, n_Reserved0), true);
+	task.t.n_ItemFlags = cpu.read_byte(space, address + offsetof(ItemNode, n_ItemFlags), true);
+	task.t.n_Item = cpu.read_dword(space, address + offsetof(ItemNode, n_Item), true);
+	task.t.n_Owner = cpu.read_dword(space, address + offsetof(ItemNode, n_Owner), true);
+	task.t.pn_Reserved1 = cpu.read_dword(space, address + offsetof(ItemNode, pn_Reserved1), true);
+
+	task.pt_ThreadTask = cpu.read_dword(space, address + offsetof(Task, pt_ThreadTask), true);
+	task.t_WaitBits = cpu.read_dword(space, address + offsetof(Task, t_WaitBits), true);
+	task.t_SigBits = cpu.read_dword(space, address + offsetof(Task, t_SigBits), true);
+	task.t_AllocatedSigs = cpu.read_dword(space, address + offsetof(Task, t_AllocatedSigs), true);
+	task.pt_StackBase = cpu.read_dword(space, address + offsetof(Task, pt_StackBase), true);
+	task.t_StackSize = cpu.read_dword(space, address + offsetof(Task, t_StackSize), true);
+	task.t_MaxUSecs = cpu.read_dword(space, address + offsetof(Task, t_MaxUSecs), true);
+	task.t_ElapsedTime.tt_Hi = cpu.read_dword(space, address + offsetof(Task, t_ElapsedTime)+0, true);
+	task.t_ElapsedTime.tt_Lo = cpu.read_dword(space, address + offsetof(Task, t_ElapsedTime)+4, true);
+	task.t_NumTaskLaunch = cpu.read_dword(space, address + offsetof(Task, t_NumTaskLaunch), true);
+	task.t_Flags = cpu.read_dword(space, address + offsetof(Task, t_Flags), true);
+	task.t_Module = cpu.read_dword(space, address + offsetof(Task, t_Module), true);
+	task.t_DefaultMsgPort = cpu.read_dword(space, address + offsetof(Task, t_DefaultMsgPort), true);
+	task.pt_UserData = cpu.read_dword(space, address + offsetof(Task, pt_UserData), true);
+
+//	m2ptr       pt_ThreadTask;      /* I am a thread of what task?  */
+//	uint32_t     t_WaitBits;        /* signals being waited for     */
+//	uint32_t     t_SigBits;         /* signals received             */
+//	uint32_t     t_AllocatedSigs;   /* signals allocated            */
+//	m2ptr        pt_StackBase;       /* base of stack                */
+//	int32_t      t_StackSize;       /* size of stack                */
+//	uint32_t     t_MaxUSecs;        /* quantum length in usecs      */
+//	TimerTicks   t_ElapsedTime;     /* time spent running this task */
+//	uint32_t     t_NumTaskLaunch;   /* # times launched this task   */
+//	uint32_t     t_Flags;           /* task flags                   */
+//	Item         t_Module;          /* the module we live within    */
+//	Item         t_DefaultMsgPort;  /* default task msgport         */
+//	m2ptr         pt_UserData;        /* user-private data            */
+
+	con.printf("**** Task Info @ %08X ****\n", address);
+	con.printf("Next:        %08X\n", task.t.pn_Next);
+	con.printf("Prev:        %08X\n", task.t.pn_Prev);
+	con.printf("SubsysType:  %X\n", task.t.n_SubsysType);
+	con.printf("Type:        %X\n", task.t.n_Type);
+	con.printf("Priority:    %X\n", task.t.n_Priority);
+	con.printf("Flags:       %X\n", task.t.n_Flags);
+	con.printf("Size:        %08X\n", task.t.n_Size);
+	con.printf("Name:        %s\n", name);
+	con.printf("Version:     %X\n", task.t.n_Version);
+	con.printf("Revision:    %X\n", task.t.n_Revision);
+	con.printf("Reserved0:   %X\n", task.t.n_Reserved0);
+	con.printf("ItemFlags:   %X\n", task.t.n_ItemFlags);
+	con.printf("Item:        %08X\n", task.t.n_Item);
+	con.printf("Owner:       %08X\n", task.t.n_Owner);
+	con.printf("Reserved1:   %08X\n", task.t.pn_Reserved1);
+	con.printf("ThreadTask:  %08X\n", task.pt_ThreadTask);
+	con.printf("WaitBits:    %08X\n", task.t_WaitBits);
+	con.printf("SigBits:     %08X\n", task.t_SigBits);
+	con.printf("AllocSigs:   %08X\n", task.t_AllocatedSigs);
+	con.printf("StackBase:   %08X\n", task.pt_StackBase);
+	con.printf("StackSize:   %08X\n", task.t_StackSize);
+	con.printf("MaxUSecs:    %08X\n", task.t_MaxUSecs);
+	con.printf("ElapsedTime: %016llu\n", (uint64_t)task.t_ElapsedTime.tt_Lo + ((uint64_t)task.t_ElapsedTime.tt_Hi << 32ull));
+	con.printf("NumTaskLaunch:	%u\n", task.t_NumTaskLaunch);
+	con.printf("Flags:          %08X\n", task.t_Flags);
+	con.printf("Module:         %08X\n", task.t_Module);
+	con.printf("DefaultMsgPort: %08X\n", task.t_DefaultMsgPort);
+	con.printf("UserData:       %08X\n", task.pt_UserData);
+	con.printf("\n");
+}

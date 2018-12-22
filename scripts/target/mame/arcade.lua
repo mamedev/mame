@@ -132,6 +132,7 @@ CPUS["HMCS40"] = true
 --CPUS["HPHYBRID"] = true
 --CPUS["SM510"] = true
 CPUS["ST62XX"] = true
+CPUS["DSPP"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -2360,6 +2361,9 @@ files {
 	MAME_DIR .. "src/mame/machine/konamigx.cpp",
 	MAME_DIR .. "src/mame/video/konamigx.cpp",
 	MAME_DIR .. "src/mame/drivers/konamim2.cpp",
+	MAME_DIR .. "src/mame/machine/3dom2.cpp",
+	MAME_DIR .. "src/mame/machine/3dom2.h",
+	MAME_DIR .. "src/mame/machine/3dom2_te.cpp",
 	MAME_DIR .. "src/mame/drivers/konblands.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal68k.cpp",

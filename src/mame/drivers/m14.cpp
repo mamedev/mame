@@ -460,9 +460,9 @@ void m14_state::m14(machine_config &config)
 	m_samples->set_samples_names(m14_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
 
-//  MCFG_DEVICE_ADD("discrete", DISCRETE)
-//  MCFG_DISCRETE_INTF(m14)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+//  DISCRETE(config, m_discrete);
+//  m_discrete->set_intf(m14);
+//  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 /***************************************************************************

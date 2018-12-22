@@ -17780,7 +17780,6 @@ winspike                        // 1997.?? GX705 (Europe)
 winspikej                       // 1997.07 GX705 (Japan)
 
 @source:konamim2.cpp
-3do_m2                          //
 btltryst                        // GX636 (c) 1998
 evilngt                         // GX810 (c) 1998
 evilngte                        // GX810 (c) 1998
@@ -38521,10 +38520,6 @@ vigilanto                       // (c) 1988 (US)
 @source:vii.cpp
 batmantv                        // The Batman, 2004
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
-vsmile                          //
-vsmileb                         //
-vsmilef                         //
-vsmileg                         //
 walle                           //
 wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
@@ -38535,6 +38530,12 @@ rad_skat                        //
 rad_skatp                       //
 rad_sktv                        //
 rad_crik                        //
+
+@source:vsmile.cpp
+vsmile                          //
+vsmileb                         //
+vsmilef                         //
+vsmileg                         //
 
 @source:vsmilepro.cpp
 vsmilpro

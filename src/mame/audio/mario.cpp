@@ -635,8 +635,8 @@ void mario_state::masao_sound_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(mario_state::mario_audio)
-
+void mario_state::mario_audio(machine_config &config)
+{
 #if USE_8039
 	i8039_device &audiocpu(I8039(config, "audiocpu", I8035_CLOCK));		/* 730 kHz */
 #else
@@ -659,24 +659,22 @@ MACHINE_CONFIG_START(mario_state::mario_audio)
 	GENERIC_LATCH_8(config, m_soundlatch4);
 
 #if OLD_SOUND
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(mario_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
+	DISCRETE(config, m_discrete);
+	m_discrete->set_intf(mario_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1);
 #else
-	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
-	MCFG_NETLIST_SETUP(mario)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
+	snd_nl.set_constructor(netlist_mario);
+	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "snd0", "SOUND0.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "snd1", "SOUND1.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "snd7", "SOUND7.IN", 0)
-	MCFG_NETLIST_INT_INPUT("snd_nl", "dac", "DAC.VAL", 0, 255)
+	NETLIST_LOGIC_INPUT(config, m_audio_snd0, "SOUND0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_snd1, "SOUND1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_snd7, "SOUND7.IN", 0);
+	NETLIST_INT_INPUT(config, m_audio_dac, "DAC.VAL", 0, 255);
 
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "ROUT.1")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(150000.0, 0.0)
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(150000.0, 0.0);
 #endif
-
-MACHINE_CONFIG_END
+}
 
 void mario_state::masao_audio(machine_config &config)
 {

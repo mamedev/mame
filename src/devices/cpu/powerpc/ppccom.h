@@ -302,6 +302,11 @@ enum
 /* Machine State Register bits - 603 */
 #define MSR603_TGPR         0x00020000  /* Temporary GPR Remapping */
 
+/* ESA Save and Restore Register bits - 602 */
+#define SPR602_ESASRR_EE	0x00000001  /* External Interrupt Enable */
+#define SPR602_ESASRR_SA	0x00000002  /* Supervisor access mode */
+#define SPR602_ESASRR_AP	0x00000004  /* Access privilege state */
+#define SPR602_ESASRR_PR	0x00000008  /* Privilege Level */
 
 /* DSISR bits for DSI/alignment exceptions */
 #define DSISR_DIRECT        0x80000000      /* DSI: direct-store error interrupt */

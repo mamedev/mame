@@ -825,6 +825,7 @@ votrpss.cpp
 votrtnt.cpp
 vp415.cpp
 vp60.cpp
+vsmile.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp
@@ -890,7 +891,6 @@ zx.cpp
 +jaguar
 +jaguarcd
 //konamim2.cpp
-+3do_m2
 //neogeo.cpp
 +aes
 //vectrex.cpp
