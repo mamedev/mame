@@ -161,12 +161,12 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 			{ 0x3f,0 },   // 0: ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
 			{ 0xff,0 },   // 1: unverified case, mimic old driver behavior of only using lowest bit
 			{ 0x3f,0 },   // 2: unverified case, mimic old driver behavior of only using lowest bit
-			{ 0xff,0 },   // 3: unverified case, mimic old driver behavior of only using lowest bit
+			{ 0xff,0 },   // 3: unverified case, mimic old driver behavior of only using lowest bit (pastelis sets this on shadows, but seems to need behavior beyond what we currently emulate, maybe also changes number of shadow bits in addition to global shadow mask/shift?)
 			{ 0x0f,0 },   // 4: eagle shot 4bpp birdie text
 			{ 0xf0,4 },   // 5: eagle shot 4bpp Japanese text
 			{ 0x3f,0 },   // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking
 			{ 0xff,0 }	  // 7: common 8bpp case
-		}; 
+		};
 
 		const uint8_t gfxbppmask = BPP_MASK_TABLE[gfx & 0x07].gfx_mask;
 		const uint8_t gfxshift = BPP_MASK_TABLE[gfx & 0x07].gfx_shift;
@@ -386,14 +386,22 @@ VIDEO_START_MEMBER(ssv_state,gdfs)
 
 READ16_MEMBER(ssv_state::vblank_r)
 {
+	// maybe reads scanline counter? pastelis reads this on the 'for use in Japan' screen + end credits
+	// and adjusts y position to do a polled raster effect by changing scroll values midscreen
+	uint16_t ret = 0x0000;
+
 	if (m_screen->vblank())
-		return 0x2000 | 0x1000;
-	else
-		return 0x0000;
+		ret |= 0x3000;
+
+	if (m_screen->hblank())
+		ret |= 0x0800;
+
+	return ret;
 }
 
 WRITE16_MEMBER(ssv_state::scroll_w)
 {
+	m_screen->update_partial(m_screen->vpos() - 1); // pastelis FOR USE IN JAPAN screen polls the vblank / hblank to do a raster effect
 	COMBINE_DATA(m_scroll + offset);
 
 /*  offsets 60-7f: CRT Controller   */
@@ -810,7 +818,12 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 
 				if (local_num != 0)
-					draw_row_64pixhigh(bitmap, cliprect, sy, scroll);
+				{
+					if (spritelist_local[0] != 0) // index 0 is the 'always automatically drawn background layer' so don't draw it twice even if it's specified later?
+					{
+						draw_row_64pixhigh(bitmap, cliprect, sy, scroll);
+					}
+				}
 			}
 			else
 			{
@@ -896,7 +909,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 				else
 				{
-					// hypreact, hypreac2, janjanspritelist_global, meosism, ryorioh, survarts, sxyreact, sxyreac2, vasara, vasara2
+					// hypreact, hypreac2, janjans1, meosism, ryorioh, survarts, sxyreact, sxyreac2, vasara, vasara2
 					sx = sprites_offsx + sx;
 					sy = sprites_offsy - sy - (ynum * 8);
 				}
@@ -979,15 +992,7 @@ uint32_t ssv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 //  printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
 
-	if (clip.min_x < 0) clip.min_x = 0;
-	if (clip.min_y < 0) clip.min_y = 0;
-	if (clip.max_x > cliprect.max_x) clip.max_x = cliprect.max_x;
-	if (clip.max_y > cliprect.max_y) clip.max_y = cliprect.max_y;
-
-	if (clip.min_x > clip.max_x)
-		clip.min_x = clip.max_x;
-	if (clip.min_y > clip.max_y)
-		clip.min_y = clip.max_y;
+	clip &= cliprect;
 
 	if (!m_enable_video)
 		return 0;
