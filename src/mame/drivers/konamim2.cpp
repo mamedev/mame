@@ -1134,8 +1134,8 @@ INPUT_PORTS_END
 
 void konamim2_state::cr589_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 0.2);
-	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 0.2);
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 0.5);
 	device = device->subdevice("cdda");
 }
 
@@ -1184,8 +1184,8 @@ void konamim2_state::konamim2(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	// TODO!
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 2.0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 2.0); // FIXME
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.set_output(5.0);
