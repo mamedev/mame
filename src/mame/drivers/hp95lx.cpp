@@ -106,10 +106,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
 		, m_p_chargen(*this, "gfx1")
-		{ }
-
-	DECLARE_MACHINE_START(hp95lx);
-	DECLARE_MACHINE_RESET(hp95lx);
+	{ }
 
 	DECLARE_WRITE8_MEMBER(d300_w);
 	DECLARE_READ8_MEMBER(d300_r);
@@ -125,6 +122,9 @@ public:
 	void hp95lx_romdos(address_map &map);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev_c000;
 	required_device<address_map_bank_device> m_bankdev_d000;
@@ -253,7 +253,7 @@ uint32_t hp95lx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-MACHINE_START_MEMBER(hp95lx_state, hp95lx)
+void hp95lx_state::machine_start()
 {
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_rtcram));
@@ -271,7 +271,7 @@ MACHINE_START_MEMBER(hp95lx_state, hp95lx)
 	memcpy(m_p_chargen + 0x0400, memregion("romdos")->base() + 0xfb200, 0x0400);
 }
 
-MACHINE_RESET_MEMBER(hp95lx_state, hp95lx)
+void hp95lx_state::machine_reset()
 {
 	std::fill(std::begin(m_mapper), std::end(m_mapper), 0);
 	std::fill(std::begin(m_rtcram), std::end(m_rtcram), 0);
@@ -714,9 +714,6 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	MCFG_DEVICE_IO_MAP(hp95lx_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_MACHINE_START_OVERRIDE(hp95lx_state, hp95lx)
-	MCFG_MACHINE_RESET_OVERRIDE(hp95lx_state, hp95lx)
-
 	ADDRESS_MAP_BANK(config, "bankdev_c000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 	ADDRESS_MAP_BANK(config, "bankdev_d000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 	ADDRESS_MAP_BANK(config, "bankdev_e000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -732,8 +729,6 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
-
-	MCFG_MACHINE_RESET_OVERRIDE(hp95lx_state, hp95lx)
 
 	ISA8(config, m_isabus, 0);
 	m_isabus->set_cputag("maincpu");
