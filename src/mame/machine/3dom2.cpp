@@ -188,7 +188,7 @@ DEFINE_DEVICE_TYPE(M2_CDE, m2_cde_device, "m2cde", "3DO M2 CDE ASIC")
     SUPPORT FUNCTIONS
 ***************************************************************************/
 
-static void write_m2_reg(uint32_t &reg, uint32_t data, reg_wmode mode)
+static void write_m2_reg(uint32_t &reg, uint32_t data, m2_reg_wmode mode)
 {
 	switch (mode)
 	{
@@ -952,7 +952,7 @@ READ32_MEMBER( m2_vdu_device::read )
 WRITE32_MEMBER( m2_vdu_device::write )
 {
 	uint32_t byte_offs = offset << 2;
-	reg_wmode wmode = byte_offs & 0x400 ? REG_CLEAR : REG_WRITE;
+	m2_reg_wmode wmode = byte_offs & 0x400 ? REG_CLEAR : REG_WRITE;
 
 //  logerror("%s: VDU WRITE: %03x %08x %x\n", machine().describe_context(), byte_offs, data, mem_mask);
 	byte_offs &= ~0x400;
@@ -1751,8 +1751,8 @@ WRITE32_MEMBER( m2_cde_device::write )
 	uint32_t byte_offs = offset << 2;
 	uint32_t dmach = byte_offs & 0x20 ? 1 : 0;
 
-	reg_wmode wm_cw = byte_offs & 0x400 ? REG_CLEAR : REG_WRITE;
-	reg_wmode wm_cs = byte_offs & 0x400 ? REG_CLEAR : REG_SET;
+	m2_reg_wmode wm_cw = byte_offs & 0x400 ? REG_CLEAR : REG_WRITE;
+	m2_reg_wmode wm_cs = byte_offs & 0x400 ? REG_CLEAR : REG_SET;
 
 	byte_offs &= ~0x400;
 

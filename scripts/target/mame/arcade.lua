@@ -2364,6 +2364,7 @@ files {
 	MAME_DIR .. "src/mame/machine/3dom2.cpp",
 	MAME_DIR .. "src/mame/machine/3dom2.h",
 	MAME_DIR .. "src/mame/machine/3dom2_te.cpp",
+	MAME_DIR .. "src/mame/machine/3dom2_te.h",
 	MAME_DIR .. "src/mame/drivers/konblands.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal68k.cpp",
