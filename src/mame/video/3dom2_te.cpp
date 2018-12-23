@@ -6,9 +6,12 @@
 
 ***************************************************************************/
 
-#include "math.h"
-#include "machine/3dom2.h"
+#include "emu.h"
 #include "video/3dom2_te.h"
+
+#include "machine/3dom2.h"
+
+#include <math.h>
 
 /*
     TODO:

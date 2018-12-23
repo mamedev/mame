@@ -627,8 +627,8 @@ MACHINE_CONFIG_START(hp9825_state::hp9825b)
 	MCFG_QUANTUM_TIME(attotime::from_hz(5000));
 
 	HP98X5_IO_SYS(config , m_io_sys , 0);
-	m_io_sys->irl().set([this](int state) { m_cpu->set_input_line(HPHYBRID_IRL , state); });
-	m_io_sys->irh().set([this](int state) { m_cpu->set_input_line(HPHYBRID_IRH , state); });
+	m_io_sys->irl().set_inputline(m_cpu, HPHYBRID_IRL);
+	m_io_sys->irh().set_inputline(m_cpu, HPHYBRID_IRH);
 	m_io_sys->sts().set(m_cpu , FUNC(hp_09825_67907_cpu_device::status_w));
 	m_io_sys->flg().set(m_cpu , FUNC(hp_09825_67907_cpu_device::flag_w));
 	m_io_sys->dmar().set(m_cpu , FUNC(hp_09825_67907_cpu_device::dmar_w));

@@ -8,9 +8,8 @@
     https://sites.google.com/site/att6300shrine/Home
     http://www.ti99.com/exelvision/website/index.php?page=logabax-persona-1600
 
-    The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were badge
-    engineered Olivetti M24s.
-
+    The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were
+    badge-engineered Olivetti M24s.
 
 ****************************************************************************/
 
@@ -44,12 +43,18 @@ public:
 
 	void olivetti(machine_config &config);
 
+protected:
+	void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<tms7000_device> m_kbc;
 	required_device<m24_keyboard_device> m_keyboard;
 	optional_device<m24_z8000_device> m_z8000_apb;
+
+	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
+	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -63,10 +68,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void machine_reset() override;
-
-	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
-	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 	static void cfg_m20_format(device_t *device);
 	void kbc_map(address_map &map);
 	void m24_io(address_map &map);
