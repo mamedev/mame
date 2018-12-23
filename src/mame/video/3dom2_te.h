@@ -2,16 +2,13 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-	3DO M2 BDA Triangle Engine
+    3DO M2 BDA Triangle Engine
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_VIDEO_3DOM2_TE_H
 #define MAME_VIDEO_3DOM2_TE_H
 
-#include "emu.h"
+#pragma once
 
 /***************************************************************************
     FORWARD DECLARATIONS
@@ -65,28 +62,28 @@ private:
 
 	enum misc
 	{
-		PIP_RAM_WORDS			= 256,
-		TEXTURE_RAM_WORDS		= 4096,
-		PIP_RAM_BYTEMASK		= PIP_RAM_WORDS * 4 - 1,
-		TEXTURE_RAM_BYTEMASK	= TEXTURE_RAM_WORDS * 4 - 1,
+		PIP_RAM_WORDS           = 256,
+		TEXTURE_RAM_WORDS       = 4096,
+		PIP_RAM_BYTEMASK        = PIP_RAM_WORDS * 4 - 1,
+		TEXTURE_RAM_BYTEMASK    = TEXTURE_RAM_WORDS * 4 - 1,
 	};
 
 	enum inst_type
 	{
-		INST_WRITE_REG	= 0x10000000,
-		INST_VTX_SHORT	= 0x20000000,
-		INST_VTX_LONG	= 0x30000000,
-		INST_VTX_POINT	= 0x40000000,
-		INST_MASK		= 0xf0000000,
+		INST_WRITE_REG  = 0x10000000,
+		INST_VTX_SHORT  = 0x20000000,
+		INST_VTX_LONG   = 0x30000000,
+		INST_VTX_POINT  = 0x40000000,
+		INST_MASK       = 0xf0000000,
 	};
 
 	enum vtx_flag
 	{
-		VTX_FLAG_SHAD	= 0x00010000,
-		VTX_FLAG_TEXT	= 0x00020000,
-		VTX_FLAG_PRSP	= 0x00040000,
-		VTX_FLAG_NEW	= 0x00080000,
-		VTX_FLAG_RM		= 0x00100000,
+		VTX_FLAG_SHAD   = 0x00010000,
+		VTX_FLAG_TEXT   = 0x00020000,
+		VTX_FLAG_PRSP   = 0x00040000,
+		VTX_FLAG_NEW    = 0x00080000,
+		VTX_FLAG_RM     = 0x00100000,
 	};
 
 	struct se_vtx
@@ -192,14 +189,14 @@ private:
 	uint32_t readbits_from_ram(uint32_t & src_addr, uint32_t & bit_offs, uint32_t bits);
 	void load_texture();
 
-	m2_bda_device		*m_bda;
+	m2_bda_device       *m_bda;
 	const address_space_config  m_space_config; // TODO: Why is this still here?
 
-	devcb_write_line	m_general_int_handler;
-	devcb_write_line	m_dfinstr_int_handler;
-	devcb_write_line	m_iminstr_int_handler;
-	devcb_write_line	m_listend_int_handler;
-	devcb_write_line	m_winclip_int_handler;
+	devcb_write_line    m_general_int_handler;
+	devcb_write_line    m_dfinstr_int_handler;
+	devcb_write_line    m_iminstr_int_handler;
+	devcb_write_line    m_listend_int_handler;
+	devcb_write_line    m_winclip_int_handler;
 
 	// Registers
 	union
@@ -225,9 +222,9 @@ private:
 	{
 		struct
 		{
-			se_vtx	vertices[3];
-			uint32_t	reserved[16];
-			uint32_t	vertex_state;
+			se_vtx  vertices[3];
+			uint32_t    reserved[16];
+			uint32_t    vertex_state;
 		};
 		uint32_t m_regs[65];
 	} m_se;
@@ -394,26 +391,26 @@ private:
 	// Destination blender state
 	struct
 	{
-		uint32_t	x;
-		uint32_t	y;
-		uint32_t	w;
+		uint32_t    x;
+		uint32_t    y;
+		uint32_t    w;
 
-		rgba	ti;
-		uint8_t	ssb;
+		rgba    ti;
+		uint8_t ssb;
 
-		rgba	src;
-		uint8_t	dsb;
+		rgba    src;
+		uint8_t dsb;
 
-		rgba	srcpath;
-		rgba	texpath;
-		rgba	blend;
-		rgba	dst;
+		rgba    srcpath;
+		rgba    texpath;
+		rgba    blend;
+		rgba    dst;
 	} m_dbstate;
 
-	te_state	m_state;
+	te_state    m_state;
 
-	uint32_t		*m_pipram;
-	uint32_t		*m_tram;
+	uint32_t        *m_pipram;
+	uint32_t        *m_tram;
 };
 
 DECLARE_DEVICE_TYPE(M2_TE, m2_te_device)
