@@ -253,8 +253,15 @@ enum
 
 	#define STV_VDP2_RAMCTL (m_vdp2_regs[0x00e/2])
 
-	#define STV_VDP2_CRKTE ((STV_VDP2_RAMCTL & 0x8000) >> 15)
-	#define STV_VDP2_CRMD  ((STV_VDP2_RAMCTL & 0x3000) >> 12)
+	#define STV_VDP2_CRKTE  ((STV_VDP2_RAMCTL & 0x8000) >> 15)
+	#define STV_VDP2_CRMD   ((STV_VDP2_RAMCTL & 0x3000) >> 12)
+
+/* VRxMD - VRAM mode bit (x - A/B)
+	0 - Do not partition in 2 Banks 
+	1 - Partition in 2 Banks */
+	#define STV_VDP2_VRBMD  ((STV_VDP2_RAMCTL & 0x0200) >> 9) // for VRAM-B
+	#define STV_VDP2_VRAMD  ((STV_VDP2_RAMCTL & 0x0100) >> 8) // for VRAM-A
+
 	#define STV_VDP2_RDBSB1 ((STV_VDP2_RAMCTL & 0x00c0) >> 6)
 	#define STV_VDP2_RDBSB0 ((STV_VDP2_RAMCTL & 0x0030) >> 4)
 	#define STV_VDP2_RDBSA1 ((STV_VDP2_RAMCTL & 0x000c) >> 2)
@@ -381,17 +388,44 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 	#define STV_VDP2_N0MZE ((STV_VDP2_MZCTL & 0x0001) >> 0)
 
 /*180024 - Special Function Code Select
+ bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
+       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
+       |    --    |    --    |    --    | R0SFCS   | N3SFCS   | N2SFCS   | N1SFCS   | N0SFCS   |
+       \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-*/
+	#define STV_VDP2_SFSEL  (m_vdp2_regs[0x024/2])
 
-	#define STV_VDP2_SFSEL (m_vdp2_regs[0x024/2])
+/*  **SFCS - Special function code Select bit (** : N0-3, R0)
+    0 - Enable special function code A
+    1 - Enable special function code B  */
+	#define STV_VDP2_R0SFCS ((STV_VDP2_SFSEL & 0x0010) >> 4) // for RBG0
+	#define STV_VDP2_N3SFCS ((STV_VDP2_SFSEL & 0x0008) >> 3) // for NBG3
+	#define STV_VDP2_N2SFCS ((STV_VDP2_SFSEL & 0x0004) >> 2) // for NBG2
+	#define STV_VDP2_N1SFCS ((STV_VDP2_SFSEL & 0x0002) >> 1) // for NBG1
+	#define STV_VDP2_N0SFCS ((STV_VDP2_SFSEL & 0x0001) >> 0) // for NBG0 or RBG1
+// TODO : Other bits unknown
 
 /*180026 - Special Function Code
-
-*/
+ bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
+       | SFCDB7   | SFCDB6   | SFCDB5   | SFCDB4   | SFCDB3   | SFCDB2   | SFCDB1   | SFCDB0   |
+       |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
+       | SFCDA7   | SFCDA6   | SFCDA5   | SFCDA4   | SFCDA3   | SFCDA2   | SFCDA1   | SFCDA0   |
+       \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_SFCODE (m_vdp2_regs[0x026/2])
 
+/*  SFCDxy - Special function code bit (x : A/B, y : 0-7)
+    00000001 - When lower 4 bits of dot color code are, 0x0 or 0x1
+    00000010 - When lower 4 bits of dot color code are, 0x2 or 0x3
+    00000100 - When lower 4 bits of dot color code are, 0x4 or 0x5
+    00001000 - When lower 4 bits of dot color code are, 0x6 or 0x7
+    00010000 - When lower 4 bits of dot color code are, 0x8 or 0x9
+    00100000 - When lower 4 bits of dot color code are, 0xa or 0xb
+    01000000 - When lower 4 bits of dot color code are, 0xc or 0xd
+    10000000 - When lower 4 bits of dot color code are, 0xe or 0xf  */
+	#define STV_VDP2_SFCDB  ((STV_VDP2_SFCODE & 0xff00) >> 8) // for special function code B
+	#define STV_VDP2_SFCDA  ((STV_VDP2_SFCODE & 0x00ff) >> 0) // for special function code A
 
 /*
 180028 - CHCTLA - Character Control (NBG0, NBG1)
@@ -1317,9 +1351,9 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 /* 18009a - Line and Vertical Cell Scroll Control (NBG0, NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |  N1LSS1  |  N1LSS0  |  N1LZMX  |  N1LSCY  |  N1LSCX  |  N1VCSC  |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |  N0LSS1  |  N0LSS0  |  N0LZMX  |  N0LSCY  |  N0LSCX  |  N0VCSC  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_SCRCTL (m_vdp2_regs[0x09a/2])
@@ -1339,64 +1373,70 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    |    --    |    --    |  VCSTA18 |  VCSTA17 |  VCSTA16 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_VCSTAU (m_vdp2_regs[0x09c/2] & 7)
+	#define STV_VDP2_VCSTAU (m_vdp2_regs[0x09c/2])
 
 
 /* 18009e - Vertical Cell Table Address (NBG0, NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |  VCSTA15 |  VCSTA14 |  VCSTA13 |  VCSTA12 |  VCSTA11 |  VCSTA10 |  VCSTA9  |  VCSTA8  |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |  VCSTA7  |  VCSTA6  |  VCSTA5  |  VCSTA4  |  VCSTA3  |  VCSTA2  |  VCSTA1  |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_VCSTAL (m_vdp2_regs[0x09e/2])
+
+	#define STV_VDP2_VCSTA  (((STV_VDP2_VCSTAU & 0x0007) << 16) | (STV_VDP2_VCSTAL & 0xfffe))
 
 /* 1800a0 - LSTA0U - Line Scroll Table Address (NBG0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    |    --    |    --    | N0LSTA18 | N0LSTA17 | N0LSTA16 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	/*bit 2 unused when VRAM = 4 Mbits*/
-	#define STV_VDP2_LSTA0U (m_vdp2_regs[0x0a0/2] & 7)
+	#define STV_VDP2_LSTA0U (m_vdp2_regs[0x0a0/2])
 
 /* 1800a2 - LSTA0L - Line Scroll Table Address (NBG0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       | N0LSTA15 | N0LSTA14 | N0LSTA13 | N0LSTA12 | N0LSTA11 | N0LSTA10 | N0LSTA9  | N0LSTA8  |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       | N0LSTA7  | N0LSTA6  | N0LSTA5  | N0LSTA4  | N0LSTA3  | N0LSTA2  | N0LSTA1  |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_LSTA0L (m_vdp2_regs[0x0a2/2])
+
+	/*bit 2 unused when VRAM = 4 Mbits*/
+	#define STV_VDP2_N0LSTA (((STV_VDP2_LSTA0U & 0x0007) << 16) | (STV_VDP2_LSTA0L & 0xfffe))
 
 /* 1800a4 - LSTA1U - Line Scroll Table Address (NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    |    --    |    --    | N1LSTA18 | N1LSTA17 | N1LSTA16 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	/*bit 2 unused when VRAM = 4 Mbits*/
-	#define STV_VDP2_LSTA1U (m_vdp2_regs[0x0a4/2] & 7)
+	#define STV_VDP2_LSTA1U (m_vdp2_regs[0x0a4/2])
 
 /* 1800a6 - LSTA1L - Line Scroll Table Address (NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       | N1LSTA15 | N1LSTA14 | N1LSTA13 | N1LSTA12 | N1LSTA11 | N1LSTA10 | N1LSTA9  | N1LSTA8  |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       | N1LSTA7  | N1LSTA6  | N1LSTA5  | N1LSTA4  | N1LSTA3  | N1LSTA2  | N1LSTA1  |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_LSTA1L (m_vdp2_regs[0x0a6/2])
 
+	/*bit 2 unused when VRAM = 4 Mbits*/
+	#define STV_VDP2_N1LSTA (((STV_VDP2_LSTA1U & 0x0007) << 16) | (STV_VDP2_LSTA1L & 0xfffe))
+
 /* 1800a8 - LCTAU - Line Colour Screen Table Address
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |  LCCLMD  |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    |    --    |    --    |  LCTA18  |  LCTA17  |  LCTA16  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_LCTAU  (m_vdp2_regs[0x0a8/2])
@@ -1404,9 +1444,9 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 /* 1800aa - LCTAL - Line Colour Screen Table Address
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |  LCTA15  |  LCTA14  |  LCTA13  |  LCTA12  |  LCTA11  |  LCTA10  |  LCTA9   |  LCTA8   |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |  LCTA7   |  LCTA6   |  LCTA5   |  LCTA4   |  LCTA3   |  LCTA2   |  LCTA1   |  LCTA0   |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 	#define STV_VDP2_LCTAL  (m_vdp2_regs[0x0aa/2])
 
@@ -1513,7 +1553,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |  RPTA18  |  RPTA17  |  RPTA16  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
-	#define STV_VDP2_RPTAU  (m_vdp2_regs[0x0bc/2] & 7)
+
+	#define STV_VDP2_RPTAU  (m_vdp2_regs[0x0bc/2])
 
 /* 1800be - RPTAL - Rotation Parameter Table Address (Rotation Parameter A,B)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1522,7 +1563,11 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |   RPTA7  |   RPTA6  |   RPTA5  |   RPTA4  |   RPTA3  |   RPTA2  |   RPTA1  |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_RPTAL  (m_vdp2_regs[0x0be/2] & 0x0000ffff)
+	#define STV_VDP2_RPTAL  (m_vdp2_regs[0x0be/2])
+
+	/*bit 2 unused when VRAM = 4 Mbits*/
+	#define STV_VDP2_RPTA   (((STV_VDP2_RPTAU & 0x0007) << 16) | (STV_VDP2_RPTAL & 0xfffe))
+
 
 /* 1800c0 - Window Position (W0, Horizontal Start Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1817,40 +1862,107 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 /* 1800ea - Special Priority Mode
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    |    --    |    --    |    --    | R0SPRM1  | R0SPRM0  |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       | N3SPRM1  | N3SPRM0  | N2SPRM1  | N2SPRM0  | N1SPRM1  | N1SPRM0  | N0SPRM1  | N0SPRM0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_SFPRMD (m_vdp2_regs[0x0ea/2])
 
+/*  xxSPRMy - Special priority mode bit (xx : N0-3, R0, y : 0/1)
+    00 - Select priority number LSB per each screen (Priority register LSB)
+    01 - Select priority number LSB per each character (Value of special priority bit in pattern name data)
+	01 - (EXBG) Invaild
+    10 - (CLUT) Select priority number LSB per each dot (Both Related to special priority bit and special function code - see SFSEL, SFCODE)
+	10 - (RGB) Invaild
+	11 - Invaild  */
+	#define STV_VDP2_R0SPRM ((STV_VDP2_SFPRMD & 0x0300) >> 8) // for RBG0
+	#define STV_VDP2_N3SPRM ((STV_VDP2_SFPRMD & 0x00c0) >> 6) // for NBG3
+	#define STV_VDP2_N2SPRM ((STV_VDP2_SFPRMD & 0x0030) >> 4) // for NBG2
+	#define STV_VDP2_N1SPRM ((STV_VDP2_SFPRMD & 0x000c) >> 2) // for NBG1 (or EXBG)
+	#define STV_VDP2_N0SPRM ((STV_VDP2_SFPRMD & 0x0003) >> 0) // for NBG0 (or RBG1)
+	// TODO : Other bits unknown
+
 
 /* 1800ec - Colour Calculation Control
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |  BOKEN   |  BOKN2   |  BOKN1   |   BOKN0  |    --    |  EXCCEN  |  CCRTMD  |  CCMD    |
+       |  BOKEN   |  BOKN2   |  BOKN1   |  BOKN0   |    --    |  EXCCEN  |  CCRTMD  |  CCMD    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |  SPCCEN  |  LCCCEN  |  R0CCEN  |  N3CCEN  |  N2CCEN  |  N1CCEN  |  N0CCEN  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_CCCR       (m_vdp2_regs[0x0ec/2])
+
+/*  BOKEN - Gradiation enable bit
+    0 - Do not use gradiation calculation function
+	1 - Use gradiation calculation function
+	Only for TV screen and Normal monitor, Other screen mode is invaild.
+	Colour mode is must be 0.  */
+	#define STV_VDP2_BOKEN      ((STV_VDP2_CCCR & 0x8000) >> 15)
+	
+/*  BOKNx - Gradiation screen number bit (x : 0-2)
+    Bit  - Screen using gradiation calculation function
+	000  - Sprite
+	001  - RBG0
+	010  - NBG0 or RBG1
+	011  - Invaild
+	100  - NBG1 or EXBG
+	101  - NBG2
+	110  - NBG3
+	111  - Invaild  */
+	#define STV_VDP2_BOKN       ((STV_VDP2_CCCR & 0x7000) >> 12)
+
+/*  EXCCEN - Extended colour calculation enable bit
+    0 - Do not use extended colour calculation
+	1 - Use extended colour calculation
+	when BOKEN bit is 1, this bit is ignored.
+	Only for TV screen and Normal monitor, Other screen mode is invaild.  */
+	#define STV_VDP2_EXCCEN     ((STV_VDP2_CCCR & 0x200) >> 9)
+
+/*  CCRTMD - Colour calculation raito mode bit
+    0 - For colour calculation raito, select per upper screen side
+	1 - For colour calculation raito, select per lower screen side  */
+	#define STV_VDP2_CCRTMD     ((STV_VDP2_CCCR & 0x200) >> 9)
+
+/*  CCMD - Colour calculation mode bit
+    0 - Add according to the colour calculation register value (Alpha blending)
+	1 - Add as is (Additive blending)  */
 	#define STV_VDP2_CCMD       ((STV_VDP2_CCCR & 0x100) >> 8)
-	#define STV_VDP2_SPCCEN     ((STV_VDP2_CCCR & 0x40) >> 6)
-	#define STV_VDP2_LCCCEN     ((STV_VDP2_CCCR & 0x20) >> 5)
-	#define STV_VDP2_R0CCEN     ((STV_VDP2_CCCR & 0x10) >> 4)
-	#define STV_VDP2_N3CCEN     ((STV_VDP2_CCCR & 0x8) >> 3)
-	#define STV_VDP2_N2CCEN     ((STV_VDP2_CCCR & 0x4) >> 2)
-	#define STV_VDP2_N1CCEN     ((STV_VDP2_CCCR & 0x2) >> 1)
-	#define STV_VDP2_N0CCEN     ((STV_VDP2_CCCR & 0x1) >> 0)
+
+/*  xxCCEN - Colour calculation enable bit (xx : N0-3, R0, LC, SP)
+    0 - Disable colour calculation
+	1 - Enable colour calculation  */
+	#define STV_VDP2_SPCCEN     ((STV_VDP2_CCCR & 0x40) >> 6) // for Sprites
+	#define STV_VDP2_LCCCEN     ((STV_VDP2_CCCR & 0x20) >> 5) // for LNCL
+	#define STV_VDP2_R0CCEN     ((STV_VDP2_CCCR & 0x10) >> 4) // for RBG0
+	#define STV_VDP2_N3CCEN     ((STV_VDP2_CCCR & 0x8) >> 3) // for NBG3
+	#define STV_VDP2_N2CCEN     ((STV_VDP2_CCCR & 0x4) >> 2) // for NBG2
+	#define STV_VDP2_N1CCEN     ((STV_VDP2_CCCR & 0x2) >> 1) // for NBG1 or EXBG
+	#define STV_VDP2_N0CCEN     ((STV_VDP2_CCCR & 0x1) >> 0) // for NBG0 or RBG1
 
 
 /* 1800ee - Special Colour Calculation Mode
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    |    --    |    --    |    --    | R0SCCM1  | R0SCCM0  |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       | N3SCCM1  | N3SCCM0  | N2SCCM1  | N2SCCM0  | N1SCCM1  | N1SCCM0  | N0SCCM1  | N0SCCM0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_SFCCMD     (m_vdp2_regs[0x0ee/2])
+/*  xxSCCMy - Special colour calculation mode bit (xx : N0-3, R0, y : 0/1)
+    00 - Select colour calculation mode per each screen (When setted colour calculation enable bit)
+    01 - Select colour calculation mode per each character (When both setted colour calculation enable bit and value of special colour calculation bit in pattern name data)
+	01 - (EXBG) Invaild
+    10 - (CLUT) Select colour calculation mode per each dot (Same as 01 but related to special function code - see SFSEL, SFCODE)
+	10 - (RGB) Invaild
+	11 - (CLUT) Select colour calculation mode with colour data MSB (When both setted colour calculation enable bit and MSB of colour data)
+	11 - (RGB) Same as 00  */
+	#define STV_VDP2_R0SCCM ((STV_VDP2_SFCCMD & 0x0300) >> 8) // for RBG0
+	#define STV_VDP2_N3SCCM ((STV_VDP2_SFCCMD & 0x00c0) >> 6) // for NBG3
+	#define STV_VDP2_N2SCCM ((STV_VDP2_SFCCMD & 0x0030) >> 4) // for NBG2
+	#define STV_VDP2_N1SCCM ((STV_VDP2_SFCCMD & 0x000c) >> 2) // for NBG1 (or EXBG)
+	#define STV_VDP2_N0SCCM ((STV_VDP2_SFCCMD & 0x0003) >> 0) // for NBG0 (or RBG1)
+	// TODO : Other bits unknown
 
 /* 1800f0 - Priority Number (Sprite 0,1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2008,7 +2120,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    | R0CCRT4  | R0CCRT3  | R0CCRT2  | R0CCRT1  | R0CCRT0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_CCRR   (m_vdp2_regs[0x10c/2])
@@ -2016,13 +2128,14 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 /* 18010e - Colour Calculation Ratio (Line Colour Screen, Back Colour Screen)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    | BKCCRT4  | BKCCRT3  | BKCCRT2  | BKCCRT1  | BKCCRT0  |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
+       |    --    |    --    |    --    | LCCCRT4  | LCCCRT3  | LCCCRT2  | LCCCRT1  | LCCCRT0  |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_CCRLB   (m_vdp2_regs[0x10e/2])
-
+	#define STV_VDP2_BKCCRT  ((STV_VDP2_CCRLB & 0x1f00) >> 8)
+	#define STV_VDP2_LCCCRT  (STV_VDP2_CCRLB & 0x1f)
 
 /* 180110 - Colour Offset Enable
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -2117,7 +2230,7 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 {
 	uint32_t address;
 
-	address = (((STV_VDP2_RPTAU << 16) | STV_VDP2_RPTAL) << 1);
+	address = STV_VDP2_RPTA << 1;
 	if ( rot_parameter == 1 )
 	{
 		address &= ~0x00000080;
@@ -4008,6 +4121,8 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 				data = m_vdp2_vram[newbase + offs/2];
 				data = (offs&1) ? (data & 0x0000ffff) : ((data & 0xffff0000) >> 16);
 
+	//          specialc = stv2_current_tilemap.special_colour_control_register;
+	//          specialpri = stv2_current_tilemap.special_priority_register;
 				/* Supplement Mode 12 bits, no flip */
 				if (stv2_current_tilemap.character_number_supplement == 1)
 				{
@@ -4031,10 +4146,11 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 			else
 			{
 				data = m_vdp2_vram[newbase + offs];
-				tilecode = (data & 0x00007fff);
-				pal   = (data &    0x007f0000)>>16;
-	//          specialc = (data & 0x10000000)>>28;
-				flipyx   = (data & 0xc0000000)>>30;
+				tilecode   = (data & 0x00007fff);
+				pal        = (data & 0x007f0000)>>16;
+	//          specialc   = (data & 0x10000000)>>28;
+	//          specialpri = (data & 0x20000000)>>29;
+				flipyx     = (data & 0xc0000000)>>30;
 			}
 /* WE'VE GOT THE TILE INFO ... */
 
@@ -4463,7 +4579,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 			int cur_char = 0;
 
 			base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
-			vcsc_address = (((STV_VDP2_VCSTAU << 16) | STV_VDP2_VCSTAL) & base_mask) * 2;
+			vcsc_address = (STV_VDP2_VCSTA & base_mask) * 2;
 			vcsc_address >>= 2;
 
 			base_offset = 0;
@@ -5134,7 +5250,7 @@ void saturn_state::stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.pattern_data_size = STV_VDP2_N0PNB;
 	stv2_current_tilemap.character_number_supplement = STV_VDP2_N0CNSM;
 	stv2_current_tilemap.special_priority_register = STV_VDP2_N0SPR;
-	stv2_current_tilemap.special_colour_control_register = STV_VDP2_PNCN0;
+	stv2_current_tilemap.special_colour_control_register = STV_VDP2_N0SCC;
 	stv2_current_tilemap.supplementary_palette_bits = STV_VDP2_N0SPLT;
 	stv2_current_tilemap.supplementary_character_bits = STV_VDP2_N0SPCN;
 
@@ -5145,7 +5261,7 @@ void saturn_state::stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 
 	stv2_current_tilemap.linescroll_enable = STV_VDP2_N0LSCX;
 	stv2_current_tilemap.linescroll_interval = (((STV_VDP2_LSMD & 3) == 2) ? (2) : (1)) << (STV_VDP2_N0LSS);
-	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA0U << 16) | STV_VDP2_LSTA0L) & base_mask) * 2;
+	stv2_current_tilemap.linescroll_table_address = (STV_VDP2_N0LSTA & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N0LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N0LZMX;
 	stv2_current_tilemap.vertical_cell_scroll_enable = STV_VDP2_N0VCSC;
@@ -5235,7 +5351,7 @@ void saturn_state::stv_vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.pattern_data_size = STV_VDP2_N1PNB;
 	stv2_current_tilemap.character_number_supplement = STV_VDP2_N1CNSM;
 	stv2_current_tilemap.special_priority_register = STV_VDP2_N1SPR;
-	stv2_current_tilemap.special_colour_control_register = STV_VDP2_PNCN1;
+	stv2_current_tilemap.special_colour_control_register = STV_VDP2_N1SCC;
 	stv2_current_tilemap.supplementary_palette_bits = STV_VDP2_N1SPLT;
 	stv2_current_tilemap.supplementary_character_bits = STV_VDP2_N1SPCN;
 
@@ -5246,7 +5362,7 @@ void saturn_state::stv_vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cli
 
 	stv2_current_tilemap.linescroll_enable = STV_VDP2_N1LSCX;
 	stv2_current_tilemap.linescroll_interval = (((STV_VDP2_LSMD & 3) == 2) ? (2) : (1)) << (STV_VDP2_N1LSS);
-	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA1U << 16) | STV_VDP2_LSTA1L) & base_mask) * 2;
+	stv2_current_tilemap.linescroll_table_address = (STV_VDP2_N1LSTA & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N1LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N1LZMX;
 	stv2_current_tilemap.vertical_cell_scroll_enable = STV_VDP2_N1VCSC;
@@ -5337,7 +5453,7 @@ void saturn_state::stv_vdp2_draw_NBG2(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.pattern_data_size = STV_VDP2_N2PNB;
 	stv2_current_tilemap.character_number_supplement = STV_VDP2_N2CNSM;
 	stv2_current_tilemap.special_priority_register = STV_VDP2_N2SPR;
-	stv2_current_tilemap.special_colour_control_register = STV_VDP2_PNCN2;
+	stv2_current_tilemap.special_colour_control_register = STV_VDP2_N2SCC;
 	stv2_current_tilemap.supplementary_palette_bits = STV_VDP2_N2SPLT;
 	stv2_current_tilemap.supplementary_character_bits = STV_VDP2_N2SPCN;
 
