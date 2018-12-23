@@ -554,17 +554,17 @@ static void write_te_reg(uint32_t &reg, uint32_t data, m2_te_device::te_reg_wmod
 {
 	switch (mode)
 	{
-		case REG_WRITE:
+		case m2_te_device::REG_WRITE:
 		{
 			reg = data;
 			break;
 		}
-		case REG_SET:
+		case m2_te_device::REG_SET:
 		{
 			reg |= data;
 			break;
 		}
-		case REG_CLEAR:
+		case m2_te_device::REG_CLEAR:
 		{
 			reg &= ~data;
 			break;
