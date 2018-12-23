@@ -28,6 +28,7 @@ Main Board  ROM Board   Year + Game                                 By
 -----------------------------------------------------------------------------------
 STA-0001    STS-0001    93  Super Real Mahjong PIV                  Seta
 STA-0001    STS-0001    93  Dramatic Adventure Quiz Keith & Lucy    Visco
+STA-0001    STS-0001    93  Pastel Island                           Visco
 STA-0001    SAM-5127    93  Survival Arts                           Sammy
 STA-0001    SAM-5127    93  Dyna Gears                              Sammy
 STA-0001B   VISCO-001B  94  Drift Out '94                           Visco
@@ -81,7 +82,7 @@ STA-0001B SYSTEM SSV
 | 2066   VOL                                              |
 |TA8210                    |--------|      74ALS245 x6    |
 |      TL072 |--------|    |        |                     |
-|H           |ENSONIC |    | ST0007 |                 JP1 |
+|H           |ENSONIQ |    | ST0007 |                 JP1 |
 |      TL072 |ES5506  |    |        |   |--------|JP2     |
 |            |OTTOR2  |    |--------|   |        |74ALS74 |
 |S           |--------|                 |  V60   |        |
@@ -108,7 +109,7 @@ Notes:
       S       - 5 pin connector for additional sound output
       D6376   - NEC D6376 2-channel 16-bit D/A converter (SOIC16)
       V60     - NEC D70615GD-16 V60 CPU, clock 16.000MHz [48/3] (QFP120)
-      ES5506  - Ensonic ES5506 sound IC, clock 16.000MHz [48/3] (PLCC68)
+      ES5506  - Ensoniq ES5506 sound IC, clock 16.000MHz [48/3] (PLCC68)
       LM358   - National Semiconductor LM358 Low Power Dual Operational Amplifier (DIP8)
       2066    - New Japan Radio NJM2066 Dual Operational Amplifier (DIP16)
       TL072   - Texas Instruments TL072 Low Noise JFET-Input Operational Amplifier (DIP8)
@@ -125,7 +126,7 @@ Notes:
       SETA custom IC's -
                          ST-0004 Video DAC (QFP64)
                          ST-0005 Parallel I/O (QFP100)
-                         ST-0006 Video controller (QFP208, covered with large heaksink)
+                         ST-0006 Video controller (QFP208, covered with large heatsink)
                          ST-0007 System controller (QFP160)
 
 To Do:
