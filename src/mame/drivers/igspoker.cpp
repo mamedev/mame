@@ -2855,15 +2855,15 @@ void igspoker_state::init_kungfu()
 }
 
 
-GAMEL( 1993?,cpoker,    0,        igspoker, cpoker,   igspoker_state, init_cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
-GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, init_cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
+GAMEL( 1993, cpoker,    0,        igspoker, cpoker,   igspoker_state, init_cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
+GAMEL( 1993, cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, init_cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
 GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                        0, layout_igspoker )
 GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
 GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
 GAMEL( 1998, chleagxa,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
 GAMEL( 1998, chleagxb,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
-GAMEL( 198?, csk227it,  0,        csk227it, csk227,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) /* SU 062 */
-GAMEL( 198?, csk234it,  csk227it, csk234it, csk234,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) /* SU 062 */
+GAMEL( 1993, csk227it,  0,        csk227it, csk227,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) /* SU 062 */
+GAMEL( 1993, csk234it,  csk227it, csk234it, csk234,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) /* SU 062 */
 GAMEL( 2000, number10,  0,        number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                         0, layout_igspoker )
 GAMEL( 2000, numbr10l,  number10, number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Lattine)",                       0, layout_igspoker )
 GAMEL( 198?, igs_ncs,   0,        igs_ncs,  igs_ncs,  igspoker_state, init_igs_ncs,  ROT0, "IGS",                  "New Champion Skill (v100n)",                   0, layout_igspoker ) /* SU 062 */
