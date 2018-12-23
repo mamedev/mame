@@ -2660,7 +2660,7 @@ ROM_END
 /*
 VM - V30 8/10
 
-TODO: doesn't boot, missing roms?
+TODO: missing itf roms, if they exist
 */
 
 ROM_START( pc9801vm )
@@ -2670,9 +2670,10 @@ ROM_START( pc9801vm )
 	// bios
 	ROM_LOAD16_BYTE( "cpu_board_1a_23128e.bin",   0x10001, 0x4000, CRC(9965c914) SHA1(1ed318b774340bd532ef02ac02f39a012354dbf8) )
 	ROM_LOAD16_BYTE( "cpu_board_4a_d23128ec.bin", 0x10000, 0x4000, CRC(e7c24a70) SHA1(cc9584b8e56b391f103e9d559d397d0bc6d00b35) )
-	// itf
-	ROM_LOAD16_BYTE( "cpu_board_2a_d23c256ec.bin", 0x18001, 0x8000, CRC(3874970d) SHA1(e50ec5ae38f00dbfd156288dd42c7f2a2bf8bc35) )
-	ROM_LOAD16_BYTE( "cpu_board_3a_23c256e.bin",   0x18000, 0x8000, CRC(4128276e) SHA1(32acb7eee779a31838a17ce51b05a9a987af4099) )
+	ROM_LOAD16_BYTE( "cpu_board_2a_d23c256ec.bin", 0x08001, 0x4000, CRC(3874970d) SHA1(e50ec5ae38f00dbfd156288dd42c7f2a2bf8bc35) )
+	ROM_CONTINUE( 0x00001, 0x4000 )
+	ROM_LOAD16_BYTE( "cpu_board_3a_23c256e.bin",   0x08000, 0x4000, CRC(4128276e) SHA1(32acb7eee779a31838a17ce51b05a9a987af4099) )
+	ROM_CONTINUE( 0x00000, 0x4000 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 //  ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
