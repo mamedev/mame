@@ -395,7 +395,7 @@ public:
 	void init_zombraid();
 
 protected:
-	virtual void machine_start() override;
+	DECLARE_MACHINE_START(zombraid);
 
 private:
 	double adc_cb(uint8_t input);

@@ -8758,7 +8758,11 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
-void zombraid_state::machine_start() { m_gun_recoil.resolve(); }
+MACHINE_START_MEMBER(zombraid_state,zombraid)
+{
+	uPD71054_timer_init();
+	m_gun_recoil.resolve();
+}
 
 MACHINE_CONFIG_START(zombraid_state::zombraid)
 	gundhara(config);
@@ -8766,6 +8770,8 @@ MACHINE_CONFIG_START(zombraid_state::zombraid)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zombraid_map)
+
+	MCFG_MACHINE_START_OVERRIDE(zombraid_state, zombraid)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
