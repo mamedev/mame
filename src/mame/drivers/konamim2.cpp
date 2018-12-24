@@ -1494,20 +1494,20 @@ void konamim2_state::init_hellngt()
  *
  *************************************/
 
-GAME( 1997, polystar,  0,        polystar, polystar, konamim2_state, empty_init,    ROT0, "Konami", "Tobe! Polystars (ver JAA)",    MACHINE_IMPERFECT_SOUND )
-GAME( 1997, totlvice,  0,        totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EBA)",         0 )
-//GAME( 1997, totlvicd, totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EAD)",         MACHINE_NOT_WORKING )
-GAME( 1997, totlvicj,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver JAD)",         MACHINE_NOT_WORKING )
-GAME( 1997, totlvica,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver AAB)",         MACHINE_NOT_WORKING )
-GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver UAC)",         MACHINE_NOT_WORKING )
-GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-//GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         0 )
-GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING )
-GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         0 )
+GAME( 1997, polystar,  0,        polystar, polystar, konamim2_state, empty_init,    ROT0, "Konami", "Tobe! Polystars (ver JAA)",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, totlvice,  0,        totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EBA)",         MACHINE_IMPERFECT_TIMING )
+//GAME( 1997, totlvicd, totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvicj,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver JAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvica,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver AAB)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver UAC)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
+GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_IMPERFECT_TIMING )
 
-//CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
 
 
 /*************************************
