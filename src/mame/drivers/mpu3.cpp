@@ -167,8 +167,6 @@ TODO: - Distinguish door switches using manual
 
 #include "video/awpvid.h"       //Fruit Machines Only
 
-static constexpr XTAL MPU3_MASTER_CLOCK = 4_MHz_XTAL;
-
 /* Lookup table for CHR data */
 
 struct mpu3_chr_table
