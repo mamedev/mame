@@ -7,17 +7,7 @@
 
     driver by Phil Bennett
 
-    NOTE:
-
-    * All games are marked MACHINE_NOT_WORKING due to the rare case
-      where the PowerPC DRC blows up, causing MAME to crash. In reality,
-      there is a good chance of being able to play through a round or
-      three with no issues on all of the parent sets.
-
     TODO:
-
-    * Fix DRC crashes
-        o  Crashes on DRC translation of 0x40028604
     * Fix texture compression
     * Sort out CD images
     * Fix Polystars blending issues
