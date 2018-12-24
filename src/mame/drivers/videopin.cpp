@@ -81,7 +81,7 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 void videopin_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
 
 	save_item(NAME(m_time_pushed));
@@ -138,26 +138,25 @@ READ8_MEMBER(videopin_state::misc_r)
 
 WRITE8_MEMBER(videopin_state::led_w)
 {
-	int i = (m_screen->vpos() >> 5) & 7;
-	static const char *const matrix[8][4] =
+	// LED matrix as seen in Video Pinball manual, fig. 4-14
+	// output to "LEDxx" where xx = 01 to 32, videopin START = LED30
+	static const int matrix[8][4] =
 	{
-		{ "LED26", "LED18", "LED11", "LED13" },
-		{ "LED25", "LED17", "LED10", "LED08" },
-		{ "LED24", "LED29", "LED09", "LED07" },
-		{ "LED23", "LED28", "LED04", "LED06" },
-		{ "LED22", "LED27", "LED03", "LED05" },
-		{ "LED21", "LED16", "LED02", "-" },
-		{ "LED20", "LED15", "LED01", "-" },
-		{ "LED19", "LED14", "LED12", "-" }
+		{ 26, 18, 11, 13 },
+		{ 25, 17, 10,  8 },
+		{ 24, 29,  9,  7 },
+		{ 23, 28,  4,  6 },
+		{ 22, 27,  3,  5 },
+		{ 21, 16,  2, 32 },
+		{ 20, 15,  1, 31 },
+		{ 19, 14, 12, 30 }
 	};
 
-	output().set_value(matrix[i][0], (data >> 0) & 1);
-	output().set_value(matrix[i][1], (data >> 1) & 1);
-	output().set_value(matrix[i][2], (data >> 2) & 1);
-	output().set_value(matrix[i][3], (data >> 3) & 1);
+	// anode from 32V,64V,128V
+	int a = m_screen->vpos() >> 5 & 7;
 
-	if (i == 7)
-		m_led = BIT(data, 3);   /* start button */
+	for (int c = 0; c < 4; c++)
+		m_leds[matrix[a][c]] = BIT(data, c);
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
