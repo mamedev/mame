@@ -2342,8 +2342,8 @@ void m2_te_device::select_lerp( uint32_t sel,
 		{
 			uint32_t cnst = ssbt ? m_tm.tex_srcconst3 : m_tm.tex_srcconst2;
 
-			ar = (cnst >> 24) & 0xff;
-			ag = (cnst >> 16) & 0xff;
+			ar = (cnst >> 16) & 0xff;
+			ag = (cnst >>  8) & 0xff;
 			ab = (cnst >>  0) & 0xff;
 			break;
 		}
