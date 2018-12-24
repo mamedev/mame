@@ -59,6 +59,8 @@ private:
 	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
 	DECLARE_WRITE8_MEMBER(mmio_w);
 	DECLARE_READ8_MEMBER(mmio_r);
+	DECLARE_READ8_MEMBER(cart_r);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void laser_get_track();
 	void laser_put_track();
@@ -102,6 +104,7 @@ private:
 	int m_laser_bg_mode;
 	int m_laser_two_color;
 	u8 m_language;
+	u32 m_cart_size;
 
 	memory_region *m_cart_rom;
 };

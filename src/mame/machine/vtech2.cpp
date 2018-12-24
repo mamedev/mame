@@ -8,7 +8,6 @@
     Davide Moretti <dave@rimini.com> ROM dump and hardware description
 
     TODO:
-        Add loading images from WAV files.
         Printer and RS232 support.
         Check if the FDC is really the same as in the
         Laser 210/310 (aka VZ200/300) series.
@@ -34,6 +33,7 @@ void vtech2_state::init_laser()
 	m_laser_track_x2[0] = m_laser_track_x2[1] = 80;
 	m_laser_fdc_bits = 8;
 	m_laser_drive = -1;
+	m_cart_size = 0;
 
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
@@ -46,9 +46,34 @@ void vtech2_state::init_laser()
 }
 
 
+DEVICE_IMAGE_LOAD_MEMBER( vtech2_state, cart_load )
+{
+	m_cart_size = m_cart->common_get_size("rom");
+
+	if (m_cart_size > 0x10000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge bigger than 64k");
+		m_cart_size = 0;
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(m_cart_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), m_cart_size, "rom");
+
+	return image_init_result::PASS;
+}
+
 void vtech2_state::machine_reset()
 {
 	m_language = m_io_keyboard[5]->read() & 0x30;
+}
+
+
+READ8_MEMBER( vtech2_state::cart_r )
+{
+	if (offset >= m_cart_size)
+		return 0xff;
+	return m_cart->read_rom(space, offset);
 }
 
 

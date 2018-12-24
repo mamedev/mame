@@ -59,9 +59,17 @@
     F    0x3c000 - 0x3ffff ROM expansion
 
     TODO:
-    - Hook up cart slots
     - Ram pak
     - undumped DOS ROM
+    - joystick
+    - need software
+
+    Cartslot works, even though it seems there were no game carts made
+    for these systems. The bios checks the first few bytes for a particular
+    sequence; if found, the cart is executed at the next byte.
+    We allow a cart of any size up to 64k, and it gets loaded into bank 12,
+    continuing on to banks 13, 14 and 15 if needed. The bios checks for the
+    sequence at each bank boundary.
 
 ***************************************************************************/
 
@@ -112,10 +120,7 @@ void vtech2_state::m_map350(address_map &map)
 	map(0x24000, 0x27fff).noprw(); // TODO: 64k ram expansion pak
 	map(0x28000, 0x2bfff).noprw(); // TODO: 64k ram expansion pak
 	map(0x2c000, 0x2ffff).noprw(); // TODO: 64k ram expansion pak
-	map(0x30000, 0x33fff).noprw(); // TODO: rom in expansion port
-	map(0x34000, 0x37fff).noprw(); // TODO: rom in expansion port
-	map(0x38000, 0x3bfff).noprw(); // TODO: rom in expansion port
-	map(0x3c000, 0x3ffff).noprw(); // TODO: rom in expansion port
+	map(0x30000, 0x3ffff).r(FUNC(vtech2_state::cart_r));
 }
 
 // Laser 500, 64k ram
@@ -133,10 +138,7 @@ void vtech2_state::m_map500(address_map &map)
 	map(0x24000, 0x27fff).noprw(); // TODO: 64k ram expansion pak
 	map(0x28000, 0x2bfff).noprw(); // TODO: 64k ram expansion pak
 	map(0x2c000, 0x2ffff).noprw(); // TODO: 64k ram expansion pak
-	map(0x30000, 0x33fff).noprw(); // TODO: rom in expansion port
-	map(0x34000, 0x37fff).noprw(); // TODO: rom in expansion port
-	map(0x38000, 0x3bfff).noprw(); // TODO: rom in expansion port
-	map(0x3c000, 0x3ffff).noprw(); // TODO: rom in expansion port
+	map(0x30000, 0x3ffff).r(FUNC(vtech2_state::cart_r));
 }
 
 // Laser 700, 128k ram
@@ -154,10 +156,7 @@ void vtech2_state::m_map700(address_map &map)
 	map(0x24000, 0x27fff).ram();
 	map(0x28000, 0x2bfff).ram();
 	map(0x2c000, 0x2ffff).ram();
-	map(0x30000, 0x33fff).noprw(); // TODO: rom in expansion port
-	map(0x34000, 0x37fff).noprw(); // TODO: rom in expansion port
-	map(0x38000, 0x3bfff).noprw(); // TODO: rom in expansion port
-	map(0x3c000, 0x3ffff).noprw(); // TODO: rom in expansion port
+	map(0x30000, 0x3ffff).r(FUNC(vtech2_state::cart_r));
 }
 
 
@@ -529,6 +528,7 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vtech_cart")
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
+	MCFG_GENERIC_LOAD(vtech2_state, cart_load)
 
 	/* 5.25" Floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_interface )
@@ -567,31 +567,31 @@ MACHINE_CONFIG_END
 
 
 ROM_START(laser350)
-	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
+	ROM_REGION(0x8000,"maincpu",0)
+	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
-	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
+	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 
 
 ROM_START(laser500) // based on the picture at http://www.8bit-museum.de/hardware/laser500pcb-h.jpg
 // There should be two roms, one 0x2000 long for the font at u10, and one longer one for the os rom at u6.
-	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("27-0401-00-00.u6", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1)) // may be dumped at wrong size; label is: "VTL 27-0401-00-00 // 6133-7081 // 8611MAK"
+	ROM_REGION(0x8000,"maincpu",0)
+	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1)) // may be dumped at wrong size; label is: "VTL 27-0401-00-00 // 6133-7081 // 8611MAK"
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) ) // label is "TMS 2364-25NL // D8614L // ZA234015 // 27-393-00/VT 85 // SINGAPORE"
-	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
+	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 
 ROM_START(laser700)
-	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
+	ROM_REGION(0x8000,"maincpu",0)
+	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
-	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
+	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 
@@ -603,6 +603,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY             FULLNAME      FLAGS
-COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)
+COMP( 1985, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
+COMP( 1985, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
+COMP( 1985, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)
