@@ -475,7 +475,10 @@ void drc_label_list::block_end(drcuml_block &block)
 	// free all of the pending fixup requests
 	label_fixup *fixup;
 	while ((fixup = m_fixup_list.detach_head()) != nullptr)
+	{
+		fixup->~label_fixup();
 		m_cache.dealloc(fixup, sizeof(*fixup));
+	}
 
 	// make sure the label list is clear, and fatalerror if we missed anything
 	reset(true);
@@ -496,6 +499,7 @@ drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_de
 	if (curlabel->m_codeptr == nullptr && !callback.isnull())
 	{
 		label_fixup *fixup = reinterpret_cast<label_fixup *>(m_cache.alloc(sizeof(*fixup)));
+		new (fixup) label_fixup;
 		fixup->m_callback = callback;
 		fixup->m_label = curlabel;
 		m_fixup_list.append(*fixup);
