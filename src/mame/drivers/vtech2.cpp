@@ -59,9 +59,9 @@
     F    0x3c000 - 0x3ffff ROM expansion
 
     TODO:
-        Add ROMs and drivers for the Laser100, 110,
-        210 and 310 machines and the Texet 8000.
-        They should probably go to the vtech1.c files, though.
+    - Hook up cart slots
+    - Ram pak
+    - undumped DOS ROM
 
 ***************************************************************************/
 
@@ -77,22 +77,87 @@
 #include "formats/vt_cas.h"
 
 
-void vtech2_state::vtech2_mem(address_map &map)
+void vtech2_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).m(m_banka, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x7fff).m(m_bankb, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).m(m_bankc, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).m(m_bankd, FUNC(address_map_bank_device::amap8));
 }
 
-void vtech2_state::vtech2_io(address_map &map)
+void vtech2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x1f).rw(FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
-	map(0x40, 0x43).w(FUNC(vtech2_state::laser_bank_select_w));
+	map(0x40, 0x40).lw8("set_bankA", [this] (u8 data) { m_banka->set_bank(data & 15); });
+	map(0x41, 0x41).lw8("set_bankB", [this] (u8 data) { m_bankb->set_bank(data & 15); });
+	map(0x42, 0x42).lw8("set_bankC", [this] (u8 data) { m_bankc->set_bank(data & 15); });
+	map(0x43, 0x43).lw8("set_bankD", [this] (u8 data) { m_bankd->set_bank(data & 15); });
 	map(0x44, 0x44).w(FUNC(vtech2_state::laser_bg_mode_w));
 	map(0x45, 0x45).w(FUNC(vtech2_state::laser_two_color_w));
+}
+
+// Laser 350, 16k ram
+void vtech2_state::m_map350(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x04000, 0x07fff).rom().region("maincpu", 0x4000);
+	map(0x08000, 0x0bfff).rw(FUNC(vtech2_state::mmio_r), FUNC(vtech2_state::mmio_w));
+	map(0x0c000, 0x0ffff).ram().share(m_videoram);
+	map(0x10000, 0x13fff).noprw();
+	map(0x14000, 0x17fff).noprw();
+	map(0x18000, 0x1bfff).noprw();
+	map(0x1c000, 0x1ffff).noprw();
+	map(0x20000, 0x23fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x24000, 0x27fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x28000, 0x2bfff).noprw(); // TODO: 64k ram expansion pak
+	map(0x2c000, 0x2ffff).noprw(); // TODO: 64k ram expansion pak
+	map(0x30000, 0x33fff).noprw(); // TODO: rom in expansion port
+	map(0x34000, 0x37fff).noprw(); // TODO: rom in expansion port
+	map(0x38000, 0x3bfff).noprw(); // TODO: rom in expansion port
+	map(0x3c000, 0x3ffff).noprw(); // TODO: rom in expansion port
+}
+
+// Laser 500, 64k ram
+void vtech2_state::m_map500(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x04000, 0x07fff).rom().region("maincpu", 0x4000);
+	map(0x08000, 0x0bfff).rw(FUNC(vtech2_state::mmio_r), FUNC(vtech2_state::mmio_w));
+	map(0x0c000, 0x0ffff).noprw();
+	map(0x10000, 0x13fff).ram();
+	map(0x14000, 0x17fff).ram();
+	map(0x18000, 0x1bfff).ram();
+	map(0x1c000, 0x1ffff).ram().share(m_videoram);
+	map(0x20000, 0x23fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x24000, 0x27fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x28000, 0x2bfff).noprw(); // TODO: 64k ram expansion pak
+	map(0x2c000, 0x2ffff).noprw(); // TODO: 64k ram expansion pak
+	map(0x30000, 0x33fff).noprw(); // TODO: rom in expansion port
+	map(0x34000, 0x37fff).noprw(); // TODO: rom in expansion port
+	map(0x38000, 0x3bfff).noprw(); // TODO: rom in expansion port
+	map(0x3c000, 0x3ffff).noprw(); // TODO: rom in expansion port
+}
+
+// Laser 700, 128k ram
+void vtech2_state::m_map700(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x04000, 0x07fff).rom().region("maincpu", 0x4000);
+	map(0x08000, 0x0bfff).rw(FUNC(vtech2_state::mmio_r), FUNC(vtech2_state::mmio_w));
+	map(0x0c000, 0x0ffff).noprw();
+	map(0x10000, 0x13fff).ram();
+	map(0x14000, 0x17fff).ram();
+	map(0x18000, 0x1bfff).ram();
+	map(0x1c000, 0x1ffff).ram().share(m_videoram);
+	map(0x20000, 0x23fff).ram();
+	map(0x24000, 0x27fff).ram();
+	map(0x28000, 0x2bfff).ram();
+	map(0x2c000, 0x2ffff).ram();
+	map(0x30000, 0x33fff).noprw(); // TODO: rom in expansion port
+	map(0x34000, 0x37fff).noprw(); // TODO: rom in expansion port
+	map(0x38000, 0x3bfff).noprw(); // TODO: rom in expansion port
+	map(0x3c000, 0x3ffff).noprw(); // TODO: rom in expansion port
 }
 
 
@@ -428,10 +493,15 @@ static const floppy_interface vtech2_floppy_interface =
 MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(vtech2_mem)
-	MCFG_DEVICE_IO_MAP(vtech2_io)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankc").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -467,13 +537,29 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vtech2_state::laser500)
 	laser350(config);
-	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
+
+	config.device_remove("banka");
+	config.device_remove("bankb");
+	config.device_remove("bankc");
+	config.device_remove("bankd");
+	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankc").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vtech2_state::laser700)
 	laser350(config);
-	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
+
+	config.device_remove("banka");
+	config.device_remove("bankb");
+	config.device_remove("bankc");
+	config.device_remove("bankd");
+	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankc").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* Second 5.25" floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )
