@@ -738,8 +738,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				data[6] = 0;
 				data[7] = 0;
 				data[8] = 0x02; data[9] = 0xc0; // 4x speed
-				data[10] = 0;
-				data[11] = 256; // 256 volume levels
+				data[10] = 0x01; data[11] = 0x00; // 256 volume levels supported
 				data[12] = 0x00; data[13] = 0x00; // buffer
 				data[14] = 0x02; data[15] = 0xc0; // 4x read speed
 				data[16] = 0;
