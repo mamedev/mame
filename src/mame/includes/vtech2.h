@@ -12,6 +12,7 @@
 #include "machine/bankdev.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/vtech/ioexp/ioexp.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "sound/spkrdev.h"
@@ -37,6 +38,7 @@ public:
 		, m_bankb(*this, "bankb")
 		, m_bankc(*this, "bankc")
 		, m_bankd(*this, "bankd")
+		, m_ioexp(*this, "io")
 	{ }
 
 	void laser350(machine_config &config);
@@ -84,6 +86,7 @@ private:
 	required_device<address_map_bank_device> m_bankb;
 	required_device<address_map_bank_device> m_bankc;
 	required_device<address_map_bank_device> m_bankd;
+	required_device<vtech_ioexp_slot_device> m_ioexp;
 
 	char m_laser_frame_message[64+1];
 	int m_laser_frame_time;

@@ -8,7 +8,7 @@
     Davide Moretti <dave@rimini.com> ROM dump and hardware description
 
     TODO:
-        Printer and RS232 support.
+        RS232 support.
         Check if the FDC is really the same as in the
         Laser 210/310 (aka VZ200/300) series.
 
@@ -43,6 +43,9 @@ void vtech2_state::init_laser()
 	// check ROM expansion
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+
+	// setup expansion slot
+	m_ioexp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 

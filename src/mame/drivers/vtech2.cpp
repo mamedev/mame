@@ -61,7 +61,6 @@
     TODO:
     - Ram pak
     - undumped DOS ROM
-    - joystick
     - need software
 
     Cartslot works, even though it seems there were no game carts made
@@ -75,14 +74,12 @@
 
 #include "emu.h"
 #include "includes/vtech2.h"
-
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
-
+#include "formats/vt_cas.h"
 #include "screen.h"
 #include "speaker.h"
 
-#include "formats/vt_cas.h"
 
 
 void vtech2_state::mem_map(address_map &map)
@@ -524,6 +521,8 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vtech2_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+
+	MCFG_IOEXP_SLOT_ADD("io")
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vtech_cart")
