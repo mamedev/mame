@@ -13194,6 +13194,7 @@ intrgmes                        // (c) 1991 Inter Games
 fw_a7_11                        // (c) 1985 Fun World
 fw_a7_11a                       // (c) 1985 Fun World
 fw_a0_1                         // (c) 1991 Fun World
+jokcrdep                        // (c) 1991 Fun World
 
 @source:funybubl.cpp
 funybubl                        // (c) 1999 In Chang Electronic Co

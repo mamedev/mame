@@ -101,6 +101,7 @@
   * Unknown Fun World A7-11 game 1,                             Fun World,          1985.
   * Unknown Fun World A7-11 game 2,                             Fun World,          1985.
   * Unknown Fun World A0-1 game,                                Fun World,          1991.
+  * Joker Card (Epoxy brick CPU),                               Fun World,          1991.
 
 *****************************************************************************************
 
@@ -6462,6 +6463,35 @@ ROM_START( fw_a0_1 )
 	ROM_LOAD( "n82s147n.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
 ROM_END
 
+/*
+  Joker Card
+  Funworld.
+
+  CPU epoxy brick marked "76AF".
+
+  Epoxy Brick contents:
+
+  - CPU: 1x Ricoh RP65C02A.
+  - RAM: 2x Toshiba TC5565APL-10.
+  - ROM: 1x Intel D27128A.
+  - PLD: 1x PAL16L8B.
+
+  - LOGIC: 1x HD74HC241P.
+           1x M74LS245P.
+           1x SN74LS139N.
+*/
+ROM_START( jokcrdep )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "e-1.bin", 0xc000, 0x4000, CRC(67ac1337) SHA1(896bd30d4b061f08b8eeeb36aaceb7859f342eaf) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "200_zg_2.bin", 0x0000, 0x8000, CRC(ba994fc3) SHA1(95d2a802c38d7249f10eb2bbe46edfb9b14b6faa) )
+	ROM_LOAD( "200_zg_1.bin", 0x8000, 0x8000, CRC(367db105) SHA1(400b82dc9e0be4c17a02add009aab3c43dd901f8) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "sn82s147n.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
+ROM_END
+
 
 /**************************
 *  Driver Initialization  *
@@ -7251,6 +7281,7 @@ GAME(  1991, intrgmes,  0,        intrgmes, funworld,  funworld_state, empty_ini
 GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                  MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                  MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, fw_a0_1,   0,        fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "unknown Fun World A0-1 game",                     MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, jokcrdep,  0,        fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "Joker Card (Epoxy brick CPU)" ,                   MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )
