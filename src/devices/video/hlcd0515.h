@@ -56,8 +56,8 @@ public:
 	hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	template <typename Object> devcb_base &set_write_cols_callback(Object &&cb) { return m_write_cols.set_callback(std::forward<Object>(cb)); }
-	template <typename Object> devcb_base &set_write_data_callback(Object &&cb) { return m_write_data.set_callback(std::forward<Object>(cb)); }
+	auto write_cols() { return m_write_cols.bind(); }
+	auto write_data() { return m_write_data.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_cs);

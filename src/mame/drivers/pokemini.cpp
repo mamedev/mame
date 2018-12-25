@@ -1760,40 +1760,39 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-MACHINE_CONFIG_START(pokemini_state::pokemini)
+void pokemini_state::pokemini(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MINX, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(pokemini_mem_map)
+	MINX(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pokemini_state::pokemini_mem_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	I2CMEM(config, "i2cmem", 0).set_data_size(0x2000);
+	I2CMEM(config, m_i2cmem, 0).set_data_size(0x2000);
 
 	/* This still needs to be improved to actually match the hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_UPDATE_DRIVER(pokemini_state, screen_update)
-	MCFG_SCREEN_SIZE( 96, 64 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
-	MCFG_SCREEN_REFRESH_RATE( 72 )
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_screen_update(FUNC(pokemini_state::screen_update));
+	m_screen->set_size(96, 64);
+	m_screen->set_visarea(0, 95, 0, 63);
+	m_screen->set_refresh_hz(72);
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)
+	PALETTE(config, "palette", 4).set_init(FUNC(pokemini_state::palette_init_pokemini));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(3, speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(3, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pokemini_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,min")
-	MCFG_GENERIC_LOAD(pokemini_state, pokemini_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min"));
+	cartslot.set_device_load(device_image_load_delegate(&pokemini_state::device_image_load_pokemini_cart, this));
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pokemini")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("pokemini");
+}
 
 ROM_START( pokemini )
 	ROM_REGION( 0x200000, "maincpu", 0 )

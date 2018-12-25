@@ -215,10 +215,11 @@ GFXDECODE_END
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(apogee_state::apogee)
+void apogee_state::apogee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(apogee_mem)
+	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apogee_state::apogee_mem);
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(XTAL(16'000'000)/9);
@@ -236,27 +237,26 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 
 	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257, i8257_device, dreq2_w))
+	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
+	i8275.set_character_width(6);
+	i8275.set_display_callback(FUNC(apogee_state::display_pixels));
+	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(78*6, 30*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_size(78*6, 30*10);
+	screen.set_visarea(0, 78*6-1, 0, 30*10-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apogee)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(apogee_state,radio86)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_apogee);
+	PALETTE(config, m_palette, 3).set_init(FUNC(apogee_state::palette_init_radio86));
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
 	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
@@ -265,13 +265,13 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
 	m_dma8257->set_reverse_rw_mode(1);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rka_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("apogee_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rka_cassette_formats);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_interface("apogee_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","apogee")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("apogee");
+}
 
 /* ROM definition */
 ROM_START( apogee )
