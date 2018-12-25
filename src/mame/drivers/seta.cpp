@@ -12167,8 +12167,9 @@ GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_ini
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 
-GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam", 0 )
-GAME( 1993, msgundam1, msgundam, msgundam,  msgunda1,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam (Japan)", 0 )
+// end credits shows Allumer as developer.
+GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam", 0 )
+GAME( 1993, msgundam1, msgundam, msgundam,  msgunda1,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam (Japan)", 0 )
 
 GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )
