@@ -59,10 +59,11 @@ private:
 	// inlines
 
 	// internal helpers
-	bool describe_special(uint16_t op, opcode_desc &desc);
-	bool describe_branch(uint16_t op, opcode_desc &desc);
-	bool describe_complex_branch(uint16_t op, opcode_desc &desc);
-	bool describe_arithmetic(uint16_t op, opcode_desc &desc);
+	void describe_special(uint16_t op, opcode_desc &desc);
+	void describe_branch(uint16_t op, opcode_desc &desc);
+	void describe_complex_branch(uint16_t op, opcode_desc &desc);
+	void describe_arithmetic(uint16_t op, opcode_desc &desc);
+	void parse_operands(uint16_t op, opcode_desc &desc, uint32_t numops);
 
 	// internal state
 	dspp_device *m_dspp;

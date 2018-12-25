@@ -26,8 +26,6 @@
 #define CC_X_MODIFIED(desc)           do { (desc).regout[0] |= 1 << 16; } while(0)
 
 #define CC_FLAGS_MODIFIED(desc)    do {  } while(0)
-//#define MULT_FLAGS_MODIFIED(desc)   do { MN_MODIFIED(desc);MV_MODIFIED(desc);MU_MODIFIED(desc);MI_MODIFIED(desc); } while(0)
-//#define SHIFT_FLAGS_MODIFIED(desc)  do { SZ_MODIFIED(desc);SV_MODIFIED(desc);SS_MODIFIED(desc); } while(0)
 
 dspp_frontend::dspp_frontend(dspp_device *dspp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
 	: drc_frontend(*dspp, window_start, window_end, max_sequence),
@@ -78,9 +76,8 @@ bool dspp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
 	uint16_t op = desc.opptr.w[0] = m_dspp->read_op(desc.physpc);
 
-	// TODO: NOOOOPE
-	desc.cycles = 1; // TODO: Extra cycles for extra operands
-	desc.length = 2;
+	desc.cycles = 1;
+	desc.length = 1;
 
 	// Decode and execute
 	if (op & 0x8000)
@@ -88,28 +85,25 @@ bool dspp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		switch ((op >> 13) & 3)
 		{
 			case 0:
-				return describe_special(op, desc);
+				describe_special(op, desc);
 
 			case 1:
 			case 2:
-				return describe_branch(op, desc);
+				describe_branch(op, desc);
 
 			case 3:
-				return describe_complex_branch(op, desc);
+				describe_complex_branch(op, desc);
 		}
-
-		return false;
 	}
 	else
 	{
-		return describe_arithmetic(op, desc);
+		describe_arithmetic(op, desc);
 	}
 
-	return false;
+	return true;
 }
 
-
-bool dspp_frontend::describe_special(uint16_t op, opcode_desc &desc)
+void dspp_frontend::describe_special(uint16_t op, opcode_desc &desc)
 {
 	switch ((op >> 10) & 7)
 	{
@@ -118,58 +112,55 @@ bool dspp_frontend::describe_special(uint16_t op, opcode_desc &desc)
 			// Super-special
 			switch ((op >> 7) & 7)
 			{
-				case 1: // BAC - TODO: MERGE?
+				case 1: // BAC
 				{
-					//desc.regin[0] = m_acc;
 					desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 					desc.targetpc = BRANCH_TARGET_DYNAMIC;
-					return true;
+					return;
 				}
 				case 4: // RTS
 				{
 					desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 					desc.targetpc = BRANCH_TARGET_DYNAMIC;
-					return true;
+					return;
 				}
 				case 5: // OP_MASK
 				{
 					// TODO
-					return true;
+					return;
 				}
 
 				case 7: // SLEEP
 				{
-					// TODO
-					return true;
+					desc.flags |= OPFLAG_END_SEQUENCE | OPFLAG_RETURN_TO_START;
+					return;
 				}
 
 				case 0: // NOP
 				case 2: // Unused
 				case 3:
 				case 6:
-					return true;
+					return;
 			}
 
 			break;
 		}
-		case 1: // JUMP  - TODO: MERGE?
+		case 1: // JUMP
 		{
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.targetpc = op & 0x3ff;
-			return true;
+			return;
 		}
 		case 2: // JSR
 		{
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.targetpc = op & 0x3ff;
-			return true;
+			return;
 		}
 		case 3: // BFM
 		{
 			// TODO: What sort of branch is this?
-//          desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-//          desc.targetpc = 0; // FIXME
-			return false;
+			return;
 		}
 		case 4: // MOVEREG
 		{
@@ -179,28 +170,29 @@ bool dspp_frontend::describe_special(uint16_t op, opcode_desc &desc)
 			if (op & 0x0010)
 				desc.flags |= OPFLAG_READS_MEMORY;
 
-			return true;
+			parse_operands(op, desc, 1);
+			return;
 		}
 		case 5: // RBASE
 		{
-			return true;
+			return;
 		}
 		case 6: // MOVED
 		{
 			desc.flags |= OPFLAG_WRITES_MEMORY;
-			return true;
+			parse_operands(op, desc, 1);
+			return;
 		}
 		case 7: // MOVEI
 		{
 			desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY;
-			return true;
+			parse_operands(op, desc, 1);
+			return;
 		}
 	}
-
-	return false;
 }
 
-bool dspp_frontend::describe_branch(uint16_t op, opcode_desc &desc)
+void dspp_frontend::describe_branch(uint16_t op, opcode_desc &desc)
 {
 	const uint32_t select = (op >> 12) & 1;
 
@@ -218,11 +210,9 @@ bool dspp_frontend::describe_branch(uint16_t op, opcode_desc &desc)
 	// TODO: Can these be unconditional?
 	desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 	desc.targetpc = op & 0x3ff;
-
-	return true;
 }
 
-bool dspp_frontend::describe_complex_branch(uint16_t op, opcode_desc &desc)
+void dspp_frontend::describe_complex_branch(uint16_t op, opcode_desc &desc)
 {
 	switch ((op >> 10) & 7)
 	{
@@ -257,22 +247,16 @@ bool dspp_frontend::describe_complex_branch(uint16_t op, opcode_desc &desc)
 
 	desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 	desc.targetpc = op & 0x3ff;
-
-	return true;
 }
 
-bool dspp_frontend::describe_arithmetic(uint16_t op, opcode_desc &desc)
+void dspp_frontend::describe_arithmetic(uint16_t op, opcode_desc &desc)
 {
-	#if 0
 	// Decode the various fields
 	uint32_t numops = (op >> 13) & 3;
 	uint32_t muxa = (op >> 10) & 3;
 	uint32_t muxb = (op >> 8) & 3;
 	uint32_t alu_op = (op >> 4) & 0xf;
 	uint32_t barrel_code = op & 0xf;
-
-	int32_t mul_res = 0;
-	uint32_t alu_res = 0;
 
 	// Check for operand overflow
 	if (numops == 0 && ((muxa == 1) || (muxa == 2) || (muxb == 1) || (muxb == 2)))
@@ -282,7 +266,6 @@ bool dspp_frontend::describe_arithmetic(uint16_t op, opcode_desc &desc)
 	if (barrel_code == 8)
 		++numops;
 
-	// TODO: We need to know:
 	// Number of cycles
 	// Number of bytes
 	// Registers read
@@ -290,293 +273,82 @@ bool dspp_frontend::describe_arithmetic(uint16_t op, opcode_desc &desc)
 	// Does it read memory?
 	// Does it write memory?
 
-//  parse_operands(numops);
+	parse_operands(op, desc, numops);
 
-	if (muxa == 3 || muxb == 3)
+	if (muxa > 0 || muxb > 0)
 	{
-		uint32_t mul_sel = (op >> 12) & 1;
-
-		int32_t op1 = sign_extend16(read_next_operand());
-		int32_t op2 = sign_extend16(mul_sel ? read_next_operand() : m_core->m_acc >> 4);
-
-		mul_res = (op1 * op2) >> 11;
+		desc.flags |= OPFLAG_READS_MEMORY;
 	}
-
-	int32_t alu_a, alu_b;
-
-	switch (muxa)
-	{
-		case 0:
-		{
-			ACCUMULATOR_USED
-			alu_a = m_core->m_acc;
-			break;
-		}
-		case 1: case 2:
-		{
-			alu_a = read_next_operand() << 4;
-			break;
-		}
-		case 3:
-		{
-			alu_a = mul_res;
-			break;
-		}
-	}
-
-	switch (muxb)
-	{
-		case 0:
-		{
-			ACCUMULATOR_USED
-			alu_b = m_core->m_acc;
-			break;
-		}
-		case 1: case 2:
-		{
-			alu_b = read_next_operand() << 4;
-			break;
-		}
-		case 3:
-		{
-			alu_b = mul_res;
-			break;
-		}
-	}
-
-	// All flags ar emodifed
-	CC_FLAGS_MODIFIED(desc);
 
 	switch (alu_op)
 	{
 		case 0: // _TRA
 		{
-//          alu_res = alu_a;
 			break;
 		}
 		case 1: // _NEG
 		{
-//          alu_res = -alu_b;
 			break;
 		}
 		case 2: // _+
+		case 4: // _-
+		case 6: // _++
+		case 7: // _--
+		case 8: // _TRL
+		case 9: // _NOT
+		case 10: // _AND
+		case 11: // _NAND
+		case 12: // _OR
+		case 13: // _NOR
+		case 14: // _XOR
+		case 15: // _XNOR
 		{
-//          alu_res = alu_a + alu_b;
-
-//          if ((alu_a & 0x80000) == (alu_b & 0x80000) &&
-//              (alu_a & 0x80000) != (alu_res & 0x80000))
-//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
-
-//          if (alu_res & 0x00100000)
-//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
-
-//          CC_V_MODIFIED(desc);
-//          CC_C_MODIFIED(desc);
+			CC_C_MODIFIED(desc);
+			CC_V_MODIFIED(desc);
 			break;
 		}
 		case 3: // _+C
-		{
-//          alu_res = alu_a + (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
-
-//          if (alu_res & 0x00100000)
-//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
-
-			CC_C_USED(desc);
-			CC_C_MODIFIED(desc);
-			break;
-		}
-		case 4: // _-
-		{
-//          alu_res = alu_a - alu_b;
-
-//          if ((alu_a & 0x80000) == (~alu_b & 0x80000) &&
-//              (alu_a & 0x80000) != (alu_res & 0x80000))
-//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
-
-//          if (alu_res & 0x00100000)
-//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
-
-			CC_C_MODIFIED(desc);
-			CC_V_MODIFIED(desc);
-			break;
-		}
 		case 5: // _-B
 		{
-//          alu_res = alu_a - (m_core->m_flags & DSPI_FLAG_CC_CARRY) ? (1 << 4) : 0;
-
-//          if (alu_res & 0x00100000)
-//              m_core->m_flags |= DSPI_FLAG_CC_CARRY;
-
 			CC_C_USED(desc);
 			CC_C_MODIFIED(desc);
-			break;
-		}
-		case 6: // _++
-		{
-//          alu_res = alu_a + 1;
-
-//          if (!(alu_a & 0x80000) && (alu_res & 0x80000))
-//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
-
-			CC_V_MODIFIED(desc);
-			break;
-		}
-		case 7: // _--
-		{
-//          alu_res = alu_a - 1;
-
-//          if ((alu_a & 0x80000) && !(alu_res & 0x80000))
-//              m_core->m_flags |= DSPI_FLAG_CC_OVER;
-
-			CC_V_MODIFIED(desc);
-			break;
-		}
-		case 8: // _TRL
-		{
-			//alu_res = alu_a;
-			break;
-		}
-		case 9: // _NOT
-		{
-			//alu_res = ~alu_a;
-			break;
-		}
-		case 10: // _AND
-		{
-			//alu_res = alu_a & alu_b;
-			break;
-		}
-		case 11: // _NAND
-		{
-			//alu_res = ~(alu_a & alu_b);
-			break;
-		}
-		case 12: // _OR
-		{
-			//alu_res = alu_a | alu_b;
-			break;
-		}
-		case 13: // _NOR
-		{
-			//alu_res = ~(alu_a | alu_b);
-			break;
-		}
-		case 14: // _XOR
-		{
-			//alu_res = alu_a ^ alu_b;
-			break;
-		}
-		case 15: // _XNOR
-		{
-			//alu_res = ~(alu_a ^ alu_b);
 			break;
 		}
 	}
-
-
-	if (alu_res & 0x00080000)
-		m_core->m_flags |= DSPI_FLAG_CC_NEG;
-
-	if ((alu_res & 0x000ffff0) == 0)
-		m_core->m_flags |= DSPI_FLAG_CC_ZERO;
-
-	if ((alu_res & 0x0000000f) == 0)
-		m_core->m_flags |= DSPI_FLAG_CC_EXACT;
 
 	CC_N_MODIFIED(desc);
 	CC_Z_MODIFIED(desc);
 	CC_X_MODIFIED(desc);
-
-	ACCUMULATOR_MODIFIED_ALWAYS;
-
-	// Barrel shift
-	static const int32_t shifts[8] = { 0, 1, 2, 3, 4, 5, 8, 16 };
-
-	if (barrel_code == 8)
-		barrel_code = read_next_operand();
-
-	if (barrel_code & 8)
-	{
-		// Right shift
-		uint32_t shift = shifts[(~barrel_code + 1) & 7];
-
-		if (alu_op < 8)
-		{
-			// Arithmetic
-			m_core->m_acc = sign_extend20(alu_res) >> shift;
-		}
-		else
-		{
-			// Logical
-			m_core->m_acc = (alu_res & 0xfffff) >> shift;
-		}
-	}
-	else
-	{
-		// Left shift
-		uint32_t shift = shifts[barrel_code];
-
-		if (shift == 16)
-		{
-			// Clip and saturate
-			if (m_core->m_flags & DSPI_FLAG_CC_OVER)
-				m_core->m_acc = (m_core->m_flags & DSPI_FLAG_CC_NEG) ? 0x7ffff : 0xfff80000;
-			else
-				m_core->m_acc = sign_extend20(alu_res);
-		}
-		else
-		{
-			m_core->m_acc = sign_extend20(alu_res) << shift;
-		}
-	}
-
-	if (m_core->m_writeback >= 0)
-	{
-		write_data(m_core->m_writeback, m_core->m_acc >> 4);
-		m_core->m_writeback = -1;
-	}
-	else if (opidx < numops)
-	{
-		write_next_operand(m_core->m_acc >> 4);
-	}
-#endif
-		return true;
 }
 
-
-#if 0
-void dspp_device::parse_operands(uint32_t numops)
+void dspp_frontend::parse_operands(uint16_t op, opcode_desc &desc, uint32_t numops)
 {
-	uint32_t addr, val = 0xBAD;
-	uint32_t opidx = 0;
-	uint32_t operand = 0;
 	uint32_t numregs = 0;
-
 	uint32_t opidx = 0;
 
 	while (opidx < numops)
 	{
-		uint16_t op = desc.opptr.w[opidx + 1] = m_dspp->read_op(desc.physpc + opidx * 2);
+		uint16_t operand = desc.opptr.w[opidx + 1] = m_dspp->read_op(desc.physpc + opidx + 1);
 
-		desc.length += 2;
-		++desc.cycles;
+		desc.length++;
+		desc.cycles++;
 
-		if (op & 0x8000)
+		if (operand & 0x8000)
 		{
 			// Immediate value
-			if ((op & 0xc000) == 0xc000)
+			if ((operand & 0xc000) == 0xc000)
 			{
-				// Nothing?-
+				opidx++;
 			}
-			else if((op & 0xe000) == 0x8000)
+			else if((operand & 0xe000) == 0x8000)
 			{
-				if (op & 0x0400) // Indirect
+				if (operand & 0x0400) // Indirect
 					desc.flags |= OPFLAG_READS_MEMORY;
 
-				if (op & 0x0800 )// Write Back
+				if (operand & 0x0800 )// Write Back
 					desc.flags |= OPFLAG_WRITES_MEMORY;
 
-				++opidx;
+				opidx++;
 			}
 			else if ((op & 0xe000) == 0xa000)
 			{
@@ -596,7 +368,6 @@ void dspp_device::parse_operands(uint32_t numops)
 			{
 				uint32_t shift = ((numregs - i) - 1) * 5;
 				uint32_t regdi = (operand >> shift) & 0x1f;
-				// OP USES REGBASE?
 
 				if (regdi & 0x0010)
 				{
@@ -617,9 +388,9 @@ void dspp_device::parse_operands(uint32_t numops)
 					if (operand & 0x800)
 						desc.flags |= OPFLAG_WRITES_MEMORY;
 				}
+				opidx++;
 			}
 			numregs = 0;
 		}
 	}
 }
-#endif
