@@ -1735,7 +1735,7 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 		}
 	} else if (woz_vers == 2) {
 		for (unsigned int trkid = 0; trkid != limit; trkid++) {
-			int head = is_35 && trkid >= 80 ? 1 : 0;
+			int head = is_35 && trkid & 1 ? 1 : 0;
 			int track = is_35 ? trkid >> 1 : trkid / 4;
 			int subtrack = is_35 ? 0 : trkid & 3;
 
