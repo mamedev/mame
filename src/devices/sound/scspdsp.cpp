@@ -8,10 +8,10 @@
 
 namespace {
 
-uint16_t PACK(int32_t val)
+u16 PACK(s32 val)
 {
 	int const sign = BIT(val, 23);
-	uint32_t temp = (val ^ (val << 1)) & 0xFFFFFF;
+	u32 temp = (val ^ (val << 1)) & 0xFFFFFF;
 	int exponent = 0;
 	for (int k = 0; k < 12; k++)
 	{
@@ -29,15 +29,15 @@ uint16_t PACK(int32_t val)
 	val |= sign << 15;
 	val |= exponent << 11;
 
-	return uint16_t(val);
+	return u16(val);
 }
 
-static int32_t UNPACK(uint16_t val)
+static s32 UNPACK(u16 val)
 {
 	int const sign = BIT(val, 15);
 	int exponent = (val >> 11) & 0xF;
 	int const mantissa = val & 0x7FF;
-	int32_t uval = mantissa << 11;
+	s32 uval = mantissa << 11;
 	if (exponent > 11)
 	{
 		exponent = 11;
@@ -79,48 +79,48 @@ void SCSPDSP::Step()
 		f=fopen("dsp.txt","wt");
 #endif
 
-	int32_t ACC = 0;    //26 bit
-	int32_t MEMVAL = 0;
-	int32_t FRC_REG = 0;    //13 bit
-	int32_t Y_REG = 0;      //24 bit
-	uint32_t ADRS_REG = 0;  //13 bit
+	s32 ACC = 0;    //26 bit
+	s32 MEMVAL = 0;
+	s32 FRC_REG = 0;    //13 bit
+	s32 Y_REG = 0;      //24 bit
+	u32 ADRS_REG = 0;  //13 bit
 
 	for (int step = 0; step < /*128*/LastStep; ++step)
 	{
-		uint16_t *const IPtr = MPRO + (step * 4);
+		u16 *const IPtr = MPRO + (step * 4);
 
 		//if (!IPtr[0] && !IPtr[1] && !IPtr[2] && !IPtr[3])
 			//break;
 
-		uint32_t const TRA   = (IPtr[0] >>  8) & 0x7F;
-		uint32_t const TWT   = (IPtr[0] >>  7) & 0x01;
-		uint32_t const TWA   = (IPtr[0] >>  0) & 0x7F;
+		u32 const TRA   = (IPtr[0] >>  8) & 0x7F;
+		u32 const TWT   = (IPtr[0] >>  7) & 0x01;
+		u32 const TWA   = (IPtr[0] >>  0) & 0x7F;
 
-		uint32_t const XSEL  = (IPtr[1] >> 15) & 0x01;
-		uint32_t const YSEL  = (IPtr[1] >> 13) & 0x03;
-		uint32_t const IRA   = (IPtr[1] >>  6) & 0x3F;
-		uint32_t const IWT   = (IPtr[1] >>  5) & 0x01;
-		uint32_t const IWA   = (IPtr[1] >>  0) & 0x1F;
+		u32 const XSEL  = (IPtr[1] >> 15) & 0x01;
+		u32 const YSEL  = (IPtr[1] >> 13) & 0x03;
+		u32 const IRA   = (IPtr[1] >>  6) & 0x3F;
+		u32 const IWT   = (IPtr[1] >>  5) & 0x01;
+		u32 const IWA   = (IPtr[1] >>  0) & 0x1F;
 
-		uint32_t const TABLE = (IPtr[2] >> 15) & 0x01;
-		uint32_t const MWT   = (IPtr[2] >> 14) & 0x01;
-		uint32_t const MRD   = (IPtr[2] >> 13) & 0x01;
-		uint32_t const EWT   = (IPtr[2] >> 12) & 0x01;
-		uint32_t const EWA   = (IPtr[2] >>  8) & 0x0F;
-		uint32_t const ADRL  = (IPtr[2] >>  7) & 0x01;
-		uint32_t const FRCL  = (IPtr[2] >>  6) & 0x01;
-		uint32_t const SHIFT = (IPtr[2] >>  4) & 0x03;
-		uint32_t const YRL   = (IPtr[2] >>  3) & 0x01;
-		uint32_t const NEGB  = (IPtr[2] >>  2) & 0x01;
-		uint32_t const ZERO  = (IPtr[2] >>  1) & 0x01;
-		uint32_t const BSEL  = (IPtr[2] >>  0) & 0x01;
+		u32 const TABLE = (IPtr[2] >> 15) & 0x01;
+		u32 const MWT   = (IPtr[2] >> 14) & 0x01;
+		u32 const MRD   = (IPtr[2] >> 13) & 0x01;
+		u32 const EWT   = (IPtr[2] >> 12) & 0x01;
+		u32 const EWA   = (IPtr[2] >>  8) & 0x0F;
+		u32 const ADRL  = (IPtr[2] >>  7) & 0x01;
+		u32 const FRCL  = (IPtr[2] >>  6) & 0x01;
+		u32 const SHIFT = (IPtr[2] >>  4) & 0x03;
+		u32 const YRL   = (IPtr[2] >>  3) & 0x01;
+		u32 const NEGB  = (IPtr[2] >>  2) & 0x01;
+		u32 const ZERO  = (IPtr[2] >>  1) & 0x01;
+		u32 const BSEL  = (IPtr[2] >>  0) & 0x01;
 
-		uint32_t const NOFL  = (IPtr[3] >> 15) & 0x01;  //????
-		uint32_t const COEF  = (IPtr[3] >>  9) & 0x3f;
+		u32 const NOFL  = (IPtr[3] >> 15) & 0x01;  //????
+		u32 const COEF  = (IPtr[3] >>  9) & 0x3f;
 
-		uint32_t const MASA  = (IPtr[3] >>  2) & 0x1f;  //???
-		uint32_t const ADREB = (IPtr[3] >>  1) & 0x01;
-		uint32_t const NXADR = (IPtr[3] >>  0) & 0x01;
+		u32 const MASA  = (IPtr[3] >>  2) & 0x1f;  //???
+		u32 const ADREB = (IPtr[3] >>  1) & 0x01;
+		u32 const NXADR = (IPtr[3] >>  0) & 0x01;
 
 		//operations are done at 24 bit precision
 #if 0
@@ -154,7 +154,7 @@ void SCSPDSP::Step()
 		//INPUTS RW
 		// colmns97 hits this
 		//assert(IRA < 0x32);
-		int32_t INPUTS; // 24-bit
+		s32 INPUTS; // 24-bit
 		if (IRA <= 0x1f)
 			INPUTS = MEMS[IRA];
 		else if (IRA <= 0x2F)
@@ -177,7 +177,7 @@ void SCSPDSP::Step()
 		}
 
 		//Operand sel
-		int32_t B; // 26-bit
+		s32 B; // 26-bit
 		if (!ZERO)
 		{
 			if (BSEL)
@@ -196,7 +196,7 @@ void SCSPDSP::Step()
 		else
 			B = 0;
 
-		int32_t X; // 24-bit
+		s32 X; // 24-bit
 		if (XSEL)
 			X = INPUTS;
 		else
@@ -208,7 +208,7 @@ void SCSPDSP::Step()
 				//X |= 0xFF000000;
 		}
 
-		int32_t Y = 0;  //13 bit
+		s32 Y = 0;  //13 bit
 		if (YSEL == 0)
 			Y = FRC_REG;
 		else if (YSEL == 1)
@@ -222,11 +222,11 @@ void SCSPDSP::Step()
 			Y_REG = INPUTS;
 
 		//Shifter
-		int32_t SHIFTED = 0;    //24 bit
+		s32 SHIFTED = 0;    //24 bit
 		if (SHIFT == 0)
-			SHIFTED = std::max<int32_t>(std::min<int32_t>(ACC, 0x007FFFFF), -0x00800000);
+			SHIFTED = std::max<s32>(std::min<s32>(ACC, 0x007FFFFF), -0x00800000);
 		else if (SHIFT == 1)
-			SHIFTED = std::max<int32_t>(std::min<int32_t>(ACC * 2, 0x007FFFFF), -0x00800000);
+			SHIFTED = std::max<s32>(std::min<s32>(ACC * 2, 0x007FFFFF), -0x00800000);
 		else if (SHIFT == 2)
 		{
 			SHIFTED = ACC * 2;
@@ -269,7 +269,7 @@ void SCSPDSP::Step()
 		if (MRD || MWT)
 		//if (0)
 		{
-			uint32_t ADDR = MADRS[MASA];
+			u32 ADDR = MADRS[MASA];
 			if (!TABLE)
 				ADDR += DEC;
 			if (ADREB)
@@ -315,7 +315,7 @@ void SCSPDSP::Step()
 		//fclose(f);
 }
 
-void SCSPDSP::SetSample(int32_t sample, int SEL, int MXL)
+void SCSPDSP::SetSample(s32 sample, int SEL, int MXL)
 {
 	//MIXS[SEL] += sample << (MXL + 1)/*7*/;
 	MIXS[SEL] += sample;
@@ -329,7 +329,7 @@ void SCSPDSP::Start()
 	int i;
 	for (i = 127; i >= 0; --i)
 	{
-		uint16_t const *const IPtr = MPRO + (i * 4);
+		u16 const *const IPtr = MPRO + (i * 4);
 		if (IPtr[0] || IPtr[1] || IPtr[2] || IPtr[3])
 			break;
 	}
