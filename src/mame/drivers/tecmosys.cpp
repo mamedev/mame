@@ -548,6 +548,45 @@ ROM_START( deroon )
 	ROM_LOAD( "t501.uad1", 0x000000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
 ROM_END
 
+ROM_START( deroon2 )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // Main Program
+	ROM_LOAD16_BYTE( "stk_t001.upau1", 0x00000, 0x80000, CRC(90c794df) SHA1(b6edd62bedf609551f4e1c19ada20bd1373deca2) )
+	ROM_LOAD16_BYTE( "stk_t002.upal1", 0x00001, 0x80000, CRC(cca9f87c) SHA1(0637b0b979f4c6c6b16cf2a21dd193b7d7ec311f) )
+
+	ROM_REGION( 0x040000, "audiocpu", 0 ) // Sound Program
+	ROM_LOAD( "t003.uz1", 0x000000, 0x040000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
+
+	ROM_REGION( 0x2200, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_LOAD( "deroon_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "deroon_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x2000000, "sprites", ROMREGION_ERASE00 ) // Sprites (non-tile based)
+	ROM_LOAD16_BYTE( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
+	ROM_LOAD16_BYTE( "t102.ual1", 0x0000001, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
+	/*                            0x8000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD16_BYTE( "t103.ubl1", 0x0800001, 0x400000, CRC(84e7da88) SHA1(b5c3234f33bb945cc9762b91db087153a0589cfb) )
+	/*                            0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
+	ROM_LOAD16_BYTE( "t104.ucl1", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
+
+	ROM_REGION( 0x100000, "layer0", 0 ) // 8x8 4bpp tiles
+	ROM_LOAD( "t301.ubd1", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
+
+	ROM_REGION( 0x100000, "layer1", ROMREGION_ERASE00) // 16x16 4bpp tiles
+	/* not used? */
+
+	ROM_REGION( 0x100000, "layer2", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_LOAD( "t201.ubb1", 0x000000, 0x100000, CRC(d5a087ac) SHA1(5098160ce7719d93e3edae05f6edd317d4c61f0d) )
+
+	ROM_REGION( 0x100000, "layer3", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_LOAD( "t202.ubc1", 0x000000, 0x100000, CRC(f051dae1) SHA1(f5677c07fe644b3838657370f0309fb09244c619) )
+
+	ROM_REGION( 0x200000, "ymz", 0 ) // YMZ280B Samples
+	ROM_LOAD( "t401.uya1", 0x000000, 0x200000, CRC(92111992) SHA1(ae27e11ae76dec0b9892ad32e1a8bf6ab11f2e6c) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // M6295 Samples
+	ROM_LOAD( "t501.uad1", 0x000000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
+ROM_END
+
 ROM_START( tkdensho )
 	ROM_REGION( 0x600000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "aeprge-2.pal", 0x00000, 0x80000, CRC(25e453d6) SHA1(9c84e2af42eff5cc9b14c1759d5bab42fa7bb663) )
@@ -659,7 +698,7 @@ void tecmosys_state::descramble()
 void tecmosys_state::init_deroon()
 {
 	descramble();
-	prot_init(0); // machine/tecmosys.c
+	prot_init(0); // machine/tecmosys.cpp
 }
 
 void tecmosys_state::init_tkdensho()
@@ -674,6 +713,7 @@ void tecmosys_state::init_tkdensha()
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero (earlier)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, deroon2,     deroon, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero (newer)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // some parts translated in English, attract without 'how to play'
 GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, init_tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, init_tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
