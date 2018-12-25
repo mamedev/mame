@@ -3217,13 +3217,20 @@ MACHINE_CONFIG_START(funworld_state::intrgmes)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(funworld_state::fw_a7_11)
+MACHINE_CONFIG_START(funworld_state::fw_brick_1)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
+
+MACHINE_CONFIG_START(funworld_state::fw_brick_2)
+	fw2ndpal(config);
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+MACHINE_CONFIG_END
 
 
 /*************************
@@ -7278,10 +7285,10 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, init_socc
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, empty_init,    ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  funworld_state, empty_init,    ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",               0,                       layout_novoplay )
 GAME(  1991, intrgmes,  0,        intrgmes, funworld,  funworld_state, empty_init,    ROT0, "Inter Games",     "unknown Inter Games poker",                       MACHINE_NOT_WORKING )
-GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                  MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                  MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, fw_a0_1,   0,        fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "unknown Fun World A0-1 game",                     MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, jokcrdep,  0,        fw_a7_11, funworld,  funworld_state, empty_init,    ROT0, "Fun World",       "Joker Card (Epoxy brick CPU)" ,                   MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_brick_1, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 2",                  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, fw_a0_1,   0,        fw_brick_2, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A0-1 game",                     MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, jokcrdep,  0,        fw_brick_2, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "Joker Card (Epoxy brick CPU)" ,                   MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
 GAMEL( 1991, royalcrd_nes,  royalcrd, royalcd2, royalcrd, funworld_state, empty_init, ROT0, "bootleg",         "Royal Card (stealth with NES multigame)",         MACHINE_NOT_WORKING,     layout_jollycrd )

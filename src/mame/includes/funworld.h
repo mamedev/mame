@@ -23,10 +23,11 @@ public:
 	void royalcd1(machine_config &config);
 	void royalcd2(machine_config &config);
 	void fw1stpal(machine_config &config);
+	void fw2ndpal(machine_config &config);
 	void chinatow(machine_config &config);
 	void magicrd2(machine_config &config);
-	void fw_a7_11(machine_config &config);
-	void fw2ndpal(machine_config &config);
+	void fw_brick_1(machine_config &config);
+	void fw_brick_2(machine_config &config);
 	void saloon(machine_config &config);
 	void cuoreuno(machine_config &config);
 	void funquiz(machine_config &config);
