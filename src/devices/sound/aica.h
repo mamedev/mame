@@ -21,7 +21,6 @@ public:
 
 	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_master(bool master) { m_master = master; }
 	void set_roffset(int roffset) { m_roffset = roffset; }
 	auto irq() { return m_irq_cb.bind(); }
 	auto main_irq() { return m_main_irq_cb.bind(); }
@@ -67,7 +66,6 @@ private:
 		int RR;     //Release
 
 		int DL;     //Decay level
-		uint8_t LPLINK;
 	};
 
 	struct AICA_SLOT
@@ -134,7 +132,6 @@ private:
 	inline signed int AICAALFO_Step(AICA_LFO_t *LFO);
 	void AICALFO_ComputeStep(AICA_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO);
 
-	bool m_master;
 	double m_rate;
 	int m_roffset;                /* offset in the region */
 	devcb_write_line m_irq_cb;
@@ -150,14 +147,9 @@ private:
 	uint16_t m_IRQL, m_IRQR;
 	uint16_t m_EFSPAN[0x48];
 	AICA_SLOT m_Slots[64];
-	signed short m_RINGBUF[64];
-	unsigned char m_BUFPTR;
 	unsigned char *m_AICARAM;
 	uint32_t m_AICARAM_LENGTH, m_RAM_MASK, m_RAM_MASK16;
 	sound_stream * m_stream;
-
-	std::vector<int32_t> m_buffertmpl;
-	std::vector<int32_t> m_buffertmpr;
 
 	uint32_t m_IrqTimA;
 	uint32_t m_IrqTimBC;
@@ -199,7 +191,6 @@ private:
 
 	int m_length;
 
-	signed short *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
 	int32_t m_EG_TABLE[0x400];
 	int m_PLFO_TRI[256],m_PLFO_SQR[256],m_PLFO_SAW[256],m_PLFO_NOI[256];
 	int m_ALFO_TRI[256],m_ALFO_SQR[256],m_ALFO_SAW[256],m_ALFO_NOI[256];

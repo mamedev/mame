@@ -14,13 +14,14 @@
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
 
     TODO:
-    - Where are EXTS Connected?
+    - Timebases are based on 44100KHz case?
 */
 
 #include "emu.h"
 #include "aica.h"
 
-#define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
+static constexpr int32_t clip16(int x) { return std::min(32767, std::max(-32768, x)); }
+static constexpr int32_t clip18(int x) { return std::min(131071, std::max(-131072, x)); }
 
 #define SHIFT   12
 #define FIX(v)  ((uint32_t) ((float) (1<<SHIFT)*(v)))
@@ -379,7 +380,7 @@ signed short aica_device::DecodeADPCM(int *PrevSignal, unsigned char Delta, int 
 	int x = *PrevQuant * quant_mul [Delta & 15];
 		x = *PrevSignal + ((int)(x + ((uint32_t)x >> 29)) >> 3);
 #endif
-	*PrevSignal=ICLIP16(x);
+	*PrevSignal=clip16(x);
 	*PrevQuant=(*PrevQuant*TableQuant[Delta&7])>>ADPCMSHIFT;
 	*PrevQuant=(*PrevQuant<0x7f)?0x7f:((*PrevQuant>0x6000)?0x6000:*PrevQuant);
 	return *PrevSignal;
@@ -513,6 +514,24 @@ void aica_device::Init()
 
 	m_ARTABLE[0]=m_DRTABLE[0]=0;    //Infinite time
 	m_ARTABLE[1]=m_DRTABLE[1]=0;    //Infinite time
+	for(i=2;i<64;++i)
+	{
+		double t,step,scale;
+		t=ARTimes[i];   //In ms
+		if(t!=0.0)
+		{
+			step=(1023*1000.0)/(44100.0*t);
+			scale=(double) (1<<EG_SHIFT);
+			m_ARTABLE[i]=(int) (step*scale);
+		}
+		else
+			m_ARTABLE[i]=1024<<EG_SHIFT;
+
+		t=DRTimes[i];   //In ms
+		step=(1023*1000.0)/(44100.0*t);
+		scale=(double) (1<<EG_SHIFT);
+		m_DRTABLE[i]=(int) (step*scale);
+	}
 	ClockChange();
 
 	// make sure all the slots are off
@@ -538,27 +557,6 @@ void aica_device::Init()
 void aica_device::ClockChange()
 {
 	m_rate = ((double)clock()) / 512.0;
-	for(int i=2;i<64;++i)
-	{
-		double t,step,scale;
-		t=ARTimes[i];   //In ms
-		if(t!=0.0)
-		{
-			step=(1023*1000.0)/(m_rate*t);
-			scale=(double) (1<<EG_SHIFT);
-			m_ARTABLE[i]=(int) (step*scale);
-		}
-		else
-			m_ARTABLE[i]=1024<<EG_SHIFT;
-
-		t=DRTimes[i];   //In ms
-		step=(1023*1000.0)/(m_rate*t);
-		scale=(double) (1<<EG_SHIFT);
-		m_DRTABLE[i]=(int) (step*scale);
-	}
-
-	m_buffertmpl.resize((int)m_rate, 0);
-	m_buffertmpr.resize((int)m_rate, 0);
 }
 
 void aica_device::UpdateSlotReg(int s,int r)
@@ -624,16 +622,8 @@ void aica_device::UpdateReg(address_space &space, int reg)
 		case 0x4:
 		case 0x5:
 			{
-				unsigned int v=RBL();
+				m_DSP.RBL = (8 * 1024) << RBL(); // 8 / 16 / 32 / 64 kwords
 				m_DSP.RBP=RBP();
-				if(v==0)
-					m_DSP.RBL=8*1024;
-				else if(v==1)
-					m_DSP.RBL=16*1024;
-				else if(v==2)
-					m_DSP.RBL=32*1024;
-				else if(v==3)
-					m_DSP.RBL=64*1024;
 			}
 			break;
 		case 0x8:
@@ -681,7 +671,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 
 		case 0x90:
 		case 0x91:
-			if(m_master)
+			if (!m_irq_cb.isnull())
 			{
 				uint32_t time;
 
@@ -700,7 +690,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 			break;
 		case 0x94:
 		case 0x95:
-			if(m_master)
+			if (!m_irq_cb.isnull())
 			{
 				uint32_t time;
 
@@ -719,7 +709,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 			break;
 		case 0x98:
 		case 0x99:
-			if(m_master)
+			if (!m_irq_cb.isnull())
 			{
 				uint32_t time;
 
@@ -746,7 +736,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 		case 0xa4:  //SCIRE
 		case 0xa5:
 
-			if(m_master)
+			if (!m_irq_cb.isnull())
 			{
 				m_udata.data[0xa0/2] &= ~m_udata.data[0xa4/2];
 				ResetInterrupts();
@@ -773,7 +763,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 		case 0xad:
 		case 0xb0:
 		case 0xb1:
-			if(m_master)
+			if (!m_irq_cb.isnull())
 			{
 				m_IrqTimA=DecodeSCI(SCITMA);
 				m_IrqTimBC=DecodeSCI(SCITMB);
@@ -1057,8 +1047,6 @@ unsigned short aica_device::r16(address_space &space, unsigned int addr)
 		else if(addr<0x45c8)
 			v = *((unsigned short *) (m_DSP.EXTS+(addr-0x45c0)/2));
 	}
-//  else if (addr<0x700)
-//      v=m_RINGBUF[(addr-0x600)/2];
 	return v;
 }
 
@@ -1289,7 +1277,6 @@ void aica_device::DoMasterSamples(int nsamples)
 		for(sl=0;sl<64;++sl)
 		{
 			AICA_SLOT *slot=m_Slots+sl;
-			m_RBUFDST=m_RINGBUF+m_BUFPTR;
 			if(m_Slots[sl].active)
 			{
 				unsigned int Enc;
@@ -1305,8 +1292,6 @@ void aica_device::DoMasterSamples(int nsamples)
 					smpr+=(sample*m_RPANTABLE[Enc])>>SHIFT;
 				}
 			}
-
-			m_BUFPTR&=63;
 		}
 
 		// process the DSP
@@ -1335,8 +1320,19 @@ void aica_device::DoMasterSamples(int nsamples)
 			}
 		}
 
-		*bufl++ = (ICLIP16(smpl>>3)*m_LPANTABLE[MVOL()<<0xd])>>SHIFT;
-		*bufr++ = (ICLIP16(smpr>>3)*m_LPANTABLE[MVOL()<<0xd])>>SHIFT;
+		if (DAC18B())
+		{
+			smpl = clip18(smpl >> 1);
+			smpr = clip18(smpr >> 1);
+		}
+		else
+		{
+			smpl = clip16(smpl >> 3);
+			smpr = clip16(smpr >> 3);
+		}
+
+		*bufl++ = (smpl*m_LPANTABLE[MVOL()<<0xd])>>SHIFT;
+		*bufr++ = (smpr*m_LPANTABLE[MVOL()<<0xd])>>SHIFT;
 	}
 }
 
@@ -1529,7 +1525,6 @@ DEFINE_DEVICE_TYPE(AICA, aica_device, "aica", "Yamaha AICA")
 aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AICA, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_master(false),
 		m_rate(44100.0),
 		m_roffset(0),
 		m_irq_cb(*this),
@@ -1537,7 +1532,6 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_ram_region(*this, this->tag()),
 		m_IRQL(0),
 		m_IRQR(0),
-		m_BUFPTR(0),
 		m_AICARAM(nullptr),
 		m_AICARAM_LENGTH(0),
 		m_RAM_MASK(0),
@@ -1555,14 +1549,12 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_bufferr(nullptr),
 		m_exts0(nullptr),
 		m_exts1(nullptr),
-		m_length(0),
-		m_RBUFDST(nullptr)
+		m_length(0)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));
 	memset(m_EFSPAN, 0, sizeof(m_EFSPAN));
 	memset(m_Slots, 0, sizeof(m_Slots));
-	memset(m_RINGBUF, 0, sizeof(m_RINGBUF));
 	memset(m_MidiStack, 0, sizeof(m_MidiStack));
 
 	memset(m_LPANTABLE, 0, sizeof(m_LPANTABLE));
@@ -1695,7 +1687,7 @@ signed int aica_device::AICAALFO_Step(AICA_LFO_t *LFO)
 
 void aica_device::AICALFO_ComputeStep(AICA_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO)
 {
-	float step=(float) LFOFreq[LFOF]*256.0f/(float)m_rate;
+	float step=(float) LFOFreq[LFOF]*256.0f/44100.0f;
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
 	if(ALFO)
 	{

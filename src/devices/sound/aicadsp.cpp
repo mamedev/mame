@@ -58,7 +58,7 @@ static int32_t UNPACK(uint16_t val)
 void AICADSP::init()
 {
 	memset(this,0,sizeof(*this));
-	RBL=0x8000;
+	RBL=(8 * 1024); // Initial RBL is 0
 	Stopped=1;
 }
 
