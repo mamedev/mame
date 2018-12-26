@@ -453,31 +453,32 @@ void tecmosys_state::machine_start()
 	save_item(NAME(m_device_value));
 }
 
-MACHINE_CONFIG_START(tecmosys_state::tecmosys)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
+void tecmosys_state::tecmosys(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tecmosys_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tecmosys_state::irq1_line_hold));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 400); // guess
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tecmosys_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &tecmosys_state::io_map);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmosys)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmosys);
 
-	EEPROM_93C46_16BIT(config, "eeprom", eeprom_serial_streaming::ENABLE);
+	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(57.4458)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tecmosys_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(57.4458);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3000));
+	m_screen->set_size(64*8, 64*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(tecmosys_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x4000+0x800)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_palette, 0x4000+0x800);
+	m_palette->set_format(PALETTE_FORMAT_xGGGGGRRRRRBBBBB);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -486,26 +487,25 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi);
+	m_soundnmi->output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymf", YMF262, XTAL(14'318'181))
-	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+	ymf262_device &ymf(YMF262(config, "ymf", XTAL(14'318'181)));
+	ymf.irq_handler().set_inputline("audiocpu", 0);
+	ymf.add_route(0, "lspeaker", 1.00);
+	ymf.add_route(1, "rspeaker", 1.00);
+	ymf.add_route(2, "lspeaker", 1.00);
+	ymf.add_route(3, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.set_addrmap(0, &tecmosys_state::oki_map);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_CONFIG_END
-
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.add_route(0, "lspeaker", 0.30);
+	ymz.add_route(1, "rspeaker", 0.30);
+}
 
 ROM_START( deroon )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // Main Program
