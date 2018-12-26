@@ -548,10 +548,19 @@ ROM_START( deroon )
 	ROM_LOAD( "t501.uad1", 0x000000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
 ROM_END
 
+/*
+About the Deroon DeroDero listed below:
+
+ This set contains less Japanese text and English translations for some game aspects such as game menus.
+ Coining up displays "TECMO STACKERS" but this set doesn't seem to include a "How to Play" demo like the parent set
+
+ Possibly a Korean set, contained genuine Tecmo dvelopment labels - Still missing the full English version titled Temco Stackers.
+
+*/
 ROM_START( deroon2 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // Main Program
-	ROM_LOAD16_BYTE( "stk_t001.upau1", 0x00000, 0x80000, CRC(90c794df) SHA1(b6edd62bedf609551f4e1c19ada20bd1373deca2) )
-	ROM_LOAD16_BYTE( "stk_t002.upal1", 0x00001, 0x80000, CRC(cca9f87c) SHA1(0637b0b979f4c6c6b16cf2a21dd193b7d7ec311f) )
+	ROM_LOAD16_BYTE( "stk_t01.upau1", 0x00000, 0x80000, CRC(90c794df) SHA1(b6edd62bedf609551f4e1c19ada20bd1373deca2) )
+	ROM_LOAD16_BYTE( "stk_t02.upal1", 0x00001, 0x80000, CRC(cca9f87c) SHA1(0637b0b979f4c6c6b16cf2a21dd193b7d7ec311f) )
 
 	ROM_REGION( 0x040000, "audiocpu", 0 ) // Sound Program
 	ROM_LOAD( "t003.uz1", 0x000000, 0x040000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
