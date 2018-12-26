@@ -830,7 +830,7 @@ void xavix_state::machine_start()
 {
 	// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
 	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
-	std::fill_n(&m_mainram[0], 0x4000, 0xff);
+	std::fill_n(&m_mainram[0], 0x3e00, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
@@ -840,6 +840,9 @@ void xavix_state::machine_start()
 	{
 		m_sound_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::sound_timer_done), this));
 	}
+
+	// at least some of the internal CPU RAM is backed up, not sure how much
+	m_nvram->set_base(&m_mainram[0x3e00], 0x200);
 }
 
 void xavix_state::machine_reset()

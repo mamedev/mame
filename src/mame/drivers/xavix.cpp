@@ -843,6 +843,9 @@ void xavix_state::xavix(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(xavix_state::interrupt));
 	m_maincpu->set_vector_callback(FUNC(xavix_state::get_vectors));
 
+	// is a battery / power source required to store NVRAM in the CPU?
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
 	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);

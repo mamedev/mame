@@ -13,6 +13,7 @@
 #include "machine/i2cmem.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/nvram.h"
 
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
@@ -69,6 +70,7 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
 		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
@@ -114,6 +116,7 @@ protected:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_device<xavix_device> m_maincpu;
+	required_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 
 private:
