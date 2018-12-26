@@ -2688,7 +2688,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		m_fdc->reset(); // See formatter description p.197 or 5-13
 	}
 
-	m_screen_blank = BIT(data, 1);
+	m_screen_blank = BIT(data, 1)? false : true; // inverse logic
 
 	// Switch determines how the monochrome output pin is taken from:
 	//    0  = M(ono) out from system module (DC011/DC012). Default, also used to setup dual monitors.
@@ -2701,7 +2701,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 			printf("\nHINT: GRAPHICS OPTION ON. TEXT ONLY (DC011/DC012) OUTPUT NOW DISABLED.\n");
 		}
 		else
-		{   printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
+		{       printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
 			m_onboard_video_selected = true;
 		}
 		logerror("DATA: %x (PC=%x)\n", data, m_i8088->pc());
