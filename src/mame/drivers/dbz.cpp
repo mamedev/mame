@@ -125,7 +125,7 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4d4000, 0x4d401f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
 	map(0x4e0000, 0x4e0001).portr("P1_P2");
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
-	map(0x4e4000, 0x4e4001).portr("DSW2");
+	map(0x4e4000, 0x4e4001).lr8("4e4000", [this]() { return uint8_t(m_dsw2->read()); });
 	map(0x4e8000, 0x4e8001).nopw();
 	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
 	map(0x4f0000, 0x4f0001).w(FUNC(dbz_state::dbz_sound_command_w));
@@ -213,10 +213,6 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-
-	PORT_START("FAKE")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )

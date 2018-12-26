@@ -95,7 +95,8 @@ public:
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
-		m_obj3_ram(*this, "obj3_ram")
+		m_obj3_ram(*this, "obj3_ram"),
+		m_pad(*this, "PAD_P%u", 1U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -109,6 +110,8 @@ public:
 	required_shared_ptr<uint8_t> m_obj1_ram;
 	required_shared_ptr<uint8_t> m_obj2_ram;
 	required_shared_ptr<uint8_t> m_obj3_ram;
+
+	optional_ioport_array<2> m_pad;
 
 	struct
 	{
@@ -130,6 +133,8 @@ public:
 	DECLARE_READ8_MEMBER(skydest_i8741_1_r);
 	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
+
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(pad_r);
 
 	void init_skydest();
 	void init_cyclemb();
@@ -662,6 +667,12 @@ void cyclemb_state::machine_reset()
 	skydest_i8741_reset();
 }
 
+template <int P>
+CUSTOM_INPUT_MEMBER(cyclemb_state::pad_r)
+{
+	return m_pad[P]->read();
+}
+
 
 static INPUT_PORTS_START( cyclemb )
 	PORT_START("SYSTEM")
@@ -696,7 +707,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "PAD_P1")
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<0>, nullptr)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P1")
@@ -719,7 +730,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "PAD_P2")
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<1>, nullptr)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P2")

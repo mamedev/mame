@@ -280,8 +280,8 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
-	int status = m_midway_serial_pic->status_r(space,0);
-	return (ioport("991030")->read() & 0x7fff7fff) | (status << 31) | (status << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r(space,0) << 15);
+	return in1 | in1 << 16;
 }
 
 
@@ -342,8 +342,8 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	int status = m_midway_serial_pic2->status_r(space,0);
-	return (ioport("991030")->read()  & 0x7fff7fff) | (status << 31) | (status << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r(space,0) << 15);
+	return in1 | in1 << 16;
 }
 
 
@@ -599,10 +599,10 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x980080, 0x980080).noprw();
 	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
 	map(0x990000, 0x990000).nopr(); // link PAL (low 4 bits must == 4)
-	map(0x991030, 0x991030).portr("991030");
+	map(0x991030, 0x991030).lr16("991030", [this]() { return uint16_t(m_in1->read()); });
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
 	map(0x991060, 0x991060).r(FUNC(midvunit_state::port0_r));
-	map(0x992000, 0x992000).portr("992000");
+	map(0x992000, 0x992000).lr16("992000", [this]() { return uint16_t(m_dsw->read()); });
 	map(0x993000, 0x993000).rw(FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
 	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
 	map(0x995000, 0x995000).rw(FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
@@ -649,14 +649,6 @@ void midvunit_state::midvplus_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( midvunit )
-	PORT_START("991030")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
-
-	PORT_START("992000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )

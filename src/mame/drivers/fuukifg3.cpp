@@ -221,10 +221,10 @@ void fuuki32_state::fuuki32_map(address_map &map)
 	map(0x600000, 0x601fff).ram().rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)); // Sprites
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // Palette
 
-	map(0x800000, 0x800003).portr("800000").nopw();                                         // Coin
-	map(0x810000, 0x810003).portr("810000").nopw();                                         // Player Inputs
-	map(0x880000, 0x880003).portr("880000");                                                     // Service + DIPS
-	map(0x890000, 0x890003).portr("890000");                                                     // More DIPS
+	map(0x800000, 0x800003).lr16("800000", [this]() { return uint16_t(m_system->read()); }).nopw();  // Coin
+	map(0x810000, 0x810003).lr16("810000", [this]() { return uint16_t(m_inputs->read()); }).nopw();  // Player Inputs
+	map(0x880000, 0x880003).lr16("880000", [this]() { return uint16_t(m_dsw1->read()); });           // Service + DIPS
+	map(0x890000, 0x890003).lr16("890000", [this]() { return uint16_t(m_dsw2->read()); });           // More DIPS
 
 	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
 	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen Related
@@ -270,22 +270,6 @@ void fuuki32_state::fuuki32_sound_io_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( asurabld )
-	PORT_START("800000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
-
-	PORT_START("810000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
-
-	PORT_START("880000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
-
-	PORT_START("890000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
-
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
