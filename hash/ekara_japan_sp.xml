@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_sp" description="Takara e-kara SP-xx series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+	     some cartridges also contain an SEEPROM
+
+	***********************************************************************************
+
+	Japanese cart listing (by SP code)
+
+	These are for use with 2 different units
+	1. e-Kara
+	2. Stepping Pad (like a dance mat)
+
+    gives a 'not for use with this system' type message if plugged into DDR
+	gives a 'memory error' if plugged into Popira (EEPROM check or something else? maybe compatible?)
+
+	SP-1  (unknown)
+	SP-2  (unknown)
+
+	(more? what's the SP highest number?)
+
+	-->
+
+	<software name="sp02"> <!-- also has SEEPROM inside -->
+		<description>SP-02</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekarasp02.bin" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+</softwarelist>
