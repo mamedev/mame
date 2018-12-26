@@ -1304,10 +1304,10 @@ void segaybd_state::yboard(machine_config &config)
 	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
 	msm6253_device &adc(MSM6253(config, "adc", 0));
-	adc.set_input_tag<0>("ADC.0");
-	adc.set_input_tag<1>("ADC.1");
-	adc.set_input_tag<2>("ADC.2");
-	adc.set_input_cb<3>(FUNC(segaybd_state::analog_mux));
+	adc.input<0>().set_ioport("ADC.0");
+	adc.input<1>().set_ioport("ADC.1");
+	adc.input<2>().set_ioport("ADC.2");
+	adc.input<3>().set(FUNC(segaybd_state::analog_mux));
 
 	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
 	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);

@@ -124,7 +124,7 @@ public:
 	void init_eightfrc();
 	void init_pairlove();
 
-	DECLARE_PALETTE_INIT(palette_init_RRRRRGGGGGBBBBB_proms);
+	DECLARE_PALETTE_INIT(RRRRRGGGGGBBBBB_proms);
 
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 

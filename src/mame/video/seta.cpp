@@ -571,7 +571,7 @@ PALETTE_INIT_MEMBER(seta_state,zingzip)
 }
 
 // color prom
-PALETTE_INIT_MEMBER(seta_state,palette_init_RRRRRGGGGGBBBBB_proms)
+PALETTE_INIT_MEMBER(seta_state,RRRRRGGGGGBBBBB_proms)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int x;
@@ -587,7 +587,7 @@ PALETTE_INIT_MEMBER(setaroul_state,setaroul)
 	m_gfxdecode->gfx(0)->set_granularity(16);
 	m_gfxdecode->gfx(1)->set_granularity(16);
 
-	PALETTE_INIT_NAME(palette_init_RRRRRGGGGGBBBBB_proms)(palette);
+	palette_init_RRRRRGGGGGBBBBB_proms(palette);
 }
 
 PALETTE_INIT_MEMBER(usclssic_state,usclssic)
