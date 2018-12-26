@@ -2838,6 +2838,24 @@ CUSTOM:       KANEKO VU-002 x2
 
 ROM_START( blazeon )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "bz-prg1.u80", 0x000000, 0x040000, CRC(3d79aa70) SHA1(419088bd4330c674ec395612e0ef4296638080be) )
+	ROM_LOAD16_BYTE( "bz-prg2.u81", 0x000001, 0x040000, CRC(a16d3b1e) SHA1(45b205cad4401255725c649353ca86d4204efcfd) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 )           /* Z80 Code */
+	ROM_LOAD( "3.u45", 0x000000, 0x020000, CRC(52fe4c94) SHA1(896230e4627503292575bbd84edc3cf9cb18b27e) )   // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "bz_sp1.u20", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
+	ROM_LOAD( "bz_sp1.u68", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
+	ROM_LOAD( "bz_sp2.u21", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
+	ROM_LOAD( "bz_sp2.u86", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
+ROM_END
+
+ROM_START( blazeonj )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "bz_prg1.u80", 0x000000, 0x040000, CRC(8409e31d) SHA1(a9dfc299f4b457df190314401aef309adfaf9bae) )
 	ROM_LOAD16_BYTE( "bz_prg2.u81", 0x000001, 0x040000, CRC(b8a0a08b) SHA1(5f275b98d3e49a834850b45179d26e8c2f9fd604) )
 
@@ -4398,7 +4416,8 @@ GAME( 1994, packbang,   0,        berlwall, packbang,  kaneko16_berlwall_state, 
 GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          init_kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          init_kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeonj,   blazeon,  blazeon,  blazeon,   kaneko16_state,          init_kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
