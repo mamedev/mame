@@ -470,6 +470,8 @@ hardware modification to the security cart.....
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #include "sfiii2.lh"
 
 #define MASTER_CLOCK    42954500
@@ -856,6 +858,20 @@ static const gfx_layout cps3_tiles8x8_layout =
 	64*8
 };
 
+static inline u8 get_fade(int c, int f)
+{
+	// bit 7 unknown
+	// bit 6 fade enable / disable
+	// bit 5 fade mode
+	// bit 4-0 fade value
+	if (f & 0x40) // Fading enable / disable
+	{
+		f &= 0x3f;
+		c = (f & 0x20) ? (c + (((0x1f - c) * (f & 0x1f)) / 0x1f)) : ((c * f) / 0x1f);
+		c = std::max(0, std::min(0x1f, c));
+	}
+	return c;
+}
 
 void cps3_state::cps3_set_mame_colours(int colournum, uint16_t data, uint32_t fadeval)
 {
@@ -866,29 +882,20 @@ void cps3_state::cps3_set_mame_colours(int colournum, uint16_t data, uint32_t fa
 	int b = (data >> 10) & 0x1f;
 
 	/* is this 100% correct? */
-	if (fadeval!=0)
+	if (fadeval & 0x40400040)
 	{
-		int fade;
 		//printf("fadeval %08x\n",fadeval);
 
-		fade = (fadeval & 0x3f000000)>>24;
-		r = (r*fade)>>5;
-		if (r>0x1f) r = 0x1f;
+		r = get_fade(r, (fadeval & 0x7f000000)>>24);
+		g = get_fade(g, (fadeval & 0x007f0000)>>16);
+		b = get_fade(b, (fadeval & 0x0000007f)>>0);
 
-		fade = (fadeval & 0x003f0000)>>16;
-		g = (g*fade)>>5;
-		if (g>0x1f) g = 0x1f;
-
-		fade = (fadeval & 0x0000003f)>>0;
-		b = (b*fade)>>5;
-		if (b>0x1f) b = 0x1f;
-
-		data = (r <<0) | (g << 5) | (b << 10);
+		data = (data & 0x8000) | (r << 0) | (g << 5) | (b << 10);
 	}
 
 	dst[colournum] = data;
 
-	m_mame_colours[colournum] = (r << (16+3)) | (g << (8+3)) | (b << (0+3));
+	m_mame_colours[colournum] = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 
 	if (colournum<0x10000) m_palette->set_pen_color(colournum,m_mame_colours[colournum]/* rgb_t(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
 }
