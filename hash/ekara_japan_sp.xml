@@ -6,17 +6,22 @@
 
 	***********************************************************************************
 
-	Japanese cart listing (by SP code)
+	Japanese cart listing (by SP code)  * = dumped
 
 	These are for use with 2 different units
 	1. e-Kara
-	2. Stepping Pad (like a dance mat)
+	2. Popira / Popira 2
+	3. Taiko de Popira
+	4. Jumping Popira (Stepping Mat type thing)
+	
+	If you plug this into a DDR Family Mat you get the message (in Japanese)
+	
+	 "please play this cartridge on e-kara series, popira, popira 2, taiko de popira or jumping popira"
 
-    gives a 'not for use with this system' type message if plugged into DDR
-	gives a 'memory error' if plugged into Popira (EEPROM check or something else? maybe compatible?)
+	gives a 'memory error' if plugged into Popira (needs cartridge SEEPROM emulating)
 
-	SP-1  (unknown)
-	SP-2  (unknown)
+	 SP-1  (unknown)
+	*SP-2  (unknown)
 
 	(more? what's the SP highest number?)
 

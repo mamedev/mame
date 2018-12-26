@@ -889,7 +889,7 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 	m_cart->set_width(GENERIC_ROM8_WIDTH);
 	cartslot.set_device_load(device_image_load_delegate(&xavix_i2c_cart_state::device_image_load_taiko_cart, this));
 
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp"); // probably not, should use D series carts
+	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 }
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
@@ -1020,7 +1020,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list_japan_ec").set_original("ekara_japan_gc");
-	//SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp"); // might be compatible, check
+	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 }
 
 void xavix_state::init_xavix()
