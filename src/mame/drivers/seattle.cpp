@@ -2737,4 +2737,4 @@ GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, init_blit
 GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, init_blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
 GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
 GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
+GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive (ver 1.40, Oct 23 1998)", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
