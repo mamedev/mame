@@ -1,42 +1,51 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ekara_japan" description="Takara e-kara (Japan) cartridges">
+<softwarelist name="ekara_japan" description="Takara e-kara (Japan) ECxxxx- series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 
 	<!--
-	Each region has it's own set of cartridges (at least US, UK/EU and Japan)
-	The Japanese ones appear to have a number of different genres each with their own numbering
 
-	There are some carts which are meant to be compatible with both Japanese e-Kara units and
-	several other systems.
+	Japanese e-kara carts appear to have a number of different genres split across various
+	cart sub-series (often supporting different hw types) special releases etc.
+	
+	This file is for the base set (number on case, ECxxxx-xxx part numbers)
+	
+	The genres in the Japanese games are represented by the code after the EC/DC/MC/GC/PC etc. number
+	JPM = J-Pop Mix
+	ATS = Artist Selection (all songs by a single artist)
+	KID = Kid's Mix
+	ENK = unknown
+	BSC = Graduation Encouragement
+	G73 = 1973-1975 collection
+	G76 = 1986-1978 collection
+	G79 = 1979-1981 collection
+	G82 = 1982-1984 collection
+	BHT = (Best Artists?)
+	BAT = (Artist Selection?) but not the same series as ATS
+	SAI = (used with S series carts)
+	HKW = (used with S series carts)
+	ATM = unknown (used by the M series 'mini' carts)
+	TPJ = TV Pop
+	MIN = unknown
+	
+	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
+	Some Japanese carts have a number starting with M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
+	Some Japanese carts have a number starting with G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
+	Some Japanese carts have a number starting with P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
+	Some Japanese carts have a number starting with D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
+	Some Japanese carts have a number starting with SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
+	(there are others, need to document them)
 
-	The genres in the Japanese games are represented by the code after the EC number
-	ECxxxx-JPM = J-Pop Mix
-	ECxxxx-ATS = Artist Selection (all songs by a single artist)
-	ECxxxx-KID = Kid's Mix
-	ECxxxx-ENK = unknown
-	ECxxxx-BSC = Graduation Encouragement
-	ECxxxx-G79 = 1979-1981 collection
+	There are also e-kara Web cartridges that were meant to be programmed using a special unit connected to a PC using the defunct e-kara web service (see ekara_japan_web.xml)
 
-	Some Japanese carts have a number starting with DC  (D-x on case)
-	DCxxxx-BHT = unknown (best artists?)
+	Genres can cross multiple cart types, eg. TV Pop 1,3,4,5,6 are in the 'G' series, while TV Pop 2 is in the 'P' series, and TV Pop 9 is in the 'D' series (where are 7,8?)
 
-	Some Japanese carts have a number starting with GC  (G-x on case) (see ekara_japan_gc.xml)
-	GCxxxx-BHT = unknown (best artists?)
-
-	Some Japanese carts have a number starting with SC  (S-x on case)
-	SCxxxx-SAI = unknown
-	SCxxxx-HKW = unknown
-
-	(there are more codes, see lists below)
-
-
-	In all lists below
-	* = dumped
-
+	for non-Japanese carts see ekara_us.xml and ekara_pal.xml, the PAL ones are noteworthy for using a different timing system
+	
 	***********************************************************************************
 
 	Japanese cart listing (by 'just number' code) (number on cartridge / box, EC in cart identifier code)
+	* = dumped
 
 	The EC number is printed on the left side of the cart label, as well as in the serial code
 	early carts don't have a number printed on the box, only the title, after a certain point a number was added (when?)
@@ -135,51 +144,6 @@
 
 	***********************************************************************************
 
-	Japanese cart listing (by M code) (M-x on cartridge / box, MC in cart identifier code)
-
-	M-1  *MC0001-ATM  Mini Volume 1
-	M-2   MC0002-
-	M-3   MC0003-
-	M-4   MC0004-     Mini Volume 4 (w-inds)
-	M-5   MC0005-
-	M-6   MC0006-
-	M-7   MC0007-ATM  Mini Volume 5
-
-	(more? what's the M highest number?)
-
-	***********************************************************************************
-
-	Japanese cart listing (by S code) (S-x on cartridge / box, SC in cart identifier code)
-	TODO: what are the full titles for SAI and HWK
-
-	S-1   SC0001-     Hello Kitty Special
-	S-2   SC0002-     (unknown)
-	S-3   SC0003-     (unknown)
-	S-4   SC0004-     (unknown)
-	S-5  *SC0005-SAI  SAI Volume 1
-	S-6  *SC0006-SAI  SAI Volume 2
-	S-7   SC0007-     (unknown)
-	S-8   SC0008-     (unknown)
-	S-9  *SC0009-SAI  SAI Volume 3
-	S-10 *SC0010-HWK  HWK (untranslated)
-	S-11  SC0011-     (unknown)
-	S-12  SC0012-     (unknown)
-	S-13  SC0013-     (unknown)
-	S-14  SC0014-     (unknown)
-	S-15  SC0015-     (unknown)
-	S-16  SC0016-     (unknown)
-	S-17  SC0017-     (unknown)
-	S-18  SC0018-     (unknown) Volume 1
-	S-19 *SC0019-SAI  SAI Volume 6
-	S-20  SC0020-     (unknown) Volume 5
-	S-21 *SC0021-SAI  SAI Volume 7
-	S-22 *SC0022-SAI  SAI Volume 8
-	S-23  SC0023-     (unknown)
-
-	(more? what's the S highest number?)
-
-	***********************************************************************************
-
 	Japanese cart listing (by KD code)
 
 	Seems to be for kids? not the same as KE series below or the -KID carts in the regular series
@@ -187,42 +151,6 @@
 
 	KD-01  (unknown)
 	KD-02  (unknown)
-
-	************************************************************************************************************************************************************
-	 Everything below is for use with other units as well as e-kara
-	************************************************************************************************************************************************************
-
-	Japanese cart listing (by D code)  (D-x on cartridge / box, DC in cart identifier code)
-
-	These are for use with 3/4 units
-	1. e-Kara
-	2. Drum
-	3. Yellow thing with 4 buttons on it (single player unit?)
-	4. Blue thing with 4 buttons on it (looks like the same as 3, but allows an additional green pad to connect for a 2nd player)
-
-	note BAT and BHT aren't the same series
-
-	D-1   DC0001-     (unknown)
-	D-2   DC0002-BAT  BAT Volume 6?
-	D-3   DC0003-BHT  BHT (Best Artists?) Volume 9?  (most other BHT carts are in G series, or P series)
-
-	(more? what's the D highest number?)
-
-	***********************************************************************************
-
-	Japanese cart listing (by P code) (for use on multiple devices, including DDR)
-
-	These are for use with 3 different units
-	1. e-Kara
-	2. Blue thing with 4 buttons on it (see note in D series)
-	3. Konami DDR Family Mat
-
-	P-1  BHT Volume 4 (Best Artists?) (1,2,3, 5 in G series)
-	P-2  TV Pop Volume 2 (1,3,4 in G series)
-	P-3  untranslated Volume 1
-	P-4  untranslated Volume 7
-
-	(more? what's the P highest number?)
 
 	************************************************************************************************************************************************************
 	 Everything below might not work with a standard e-kara, requires different hardware even if cart form is the same
@@ -591,114 +519,5 @@
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- Japanese e-kara cartridges MC (Mini) series -->
-	<!-- these have unique presentation -->
-
-	<software name="mc0001">
-		<description>Mini Volume 1 (Japan) (MC0001-ATM)</description>
-		<year>2003</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x080000">
-				<rom name="mc0001-atm.u1" size="0x080000" crc="3ef59e82" sha1="d10f0b4a174bef736fea538028eacbeb46af5bbd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Japanese e-kara cartridges SC (Special?) series -->
-	<!-- these have unique presentation -->
-
-	<software name="sc0005">
-		<description>SAI Volume 1 (Japan) (SC0005-SAI)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x100000">
-				<rom name="sc0005-sai.u1" size="0x100000" crc="f919b155" sha1="60fc9985d277422d4d64fb4f0cebf2732e2958aa" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc0006">
-		<description>SAI Volume 2 (Japan) (SC0006-SAI)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x100000">
-				<rom name="sc0006-sai.u1" size="0x100000" crc="4bd8669e" sha1="e77d16ecead2a6c660fedcbca3a1e0e719648be4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc0009">
-		<description>SAI Volume 3 (Japan) (SC0009-SAI)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x100000">
-				<rom name="sc0009-sai.u1" size="0x100000" crc="61413fd5" sha1="47dad178faa99301009ae74554a39b15c01e0db2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc0010">
-		<description>HWK (Japan) (SC0010-HKW)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="sc0010-hkw.u1" size="0x200000" crc="fd6dc588" sha1="fece06706399eb36f3e69f7693116c944fe890e7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc0019">
-		<description>SAI Volume 6 (Japan) (SC0019-SAI)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc0021">
-		<description>SAI Volume 7 (Japan) (SC0021-SAI)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="sc0021-sai.u1" size="0x100000" crc="fbc77e6c" sha1="eee3c8a68807dbac62c8021f9c755d08076925e2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sc0022">
-		<description>SAI Volume 8 (Japan) (SC0022-SAI)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="sc0022-sai.u1" size="0x100000" crc="d631d890" sha1="a0953aa347c9ec152e64bc455fc360056c5c0807" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Japanese e-kara web cartridge
-	     this was meant to be used with an e-kara web unit, USB cable and PC software, presumably to transfer songs offered on some online service
-	     e-karaweb.com no longer resolves to anything -->
-	<software name="ekaraweb">
-		<description>e-kara Web cartridge 28M (Japan)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x200000">
-				<rom name="web.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
+	
 </softwarelist>

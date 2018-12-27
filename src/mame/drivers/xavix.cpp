@@ -638,13 +638,20 @@ static INPUT_PORTS_START( popira )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pad 2") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pad 3") PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 4") PORT_PLAYER(1)
-	// 0x10 unused?
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Select Previous") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Select Next") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start") PORT_PLAYER(1)
 
 	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // halts execution and enables a memory viewer if used with cartridge gc0001 (debug leftover?)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -886,16 +893,6 @@ void xavix_i2c_state::xavix_i2c_24lc02(machine_config &config)
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02 (taiko)
 }
 
-void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
-{
-	xavix_i2c_24lc02(config);
-
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ekara_cart", "bin"));
-	m_cart->set_width(GENERIC_ROM8_WIDTH);
-	cartslot.set_device_load(device_image_load_delegate(&xavix_i2c_cart_state::device_image_load_taiko_cart, this));
-
-	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
-}
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
@@ -1007,6 +1004,18 @@ void xavix_cart_state::xavix_cart(machine_config &config)
 	cartslot.set_device_load(device_image_load_delegate(&xavix_cart_state::device_image_load_ekara_cart, this));
 }
 
+void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
+{
+	xavix_i2c_24lc02(config);
+
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ekara_cart", "bin"));
+	m_cart->set_width(GENERIC_ROM8_WIDTH);
+	cartslot.set_device_load(device_image_load_delegate(&xavix_i2c_cart_state::device_image_load_taiko_cart, this));
+
+	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
+	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+}
+
 void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 {
 	xavix_cart(config);
@@ -1015,8 +1024,13 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_us").set_original("ekara_us");
 	SOFTWARE_LIST(config, "cart_list_pal").set_original("ekara_pal");
 	SOFTWARE_LIST(config, "cart_list_japan").set_original("ekara_japan");
-	SOFTWARE_LIST(config, "cart_list_japan_ec").set_original("ekara_japan_gc");
+	SOFTWARE_LIST(config, "cart_list_japan_g").set_original("ekara_japan_g");
+	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
+	SOFTWARE_LIST(config, "cart_list_japan_s").set_original("ekara_japan_s");
+	SOFTWARE_LIST(config, "cart_list_japan_m").set_original("ekara_japan_m");
+	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+	SOFTWARE_LIST(config, "cart_list_japan_web").set_original("ekara_japan_web");
 }
 
 void xavix_cart_state::xavix_cart_popira(machine_config &config)
@@ -1024,8 +1038,19 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 	xavix_cart(config);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list_japan_ec").set_original("ekara_japan_gc");
+	SOFTWARE_LIST(config, "cart_list_japan_g").set_original("ekara_japan_g");
+	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
+	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+}
+
+void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
+{
+	xavix_cart(config);
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cart_list_japan_p").set_original("ekara_japan_p");
+	//SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp"); // not for this system, but unlike other carts, actually tells you this if inserted rather than crashing the system
 }
 
 void xavix_state::init_xavix()
@@ -1163,6 +1188,12 @@ ROM_START( ekara )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
+ROM_START( ekaraa )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekara2.bin", 0x600000, 0x100000, CRC(3c92d48d) SHA1(450fbe53826cdb87ec797f84b9757987afcc1ec5) )
+	ROM_RELOAD(0x000000, 0x100000)
+ROM_END
+
 ROM_START( ekaraj )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarajapan.bin", 0x600000, 0x100000, CRC(e459e43b) SHA1(58b7f36a81571a2df5e812c118fdf68812a05abc) )
@@ -1229,12 +1260,16 @@ CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_i2c_sta
 
 CONS( 200?, has_wamg,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// timers need fixing up, otherwise music plays at the wrong speed
-CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT ) // unclear if same ROM was used for Europe and US
-CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
+
+
+
+// timers need fixing up, otherwise music plays at the wrong speed, unclear if same BIOS ROM was used for Europe and US
+CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT ) // shows "Please insert a cartridge before turn it on" without cart
+CONS( 2000, ekaraa,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT ) // shows "Please insert a cartridge before turning on e-kara" without cart
+CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT ) // shows Japanese message without cart
 // there appear to be later e-kara releases for each region with 3 built in songs too
 
-CONS( 2001, ddrfammt, 0,           0,  xavix_cart,       ddrfammt, xavix_cart_state,     init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
+CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_state,     init_xavix,    "Takara / SSD Company LTD",                     "Popira (Yellow, single player) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT ) // there is a blue+green set with 2 Player support, probably different ROM
 

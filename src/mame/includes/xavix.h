@@ -602,6 +602,7 @@ public:
 	void xavix_cart(machine_config &config);
 	void xavix_cart_ekara(machine_config &config);
 	void xavix_cart_popira(machine_config &config);
+	void xavix_cart_ddrfammt(machine_config &config);
 
 protected:
 	required_device<generic_slot_device> m_cart;

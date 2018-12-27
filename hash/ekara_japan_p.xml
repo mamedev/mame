@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_p" description="Takara e-kara (Japan) P-xx / PCxxxx- series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	Japanese cart listing (by P code) (for use on multiple devices, including DDR) (P on box, P/PC on cart)
+
+	These are for use with 3 different units
+	1. e-Kara
+	2. Popira (and Popira 2?)
+	3. Konami DDR Family Mat
+
+	*P-1  BHT Volume 4 (Best Artists?) (1,2,3, 5 in G series)
+	 P-2  TV Pop Volume 2 (1,3,4 in G series)
+	*P-3  ENB Volume 1
+	 P-4  BHT Volume 7
+	-->
+
+	<software name="pc0001">
+		<description>BHT Volume 4 (Japan) (PC0001-BHT)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekarap1.bin" size="0x100000" crc="4fbc13a6" sha1="142191a6522c1aa9c7772de6dc1b5706816258de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc0003">
+		<description>ENB Volume 1 (Japan) (PC0003-ENB)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekarap3.bin" size="0x100000" crc="2fa57d12" sha1="01954a20e190c3f9e1d16c4285c9ec39f601eb80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- FIXED BITS (xxxxxx0x)
+	<software name="pc0004">
+		<description>BHT Volume 7 (Japan) (PC0004-BHT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekarap4.bin" size="0x100000" crc="08d375ea" sha1="ff78541d0adaa97f7df46b7592479737cff0194d" offset="0" /> 
+			</dataarea>
+		</part>
+	</software>	
+	-->
+</softwarelist>

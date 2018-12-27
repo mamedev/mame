@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ekara_japan_sp" description="Takara e-kara SP-xx series cartridges">
+<softwarelist name="ekara_japan_sp" description="Takara e-kara (Japan) SP-xx series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 	     some cartridges also contain an SEEPROM
 
 	***********************************************************************************
 
 	Japanese cart listing (by SP code)  * = dumped
+	
+	These don't seem to have a secondary numbering scheme (eg SPxxxx-xxx)
 
 	These are for use with 5 different units
 	1. e-Kara
@@ -30,7 +32,7 @@
 	-->
 
 	<software name="sp02"> <!-- also has SEEPROM inside -->
-		<description>SP-02</description>
+		<description>SP-02 Super Cartridge (Japan)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">

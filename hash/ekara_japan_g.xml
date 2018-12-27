@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_g" description="Takara e-kara (Japan) G-xx / GCxxxx- series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	Japanese cart listing (by G code)  (G-x on cartridge / box, GC in cart identifier code)
+
+	These are for use with 2 different units
+	1. e-Kara
+	2. Popira (and Popira 2?)
+
+	G-1  *GC0001-BAT  BAT Volume 1 (Artist Selection?)
+	G-2  *GC0002-BHT  BHT Volume 1 (Best Artists?)
+	G-3   GC0003-BAT  BAT Volume 2 (Artist Selection?)
+	G-4   GC0004-BHT  BHT Volume 2 (Best Artists?)
+	G-5   GC0005-TPJ  TV Pop Volume 1
+	G-6  *GC0006-BHT  BHT Volume 3 (Best Artists?)
+	G-7   GC0007-BAT  BAT Volume 3 (Artist Selection?)
+	G-8   GC0008-MIN? untranslated (no volume)
+	G-9   GC0009-TPJ  TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
+	G-10  GC0010-BAT  BAT Volume 4 (Artist Selection?)
+	G-11  GC0011-TPJ  TV Pop Volume 4
+	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
+	G-13  GC0013-     (unknown) Volume 6
+	G-14  GC0014-     (unknown) Volume 2
+	G-15  GC0015-BAT  BAT Volume 5 (Artist Selection?)
+	G-16 *GC0016-TPJ  TV Pop Volume 5
+	G-17  GC0017-TPJ  TV Pop Volume 6
+
+	(more? what's the G highest number?)
+
+	-->
+	
+	<software name="gc0001">
+		<description>BAT Volume 1 (Japan) (GC0001-BAT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekarag1.bin" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0002">
+		<description>BHT Volume 1 (Japan) (GC0002-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- FIXED BITS (xxxxxx0x)
+	<software name="gc0003">
+		<description>BAT Volume 2 (Japan) (GC0003-BAT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekarag3.bin" size="0x100000" crc="a3f8756b" sha1="8569c4079b1394dfe5ccc69fcfcabcb877716949" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	-->
+	
+	<!-- FIXED BITS (xxxxxx0x)
+	<software name="gc0004">
+		<description>BHT Volume 2 (Japan) (GC0004-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekarag4.bin" size="0x100000" crc="bb10aa6e" sha1="7c4f4f08994fb7be5bfc9f0ab2a6084a71a94cdd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	-->
+	
+	<software name="gc0006">
+		<description>BHT Volume 3 (Japan) (GC0006-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0006-bht.u1" size="0x100000" crc="76bbefae" sha1="a2a41f58b5750fafa92d6e3094562dd05a5d9029" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="gc0016"> <!-- has SEEPROM? (reports memory error in Popira) -->
+		<description>TV Pop Volume 5 (Japan) (GC0016-TPJ)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekarag16.bin" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+</softwarelist>
