@@ -31,6 +31,7 @@
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
+			<!--<feature name="slot" value="rom_24lc02"/>-->
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0002-bat.u1" size="0x100000" crc="bb4e13a7" sha1="f9d3a669de1b7ad3080eb428575905ee2170458c" offset="0" />
 			</dataarea>
@@ -42,6 +43,7 @@
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
+			<!--<feature name="slot" value="rom_24lc02"/>-->
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0005-tpj.u1" size="0x100000" crc="515c125f" sha1="a7c7bf758b1afecb8fb55eb5766343325c1acc89" offset="0" />
 			</dataarea>

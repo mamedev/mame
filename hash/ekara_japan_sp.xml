@@ -36,8 +36,9 @@
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
+			<!--<feature name="slot" value="rom_24lc04"/>-->
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekarasp02.bin" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee" offset="0" />
+				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>	
