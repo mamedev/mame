@@ -260,7 +260,6 @@ private:
 	DECLARE_WRITE8_MEMBER(ddenlovr_layer_enable2_w);
 	DECLARE_WRITE8_MEMBER(hanakanz_blitter_reg_w);
 	DECLARE_WRITE8_MEMBER(hanakanz_blitter_data_w);
-	DECLARE_WRITE_LINE_MEMBER(rongrong_blitter_irq);
 	DECLARE_WRITE8_MEMBER(ddenlovr_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq);
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_blitter_irq_ack_w);
@@ -339,7 +338,6 @@ private:
 	DECLARE_READ8_MEMBER(mjmyster_keyb_r);
 	DECLARE_READ8_MEMBER(mjmyster_dsw_r);
 	DECLARE_WRITE8_MEMBER(mjmyster_coincounter_w);
-	DECLARE_WRITE_LINE_MEMBER(mjmyster_blitter_irq);
 	DECLARE_WRITE8_MEMBER(hginga_rombank_w);
 	DECLARE_READ8_MEMBER(hginga_protection_r);
 	DECLARE_WRITE8_MEMBER(hginga_input_w);
@@ -388,7 +386,6 @@ private:
 	DECLARE_WRITE8_MEMBER(daimyojn_blitter_data_palette_w);
 	DECLARE_READ8_MEMBER(daimyojn_year_hack_r);
 	DECLARE_WRITE8_MEMBER(janshinp_coincounter_w);
-	DECLARE_WRITE_LINE_MEMBER(seljan2_blitter_irq);
 	DECLARE_WRITE8_MEMBER(seljan2_rombank_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_enab_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_w);
@@ -1557,13 +1554,6 @@ g_profiler.start(PROFILER_VIDEO);
 g_profiler.stop();
 }
 
-
-WRITE_LINE_MEMBER(ddenlovr_state::rongrong_blitter_irq)
-{
-	auto &cpu = downcast<tmpz84c015_device &>(*m_maincpu);
-	cpu.trg0(state);
-	cpu.trg1(state);
-}
 
 WRITE8_MEMBER(ddenlovr_state::ddenlovr_blitter_w)
 {
@@ -3174,13 +3164,6 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 	}
 }
 
-WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_blitter_irq)
-{
-	auto &cpu = downcast<tmpz84c015_device &>(*m_maincpu);
-	cpu.trg1(state);
-	cpu.trg2(state);
-}
-
 void ddenlovr_state::mjmyster_portmap(address_map &map)
 {
 	map.global_mask(0xff);
@@ -4105,12 +4088,6 @@ void ddenlovr_state::janshinp_portmap(address_map &map)
 /***************************************************************************
                              Return Of Sel Jan II
 ***************************************************************************/
-
-WRITE_LINE_MEMBER(ddenlovr_state::seljan2_blitter_irq)
-{
-	// PA bit 7 = blitter busy
-	downcast<tmpz84c015_device &>(*m_maincpu).pa7_w(!state);
-}
 
 WRITE8_MEMBER(ddenlovr_state::seljan2_rombank_w)
 {
@@ -9867,7 +9844,8 @@ void ddenlovr_state::quizchq(machine_config &config)
 
 	PALETTE(config, m_palette, 0x100);
 
-	blitter_irq().set(FUNC(ddenlovr_state::rongrong_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
@@ -10207,7 +10185,8 @@ void ddenlovr_state::mjschuka(machine_config &config)
 
 	PALETTE(config, m_palette, 0x200);
 
-	blitter_irq().set(FUNC(ddenlovr_state::mjmyster_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
@@ -10253,7 +10232,8 @@ void ddenlovr_state::mjmyster(machine_config &config)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	blitter_irq().set(FUNC(ddenlovr_state::mjmyster_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10290,7 +10270,8 @@ void ddenlovr_state::hginga(machine_config &config)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
 
-	blitter_irq().set(FUNC(ddenlovr_state::mjmyster_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10316,7 +10297,8 @@ void ddenlovr_state::hgokou(machine_config &config)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
 
-	blitter_irq().set(FUNC(ddenlovr_state::mjmyster_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10364,7 +10346,8 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	blitter_irq().set(FUNC(ddenlovr_state::mjmyster_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
@@ -10390,7 +10373,8 @@ void ddenlovr_state::mjmyornt(machine_config &config)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
-	blitter_irq().set(FUNC(ddenlovr_state::mjmyster_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
+	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
@@ -10663,7 +10647,7 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	blitter_irq().set(FUNC(ddenlovr_state::seljan2_blitter_irq));
+	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::pa7_w)).invert(); // PA bit 7 = blitter busy
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
