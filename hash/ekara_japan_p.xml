@@ -24,7 +24,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarap1.bin" size="0x100000" crc="4fbc13a6" sha1="142191a6522c1aa9c7772de6dc1b5706816258de" offset="0" />
+				<rom name="pc0001-bht.u1" size="0x100000" crc="4fbc13a6" sha1="142191a6522c1aa9c7772de6dc1b5706816258de" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -35,7 +35,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarap3.bin" size="0x100000" crc="2fa57d12" sha1="01954a20e190c3f9e1d16c4285c9ec39f601eb80" offset="0" />
+				<rom name="pc0003-enb.u1" size="0x100000" crc="2fa57d12" sha1="01954a20e190c3f9e1d16c4285c9ec39f601eb80" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarap4.bin" size="0x100000" crc="08d375ea" sha1="ff78541d0adaa97f7df46b7592479737cff0194d" offset="0" /> 
+				<rom name="pc0004-bht.u1" size="0x100000" crc="08d375ea" sha1="ff78541d0adaa97f7df46b7592479737cff0194d" offset="0" /> 
 			</dataarea>
 		</part>
 	</software>	

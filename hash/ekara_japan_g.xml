@@ -39,7 +39,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarag1.bin" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7" offset="0" />
+				<rom name="gc0001-bat.u1" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarag16.bin" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34" offset="0" />
+				<rom name="gc0016-tpj.u1" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34" offset="0" />
 			</dataarea>
 		</part>
 	</software>	
