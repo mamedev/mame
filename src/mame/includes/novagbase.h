@@ -39,10 +39,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	optional_device<beep_device> m_beeper;
-
-protected:
 	// devices/pointers
+	optional_device<beep_device> m_beeper;
 	required_device<cpu_device> m_maincpu;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<hd44780_device> m_lcd;
