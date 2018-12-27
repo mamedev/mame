@@ -182,10 +182,10 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	MB3773(config, m_watchdog, 0);
 
 	msm6253_device &adc(MSM6253(config, "adc", 32_MHz_XTAL / 16 / 4));
-	adc.input<0>().set(FUNC(model1io2_device::analog0_r));
-	adc.input<1>().set(FUNC(model1io2_device::analog1_r));
-	adc.input<2>().set(FUNC(model1io2_device::analog2_r));
-	adc.input<3>().set(FUNC(model1io2_device::analog3_r));
+	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r));
+	adc.set_input_cb<1>(FUNC(model1io2_device::analog1_r));
+	adc.set_input_cb<2>(FUNC(model1io2_device::analog2_r));
+	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r));
 
 	// diagnostic LCD display
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

@@ -371,8 +371,8 @@ class sega_multi32_analog_state : public sega_multi32_state
 public:
 	sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(in2_analog_read);
-	DECLARE_READ8_MEMBER(in3_analog_read);
+	ioport_value in2_analog_read();
+	ioport_value in3_analog_read();
 	DECLARE_WRITE8_MEMBER(analog_bank_w);
 
 	void multi32_analog_map(address_map &map);

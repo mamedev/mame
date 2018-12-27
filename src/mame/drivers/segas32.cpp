@@ -2393,10 +2393,10 @@ void segas32_analog_state::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_analog_state::system32_analog_map);
 
 	msm6253_device &adc(MSM6253(config, "adc", 0));
-	adc.input<0>().set_ioport("ANALOG1");
-	adc.input<1>().set_ioport("ANALOG2");
-	adc.input<2>().set_ioport("ANALOG3");
-	adc.input<3>().set_ioport("ANALOG4");
+	adc.set_input_tag<0>("ANALOG1");
+	adc.set_input_tag<1>("ANALOG2");
+	adc.set_input_tag<2>("ANALOG3");
+	adc.set_input_tag<3>("ANALOG4");
 }
 
 DEFINE_DEVICE_TYPE(SEGA_S32_ANALOG_DEVICE, segas32_analog_state, "segas32_pcb_analog", "Sega System 32 analog PCB")
@@ -2726,18 +2726,18 @@ void sega_multi32_analog_state::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_analog_state::multi32_analog_map);
 
 	msm6253_device &adc(MSM6253(config, "adc", 0));
-	adc.input<0>().set_ioport("ANALOG1");
-	adc.input<1>().set_ioport("ANALOG2");
-	adc.input<2>().set(FUNC(sega_multi32_analog_state::in2_analog_read));
-	adc.input<3>().set(FUNC(sega_multi32_analog_state::in3_analog_read));
+	adc.set_input_tag<0>("ANALOG1");
+	adc.set_input_tag<1>("ANALOG2");
+	adc.set_input_cb<2>(FUNC(sega_multi32_analog_state::in2_analog_read));
+	adc.set_input_cb<3>(FUNC(sega_multi32_analog_state::in3_analog_read));
 }
 
-READ8_MEMBER(sega_multi32_analog_state::in2_analog_read)
+ioport_value sega_multi32_analog_state::in2_analog_read()
 {
 	return m_analog_ports[m_analog_bank * 4 + 2].read_safe(0);
 }
 
-READ8_MEMBER(sega_multi32_analog_state::in3_analog_read)
+ioport_value sega_multi32_analog_state::in3_analog_read()
 {
 	return m_analog_ports[m_analog_bank * 4 + 3].read_safe(0);
 }

@@ -32,11 +32,22 @@
 class msm6253_device : public device_t
 {
 public:
+	typedef device_delegate<ioport_value ()> port_read_delegate;
+
 	// construction/destruction
 	msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	template <unsigned Port> auto input() { return m_analog_input_cb[Port].bind(); }
+	template <unsigned P> void set_input_tag(const char *tag) { m_analog_ports[P].set_tag(tag); }
+	template <unsigned P> void set_input_cb(port_read_delegate callback) { m_analog_input_cb[P] = callback; }
+	template <unsigned P, class FunctionClass> void set_input_cb(const char *devname, ioport_value (FunctionClass::*callback)(), const char *name)
+	{
+		set_input_cb<P>(port_read_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <unsigned P, class FunctionClass> void set_input_cb(ioport_value (FunctionClass::*callback)(), const char *name)
+	{
+		set_input_cb<P>(port_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// write handlers
 	WRITE8_MEMBER(address_w);
@@ -52,8 +63,12 @@ protected:
 	virtual void device_start() override;
 
 private:
+	// helpers
+	template<int port> ioport_value port_read();
+
 	// input configuration
-	devcb_read8 m_analog_input_cb[4];
+	optional_ioport_array<4> m_analog_ports;
+	port_read_delegate m_analog_input_cb[4];
 
 	// private data
 	u8 m_shift_register;

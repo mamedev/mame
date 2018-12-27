@@ -148,10 +148,10 @@ void  model1io_device::device_add_mconfig(machine_config &config)
 	io.in_pg_callback().set(FUNC(model1io_device::io_pg_r));
 
 	msm6253_device &adc(MSM6253(config, "adc", 0));
-	adc.input<0>().set(FUNC(model1io_device::analog0_r));
-	adc.input<1>().set(FUNC(model1io_device::analog1_r));
-	adc.input<2>().set(FUNC(model1io_device::analog2_r));
-	adc.input<3>().set(FUNC(model1io_device::analog3_r));
+	adc.set_input_cb<0>(FUNC(model1io_device::analog0_r));
+	adc.set_input_cb<1>(FUNC(model1io_device::analog1_r));
+	adc.set_input_cb<2>(FUNC(model1io_device::analog2_r));
+	adc.set_input_cb<3>(FUNC(model1io_device::analog3_r));
 }
 
 

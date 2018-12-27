@@ -2016,10 +2016,10 @@ void segas24_state::system24_floppy_hotrod(machine_config &config)
 	upd2.set_porty_tag("DIAL4");
 
 	msm6253_device &adc1(MSM6253(config, "adc1", 0)); // IC5 - 33k/33p R/C clock
-	adc1.input<0>().set_ioport("PEDAL1");
-	adc1.input<1>().set_ioport("PEDAL2");
-	adc1.input<2>().set_ioport("PEDAL3");
-	adc1.input<3>().set_ioport("PEDAL4");
+	adc1.set_input_tag<0>("PEDAL1");
+	adc1.set_input_tag<1>("PEDAL2");
+	adc1.set_input_tag<2>("PEDAL3");
+	adc1.set_input_tag<3>("PEDAL4");
 
 	MSM6253(config, "adc2", 0); // IC2 - 33k/33p R/C clock
 }
