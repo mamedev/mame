@@ -11333,6 +11333,7 @@ skullfnga                       // MCH (c) 1996 Data East Corporation (Asia)
 skullfngj                       // MCH (c) 1996 Data East Corporation (Japan)
 stadhr96                        // MCM (c) 1996 Data East Corporation (World)
 stadhr96j                       // MCM (c) 1996 Data East Corporation (Japan)
+stadhr96j2                      // MCM (c) 1996 Data East Corporation (Japan)
 stadhr96u                       // MCM (c) 1996 Data East Corporation (USA)
 
 @source:deco156.cpp

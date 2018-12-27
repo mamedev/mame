@@ -740,6 +740,33 @@ ROM_START( stadhr96j )
 	ROM_LOAD( "eeprom-stadhr96j.bin",  0x00, 0x80, CRC(cf98098f) SHA1(54fc9bdd1ce9b836dad7b4a9909608e8f9842f71) )
 ROM_END
 
+// currently not working: 'This game board is not compatible with country code of mother board. Do not use, or damage will occur and void warranty of both boards.'
+// according to a dumper: 'I ran into this issue a few years ago when I was "updating" some Stadium heros 96 boards to English. Some converted with an EPROM swap and other gave me the error.
+// It wound up being a small serial EEPROM that was added to the PCB(it was socketed IIRC, on the bottom side of the PCB) and when I removed, it booted fine.
+// The other SH 96's didn't have this part and was the only difference.
+
+ROM_START( stadhr96j2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "eae00-5.2a", 0x000000, 0x80000, CRC(902b84e9) SHA1(62dfbb5b5e2bfea503fe0e3a96194dd34dab9829) ) /* WED SEP  4 00:00:00 JST 1996 (FINAL) */
+	ROM_LOAD32_WORD( "eae01-5.2b", 0x000002, 0x80000, CRC(16245497) SHA1(776a9c20a9021987c618608d3b6ab569833bd439) ) /*                JAPAN                 */
+
+	ROM_REGION( 0x1800000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "mcm-00.2e", 0x0000001, 0x400000, CRC(c1919c3c) SHA1(168000ff1512a147d7029ee8878dd70de680fb08) )
+	ROM_LOAD16_BYTE( "mcm-01.8m", 0x0000000, 0x400000, CRC(2255d47d) SHA1(ba3298e781fce1c84f68290bc464f2bc991382c0) )
+	ROM_LOAD16_BYTE( "mcm-02.4e", 0x0800001, 0x400000, CRC(38c39822) SHA1(393d2c1c3c0bcb99df706d32ee3f8b681891dcac) )
+	ROM_LOAD16_BYTE( "mcm-03.10m",0x0800000, 0x400000, CRC(4bd84ca7) SHA1(43dad8ced344f8d629d36f30ab2332879ba067d2) )
+	ROM_LOAD16_BYTE( "mcm-04.6e", 0x1000001, 0x400000, CRC(7c0bd84c) SHA1(730b085a893d3c70592a8b4aecaeeaf4aceede56) )
+	ROM_LOAD16_BYTE( "mcm-05.11m",0x1000000, 0x400000, CRC(476f03d7) SHA1(5c58ab4fc0e29f76619827bc27fa64cce2627e48) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "eae02-0.6h", 0x000000, 0x80000, CRC(57c30ca8) SHA1(e3bd2faf4637078c5594f62c7bc6db3067809cf9) )
+
+	ROM_REGION( 0x800000, "ymz", 0 )
+	ROM_LOAD( "mcm-06.6a",  0x000000, 0x400000,  CRC(fbc178f3) SHA1(f44cb913177b6552b30c139505c3284bc445ba13) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
+ROM_END
+
 
 ROM_START( hoops96 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -954,6 +981,7 @@ GAME( 1995, avengrgsj, avengrgs, avengrgs, mlc, deco_mlc_state, init_avengrgs, R
 GAME( 1996, stadhr96,  0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Europe, EAJ)",             MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAJ  ^^
 GAME( 1996, stadhr96u, stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (USA, EAH)",                MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAH  ^^
 GAME( 1996, stadhr96j, stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)",              MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
+GAME( 1996, stadhr96j2,stadhr96, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan?, EAE)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rom labels are EAE ^^
 GAME( 1996, skullfng,  0,        mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Europe 1.13)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Europe, Master 96.02.19 13:45 */
 GAME( 1996, skullfngj, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan 1.09)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.09, Japan, Master 96.02.08 14:39 */
 GAME( 1996, skullfnga, skullfng, mlc_6bpp, mlc, deco_mlc_state, init_mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia 1.13)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* Version 1.13, Asia, Master 96.02.19 13:49 */
