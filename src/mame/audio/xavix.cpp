@@ -492,6 +492,8 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 				   11 is too fast (popira checked on various tracks, finish before getting to 100% then jump to 100%) where is this multiplier coming from? clock divided?
 				   10 seems close to correct for ddrfammt, popira, might need fine tuning.  seems too slow for rad_crdn / rad_bass?
 				   tweaked to 10.3f stay in time with the first song in https://www.youtube.com/watch?v=3x1C9bhC2rc
+
+				   the usual clock divided by 2 would be 10.738636 but that's too high
 				*/
 				attotime period = attotime::from_hz(10.3f * (m_sndtimer[t]));
 				m_sound_timer[t]->adjust(period, t, period);

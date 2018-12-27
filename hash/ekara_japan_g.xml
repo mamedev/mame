@@ -97,7 +97,7 @@
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
-			<!--<feature name="slot" value="rom_24lc04"/>--> <!-- or 24lc02? -->
+			<feature name="slot" value="rom_24lc04"/> <!-- or 24lc02? -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0016-tpj.u1" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34" offset="0" />
 			</dataarea>

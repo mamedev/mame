@@ -842,7 +842,8 @@ void xavix_state::machine_start()
 	}
 
 	// at least some of the internal CPU RAM is backed up, not sure how much
-	m_nvram->set_base(&m_mainram[0x3e00], 0x200);
+	if (m_nvram)
+		m_nvram->set_base(&m_mainram[0x3e00], 0x200);
 }
 
 void xavix_state::machine_reset()
@@ -911,6 +912,8 @@ void xavix_state::machine_reset()
 	m_adc_control = 0x00;
 
 	m_sprite_xhigh_ignore_hack = true;
+
+	m_cpuspace = &m_maincpu->space(AS_PROGRAM);
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

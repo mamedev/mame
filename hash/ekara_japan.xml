@@ -29,12 +29,20 @@
 	MIN = unknown
 	
 	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
-	Some Japanese carts have a number starting with M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
-	Some Japanese carts have a number starting with G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
-	Some Japanese carts have a number starting with P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
-	Some Japanese carts have a number starting with D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
-	Some Japanese carts have a number starting with SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
+	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
+	                                                G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
+	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
+                                                    D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
+	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
+
+	these exist but haven't got any
+	Some Japanese carts have a number starting with JP (for Jumping Popira Only?)
+	                                                A (for Pichi Pichi Pitch Only?)
+	                                                KE (for Kids Lyric book device Only?)
+													KD (for e-kara?)
+	
 	(there are others, need to document them)
+
 
 	There are also e-kara Web cartridges that were meant to be programmed using a special unit connected to a PC using the defunct e-kara web service (see ekara_japan_web.xml)
 
@@ -139,6 +147,10 @@
 	79   EC0079-     (unknown)
 	80   EC0080-     (unknown)
 	81   EC0081-JPM  J-Pop Mix Volume 42
+	82
+	83
+	84
+	85               (seen in the wild)
 
 	(more? what's the highest regular number?)
 

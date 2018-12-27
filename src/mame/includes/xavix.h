@@ -13,6 +13,7 @@
 #include "machine/i2cmem.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/ekara/slot.h"
 #include "machine/nvram.h"
 
 #include "machine/xavix_mtrk_wheel.h"
@@ -72,6 +73,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
+		m_lowbus(*this, "lowbus"),
 		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
@@ -92,7 +94,6 @@ public:
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lowbus(*this, "lowbus"),
 		m_sound(*this, "xavix_sound")
 	{ }
 
@@ -107,44 +108,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
-protected:
 
-	virtual uint8_t read_io0(uint8_t direction);
-	virtual uint8_t read_io1(uint8_t direction);
-	virtual void write_io0(uint8_t data, uint8_t direction);
-	virtual void write_io1(uint8_t data, uint8_t direction);
-	required_ioport m_in0;
-	required_ioport m_in1;
-	required_device<xavix_device> m_maincpu;
-	required_device<nvram_device> m_nvram;
-	required_device<screen_device> m_screen;
-
-private:
-
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void xavix_map(address_map &map);
-
-	void xavix_lowbus_map(address_map &map);
-	void xavix_extbus_map(address_map &map);
-	void superxavix_lowbus_map(address_map &map);
-
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
-
-	DECLARE_READ8_MEMBER(opcodes_000000_r);
-	DECLARE_READ8_MEMBER(opcodes_800000_r);
-
-	DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
-	DECLARE_WRITE8_MEMBER(extbus_w) { logerror("write to external bus %06x %02x\n", offset, data); }
-
+	int m_rgnlen;
+	uint8_t* m_rgn;
 
 	/* this is just a quick memory system bypass for video reads etc. because going through the
 	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
@@ -192,12 +158,71 @@ private:
 		return 0x00;
 	}
 
+protected:
+
+	virtual uint8_t read_io0(uint8_t direction);
+	virtual uint8_t read_io1(uint8_t direction);
+	virtual void write_io0(uint8_t data, uint8_t direction);
+	virtual void write_io1(uint8_t data, uint8_t direction);
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_device<xavix_device> m_maincpu;
+	optional_device<nvram_device> m_nvram;
+	required_device<screen_device> m_screen;
+	required_device<address_map_bank_device> m_lowbus;
+	address_space* m_cpuspace;
+
+private:
+
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void xavix_map(address_map &map);
+
+	void xavix_lowbus_map(address_map &map);
+	void xavix_extbus_map(address_map &map);
+	void superxavix_lowbus_map(address_map &map);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+
+	virtual DECLARE_READ8_MEMBER(opcodes_000000_r)
+	{
+		if (offset & 0x8000)
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+		else
+		{
+			return m_lowbus->read8(space, offset & 0x7fff);
+		}
+	}
+
+	virtual DECLARE_READ8_MEMBER(opcodes_800000_r)
+	{
+		// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
+		return m_rgn[(offset) & (m_rgnlen - 1)];
+	}
+
+	virtual DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
+	virtual DECLARE_WRITE8_MEMBER(extbus_w)
+	{
+		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);	
+	}
+
+
 	DECLARE_READ8_MEMBER(sample_read)
 	{
 		return read_full_data_sp_bypass(offset);
 	};
 
-	inline uint8_t read_full_data_sp_bypass(uint32_t adr)
+	virtual inline uint8_t read_full_data_sp_bypass(uint32_t adr)
 	{
 		uint8_t databank = adr >> 16;
 
@@ -492,9 +517,6 @@ private:
 
 	uint8_t m_spritereg;
 
-	int m_rgnlen;
-	uint8_t* m_rgn;
-
 	// variables used by rendering
 	int m_tmp_dataaddress;
 	int m_tmp_databit;
@@ -505,7 +527,6 @@ private:
 	uint8_t get_next_byte();
 
 	int get_current_address_byte();
-	required_device<address_map_bank_device> m_lowbus;
 
 	required_device<xavix_sound_device> m_sound;
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
@@ -596,7 +617,7 @@ class xavix_cart_state : public xavix_state
 public:
 	xavix_cart_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
+		m_cartslot(*this, "cartslot")
 	{ }
 
 	void xavix_cart(machine_config &config);
@@ -605,9 +626,134 @@ public:
 	void xavix_cart_ddrfammt(machine_config &config);
 
 protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
-	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
+
+	// for Cart cases this memory bypass becomes more complex
+
+	virtual DECLARE_READ8_MEMBER(opcodes_000000_r) override
+	{
+		if (offset & 0x8000)
+		{
+			if (offset & 0x400000)
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+			else
+			{
+				if (m_cartslot->has_cart())
+				{
+					return m_cartslot->read_cart(*m_cpuspace, offset);
+				}
+				else
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+			}
+		}
+		else
+		{
+			return m_lowbus->read8(space, offset & 0x7fff);
+		}
+	}
+
+	virtual DECLARE_READ8_MEMBER(opcodes_800000_r) override
+	{
+		if (offset & 0x400000)
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+		else
+		{
+			if (m_cartslot->has_cart())
+			{
+				return m_cartslot->read_cart(*m_cpuspace, offset);
+			}
+			else
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+		}
+	}
+
+	virtual DECLARE_READ8_MEMBER(extbus_r) override
+	{
+		if (offset & 0x400000)
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+		else
+		{
+			if (m_cartslot->has_cart())
+			{
+				return m_cartslot->read_cart(*m_cpuspace, offset);
+			}
+			else
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+		}	
+	}
+	virtual DECLARE_WRITE8_MEMBER(extbus_w) override
+	{
+		if (m_cartslot->has_cart())
+		{
+			return m_cartslot->write_cart(*m_cpuspace, offset, data);
+		}
+		else
+		{
+			logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
+		}
+	}
+
+	virtual inline uint8_t read_full_data_sp_bypass(uint32_t offset) override
+	{
+		uint8_t databank = offset >> 16;
+
+		if (databank >= 0x80)
+		{
+			if (offset & 0x400000)
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+			else
+			{
+				if (m_cartslot->has_cart())
+				{
+					return m_cartslot->read_cart(*m_cpuspace, offset);
+				}
+				else
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+			}
+		}
+		else
+		{
+			if ((offset & 0xffff) >= 0x8000)
+			{
+				if (offset & 0x400000)
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+				else
+				{
+					if (m_cartslot->has_cart())
+					{
+						return m_cartslot->read_cart(*m_cpuspace, offset);
+					}
+					else
+					{
+						return m_rgn[(offset) & (m_rgnlen - 1)];
+					}
+				}
+			}
+			else
+			{
+				return read_full_data_sp_lowbus_bypass(offset);
+			}
+		}
+	}
+
+	required_device<ekara_cart_slot_device> m_cartslot;
 };
 
 class xavix_i2c_cart_state : public xavix_i2c_state
@@ -615,16 +761,14 @@ class xavix_i2c_cart_state : public xavix_i2c_state
 public:
 	xavix_i2c_cart_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_i2c_state(mconfig,type,tag),
-		m_cart(*this, "cartslot")
+		m_cartslot(*this, "cartslot")
 	{ }
 
 	void xavix_i2c_taiko(machine_config &config);
 
 protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(taiko_cart);
-	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
-};
+	required_device<ekara_cart_slot_device> m_cartslot;
+	};
 
 
 class xavix_ekara_state : public xavix_cart_state

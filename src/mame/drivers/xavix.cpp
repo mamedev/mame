@@ -208,6 +208,8 @@
 
 // NTSC clock for regular XaviX?
 #define MAIN_CLOCK XTAL(21'477'272)
+// some games (eg Radica Opus) run off a 3.579545MHz XTAL ( same as the above /6 ) so presumably there is a divider / multiplier circuit on some PCBs?
+// TODO: what's the PAL clock?
 
 /* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
    the CPU 0 page memory and stack are still at 0 but ROM must be in the 3xxx range (game hasn't got far enough to call this yet to help either)
@@ -235,24 +237,6 @@
 
 
 */
-
-READ8_MEMBER(xavix_state::opcodes_000000_r)
-{
-	if (offset & 0x8000)
-	{
-		return m_rgn[(offset) & (m_rgnlen - 1)];
-	}
-	else
-	{
-		return m_lowbus->read8(space, offset & 0x7fff);
-	}
-}
-
-READ8_MEMBER(xavix_state::opcodes_800000_r)
-{
-	// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
-	return m_rgn[(offset) & (m_rgnlen - 1)];
-}
 
 // this is only used for opcode / oprand reads, data memory addressing is handled in core, doing the opcode / oprand addressing in core causes disassembly issues when running from lowbus space (ram, interrupts on most games)
 void xavix_state::xavix_map(address_map &map)
@@ -850,9 +834,6 @@ void xavix_state::xavix(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(xavix_state::interrupt));
 	m_maincpu->set_vector_callback(FUNC(xavix_state::get_vectors));
 
-	// is a battery / power source required to store NVRAM in the CPU?
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
 	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
@@ -968,49 +949,22 @@ void xavix_madfb_state::xavix_madfb(machine_config &config)
 	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( xavix_cart_state, ekara_cart )
-{
-	uint32_t size = m_cart->common_get_size("rom");
-	std::vector<uint8_t> temp;
-	temp.resize(size);
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(&temp[0], size, "rom");
-
-	memcpy(memregion("bios")->base(), &temp[0], size);
-
-	return image_init_result::PASS;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER( xavix_i2c_cart_state, taiko_cart ) // TODO: check if this really is the same logic as the other ekara carts once some of the 'D' carts are dumped
-{
-	uint32_t size = m_cart->common_get_size("rom");
-	std::vector<uint8_t> temp;
-	temp.resize(size);
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(&temp[0], size, "rom");
-
-	memcpy(memregion("bios")->base(), &temp[0], size);
-
-	return image_init_result::PASS;
-}
-
 
 void xavix_cart_state::xavix_cart(machine_config &config)
 {
 	xavix(config);
 
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ekara_cart", "bin"));
-	m_cart->set_width(GENERIC_ROM8_WIDTH);
-	cartslot.set_device_load(device_image_load_delegate(&xavix_cart_state::device_image_load_ekara_cart, this));
+	// is a battery / power source required to store NVRAM in the CPU?  Popira definitely needs NVRAM storing on power-off, XaviX Tennis won't boot if you do (but that could be an unrelated SEEPROM issue?)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_EKARA_CARTRIDGE_ADD("cartslot", ekara_cart, nullptr)
 }
 
 void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_i2c_24lc02(config);
 
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ekara_cart", "bin"));
-	m_cart->set_width(GENERIC_ROM8_WIDTH);
-	cartslot.set_device_load(device_image_load_delegate(&xavix_i2c_cart_state::device_image_load_taiko_cart, this));
+	MCFG_EKARA_CARTRIDGE_ADD("cartslot", ekara_cart, nullptr)
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
