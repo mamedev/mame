@@ -1393,7 +1393,7 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0xf17000, 0xf17003).portr("SYSTEM");     // GPI03
+	map(0xf17000, 0xf17003).lr16("f17000", [this]() { return uint16_t(m_system->read()); }); // GPI03
 //  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
 	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPI05
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
