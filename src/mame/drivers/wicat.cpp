@@ -596,25 +596,25 @@ WRITE8_MEMBER(wicat_state::video_dma_w)
 READ8_MEMBER(wicat_state::video_uart0_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart0->read(space,noff);
+	return m_videouart0->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart0_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart0->write(space,noff,data);
+	m_videouart0->write(noff,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart1_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart1->read(space,noff);
+	return m_videouart1->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart1_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart1->write(space,noff,data);
+	m_videouart1->write(noff,data);
 }
 
 // XD2210 64 x 4bit NOVRAM

@@ -197,8 +197,8 @@ private:
 	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nevada);
 
-	template<int N> DECLARE_READ8_MEMBER(duart_r);
-	template<int N> DECLARE_WRITE8_MEMBER(duart_w);
+	template<int N> uint8_t duart_r(offs_t offset);
+	template<int N> void duart_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ16_MEMBER(io_board_r);
@@ -344,15 +344,15 @@ void nevada_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 ***************************************************************************/
 
 template<int N>
-READ8_MEMBER(nevada_state::duart_r)
+uint8_t nevada_state::duart_r(offs_t offset)
 {
-	return m_duart[N]->read(space, offset >> 3);
+	return m_duart[N]->read(offset >> 3);
 }
 
 template<int N>
-WRITE8_MEMBER(nevada_state::duart_w)
+void nevada_state::duart_w(offs_t offset, uint8_t data)
 {
-	m_duart[N]->write(space, offset >> 3, data);
+	m_duart[N]->write(offset >> 3, data);
 }
 
 /***************************************************************************/

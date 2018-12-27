@@ -459,12 +459,12 @@ TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 
 }
 
-READ8_MEMBER(mc68681_device::read)
+uint8_t mc68681_device::read(offs_t offset)
 {
 	if (offset == 0x0c)
 		return IVR;
 
-	uint8_t r = duart_base_device::read(space, offset, mem_mask);
+	uint8_t r = duart_base_device::read(offset);
 
 	if (offset == 0x0d)
 	{
@@ -478,7 +478,7 @@ READ8_MEMBER(mc68681_device::read)
 	return r;
 }
 
-READ8_MEMBER(mc68340_duart_device::read)
+uint8_t mc68340_duart_device::read(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -497,19 +497,19 @@ READ8_MEMBER(mc68340_duart_device::read)
 		r = m_chanB->read_MR2();
 		break;
 	default:
-		r = duart_base_device::read(space, offset, mem_mask);
+		r = duart_base_device::read(offset);
 	}
 	return r;
 }
 
-READ8_MEMBER(sc28c94_device::read)
+uint8_t sc28c94_device::read(offs_t offset)
 {
 	uint8_t r = 0;
 	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
-		return duart_base_device::read(space, offset, mem_mask);
+		return duart_base_device::read(offset);
 	}
 
 	switch (offset)
@@ -530,7 +530,7 @@ READ8_MEMBER(sc28c94_device::read)
 	return r;
 }
 
-READ8_MEMBER(xr68c681_device::read)
+uint8_t xr68c681_device::read(offs_t offset)
 {
 	if (offset == 0x02)
 	{
@@ -538,10 +538,10 @@ READ8_MEMBER(xr68c681_device::read)
 		return ISR & IMR;
 	}
 	else
-		return mc68681_device::read(space, offset, mem_mask);
+		return mc68681_device::read(offset);
 }
 
-READ8_MEMBER(duart_base_device::read)
+uint8_t duart_base_device::read(offs_t offset)
 {
 	uint8_t r = 0xff;
 
@@ -631,15 +631,15 @@ READ8_MEMBER(duart_base_device::read)
 	return r;
 }
 
-WRITE8_MEMBER(mc68681_device::write)
+void mc68681_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x0c)
 		IVR = data;
 	else
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 }
 
-WRITE8_MEMBER(mc68340_duart_device::write)
+void mc68340_duart_device::write(offs_t offset, uint8_t data)
 {
 	//printf("Duart write %02x -> %02x\n", data, offset);
 
@@ -658,17 +658,17 @@ WRITE8_MEMBER(mc68340_duart_device::write)
 		m_chanB->write_MR2(data);
 		break;
 	default:
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 	}
 }
 
-WRITE8_MEMBER(sc28c94_device::write)
+void sc28c94_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 	}
 
 	switch (offset)
@@ -689,7 +689,7 @@ WRITE8_MEMBER(sc28c94_device::write)
 	}
 }
 
-WRITE8_MEMBER(xr68c681_device::write)
+void xr68c681_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x02) /* CRA */
 		switch (data >> 4)
@@ -761,10 +761,10 @@ WRITE8_MEMBER(xr68c681_device::write)
 			break;
 		}
 
-	mc68681_device::write(space, offset, data, mem_mask); /* pass on 68681 command */
+	mc68681_device::write(offset, data); /* pass on 68681 command */
 }
 
-WRITE8_MEMBER(duart_base_device::write)
+void duart_base_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x0f;
 	LOG("Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data);

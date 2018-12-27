@@ -281,14 +281,14 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 READ8_MEMBER(vt240_state::duart_r)
 {
 	if(!(offset & 1))
-		return m_duart->read(space, offset >> 1);
+		return m_duart->read(offset >> 1);
 	return 0;
 }
 
 WRITE8_MEMBER(vt240_state::duart_w)
 {
 	if(offset & 1)
-		m_duart->write(space, offset >> 1, data);
+		m_duart->write(offset >> 1, data);
 }
 
 WRITE8_MEMBER(vt240_state::duartout_w)

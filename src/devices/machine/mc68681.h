@@ -120,8 +120,8 @@ public:
 	}
 
 	// API
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(rx_a_w) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER(rx_b_w) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
@@ -225,8 +225,8 @@ class mc68681_device : public duart_base_device
 public:
 	mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 	uint8_t get_irq_vector() { m_read_vector = true; return IVR; }
 
 protected:
@@ -252,8 +252,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rx_c_w) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER(rx_d_w) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -266,8 +266,8 @@ class mc68340_duart_device : public duart_base_device
 public:
 	mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -279,8 +279,8 @@ class xr68c681_device : public mc68681_device
 public:
 	xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_start() override;

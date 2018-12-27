@@ -425,7 +425,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				return m_duart->read(space,offset);
+				return m_duart->read(offset);
 			}
 			else
 			{
@@ -594,7 +594,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				m_duart->write(space,offset,data&0x00ff);
+				m_duart->write(offset,data&0x00ff);
 			}
 			else
 			{
