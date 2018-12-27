@@ -121,12 +121,17 @@ WRITE8_MEMBER(xavix_state::irq_vector_hi_w)
 
 WRITE8_MEMBER(xavix_state::extintrf_7900_w)
 {
+	// some games with cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
 	LOG("%s: extintrf_7900_w %02x (---FIRST WRITE ON STARTUP---)\n", machine().describe_context(), data);
+	m_7900 = data;
+
 }
 
 WRITE8_MEMBER(xavix_state::extintrf_7901_w)
 {
+	// some games with cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
 	LOG("%s: extintrf_7901_w %02x\n", machine().describe_context(), data);
+	m_7901 = data;
 }
 
 WRITE8_MEMBER(xavix_state::extintrf_7902_w)
@@ -914,6 +919,9 @@ void xavix_state::machine_reset()
 	m_sprite_xhigh_ignore_hack = true;
 
 	m_cpuspace = &m_maincpu->space(AS_PROGRAM);
+
+	m_7900 = 0x00;
+	m_7901 = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

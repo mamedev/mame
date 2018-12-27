@@ -171,6 +171,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace;
+	uint8_t m_7900;
+	uint8_t m_7901;
 
 private:
 
@@ -676,31 +678,46 @@ protected:
 
 	virtual DECLARE_READ8_MEMBER(extbus_r) override
 	{
-		if (offset & 0x400000)
+		if (m_7901 & 0x08)
 		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
+			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
+			return 0xff;
+		}
+		else
+		{
+			if (offset & 0x400000)
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+			else
+			{
+				if (m_cartslot->has_cart())
+				{
+					return m_cartslot->read_cart(*m_cpuspace, offset);
+				}
+				else
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+			}
+		}
+	}
+	virtual DECLARE_WRITE8_MEMBER(extbus_w) override
+	{
+		if (m_7900 & 0x08)
+		{
+			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
 		}
 		else
 		{
 			if (m_cartslot->has_cart())
 			{
-				return m_cartslot->read_cart(*m_cpuspace, offset);
+				return m_cartslot->write_cart(*m_cpuspace, offset, data);
 			}
 			else
 			{
-				return m_rgn[(offset) & (m_rgnlen - 1)];
+				logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
 			}
-		}	
-	}
-	virtual DECLARE_WRITE8_MEMBER(extbus_w) override
-	{
-		if (m_cartslot->has_cart())
-		{
-			return m_cartslot->write_cart(*m_cpuspace, offset, data);
-		}
-		else
-		{
-			logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
 		}
 	}
 

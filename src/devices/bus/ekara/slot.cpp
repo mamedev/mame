@@ -94,9 +94,9 @@ struct ekara_slot
 static const ekara_slot slot_list[] =
 {
 	{ EKARA_PLAIN,       "plain" },
-	{ EKARA_I2C_BASE,      "i2c_base" },
-	{ EKARA_I2C_24LC04,      "rom_24lc04" },
-	{ EKARA_I2C_24LC02,      "rom_24lc02" },
+	{ EKARA_I2C_BASE,    "i2c_base" },
+	{ EKARA_I2C_24LC04,  "rom_24lc04" },
+	{ EKARA_I2C_24LC02,  "rom_24lc02" },
 };
 
 static int ekara_get_pcb_id(const char *slot)
