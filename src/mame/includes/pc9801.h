@@ -121,6 +121,7 @@ public:
 	void pc9801rs(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
+	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
