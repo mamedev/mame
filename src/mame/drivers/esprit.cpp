@@ -201,7 +201,7 @@ void esprit_state::esprit3(machine_config &config)
 	crtc.set_char_width(9);
 	crtc.set_update_row_callback(FUNC(esprit_state::crtc_update_row), this);
 	crtc.set_on_update_addr_change_callback(FUNC(esprit_state::crtc_update_addr), this);
-	//crtc.out_hsync_callback().set("via", FUNC(via6522_device::write_pb6)).invert();
+	crtc.out_hsync_callback().set("via", FUNC(via6522_device::write_pb6)).invert();
 }
 
 ROM_START( esprit )
