@@ -1082,7 +1082,7 @@ void midvunit_state::midvunit(machine_config &config)
 {
 	midvcommon(config);
 
-	ADC0844(config, m_adc, 0);
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set_inputline("maincpu", 3);
 	m_adc->ch1_callback().set_ioport("WHEEL");
 	m_adc->ch2_callback().set_ioport("ACCEL");

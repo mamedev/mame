@@ -1132,7 +1132,7 @@ void mcr3_state::maxrpm(machine_config &config)
 {
 	mono_tcs(config);
 
-	ADC0844(config, m_maxrpm_adc, 0);
+	ADC0844(config, m_maxrpm_adc);
 	m_maxrpm_adc->ch1_callback().set_ioport("MONO.IP1");
 	m_maxrpm_adc->ch2_callback().set_ioport("MONO.IP1.ALT1");
 	m_maxrpm_adc->ch3_callback().set_ioport("MONO.IP1.ALT2");

@@ -8780,7 +8780,7 @@ void zombraid_state::zombraid(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	adc0834_device &adc(ADC0834(config, "adc", 0));
+	adc0834_device &adc(ADC0834(config, "adc"));
 	adc.set_input_callback(FUNC(zombraid_state::adc_cb));
 
 	m_x1->set_addrmap(0, &zombraid_state::zombraid_x1_map);

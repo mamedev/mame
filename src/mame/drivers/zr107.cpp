@@ -837,7 +837,7 @@ void zr107_state::zr107(machine_config &config)
 	k054539_2.add_route(0, "lspeaker", 0.75);
 	k054539_2.add_route(1, "rspeaker", 0.75);
 
-	adc0838_device &adc(ADC0838(config, "adc0838", 0));
+	adc0838_device &adc(ADC0838(config, "adc0838"));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	KONPPC(config, m_konppc, 0);

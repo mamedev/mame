@@ -270,7 +270,7 @@ void midxunit_state::midxunit(machine_config &config)
 	/* serial prefixes 419, 420 */
 	m_midway_serial_pic->set_upper(419);
 
-	adc0848_device &adc(ADC0848(config, "adc", 0));
+	adc0848_device &adc(ADC0848(config, "adc"));
 	adc.intr_callback().set(FUNC(midxunit_state::adc_int_w)); // ADC INT passed through PLSI1032
 	adc.ch1_callback().set_ioport("AN0");
 	adc.ch2_callback().set_ioport("AN1");

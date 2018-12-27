@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
 	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
 
-	ADC0844(config, m_adc, 0);
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));
 	m_adc->ch1_callback().set_ioport("THROTTLE");
 	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));

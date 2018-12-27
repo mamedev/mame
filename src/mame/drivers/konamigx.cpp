@@ -1792,7 +1792,7 @@ void konamigx_state::opengolf(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type1_map);
 
-	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 }
 

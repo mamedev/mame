@@ -1255,7 +1255,7 @@ MACHINE_CONFIG_END
 void midyunit_state::term2(machine_config &config)
 {
 	yunit_adpcm_6bit_faster(config);
-	ADC0844(config, m_term2_adc, 0); // U2 on Coil Lamp Driver Board (A-14915)
+	ADC0844(config, m_term2_adc); // U2 on Coil Lamp Driver Board (A-14915)
 	m_term2_adc->ch1_callback().set_ioport("STICK0_X");
 	m_term2_adc->ch2_callback().set_ioport("STICK0_Y");
 	m_term2_adc->ch3_callback().set_ioport("STICK1_X");
