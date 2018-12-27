@@ -32,6 +32,9 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) { }
 
+	virtual DECLARE_READ8_MEMBER(read_extra) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write_extra) { }
+
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint32_t get_rom_size() { return m_rom_size; }
@@ -78,6 +81,9 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
+
+	virtual DECLARE_READ8_MEMBER(read_extra);
+	virtual DECLARE_WRITE8_MEMBER(write_extra);
 
 	bool has_cart() { return m_cart ? true : false; }
 

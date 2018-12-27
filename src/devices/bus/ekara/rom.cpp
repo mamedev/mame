@@ -70,20 +70,32 @@ WRITE8_MEMBER(ekara_rom_plain_device::write_cart)
 
 WRITE8_MEMBER(ekara_rom_plain_device::write_rom)
 {
-	logerror("ekara_rom_plain_device::write_rom %04x %02x\n", offset, data);
+	logerror("ekara_rom_plain_device::write_rom %08x %02x\n", offset, data);
 }
 
 // i2c base
 
 WRITE8_MEMBER(ekara_rom_i2c_base_device::write_rom)
 {
-	logerror("ekara_rom_i2c_base_device::write_rom %04x %02x\n", offset, data);
+	logerror("ekara_rom_i2c_base_device::write_rom %08x %02x\n", offset, data);
 }
 
 READ8_MEMBER(ekara_rom_i2c_base_device::read_rom)
 {
 	return m_rom[offset & (m_rom_size - 1)];
 }
+
+READ8_MEMBER(ekara_rom_i2c_base_device::read_extra)
+{
+	logerror("ekara_rom_i2c_base_device::read_extra %08x\n", offset);
+	return 0xff;
+}
+
+WRITE8_MEMBER(ekara_rom_i2c_base_device::write_extra)
+{
+	logerror("ekara_rom_i2c_base_device::write_extra %08x %02x\n", offset, data);
+}
+
 
 // i2c 24lc04
 

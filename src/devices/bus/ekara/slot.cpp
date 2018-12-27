@@ -218,3 +218,22 @@ WRITE8_MEMBER(ekara_cart_slot_device::write_cart)
 {
 	m_cart->write_cart(space, offset, data);
 }
+
+/*-------------------------------------------------
+ read extra
+ -------------------------------------------------*/
+
+READ8_MEMBER(ekara_cart_slot_device::read_extra)
+{
+	return m_cart->read_extra(space, offset);
+}
+
+/*-------------------------------------------------
+ write extra
+ -------------------------------------------------*/
+
+WRITE8_MEMBER(ekara_cart_slot_device::write_extra)
+{
+	m_cart->write_extra(space, offset, data);
+}
+

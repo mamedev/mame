@@ -20,6 +20,10 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+
+	virtual DECLARE_READ8_MEMBER(read_extra) override { return 0xff; };
+	virtual DECLARE_WRITE8_MEMBER(write_extra) override { };
+
 	virtual READ8_MEMBER(read_rom);
 	virtual WRITE8_MEMBER(write_rom);
 
@@ -48,7 +52,8 @@ protected:
 
 	optional_device<i2cmem_device> m_i2cmem;
 
-protected:
+	virtual DECLARE_READ8_MEMBER(read_extra) override;
+	virtual DECLARE_WRITE8_MEMBER(write_extra) override;
 };
 
 // ======================> ekara_rom_i2c_24lc04_device

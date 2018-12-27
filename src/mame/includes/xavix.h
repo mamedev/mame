@@ -681,7 +681,7 @@ protected:
 		if (m_7901 & 0x08)
 		{
 			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
-			return 0xff;
+			return m_cartslot->read_extra(*m_cpuspace, offset);
 		}
 		else
 		{
@@ -707,6 +707,7 @@ protected:
 		if (m_7900 & 0x08)
 		{
 			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
+			return m_cartslot->write_extra(*m_cpuspace, offset, data);
 		}
 		else
 		{
