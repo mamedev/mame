@@ -13,10 +13,6 @@
 #include "emu.h"
 #include "includes/orion.h"
 
-void orion_state::video_start()
-{
-}
-
 uint32_t orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t code1,code2,code3,code4,color,val;

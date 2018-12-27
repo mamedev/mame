@@ -7,6 +7,10 @@
     various SNK triple Z80 games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SNK_H
+#define MAME_INCLUDES_SNK_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -281,3 +285,5 @@ private:
 	void tnk3_cpuA_map(address_map &map);
 	void tnk3_cpuB_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SNK_H

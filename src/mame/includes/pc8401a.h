@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_PC8401A_H
 #define MAME_INCLUDES_PC8401A_H
+
+#pragma once
 
 
 #include "cpu/z80/z80.h"
@@ -113,10 +113,15 @@ public:
 		: pc8401a_state(mconfig, type, tag)
 	{ }
 
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pc8500(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
 	void pc8500_video(machine_config &config);
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif
+#endif // MAME_INCLUDES_PC8401A_H

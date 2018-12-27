@@ -5,9 +5,10 @@
  * includes/pocketc.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_POCKETC_H
 #define MAME_INCLUDES_POCKETC_H
+
+#pragma once
 
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"

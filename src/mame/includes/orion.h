@@ -82,7 +82,6 @@ protected:
 	DECLARE_MACHINE_START(orion128);
 	DECLARE_MACHINE_RESET(orion128);
 	DECLARE_PALETTE_INIT(orion128);
-	virtual void video_start() override;
 	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
 	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);
@@ -145,8 +144,9 @@ protected:
 class orion_z80_state : public orion_state
 {
 public:
-	orion_z80_state(const machine_config &mconfig, device_type type, const char *tag) :
-		orion_state(mconfig, type, tag) {}
+	orion_z80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: orion_state(mconfig, type, tag)
+	{ }
 
 	void orionz80(machine_config &config);
 	void orionz80ms(machine_config &config);
@@ -159,8 +159,9 @@ protected:
 class orion_pro_state : public orion_state
 {
 public:
-	orion_pro_state(const machine_config &mconfig, device_type type, const char *tag) :
-		orion_state(mconfig, type, tag) {}
+	orion_pro_state(const machine_config &mconfig, device_type type, const char *tag)
+		: orion_state(mconfig, type, tag)
+	{ }
 
 	void orionpro(machine_config &config);
 

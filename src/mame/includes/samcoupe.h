@@ -13,6 +13,8 @@
 #ifndef MAME_INCLUDES_SAMCOUPE_H
 #define MAME_INCLUDES_SAMCOUPE_H
 
+#pragma once
+
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -46,33 +48,33 @@
 class samcoupe_state :  public driver_device
 {
 public:
-	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_screen(*this, "screen"),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_lpt1(*this, "lpt1"),
-			m_lpt2(*this, "lpt2"),
-			m_ram(*this, RAM_TAG),
-			m_rtc(*this, "sambus_clock"),
-			m_fdc(*this, "wd1772"),
-			m_wd1772_0(*this, "wd1772:0"),
-			m_wd1772_1(*this, "wd1772:1"),
-			m_region_maincpu(*this, "maincpu"),
-			m_keyboard_row_fe(*this, "keyboard_row_fe"),
-			m_keyboard_row_fd(*this, "keyboard_row_fd"),
-			m_keyboard_row_fb(*this, "keyboard_row_fb"),
-			m_keyboard_row_f7(*this, "keyboard_row_f7"),
-			m_keyboard_row_ef(*this, "keyboard_row_ef"),
-			m_keyboard_row_df(*this, "keyboard_row_df"),
-			m_keyboard_row_bf(*this, "keyboard_row_bf"),
-			m_keyboard_row_7f(*this, "keyboard_row_7f"),
-			m_keyboard_row_ff(*this, "keyboard_row_ff"),
-			m_mouse_buttons(*this, "mouse_buttons"),
-			m_io_mouse_x(*this, "mouse_x"),
-			m_io_mouse_y(*this, "mouse_y"),
-			m_config(*this, "config")
+	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_lpt1(*this, "lpt1"),
+		m_lpt2(*this, "lpt2"),
+		m_ram(*this, RAM_TAG),
+		m_rtc(*this, "sambus_clock"),
+		m_fdc(*this, "wd1772"),
+		m_wd1772_0(*this, "wd1772:0"),
+		m_wd1772_1(*this, "wd1772:1"),
+		m_region_maincpu(*this, "maincpu"),
+		m_keyboard_row_fe(*this, "keyboard_row_fe"),
+		m_keyboard_row_fd(*this, "keyboard_row_fd"),
+		m_keyboard_row_fb(*this, "keyboard_row_fb"),
+		m_keyboard_row_f7(*this, "keyboard_row_f7"),
+		m_keyboard_row_ef(*this, "keyboard_row_ef"),
+		m_keyboard_row_df(*this, "keyboard_row_df"),
+		m_keyboard_row_bf(*this, "keyboard_row_bf"),
+		m_keyboard_row_7f(*this, "keyboard_row_7f"),
+		m_keyboard_row_ff(*this, "keyboard_row_ff"),
+		m_mouse_buttons(*this, "mouse_buttons"),
+		m_io_mouse_x(*this, "mouse_x"),
+		m_io_mouse_y(*this, "mouse_y"),
+		m_config(*this, "config")
 	{
 		sam_bank_read_ptr[0] = nullptr;
 		sam_bank_write_ptr[0] = nullptr;
@@ -86,7 +88,7 @@ public:
 
 	void samcoupe(machine_config &config);
 
-private:
+protected:
 	enum
 	{
 		TIMER_IRQ_OFF,
@@ -94,8 +96,13 @@ private:
 		TIMER_VIDEO_UPDATE
 	};
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	bitmap_ind16 m_bitmap;
@@ -136,8 +143,6 @@ private:
 	DECLARE_READ8_MEMBER(samcoupe_keyboard_r);
 	DECLARE_WRITE8_MEMBER(samcoupe_border_w);
 	DECLARE_READ8_MEMBER(samcoupe_attributes_r);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(samcoupe);
 	INTERRUPT_GEN_MEMBER(samcoupe_frame_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -207,8 +212,6 @@ private:
 
 	void samcoupe_io(address_map &map);
 	void samcoupe_mem(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_SAMCOUPE_H

@@ -50,9 +50,10 @@ protected:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+
+private:
 	required_ioport_array<10> m_keyboard;
 	uint8_t m_port_101f;
 	uint8_t m_port_202f;

@@ -213,36 +213,28 @@ void radio86_state::mikrosha_8255_font_page_w(uint8_t data)
 
 I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const uint8_t *charmap = m_charmap;
-	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp) {
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t pixels = m_charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if (vsp)
 		pixels = 0;
-	}
-	if (lten) {
+
+	if (lten)
 		pixels = 0xff;
-	}
-	if (rvv) {
+
+	if (rvv)
 		pixels ^= 0xff;
-	}
-	for(i=0;i<6;i++) {
+
+	for (int i = 0; i < 6; i++)
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
-	}
 }
 
-static const rgb_t radio86_palette[3] = {
-	rgb_t(0x00, 0x00, 0x00), // black
-	rgb_t(0xa0, 0xa0, 0xa0), // white
-	rgb_t(0xff, 0xff, 0xff)  // highlight
+static constexpr rgb_t radio86_palette[3] = {
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0xa0, 0xa0, 0xa0 }, // white
+	{ 0xff, 0xff, 0xff }  // highlight
 };
 
 PALETTE_INIT_MEMBER(radio86_state,radio86)
 {
 	palette.set_pen_colors(0, radio86_palette, ARRAY_LENGTH(radio86_palette));
-}
-
-void radio86_state::video_start()
-{
-	m_charmap = memregion("gfx1")->base();
 }

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
+#ifndef MAME_INCLUDES_PORTRAIT_H
+#define MAME_INCLUDES_PORTRAIT_H
+
+#pragma once
+
 #include "sound/tms5220.h"
 #include "emupal.h"
 
@@ -22,6 +27,10 @@ public:
 
 	void portrait(machine_config &config);
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(positive_scroll_w);
@@ -40,9 +49,6 @@ private:
 	void portrait_map(address_map &map);
 	void portrait_sound_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -57,3 +63,5 @@ private:
 	tilemap_t *m_foreground;
 	tilemap_t *m_background;
 };
+
+#endif // MAME_INCLUDES_PORTRAIT_H

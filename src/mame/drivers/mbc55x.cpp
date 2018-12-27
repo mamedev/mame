@@ -30,17 +30,17 @@ ToDo:
 #include "softlist.h"
 #include "speaker.h"
 
-const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
+static constexpr rgb_t mbc55x_palette[SCREEN_NO_COLOURS] =
 {
-	/*normal brightness */
-	{ 0x00,0x00,0x00 }, /* black */
-	{ 0x00,0x00,0x80 }, /* blue */
-	{ 0x00,0x80,0x00 }, /* green */
-	{ 0x00,0x80,0x80 }, /* cyan */
-	{ 0x80,0x00,0x00 }, /* red */
-	{ 0x80,0x00,0x80 }, /* magenta */
-	{ 0x80,0x80,0x00 }, /* yellow */
-	{ 0x80,0x80,0x80 }, /* light grey */
+	// normal brightness
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0x00, 0x00, 0x80 }, // blue
+	{ 0x00, 0x80, 0x00 }, // green
+	{ 0x00, 0x80, 0x80 }, // cyan
+	{ 0x80, 0x00, 0x00 }, // red
+	{ 0x80, 0x00, 0x80 }, // magenta
+	{ 0x80, 0x80, 0x00 }, // yellow
+	{ 0x80, 0x80, 0x80 }  // light grey
 };
 
 
@@ -226,12 +226,9 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(mbc55x_state, mbc55x)
 {
-	int colourno;
-
 	logerror("initializing palette\n");
 
-	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
-		palette.set_pen_color(colourno, mbc55x_palette[colourno][RED], mbc55x_palette[colourno][GREEN], mbc55x_palette[colourno][BLUE]);
+	palette.set_pen_colors(0, mbc55x_palette, ARRAY_LENGTH(mbc55x_palette));
 }
 
 

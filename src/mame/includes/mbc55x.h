@@ -92,8 +92,8 @@ struct keyboard_t
 class mbc55x_state : public driver_device
 {
 public:
-	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_iodecode(*this, "iodecode"),
 		m_crtc(*this, VID_MC6845_NAME),
@@ -117,6 +117,12 @@ public:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_iodecode;
 	uint32_t      m_debug_machine;
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -147,11 +153,6 @@ private:
 	void mbc55x_mem(address_map &map);
 	void mbc55x_iodecode(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void video_reset() override;
-
 	void keyboard_reset();
 	void scan_keyboard();
 	void set_ram_size();
@@ -178,11 +179,6 @@ private:
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);
 };
-
-/*----------- defined in drivers/mbc55x.c -----------*/
-
-extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
-
 
 /*----------- defined in machine/mbc55x.c -----------*/
 
@@ -212,10 +208,6 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 
 
 /*----------- defined in video/mbc55x.c -----------*/
-
-#define RED                     0
-#define GREEN                   1
-#define BLUE                    2
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 

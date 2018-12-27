@@ -258,13 +258,13 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(novagbase_state, novag_lcd)
+	MCFG_PALETTE_INIT_OWNER(novag68k_state, novag_lcd)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(novagbase_state, novag_lcd_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(novag68k_state, novag_lcd_pixel_update)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag68k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_novag_diablo68k);
 
 	/* sound hardware */

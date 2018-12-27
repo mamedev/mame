@@ -5,7 +5,6 @@
  * includes/gb.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_GB_H
 #define MAME_INCLUDES_GB_H
 
@@ -102,6 +101,7 @@ public:
 	void gameboy_map(address_map &map);
 	void gbc_map(address_map &map);
 	void sgb_map(address_map &map);
+
 protected:
 	enum {
 		SIO_ENABLED = 0x80,
@@ -137,29 +137,31 @@ protected:
 class megaduck_state : public gb_state
 {
 public:
-	megaduck_state(const machine_config &mconfig, device_type type, const char *tag)
-		: gb_state(mconfig, type, tag)
-		, m_cartslot(*this, "duckslot")
+	megaduck_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gb_state(mconfig, type, tag),
+		m_cartslot(*this, "duckslot")
 	{ }
 
+	void megaduck(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	DECLARE_READ8_MEMBER(megaduck_video_r);
 	DECLARE_WRITE8_MEMBER(megaduck_video_w);
 	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
 	DECLARE_READ8_MEMBER(megaduck_sound_r1);
 	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
 	DECLARE_READ8_MEMBER(megaduck_sound_r2);
-	DECLARE_MACHINE_START(megaduck);
-	DECLARE_MACHINE_RESET(megaduck);
 	DECLARE_PALETTE_INIT(megaduck);
+	void megaduck_map(address_map &map);
 
 	DECLARE_READ8_MEMBER(cart_r);
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
-	optional_device<megaduck_cart_slot_device> m_cartslot;
-	void megaduck(machine_config &config);
-	void megaduck_map(address_map &map);
+	required_device<megaduck_cart_slot_device> m_cartslot;
 };
-
-
 
 #endif // MAME_INCLUDES_GB_H

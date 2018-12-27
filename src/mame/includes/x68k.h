@@ -11,6 +11,8 @@
 #ifndef MAME_INCLUDES_X68K_H
 #define MAME_INCLUDES_X68K_H
 
+#pragma once
+
 #include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
 #include "machine/8530scc.h"
@@ -251,7 +253,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_16);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(x68000);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(led_callback);
 	TIMER_CALLBACK_MEMBER(scc_ack);

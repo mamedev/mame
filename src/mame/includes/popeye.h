@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
+#ifndef MAME_INCLUDES_POPEYE_H
+#define MAME_INCLUDES_POPEYE_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -10,8 +14,8 @@
 class tnx1_state : public driver_device
 {
 public:
-	tnx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tnx1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_aysnd(*this, "aysnd"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -20,10 +24,12 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_color_prom(*this, "proms"),
-		m_color_prom_spr(*this, "sprpal") { }
+		m_color_prom_spr(*this, "sprpal")
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
 	DECLARE_CUSTOM_INPUT_MEMBER(pop_field_r);
+
 	virtual void config(machine_config &config);
 
 protected:
@@ -125,6 +131,9 @@ protected:
 class tpp2_noalu_state : public tpp2_state
 {
 	using tpp2_state::tpp2_state;
+
 protected:
 	virtual void maincpu_program_map(address_map &map) override;
 };
+
+#endif // MAME_INCLUDES_POPEYE_H

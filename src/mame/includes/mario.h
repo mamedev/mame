@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-
 #ifndef MAME_INCLUDES_MARIO_H
 #define MAME_INCLUDES_MARIO_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/z80dma.h"
@@ -47,9 +48,8 @@
 class mario_state : public driver_device
 {
 public:
-	mario_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-
+	mario_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -69,7 +69,8 @@ public:
 #endif
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_monitor(0) { }
+		m_monitor(0)
+	{ }
 
 	void mario_base(machine_config &config);
 	void masao(machine_config &config);

@@ -416,5 +416,4 @@ private:
 	uint16_t egc_shift(int plane, uint16_t val);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_PC9801_H

@@ -5,9 +5,10 @@
  * includes/tx0.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_TX0_H
 #define MAME_INCLUDES_TX0_H
+
+#pragma once
 
 #include "video/crt.h"
 #include "cpu/pdp1/tx0.h"
@@ -133,8 +134,8 @@ struct magtape_t
 class tx0_state : public driver_device
 {
 public:
-	tx0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tx0_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),

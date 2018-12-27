@@ -196,7 +196,7 @@ void gb_state::machine_reset()
 {
 	gb_init();
 
-	/* Enable BIOS rom */
+	// Enable BIOS ROM
 	m_bios_disable = false;
 }
 
@@ -663,15 +663,15 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 
  ****************************************************************************/
 
-MACHINE_START_MEMBER(megaduck_state,megaduck)
+void megaduck_state::machine_start()
 {
-	save_gb_base();
+	gb_state::machine_start();
 }
 
-MACHINE_RESET_MEMBER(megaduck_state,megaduck)
+void megaduck_state::machine_reset()
 {
-	/* We may have to add some more stuff here, if not then it can be merged back into gb */
-	gb_init();
+	// We may have to add some more stuff here, if not then it can be merged back into gb
+	gb_state::machine_reset();
 
 	m_bios_disable = true;
 }

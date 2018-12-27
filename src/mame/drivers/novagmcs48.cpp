@@ -155,7 +155,7 @@ MACHINE_CONFIG_START(novagmcs48_state::presto)
 	maincpu.p2_out_cb().set(FUNC(novagmcs48_state::presto_control_w));
 	maincpu.bus_out_cb().set(FUNC(novagmcs48_state::presto_mux_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagmcs48_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_novag_presto);
 
 	/* sound hardware */

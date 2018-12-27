@@ -771,9 +771,6 @@ void megaduck_state::megaduck(machine_config &config)
 	screen.set_size(20*8, 18*8);
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
-	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck)
-	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck)
-
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 
 	PALETTE(config, m_palette, 4).set_init(FUNC(megaduck_state::palette_init_megaduck));
