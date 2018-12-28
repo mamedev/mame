@@ -57,6 +57,7 @@ public:
 	void write_chan_reg(int reg, uint8_t data);
 	void update_interrupts();
 
+	void rx_fifo_push(uint8_t data, uint8_t errors);
 	uint8_t read_rx_fifo();
 
 	void baud_updated();
@@ -83,7 +84,7 @@ private:
 
 	/* Receiver */
 	uint8_t rx_enabled;
-	uint8_t rx_fifo[MC68681_RX_FIFO_SIZE];
+	uint16_t rx_fifo[MC68681_RX_FIFO_SIZE];
 	int   rx_fifo_read_ptr;
 	int   rx_fifo_write_ptr;
 	int   rx_fifo_num;

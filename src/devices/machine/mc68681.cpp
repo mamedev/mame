@@ -48,6 +48,8 @@
 #include "emu.h"
 #include "mc68681.h"
 
+#include <algorithm>
+
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
@@ -87,6 +89,7 @@ static const int baud_rate_ACR_1_X_1[] = { 50, 110, 134, 200, 3600, 14400, 28800
 #define STATUS_RECEIVER_READY       0x01
 
 #define MODE_RX_INT_SELECT_BIT      0x40
+#define MODE_BLOCK_ERROR            0x20
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
@@ -1062,6 +1065,7 @@ duart_channel::duart_channel(const machine_config &mconfig, const char *tag, dev
 	, rx_fifo_num(0)
 	, tx_enabled(0)
 {
+	std::fill_n(&rx_fifo[0], MC68681_RX_FIFO_SIZE, 0);
 }
 
 void duart_channel::device_start()
@@ -1109,20 +1113,38 @@ void duart_channel::rcv_complete()
 
 	if (rx_enabled)
 	{
-		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
-		{
-			logerror("68681: FIFO overflow\n");
-			SR |= STATUS_OVERRUN_ERROR;
-			return;
-		}
-		rx_fifo[rx_fifo_write_ptr++] = get_received_char();
-		if ( rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE )
-		{
-			rx_fifo_write_ptr = 0;
-		}
-		rx_fifo_num++;
-		update_interrupts();
+		uint8_t errors = 0;
+		if (is_receive_framing_error())
+			errors |= STATUS_FRAMING_ERROR;
+		if (is_receive_parity_error())
+			errors |= STATUS_PARITY_ERROR;
+		rx_fifo_push(get_received_char(), errors);
 	}
+}
+
+void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
+{
+	if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
+	{
+		logerror("68681: FIFO overflow\n");
+		SR |= STATUS_OVERRUN_ERROR;
+		return;
+	}
+
+	rx_fifo[rx_fifo_write_ptr++] = data | (errors << 8);
+	if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
+		rx_fifo_write_ptr = 0;
+
+	if (rx_fifo_num++ == 0)
+	{
+		SR |= STATUS_RECEIVER_READY;
+		if (!(MR1 & MODE_BLOCK_ERROR))
+			SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
+		SR |= errors;
+	}
+	if (rx_fifo_num == MC68681_RX_FIFO_SIZE)
+		SR |= STATUS_FIFO_FULL;
+	update_interrupts();
 }
 
 void duart_channel::tra_complete()
@@ -1138,22 +1160,7 @@ void duart_channel::tra_complete()
 
 	// if local loopback is on, write the transmitted data as if a byte had been received
 	if ((MR2 & 0xc0) == 0x80)
-	{
-		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
-		{
-			LOG("68681: FIFO overflow\n");
-			SR |= STATUS_OVERRUN_ERROR;
-		}
-		else
-		{
-			rx_fifo[rx_fifo_write_ptr++]= tx_data;
-			if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
-			{
-				rx_fifo_write_ptr = 0;
-			}
-			rx_fifo_num++;
-		}
-	}
+		rx_fifo_push(tx_data, 0);
 
 	update_interrupts();
 }
@@ -1190,26 +1197,6 @@ void duart_channel::tra_callback()
 
 void duart_channel::update_interrupts()
 {
-	if (rx_enabled)
-	{
-		if (rx_fifo_num > 0)
-		{
-			SR |= STATUS_RECEIVER_READY;
-		}
-		else
-		{
-			SR &= ~STATUS_RECEIVER_READY;
-		}
-		if (rx_fifo_num == MC68681_RX_FIFO_SIZE)
-		{
-			SR |= STATUS_FIFO_FULL;
-		}
-		else
-		{
-			SR &= ~STATUS_FIFO_FULL;
-		}
-	}
-
 	// Handle the TxEMT and TxRDY bits based on mode
 	switch (MR2 & 0xc0) // what mode are we in?
 	{
@@ -1298,6 +1285,13 @@ uint8_t duart_channel::read_rx_fifo()
 	}
 
 	rx_fifo_num--;
+	SR &= ~STATUS_FIFO_FULL;
+	if (!(MR1 & MODE_BLOCK_ERROR))
+		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
+	if (rx_fifo_num == 0)
+		SR &= ~STATUS_RECEIVER_READY;
+	else
+		SR |= rx_fifo[rx_fifo_read_ptr] >> 8;
 	update_interrupts();
 
 	//printf("Rx read %02x\n", rv);
@@ -1446,6 +1440,7 @@ void duart_channel::write_CR(uint8_t data)
 	case 2: /* Reset channel receiver (disable receiver and flush fifo) */
 		rx_enabled = 0;
 		SR &= ~STATUS_RECEIVER_READY;
+		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
 		SR &= ~STATUS_OVERRUN_ERROR; // is this correct?
 		rx_fifo_read_ptr = 0;
 		rx_fifo_write_ptr = 0;
