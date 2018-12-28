@@ -27,77 +27,77 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, black_t, u32 entries)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_all_black), this), entries)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_all_black), tag, this), entries)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome), this), 2)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome), tag, this), 2)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_inv_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), this), 2)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), tag, this), 2)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_hi_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), this), 3)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), tag, this), 3)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rgb), this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rgb), tag, this), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rbg_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rbg), this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rbg), tag, this), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_grb), this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_grb), tag, this), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, gbr_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_gbr), this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_gbr), tag, this), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, brg_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_brg), this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_brg), tag, this), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_bgr), this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_bgr), tag, this), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_555), this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_555), tag, this), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_grb_555), this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_grb_555), tag, this), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_555), this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_555), tag, this), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_565_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_565), this), 65536)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_565), tag, this), 65536)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_565_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_565), this), 65536)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_565), tag, this), 65536)
 {
 }
 

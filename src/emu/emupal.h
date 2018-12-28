@@ -305,7 +305,7 @@ public:
 
 	template <typename T>
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_444_prom_t, T &&region, u32 entries)
-		: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_444_proms), this), entries)
+		: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_444_proms), tag, this), entries)
 	{
 		set_prom_region(std::forward<T>(region));
 	}
