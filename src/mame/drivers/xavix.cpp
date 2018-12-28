@@ -374,8 +374,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 
 	// CPU Vector registers
 	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // enables / disables the custom vectors
-	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::nmi_vector_lo_w)); // an IRQ vector (nmi?)
-	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::nmi_vector_hi_w));
+	map(0x7ffa, 0x7ffa).rw(FUNC(xavix_state::nmi_vector_lo_r), FUNC(xavix_state::nmi_vector_lo_w)); // an IRQ vector (nmi?) - popira needs to read it back if you pause on one of the seeprom carts
+	map(0x7ffb, 0x7ffb).rw(FUNC(xavix_state::nmi_vector_hi_r), FUNC(xavix_state::nmi_vector_hi_w));
 	map(0x7ffc, 0x7ffc).rw(FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
 	// map(0x7ffd, 0x7ffd) some of the Nostalgia games read here, why?
 	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector_lo_w)); // an IRQ vector (irq?)
@@ -1215,7 +1215,6 @@ CONS( 200?, has_wamg,  0,          0,  xavix,            xavix,    xavix_state, 
 
 
 /* Music titles: Emulation note:
-   Popira has a 'pause' function with the SEEPROM based carts (D series, SP series, later G series) but pausing it crashes the emulation? (check real system)
    SEEPROM write appears to work (save NVRAM file looks valid) but game fails to read it back properly, fails backup data checksum, and blanks it again.
    Timers might not be 100%, PAL stuff uses different ways to do timing.
 */

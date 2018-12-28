@@ -94,10 +94,20 @@ WRITE8_MEMBER(xavix_state::vector_enable_w)
 	m_vectorenable = data;
 }
 
+READ8_MEMBER(xavix_state::nmi_vector_lo_r)
+{
+	return m_nmi_vector_lo_data;
+}
+
 WRITE8_MEMBER(xavix_state::nmi_vector_lo_w)
 {
 	LOG("%s: nmi_vector_lo_w %02x\n", machine().describe_context(), data);
 	m_nmi_vector_lo_data = data;
+}
+
+READ8_MEMBER(xavix_state::nmi_vector_hi_r)
+{
+	return m_nmi_vector_hi_data;
 }
 
 WRITE8_MEMBER(xavix_state::nmi_vector_hi_w)

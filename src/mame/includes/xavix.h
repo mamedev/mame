@@ -294,6 +294,9 @@ private:
 	uint8_t m_io0_direction;
 	uint8_t m_io1_direction;
 
+	DECLARE_READ8_MEMBER(nmi_vector_lo_r);
+	DECLARE_READ8_MEMBER(nmi_vector_hi_r);
+
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
 	DECLARE_WRITE8_MEMBER(nmi_vector_hi_w);
