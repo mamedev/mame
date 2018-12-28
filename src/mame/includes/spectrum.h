@@ -180,7 +180,7 @@ protected:
 
 	DECLARE_MACHINE_RESET(spectrum);
 	DECLARE_VIDEO_START(spectrum);
-	DECLARE_PALETTE_INIT(spectrum);
+	void spectrum_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(tc2048);
 	DECLARE_VIDEO_START(spectrum_128);
 	DECLARE_MACHINE_RESET(spectrum_128);

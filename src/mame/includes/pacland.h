@@ -71,7 +71,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pacland);
+	void pacland_palette(palette_device &palette);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 

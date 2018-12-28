@@ -70,8 +70,6 @@ public:
 	DECLARE_READ8_MEMBER( vcount_read );
 	DECLARE_READ8_MEMBER( hcount_read );
 
-	DECLARE_PALETTE_INIT( sega315_5124 );
-
 	void hcount_latch() { hcount_latch_at_hpos(screen().hpos()); };
 	void hcount_latch_at_hpos(int hpos);
 
@@ -83,7 +81,6 @@ public:
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) { }
 
-	void sega315_5124(address_map &map);
 protected:
 	static constexpr unsigned SEGA315_5377_CRAM_SIZE        = 0x40; /* 32 colors x 2 bytes per color = 64 bytes */
 	static constexpr unsigned SEGA315_5124_CRAM_SIZE        = 0x20; /* 32 colors x 1 bytes per color = 32 bytes */
@@ -96,6 +93,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual space_config_vector memory_space_config() const override;
+
+	void sega315_5124_palette(palette_device &palette) const;
+
+	void sega315_5124(address_map &map);
 
 	void set_display_settings();
 	void set_frame_timing();
@@ -228,7 +229,7 @@ protected:
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line) override;
 
 private:
-	DECLARE_PALETTE_INIT( sega315_5377 );
+	void sega315_5377_palette(palette_device &palette) const;
 };
 
 

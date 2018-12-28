@@ -307,9 +307,7 @@ void gradius3_state::gradius3(machine_config &config)
 	screen.set_screen_update(FUNC(gradius3_state::screen_update_gradius3));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2048));
-	palette.set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
-	palette.enable_shadows();
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");

@@ -316,7 +316,6 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -326,9 +325,8 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	MCFG_SCREEN_UPDATE_DRIVER(ashnojoe_state, screen_update_ashnojoe)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ashnojoe)
-	MCFG_PALETTE_ADD("palette", 0x1000/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ashnojoe);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

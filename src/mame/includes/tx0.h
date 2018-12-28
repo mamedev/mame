@@ -172,7 +172,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tx0);
+	void tx0_palette(palette_device &palette) const;
 	uint32_t screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tx0);
 	INTERRUPT_GEN_MEMBER(tx0_interrupt);

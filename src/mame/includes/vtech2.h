@@ -5,9 +5,10 @@
  * includes/vtech2.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_VTECH2_H
 #define MAME_INCLUDES_VTECH2_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "bus/generic/carts.h"
@@ -49,14 +50,16 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(laser_bank_select_w);
 	DECLARE_WRITE8_MEMBER(laser_fdc_w);
 	DECLARE_WRITE8_MEMBER(laser_bg_mode_w);
 	DECLARE_WRITE8_MEMBER(laser_two_color_w);
 	DECLARE_READ8_MEMBER(laser_fdc_r);
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(vtech2);
+	void vtech2_palette(palette_device &palette) const;
 	uint32_t screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
 	DECLARE_WRITE8_MEMBER(mmio_w);
@@ -111,6 +114,5 @@ private:
 
 	memory_region *m_cart_rom;
 };
-
 
 #endif // MAME_INCLUDES_VTECH2_H

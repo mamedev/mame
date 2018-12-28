@@ -206,8 +206,7 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_stadhero);
-
-	PALETTE(config, "palette", 1024).set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO_BAC06(config, m_tilegen, 0);
 	m_tilegen->set_gfx_region_wide(1, 1, 2);

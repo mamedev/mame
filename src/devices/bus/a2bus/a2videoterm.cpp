@@ -171,7 +171,7 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0),
-	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_palette(*this, ":palette"),
+	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_palette(*this, ":a2video"),
 	m_rambank(0)
 {
 }

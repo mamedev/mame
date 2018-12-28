@@ -611,11 +611,10 @@ MACHINE_CONFIG_START(magicbub_state::magicbub)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(magicbub_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsun16);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -649,11 +648,10 @@ MACHINE_CONFIG_START(shocking_state::shocking)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(shocking_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsun16);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

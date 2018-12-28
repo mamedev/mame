@@ -417,13 +417,13 @@ MACHINE_CONFIG_START(simpl156_state::chainrec)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(simpl156_state, screen_update_simpl156)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette);
+	m_palette->set_format(palette_device::xBGR_555, 4096);
+	m_palette->set_membits(16);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_simpl156)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_simpl156)
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);

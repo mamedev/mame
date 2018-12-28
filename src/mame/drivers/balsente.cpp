@@ -1374,7 +1374,7 @@ void balsente_state::balsente(machine_config &config)
 	m_screen->set_screen_update(FUNC(balsente_state::screen_update_balsente));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 1024);
+	PALETTE(config, m_palette).set_entries(1024);
 
 
 	/* sound hardware */
@@ -1436,6 +1436,7 @@ void balsente_state::rescraid(machine_config &config)
 void balsente_state::triviamb(machine_config &config)
 {
 	balsente(config);
+
 	config.device_remove("outlatch");
 	config.device_remove("acia");
 	config.device_remove("audio6vb");
@@ -1461,7 +1462,7 @@ void balsente_state::triviamb(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(4);
 
-	m_palette->set_format(PALETTE_FORMAT_BBGGGRRR);
+	m_palette->set_format(palette_device::BGR_233, 1024);
 
 	// sound PCB has: 2x Z80CTC, 2x AY8910A, 1x M5205, 1x 8MHz XTAL (divisor unknown for every device)
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);

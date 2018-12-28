@@ -127,15 +127,16 @@
 class mil4000_state : public driver_device
 {
 public:
-	mil4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mil4000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U) { }
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	void chewheel(machine_config &config);
 	void mil4000(machine_config &config);
@@ -576,10 +577,8 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x800)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mil4000)
+	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::RGBx_555, 0x800);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mil4000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.

@@ -37,8 +37,8 @@
 class quickpick5_state : public driver_device
 {
 public:
-	quickpick5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	quickpick5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_k053245(*this, "k053245"),
@@ -421,9 +421,8 @@ void quickpick5_state::quickpick5(machine_config &config)
 	screen.set_screen_update(FUNC(quickpick5_state::screen_update_quickpick5));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 1024);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette(m_palette);

@@ -466,12 +466,10 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cop01)
-	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cop01);
+	PALETTE(config, m_palette, FUNC(cop01_state::cop01_palette), 16+8*16+16*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -507,12 +505,10 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cop01)
-	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cop01);
+	PALETTE(config, m_palette, FUNC(cop01_state::cop01_palette), 16+8*16+16*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -526,7 +522,6 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-
 MACHINE_CONFIG_END
 
 

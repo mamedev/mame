@@ -329,7 +329,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
 public:
-	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
+	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

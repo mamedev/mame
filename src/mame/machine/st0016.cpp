@@ -124,7 +124,7 @@ void st0016_cpu_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	PALETTE(config, "palette", 16*16*4+1);
+	PALETTE(config, "palette").set_entries(16*16*4+1);
 
 	st0016_device &stsnd(ST0016(config, "stsnd", 0));
 	stsnd.ram_read().set(FUNC(st0016_cpu_device::soundram_read));

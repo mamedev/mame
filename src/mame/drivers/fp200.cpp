@@ -32,8 +32,8 @@ class fp200_state : public driver_device
 {
 public:
 	fp200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void fp200(machine_config &config);
@@ -72,7 +72,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
-	DECLARE_PALETTE_INIT(fp200);
+	void fp200_palette(palette_device &palette) const;
 	void fp200_io(address_map &map);
 	void fp200_map(address_map &map);
 
@@ -572,7 +572,7 @@ void fp200_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(fp200_state, fp200)
+void fp200_state::fp200_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
@@ -608,7 +608,7 @@ void fp200_state::fp200(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_fp200);
 
-	PALETTE(config, "palette", 2).set_init(FUNC(fp200_state::palette_init_fp200));
+	PALETTE(config, "palette", FUNC(fp200_state::fp200_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

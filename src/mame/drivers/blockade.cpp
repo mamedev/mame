@@ -30,8 +30,8 @@
 class blockade_state : public driver_device
 {
 public:
-	blockade_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	blockade_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -482,7 +482,7 @@ void blockade_state::blockade(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_blockade);
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

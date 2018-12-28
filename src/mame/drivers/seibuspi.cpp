@@ -1893,7 +1893,7 @@ void seibuspi_state::spi(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
 
-	PALETTE(config, m_palette, 6144).set_init("palette", FUNC(palette_device::palette_init_all_black));
+	PALETTE(config, m_palette, palette_device::BLACK, 6144);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
@@ -2015,7 +2015,7 @@ void seibuspi_state::sys386i(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
 
-	PALETTE(config, m_palette, 6144).set_init("palette", FUNC(palette_device::palette_init_all_black));
+	PALETTE(config, m_palette, palette_device::BLACK, 6144);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
@@ -2074,7 +2074,7 @@ void seibuspi_state::sys386f(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys386f);
 
-	PALETTE(config, m_palette, 8192).set_init("palette", FUNC(palette_device::palette_init_all_black));
+	PALETTE(config, m_palette, palette_device::BLACK, 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 

@@ -693,7 +693,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(31, 15);
 
-	MCFG_DEVICE_ADD("spriteram16", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram16);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -703,9 +703,8 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	m_screen->screen_vblank().append(FUNC(twincobr_state::twincobr_vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twincobr)
-	MCFG_PALETTE_ADD("palette", 1792)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twincobr);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1792);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

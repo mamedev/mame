@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(32, 14);
 
-	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram8);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -434,9 +434,8 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wardner);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

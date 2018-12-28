@@ -604,7 +604,7 @@ void tnx1_state::config(machine_config &config)
 	screen.screen_vblank().set(FUNC(tnx1_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popeye);
-	PALETTE(config, m_palette, 16+16*2+8*4).set_init(FUNC(tnx1_state::palette_init_tnx1));
+	PALETTE(config, m_palette, FUNC(tnx1_state::tnx1_palette), 16 + 16*2 + 8*4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1160,7 +1160,7 @@ void missile_state::missile(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	PALETTE(config, m_palette, 8);
+	PALETTE(config, m_palette).set_entries(8);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);

@@ -76,7 +76,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_sl_tile_info);
-	DECLARE_PALETTE_INIT(dday);
+	void dday_palette(palette_device &palette) const;
 	uint32_t screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(countdown_timer_callback);
 	void start_countdown_timer();

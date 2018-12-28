@@ -247,8 +247,8 @@ private:
 	DECLARE_WRITE8_MEMBER(mjvegasa_12400_w);
 	DECLARE_READ8_MEMBER(mjvegasa_12500_r);
 
-	DECLARE_PALETTE_INIT(royalmah);
-	DECLARE_PALETTE_INIT(mjderngr);
+	void royalmah_palette(palette_device &palette) const;
+	void mjderngr_palette(palette_device &palette) const;
 
 	uint32_t screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -336,54 +336,52 @@ void royalmah_state::machine_start()
 	save_item(NAME(m_flip_screen));
 }
 
-PALETTE_INIT_MEMBER(royalmah_state, royalmah)
+void royalmah_state::royalmah_palette(palette_device &palette) const
 {
-	offs_t i;
-	const uint8_t *prom = memregion("proms")->base();
-	int len = memregion("proms")->bytes();
+	uint8_t const *const prom = memregion("proms")->base();
 
-	for (i = 0; i < len; i++)
+	offs_t const len(memregion("proms")->bytes());
+	for (offs_t i = 0; i < len; i++)
 	{
-		uint8_t bit0, bit1, bit2, r, g, b;
+		uint8_t bit0, bit1, bit2;
 
-		uint8_t data = prom[i];
+		uint8_t const data = prom[i];
 
-		/* red component */
-		bit0 = (data >> 0) & 0x01;
-		bit1 = (data >> 1) & 0x01;
-		bit2 = (data >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(data, 0);
+		bit1 = BIT(data, 1);
+		bit2 = BIT(data, 2);
+		uint8_t const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (data >> 3) & 0x01;
-		bit1 = (data >> 4) & 0x01;
-		bit2 = (data >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(data, 3);
+		bit1 = BIT(data, 4);
+		bit2 = BIT(data, 5);
+		uint8_t const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
-		bit1 = (data >> 6) & 0x01;
-		bit2 = (data >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(data, 6);
+		bit2 = BIT(data, 7);
+		uint8_t const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i, r,g,b);
+		palette.set_pen_color(i, r, g, b);
 	}
 }
 
-PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
+void royalmah_state::mjderngr_palette(palette_device &palette) const
 {
-	offs_t i;
-	const uint8_t *prom = memregion("proms")->base();
-	int len = memregion("proms")->bytes();
+	uint8_t const *const prom = memregion("proms")->base();
 
-	for (i = 0; i < len / 2; i++)
+	offs_t const len(memregion("proms")->bytes());
+	for (offs_t i = 0; i < (len / 2); i++)
 	{
-		uint16_t data = (prom[i] << 8) | prom[i + 0x200];
+		uint16_t const data = (prom[i] << 8) | prom[i + 0x200];
 
-		/* the bits are in reverse order */
-		uint8_t r = bitswap<8>((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
-		uint8_t g = bitswap<8>((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
-		uint8_t b = bitswap<8>((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
+		// the bits are in reverse order
+		uint8_t const r = bitswap<5>((data >>  0) & 0x1f, 0, 1, 2, 3, 4);
+		uint8_t const g = bitswap<5>((data >>  5) & 0x1f, 0, 1, 2, 3, 4);
+		uint8_t const b = bitswap<5>((data >> 10) & 0x1f, 0, 1, 2, 3, 4);
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -3545,8 +3543,7 @@ MACHINE_CONFIG_START(royalmah_state::royalmah)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 16*4)
-	MCFG_PALETTE_INIT_OWNER(royalmah_state,royalmah)
+	PALETTE(config, "palette", FUNC(royalmah_state::royalmah_palette), 16*4);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(256, 256)
@@ -3714,9 +3711,9 @@ MACHINE_CONFIG_START(royalmah_state::mjderngr)
 	MCFG_DEVICE_IO_MAP(mjderngr_iomap)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16*32)
-	MCFG_PALETTE_INIT_OWNER(royalmah_state,mjderngr)
+	auto &palette(*subdevice<palette_device>("palette"));
+	palette.set_entries(16*32);
+	palette.set_init(FUNC(royalmah_state::mjderngr_palette));
 MACHINE_CONFIG_END
 
 void royalmah_state::janptr96(machine_config &config)

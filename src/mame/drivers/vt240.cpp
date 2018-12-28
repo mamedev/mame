@@ -673,7 +673,7 @@ void vt240_state::vt240(machine_config &config)
 	screen.set_raw(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480);
 	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 
-	PALETTE(config, m_palette, 32);
+	PALETTE(config, m_palette).set_entries(32);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_vt240);
 
 	UPD7220(config, m_hgdc, XTAL(16'097'280) / 16); // actually /8?

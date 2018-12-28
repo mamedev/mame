@@ -2286,7 +2286,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 400-1);
 	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
 
-	PALETTE(config, m_palette, 0x200);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	EEPROM_93C56_16BIT(config, m_eeprom[0]);
 	EEPROM_93C56_16BIT(config, m_eeprom[1]);

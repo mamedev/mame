@@ -81,7 +81,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(orionpro_io_w);
 	DECLARE_MACHINE_START(orion128);
 	DECLARE_MACHINE_RESET(orion128);
-	DECLARE_PALETTE_INIT(orion128);
+	void orion128_palette(palette_device &palette) const;
 	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
 	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);

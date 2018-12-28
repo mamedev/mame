@@ -91,7 +91,7 @@ private:
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_disable_w);
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
-	DECLARE_PALETTE_INIT(toypop);
+	void toypop_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(dipA_l);
 	DECLARE_READ8_MEMBER(dipA_h);
 	DECLARE_READ8_MEMBER(dipB_l);
@@ -129,48 +129,48 @@ private:
 	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
 };
 
-PALETTE_INIT_MEMBER(namcos16_state, toypop)
+void namcos16_state::toypop_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (int i = 0;i < 256;i++)
+	for (int i = 0; i < 256; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
 		// red component
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		// green component
-		bit0 = (color_prom[i+0x100] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
-		bit2 = (color_prom[i+0x100] >> 2) & 0x01;
-		bit3 = (color_prom[i+0x100] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 0x100], 0);
+		bit1 = BIT(color_prom[i + 0x100], 1);
+		bit2 = BIT(color_prom[i + 0x100], 2);
+		bit3 = BIT(color_prom[i + 0x100], 3);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		// blue component
-		bit0 = (color_prom[i+0x200] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x200] >> 1) & 0x01;
-		bit2 = (color_prom[i+0x200] >> 2) & 0x01;
-		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 0x200], 0);
+		bit1 = BIT(color_prom[i + 0x200], 1);
+		bit2 = BIT(color_prom[i + 0x200], 2);
+		bit3 = BIT(color_prom[i + 0x200], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_indirect_color(i, rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	for (int i = 0;i < 256;i++)
+	for (int i = 0; i < 256; i++)
 	{
-		uint8_t entry;
-
 		// characters
 		palette.set_pen_indirect(i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
 		palette.set_pen_indirect(i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
+
 		// sprites
-		entry = color_prom[i + 0x500];
+		uint8_t const entry = color_prom[i + 0x500];
 		palette.set_pen_indirect(i + 2*256, entry);
 	}
-	for (int i = 0;i < 16;i++)
+
+	for (int i = 0; i < 16; i++)
 	{
 		// background
 		palette.set_pen_indirect(i + 3*256 + 0*16, 0x60 + i);
@@ -729,9 +729,7 @@ void namcos16_state::liblrabl(machine_config &config)
 	screen.screen_vblank().set(FUNC(namcos16_state::slave_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toypop);
-	PALETTE(config, m_palette, 128*4+64*4+16*2);
-	m_palette->set_indirect_entries(256);
-	m_palette->set_init(FUNC(namcos16_state::palette_init_toypop));
+	PALETTE(config, m_palette, FUNC(namcos16_state::toypop_palette), 128*4 + 64*4 + 16*2, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

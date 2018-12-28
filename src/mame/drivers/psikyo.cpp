@@ -1045,7 +1045,7 @@ void psikyo_state::sngkace(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
-	PALETTE(config, m_palette, 0x1000).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,sngkace)
 
@@ -1090,7 +1090,7 @@ void psikyo_state::gunbird(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
-	PALETTE(config, m_palette, 0x1000).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
@@ -1130,7 +1130,7 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
-	PALETTE(config, m_palette, 0x1000).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
@@ -1172,7 +1172,7 @@ void psikyo_state::s1945(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
-	PALETTE(config, m_palette, 0x1000).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 

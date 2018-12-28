@@ -4229,8 +4229,7 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	blitter.ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 	blitter.blit_dest_cb().set(FUNC(dynax_state::dynax_blit_dest_w));
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
+	PALETTE(config, m_palette, FUNC(dynax_state::sprtmtch_palette), 512); // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
@@ -4286,9 +4285,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
-	MCFG_PALETTE_ADD("palette", 512)
-
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
+	PALETTE(config, m_palette, FUNC(dynax_state::sprtmtch_palette), 512); // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
@@ -4360,7 +4357,7 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
-	MCFG_PALETTE_ADD("palette", 16*256)
+	PALETTE(config, m_palette).set_entries(16*256);
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
@@ -4429,7 +4426,7 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
-	MCFG_PALETTE_ADD("palette", 16*256)
+	PALETTE(config, m_palette).set_entries(16*256);
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
@@ -4491,9 +4488,7 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
-	MCFG_PALETTE_ADD("palette", 512)
-
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
+	PALETTE(config, m_palette, FUNC(dynax_state::sprtmtch_palette), 512); // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,sprtmtch)
 
 	/* sound hardware */
@@ -4558,9 +4553,7 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 	// No blitter IRQ
 
-	MCFG_PALETTE_ADD("palette", 512)
-
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
+	PALETTE(config, m_palette, FUNC(dynax_state::sprtmtch_palette), 512); // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
@@ -4702,8 +4695,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	m_soundlatch->set_separate_acknowledge(true);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
+	PALETTE(config, m_palette, FUNC(dynax_state::sprtmtch_palette), 512); // static palette
 	config.set_default_layout(layout_dualhuov);
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
@@ -4758,11 +4750,11 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MSM6242(config, "rtc", 32.768_kHz_XTAL);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dynax_state::janyuki)
+void dynax_state::janyuki(machine_config &config)
+{
 	jantouki(config);
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(dynax_state,janyuki)         // static palette
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(dynax_state::janyuki_palette)); // static palette
+}
 
 
 /***************************************************************************
@@ -4895,7 +4887,7 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::tenkai_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(dynax_state::tenkai_blitter_irq_w));
 
-	MCFG_PALETTE_ADD("palette", 16*256)
+	PALETTE(config, m_palette).set_entries(16*256);
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 
@@ -4913,12 +4905,12 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dynax_state::majrjhdx)
+void dynax_state::majrjhdx(machine_config &config)
+{
 	tenkai(config);
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(512)
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
-MACHINE_CONFIG_END
+	m_palette->set_entries(512);
+	m_palette->set_init(FUNC(dynax_state::sprtmtch_palette)); // static palette
+}
 
 void dynax_state::mjreach(machine_config &config)
 {
@@ -4969,8 +4961,7 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
+	PALETTE(config, m_palette, FUNC(dynax_state::sprtmtch_palette), 512); // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */

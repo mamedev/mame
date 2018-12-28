@@ -754,7 +754,7 @@ void m90_state::m90(machine_config &config)
 	m_screen->screen_vblank().set_inputline("maincpu", NEC_INPUT_LINE_INTP0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m90);
-	PALETTE(config, m_palette, 512).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

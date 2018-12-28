@@ -105,7 +105,7 @@ public:
 		, m_ms7004(*this, "ms7004")
 		, m_screen(*this, "screen")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void ksm(machine_config &config);
 
@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);

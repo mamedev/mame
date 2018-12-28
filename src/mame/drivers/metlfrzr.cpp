@@ -33,8 +33,8 @@
 class metlfrzr_state : public driver_device
 {
 public:
-	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_work_ram(*this, "wram"),
@@ -376,11 +376,9 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200).set_indirect_entries(256 * 2);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlfrzr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlfrzr);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -389,7 +387,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 16, 256 - 16 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(metlfrzr_state, screen_update_metlfrzr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -812,7 +812,7 @@ void zr107_state::zr107(machine_config &config)
 	m_screen->set_visarea(0*8, 64*8-1, 0*8, 48*8-1);
 	m_screen->screen_vblank().set(FUNC(zr107_state::vblank));
 
-	PALETTE(config, m_palette, 65536);
+	PALETTE(config, m_palette).set_entries(65536);
 
 	K001005(config, m_k001005, 0, m_k001006_1);
 

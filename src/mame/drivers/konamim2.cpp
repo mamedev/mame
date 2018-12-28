@@ -247,8 +247,8 @@ Notes:
 class konamim2_state : public driver_device
 {
 public:
-	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	konamim2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ppc1(*this, "ppc1"),
 		m_ppc2(*this, "ppc2"),
 		m_bda(*this, "bda"),

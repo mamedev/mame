@@ -1616,10 +1616,10 @@ MACHINE_CONFIG_START(dec0_state::dec0_base)
 	//MCFG_SCREEN_SIZE(32*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	//MCFG_SCREEN_UPDATE_DRIVER differs per game
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dec0)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dec0)
+	PALETTE(config, m_palette);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
@@ -1655,8 +1655,7 @@ MACHINE_CONFIG_START(dec0_state::dec0)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(XBGR)
+	m_palette->set_format(palette_device::xBGR_888, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1684,8 +1683,7 @@ MACHINE_CONFIG_START(dec0_state::dec1)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	m_palette->set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1753,7 +1751,7 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_automat)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
@@ -1771,10 +1769,9 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	m_spritegen->set_gfx_region(3);
 	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_automat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_automat)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1832,7 +1829,7 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_secretab)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
@@ -1850,10 +1847,9 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	m_spritegen->set_gfx_region(3);
 	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_secretab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_secretab)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

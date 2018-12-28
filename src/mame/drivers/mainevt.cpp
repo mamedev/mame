@@ -444,9 +444,7 @@ void mainevt_state::mainevt(machine_config &config)
 	screen.set_screen_update(FUNC(mainevt_state::screen_update_mainevt));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 256));
-	palette.enable_shadows();
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 256).enable_shadows();
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
@@ -493,9 +491,7 @@ void mainevt_state::devstors(machine_config &config)
 	screen.set_screen_update(FUNC(mainevt_state::screen_update_dv));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 256));
-	palette.enable_shadows();
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 256).enable_shadows();
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");

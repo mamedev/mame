@@ -791,8 +791,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	screen.set_screen_update(FUNC(oric_state::screen_update_oric));
 	screen.screen_vblank().set(FUNC(oric_state::vblank_w));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -7873,7 +7873,7 @@ void seta_state::tndrcade(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -7928,7 +7928,7 @@ void seta_state::twineagl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,twineagl_1_layer)
 
@@ -7974,7 +7974,7 @@ void seta_state::downtown(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
@@ -8055,10 +8055,7 @@ void usclssic_state::usclssic(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_usclssic);
-
-	PALETTE(config, m_palette, 16*32 + 64*32*2);        /* sprites, layer */
-	m_palette->set_indirect_entries(0x400);
-	m_palette->set_init(FUNC(usclssic_state::palette_init_usclssic)); /* layer is 6 planes deep */
+	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta_1_layer)
 
@@ -8118,7 +8115,7 @@ void seta_state::calibr50(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
@@ -8167,7 +8164,7 @@ void seta_state::metafox(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
@@ -8207,7 +8204,7 @@ void seta_state::atehate(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -8252,10 +8249,7 @@ void seta_state::blandia(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blandia);
-
-	PALETTE(config, m_palette, (16*32+64*32*4)*2);  /* sprites, layer1, layer2, palette effect */
-	m_palette->set_indirect_entries(0x600*2);
-	m_palette->set_init(FUNC(seta_state::palette_init_blandia)); /* layers 1&2 are 6 planes deep */
+	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8290,10 +8284,7 @@ void seta_state::blandiap(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blandia);
-
-	PALETTE(config, m_palette, (16*32+64*32*4)*2);  /* sprites, layer1, layer2, palette effect */
-	m_palette->set_indirect_entries(0x600*2);
-	m_palette->set_init(FUNC(seta_state::palette_init_blandia)); /* layers 1&2 are 6 planes deep */
+	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8331,7 +8322,7 @@ void seta_state::blockcar(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -8405,7 +8396,7 @@ void seta_state::daioh(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer1, layer2 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8442,7 +8433,7 @@ void seta_state::daiohp(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_daiohp);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer1, layer2 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8486,7 +8477,7 @@ void seta_state::drgnunit(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
@@ -8522,7 +8513,7 @@ void seta_state::qzkklgy2(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_qzkklgy2);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
@@ -8587,9 +8578,7 @@ void setaroul_state::setaroul(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_setaroul);
-
-	PALETTE(config, m_palette, 512);
-	m_palette->set_init(FUNC(setaroul_state::palette_init_setaroul));
+	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
 	MCFG_VIDEO_START_OVERRIDE(setaroul_state,setaroul_1_layer)
 
@@ -8632,7 +8621,7 @@ void seta_state::eightfrc(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer1, layer2 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8676,10 +8665,7 @@ void seta_state::extdwnhl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zingzip);
-
-	PALETTE(config, m_palette, 16*32+16*32+64*32*2);    /* sprites, layer2, layer1 */
-	m_palette->set_indirect_entries(0x600);
-	m_palette->set_init(FUNC(seta_state::palette_init_zingzip));	/* layer 1 gfx is 6 planes deep */
+	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8744,10 +8730,7 @@ void seta_state::gundhara(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
-
-	PALETTE(config, m_palette, 16*32+64*32*4);  /* sprites, layer2, layer1 */
-	m_palette->set_indirect_entries(0x600);
-	m_palette->set_init(FUNC(seta_state::palette_init_gundhara));	/* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8816,10 +8799,7 @@ void seta_state::jjsquawk(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
-
-	PALETTE(config, m_palette, 16*32+64*32*4);  /* sprites, layer2, layer1 */
-	m_palette->set_indirect_entries(0x600);
-	m_palette->set_init(FUNC(seta_state::palette_init_jjsquawk));	/* layers are 6 planes deep */
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8851,10 +8831,7 @@ void seta_state::jjsquawb(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
-
-	PALETTE(config, m_palette, 16*32+64*32*4);  /* sprites, layer2, layer1 */
-	m_palette->set_indirect_entries(0x600);
-	m_palette->set_init(FUNC(seta_state::palette_init_jjsquawk));	/* layers are 6 planes deep */
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8898,7 +8875,7 @@ void seta_state::kamenrid(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer2, layer1 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8937,7 +8914,7 @@ void seta_state::orbs(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_orbs);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -8978,7 +8955,7 @@ void seta_state::keroppij(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_orbs);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -9031,7 +9008,7 @@ void seta_state::krzybowl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -9075,10 +9052,7 @@ void seta_state::madshark(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
-
-	PALETTE(config, m_palette, 16*32+64*32*4);  /* sprites, layer2, layer1 */
-	m_palette->set_indirect_entries(0x600);
-	m_palette->set_init(FUNC(seta_state::palette_init_jjsquawk));	/* layers are 6 planes deep */
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9126,7 +9100,7 @@ void seta_state::magspeed(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer2, layer1 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9170,7 +9144,7 @@ void seta_state::msgundam(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer2, layer1 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9208,7 +9182,7 @@ void seta_state::oisipuzl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer2, layer1 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
 
@@ -9249,7 +9223,7 @@ void seta_state::triplfun(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer2, layer1 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
 
@@ -9301,7 +9275,7 @@ void kiwame_state::kiwame(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(kiwame_state,seta_no_layers)
 
@@ -9344,7 +9318,7 @@ void seta_state::rezon(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer1, layer2 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9383,7 +9357,7 @@ void seta_state::thunderl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -9457,7 +9431,7 @@ void seta_state::wiggie(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiggie);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -9497,7 +9471,7 @@ void seta_state::wits(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);    /* sprites only */
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -9534,7 +9508,7 @@ void seta_state::umanclub(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -9575,7 +9549,7 @@ void seta_state::utoukond(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer2, layer1 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9633,7 +9607,7 @@ void seta_state::wrofaero(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
-	PALETTE(config, m_palette, 512 * 3);    /* sprites, layer1, layer2 */
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9677,10 +9651,7 @@ void seta_state::zingzip(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zingzip);
-
-	PALETTE(config, m_palette, 16*32+16*32+64*32*2);    /* sprites, layer2, layer1 */
-	m_palette->set_indirect_entries(0x600);
-	m_palette->set_init(FUNC(seta_state::palette_init_zingzip));	/* layer 1 gfx is 6 planes deep */
+	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9732,7 +9703,7 @@ void seta_state::pairlove(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pairlove);
-	PALETTE(config, m_palette, 2048);   /* sprites only */
+	PALETTE(config, m_palette).set_entries(2048);   // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -9780,10 +9751,7 @@ void seta_state::crazyfgt(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crazyfgt);
-
-	PALETTE(config, m_palette, 16*32+64*32*4);  /* sprites, layer1, layer2 */
-	m_palette->set_indirect_entries(0x600);
-	m_palette->set_init(FUNC(seta_state::palette_init_gundhara));	/* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9861,9 +9829,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jockeyc);
-
-	PALETTE(config, m_palette, 512);
-	m_palette->set_init(FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms));
+	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,jockeyc_1_layer)
 
@@ -9893,6 +9859,7 @@ MACHINE_START_MEMBER(jockeyc_state, inttoote)
 void jockeyc_state::inttoote(machine_config &config)
 {
 	jockeyc(config);
+
 	M68000(config.replace(), m_maincpu, XTAL(16'000'000)); // TMP68HC000N-16
 	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::inttoote_map);
 

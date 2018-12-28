@@ -308,8 +308,8 @@ uPC1352C @ N3
 class dwarfd_state : public driver_device
 {
 public:
-	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_palette(*this, "palette"),
 		m_crtc(*this, "i8275"),
@@ -323,6 +323,10 @@ public:
 
 	void init_qc();
 	void init_dwarfd();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	/* video-related */
@@ -345,9 +349,7 @@ private:
 	DECLARE_READ8_MEMBER(qc_b8_r);
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dwarfd);
+	void dwarfd_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
@@ -700,14 +702,14 @@ static GFXDECODE_START( gfx_dwarfd )
 	GFXDECODE_REVERSEBITS("gfx1", 0, tiles8x8_layout, 0, 8)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
+void dwarfd_state::dwarfd_palette(palette_device &palette) const
 {
-	uint8_t rgb[3];
-	uint8_t *prom = memregion("proms")->base();
+	uint8_t const *const prom = memregion("proms")->base();
 
 	for (int i = 0; i < 32; i++)
 	{
 		// what are the top 2 bits?
+		uint8_t rgb[3];
 		rgb[0] = ((prom[i] & 0x08) >> 2) | (prom[i] & 1);
 		rgb[1] = ((prom[i] & 0x10) >> 3) | ((prom[i] & 2) >> 1);
 		rgb[2] = ((prom[i] & 0x20) >> 4) | ((prom[i] & 4) >> 2);
@@ -752,7 +754,7 @@ void dwarfd_state::dwarfd(machine_config &config)
 	m_crtc->drq_wr_callback().set(FUNC(dwarfd_state::drq_w));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dwarfd);
-	PALETTE(config, m_palette, 32).set_init(FUNC(dwarfd_state::palette_init_dwarfd));
+	PALETTE(config, m_palette, FUNC(dwarfd_state::dwarfd_palette), 32);
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
@@ -764,6 +766,7 @@ void dwarfd_state::dwarfd(machine_config &config)
 void dwarfd_state::pokeresp(machine_config &config)
 {
 	dwarfd(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &dwarfd_state::pokeresp_map);
 	m_maincpu->set_addrmap(AS_IO, &dwarfd_state::io_map);
 

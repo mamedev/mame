@@ -30,8 +30,9 @@ class apogee_state : public radio86_state
 {
 public:
 	apogee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: radio86_state(mconfig, type, tag),
-		m_speaker(*this, "speaker") { }
+		: radio86_state(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+	{ }
 
 	void apogee(machine_config &config);
 
@@ -177,9 +178,8 @@ WRITE_LINE_MEMBER(apogee_state::pit8253_out2_changed)
 
 I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const uint8_t *charmap = m_charmap + (gpa & 1) * 0x400;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charmap = &m_charmap[(gpa & 1) * 0x400];
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;
@@ -190,7 +190,7 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 	if (rvv) {
 		pixels ^= 0xff;
 	}
-	for(i=0;i<6;i++) {
+	for(int i=0;i<6;i++) {
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 	}
 }
@@ -250,7 +250,7 @@ void apogee_state::apogee(machine_config &config)
 	screen.set_visarea(0, 78*6-1, 0, 30*10-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_apogee);
-	PALETTE(config, m_palette, 3).set_init(FUNC(apogee_state::palette_init_radio86));
+	PALETTE(config, m_palette, FUNC(apogee_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);

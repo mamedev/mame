@@ -146,7 +146,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(mbc55x);
+	void mbc55x_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
 
 	void mbc55x_io(address_map &map);

@@ -340,11 +340,10 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_espial)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_espial);
+	PALETTE(config, m_palette, FUNC(espial_state::espial_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

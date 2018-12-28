@@ -550,10 +550,8 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 	MCFG_SCREEN_UPDATE_DRIVER(angelkds_state, screen_update_angelkds)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_angelkds)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_angelkds);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x100);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -574,6 +572,7 @@ MACHINE_CONFIG_END
 void angelkds_state::spcpostn(machine_config &config)
 {
 	angelkds(config);
+
 	/* encryption */
 	sega_317_0005_device &maincpu(SEGA_317_0005(config.replace(), m_maincpu, XTAL(6'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &angelkds_state::main_map);

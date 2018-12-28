@@ -54,7 +54,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_1_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_PALETTE_INIT(munchmo);
+	void munchmo_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	IRQ_CALLBACK_MEMBER(generic_irq_ack);

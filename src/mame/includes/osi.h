@@ -60,7 +60,7 @@ protected:
 
 	void floppy_index_callback(floppy_image_device *floppy, int state);
 
-	DECLARE_PALETTE_INIT(osi630);
+	void osi630_palette(palette_device &palette) const;
 
 	void osi600_video(machine_config &config);
 	void osi630_video(machine_config &config);

@@ -862,7 +862,7 @@ void xavix_state::xavix(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xavix);
 
-	PALETTE(config, m_palette, 256).set_init("palette", FUNC(palette_device::palette_init_all_black));
+	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
 	/* sound hardware */
 

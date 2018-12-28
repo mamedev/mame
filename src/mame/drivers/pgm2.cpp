@@ -781,9 +781,9 @@ void pgm2_state::pgm2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode2, m_tx_palette, pgm2_tx);
 	GFXDECODE(config, m_gfxdecode3, m_bg_palette, pgm2_bg);
 
-	PALETTE(config, m_sp_palette, 0x4000/4).set_format(PALETTE_FORMAT_XRGB); // sprites
-	PALETTE(config, m_tx_palette, 0x800/4).set_format(PALETTE_FORMAT_XRGB); // text
-	PALETTE(config, m_bg_palette, 0x2000/4).set_format(PALETTE_FORMAT_XRGB); // bg
+	PALETTE(config, m_sp_palette).set_format(palette_device::xRGB_888, 0x4000 / 4); // sprites
+	PALETTE(config, m_tx_palette).set_format(palette_device::xRGB_888, 0x800 / 4); // text
+	PALETTE(config, m_bg_palette).set_format(palette_device::xRGB_888, 0x2000 / 4); // bg
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 

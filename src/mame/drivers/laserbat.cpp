@@ -499,7 +499,7 @@ void laserbat_state::laserbat(machine_config &config)
 	laserbat_base(config);
 
 	// video hardware
-	PALETTE(config, m_palette, 256).set_init(FUNC(laserbat_state::palette_init_laserbat));
+	PALETTE(config, m_palette, FUNC(laserbat_state::laserbat_palette), 256);
 
 	// sound board devices
 	SPEAKER(config, "speaker").front_center();
@@ -531,7 +531,7 @@ void catnmous_state::catnmous(machine_config &config)
 	laserbat_base(config);
 
 	// video hardware
-	PALETTE(config, m_palette, 256).set_init(FUNC(catnmous_state::palette_init_catnmous));
+	PALETTE(config, m_palette, FUNC(catnmous_state::catnmous_palette), 256);
 
 	// sound board devices
 	SPEAKER(config, "speaker").front_center();

@@ -32,8 +32,8 @@ TODO:
 class tk80bs_state : public driver_device
 {
 public:
-	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi"),
@@ -184,9 +184,9 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	MCFG_SCREEN_SIZE(256, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tk80bs_state, screen_update_tk80bs)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk80bs)
 
 	/* Devices */

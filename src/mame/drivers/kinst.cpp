@@ -740,7 +740,7 @@ void kinst_state::kinst(machine_config &config)
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 32768).set_init("palette", FUNC(palette_device::palette_init_BBBBBGGGGGRRRRR));
+	PALETTE(config, "palette", palette_device::BGR_555);
 
 	/* sound hardware */
 	DCS_AUDIO_2K(config, m_dcs, 0);

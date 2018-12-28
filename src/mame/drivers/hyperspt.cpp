@@ -324,10 +324,8 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_hyperspt)
-	MCFG_PALETTE_ADD(m_palette, 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hyperspt);
+	PALETTE(config, m_palette, FUNC(hyperspt_state::hyperspt_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -385,8 +385,7 @@ void apricot_state::apricot(machine_config &config)
 	screen.set_refresh_hz(72);
 	screen.set_screen_update(FUNC(apricot_state::screen_update_apricot));
 
-	PALETTE(config, m_palette, 3);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	HD6845(config, m_crtc, 15_MHz_XTAL / 10);
 	m_crtc->set_screen("screen");

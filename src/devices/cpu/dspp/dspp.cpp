@@ -10,10 +10,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "dspp.h"
 #include "dsppfe.h"
 #include "dsppdasm.h"
+
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -1473,7 +1474,7 @@ void dspp_device::process_next_dma(int32_t channel)
 int16_t dspp_device::decode_sqxd(int8_t data, int16_t prev)
 {
 	int16_t temp = sign_extend8(data & 0xfe);
-	int32_t expanded = (temp * abs(temp)) << 1;
+	int32_t expanded = (temp * iabs(temp)) << 1;
 	int16_t output;
 
 	if (data & 1)

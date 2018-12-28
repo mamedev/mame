@@ -471,7 +471,7 @@ void stfight_state::stfight_base(machine_config &config)
 
 	config.m_minimum_quantum = attotime::from_hz(600);
 
-	PALETTE(config, "palette", 256).set_format(PALETTE_FORMAT_xxxxBBBBRRRRGGGG);
+	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

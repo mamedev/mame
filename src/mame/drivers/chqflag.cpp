@@ -339,9 +339,8 @@ void chqflag_state::chqflag(machine_config &config)
 	screen.set_screen_update(FUNC(chqflag_state::screen_update_chqflag));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 1024);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);

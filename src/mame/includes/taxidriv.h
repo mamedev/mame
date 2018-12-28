@@ -77,7 +77,7 @@ private:
 	DECLARE_WRITE8_MEMBER(p8910_0b_w);
 	DECLARE_WRITE8_MEMBER(spritectrl_w);
 
-	DECLARE_PALETTE_INIT(taxidriv);
+	void taxidriv_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cpu2_map(address_map &map);

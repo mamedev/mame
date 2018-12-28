@@ -331,7 +331,7 @@ void risc2500_state::risc2500(machine_config &config)
 
 	config.set_default_layout(layout_risc2500);
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("128K, 256K, 512K, 1M, 2M");
 

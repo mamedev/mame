@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
 	m_crtc->set_screen(SCREEN_TAG);

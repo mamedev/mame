@@ -236,8 +236,7 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	MCFG_SCREEN_UPDATE_DRIVER(sbugger_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(sbugger_state, sbugger)
+	PALETTE(config, "palette", FUNC(sbugger_state::sbugger_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

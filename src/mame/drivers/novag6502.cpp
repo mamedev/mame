@@ -255,7 +255,7 @@ void novagbase_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, boo
 
 // LCD
 
-PALETTE_INIT_MEMBER(novagbase_state, novag_lcd)
+void novagbase_state::novag_lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
@@ -885,8 +885,8 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1024) // guessed
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beeper, 1024); // guessed
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::cforte)
@@ -909,8 +909,8 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::sexpert)
@@ -945,8 +945,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16, 0, 10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(novag6502_state, novag_lcd)
+	PALETTE(config, "palette", FUNC(novag6502_state::novag_lcd_palette), 3);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)
@@ -957,8 +956,8 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::sforte)

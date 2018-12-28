@@ -1357,7 +1357,7 @@ void segas18_state::system18(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas18);
-	PALETTE(config, m_palette, 2048*3+2048 + 64*3);
+	PALETTE(config, m_palette).set_entries(2048*3+2048 + 64*3);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);

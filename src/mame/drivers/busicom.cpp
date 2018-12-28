@@ -240,10 +240,9 @@ MACHINE_CONFIG_START(busicom_state::busicom)
 	MCFG_SCREEN_SIZE(40*17, 44*11)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
 	MCFG_SCREEN_UPDATE_DRIVER(busicom_state, screen_update_busicom)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(busicom_state, busicom)
+	PALETTE(config, m_palette, FUNC(busicom_state::busicom_palette), 16);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("busicom_timer", busicom_state, timer_callback, attotime::from_msec(28*2))
 MACHINE_CONFIG_END

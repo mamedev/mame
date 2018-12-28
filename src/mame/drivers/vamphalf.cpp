@@ -146,6 +146,8 @@ public:
 	void common_32bit_map(address_map &map);
 
 protected:
+	virtual void video_start() override;
+
 	int m_flip_bit;
 	int m_palshift;
 
@@ -209,8 +211,6 @@ private:
 	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(mrkicker_oki_bank_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
-
-	virtual void video_start() override;
 
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -308,9 +308,7 @@ private:
 READ16_MEMBER(vamphalf_state::eeprom_r)
 {
 	if(offset)
-	{
 		return m_eeprom->do_read();
-	}
 	else
 		return 0;
 }
@@ -386,12 +384,12 @@ READ32_MEMBER(vamphalf_nvram_state::finalgdr_prot_r)
 
 WRITE32_MEMBER(vamphalf_nvram_state::finalgdr_prot_w)
 {
-/*
-41C6
-967E
-446B
-F94B
-*/
+	/*
+	41C6
+	967E
+	446B
+	F94B
+	*/
 	if(data == 0x41c6 || data == 0x446b)
 		m_semicom_prot_which = 0;
 	else
@@ -1124,8 +1122,7 @@ void vamphalf_state::common(machine_config &config)
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_common));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vamphalf);
 }
 
@@ -1312,8 +1309,7 @@ void vamphalf_state::aoh(machine_config &config)
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_aoh));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vamphalf);
 
 	/* sound hardware */

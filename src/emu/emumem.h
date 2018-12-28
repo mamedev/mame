@@ -164,8 +164,6 @@ template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<D, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
 template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
 
 template <typename D, typename T> using rw_device_class_t  = typename rw_device_class <D, T>::type;
 

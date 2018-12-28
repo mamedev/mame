@@ -536,70 +536,70 @@ static void megaduck_cart(device_slot_interface &device)
 
 
 
-static const unsigned char palette_gb[] =
+static constexpr rgb_t palette_gb[] =
 {
-	/* Simple black and white palette */
-	/*  0xFF,0xFF,0xFF,
-	 0xB0,0xB0,0xB0,
+	// Simple black and white palette
+	/*  0xff,0xff,0xff,
+	 0xb0,0xb0,0xb0,
 	 0x60,0x60,0x60,
 	 0x00,0x00,0x00 */
 
-	/* Possibly needs a little more green in it */
-	0xFF,0xFB,0x87,     /* Background */
-	0xB1,0xAE,0x4E,     /* Light */
-	0x84,0x80,0x4E,     /* Medium */
-	0x4E,0x4E,0x4E,     /* Dark */
+	// Possibly needs a little more green in it
+	{ 0xff,0xfb,0x87 },     // Background
+	{ 0xb1,0xae,0x4e },     // Light
+	{ 0x84,0x80,0x4e },     // Medium
+	{ 0x4e,0x4e,0x4e },     // Dark
 
-	/* Palette for Game Boy Pocket/Light */
-	0xC4,0xCF,0xA1,     /* Background */
-	0x8B,0x95,0x6D,     /* Light      */
-	0x6B,0x73,0x53,     /* Medium     */
-	0x41,0x41,0x41,     /* Dark       */
+	// Palette for Game Boy Pocket/Light
+	{ 0xc4,0xcf,0xa1 },     // Background
+	{ 0x8b,0x95,0x6d },     // Light
+	{ 0x6b,0x73,0x53 },     // Medium
+	{ 0x41,0x41,0x41 },     // Dark
 };
 
-static const unsigned char palette_megaduck[] = {
-	0x6B, 0xA6, 0x4A, 0x43, 0x7A, 0x63, 0x25, 0x59, 0x55, 0x12, 0x42, 0x4C
+static constexpr rgb_t palette_megaduck[] = {
+	{ 0x6b, 0xa6, 0x4a }, { 0x43, 0x7a, 0x63 }, { 0x25, 0x59, 0x55 }, { 0x12, 0x42, 0x4c }
 };
 
-/* Initialise the palettes */
-PALETTE_INIT_MEMBER(gb_state, gb)
+// Initialise the palettes
+void gb_state::gb_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4; i++)
-		palette.set_pen_color(i, palette_gb[i * 3 + 0], palette_gb[i * 3 + 1], palette_gb[i * 3 + 2]);
+		palette.set_pen_color(i, palette_gb[i]);
 }
 
-PALETTE_INIT_MEMBER(gb_state, gbp)
+void gb_state::gbp_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4; i++)
-		palette.set_pen_color(i, palette_gb[(i + 4) * 3 + 0], palette_gb[(i + 4) * 3 + 1], palette_gb[(i + 4) * 3 + 2]);
+		palette.set_pen_color(i, palette_gb[i + 4]);
 }
 
-PALETTE_INIT_MEMBER(gb_state, sgb)
+void gb_state::sgb_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 32768; i++)
 	{
-		int r = (i & 0x1F) << 3;
-		int g = ((i >> 5) & 0x1F) << 3;
-		int b = ((i >> 10) & 0x1F) << 3;
-		palette.set_pen_color(i, r, g, b);
+		int const r = i & 0x1f;
+		int const g = (i >> 5) & 0x1f;
+		int const b = (i >> 10) & 0x1f;
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-PALETTE_INIT_MEMBER(gb_state, gbc)
+void gb_state::gbc_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 32768; i++)
 	{
-		int r = (i & 0x1F) << 3;
-		int g = ((i >> 5) & 0x1F) << 3;
-		int b = ((i >> 10) & 0x1F) << 3;
-		palette.set_pen_color(i, r, g, b);
+		int const r = i & 0x1f;
+		int const g = (i >> 5) & 0x1f;
+		int const b = (i >> 10) & 0x1f;
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-PALETTE_INIT_MEMBER(megaduck_state, megaduck)
+void megaduck_state::megaduck_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4; i++)
-		palette.set_pen_color(i, palette_megaduck[i * 3 + 0], palette_megaduck[i * 3 + 1], palette_megaduck[i * 3 + 2]);
+		palette.set_pen_color(i, palette_megaduck[i]);
 }
 
 
@@ -622,7 +622,7 @@ void gb_state::gameboy(machine_config &config)
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
-	PALETTE(config, m_palette, 4).set_init(FUNC(gb_state::palette_init_gb));
+	PALETTE(config, m_palette, FUNC(gb_state::gb_palette), 4);
 
 	DMG_PPU(config, m_ppu, m_maincpu);
 
@@ -662,7 +662,7 @@ void gb_state::supergb(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
-	PALETTE(config, m_palette, 32768).set_init(FUNC(gb_state::palette_init_sgb));
+	PALETTE(config, m_palette, FUNC(gb_state::sgb_palette), 32768);
 
 	SGB_PPU(config, m_ppu, m_maincpu);
 
@@ -683,6 +683,7 @@ void gb_state::supergb(machine_config &config)
 void gb_state::supergb2(machine_config &config)
 {
 	gameboy(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gb_state::sgb_map);
 
@@ -696,7 +697,7 @@ void gb_state::supergb2(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 
 	m_palette->set_entries(32768);
-	m_palette->set_init(FUNC(gb_state::palette_init_sgb));
+	m_palette->set_init(FUNC(gb_state::sgb_palette));
 
 	SGB_PPU(config.replace(), m_ppu, m_maincpu);
 }
@@ -706,7 +707,7 @@ void gb_state::gbpocket(machine_config &config)
 	gameboy(config);
 
 	/* video hardware */
-	m_palette->set_init(FUNC(gb_state::palette_init_gbp));
+	m_palette->set_init(FUNC(gb_state::gbp_palette));
 
 	MGB_PPU(config.replace(), m_ppu, m_maincpu);
 }
@@ -732,8 +733,7 @@ void gb_state::gbcolor(machine_config &config)
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
-
-	PALETTE(config, m_palette, 32768).set_init(FUNC(gb_state::palette_init_gbc));
+	PALETTE(config, m_palette, FUNC(gb_state::gbc_palette), 32768);
 
 	CGB_PPU(config, m_ppu, m_maincpu);
 
@@ -772,8 +772,7 @@ void megaduck_state::megaduck(machine_config &config)
 	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
-
-	PALETTE(config, m_palette, 4).set_init(FUNC(megaduck_state::palette_init_megaduck));
+	PALETTE(config, m_palette, FUNC(megaduck_state::megaduck_palette), 4);
 
 	DMG_PPU(config, m_ppu, m_maincpu);
 

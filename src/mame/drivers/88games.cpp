@@ -325,9 +325,7 @@ void _88games_state::_88games(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(_88games_state::vblank_irq));
 
-	palette_device &palette(PALETTE(config, "palette", 2048));
-	palette.enable_shadows();
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");

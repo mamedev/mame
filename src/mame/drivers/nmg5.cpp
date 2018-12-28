@@ -260,6 +260,11 @@ public:
 	void init_prot_val_20();
 	void init_prot_val_40();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -294,9 +299,6 @@ private:
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nmg5_map(address_map &map);
 	void nmg5_sound_map(address_map &map);
@@ -996,9 +998,8 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nmg5)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_nmg5);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x400);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(1);

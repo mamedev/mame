@@ -76,9 +76,9 @@ protected:
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(sasuke);
 	DECLARE_VIDEO_START(satansat);
-	DECLARE_PALETTE_INIT(satansat);
+	void satansat_palette(palette_device &palette);
 	DECLARE_VIDEO_START(snk6502);
-	DECLARE_PALETTE_INIT(snk6502);
+	void snk6502_palette(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -354,7 +354,7 @@ void atetris_state::atetris_base(machine_config &config)
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_atetris);
 
-	PALETTE(config, "palette", 256).set_format(PALETTE_FORMAT_RRRGGGBB);
+	PALETTE(config, "palette").set_format(palette_device::RGB_332, 256);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* note: these parameters are from published specs, not derived */

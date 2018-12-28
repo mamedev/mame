@@ -1110,8 +1110,8 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr3)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mcr3);
+	PALETTE(config, "palette").set_entries(64);
 MACHINE_CONFIG_END
 
 
@@ -1172,10 +1172,8 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+4)
+	subdevice<palette_device>("palette")->set_entries(64 + 4).set_init(FUNC(mcr3_state::spyhunt_palette));
 
-	MCFG_PALETTE_INIT_OWNER(mcr3_state,spyhunt)
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)
 MACHINE_CONFIG_END
 

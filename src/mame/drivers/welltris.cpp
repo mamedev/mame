@@ -691,9 +691,8 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_welltris)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_welltris);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 

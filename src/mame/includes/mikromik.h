@@ -134,7 +134,7 @@ private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	DECLARE_PALETTE_INIT( mm1 );
+	void mm1_palette(palette_device &palette) const;
 	void mm1_map(address_map &map);
 	void mm1_upd7220_map(address_map &map);
 };

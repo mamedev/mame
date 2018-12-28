@@ -1955,7 +1955,7 @@ void segas24_state::system24(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas24_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8192*2);
+	PALETTE(config, m_palette).set_entries(8192*2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

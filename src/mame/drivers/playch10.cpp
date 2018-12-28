@@ -671,7 +671,7 @@ void playch10_state::playch10(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_playch10);
-	PALETTE(config, "palette", 256).set_init(FUNC(playch10_state::palette_init_playch10));
+	PALETTE(config, "palette", FUNC(playch10_state::playch10_palette), 256);
 	config.set_default_layout(layout_playch10);
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));

@@ -64,6 +64,11 @@ public:
 
 	void seabattl(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
@@ -81,14 +86,10 @@ private:
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
-	DECLARE_PALETTE_INIT(seabattl);
+	void seabattl_palette(palette_device &palette) const;
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void seabattl_data_map(address_map &map);
 	void seabattl_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -116,7 +117,7 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(seabattl_state, seabattl)
+void seabattl_state::seabattl_palette(palette_device &palette) const
 {
 	// sprites (m.obj) + s2636
 	for (int i = 0; i < 8; i++)
@@ -510,7 +511,7 @@ MACHINE_CONFIG_START(seabattl_state::seabattl)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seabattl);
-	PALETTE(config, m_palette, 26).set_init(FUNC(seabattl_state::palette_init_seabattl));
+	PALETTE(config, m_palette, FUNC(seabattl_state::seabattl_palette), 26);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

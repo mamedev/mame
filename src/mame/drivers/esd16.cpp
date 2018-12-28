@@ -660,9 +660,8 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	m_sprgen->set_flipallx(1);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esd16)
-	MCFG_PALETTE_ADD("palette", 0x1000/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_esd16);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
 
 
 	/* sound hardware */

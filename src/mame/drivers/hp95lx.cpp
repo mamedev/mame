@@ -115,12 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(f300_w);
 	DECLARE_READ8_MEMBER(f300_r);
 
-	DECLARE_PALETTE_INIT(hp95lx);
 	void hp95lx(machine_config &config);
-	void hp95lx_io(address_map &map);
-	void hp95lx_map(address_map &map);
-	void hp95lx_romdos(address_map &map);
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -141,6 +136,8 @@ protected:
 	required_device<screen_device> m_screen;
 
 private:
+	void hp95lx_palette(palette_device &palette) const;
+
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -151,6 +148,10 @@ private:
 	DECLARE_READ8_MEMBER(video_register_r);
 	DECLARE_WRITE8_MEMBER(video_register_w);
 	DECLARE_WRITE8_MEMBER(debug_w);
+
+	void hp95lx_io(address_map &map);
+	void hp95lx_map(address_map &map);
+	void hp95lx_romdos(address_map &map);
 
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -174,7 +175,7 @@ private:
 };
 
 
-PALETTE_INIT_MEMBER(hp95lx_state, hp95lx)
+void hp95lx_state::hp95lx_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
@@ -748,10 +749,9 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DRIVER(hp95lx_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128)
-
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hp95lx_state, hp95lx)
+
+	PALETTE(config, "palette", FUNC(hp95lx_state::hp95lx_palette), 2);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END

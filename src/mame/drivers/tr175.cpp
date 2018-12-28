@@ -105,7 +105,7 @@ void tr175_state::tr175(machine_config &config)
 	scn2681_device &duart(SCN2681(config, "duart", 11.0592_MHz_XTAL / 3)); // is this the right clock?
 	duart.irq_cb().set_inputline("maincpu", M68K_IRQ_1);
 
-	PALETTE(config, "palette", 0x100);
+	PALETTE(config, "palette").set_entries(0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &tr175_state::ramdac_map);
 }

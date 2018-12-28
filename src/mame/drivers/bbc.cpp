@@ -848,8 +848,7 @@ void bbc_state::bbca(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(palette_init_delegate(FUNC(bbc_state::palette_init_bbc), this));
+	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);
@@ -1352,8 +1351,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(palette_init_delegate(FUNC(bbc_state::palette_init_bbc), this));
+	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);

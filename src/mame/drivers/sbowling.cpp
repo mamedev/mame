@@ -53,13 +53,17 @@ PROMs : NEC B406 (1kx4) x2
 class sbowling_state : public driver_device
 {
 public:
-	sbowling_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sbowling_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void sbowling(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -85,8 +89,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(sbowling);
+	void sbowling_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
@@ -371,42 +374,41 @@ static GFXDECODE_START( gfx_sbowling )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(sbowling_state, sbowling)
+void sbowling_state::sbowling_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[3] = { 470, 270, 100 };
+	static constexpr int resistances_b[2]  = { 270, 100 };
 
-	static const int resistances_rg[3] = { 470, 270, 100 };
-	static const int resistances_b[2]  = { 270, 100 };
-	double outputs_r[1<<3], outputs_g[1<<3], outputs_b[1<<2];
-
-	/* the game uses output collector PROMs type: NEC B406  */
+	// the game uses output collector PROMs type: NEC B406
+	double outputs_r[1 << 3], outputs_g[1 << 3], outputs_b[1 << 2];
 	compute_resistor_net_outputs(0, 255,    -1.0,
-		3,  resistances_rg, outputs_r,  0,  100,
-		3,  resistances_rg, outputs_g,  0,  100,
-		2,  resistances_b,  outputs_b,  0,  100);
+			3,  resistances_rg, outputs_r,  0,  100,
+			3,  resistances_rg, outputs_g,  0,  100,
+			2,  resistances_b,  outputs_b,  0,  100);
 
-	for (int i = 0;i < palette.entries();i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		b = (int)(outputs_b[ (bit0<<0) | (bit1<<1) ] + 0.5);
+		// blue component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const b = int(outputs_b[(bit0 << 0) | (bit1 << 1)] + 0.5);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
-		bit1 = (color_prom[i] >> 3) & 0x01;
-		bit2 = (color_prom[i+0x400] >> 0) & 0x01;
-		g = (int)(outputs_g[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		bit2 = BIT(color_prom[i + 0x400], 0);
+		int const g = int(outputs_g[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
 
-		/* red component */
-		bit0 = (color_prom[i+0x400] >> 1) & 0x01;
-		bit1 = (color_prom[i+0x400] >> 2) & 0x01;
-		bit2 = (color_prom[i+0x400] >> 3) & 0x01;
-		r = (int)(outputs_r[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
+		// red component
+		bit0 = BIT(color_prom[i + 0x400], 1);
+		bit1 = BIT(color_prom[i + 0x400], 2);
+		bit2 = BIT(color_prom[i + 0x400], 3);
+		int const r = int(outputs_r[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -426,10 +428,9 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbowling)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sbowling);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)
+	PALETTE(config, "palette", FUNC(sbowling_state::sbowling_palette), 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

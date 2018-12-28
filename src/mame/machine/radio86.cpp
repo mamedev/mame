@@ -228,13 +228,13 @@ I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
-static constexpr rgb_t radio86_palette[3] = {
+static constexpr rgb_t radio86_pens[3] = {
 	{ 0x00, 0x00, 0x00 }, // black
 	{ 0xa0, 0xa0, 0xa0 }, // white
 	{ 0xff, 0xff, 0xff }  // highlight
 };
 
-PALETTE_INIT_MEMBER(radio86_state,radio86)
+void radio86_state::radio86_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, radio86_palette, ARRAY_LENGTH(radio86_palette));
+	palette.set_pen_colors(0, radio86_pens);
 }

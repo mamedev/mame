@@ -233,8 +233,8 @@ public:
 	void init_jungsub();
 	void init_victoryc();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	DECLARE_PALETTE_INIT(galaxian);
-	DECLARE_PALETTE_INIT(moonwar);
+	void galaxian_palette(palette_device &palette);
+	void moonwar_palette(palette_device &palette);
 	void tenspot_set_game_bank(int bank, int from_game);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);

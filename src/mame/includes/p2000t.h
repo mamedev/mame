@@ -75,7 +75,7 @@ public:
 
 protected:
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(p2000m);
+	void p2000m_palette(palette_device &palette) const;
 	uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void p2000m_mem(address_map &map);

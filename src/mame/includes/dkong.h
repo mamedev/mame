@@ -299,13 +299,13 @@ private:
 	DECLARE_MACHINE_RESET(ddk);
 	DECLARE_VIDEO_START(dkong);
 	DECLARE_VIDEO_START(dkong_base);
-	DECLARE_PALETTE_INIT(dkong2b);
+	void dkong2b_palette(palette_device &palette);
 	DECLARE_MACHINE_START(dkong3);
-	DECLARE_PALETTE_INIT(dkong3);
+	void dkong3_palette(palette_device &palette);
 	DECLARE_MACHINE_START(radarscp);
-	DECLARE_PALETTE_INIT(radarscp);
+	void radarscp_palette(palette_device &palette);
 	DECLARE_MACHINE_START(radarscp1);
-	DECLARE_PALETTE_INIT(radarscp1);
+	void radarscp1_palette(palette_device &palette);
 	DECLARE_MACHINE_START(s2650);
 	DECLARE_MACHINE_RESET(strtheat);
 	DECLARE_MACHINE_RESET(drakton);

@@ -57,7 +57,7 @@ private:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m58);
+	void m58_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);

@@ -226,8 +226,7 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 1024);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dietgo)
 

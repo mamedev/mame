@@ -87,11 +87,11 @@ private:
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
-	DECLARE_PALETTE_INIT(lasso);
+	void lasso_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(wwjgtin);
 	DECLARE_MACHINE_RESET(wwjgtin);
 	DECLARE_VIDEO_START(wwjgtin);
-	DECLARE_PALETTE_INIT(wwjgtin);
+	void wwjgtin_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(pinbo);
 	uint32_t screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -71,7 +71,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
 
 	// video
-	DECLARE_PALETTE_INIT(thedealr);
+	void thedealr_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
@@ -96,13 +96,13 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thedealr_state,thedealr)
+void thedealr_state::thedealr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int col = (color_prom[i] << 8) + color_prom[i + 512];
+		int const col = (color_prom[i] << 8) | color_prom[i + 512];
 		palette.set_pen_color(i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
 	}
 }
@@ -568,9 +568,8 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	screen.screen_vblank().append_inputline(m_subcpu, INPUT_LINE_NMI);
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedealr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(thedealr_state,thedealr)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_thedealr);
+	PALETTE(config, m_palette, FUNC(thedealr_state::thedealr_palette), 512);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

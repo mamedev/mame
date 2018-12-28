@@ -968,8 +968,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_mystwarr));
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_XRGB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
@@ -1137,10 +1136,6 @@ void mystwarr_state::martchmp(machine_config &config)
 
 	m_k053252->set_clock(16000000/2);
 	m_k053252->set_offsets(32, 24-1);
-
-	m_palette->set_format(PALETTE_FORMAT_XRGB);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, martchmp)
 

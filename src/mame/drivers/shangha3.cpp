@@ -464,9 +464,7 @@ void shangha3_state::shangha3(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_RRRRRGGGGGBBBBBx);
-	m_palette->enable_shadows();
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -503,9 +501,7 @@ void shangha3_state::heberpop(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_RRRRRGGGGGBBBBBx);
-	m_palette->enable_shadows();
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -545,9 +541,7 @@ void shangha3_state::blocken(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_RRRRRGGGGGBBBBBx);
-	m_palette->enable_shadows();
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -2525,7 +2525,7 @@ void cps3_state::cps3(machine_config &config)
 */
 
 	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
-	PALETTE(config, m_palette, 0x10000); // actually 0x20000 ...
+	PALETTE(config, m_palette).set_entries(0x10000); // actually 0x20000 ...
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

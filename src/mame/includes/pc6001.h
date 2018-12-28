@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(nec_ppi8255_r);
 	DECLARE_WRITE8_MEMBER(nec_ppi8255_w);
 
-	DECLARE_PALETTE_INIT(pc6001);
+	void pc6001_palette(palette_device &palette) const;
 
 	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -175,7 +175,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mk2_timer_adj_w);
 	DECLARE_WRITE8_MEMBER(mk2_timer_irqv_w);
 
-	DECLARE_PALETTE_INIT(pc6001mk2);
+	void pc6001mk2_palette(palette_device &palette) const;
 	void pc6001mk2(machine_config &config);
 
 	uint32_t screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

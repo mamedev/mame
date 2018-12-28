@@ -527,9 +527,9 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_deco_mlc)
-	MCFG_PALETTE_ADD(m_palette, 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette);
+	m_palette->set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -560,9 +560,9 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_deco_mlc)
-	MCFG_PALETTE_ADD(m_palette, 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette);
+	m_palette->set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(16);
 
 	DECO146PROT(config, m_deco146, 0);
 	m_deco146->set_use_magic_read_address_xor(true);

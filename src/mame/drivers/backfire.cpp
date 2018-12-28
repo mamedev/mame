@@ -12,7 +12,6 @@
 
 */
 
-#define DE156CPU ARM
 #include "emu.h"
 #include "machine/adc0808.h"
 #include "machine/decocrpt.h"
@@ -376,8 +375,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	m_adc->in_callback<1>().set_ioport("PADDLE1");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_backfire)
 	config.set_default_layout(layout_dualhsxs);
@@ -388,7 +386,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, backfire_state, vbl_interrupt))
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -397,7 +395,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_screen(m_lscreen);

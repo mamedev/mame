@@ -1158,18 +1158,17 @@ void funworld_state::cuoreuno_map(address_map &map)
 }
 
 
-READ8_MEMBER(funworld_state::chinatow_r_32f0)
+READ8_MEMBER(chinatow_state::chinatow_r_32f0)
 {
-	logerror("read from 0x32f0 at offset %02X\n",offset);
+	logerror("read from 0x32f0 at offset %02X\n", offset);
 	switch (offset)
 	{
 	case 0: return 0xfe;
-
 	}
 	return 0xff;
 }
 
-void funworld_state::chinatow_map(address_map &map)
+void chinatow_state::chinatow_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -1178,15 +1177,15 @@ void funworld_state::chinatow_map(address_map &map)
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2000, 0x2000).nopr(); /* some unknown reads */
-	map(0x32f0, 0x32ff).r(FUNC(funworld_state::chinatow_r_32f0));
-	map(0x4000, 0x5fff).rom(); /* used by rcdino4 (dino4 hw ) */
-	map(0x6000, 0x6fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).nopr(); // some unknown reads
+	map(0x32f0, 0x32ff).r(FUNC(chinatow_state::chinatow_r_32f0));
+	map(0x4000, 0x5fff).rom(); // used by rcdino4 (dino4 hw)
+	map(0x6000, 0x6fff).ram().w(FUNC(chinatow_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(chinatow_state::funworld_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
-void funworld_state::lunapark_map(address_map &map)
+void lunapark_state::lunapark_map(address_map &map)
 { // mirrored video RAM 4000/5000 to 6000/7000
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -1195,8 +1194,8 @@ void funworld_state::lunapark_map(address_map &map)
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x4000, 0x4fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram").mirror(0x2000);
-	map(0x5000, 0x5fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram").mirror(0x2000);
+	map(0x4000, 0x4fff).ram().w(FUNC(lunapark_state::funworld_videoram_w)).share("videoram").mirror(0x2000);
+	map(0x5000, 0x5fff).ram().w(FUNC(lunapark_state::funworld_colorram_w)).share("colorram").mirror(0x2000);
 	map(0x8000, 0xffff).bankr("bank1");
 }
 
@@ -3096,9 +3095,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fw1stpal)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
+	PALETTE(config, "palette", FUNC(funworld_state::funworld_palette), 0x200);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* 2MHz, verified on jollycrd & royalcrd */
 	crtc.set_screen("screen");
@@ -3137,17 +3134,17 @@ MACHINE_CONFIG_START(funworld_state::funquiz)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(funworld_state::magicrd2)
+MACHINE_CONFIG_START(magicrd2_state::magicrd2)
 	fw1stpal(config);
+
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(magicrd2_map)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, magicrd2)
 
 	subdevice<mc6845_device>("crtc")->set_visarea_adjust(0, -56, 0, 0);
 
 	ay8910_device &ay8910(AY8910(config.replace(), "ay8910", SND_CLOCK));    /* 2MHz */
-	ay8910.port_a_write_callback().set(FUNC(funworld_state::funworld_lamp_a_w));
-	ay8910.port_b_write_callback().set(FUNC(funworld_state::funworld_lamp_b_w));
+	ay8910.port_a_write_callback().set(FUNC(magicrd2_state::funworld_lamp_a_w));
+	ay8910.port_b_write_callback().set(FUNC(magicrd2_state::funworld_lamp_b_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.5);  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
@@ -3194,18 +3191,16 @@ MACHINE_CONFIG_START(lunapark_state::lunapark)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(funworld_state::chinatow)
+MACHINE_CONFIG_START(chinatow_state::chinatow)
 	fw2ndpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(funworld_state::rcdino4)
+MACHINE_CONFIG_START(chinatow_state::rcdino4)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
 
@@ -6542,30 +6537,30 @@ void funworld_state::init_tabblue()
 }
 
 
-void funworld_state::init_magicd2b()
-/*****************************************************************
-
-  For a serie of Mexican Rockwell's 65c02
-  seems that opcode 0x91 is STA ($zp) instead of STA ($zp),y
-  ...or is patched with the correct opcode (0x92) by PLDs...
-
-  In offset $C1C4, the code is trying to initialize both PIAs
-  putting value 0x34 in $0800-$0803 & $0A00-$0A03.
-
-  The code use STA ($zp),y (opcode 0x91). As soon as register 'y'
-  increments, almost all writes go out of range.
-
-******************************************************************/
+void magicrd2_state::init_magicd2b()
 {
+	/*****************************************************************
+
+	  For a serie of Mexican Rockwell's 65c02
+	  seems that opcode 0x91 is STA ($zp) instead of STA ($zp),y
+	  ...or is patched with the correct opcode (0x92) by PLDs...
+
+	  In offset $C1C4, the code is trying to initialize both PIAs
+	  putting value 0x34 in $0800-$0803 & $0A00-$0A03.
+
+	  The code use STA ($zp),y (opcode 0x91). As soon as register 'y'
+	  increments, almost all writes go out of range.
+
+	******************************************************************/
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xc1c6] = 0x92;
 }
 
 
-void funworld_state::init_magicd2c()
-/*** same as blue TAB PCB, with the magicd2a patch ***/
+void magicrd2_state::init_magicd2c()
 {
+	/*** same as blue TAB PCB, with the magicd2a patch ***/
 	int x, na, nb, nad, nbd;
 	uint8_t *src = memregion( "gfx1" )->base();
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -6587,12 +6582,12 @@ void funworld_state::init_magicd2c()
 
 void funworld_state::init_mongolnw()
 {
-/* temporary patch to avoid hardware errors for debug purposes */
+	/* temporary patch to avoid hardware errors for debug purposes */
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x9115] = 0xa5;
 
-/* prevents one test from triggering hardware error */
+	/* prevents one test from triggering hardware error */
 	ROM[0xb8f3] = 0xff;
 }
 
@@ -7030,18 +7025,18 @@ static uint8_t rcdino4_keys80[] =
 	0x06, 0x1e, 0x28, 0x5a, 0xcf, 0x79, 0x11
 };
 
-void funworld_state::init_rcdino4()
-/*****************************************************
-
-  Dino4 hardware with CPU+PLCC daughterboard
-
-  Program ROM data & address lines are swapped.
-  GFX ROMs address lines are swapped and data encrypted.
-
-  Color PROM seems straight.
-
-******************************************************/
+void chinatow_state::init_rcdino4()
 {
+	/*****************************************************
+
+	  Dino4 hardware with CPU+PLCC daughterboard
+
+	  Program ROM data & address lines are swapped.
+	  GFX ROMs address lines are swapped and data encrypted.
+
+	  Color PROM seems straight.
+
+	******************************************************/
 	uint8_t *rom = memregion("maincpu")->base();
 
 	decrypt_rcdino4(rom, memregion("maincpu")->bytes(), memregion("gfx1")->base(), memregion("gfx1")->bytes(), memregion( "gfx1" )->base());
@@ -7156,15 +7151,15 @@ void funworld_state::init_rcdino4()
 	while (1);
 }
 
-void funworld_state::init_rcdinch()
-/*****************************************************
-
-  Dino4 hardware with CPU+PLCC daughterboard
-
-  Less encryption than rc4dino
-
-******************************************************/
+void chinatow_state::init_rcdinch()
 {
+	/*****************************************************
+
+	  Dino4 hardware with CPU+PLCC daughterboard
+
+	  Less encryption than rc4dino
+
+	******************************************************/
 	decrypt_rcdino4(memregion("maincpu")->base(), memregion("maincpu")->bytes(), memregion("gfx1")->base(), memregion("gfx1")->bytes(), memregion( "gfx1" )->base());
 }
 
@@ -7243,10 +7238,10 @@ GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  funworld_state, empty_ini
 GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  funworld_state, empty_init,    ROT0, "TAB Austria",     "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
 
 // Magic Card 2 based...
-GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  funworld_state, empty_init,    ROT0, "Impera",          "Magic Card II (Bulgarian)",                       0,                       layout_jollycrd )
-GAMEL( 1996, magicrd2a, magicrd2, magicrd2, magicrd2,  funworld_state, empty_init,    ROT0, "Impera",          "Magic Card II (Nov, Yugoslavian)",                0,                       layout_jollycrd )
-GAME(  1996, magicrd2b, magicrd2, magicrd2, magicrd2,  funworld_state, init_magicd2b, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       0 )
-GAME(  1996, magicrd2c, magicrd2, magicrd2, magicrd2,  funworld_state, init_magicd2c, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       0 )
+GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  magicrd2_state, empty_init,    ROT0, "Impera",          "Magic Card II (Bulgarian)",                       0,                       layout_jollycrd )
+GAMEL( 1996, magicrd2a, magicrd2, magicrd2, magicrd2,  magicrd2_state, empty_init,    ROT0, "Impera",          "Magic Card II (Nov, Yugoslavian)",                0,                       layout_jollycrd )
+GAME(  1996, magicrd2b, magicrd2, magicrd2, magicrd2,  magicrd2_state, init_magicd2b, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       0 )
+GAME(  1996, magicrd2c, magicrd2, magicrd2, magicrd2,  magicrd2_state, init_magicd2c, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       0 )
 
 // Joker Card based...
 GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  funworld_state, empty_init,    ROT0, "Fun World",       "Royal Vegas Joker Card (slow deal)",              0,                       layout_jollycrd )
@@ -7274,8 +7269,8 @@ GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, init_tabb
 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, init_dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
-GAME(  1998, rcdino4,   0,        rcdino4,  rcdino4,   funworld_state, init_rcdino4,  ROT0, "<unknown>",       "Royal Card (Italian, Dino 4 hardware, encrypted)",0 )
-GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, init_rcdinch,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
+GAME(  1998, rcdino4,   0,        rcdino4,  rcdino4,   chinatow_state, init_rcdino4,  ROT0, "<unknown>",       "Royal Card (Italian, Dino 4 hardware, encrypted)",0 )
+GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  chinatow_state, init_rcdinch,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
 
 // MCU based games...
 GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, init_mongolnw, ROT0, "<unknown>",       "Mongolfier New (Italian)",                        MACHINE_UNEMULATED_PROTECTION )

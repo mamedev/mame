@@ -60,7 +60,7 @@ public:
 		, m_samples(*this, "samples")
 		, m_screen(*this, "screen")
 		, m_color_prom(*this, "proms")
-		{ }
+	{ }
 
 	void spcking2(machine_config &config);
 	void spaceint(machine_config &config);
@@ -692,8 +692,7 @@ void astinvad_state::kamikaze(machine_config &config)
 	m_screen->set_raw(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256);
 	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_astinvad));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -738,8 +737,7 @@ void astinvad_state::spaceint(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_spaceint));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

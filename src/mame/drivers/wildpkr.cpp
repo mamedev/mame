@@ -182,8 +182,8 @@
 class wildpkr_state : public driver_device
 {
 public:
-	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_id(*this, "id"),
@@ -197,6 +197,10 @@ public:
 
 	void init_wildpkr();
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -208,9 +212,7 @@ private:
 
 	u16 m_clock_rate;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(wildpkr);
+	void wildpkr_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(unknown_read8);
 	DECLARE_WRITE8_MEMBER(unknown_write8);
 	DECLARE_WRITE16_MEMBER(nvram_w);
@@ -238,7 +240,7 @@ void wildpkr_state::video_start()
 {
 }
 
-PALETTE_INIT_MEMBER(wildpkr_state, wildpkr)
+void wildpkr_state::wildpkr_palette(palette_device &palette) const
 {
 }
 
@@ -485,8 +487,7 @@ MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
+	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -526,8 +527,7 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
+	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

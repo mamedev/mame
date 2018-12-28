@@ -417,7 +417,7 @@ void bigevglf_state::bigevglf(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigevglf);
-	PALETTE(config, m_palette, 0x800);
+	PALETTE(config, m_palette).set_entries(0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

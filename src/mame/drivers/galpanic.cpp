@@ -249,12 +249,11 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galpanic_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galpanic)
-	MCFG_PALETTE_ADD("palette", 1024 + 32768)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx) // fg palette ram, bit 0 seems to be a transparency flag for the front bitmap
-	MCFG_PALETTE_INIT_OWNER(galpanic_state, galpanic)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galpanic);
+	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
+	PALETTE(config, m_palette, FUNC(galpanic_state::galpanic_palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_offsets(0, -16);

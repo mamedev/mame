@@ -37,14 +37,14 @@
 class pb1000_state : public driver_device
 {
 public:
-	pb1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_beeper(*this, "beeper"),
-			m_hd44352(*this, "hd44352"),
-			m_card1(*this, "cardslot1"),
-			m_card2(*this, "cardslot2")
-		{ }
+	pb1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper"),
+		m_hd44352(*this, "hd44352"),
+		m_card1(*this, "cardslot1"),
+		m_card2(*this, "cardslot2")
+	{ }
 
 	void pb2000c(machine_config &config);
 	void pb1000(machine_config &config);
@@ -76,7 +76,7 @@ private:
 	DECLARE_READ8_MEMBER( pb2000c_port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
 	uint16_t read_touchscreen(uint8_t line);
-	DECLARE_PALETTE_INIT(pb1000);
+	void pb1000_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
 	void pb1000_mem(address_map &map);
 	void pb2000c_mem(address_map &map);
@@ -308,7 +308,7 @@ static INPUT_PORTS_START( pb2000c )
 		PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pb1000_state, pb1000)
+void pb1000_state::pb1000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -504,7 +504,7 @@ void pb1000_state::pb1000(machine_config &config)
 	screen.set_visarea(0, 192-1, 0, 32-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init(FUNC(pb1000_state::palette_init_pb1000));
+	PALETTE(config, "palette", FUNC(pb1000_state::pb1000_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pb1000);
 
 	HD44352(config, m_hd44352, 910000);
@@ -521,6 +521,7 @@ void pb1000_state::pb1000(machine_config &config)
 void pb1000_state::pb2000c(machine_config &config)
 {
 	pb1000(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pb1000_state::pb2000c_mem);
 	m_maincpu->kb_read().set(FUNC(pb1000_state::pb2000c_kb_r));

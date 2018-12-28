@@ -614,8 +614,8 @@ void psikyo4_state::ps4big(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette[0], gfx_ps4);
-	PALETTE(config, m_palette[0], (0x2000/4) + 1); /* palette + clear colour */
-	PALETTE(config, m_palette[1], (0x2000/4) + 1);
+	PALETTE(config, m_palette[0]).set_entries((0x2000/4) + 1); /* palette + clear colour */
+	PALETTE(config, m_palette[1]).set_entries((0x2000/4) + 1);
 
 	config.set_default_layout(layout_dualhsxs);
 

@@ -560,12 +560,10 @@ MACHINE_CONFIG_START(markham_state::markham)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_markham)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_markham)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(markham_state, markham)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_markham);
+	PALETTE(config, m_palette, FUNC(markham_state::markham_palette), 1024, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

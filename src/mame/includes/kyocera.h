@@ -148,7 +148,7 @@ protected:
 	int m_centronics_busy;
 	int m_centronics_select;
 
-	DECLARE_PALETTE_INIT(kc85);
+	void kc85_palette(palette_device &palette) const;
 	void kc85_io(address_map &map);
 	void kc85_mem(address_map &map);
 	void trsm100_io(address_map &map);
@@ -250,7 +250,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
-	DECLARE_PALETTE_INIT(tandy200);
+	void tandy200_palette(palette_device &palette) const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tandy200_tp_tick);
 

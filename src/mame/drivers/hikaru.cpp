@@ -529,7 +529,7 @@ void hikaru_state::hikaru(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));
 
-	PALETTE(config, "palette", 0x1000);
+	PALETTE(config, "palette").set_entries(0x1000);
 
 //  SPEAKER(config, "lspeaker").front_left();
 //  SPEAKER(config, "rspeaker").front_right();

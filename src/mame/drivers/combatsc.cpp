@@ -724,14 +724,12 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatsc)
-	MCFG_PALETTE_ADD("palette", 8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatsc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_combatsc);
+	PALETTE(config, m_palette, FUNC(combatsc_state::combatsc_palette));
+	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
 	K007121(config, m_k007121_1, 0);
@@ -748,8 +746,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	ymsnd.port_a_write_callback().set(FUNC(combatsc_state::combatsc_portA_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.70);
 MACHINE_CONFIG_END
 
 
@@ -775,14 +772,12 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatscb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatscb)
-	MCFG_PALETTE_ADD("palette", 8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_combatscb);
+	PALETTE(config, m_palette, FUNC(combatsc_state::combatscb_palette));
+	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
 	SPEAKER(config, "mono").front_center();

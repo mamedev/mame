@@ -213,7 +213,7 @@ private:
 	TILE_GET_INFO_MEMBER(ikari_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(gwar_get_bg_tile_info);
 	DECLARE_VIDEO_START(marvins);
-	DECLARE_PALETTE_INIT(tnk3);
+	void tnk3_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(jcross);
 	DECLARE_VIDEO_START(tnk3);
 	DECLARE_VIDEO_START(ikari);

@@ -438,9 +438,7 @@ void pacland_state::pacland(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(pacland_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pacland);
-	PALETTE(config, m_palette, 256*4+256*4+64*16);
-	m_palette->set_indirect_entries(256);
-	m_palette->set_init(FUNC(pacland_state::palette_init_pacland));
+	PALETTE(config, m_palette, FUNC(pacland_state::pacland_palette), 256*4 + 256*4 + 64*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

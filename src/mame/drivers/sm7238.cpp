@@ -82,7 +82,7 @@ public:
 	void sm7238(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(sm7238);
+	void sm7238_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
@@ -353,7 +353,7 @@ static GFXDECODE_START( gfx_sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(sm7238_state, sm7238)
+void sm7238_state::sm7238_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
@@ -376,8 +376,7 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_pic8259, pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
+	PALETTE(config, "palette", FUNC(sm7238_state::sm7238_palette), 3);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm7238)
 
 	PIC8259(config, m_pic8259, 0);

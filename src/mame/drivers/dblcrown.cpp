@@ -62,13 +62,13 @@ class dblcrown_state : public driver_device
 {
 public:
 	dblcrown_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_watchdog(*this, "watchdog"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_inputs(*this, "IN%u", 0U),
-			m_lamps(*this, "lamp%u", 0U)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_watchdog(*this, "watchdog")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_inputs(*this, "IN%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void dblcrown(machine_config &config);
@@ -100,7 +100,7 @@ private:
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
-	DECLARE_PALETTE_INIT(dblcrown);
+	void dblcrown_palette(palette_device &palette) const;
 
 	void dblcrown_io(address_map &map);
 	void dblcrown_map(address_map &map);
@@ -552,7 +552,7 @@ void dblcrown_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(dblcrown_state, dblcrown)
+void dblcrown_state::dblcrown_palette(palette_device &palette) const
 {
 }
 
@@ -616,12 +616,11 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_SCREEN_UPDATE_DRIVER(dblcrown_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblcrown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dblcrown)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
+	PALETTE(config, m_palette, FUNC(dblcrown_state::dblcrown_palette), 0x100);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -329,7 +329,7 @@ static INPUT_PORTS_START( sr16 )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(alesis_state, alesis)
+void alesis_state::alesis_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -432,8 +432,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
+	PALETTE(config, "palette", FUNC(alesis_state::alesis_palette), 2);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)

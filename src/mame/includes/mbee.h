@@ -120,8 +120,8 @@ private:
 	DECLARE_VIDEO_START(mono);
 	DECLARE_VIDEO_START(standard);
 	DECLARE_VIDEO_START(premium);
-	DECLARE_PALETTE_INIT(standard);
-	DECLARE_PALETTE_INIT(premium);
+	void standard_palette(palette_device &palette) const;
+	void premium_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(mbee56);
 	DECLARE_MACHINE_RESET(mbee128);
 	DECLARE_MACHINE_RESET(mbee256);

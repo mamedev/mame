@@ -2339,7 +2339,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
-	PALETTE(config, m_palette, 0x4000);
+	PALETTE(config, m_palette).set_entries(0x4000);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -2664,7 +2664,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
-	PALETTE(config, m_palette, 0x8000);
+	PALETTE(config, m_palette).set_entries(0x8000);
 	config.set_default_layout(layout_dualhsxs);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

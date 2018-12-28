@@ -121,8 +121,8 @@ OSC:    12.000MHz
 class jalmah_state : public driver_device
 {
 public:
-	jalmah_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jalmah_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_tmap(*this, "scroll%u", 0),
 		m_sharedram(*this, "sharedram"),
@@ -133,7 +133,7 @@ public:
 		m_okibank(*this, "okibank"),
 		m_system_io(*this, "SYSTEM"),
 		m_dsw_io(*this, "DSW")
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(tilebank_w);
 	DECLARE_WRITE8_MEMBER(okirom_w);
@@ -1101,10 +1101,9 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12000000/2,406,0,256,263,16,240) // assume same as nmk16 & mega system 1
 	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_jalmah)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, mcu_sim, attotime::from_hz(10000))
 

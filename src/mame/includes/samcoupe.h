@@ -143,7 +143,7 @@ private:
 	DECLARE_READ8_MEMBER(samcoupe_keyboard_r);
 	DECLARE_WRITE8_MEMBER(samcoupe_border_w);
 	DECLARE_READ8_MEMBER(samcoupe_attributes_r);
-	DECLARE_PALETTE_INIT(samcoupe);
+	void samcoupe_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(samcoupe_frame_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(samcoupe_mouse_reset);

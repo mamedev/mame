@@ -408,7 +408,7 @@ void segajw_state::segajw(machine_config &config)
 	screen.set_visarea(0, 720-1, 0, 448-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 16);
+	PALETTE(config, "palette").set_entries(16);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 

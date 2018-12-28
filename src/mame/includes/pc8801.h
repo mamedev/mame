@@ -237,7 +237,7 @@ private:
 	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(pc8801);
+	void pc8801_palette(palette_device &palette) const;
 	void pc8801_io(address_map &map);
 	void pc8801_mem(address_map &map);
 	void pc8801fdc_io(address_map &map);

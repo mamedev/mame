@@ -40,7 +40,7 @@ private:
 	DECLARE_WRITE8_MEMBER(printer_w);
 	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_WRITE8_MEMBER(printer_ctrl_w);
-	DECLARE_PALETTE_INIT(busicom);
+	void busicom_palette(palette_device &palette) const;
 	uint32_t screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint8_t get_bit_selected(uint32_t val,int num);

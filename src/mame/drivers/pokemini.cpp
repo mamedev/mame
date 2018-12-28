@@ -20,35 +20,6 @@ The LCD is likely to be a SSD1828 LCD.
 #include "softlist.h"
 #include "speaker.h"
 
-struct PRC
-{
-	uint8_t       colors_inverted;
-	uint8_t       background_enabled;
-	uint8_t       sprites_enabled;
-	uint8_t       copy_enabled;
-	uint8_t       map_size;
-	uint8_t       map_size_x;
-	uint8_t       frame_count;
-	uint8_t       max_frame_count;
-	uint32_t      bg_tiles;
-	uint32_t      spr_tiles;
-	uint8_t       count;
-	emu_timer   *count_timer;
-};
-
-
-struct TIMERS
-{
-	emu_timer   *seconds_timer;
-	emu_timer   *hz256_timer;
-	emu_timer   *timer1;                /* Timer 1 low or 16bit */
-	emu_timer   *timer1_hi;             /* Timer 1 hi */
-	emu_timer   *timer2;                /* Timer 2 low or 16bit */
-	emu_timer   *timer2_hi;             /* Timer 2 high */
-	emu_timer   *timer3;                /* Timer 3 low or 16bit */
-	emu_timer   *timer3_hi;             /* Timer 3 high */
-};
-
 
 class pokemini_state : public driver_device
 {
@@ -66,23 +37,7 @@ public:
 
 	void pokemini(machine_config &config);
 
-private:
-	uint8_t m_pm_reg[0x100];
-	PRC m_prc;
-	TIMERS m_timers;
-	bitmap_ind16 m_bitmap;
-	virtual void video_start() override;
-	virtual void machine_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(pokemini);
-	DECLARE_WRITE8_MEMBER(hwreg_w);
-	DECLARE_READ8_MEMBER(hwreg_r);
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
-
-	void pokemini_mem_map(address_map &map);
-
+protected:
 	enum
 	{
 		TIMER_SECONDS,
@@ -98,6 +53,44 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	virtual void video_start() override;
+	virtual void machine_start() override;
+
+private:
+	struct PRC
+	{
+		uint8_t       colors_inverted;
+		uint8_t       background_enabled;
+		uint8_t       sprites_enabled;
+		uint8_t       copy_enabled;
+		uint8_t       map_size;
+		uint8_t       map_size_x;
+		uint8_t       frame_count;
+		uint8_t       max_frame_count;
+		uint32_t      bg_tiles;
+		uint32_t      spr_tiles;
+		uint8_t       count;
+		emu_timer   *count_timer;
+	};
+
+
+	struct TIMERS
+	{
+		emu_timer   *seconds_timer;
+		emu_timer   *hz256_timer;
+		emu_timer   *timer1;                // Timer 1 low or 16bit
+		emu_timer   *timer1_hi;             // Timer 1 hi
+		emu_timer   *timer2;                // Timer 2 low or 16bit
+		emu_timer   *timer2_hi;             // Timer 2 high
+		emu_timer   *timer3;                // Timer 3 low or 16bit
+		emu_timer   *timer3_hi;             // Timer 3 high
+	};
+
+	uint8_t m_pm_reg[0x100];
+	PRC m_prc;
+	TIMERS m_timers;
+	bitmap_ind16 m_bitmap;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -105,6 +98,15 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pokemini_palette(palette_device &palette) const;
+	DECLARE_WRITE8_MEMBER(hwreg_w);
+	DECLARE_READ8_MEMBER(hwreg_r);
+	DECLARE_READ8_MEMBER(rom_r);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
+
+	void pokemini_mem_map(address_map &map);
 
 	void check_irqs();
 	void update_sound();
@@ -149,7 +151,7 @@ static INPUT_PORTS_START( pokemini )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(pokemini_state, pokemini)
+void pokemini_state::pokemini_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0xff, 0xfb, 0x87));
 	palette.set_pen_color(1, rgb_t(0xb1, 0xae, 0x4e));
@@ -1778,7 +1780,7 @@ void pokemini_state::pokemini(machine_config &config)
 	m_screen->set_refresh_hz(72);
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", 4).set_init(FUNC(pokemini_state::palette_init_pokemini));
+	PALETTE(config, "palette", FUNC(pokemini_state::pokemini_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

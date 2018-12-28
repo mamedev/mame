@@ -63,7 +63,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_keyboard(*this, "LINE%u", 0)
-		{ }
+	{ }
 
 	void meritum(machine_config &config);
 
@@ -429,8 +429,8 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	MCFG_SCREEN_UPDATE_DRIVER(meritum_state, screen_update_meritum)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_meritum)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_meritum);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

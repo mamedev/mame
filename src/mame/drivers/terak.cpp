@@ -118,7 +118,7 @@ void terak_state::terak(machine_config &config)
 	screen.set_screen_update(FUNC(terak_state::screen_update_terak));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 }
 
 /* ROM definition */

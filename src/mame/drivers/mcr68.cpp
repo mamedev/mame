@@ -920,9 +920,8 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr68)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_FORMAT(xxxxxxxRRRBBBGGG)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mcr68);
+	PALETTE(config, "palette").set_format(palette_device::xRBG_333, 64);
 
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
 

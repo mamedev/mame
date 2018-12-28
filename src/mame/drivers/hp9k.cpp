@@ -112,11 +112,11 @@ static uint8_t prom16a[256] = {
 class hp9k_state : public driver_device
 {
 public:
-	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_6845(*this, "mc6845"),
-	m_gfxdecode(*this, "gfxdecode")
+	hp9k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_6845(*this, "mc6845"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 		kbdBit=0;
 		crtc_curreg=0;
@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MC6845(config, m_6845, XTAL(16'000'000) / 16);
 	m_6845->set_screen("screen");

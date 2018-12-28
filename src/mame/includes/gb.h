@@ -74,14 +74,14 @@ public:
 	DECLARE_WRITE8_MEMBER(gbc_io_w);
 	DECLARE_WRITE8_MEMBER(gbc_io2_w);
 	DECLARE_READ8_MEMBER(gbc_io2_r);
-	DECLARE_PALETTE_INIT(gb);
+	void gb_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(sgb);
 	DECLARE_MACHINE_RESET(sgb);
-	DECLARE_PALETTE_INIT(sgb);
-	DECLARE_PALETTE_INIT(gbp);
+	void sgb_palette(palette_device &palette) const;
+	void gbp_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
-	DECLARE_PALETTE_INIT(gbc);
+	void gbc_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
 	DECLARE_READ8_MEMBER(gb_cart_r);
@@ -155,7 +155,7 @@ private:
 	DECLARE_READ8_MEMBER(megaduck_sound_r1);
 	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
 	DECLARE_READ8_MEMBER(megaduck_sound_r2);
-	DECLARE_PALETTE_INIT(megaduck);
+	void megaduck_palette(palette_device &palette) const;;
 	void megaduck_map(address_map &map);
 
 	DECLARE_READ8_MEMBER(cart_r);

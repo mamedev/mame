@@ -533,10 +533,9 @@ void fuuki32_state::fuuki32(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki32);
-	PALETTE(config, m_palette, 0x4000 / 2).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	FUUKI_VIDEO(config, m_fuukivid, 0);
-	m_fuukivid->set_gfxdecode_tag(m_gfxdecode);
+	FUUKI_VIDEO(config, m_fuukivid, 0, m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

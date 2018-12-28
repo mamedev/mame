@@ -1583,7 +1583,7 @@ void segac2_state::segac(machine_config &config)
 	screen.set_screen_update(FUNC(segac2_state::screen_update_segac2_new));
 	screen.screen_vblank().set(FUNC(segac2_state::screen_vblank_megadriv));
 
-	PALETTE(config, m_palette, 2048*3);
+	PALETTE(config, m_palette).set_entries(2048*3);
 
 	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 

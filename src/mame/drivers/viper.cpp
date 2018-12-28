@@ -2422,7 +2422,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	screen.set_visarea(0, 1024 - 1, 0, 768 - 1);
 	screen.set_screen_update(FUNC(viper_state::screen_update_viper));
 
-	PALETTE(config, "palette", 65536);
+	PALETTE(config, "palette").set_entries(65536);
 
 	TIMER(config, "ds2430_timer2", 0);
 	//MCFG_TIMER_ADD_NONE("ds2430_timer2")

@@ -71,6 +71,8 @@
 #include "sound/sn76477.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)
 {
@@ -261,11 +263,9 @@ static GFXDECODE_START( gfx_malzak )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(malzak_state, malzak)
+void malzak_state::malzak_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 8 * 8; i++)
+	for (int i = 0; i < 8 * 8; i++)
 	{
 		palette.set_pen_color(i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
 		palette.set_pen_color(i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
@@ -290,7 +290,7 @@ void malzak_state::machine_start()
 
 void malzak_state::machine_reset()
 {
-	memset(m_playfield_code, 0, 256 * sizeof(int));
+	std::fill(std::begin(m_playfield_code), std::end(m_playfield_code), 0);
 
 	m_malzak_x = 0;
 	m_malzak_y = 0;
@@ -314,7 +314,7 @@ void malzak_state::malzak(machine_config &config)
 	m_screen->set_screen_update(FUNC(malzak_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_malzak);
-	PALETTE(config, m_palette, 128).set_init(FUNC(malzak_state::palette_init_malzak));
+	PALETTE(config, m_palette, FUNC(malzak_state::malzak_palette), 128);
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(0, -16);  // -8, -16

@@ -1932,7 +1932,7 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_SCREEN_UPDATE_DRIVER(neogeo_base_state, screen_update)
 
 	/* 4096 colors * two banks * normal and shadow */
-	MCFG_PALETTE_ADD_INIT_BLACK(m_palette, 4096*2*2)
+	MCFG_DEVICE_ADD(m_palette, PALETTE, palette_device::BLACK, 4096*2*2)
 
 	MCFG_DEVICE_ADD(m_sprgen, NEOGEO_SPRITE_OPTIMZIED, 0)
 

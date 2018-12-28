@@ -73,7 +73,7 @@ private:
 	DECLARE_WRITE8_MEMBER( rtc_data_w );
 	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
 
-	DECLARE_PALETTE_INIT(micronic);
+	void micronic_palette(palette_device &palette) const;
 
 	void micronic_io(address_map &map);
 	void micronic_mem(address_map &map);

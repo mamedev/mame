@@ -21,11 +21,12 @@ public:
 
 	void quasar(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+private:
 	DECLARE_WRITE8_MEMBER(video_page_select_w);
 	DECLARE_WRITE8_MEMBER(io_page_select_w);
 	DECLARE_WRITE8_MEMBER(quasar_video_w);
@@ -34,7 +35,7 @@ private:
 	DECLARE_WRITE8_MEMBER(quasar_sh_command_w);
 	DECLARE_READ8_MEMBER(quasar_sh_command_r);
 	DECLARE_READ_LINE_MEMBER(audio_t1_r);
-	DECLARE_PALETTE_INIT(quasar);
+	void quasar_palette(palette_device &palette) const;
 	uint32_t screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(quasar_interrupt);
 

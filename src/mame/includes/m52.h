@@ -11,8 +11,8 @@
 class m52_state : public driver_device
 {
 public:
-	m52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m52_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -33,6 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(m52_protection_r);
 
 protected:
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual DECLARE_WRITE8_MEMBER(m52_scroll_w);
 
@@ -54,19 +55,7 @@ private:
 	uint8_t                m_bg2xpos;
 	uint8_t                m_bg2ypos;
 	uint8_t                m_bgcontrol;
-	DECLARE_WRITE8_MEMBER(m52_bg1ypos_w);
-	DECLARE_WRITE8_MEMBER(m52_bg1xpos_w);
-	DECLARE_WRITE8_MEMBER(m52_bg2xpos_w);
-	DECLARE_WRITE8_MEMBER(m52_bg2ypos_w);
-	DECLARE_WRITE8_MEMBER(m52_bgcontrol_w);
-	DECLARE_WRITE8_MEMBER(m52_flipscreen_w);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_reset() override;
-	void init_palette();
-	void init_sprite_palette(const int *resistances_3, const int *resistances_2, double *weights_r, double *weights_g, double *weights_b, double scale);
-	uint32_t screen_update_m52(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int initoffs);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_sp_gfxdecode;
 	required_device<gfxdecode_device> m_tx_gfxdecode;
@@ -75,6 +64,20 @@ private:
 	required_device<palette_device> m_sp_palette;
 	required_device<palette_device> m_tx_palette;
 	required_device<palette_device> m_bg_palette;
+
+	DECLARE_WRITE8_MEMBER(m52_bg1ypos_w);
+	DECLARE_WRITE8_MEMBER(m52_bg1xpos_w);
+	DECLARE_WRITE8_MEMBER(m52_bg2xpos_w);
+	DECLARE_WRITE8_MEMBER(m52_bg2ypos_w);
+	DECLARE_WRITE8_MEMBER(m52_bgcontrol_w);
+	DECLARE_WRITE8_MEMBER(m52_flipscreen_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void init_palette();
+	void init_sprite_palette(const int *resistances_3, const int *resistances_2, double *weights_r, double *weights_g, double *weights_b, double scale);
+	uint32_t screen_update_m52(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int initoffs);
+
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 };

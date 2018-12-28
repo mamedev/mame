@@ -307,8 +307,7 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
 
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 2);
@@ -369,8 +368,7 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
 
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);

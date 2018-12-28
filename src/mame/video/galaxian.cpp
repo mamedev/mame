@@ -235,13 +235,10 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(galaxian_state, galaxian)
+void galaxian_state::galaxian_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
-	int i, minval, midval, maxval, len;
-	uint8_t starmap[4];
 
 	/*
 	    Sprite/tilemap colors are mapped through a color PROM as follows:
@@ -273,35 +270,36 @@ PALETTE_INIT_MEMBER(galaxian_state, galaxian)
 	    of the main game would be very low to allow for all the oversaturation
 	    of the stars and shells/missiles.
 	*/
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, RGB_MAXIMUM, -1.0,
 			3, &rgb_resistances[0], rweights, 470, 0,
 			3, &rgb_resistances[0], gweights, 470, 0,
 			2, &rgb_resistances[1], bweights, 470, 0);
 
-	/* decode the palette first */
-	len = memregion("proms")->bytes();
-	for (i = 0; i < len; i++)
+	// decode the palette first
+	int const len = memregion("proms")->bytes();
+	for (int i = 0; i < len; i++)
 	{
-		uint8_t bit0, bit1, bit2, r, g, b;
+		uint8_t bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = BIT(color_prom[i],0);
-		bit1 = BIT(color_prom[i],1);
-		bit2 = BIT(color_prom[i],2);
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = BIT(color_prom[i],3);
-		bit1 = BIT(color_prom[i],4);
-		bit2 = BIT(color_prom[i],5);
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = BIT(color_prom[i],6);
-		bit1 = BIT(color_prom[i],7);
-		b = combine_2_weights(bweights, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_2_weights(bweights, bit0, bit1);
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	/*
@@ -319,52 +317,53 @@ PALETTE_INIT_MEMBER(galaxian_state, galaxian)
 	    Since we can't saturate that high, we instead approximate this
 	    by compressing the values proportionally into the 194->255 range.
 	*/
-	minval = RGB_MAXIMUM * 130 / 150;
-	midval = RGB_MAXIMUM * 130 / 100;
-	maxval = RGB_MAXIMUM * 130 / 60;
+	int const minval = RGB_MAXIMUM * 130 / 150;
+	int const midval = RGB_MAXIMUM * 130 / 100;
+	int const maxval = RGB_MAXIMUM * 130 / 60;
 
-	/* compute the values for each of 4 possible star values */
-	starmap[0] = 0;
-	starmap[1] = minval;
-	starmap[2] = minval + (255 - minval) * (midval - minval) / (maxval - minval);
-	starmap[3] = 255;
+	// compute the values for each of 4 possible star values
+	uint8_t const starmap[4]{
+			0,
+			minval,
+			minval + (255 - minval) * (midval - minval) / (maxval - minval),
+			255 };
 
-	/* generate the colors for the stars */
-	for (i = 0; i < 64; i++)
+	// generate the colors for the stars
+	for (int i = 0; i < 64; i++)
 	{
-		uint8_t bit0, bit1, r, g, b;
+		uint8_t bit0, bit1;
 
-		/* bit 5 = red @ 150 Ohm, bit 4 = red @ 100 Ohm */
-		bit0 = BIT(i,5);
-		bit1 = BIT(i,4);
-		r = starmap[(bit1 << 1) | bit0];
+		// bit 5 = red @ 150 Ohm, bit 4 = red @ 100 Ohm
+		bit0 = BIT(i, 5);
+		bit1 = BIT(i, 4);
+		int const r = starmap[(bit1 << 1) | bit0];
 
-		/* bit 3 = green @ 150 Ohm, bit 2 = green @ 100 Ohm */
-		bit0 = BIT(i,3);
-		bit1 = BIT(i,2);
-		g = starmap[(bit1 << 1) | bit0];
+		// bit 3 = green @ 150 Ohm, bit 2 = green @ 100 Ohm
+		bit0 = BIT(i, 3);
+		bit1 = BIT(i, 2);
+		int const g = starmap[(bit1 << 1) | bit0];
 
-		/* bit 1 = blue @ 150 Ohm, bit 0 = blue @ 100 Ohm */
-		bit0 = BIT(i,1);
-		bit1 = BIT(i,0);
-		b = starmap[(bit1 << 1) | bit0];
+		// bit 1 = blue @ 150 Ohm, bit 0 = blue @ 100 Ohm
+		bit0 = BIT(i, 1);
+		bit1 = BIT(i, 0);
+		int const b = starmap[(bit1 << 1) | bit0];
 
-		/* set the RGB color */
+		// set the RGB color
 		m_star_color[i] = rgb_t(r, g, b);
 	}
 
-	/* default bullet colors are white for the first 7, and yellow for the last one */
-	for (i = 0; i < 7; i++)
-		m_bullet_color[i] = rgb_t(0xff,0xff,0xff);
+	// default bullet colors are white for the first 7, and yellow for the last one
+	for (int i = 0; i < 7; i++)
+		m_bullet_color[i] = rgb_t(0xff, 0xff, 0xff);
 	m_bullet_color[7] = rgb_t(0xff,0xff,0x00);
 }
 
-PALETTE_INIT_MEMBER(galaxian_state,moonwar)
+void galaxian_state::moonwar_palette(palette_device &palette)
 {
-	PALETTE_INIT_NAME(galaxian)(palette);
+	galaxian_palette(palette);
 
-	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
-	m_bullet_color[7] = rgb_t(0xef,0xef,0x97);
+	// wire mod to connect the bullet blue output to the 220 ohm resistor
+	m_bullet_color[7] = rgb_t(0xef, 0xef, 0x97);
 }
 
 /*************************************

@@ -249,27 +249,25 @@ static GFXDECODE_START( gfx_spcforce )
 GFXDECODE_END
 
 
-/* 1-bit RGB palette */
-static const int colortable_source[] =
+// 1-bit RGB palette
+static constexpr int COLORTABLE_SOURCE[] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
-	0, 0, 1, 2, 3, 4, 5, 6,  /* not sure about these, but they are only used */
-	0, 7, 0, 1, 2, 3, 4, 5,  /* to change the text color. During the game,   */
-	0, 6, 7, 0, 1, 2, 3, 4,  /* only color 0 is used, which is correct.      */
+	0, 0, 1, 2, 3, 4, 5, 6,  // not sure about these, but they are only used
+	0, 7, 0, 1, 2, 3, 4, 5,  // to change the text color. During the game,
+	0, 6, 7, 0, 1, 2, 3, 4,  // only color 0 is used, which is correct.
 	0, 5, 6, 7, 0, 1, 2, 3,
 	0, 4, 5, 6, 7, 0, 1, 2,
 	0, 3, 4, 5, 6, 7, 0, 1,
 	0, 2, 3, 4, 5, 6, 7, 0
 };
 
-PALETTE_INIT_MEMBER(spcforce_state, spcforce)
+void spcforce_state::spcforce_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < ARRAY_LENGTH(COLORTABLE_SOURCE); i++)
 	{
-		int data = colortable_source[i];
-		rgb_t color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
+		int const data = COLORTABLE_SOURCE[i];
+		rgb_t const color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
 
 		palette.set_pen_color(i, color);
 	}
@@ -313,8 +311,7 @@ void spcforce_state::spcforce(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spcforce);
-	PALETTE(config, m_palette, ARRAY_LENGTH(colortable_source));
-	m_palette->set_init(FUNC(spcforce_state::palette_init_spcforce));
+	PALETTE(config, m_palette, FUNC(spcforce_state::spcforce_palette), ARRAY_LENGTH(COLORTABLE_SOURCE));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

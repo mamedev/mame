@@ -275,68 +275,65 @@ void zerohour_stars_device::device_reset()
 void ladybug_base_state::palette_init_common(palette_device &palette, const uint8_t *color_prom,
 								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1) const
 {
-	static const int resistances[2] = { 470, 220 };
-	double rweights[2], gweights[2], bweights[2];
-	int i;
+	static constexpr int resistances[2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[2], gweights[2], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, rweights, 470, 0,
 			2, resistances, gweights, 470, 0,
 			2, resistances, bweights, 470, 0);
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (~color_prom[i] >> r_bit0) & 0x01;
-		bit1 = (~color_prom[i] >> r_bit1) & 0x01;
-		r = combine_2_weights(rweights, bit0, bit1);
+		// red component
+		bit0 = BIT(~color_prom[i], r_bit0);
+		bit1 = BIT(~color_prom[i], r_bit1);
+		int const r = combine_2_weights(rweights, bit0, bit1);
 
-		/* green component */
-		bit0 = (~color_prom[i] >> g_bit0) & 0x01;
-		bit1 = (~color_prom[i] >> g_bit1) & 0x01;
-		g = combine_2_weights(gweights, bit0, bit1);
+		// green component
+		bit0 = BIT(~color_prom[i], g_bit0);
+		bit1 = BIT(~color_prom[i], g_bit1);
+		int const g = combine_2_weights(gweights, bit0, bit1);
 
-		/* blue component */
-		bit0 = (~color_prom[i] >> b_bit0) & 0x01;
-		bit1 = (~color_prom[i] >> b_bit1) & 0x01;
-		b = combine_2_weights(bweights, bit0, bit1);
+		// blue component
+		bit0 = BIT(~color_prom[i], b_bit0);
+		bit1 = BIT(~color_prom[i], b_bit1);
+		int const b = combine_2_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x20;
 
-	/* characters */
-	for (i = 0; i < 0x20; i++)
+	// characters
+	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		uint8_t const ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites */
-	for (i = 0x20; i < 0x40; i++)
+	// sprites
+	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t ctabentry = color_prom[(i - 0x20) >> 1];
+		uint8_t ctabentry;
 
-		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
-		palette.set_pen_indirect(i + 0x00, ctabentry);
-
-		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
+		ctabentry = bitswap<4>((color_prom[i] >> 0) & 0x0f, 0,1,2,3);
 		palette.set_pen_indirect(i + 0x20, ctabentry);
+
+		ctabentry = bitswap<4>((color_prom[i] >> 4) & 0x0f, 0,1,2,3);
+		palette.set_pen_indirect(i + 0x40, ctabentry);
 	}
 }
 
 
-PALETTE_INIT_MEMBER(ladybug_state, ladybug)
+void ladybug_state::ladybug_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	palette_init_common(palette, color_prom, 0, 5, 2, 6, 4, 7);
+	palette_init_common(palette, memregion("proms")->base(), 0, 5, 2, 6, 4, 7);
 }
 
 WRITE_LINE_MEMBER(ladybug_state::flipscreen_w)
@@ -356,7 +353,7 @@ uint32_t ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind1
 }
 
 
-PALETTE_INIT_MEMBER(sraider_state, sraider)
+void sraider_state::sraider_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -364,30 +361,29 @@ PALETTE_INIT_MEMBER(sraider_state, sraider)
 	palette_init_common(palette, color_prom, 3, 0, 5, 4, 7, 6);
 
 	// star colors
-	for (int i = 0x20; i < 0x40; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1;
-		int r, g, b;
 
 		// red component
-		bit0 = ((i - 0x20) >> 3) & 0x01;
-		bit1 = ((i - 0x20) >> 4) & 0x01;
-		b = 0x47 * bit0 + 0x97 * bit1;
+		bit0 = BIT(i, 3);
+		bit1 = BIT(i, 4);
+		int const b = 0x47 * bit0 + 0x97 * bit1;
 
 		// green component
-		bit0 = ((i - 0x20) >> 1) & 0x01;
-		bit1 = ((i - 0x20) >> 2) & 0x01;
-		g = 0x47 * bit0 + 0x97 * bit1;
+		bit0 = BIT(i, 1);
+		bit1 = BIT(i, 2);
+		int const g = 0x47 * bit0 + 0x97 * bit1;
 
 		// blue component
-		bit0 = ((i - 0x20) >> 0) & 0x01;
-		r = 0x47 * bit0;
+		bit0 = BIT(i, 0);
+		int const r = 0x47 * bit0;
 
-		palette.set_indirect_color(i, rgb_t(r, g, b));
+		palette.set_indirect_color(i + 0x20, rgb_t(r, g, b));
 	}
 
-	for (int i = 0x60; i < 0x80; i++)
-		palette.set_pen_indirect(i, (i - 0x60) + 0x20);
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i + 0x60, i + 0x20);
 
 	// stationary part of grid
 	palette.set_pen_indirect(0x81, 0x40);

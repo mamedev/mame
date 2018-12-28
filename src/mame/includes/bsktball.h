@@ -43,7 +43,7 @@ protected:
 	DECLARE_READ8_MEMBER(bsktball_in0_r);
 	DECLARE_WRITE8_MEMBER(bsktball_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(bsktball);
+	void bsktball_palette(palette_device &palette) const;
 	uint32_t screen_update_bsktball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bsktball_scanline);
 	DECLARE_WRITE8_MEMBER(bsktball_bounce_w);

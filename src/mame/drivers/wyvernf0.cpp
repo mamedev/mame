@@ -63,6 +63,11 @@ public:
 
 	void wyvernf0(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgram;
@@ -79,7 +84,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_VIDEO_START(wyvernf0);
 	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
@@ -94,8 +98,6 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_MACHINE_START(wyvernf0);
-	DECLARE_MACHINE_RESET(wyvernf0);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	// MCU
@@ -162,7 +164,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
-VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -618,7 +620,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_start()
 {
 	uint8_t *ROM = memregion("rombank")->base();
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
@@ -636,7 +638,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 	save_item(NAME(m_mcu_ready));
 }
 
-MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_reset()
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
@@ -661,9 +663,6 @@ void wyvernf0_state::wyvernf0(machine_config &config)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
-	MCFG_MACHINE_START_OVERRIDE(wyvernf0_state,wyvernf0)
-	MCFG_MACHINE_RESET_OVERRIDE(wyvernf0_state,wyvernf0)
-
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -674,11 +673,8 @@ void wyvernf0_state::wyvernf0(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wyvernf0);
-	PALETTE(config, m_palette, 512);
-	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 512);
 	m_palette->set_endianness(ENDIANNESS_BIG);
-
-	MCFG_VIDEO_START_OVERRIDE(wyvernf0_state,wyvernf0)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

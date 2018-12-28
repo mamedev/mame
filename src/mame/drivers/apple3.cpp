@@ -72,12 +72,12 @@ void apple3_state::apple3(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple3_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_via[1], FUNC(via6522_device::write_cb1));
 	m_screen->screen_vblank().append(m_via[1], FUNC(via6522_device::write_cb2));
 	m_screen->screen_vblank().append(FUNC(apple3_state::vbl_w));
 
-	PALETTE(config, m_palette, 32).set_init(FUNC(apple3_state::palette_init_apple3));
+	PALETTE(config, m_palette, FUNC(apple3_state::palette_init), 32);
 
 	/* keyboard controller */
 	AY3600(config, m_ay3600, 0);

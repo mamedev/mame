@@ -73,7 +73,6 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(zx);
 	void zx_tape_input();
 	void zx_ula_hsync();
 

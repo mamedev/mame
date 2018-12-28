@@ -731,9 +731,7 @@ void pocketc_state::pocketc_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc1401);
-	PALETTE(config, m_palette, 8*2);
-	m_palette->set_indirect_entries(6);
-	m_palette->set_init(palette_init_delegate(FUNC(pocketc_state::palette_init_pocketc), this));
+	PALETTE(config, m_palette, FUNC(pocketc_state::pocketc_palette), 8*2, 6);
 }
 
 void pc1401_state::pc1401(machine_config &config)

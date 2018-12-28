@@ -612,7 +612,7 @@ void atvtrack_state::atvtrack(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(atvtrack_state::screen_update_atvtrack));
 
-	PALETTE(config, "palette", 0x1000);
+	PALETTE(config, "palette").set_entries(0x1000);
 }
 
 void smashdrv_state::smashdrv(machine_config &config)

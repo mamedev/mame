@@ -477,8 +477,7 @@ void tecmosys_state::tecmosys(machine_config &config)
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(tecmosys_state::screen_update));
 
-	PALETTE(config, m_palette, 0x4000+0x800);
-	m_palette->set_format(PALETTE_FORMAT_xGGGGGRRRRRBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000+0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

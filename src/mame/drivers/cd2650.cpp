@@ -311,7 +311,7 @@ void cd2650_state::cd2650(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cd2650);
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));

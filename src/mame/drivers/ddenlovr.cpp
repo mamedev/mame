@@ -4375,7 +4375,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
 	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
-	PALETTE(config, m_palette, 16*256);
+	PALETTE(config, m_palette).set_entries(16*256);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,htengoku)
 
@@ -9717,7 +9717,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::ddenlovr_irq));
 
-	PALETTE(config, m_palette, 0x100);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq));
 
@@ -9842,7 +9842,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::strobe_a)).invert();
 
-	PALETTE(config, m_palette, 0x100);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg0));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg1));
@@ -9932,7 +9932,7 @@ void ddenlovr_state::mmpanic(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mmpanic_irq));
 
-	PALETTE(config, m_palette, 0x100);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	blitter_irq().set(FUNC(ddenlovr_state::mmpanic_blitter_irq));
 
@@ -10018,7 +10018,7 @@ void ddenlovr_state::hanakanz(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	PALETTE(config, m_palette, 0x200);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
@@ -10064,7 +10064,7 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::hanakanz_irq));
 
-	PALETTE(config, m_palette, 0x200);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
@@ -10183,7 +10183,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
-	PALETTE(config, m_palette, 0x200);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));

@@ -1558,7 +1558,7 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnzs);
-	PALETTE(config, m_palette, 512).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1590,6 +1590,7 @@ void tnzs_mcu_state::tnzs(machine_config &config)
 void extrmatn_state::extrmatn(machine_config &config)
 {
 	tnzs(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &extrmatn_state::prompal_main_map);
 
@@ -1597,12 +1598,13 @@ void extrmatn_state::extrmatn(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-	m_palette->set_init(FUNC(extrmatn_state::palette_init_prompalette));
+	m_palette->set_init(FUNC(extrmatn_state::prompalette));
 }
 
 void extrmatn_state::plumppop(machine_config &config)
 {
 	extrmatn(config);
+
 	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("AN1");
 	m_upd4701->set_porty_tag("AN2");
@@ -1611,6 +1613,7 @@ void extrmatn_state::plumppop(machine_config &config)
 void arknoid2_state::arknoid2(machine_config &config)
 {
 	plumppop(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_vblank_int("screen", FUNC(arknoid2_state::mcu_interrupt));
 	m_subcpu->set_addrmap(AS_PROGRAM, &arknoid2_state::arknoid2_sub_map);
@@ -1621,6 +1624,7 @@ void arknoid2_state::arknoid2(machine_config &config)
 void insectx_state::insectx(machine_config &config)
 {
 	tnzs_base(config);
+
 	/* basic machine hardware */
 	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::insectx_sub_map);
 
@@ -1637,6 +1641,7 @@ void insectx_state::insectx(machine_config &config)
 void kageki_state::kageki(machine_config &config)
 {
 	tnzs_base(config);
+
 	/* basic machine hardware */
 	m_subcpu->set_addrmap(AS_PROGRAM, &kageki_state::kageki_sub_map);
 
@@ -1658,6 +1663,7 @@ void kageki_state::kageki(machine_config &config)
 void tnzsb_state::tnzsb(machine_config &config)
 {
 	tnzs_base(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tnzsb_state::tnzsb_main_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tnzsb_state::tnzsb_sub_map);
@@ -1703,6 +1709,7 @@ void kabukiz_state::kabukiz(machine_config &config)
 void jpopnics_state::jpopnics(machine_config &config)
 {
 	tnzs_base(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpopnics_state::jpopnics_main_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &jpopnics_state::jpopnics_sub_map);
@@ -1712,8 +1719,7 @@ void jpopnics_state::jpopnics(machine_config &config)
 	m_upd4701->set_porty_tag("AN2");
 
 	/* video hardware */
-	m_palette->set_entries(1024);
-	m_palette->set_format(PALETTE_FORMAT_GGGGBBBBRRRRxxxx); /* wrong, the other 4 bits seem to be used as well */
+	m_palette->set_format(palette_device::GBRx_444, 1024); // wrong, the other 4 bits seem to be used as well
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */

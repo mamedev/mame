@@ -198,7 +198,7 @@ void ip22_state::ip22_base(machine_config &config)
 	screen.set_screen_update("newport", FUNC(newport_video_device::screen_update));
 	screen.screen_vblank().set(m_newport, FUNC(newport_video_device::vblank_w));
 
-	PALETTE(config, "palette", 65536);
+	PALETTE(config, "palette").set_entries(65536);
 
 	NEWPORT_VIDEO(config, m_newport, m_maincpu, m_hpc3);
 

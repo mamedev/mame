@@ -60,7 +60,7 @@ Known Issues:
 
 
 
-int twin16_state::spriteram_process_enable(  )
+int twin16_state::spriteram_process_enable()
 {
 	return (m_CPUA_register & 0x40) == 0;
 }
@@ -676,8 +676,7 @@ void twin16_state::twin16(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twin16);
 
-	PALETTE(config, m_palette, 1024);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);
 	m_palette->enable_shadows();
 
@@ -731,8 +730,7 @@ void fround_state::fround(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fround);
 
-	PALETTE(config, m_palette, 1024);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);
 	m_palette->enable_shadows();
 

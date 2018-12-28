@@ -83,12 +83,12 @@ static const gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-PALETTE_INIT_MEMBER(p2000m_state,p2000m)
+void p2000m_state::p2000m_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0,rgb_t::white()); /* white */
-	palette.set_pen_color(1,rgb_t::black()); /* black */
-	palette.set_pen_color(2,rgb_t::black()); /* black */
-	palette.set_pen_color(3,rgb_t::white()); /* white */
+	palette.set_pen_color(0, rgb_t::white()); // white
+	palette.set_pen_color(1, rgb_t::black()); // black
+	palette.set_pen_color(2, rgb_t::black()); // black
+	palette.set_pen_color(3, rgb_t::white()); // white
 }
 
 static GFXDECODE_START( gfx_p2000m )
@@ -263,16 +263,14 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	MCFG_SCREEN_SIZE(80 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 12 - 1, 0, 24 * 20 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(p2000m_state, screen_update_p2000m)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_p2000m)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(p2000m_state,p2000m)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_p2000m);
+	PALETTE(config, m_palette, FUNC(p2000m_state::p2000m_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 

@@ -3606,7 +3606,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	TIMER(config, "sega32x_scanline_timer", 0);
 
-	PALETTE(config, "sega32x_palette", 0xc0 * 2);
+	PALETTE(config, "sega32x_palette").set_entries(0xc0 * 2);
 
 	m_sega32x->subdevice<cpu_device>("32x_master_sh2")->set_disable();
 	m_sega32x->subdevice<cpu_device>("32x_slave_sh2")->set_disable();

@@ -859,9 +859,7 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_tubep)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32 + 256*64)
-
-	MCFG_PALETTE_INIT_OWNER(tubep_state,tubep)
+	PALETTE(config, "palette", FUNC(tubep_state::tubep_palette), 32 + 256*64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -931,9 +929,7 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_rjammer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_PALETTE_INIT_OWNER(tubep_state,rjammer)
+	PALETTE(config, "palette", FUNC(tubep_state::rjammer_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

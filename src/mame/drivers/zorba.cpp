@@ -143,7 +143,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_zorba)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(m_palette)
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

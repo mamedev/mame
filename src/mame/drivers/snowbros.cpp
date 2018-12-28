@@ -1770,7 +1770,7 @@ void snowbros_state::snowbros(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_snowbros);
-	PALETTE(config, m_palette, 256).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);
@@ -1873,7 +1873,7 @@ void snowbros_state::honeydol(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_honeydol);
-	PALETTE(config, m_palette, 0x800/2).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1912,7 +1912,7 @@ void snowbros_state::twinadv(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twinadv);
-	PALETTE(config, m_palette, 0x100).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1992,7 +1992,7 @@ void snowbros_state::snowbro3(machine_config &config) /* PCB has 16MHz & 12MHz O
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sb3);
-	PALETTE(config, m_palette, 512).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2021,7 +2021,7 @@ void snowbros_state::yutnori(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hyperpac);
-	PALETTE(config, m_palette, 256).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);

@@ -71,6 +71,11 @@ public:
 
 	void smc777(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_READ8_MEMBER(vram_r);
@@ -94,7 +99,7 @@ private:
 	DECLARE_WRITE8_MEMBER(smc777_mem_w);
 	DECLARE_READ8_MEMBER(irq_mask_r);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_PALETTE_INIT(smc777);
+	void smc777_palette(palette_device &palette) const;
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
@@ -110,10 +115,6 @@ private:
 
 	void smc777_io(address_map &map);
 	void smc777_mem(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -993,20 +994,16 @@ void smc777_state::machine_reset()
 
 
 /* set-up SMC-70 mode colors */
-PALETTE_INIT_MEMBER(smc777_state, smc777)
+void smc777_state::smc777_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0x10;i<0x18;i++)
+	for(int i = 0x10; i < 0x18; i++)
 	{
-		uint8_t r,g,b;
+		uint8_t const r = BIT(i, 2);
+		uint8_t const g = BIT(i, 1);
+		uint8_t const b = BIT(i, 0);
 
-		r = (i & 4) >> 2;
-		g = (i & 2) >> 1;
-		b = (i & 1) >> 0;
-
-		palette.set_pen_color(i, pal1bit(r),pal1bit(g),pal1bit(b));
-		palette.set_pen_color(i+8, pal1bit(0),pal1bit(0),pal1bit(0));
+		palette.set_pen_color(i, pal1bit(r), pal1bit(g), pal1bit(b));
+		palette.set_pen_color(i+8, rgb_t::black());
 	}
 }
 
@@ -1038,12 +1035,11 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_SCREEN_SIZE(0x400, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
-	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)
+	PALETTE(config, m_palette, FUNC(smc777_state::smc777_palette), 0x20); // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	H46505(config, m_crtc, MASTER_CLOCK/2);    /* unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen(m_screen);
@@ -1068,8 +1064,8 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 300) // TODO: correct frequency
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	BEEP(config, m_beeper, 300); // TODO: correct frequency
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", smc777_state, keyboard_callback, attotime::from_hz(240/32))
 MACHINE_CONFIG_END

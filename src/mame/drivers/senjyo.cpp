@@ -577,13 +577,10 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_senjyo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_senjyo);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, senjyo_state, IIBBGGRR)
-
-	MCFG_PALETTE_ADD("radar_palette", 2)
-	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(1, &senjyo_state::IIBBGGRR, 512);
+	PALETTE(config, m_radar_palette, FUNC(senjyo_state::radar_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

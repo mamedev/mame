@@ -9,9 +9,10 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_GAMECOM_H
 #define MAME_INCLUDES_GAMECOM_H
+
+#pragma once
 
 #include "cpu/sm8500/sm8500.h"
 #include "sound/dac.h"
@@ -242,7 +243,7 @@ private:
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
 	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
-	DECLARE_PALETTE_INIT(gamecom);
+	void gamecom_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_sound0_timer_callback);

@@ -313,9 +313,7 @@ void gijoe_state::gijoe(machine_config &config)
 	screen.set_screen_update(FUNC(gijoe_state::screen_update_gijoe));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2048));
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	palette.enable_shadows();
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback), this);

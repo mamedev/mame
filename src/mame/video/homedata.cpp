@@ -315,86 +315,78 @@ finish:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(homedata_state,mrokumei)
+void homedata_state::mrokumei_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* initialize 555 RGB palette */
-	for (i = 0; i < 0x8000; i++)
+	// initialize 555 RGB palette
+	for (int i = 0; i < 0x8000; i++)
 	{
-		int r,g,b;
-		int color = color_prom[i*2] * 256 + color_prom[i*2+1];
+		int const color = color_prom[i*2] * 256 + color_prom[i*2+1];
 		/* xxxx--------x--- red
 		 * ----xxxx-----x-- green
 		 * --------xxxx--x- blue
 		 * ---------------x unused
 		 */
-		r = ((color >> 11) & 0x1e) | ((color >> 3) & 1);
-		g = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
-		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
+		int const r = ((color >> 11) & 0x1e) | ((color >> 3) & 1);
+		int const g = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
+		int const b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::reikaids_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* initialize 555 RGB palette */
-	for (i = 0; i < 0x8000; i++)
+	// initialize 555 RGB palette
+	for (int i = 0; i < 0x8000; i++)
 	{
-		int r,g,b;
-		int color = color_prom[i*2] * 256 + color_prom[i*2+1];
+		int const color = color_prom[i*2] * 256 + color_prom[i*2+1];
 		/* xxxx--------x--- green
 		 * ----xxxx-----x-- red
 		 * --------xxxx--x- blue
 		 * ---------------x unused
 		 */
-		g = ((color >> 11) & 0x1e) | ((color >> 3) & 1);
-		r = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
-		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
+		int const g = ((color >> 11) & 0x1e) | ((color >> 3) & 1);
+		int const r = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
+		int const b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,pteacher)
+void homedata_state::pteacher_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* initialize 555 RGB palette */
-	for (i = 0; i < 0x8000; i++)
+	// initialize 555 RGB palette
+	for (int i = 0; i < 0x8000; i++)
 	{
-		int r,g,b;
-		int color = color_prom[i*2] * 256 + color_prom[i*2+1];
+		int const color = color_prom[i*2] * 256 + color_prom[i*2+1];
 		/* xxxxx----------- green
 		 * -----xxxxx------ red
 		 * ----------xxxxx- blue
 		 * ---------------x unused
 		 */
-		g = ((color >> 11) & 0x1f);
-		r = ((color >>  6) & 0x1f);
-		b = ((color >>  1) & 0x1f);
+		int const g = ((color >> 11) & 0x1f);
+		int const r = ((color >>  6) & 0x1f);
+		int const b = ((color >>  1) & 0x1f);
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::mirderby_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r,g,b;
-		r = color_prom[0x000+i];
-		g = color_prom[0x100+i];
-		b = color_prom[0x200+i];
+		int const r = color_prom[0x000+i];
+		int const g = color_prom[0x100+i];
+		int const b = color_prom[0x200+i];
 
 		palette.set_pen_color(i,pal4bit(r),pal4bit(g),pal4bit(b));
 	}

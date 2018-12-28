@@ -105,6 +105,15 @@ public:
 		m_sysram[1] = nullptr;
 	}
 
+	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
+
+	void cc40(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
+private:
 	void postload();
 	void init_sysram(int chip, u16 size);
 	void update_lcd_indicator(u8 y, u8 x, int state);
@@ -123,18 +132,12 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 
-	DECLARE_PALETTE_INIT(cc40);
-	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
+	void cc40_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
-	void cc40(machine_config &config);
+
 	void main_map(address_map &map);
 
-protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
-private:
 	required_device<tms70c20_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
@@ -190,7 +193,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(cc40_state, cc40)
+void cc40_state::cc40_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
@@ -604,8 +607,7 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(cc40_state, cc40)
+	PALETTE(config, "palette", FUNC(cc40_state::cc40_palette), 3);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal

@@ -44,7 +44,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(baraduke);
+	void baraduke_palette(palette_device &palette) const;
 	uint32_t screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_baraduke);
 	void scroll_w(address_space &space, int layer, int offset, int data);

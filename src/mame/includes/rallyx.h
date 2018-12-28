@@ -84,9 +84,9 @@ public:
 	TILE_GET_INFO_MEMBER(locomotn_fg_get_tile_info);
 	DECLARE_MACHINE_START(rallyx);
 	DECLARE_VIDEO_START(rallyx);
-	DECLARE_PALETTE_INIT(rallyx);
+	void rallyx_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(jungler);
-	DECLARE_PALETTE_INIT(jungler);
+	void jungler_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(locomotn);
 	DECLARE_VIDEO_START(commsega);
 	uint32_t screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

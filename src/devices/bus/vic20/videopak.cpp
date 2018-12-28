@@ -105,7 +105,7 @@ MACHINE_CONFIG_START(vic20_video_pak_device::device_add_mconfig)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vic20_video_pak)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	H46505(config, m_crtc, XTAL(14'318'181) / 8);
 	m_crtc->set_screen(MC6845_SCREEN_TAG);

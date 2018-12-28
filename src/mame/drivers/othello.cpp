@@ -59,8 +59,8 @@ constexpr uint8_t TILE_WIDTH = 6;
 class othello_state : public driver_device
 {
 public:
-	othello_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	othello_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "ay%u", 0U),
@@ -120,7 +120,7 @@ private:
 	template<int Shift> void n7751_rom_addr_w(uint8_t data);
 	void n7751_rom_select_w(uint8_t data);
 
-	DECLARE_PALETTE_INIT(othello);
+	void othello_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void audio_map(address_map &map);
@@ -149,14 +149,12 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 	}
 }
 
-PALETTE_INIT_MEMBER(othello_state, othello)
+void othello_state::othello_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
-	{
 		palette.set_pen_color(i, rgb_t(0xff, 0x00, 0xff));
-	}
 
-	/* only colors  2,3,7,9,c,d,f are used */
+	// only colors  2,3,7,9,c,d,f are used
 	palette.set_pen_color(0x02, rgb_t(0x00, 0xff, 0x00));
 	palette.set_pen_color(0x03, rgb_t(0xff, 0x7f, 0x00));
 	palette.set_pen_color(0x07, rgb_t(0x00, 0x00, 0x00));
@@ -183,8 +181,6 @@ READ8_MEMBER(othello_state::unk_87_r)
 WRITE8_MEMBER(othello_state::unk_8a_w)
 {
 	/*
-
-
 	m_n7751_command = (data & 0x07);
 	m_n7751->set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	//m_n7751->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
@@ -421,7 +417,7 @@ void othello_state::othello(machine_config &config)
 	screen.set_visarea(0*8, 64*6-1, 0*8, 64*8-1);
 	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
 
-	PALETTE(config, m_palette, 0x10).set_init(palette_init_delegate(FUNC(othello_state::palette_init_othello), this));
+	PALETTE(config, m_palette, FUNC(othello_state::othello_palette), 0x10);
 
 	h46505_device &crtc(H46505(config, "crtc", 1000000 /* ? MHz */));   /* H46505 @ CPU clock */
 	crtc.set_screen("screen");
@@ -435,7 +431,6 @@ void othello_state::othello(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, m_ay[0], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
-
 	AY8910(config, m_ay[1], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC

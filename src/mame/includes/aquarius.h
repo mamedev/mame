@@ -95,7 +95,7 @@ private:
 	DECLARE_WRITE8_MEMBER(scrambler_w);
 	DECLARE_READ8_MEMBER(cartridge_r);
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
-	DECLARE_PALETTE_INIT(aquarius);
+	void aquarius_palette(palette_device &palette) const;
 	uint32_t screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void aquarius_io(address_map &map);
 	void aquarius_mem(address_map &map);

@@ -105,7 +105,7 @@ protected:
 
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 
-	DECLARE_PALETTE_INIT(gsword);
+	void gsword_palette(palette_device &palette) const;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -154,7 +154,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(mcu2_p1_w);
 	DECLARE_WRITE8_MEMBER(mcu2_p2_w);
 
-	DECLARE_PALETTE_INIT(josvolly);
+	void josvolly_palette(palette_device &palette) const;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

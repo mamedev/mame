@@ -97,6 +97,10 @@ public:
 
 	void pipeline(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram1_w);
@@ -108,9 +112,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pipeline);
+	void pipeline_palette(palette_device &palette) const;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -181,7 +183,7 @@ WRITE8_MEMBER(pipeline_state::vidctrl_w)
 
 WRITE8_MEMBER(pipeline_state::vram2_w)
 {
-	if(!(m_vidctrl & 1))
+	if (!(m_vidctrl & 1))
 	{
 		m_tilemap1->mark_tile_dirty(offset & 0x7ff);
 		m_vram2[offset] = data;
@@ -334,21 +336,18 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ nullptr }
 };
 
-PALETTE_INIT_MEMBER(pipeline_state, pipeline)
+void pipeline_state::pipeline_palette(palette_device &palette) const
 {
-	u8 *prom1 = &memregion("proms")->base()[0x000];
-	u8 *prom2 = &memregion("proms")->base()[0x100];
+	u8 const *const prom1 = &memregion("proms")->base()[0x000];
+	u8 const *const prom2 = &memregion("proms")->base()[0x100];
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		int c = prom1[i] | (prom2[i] << 4);
-		int r = c & 7;
-		int g = (c >> 3) & 7;
-		int b = (c >> 6) & 3;
-		r *= 36;
-		g *= 36;
-		b *= 85;
-		palette.set_pen_color(0x100+i, rgb_t(r, g, b));
+		int const c = prom1[i] | (prom2[i] << 4);
+		int const r = c & 7;
+		int const g = (c >> 3) & 7;
+		int const b = (c >> 6) & 3;
+		palette.set_pen_color(0x100 + i, rgb_t(pal3bit(r), pal3bit(g), pal2bit(b)));
 	}
 }
 
@@ -389,11 +388,11 @@ void pipeline_state::pipeline(machine_config &config)
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 319, 16, 239);
 	screen.set_screen_update(FUNC(pipeline_state::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pipeline);
-	PALETTE(config, m_palette, 0x100+0x100).set_init(FUNC(pipeline_state::palette_init_pipeline));
+	PALETTE(config, m_palette, FUNC(pipeline_state::pipeline_palette), 0x100 + 0x100);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

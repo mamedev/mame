@@ -67,7 +67,7 @@ protected:
 	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
 	u8 m_display_decay[0x20][0x20]; // (internal use)
 
-	DECLARE_PALETTE_INIT(novag_lcd);
+	void novag_lcd_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	HD44780_PIXEL_UPDATE(novag_lcd_pixel_update);
 	void display_update();

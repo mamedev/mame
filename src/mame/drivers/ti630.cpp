@@ -54,16 +54,18 @@ public:
 
 	void init_ti630();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
 	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
-	DECLARE_PALETTE_INIT(ti630);
+	void ti630_palette(palette_device &palette) const;
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
@@ -116,7 +118,7 @@ WRITE8_MEMBER(ti630_state::i80c31_p3_w)
 		logerror("Write to P3: %02X\n", data);
 }
 
-PALETTE_INIT_MEMBER(ti630_state, ti630)
+void ti630_state::ti630_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -156,8 +158,7 @@ void ti630_state::ti630(machine_config &config)
 	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init(FUNC(ti630_state::palette_init_ti630));
-
+	PALETTE(config, "palette", FUNC(ti630_state::ti630_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ti630);
 
 	HD44780(config, m_lcdc, 0);

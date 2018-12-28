@@ -884,7 +884,7 @@ void nwktr_state::nwktr(machine_config &config)
 	rscreen.set_visarea(0, 511, 0, 383);
 	rscreen.set_screen_update(FUNC(nwktr_state::screen_update_rscreen));
 
-	PALETTE(config, m_palette, 65536);
+	PALETTE(config, m_palette).set_entries(65536);
 
 	K001604(config, m_k001604, 0);
 	m_k001604->set_layer_size(0);

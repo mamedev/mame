@@ -582,8 +582,7 @@ void polygonet_state::plygonet(machine_config &config)
 	screen.set_screen_update(FUNC(polygonet_state::screen_update_polygonet));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 32768);
-	m_palette->set_format(PALETTE_FORMAT_XRGB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
 	K053936(config, m_k053936, 0);
 

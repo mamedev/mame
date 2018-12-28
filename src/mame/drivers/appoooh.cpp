@@ -457,12 +457,10 @@ MACHINE_CONFIG_START(appoooh_state::appoooh)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_appoooh)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_appoooh);
+	PALETTE(config, m_palette, FUNC(appoooh_state::appoooh_palette), 32*8+32*8);
 MACHINE_CONFIG_END
 
 
@@ -479,12 +477,10 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robowres)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robowres);
+	PALETTE(config, m_palette, FUNC(appoooh_state::robowres_palette), 32*8+32*8);
 MACHINE_CONFIG_END
 
 void appoooh_state::robowrese(machine_config &config)

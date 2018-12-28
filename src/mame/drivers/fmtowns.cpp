@@ -2770,9 +2770,9 @@ void towns_state::towns_base(machine_config &config)
 	m_screen->set_screen_update(FUNC(towns_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette16[0], gfx_towns);
-	PALETTE(config, m_palette, 256);
-	PALETTE(config, m_palette16[0], 16);
-	PALETTE(config, m_palette16[1], 16);
+	PALETTE(config, m_palette).set_entries(256);
+	PALETTE(config, m_palette16[0]).set_entries(16);
+	PALETTE(config, m_palette16[1]).set_entries(16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

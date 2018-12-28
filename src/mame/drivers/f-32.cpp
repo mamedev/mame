@@ -40,10 +40,11 @@ f5
 class mosaicf2_state : public driver_device
 {
 public:
-	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void mosaicf2(machine_config &config);
 	void royalpk2(machine_config &config);
@@ -188,7 +189,7 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaicf2_state, screen_update_mosaicf2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -267,7 +268,7 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaicf2_state, screen_update_mosaicf2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -62,7 +62,7 @@ public:
 	void tsukande(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(konmedal);
+	void konmedal_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(shuriboy);
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -199,18 +199,17 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(konmedal_state, konmedal)
+void konmedal_state::konmedal_palette(palette_device &palette) const
 {
-	int i;
-	uint8_t *PROM = memregion("proms")->base();
+	uint8_t const *const PROM = memregion("proms")->base();
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		// this is extremely wrong, see the color test screen
 		palette.set_pen_color(i,
-			PROM[i]<<4,
-			PROM[0x100+i]<<4,
-			PROM[0x200+i]<<4);
+				PROM[i] << 4,
+				PROM[0x100 + i] << 4,
+				PROM[0x200 + i] << 4);
 	}
 }
 
@@ -397,10 +396,8 @@ void konmedal_state::tsukande(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8192);
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	m_palette->set_init(FUNC(konmedal_state::palette_init_konmedal));
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
@@ -432,10 +429,8 @@ void konmedal_state::ddboy(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8192);
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	m_palette->set_init(FUNC(konmedal_state::palette_init_konmedal));
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
@@ -559,8 +554,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8192); // not verified
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192); // not verified
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 

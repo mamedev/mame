@@ -100,12 +100,12 @@ private:
 	DECLARE_WRITE8_MEMBER(n8080_status_callback);
 	DECLARE_MACHINE_RESET(spacefev);
 	DECLARE_VIDEO_START(spacefev);
-	DECLARE_PALETTE_INIT(n8080);
+	void n8080_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(sheriff);
 	DECLARE_VIDEO_START(sheriff);
 	DECLARE_MACHINE_RESET(helifire);
 	DECLARE_VIDEO_START(helifire);
-	DECLARE_PALETTE_INIT(helifire);
+	void helifire_palette(palette_device &palette) const;
 	DECLARE_SOUND_START(spacefev);
 	DECLARE_SOUND_RESET(spacefev);
 	DECLARE_SOUND_START(sheriff);

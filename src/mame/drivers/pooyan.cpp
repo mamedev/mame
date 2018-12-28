@@ -219,14 +219,11 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pooyan_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pooyan)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(pooyan_state, pooyan)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pooyan);
+	PALETTE(config, m_palette, FUNC(pooyan_state::pooyan_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
-
-	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
+	TIMEPLT_AUDIO(config, "timeplt_audio");
 MACHINE_CONFIG_END
 
 

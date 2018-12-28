@@ -1778,7 +1778,7 @@ void mcr_state::mcr_90009(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr);
-	PALETTE(config, m_palette, 32).set_format(PALETTE_FORMAT_xxxxRRRRBBBBGGGG);
+	PALETTE(config, m_palette).set_format(palette_device::xRBG_444, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1808,8 +1808,7 @@ void mcr_state::mcr_90010(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90010_portmap);
 
 	/* video hardware */
-	m_palette->set_entries(64);
-	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRBBBBGGGG);
+	m_palette->set_format(palette_device::xRBG_444, 64);
 }
 
 /* as above, plus 8-track tape */
@@ -1831,8 +1830,7 @@ void mcr_state::mcr_91475(machine_config &config)
 	mcr_90010(config);
 
 	/* video hardware */
-	m_palette->set_entries(128);
-	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRBBBBGGGG);
+	m_palette->set_format(palette_device::xRBG_444, 128);
 
 	/* sound hardware */
 	SAMPLES(config, m_samples);

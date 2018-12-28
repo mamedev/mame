@@ -2030,14 +2030,13 @@ uint32_t pc9801_state::a20_286(bool state)
 ****************************************/
 
 //
-PALETTE_INIT_MEMBER(pc9801_state,pc9801)
+void pc9801_state::pc9801_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<8;i++)
+	for(int i = 0; i < 8; i++)
 		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	for(i=8;i<palette.entries();i++)
-		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
+
+	for(int i = 8; i < palette.entries(); i++)
+		palette.set_pen_color(i, rgb_t::black());
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801_common)
@@ -2408,7 +2407,7 @@ void pc9801_state::pc9801(machine_config &config)
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::mdma_w));
 
-	PALETTE(config, m_palette, 16).set_init(FUNC(pc9801_state::palette_init_pc9801));
+	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 }
 
 
@@ -2435,7 +2434,7 @@ void pc9801_state::pc9801rs(machine_config &config)
 
 	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_grcg_2_map);
 
-	PALETTE(config, m_palette, 16+16).set_init(FUNC(pc9801_state::palette_init_pc9801));
+	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16 + 16);
 }
 
 void pc9801_state::pc9801vm(machine_config &config)
@@ -2491,7 +2490,7 @@ void pc9801_state::pc9821(machine_config &config)
 
 	m_dmac->set_clock(16000000); // unknown clock
 
-	PALETTE(config.replace(), m_palette, 16+16+256).set_init(FUNC(pc9801_state::palette_init_pc9801));
+	PALETTE(config.replace(), m_palette, FUNC(pc9801_state::pc9801_palette), 16 + 16 + 256);
 }
 
 void pc9801_state::pc9821ap2(machine_config &config)

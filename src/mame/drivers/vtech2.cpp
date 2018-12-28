@@ -435,43 +435,41 @@ static GFXDECODE_START( gfx_vtech2 )
 GFXDECODE_END
 
 
-static const rgb_t vt_colors[] =
+static constexpr rgb_t vt_colors[] =
 {
 	rgb_t::black(),
-	rgb_t(0x00, 0x00, 0x7f),  /* blue */
-	rgb_t(0x00, 0x7f, 0x00),  /* green */
-	rgb_t(0x00, 0x7f, 0x7f),  /* cyan */
-	rgb_t(0x7f, 0x00, 0x00),  /* red */
-	rgb_t(0x7f, 0x00, 0x7f),  /* magenta */
-	rgb_t(0x7f, 0x7f, 0x00),  /* yellow */
-	rgb_t(0xa0, 0xa0, 0xa0),  /* bright grey */
-	rgb_t(0x7f, 0x7f, 0x7f),  /* dark grey */
-	rgb_t(0x00, 0x00, 0xff),  /* bright blue */
-	rgb_t(0x00, 0xff, 0x00),  /* bright green */
-	rgb_t(0x00, 0xff, 0xff),  /* bright cyan */
-	rgb_t(0xff, 0x00, 0x00),  /* bright red */
-	rgb_t(0xff, 0x00, 0xff),  /* bright magenta */
-	rgb_t(0xff, 0xff, 0x00),  /* bright yellow */
+	{ 0x00, 0x00, 0x7f },  // blue
+	{ 0x00, 0x7f, 0x00 },  // green
+	{ 0x00, 0x7f, 0x7f },  // cyan
+	{ 0x7f, 0x00, 0x00 },  // red
+	{ 0x7f, 0x00, 0x7f },  // magenta
+	{ 0x7f, 0x7f, 0x00 },  // yellow
+	{ 0xa0, 0xa0, 0xa0 },  // bright grey
+	{ 0x7f, 0x7f, 0x7f },  // dark grey
+	{ 0x00, 0x00, 0xff },  // bright blue
+	{ 0x00, 0xff, 0x00 },  // bright green
+	{ 0x00, 0xff, 0xff },  // bright cyan
+	{ 0xff, 0x00, 0x00 },  // bright red
+	{ 0xff, 0x00, 0xff },  // bright magenta
+	{ 0xff, 0xff, 0x00 },  // bright yellow
 	rgb_t::white()
 };
 
 
-/* Initialise the palette */
-PALETTE_INIT_MEMBER(vtech2_state, vtech2)
+// Initialise the palette
+void vtech2_state::vtech2_palette(palette_device &palette) const
 {
-	int i;
-
-	for ( i = 0; i < 16; i++ )
+	for (int i = 0; i < 16; i++)
 		palette.set_indirect_color(i, vt_colors[i]);
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		palette.set_pen_indirect(2*i, i&15);
-		palette.set_pen_indirect(2*i+1, i>>4);
+		palette.set_pen_indirect(2*i, i & 15);
+		palette.set_pen_indirect(2*i + 1, i >> 4);
 	}
 
-	for (i = 0; i < 16; i++)
-		palette.set_pen_indirect(512+i, i);
+	for (int i = 0; i < 16; i++)
+		palette.set_pen_indirect(512 + i, i);
 }
 
 INTERRUPT_GEN_MEMBER(vtech2_state::vtech2_interrupt)
@@ -506,12 +504,10 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_SCREEN_SIZE(88*8, 24*8+32)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vtech2)
-	MCFG_PALETTE_ADD("palette", 512+16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vtech2);
+	PALETTE(config, m_palette, FUNC(vtech2_state::vtech2_palette), 512 + 16, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -534,31 +530,24 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(vtech2_state::laser500)
+void vtech2_state::laser500(machine_config &config)
+{
 	laser350(config);
 
-	config.device_remove("banka");
-	config.device_remove("bankb");
-	config.device_remove("bankc");
-	config.device_remove("bankd");
-	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-	ADDRESS_MAP_BANK(config, "bankc").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-MACHINE_CONFIG_END
+	ADDRESS_MAP_BANK(config.replace(), "banka").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankb").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankc").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+}
 
 
 MACHINE_CONFIG_START(vtech2_state::laser700)
 	laser350(config);
 
-	config.device_remove("banka");
-	config.device_remove("bankb");
-	config.device_remove("bankc");
-	config.device_remove("bankd");
-	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-	ADDRESS_MAP_BANK(config, "bankc").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "banka").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankb").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankc").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* Second 5.25" floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )

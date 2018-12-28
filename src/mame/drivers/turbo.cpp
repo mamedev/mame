@@ -881,9 +881,8 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	outlatch.q_out_cb<3>().set(FUNC(turbo_state::start_lamp_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::turbo_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -921,9 +920,8 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::subroc3d_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -969,9 +967,8 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::buckrog_palette), 1024);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)

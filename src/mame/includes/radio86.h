@@ -56,7 +56,7 @@ public:
 	void radio86_pagesel(uint8_t data);
 	void init_radioram();
 	void init_radio86();
-	DECLARE_PALETTE_INIT(radio86);
+	void radio86_palette(palette_device &palette) const;
 	uint8_t radio86_8255_portb_r2();
 	uint8_t radio86_8255_portc_r2();
 	void radio86_8255_porta_w2(uint8_t data);

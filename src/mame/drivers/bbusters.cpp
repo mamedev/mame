@@ -656,9 +656,8 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	screen.screen_vblank().append(m_spriteram[1], FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bbusters)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bbusters);
+	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
@@ -698,9 +697,8 @@ MACHINE_CONFIG_START(mechatt_state::mechatt)
 	screen.screen_vblank().set(m_spriteram[0], FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mechatt)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mechatt);
+	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 1024);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 

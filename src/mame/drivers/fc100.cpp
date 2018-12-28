@@ -530,7 +530,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "f4palette", gfx_fc100)
-	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
+	PALETTE(config, "f4palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

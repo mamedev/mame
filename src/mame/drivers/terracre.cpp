@@ -473,12 +473,10 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_terracre)
-	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_terracre);
+	PALETTE(config, m_palette, FUNC(terracre_state::terracre_palette), 1*16+16*16+16*256, 256);
 
 	SPEAKER(config, "speaker").front_center();
 

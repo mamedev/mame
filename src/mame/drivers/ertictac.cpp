@@ -237,7 +237,7 @@ void ertictac_state::ertictac(machine_config &config)
 	m_screen->set_raw(XTAL(16'000'000), 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
 	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
 
-	PALETTE(config, m_palette, 0x200);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	SPEAKER(config, "speaker").front_center();
 	for (int i = 0; i < 8; i++)

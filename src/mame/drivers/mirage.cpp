@@ -54,8 +54,8 @@ MR_01-.3A    [a0b758aa]
 class miragemj_state : public driver_device
 {
 public:
-	miragemj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	miragemj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_deco_tilegen(*this, "tilegen"),
 		m_eeprom(*this, "eeprom"),
@@ -311,10 +311,8 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirage)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);
