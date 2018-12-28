@@ -40,16 +40,15 @@
 		</part>
 	</software>
 	
-	<!-- FIXED BITS (xxxxxx0x)
 	<software name="pc0004">
 		<description>BHT Volume 7 (Japan) (PC0004-BHT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="pc0004-bht.u1" size="0x100000" crc="08d375ea" sha1="ff78541d0adaa97f7df46b7592479737cff0194d" offset="0" /> 
+				<rom name="pc0004-bht.u1" size="0x100000" crc="95e35899" sha1="a9bd2694f5ee4b964e8d73afc3e88c0eb18ca1d2" offset="0" /> 
 			</dataarea>
 		</part>
 	</software>	
-	-->
+
 </softwarelist>

@@ -55,31 +55,27 @@
 		</part>
 	</software>
 
-	<!-- FIXED BITS (xxxxxx0x)
 	<software name="gc0003">
 		<description>BAT Volume 2 (Japan) (GC0003-BAT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarag3.bin" size="0x100000" crc="a3f8756b" sha1="8569c4079b1394dfe5ccc69fcfcabcb877716949" offset="0" />
+				<rom name="gc00003-bat.u1" size="0x100000" crc="49536d5a" sha1="c112b6ac62f586fc1d1615406362fc659e587772" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	-->
 	
-	<!-- FIXED BITS (xxxxxx0x)
 	<software name="gc0004">
 		<description>BHT Volume 2 (Japan) (GC0004-BHT)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarag4.bin" size="0x100000" crc="bb10aa6e" sha1="7c4f4f08994fb7be5bfc9f0ab2a6084a71a94cdd" offset="0" />
+				<rom name="gc0004-bht.u1" size="0x100000" crc="6d2e9711" sha1="0478578c297f14d78a6612ecd61387129bd6df42" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-	-->
 	
 	<software name="gc0006">
 		<description>BHT Volume 3 (Japan) (GC0006-BHT)</description>

@@ -5,14 +5,20 @@
 
 	Japanese cart listing (by M code) (M-x on cartridge / box, MC in cart identifier code)
 
-	M-1  *MC0001-ATM  Mini Volume 1
+	M-1  *MC0001-ATM  ATM Mini Volume 1
 	M-2   MC0002-
 	M-3   MC0003-
-	M-4   MC0004-     Mini Volume 4 (w-inds)
+	M-4   MC0004-     ? Mini Volume 4 (w-inds)
 	M-5   MC0005-
 	M-6   MC0006-
-	M-7   MC0007-ATM  Mini Volume 5
-
+	M-7   MC0007-ATM  ATM Mini Volume 5
+	M-8
+	M-9
+	M-10
+	M-11
+	M-12
+	M-13  MC0013-KSM  KSM Mini Volume 5
+	
 	(more? what's the M highest number?)
 
 	-->
@@ -21,12 +27,23 @@
 	<!-- these have unique presentation -->
 
 	<software name="mc0001">
-		<description>Mini Volume 1 (Japan) (MC0001-ATM)</description>
+		<description>ATM Mini Volume 1 (Japan) (MC0001-ATM)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0001-atm.u1" size="0x080000" crc="3ef59e82" sha1="d10f0b4a174bef736fea538028eacbeb46af5bbd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc0013">
+		<description>KSM Mini Volume 5 (Japan) (MC0005-KSM)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="mc0013-ksm.u1" size="0x080000" crc="db05eafa" sha1="b58efcc41ad8d5571c319e0d88fa8a3d9badbe93" offset="0" />
 			</dataarea>
 		</part>
 	</software>
