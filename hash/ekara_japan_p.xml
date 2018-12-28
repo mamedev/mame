@@ -45,6 +45,7 @@
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc02"/> 
 			<dataarea name="rom" size="0x100000">
 				<rom name="pc0004-bht.u1" size="0x100000" crc="95e35899" sha1="a9bd2694f5ee4b964e8d73afc3e88c0eb18ca1d2" offset="0" /> 
 			</dataarea>

@@ -104,7 +104,7 @@
 	
 	
 	<!-- G15 looks like G16- 74HC125 and 24LC02. -->
-	<software name="gc0015"> <!-- has SEEPROM?  -->
+	<software name="gc0015">
 		<description>BAT Volume 5 (Japan) (GC0015-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
@@ -116,7 +116,7 @@
 		</part>
 	</software>		
 		
-	<software name="gc0016"> <!-- has SEEPROM? -->
+	<software name="gc0016">
 		<description>TV Pop Volume 5 (Japan) (GC0016-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
