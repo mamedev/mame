@@ -89,7 +89,7 @@ READ8_MEMBER(ekara_rom_i2c_base_device::read_extra)
 {
 	logerror("ekara_rom_i2c_base_device::read_extra %08x\n", offset);
 
-	return (m_i2cmem->read_sda() & 1) << 7;
+	return (m_i2cmem->read_sda() & 1) ? 0xff : 0x00;
 }
 
 WRITE8_MEMBER(ekara_rom_i2c_base_device::write_extra)

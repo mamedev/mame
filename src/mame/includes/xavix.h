@@ -70,6 +70,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
+		m_an_in(*this, "AN%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
@@ -166,6 +167,7 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction);
 	required_ioport m_in0;
 	required_ioport m_in1;
+	required_ioport_array<8> m_an_in;
 	required_device<xavix_device> m_maincpu;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
@@ -293,6 +295,8 @@ private:
 	uint8_t m_io1_data;
 	uint8_t m_io0_direction;
 	uint8_t m_io1_direction;
+
+	uint8_t m_adc_inlatch;
 
 	DECLARE_READ8_MEMBER(nmi_vector_lo_r);
 	DECLARE_READ8_MEMBER(nmi_vector_hi_r);
