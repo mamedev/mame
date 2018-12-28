@@ -470,6 +470,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( xavix_an )
     PORT_INCLUDE(xavix)
 
+	// test inputs, not real!
 	PORT_MODIFY("AN0") // 00
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 	PORT_MODIFY("AN1") // 01
@@ -488,7 +489,9 @@ static INPUT_PORTS_START( xavix_an )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( taikodp )
+// left + right drums together = select / forward (needed on initial screen).  left drum = left in menus   right drum  = right in menus
+// analog reading depends heavily on timers, they're too fast right now so drum hits are too hard and register multiple times
+static INPUT_PORTS_START( taikodp ) 
     PORT_INCLUDE(xavix_an)
 
 	PORT_MODIFY("AN0") // 00  (read by one type of function, handled in timer interrupt at 0x1d92 in RAM)
@@ -1034,12 +1037,14 @@ void xavix_cart_state::xavix_cart(machine_config &config)
 
 void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
-	xavix_i2c_24lc02(config);
+	xavix_cart(config);
 
-	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
+	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
+
+	// do any of the later G/P series carts with SEEPROM work with this too? check
 }
 
 void xavix_cart_state::xavix_cart_ekara(machine_config &config)

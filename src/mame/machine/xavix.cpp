@@ -455,6 +455,34 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
+// for taikodp
+uint8_t xavix_i2c_cart_state::read_io1(uint8_t direction)
+{
+	uint8_t ret = m_in1->read();
+
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
+
+	return ret;
+}
+
+void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}
+}
+
+
 uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
 {
 	uint8_t ret = m_in1->read();

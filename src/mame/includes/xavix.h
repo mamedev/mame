@@ -779,19 +779,22 @@ protected:
 	required_device<ekara_cart_slot_device> m_cartslot;
 };
 
-class xavix_i2c_cart_state : public xavix_i2c_state
+class xavix_i2c_cart_state : public xavix_cart_state
 {
 public:
 	xavix_i2c_cart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig,type,tag),
-		m_cartslot(*this, "cartslot")
+		: xavix_cart_state(mconfig,type,tag),
+		m_i2cmem(*this, "i2cmem")
 	{ }
 
 	void xavix_i2c_taiko(machine_config &config);
 
 protected:
-	required_device<ekara_cart_slot_device> m_cartslot;
-	};
+	virtual uint8_t read_io1(uint8_t direction) override;
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
 
 
 class xavix_ekara_state : public xavix_cart_state
