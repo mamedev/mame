@@ -627,7 +627,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekarae82.bin" size="0x100000" crc="3998e478" sha1="29dad31dfd79c57b2ccec0caac81b3489946b798" offset="0" />
+				<rom name="ec0082-mbh.u1" size="0x100000" crc="3998e478" sha1="29dad31dfd79c57b2ccec0caac81b3489946b798" offset="0" />
 			</dataarea>
 		</part>
 	</software>	
