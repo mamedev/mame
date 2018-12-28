@@ -1061,6 +1061,7 @@ void robokid_state::robokid(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &robokid_state::ninjakid_nopcm_sound_cpu);
 
 	/* video hardware */
+	m_gfxdecode->set_info(gfx_robokid);
 	m_palette->set_format(palette_device::RGBx_444, 0x400);  // RAM is this large, but still only 0x300 colors used
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
