@@ -118,26 +118,22 @@ WRITE8_MEMBER(xavix_state::irq_vector_hi_w)
 	m_irq_vector_hi_data = data;
 }
 
+// this is external bus control (access to ROM etc.)
 
-WRITE8_MEMBER(xavix_state::extintrf_7900_w)
+READ8_MEMBER(xavix_state::extintrf_790x_r)
 {
-	// some games with cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
-	LOG("%s: extintrf_7900_w %02x (---FIRST WRITE ON STARTUP---)\n", machine().describe_context(), data);
-	m_7900 = data;
-
+	LOG("%s: extintrf_790x_r %02x\n", machine().describe_context(), offset);
+	return m_extbusctrl[offset];
 }
 
-WRITE8_MEMBER(xavix_state::extintrf_7901_w)
+WRITE8_MEMBER(xavix_state::extintrf_790x_w)
 {
-	// some games with cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
-	LOG("%s: extintrf_7901_w %02x\n", machine().describe_context(), data);
-	m_7901 = data;
+	// Popira, Taiko De Popira etc. games with SEEPROM cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
+	LOG("%s: extintrf_790x_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_extbusctrl[offset] = data;
 }
 
-WRITE8_MEMBER(xavix_state::extintrf_7902_w)
-{
-	LOG("%s: extintrf_7902_w %02x\n", machine().describe_context(), data);
-}
+
 
 
 
@@ -920,8 +916,10 @@ void xavix_state::machine_reset()
 
 	m_cpuspace = &m_maincpu->space(AS_PROGRAM);
 
-	m_7900 = 0x00;
-	m_7901 = 0x00;
+	m_extbusctrl[0] = 0x00;
+	m_extbusctrl[1] = 0x00;
+	m_extbusctrl[2] = 0x00;
+
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

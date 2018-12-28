@@ -171,8 +171,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_lowbus;
 	address_space* m_cpuspace;
-	uint8_t m_7900;
-	uint8_t m_7901;
+	uint8_t m_extbusctrl[3];
 
 private:
 
@@ -245,9 +244,8 @@ private:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(extintrf_7900_w);
-	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
-	DECLARE_WRITE8_MEMBER(extintrf_7902_w);
+	DECLARE_READ8_MEMBER(extintrf_790x_r);
+	DECLARE_WRITE8_MEMBER(extintrf_790x_w);
 
 	DECLARE_READ8_MEMBER(ioevent_enable_r);
 	DECLARE_WRITE8_MEMBER(ioevent_enable_w);
@@ -678,7 +676,7 @@ protected:
 
 	virtual DECLARE_READ8_MEMBER(extbus_r) override
 	{
-		if (m_7901 & 0x08)
+		if (m_extbusctrl[1] & 0x08)
 		{
 			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
 			return m_cartslot->read_extra(*m_cpuspace, offset);
@@ -704,7 +702,7 @@ protected:
 	}
 	virtual DECLARE_WRITE8_MEMBER(extbus_w) override
 	{
-		if (m_7900 & 0x08)
+		if (m_extbusctrl[0] & 0x08)
 		{
 			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
 			return m_cartslot->write_extra(*m_cpuspace, offset, data);

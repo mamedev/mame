@@ -327,10 +327,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// Slot Registers
 	map(0x7810, 0x7810).w(FUNC(xavix_state::slotreg_7810_w)); // startup
 
-	// External Interface
-	map(0x7900, 0x7900).w(FUNC(xavix_state::extintrf_7900_w));
-	map(0x7901, 0x7901).w(FUNC(xavix_state::extintrf_7901_w));
-	map(0x7902, 0x7902).w(FUNC(xavix_state::extintrf_7902_w));
+	// External Bus Interface control
+	map(0x7900, 0x7902).rw(FUNC(xavix_state::extintrf_790x_r), FUNC(xavix_state::extintrf_790x_w));
 
 	// DMA Controller
 	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmastat_r), FUNC(xavix_state::rom_dmatrg_w));
