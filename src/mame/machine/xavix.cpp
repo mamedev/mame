@@ -855,6 +855,47 @@ void xavix_state::machine_start()
 	// at least some of the internal CPU RAM is backed up, not sure how much
 	if (m_nvram)
 		m_nvram->set_base(&m_mainram[0x3e00], 0x200);
+
+
+	save_item(NAME(m_extbusctrl));
+	save_item(NAME(m_ioevent_enable));
+	save_item(NAME(m_ioevent_active));
+	save_item(NAME(m_io0_data));
+	save_item(NAME(m_io1_data));
+	save_item(NAME(m_io0_direction));
+	save_item(NAME(m_io1_direction));
+	save_item(NAME(m_adc_control));
+	save_item(NAME(m_sound_irqstatus));
+	save_item(NAME(m_soundreg16_0));
+	save_item(NAME(m_soundreg16_1));
+	save_item(NAME(m_sound_regbase));
+	save_item(NAME(m_timer_control));
+	save_item(NAME(m_timer_freq));
+	save_item(NAME(m_txarray));
+	save_item(NAME(m_irqsource));
+	save_item(NAME(m_vectorenable));
+	save_item(NAME(m_nmi_vector_lo_data));
+	save_item(NAME(m_nmi_vector_hi_data));
+	save_item(NAME(m_irq_vector_lo_data));
+	save_item(NAME(m_irq_vector_hi_data));
+	save_item(NAME(m_multparams));
+	save_item(NAME(m_multresults));
+	save_item(NAME(m_spritefragment_dmaparam1));
+	save_item(NAME(m_spritefragment_dmaparam2));
+	save_item(NAME(m_tmap1_regs));
+	save_item(NAME(m_tmap2_regs));
+	save_item(NAME(m_arena_start));
+	save_item(NAME(m_arena_end));
+	save_item(NAME(m_arena_control));
+	save_item(NAME(m_6ff0));
+	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_mastervol));
+	save_item(NAME(m_unk_snd75f8));
+	save_item(NAME(m_unk_snd75f9));
+	save_item(NAME(m_unk_snd75ff));
+	save_item(NAME(m_sndtimer));
+	save_item(NAME(m_timer_baseval));
+	save_item(NAME(m_spritereg));
 }
 
 void xavix_state::machine_reset()
@@ -885,8 +926,8 @@ void xavix_state::machine_reset()
 
 	m_mastervol = 0x00;
 	m_unk_snd75f8 = 0x00;
-	m_unksnd75f9 = 0x00;
-	m_unksnd75ff = 0x00;
+	m_unk_snd75f9 = 0x00;
+	m_unk_snd75ff = 0x00;
 
 	for (int i = 0; i < 4; i++)
 	{

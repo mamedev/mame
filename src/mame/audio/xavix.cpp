@@ -382,12 +382,12 @@ WRITE8_MEMBER(xavix_state::sound_75f8_w)
 READ8_MEMBER(xavix_state::sound_75f9_r)
 {
 	LOG("%s: sound_75f9_r\n", machine().describe_context());
-	return m_unksnd75f9;
+	return m_unk_snd75f9;
 }
 
 WRITE8_MEMBER(xavix_state::sound_75f9_w)
 {
-	m_unksnd75f9 = data;
+	m_unk_snd75f9 = data;
 	LOG("%s: sound_75f9_w %02x\n", machine().describe_context().c_str(), data);
 }
 
@@ -516,7 +516,7 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 
 WRITE8_MEMBER(xavix_state::sound_75ff_w)
 {
-	m_unksnd75ff = data;
+	m_unk_snd75ff = data;
 	LOG("%s: sound_75ff_w %02x\n", machine().describe_context(), data);
 }
 

@@ -465,8 +465,8 @@ private:
 
 	uint8_t m_mastervol;
 	uint8_t m_unk_snd75f8;
-	uint8_t m_unksnd75f9;
-	uint8_t m_unksnd75ff;
+	uint8_t m_unk_snd75f9;
+	uint8_t m_unk_snd75ff;
 	uint8_t m_sndtimer[4];
 
 	uint8_t m_timer_baseval;
