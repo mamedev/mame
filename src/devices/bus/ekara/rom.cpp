@@ -26,13 +26,13 @@ ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, co
 
 ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ekara_rom_plain_device(mconfig, EKARA_ROM_I2C_BASE, tag, owner, clock),
-	m_i2cmem(*this, "ic2mem")
+	m_i2cmem(*this, "i2cmem")
 {
 }
 
 ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	ekara_rom_plain_device(mconfig, type, tag, owner, clock),
-	m_i2cmem(*this, "ic2mem")
+	m_i2cmem(*this, "i2cmem")
 {
 }
 
@@ -88,12 +88,16 @@ READ8_MEMBER(ekara_rom_i2c_base_device::read_rom)
 READ8_MEMBER(ekara_rom_i2c_base_device::read_extra)
 {
 	logerror("ekara_rom_i2c_base_device::read_extra %08x\n", offset);
-	return 0xff;
+
+	return (m_i2cmem->read_sda() & 1) << 7;
 }
 
 WRITE8_MEMBER(ekara_rom_i2c_base_device::write_extra)
 {
 	logerror("ekara_rom_i2c_base_device::write_extra %08x %02x\n", offset, data);
+
+	m_i2cmem->write_sda((data & 0x01) >> 0);
+	m_i2cmem->write_scl((data & 0x02) >> 1);
 }
 
 
