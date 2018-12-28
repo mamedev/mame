@@ -13,19 +13,19 @@
 
 	G-1  *GC0001-BAT  BAT Volume 1 (Artist Selection?)
 	G-2  *GC0002-BHT  BHT Volume 1 (Best Artists?)
-	G-3   GC0003-BAT  BAT Volume 2 (Artist Selection?)
-	G-4   GC0004-BHT  BHT Volume 2 (Best Artists?)
+	G-3  *GC0003-BAT  BAT Volume 2 (Artist Selection?)
+	G-4  *GC0004-BHT  BHT Volume 2 (Best Artists?)
 	G-5   GC0005-TPJ  TV Pop Volume 1
 	G-6  *GC0006-BHT  BHT Volume 3 (Best Artists?)
 	G-7   GC0007-BAT  BAT Volume 3 (Artist Selection?)
 	G-8   GC0008-MIN? untranslated (no volume)
 	G-9   GC0009-TPJ  TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
-	G-10  GC0010-BAT  BAT Volume 4 (Artist Selection?)
+	G-10 *GC0010-BAT  BAT Volume 4 (Artist Selection?)
 	G-11  GC0011-TPJ  TV Pop Volume 4
 	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
 	G-13  GC0013-     (unknown) Volume 6
 	G-14  GC0014-     (unknown) Volume 2
-	G-15  GC0015-BAT  BAT Volume 5 (Artist Selection?)
+	G-15 *GC0015-BAT  BAT Volume 5 (Artist Selection?)
 	G-16 *GC0016-TPJ  TV Pop Volume 5
 	G-17  GC0017-TPJ  TV Pop Volume 6
 
@@ -88,7 +88,31 @@
 		</part>
 	</software>
 	
-	<software name="gc0016"> <!-- has SEEPROM? (reports memory error in Popira) -->
+	<software name="gc0010"> <!-- has SEEPROM?  -->
+		<description>BAT Volume 4 (Japan) (GC0010-BAT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/> <!-- or 24lc02? -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="gc0015"> <!-- has SEEPROM?  -->
+		<description>BAT Volume 5 (Japan) (GC0015-BAT)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/> <!-- or 24lc02? -->
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0015-bat.u1" size="0x100000" crc="a839b745" sha1="a02bd29383baf1f92b3573aaa6343cc309a6f589" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+		
+	<software name="gc0016"> <!-- has SEEPROM? -->
 		<description>TV Pop Volume 5 (Japan) (GC0016-TPJ)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
