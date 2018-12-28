@@ -965,9 +965,6 @@ void xavix_cart_state::xavix_cart(machine_config &config)
 {
 	xavix(config);
 
-	// is a battery / power source required to store NVRAM in the CPU?  Popira definitely needs NVRAM storing on power-off, XaviX Tennis won't boot if you do (but that could be an unrelated SEEPROM issue?)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
 	MCFG_EKARA_CARTRIDGE_ADD("cartslot", ekara_cart, nullptr)
 }
 
@@ -1002,6 +999,10 @@ void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 void xavix_cart_state::xavix_cart_popira(machine_config &config)
 {
 	xavix_cart(config);
+
+	// is a battery / power source required to store NVRAM in the CPU?  Popira definitely needs NVRAM storing on power-of
+	// XaviX Tennis won't boot if you do (but that could be an unrelated SEEPROM issue?) & DDR Family Mat gets stuck in 2 Player mode with no obvious way of changing back 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list_japan_g").set_original("ekara_japan_g");
