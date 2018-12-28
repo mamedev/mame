@@ -145,10 +145,10 @@
 	76  *EC0076-JPM  J-Pop Mix Volume 39
 	77   EC0077-ATS  Artist Selection Volume 15 - unknown artist (should be Vol 15? sales sheet lists 5?)
 	78   EC0078-     (unknown)
-	79   EC0079-ETZ  ETZ (custom presentation etc.)
+	79  *EC0079-ETZ  ETZ (custom presentation etc.)
 	80   EC0080-     (unknown)
 	81   EC0081-JPM  J-Pop Mix Volume 42
-	82   EC0082-MBH  Matthew's Best Hit Selection
+	82  *EC0082-MBH  Matthew's Best Hit Selection
 	83
 	84
 	85               (seen in the wild)
