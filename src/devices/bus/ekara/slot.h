@@ -56,6 +56,17 @@ class ekara_cart_slot_device : public device_t,
 public:
 	// construction/destruction
 	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: ekara_cart_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	virtual ~ekara_cart_slot_device();
 
 	// image-level overrides
@@ -103,13 +114,6 @@ DECLARE_DEVICE_TYPE(EKARA_CART_SLOT, ekara_cart_slot_device)
  ***************************************************************************/
 
 #define EKARASLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_EKARA_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	{ \
-	device_t *device = nullptr; \
-	MCFG_DEVICE_ADD(_tag, EKARA_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	}
 
 void ekara_cart(device_slot_interface &device);
 

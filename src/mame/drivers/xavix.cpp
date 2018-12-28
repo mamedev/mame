@@ -965,14 +965,14 @@ void xavix_cart_state::xavix_cart(machine_config &config)
 {
 	xavix(config);
 
-	MCFG_EKARA_CARTRIDGE_ADD("cartslot", ekara_cart, nullptr)
+	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
 }
 
 void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 {
 	xavix_i2c_24lc02(config);
 
-	MCFG_EKARA_CARTRIDGE_ADD("cartslot", ekara_cart, nullptr)
+	EKARA_CART_SLOT(config, m_cartslot, 0, ekara_cart, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
