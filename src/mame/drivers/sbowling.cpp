@@ -41,7 +41,6 @@ PROMs : NEC B406 (1kx4) x2
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
