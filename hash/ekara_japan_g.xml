@@ -88,12 +88,11 @@
 		</part>
 	</software>
 	
-	<software name="gc0010"> <!-- has SEEPROM?  -->
+	<software name="gc0010">
 		<description>BAT Volume 4 (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc04"/> <!-- or 24lc02? -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee" offset="0" />
 			</dataarea>
