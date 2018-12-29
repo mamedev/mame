@@ -443,16 +443,14 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 	MCFG_SCREEN_UPDATE_DRIVER(crospang_state, screen_update_crospang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crospang)
 
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, 7)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, 7);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 
 	/* sound hardware */

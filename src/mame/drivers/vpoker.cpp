@@ -109,11 +109,12 @@
 class vpoker_state : public driver_device
 {
 public:
-	vpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void vpoker(machine_config &config);
 
@@ -648,11 +649,11 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vpoker)
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(4'000'000) / 4));

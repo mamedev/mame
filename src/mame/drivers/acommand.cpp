@@ -72,8 +72,8 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 class acommand_state : public driver_device
 {
 public:
-	acommand_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	acommand_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki1(*this, "oki1"),
@@ -482,14 +482,13 @@ MACHINE_CONFIG_START(acommand_state::acommand)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acommand)
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_acommand);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x4000);
 
-	MCFG_MEGASYS1_TILEMAP_ADD("bgtmap", "palette", 0x0f00)
-	MCFG_MEGASYS1_TILEMAP_ADD("txtmap", "palette", 0x2700)
+	MEGASYS1_TILEMAP(config, m_bgtmap, m_palette, 0x0f00);
+	MEGASYS1_TILEMAP(config, m_txtmap, m_palette, 0x2700);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

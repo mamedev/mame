@@ -5,6 +5,10 @@
     Pinball Action
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PBACTION_H
+#define MAME_INCLUDES_PBACTION_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -14,8 +18,8 @@
 class pbaction_state : public driver_device
 {
 public:
-	pbaction_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pbaction_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_colorram(*this, "colorram"),
@@ -28,7 +32,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_ctc(*this, "ctc"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -89,13 +94,14 @@ public:
 class pbaction_tecfri_state : public pbaction_state
 {
 public:
-	pbaction_tecfri_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pbaction_state(mconfig, type, tag),
+	pbaction_tecfri_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pbaction_state(mconfig, type, tag),
 		m_subcpu(*this, "subcpu"),
 		m_ctc2(*this, "ctc2"),
 		m_maintosublatch(*this, "maintosublatch"),
 		//m_subtomainlatch(*this, "subtomainlatch"),
-		m_digits(*this, "digit%u", 0U) { }
+		m_digits(*this, "digit%u", 0U)
+	{ }
 
 	void pbactiont(machine_config &config);
 
@@ -112,7 +118,7 @@ private:
 
 	DECLARE_READ8_MEMBER(subcpu_r);
 	DECLARE_WRITE8_MEMBER(subcpu_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(sub8000_w);
 	DECLARE_WRITE_LINE_MEMBER(sub8001_w);
 	DECLARE_WRITE8_MEMBER(sub8008_w);
@@ -128,3 +134,5 @@ private:
 	uint8_t m_outlatch;
 	uint32_t m_outdata;
 };
+
+#endif // MAME_INCLUDES_PBACTION_H

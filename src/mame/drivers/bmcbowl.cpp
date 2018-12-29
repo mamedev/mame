@@ -119,8 +119,8 @@ Main board:
 class bmcbowl_state : public driver_device
 {
 public:
-	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_stats_ram(*this, "nvram", 16),
 		m_vid1(*this, "vid1"),
@@ -476,7 +476,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &bmcbowl_state::ramdac_map);
 

@@ -546,9 +546,8 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	crtc.layer_en_callback().set(FUNC(bloodbro_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(bloodbro_state::layer_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bloodbro)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bloodbro);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -581,9 +580,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_weststry)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	m_palette->set_format(palette_device::xBGR_444, 1024);
 
 	// Bootleg video hardware is non-Seibu
 	MCFG_SCREEN_MODIFY("screen")

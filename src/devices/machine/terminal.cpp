@@ -334,8 +334,8 @@ MACHINE_CONFIG_START(generic_terminal_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, generic_terminal_device, update)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(generic_terminal_device, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(generic_terminal_device::kbd_put));
 
 	SPEAKER(config, "bell").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2'000)

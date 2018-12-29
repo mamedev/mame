@@ -42,9 +42,6 @@
  *      1 1 1 1 GR1 bank 3 0E000-0FFFF
  */
 
-void vtech2_state::video_start()
-{
-}
 
 static const int offs_2[192] = {
 	0x0000,0x0800,0x1000,0x1800,0x2000,0x2800,0x3000,0x3800,
@@ -120,6 +117,12 @@ uint32_t vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &
 	uint8_t *videoram = m_videoram;
 	int offs, x, y;
 	int full_refresh = 1;
+	int lang_offs = 0;
+	if (m_language == 0x10)
+		lang_offs = 0x300;
+	else
+	if (m_language == 0x20)
+		lang_offs = 0x200;
 
 	if( full_refresh )
 		bitmap.fill(((m_laser_bg_mode >> 4) & 15)<<1, cliprect);
@@ -262,7 +265,7 @@ uint32_t vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &
 					int sx, sy, code, color = m_laser_two_color;
 					sy = BORDER_V/2 + y * 8;
 					sx = BORDER_H/2 + x * 8;
-					code = videoram[0x3800+offs];
+					code = videoram[0x3800+offs] + lang_offs;
 					m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,code,color,0,0,sx,sy);
 				}
 			}
@@ -278,7 +281,7 @@ uint32_t vtech2_state::screen_update_laser(screen_device &screen, bitmap_ind16 &
 					int sx, sy, code, color = 0;
 					sy = BORDER_V/2 + y * 8;
 					sx = BORDER_H/2 + x * 16;
-					code = videoram[0x3800+offs];
+					code = videoram[0x3800+offs] + lang_offs;
 					color = videoram[0x3801+offs];
 					m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,code,color,0,0,sx,sy);
 				}

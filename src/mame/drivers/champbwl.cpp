@@ -174,7 +174,8 @@ public:
 		m_hopper(*this, "hopper"),
 		m_mainbank(*this, "mainbank"),
 		m_fakex(*this, "FAKEX"),
-		m_fakey(*this, "FAKEY") { }
+		m_fakey(*this, "FAKEY")
+	{ }
 
 	int      m_screenflip;
 
@@ -196,7 +197,7 @@ public:
 	DECLARE_MACHINE_START(champbwl);
 	DECLARE_MACHINE_RESET(champbwl);
 	DECLARE_MACHINE_START(doraemon);
-	DECLARE_PALETTE_INIT(champbwl);
+	void champbwl_palette(palette_device &palette) const;
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
@@ -207,14 +208,12 @@ public:
 	void doraemon_map(address_map &map);
 };
 
-PALETTE_INIT_MEMBER(champbwl_state,champbwl)
+void champbwl_state::champbwl_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i, col;
-
-	for (i = 0; i < palette.entries(); i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		col = (color_prom[i] << 8) + color_prom[i + 512];
+		int const col = (color_prom[i] << 8) + color_prom[i + 512];
 		palette.set_pen_color(i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
 	}
 }
@@ -513,12 +512,10 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_champbwl))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbwl)
-	MCFG_PALETTE_ADD("palette", 512)
-
-	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
+	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -580,12 +577,10 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_doraemon))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbwl)
-	MCFG_PALETTE_ADD("palette", 512)
-
-	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_champbwl);
+	PALETTE(config, m_palette, FUNC(champbwl_state::champbwl_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Patrick Mackinlay
 
 #ifndef MAME_CPU_MIPS_MIPS1_H
 #define MAME_CPU_MIPS_MIPS1_H
@@ -9,6 +9,18 @@
 class mips1core_device_base : public cpu_device
 {
 public:
+	// floating point coprocessor revision numbers recognised by RISC/os 4.52 and IRIX
+	enum fpu_rev_t : u32
+	{
+		MIPS_R2360    = 0x0100, // MIPS R2360 Floating Point Board
+		MIPS_R2010    = 0x0200, // MIPS R2010 VLSI Floating Point Chip
+		MIPS_R2010A   = 0x0310, // MIPS R2010A VLSI Floating Point Chip
+		MIPS_R3010    = 0x0320, // MIPS R3010 VLSI Floating Point Chip
+		MIPS_R3010A   = 0x0330, // MIPS R3010A VLSI Floating Point Chip
+		MIPS_R3010Av4 = 0x0340, // MIPS R3010A VLSI Floating Point Chip
+		MIPS_R6010    = 0x0400, // MIPS R6010 Floating Point Chip
+	};
+
 	// device configuration
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
 	void set_fpurev(u32 revision) { m_hasfpu = true; m_fpurev = revision; }
@@ -89,32 +101,32 @@ protected:
 
 	enum sr_mask : u32
 	{
-		SR_IEc   = 0x00000001,
-		SR_KUc   = 0x00000002,
-		SR_IEp   = 0x00000004,
-		SR_KUp   = 0x00000008,
-		SR_IEo   = 0x00000010,
-		SR_KUo   = 0x00000020,
-		SR_IMSW0 = 0x00000100,
-		SR_IMSW1 = 0x00000200,
-		SR_IMEX0 = 0x00000400,
-		SR_IMEX1 = 0x00000800,
-		SR_IMEX2 = 0x00001000,
-		SR_IMEX3 = 0x00002000,
-		SR_IMEX4 = 0x00004000,
-		SR_IMEX5 = 0x00008000,
-		SR_IsC   = 0x00010000,
-		SR_SwC   = 0x00020000,
-		SR_PZ    = 0x00040000,
-		SR_CM    = 0x00080000,
-		SR_PE    = 0x00100000,
-		SR_TS    = 0x00200000,
-		SR_BEV   = 0x00400000,
-		SR_RE    = 0x02000000,
-		SR_COP0  = 0x10000000,
-		SR_COP1  = 0x20000000,
-		SR_COP2  = 0x40000000,
-		SR_COP3  = 0x80000000,
+		SR_IEc   = 0x00000001, // interrupt enable (current)
+		SR_KUc   = 0x00000002, // user mode (current)
+		SR_IEp   = 0x00000004, // interrupt enable (previous)
+		SR_KUp   = 0x00000008, // user mode (previous)
+		SR_IEo   = 0x00000010, // interrupt enable (old)
+		SR_KUo   = 0x00000020, // user mode (old)
+		SR_IMSW0 = 0x00000100, // software interrupt 0 enable
+		SR_IMSW1 = 0x00000200, // software interrupt 1 enable
+		SR_IMEX0 = 0x00000400, // external interrupt 0 enable
+		SR_IMEX1 = 0x00000800, // external interrupt 1 enable
+		SR_IMEX2 = 0x00001000, // external interrupt 2 enable
+		SR_IMEX3 = 0x00002000, // external interrupt 3 enable
+		SR_IMEX4 = 0x00004000, // external interrupt 4 enable
+		SR_IMEX5 = 0x00008000, // external interrupt 5 enable
+		SR_IsC   = 0x00010000, // isolate (data) cache
+		SR_SwC   = 0x00020000, // swap caches
+		SR_PZ    = 0x00040000, // cache parity zero
+		SR_CM    = 0x00080000, // cache match
+		SR_PE    = 0x00100000, // cache parity error
+		SR_TS    = 0x00200000, // tlb shutdown
+		SR_BEV   = 0x00400000, // boot exception vectors
+		SR_RE    = 0x02000000, // reverse endianness in user mode
+		SR_COP0  = 0x10000000, // coprocessor 0 usable
+		SR_COP1  = 0x20000000, // coprocessor 1 usable
+		SR_COP2  = 0x40000000, // coprocessor 2 usable
+		SR_COP3  = 0x80000000, // coprocessor 3 usable
 	};
 
 	enum entryhi_mask : u32
@@ -129,6 +141,11 @@ protected:
 		EL_D   = 0x00000400, // dirty
 		EL_V   = 0x00000200, // valid
 		EL_G   = 0x00000100, // global
+	};
+	enum context_mask : u32
+	{
+		PTE_BASE = 0xffe00000, // base address of page table
+		BAD_VPN  = 0x001ffffc, // virtual address bits 30..12
 	};
 
 	// device_t overrides
@@ -154,7 +171,7 @@ protected:
 	void dcache_map(address_map &map);
 
 	// interrupts
-	void generate_exception(int exception);
+	void generate_exception(int exception, bool refill = false);
 	void check_irqs();
 	void set_irq_line(int irqline, int state);
 
@@ -201,7 +218,6 @@ protected:
 
 	// core registers
 	u32 m_pc;
-	u32 m_nextpc;
 	u32 m_hi;
 	u32 m_lo;
 	u32 m_r[32];
@@ -211,8 +227,16 @@ protected:
 	u32 m_ccr[4][32];
 
 	// internal stuff
-	u32 m_ppc;
 	int m_icount;
+	enum branch_state_t : unsigned
+	{
+		NONE      = 0,
+		DELAY     = 1, // delay slot instruction active
+		BRANCH    = 2, // branch instruction active
+		EXCEPTION = 3, // exception triggered
+	}
+	m_branch_state;
+	u32 m_branch_target;
 
 	// cache memory
 	size_t const m_icache_size;

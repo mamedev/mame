@@ -820,7 +820,7 @@ void lua_engine::initialize()
  *                                     support zipped files on the searchpath
  * file:open(name) - open first file matching name in searchpath, supports read and write sockets as "socket.127.0.0.1:1234"
  * file:open_next() - open next file matching name in searchpath
- * file:read(len) - only reads len bytes, doen't do lua style formats
+ * file:read(len) - only reads len bytes, doesn't do lua style formats
  * file:write(data) - write data to file
  * file:seek(offset, whence) - whence is as C "SEEK_*" int
  * file:seek([opt] whence, [opt] offset) - lua style "set"|"cur"|"end", returns cur offset

@@ -99,7 +99,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(vvillage_output_w);
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	DECLARE_PALETTE_INIT(caswin);
+	void caswin_palette(palette_device &palette) const;
 	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;
@@ -307,26 +307,25 @@ static GFXDECODE_START( gfx_vvillage )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(caswin_state, caswin)
+void caswin_state::caswin_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
-
-	for (i = 0; i < 0x40; ++i)
+	for (int i = 0; i < 0x40; ++i)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
 		bit1 = (color_prom[0] >> 0) & 0x01;
 		bit2 = (color_prom[0] >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[0] >> 2) & 0x01;
 		bit1 = (color_prom[0] >> 3) & 0x01;
 		bit2 = (color_prom[0] >> 4) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[0] >> 5) & 0x01;
 		bit1 = (color_prom[0] >> 6) & 0x01;
 		bit2 = (color_prom[0] >> 7) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
@@ -353,8 +352,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
-	MCFG_PALETTE_ADD("palette", 0x40)
-	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
+	PALETTE(config, "palette", FUNC(caswin_state::caswin_palette), 0x40);
 
 	SPEAKER(config, "mono").front_center();
 

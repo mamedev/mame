@@ -114,9 +114,8 @@ void cyberbal_base_state::video_start()
 
 void cyberbal_state::video_start()
 {
-	palette_device *rpalette = subdevice<palette_device>("rpalette");
-	m_playfield2->set_palette(*rpalette);
-	m_alpha2->set_palette(*rpalette);
+	m_playfield2->set_palette(*m_rpalette);
+	m_alpha2->set_palette(*m_rpalette);
 
 	cyberbal_base_state::video_start();
 

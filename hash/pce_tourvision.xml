@@ -5,7 +5,7 @@
 <!--
 
 The 4×2 pins section on the edge connector (pins 1 to 8) are connected to a 74LS244 near each cart slot and
-are actually just being read as an IO port just like any other input.  
+are actually just being read as an IO port just like any other input.
 They form an 8 bit number which is the game ID, for example Override is: 00110101 – 53
 The Game ID is added as a feature on each game of the softwarelist (-1 is used when the ID is not known).
 

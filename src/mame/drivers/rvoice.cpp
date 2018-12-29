@@ -91,7 +91,6 @@ private:
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	void hd63701_main_io(address_map &map);
 	void hd63701_main_mem(address_map &map);
 };
 
@@ -347,11 +346,6 @@ void rvoice_state::hd63701_main_mem(address_map &map)
 	map(0x8000, 0xffff).rom(); // 27512 EPROM
 }
 
-void rvoice_state::hd63701_main_io(address_map &map)
-{
-	map.unmap_value_high();
-}
-
 
 /******************************************************************************
  Input Ports
@@ -366,16 +360,16 @@ void rvoice_state::null_kbd_put(u8 data)
 {
 }
 
-MACHINE_CONFIG_START(rvoice_state::rvoicepc)
+void rvoice_state::rvoicepc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD63701, XTAL(7'372'800))
-	MCFG_DEVICE_PROGRAM_MAP(hd63701_main_mem)
-	MCFG_DEVICE_IO_MAP(hd63701_main_io)
+	HD63701(config, m_maincpu, XTAL(7'372'800));
+	m_maincpu->set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_main_mem);
 
-	//MCFG_DEVICE_ADD("playercpu", HD63701, XTAL(7'372'800)) // not dumped yet
-	//MCFG_DEVICE_PROGRAM_MAP(hd63701_slave_mem)
-	//MCFG_DEVICE_IO_MAP(hd63701_slave_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	//hd63701_cpu_device &playercpu(HD63701(config "playercpu", XTAL(7'372'800))); // not dumped yet
+	//playercpu.set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_slave_mem);
+	//playercpu.set_addrmap(AS_PROGRAM, &rvoice_state::hd63701_slave_io);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	mos6551_device &acia(MOS6551(config, "acia65c51", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -383,10 +377,9 @@ MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	/* video hardware */
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(rvoice_state, null_kbd_put))
-
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(rvoice_state::null_kbd_put));
+}
 
 
 

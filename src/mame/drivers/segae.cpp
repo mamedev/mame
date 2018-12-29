@@ -952,14 +952,15 @@ MACHINE_CONFIG_START(systeme_state::systemex)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(systeme_state::systemex_315_5177)
+void systeme_state::systemex_315_5177(machine_config &config)
+{
 	systeme(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5177, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(systeme_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5177_device &maincpu(SEGA_315_5177(config.replace(), m_maincpu, XTAL(10'738'635)/2)); /* Z80B @ 5.3693Mhz */
+	maincpu.set_addrmap(AS_PROGRAM, &systeme_state::systeme_map);
+	maincpu.set_addrmap(AS_IO, &systeme_state::io_map);
+	maincpu.set_addrmap(AS_OPCODES, &systeme_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 MACHINE_CONFIG_START(systeme_state::systemeb)
 	systeme(config);

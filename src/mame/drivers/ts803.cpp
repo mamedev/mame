@@ -48,6 +48,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
@@ -433,7 +434,7 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* crtc */
 	sy6545_1_device &crtc(SY6545_1(config, "crtc", 13608000 / 8));

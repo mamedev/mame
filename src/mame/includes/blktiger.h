@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
 
@@ -49,7 +50,7 @@ public:
 	uint8_t   m_i8751_latch;
 
 	/* devices */
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ8_MEMBER(blktiger_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(blktiger_to_mcu_w);

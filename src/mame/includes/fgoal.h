@@ -79,7 +79,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
-	DECLARE_PALETTE_INIT(fgoal);
+	void fgoal_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	static int intensity(int bits);

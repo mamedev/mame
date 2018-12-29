@@ -67,7 +67,7 @@
 #include "includes/dgn_beta.h"
 #include "includes/coco.h"
 #include "machine/mos6551.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "debugger.h"
 #include "debug/debugcon.h"

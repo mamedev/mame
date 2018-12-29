@@ -65,8 +65,8 @@
 class midas_state : public driver_device
 {
 public:
-	midas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	midas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -83,6 +83,11 @@ public:
 
 	void init_livequiz();
 
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
@@ -92,10 +97,6 @@ private:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 
 	uint32_t screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -113,8 +114,6 @@ private:
 	void hammer_map(address_map &map);
 	void livequiz_map(address_map &map);
 };
-
-
 
 
 
@@ -649,9 +648,8 @@ MACHINE_CONFIG_START(midas_state::livequiz)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -682,10 +680,8 @@ MACHINE_CONFIG_START(midas_state::hammer)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(XRGB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

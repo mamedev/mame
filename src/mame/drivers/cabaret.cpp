@@ -395,11 +395,10 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabaret)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_cabaret)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

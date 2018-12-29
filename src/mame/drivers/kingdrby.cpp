@@ -107,6 +107,9 @@ public:
 	void cowrace(machine_config &config);
 	void kingdrby(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
@@ -122,9 +125,8 @@ private:
 	DECLARE_WRITE8_MEMBER(outportb_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(kingdrby);
-	DECLARE_PALETTE_INIT(kingdrbb);
+	void kingdrby_palette(palette_device &palette) const;
+	void kingdrbb_palette(palette_device &palette) const;
 	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -902,59 +904,61 @@ GFXDECODE_END
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
+void kingdrby_state::kingdrby_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
-
-	for (i = 0; i < 0x200; ++i)
+	for (int i = 0; i < 0x200; ++i)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 0) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 3) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 7) & 0x01;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 0);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[0], 4);
+		bit1 = BIT(color_prom[0], 3);
+		bit2 = BIT(color_prom[0], 2);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[0], 7);
+		bit1 = BIT(color_prom[0], 6);
+		bit2 = BIT(color_prom[0], 5);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
 
-PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
+void kingdrby_state::kingdrbb_palette(palette_device &palette) const
 {
-	uint8_t *raw_prom = memregion("raw_prom")->base();
+	uint8_t *const raw_prom = memregion("raw_prom")->base();
 	uint8_t *prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
-
-	for(i = 0; i < 0x200; i++)
+	for (int i = 0; i < 0x200; i++)
 	{
-		/* this set has an extra address line shuffle applied on the prom */
+		// this set has an extra address line shuffle applied on the PROM
 		prom[i] = raw_prom[bitswap<16>(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
 	}
 
-	for(i = 0; i < 0x200; i++)
+	for (int i = 0; i < 0x200; i++)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
-		bit1 = (prom[i] >> 1) & 0x01;
-		bit2 = (prom[i] >> 0) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (prom[i] >> 4) & 0x01;
-		bit1 = (prom[i] >> 3) & 0x01;
-		bit2 = (prom[i] >> 2) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (prom[i] >> 7) & 0x01;
-		bit1 = (prom[i] >> 6) & 0x01;
-		bit2 = (prom[i] >> 5) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(prom[i], 1);
+		bit2 = BIT(prom[i], 0);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(prom[i], 4);
+		bit1 = BIT(prom[i], 3);
+		bit2 = BIT(prom[i], 2);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(prom[i], 7);
+		bit1 = BIT(prom[i], 6);
+		bit2 = BIT(prom[i], 5);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -994,16 +998,15 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	m_ppi[1]->in_pc_callback().set(FUNC(kingdrby_state::input_mux_r));
 	m_ppi[1]->out_pc_callback().set(FUNC(kingdrby_state::outport2_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingdrby)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kingdrby);
+	PALETTE(config, m_palette, FUNC(kingdrby_state::kingdrby_palette), 0x200);
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)    /* controlled by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
 	crtc.set_screen("screen");
@@ -1023,8 +1026,7 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 	MCFG_DEVICE_MODIFY("slave")
 	MCFG_DEVICE_PROGRAM_MAP(slave_1986_map)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
+	m_palette->set_init(FUNC(kingdrby_state::kingdrbb_palette));
 
 	/* C as input, (all) as output */
 	m_ppi[0]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
@@ -1052,8 +1054,7 @@ MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cowrace)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
+	m_palette->set_init(FUNC(kingdrby_state::kingdrby_palette));
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

@@ -426,12 +426,10 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberet)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberet)
-	MCFG_PALETTE_ADD("palette", 2*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gberet);
+	PALETTE(config, m_palette, FUNC(gberet_state::gberet_palette), 2*16*16, 32);
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
@@ -467,12 +465,10 @@ MACHINE_CONFIG_START(gberet_state::gberetb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberetb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gberetb)
-	MCFG_PALETTE_ADD("palette", 2*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gberetb);
+	PALETTE(config, m_palette, FUNC(gberet_state::gberet_palette), 2*16*16, 32);
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */

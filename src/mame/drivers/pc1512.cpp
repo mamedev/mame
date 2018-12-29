@@ -1169,9 +1169,9 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
-	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
-	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, pc1512_state, kbclk_w))
-	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(*this, pc1512_state, kbdata_w))
+	PC1512_KEYBOARD(config, m_kb, 0);
+	m_kb->clock_wr_callback().set(FUNC(pc1512_state::kbclk_w));
+	m_kb->data_wr_callback().set(FUNC(pc1512_state::kbdata_w));
 
 	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
 	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_state, mouse_x_w))
@@ -1300,9 +1300,9 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
-	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
-	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, pc1512_base_state, kbclk_w))
-	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(*this, pc1512_base_state, kbdata_w))
+	PC1512_KEYBOARD(config, m_kb, 0);
+	m_kb->clock_wr_callback().set(FUNC(pc1512_base_state::kbclk_w));
+	m_kb->data_wr_callback().set(FUNC(pc1512_base_state::kbdata_w));
 
 	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
 	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_base_state, mouse_x_w))

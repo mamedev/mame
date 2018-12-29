@@ -2079,11 +2079,11 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_7759_map)
-	MCFG_DEVICE_IO_MAP(sound_7759_io_map)
+void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
+{
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sound_7759_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_7759_io_map);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2091,12 +2091,12 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 
 	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
-	MCFG_DEVICE_ADD("7759", UPD7759)
-	MCFG_UPD7759_MD(0)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas1x_bootleg_state,sound_cause_nmi))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->md_w(0);
+	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.48);
+}
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 	/* TODO:
@@ -2172,8 +2172,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries(2048*SHADOW_COLORS_MULTIPLIER);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
@@ -2269,9 +2269,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 2048*SHADOW_COLORS_MULTIPLIER)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette", palette_device::BLACK, 2048*SHADOW_COLORS_MULTIPLIER);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	m_sprites->set_local_originx(189-121);
@@ -2284,8 +2283,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
 	goldnaxeb_base(config);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+	subdevice<palette_device>("palette")->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
 	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
@@ -2298,8 +2296,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb2)
 	MCFG_DEVICE_PROGRAM_MAP(goldnaxeb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+	subdevice<palette_device>("palette")->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
 	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
@@ -2439,8 +2436,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
@@ -2495,8 +2492,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
@@ -2590,8 +2587,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 

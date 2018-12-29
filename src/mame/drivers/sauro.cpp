@@ -464,10 +464,10 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
 	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sauro_state, vblank_irq))
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

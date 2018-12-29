@@ -393,17 +393,23 @@ class hikaru_state : public driver_device
 {
 public:
 	hikaru_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_slave(*this, "slave")
+	{ }
 
 	void hikaru(machine_config &config);
 
 private:
 	virtual void video_start() override;
-	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+
 	void hikaru_map(address_map &map);
 	void hikaru_map_slave(address_map &map);
+
+	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<sh4_device> m_maincpu;
+	required_device<sh4_device> m_slave;
 };
 
 void hikaru_state::video_start()
@@ -490,44 +496,40 @@ void hikaru_state::hikaru_map_slave(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(hikaru_state::hikaru)
+void hikaru_state::hikaru(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK)
-//  MCFG_SH4_MD0(1)
-//  MCFG_SH4_MD1(0)
-//  MCFG_SH4_MD2(1)
-//  MCFG_SH4_MD3(0)
-//  MCFG_SH4_MD4(0)
-//  MCFG_SH4_MD5(1)
-//  MCFG_SH4_MD6(0)
-//  MCFG_SH4_MD7(1)
-//  MCFG_SH4_MD8(0)
-//  MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(hikaru_map)
-//  MCFG_DEVICE_IO_MAP(hikaru_port)
-	MCFG_CPU_FORCE_NO_DRC()
-//  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+//  m_maincpu->set_md(0, 1);
+//  m_maincpu->set_md(1, 0);
+//  m_maincpu->set_md(2, 1);
+//  m_maincpu->set_md(3, 0);
+//  m_maincpu->set_md(4, 0);
+//  m_maincpu->set_md(5, 1);
+//  m_maincpu->set_md(6, 0);
+//  m_maincpu->set_md(7, 1);
+//  m_maincpu->set_md(8, 0);
+//  m_maincpu->set_sh4_clock(CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hikaru_state::hikaru_map);
+//  m_maincpu->set_addrmap(AS_IO, &hikaru_state::hikaru_port);
+	m_maincpu->set_force_no_drc(true);
+//  m_maincpu->set_vblank_int("screen", FUNC(hikaru_state::vblank));
 
-	MCFG_DEVICE_ADD("slave", SH4LE, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(hikaru_map_slave)
-	MCFG_CPU_FORCE_NO_DRC()
-
-
-//  MCFG_MACHINE_START_OVERRIDE(hikaru_state, hikaru )
-//  MCFG_MACHINE_RESET_OVERRIDE(hikaru_state, hikaru )
+	SH4LE(config, m_slave, CPU_CLOCK);
+	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::hikaru_map_slave);
+	m_slave->set_force_no_drc(true);
 
 //  MCFG_NVRAM_HANDLER(hikaru_eeproms)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hikaru_state, screen_update_hikaru)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-
+	PALETTE(config, "palette").set_entries(0x1000);
 
 //  SPEAKER(config, "lspeaker").front_left();
 //  SPEAKER(config, "rspeaker").front_right();
@@ -539,7 +541,7 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 //  MCFG_DEVICE_ADD("aica_pcb", AICA, (XTAL(33'868'800)*2)/3) // AICA PCB
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 //  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
-MACHINE_CONFIG_END
+}
 
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

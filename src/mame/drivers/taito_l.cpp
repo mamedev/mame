@@ -1456,22 +1456,22 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitol_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, taito_l);
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette, palette_device::BLACK);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 void taitol_state::l_system_pal12bit(machine_config &config)
 {
-	m_palette->set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	m_palette->set_format(palette_device::xBGR_444, 256);
 }
 
 void taitol_state::l_system_pal15bit(machine_config &config)
 {
-	m_palette->set_format(PALETTE_FORMAT_xBGRBBBBGGGGRRRR_bit0);
+	m_palette->set_format(2, &taitol_state::tc0090lvc_xBGRBBBBGGGGRRRR, 256);
 }
 
 MACHINE_CONFIG_START(fhawk_state::fhawk)

@@ -1059,7 +1059,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_c116, gfx_namconb1)
+	GFXDECODE(config, "gfxdecode", m_c116, gfx_namconb1);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -1091,6 +1091,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::namconb2)
 	namconb1(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
 
@@ -1101,7 +1102,6 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x20000/2);
 	m_c169roz->set_color_base(0x1800);
-
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::machbrkr)

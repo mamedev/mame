@@ -102,6 +102,7 @@ DONE:
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
@@ -827,7 +828,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
 	CRT5027(config, m_crtc, (36_MHz_XTAL / 4) / 8); // See below

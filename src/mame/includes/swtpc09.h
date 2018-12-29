@@ -14,7 +14,7 @@
 #include "cpu/m6809/m6809.h"
 #include "video/generic.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"

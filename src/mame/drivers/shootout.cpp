@@ -292,11 +292,10 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
 
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_shootout)
+	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -322,11 +321,10 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
 
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_shootout)
+	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

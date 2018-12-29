@@ -959,8 +959,9 @@ void f8_cpu_device::f8_com()
  ***************************************************/
 void f8_cpu_device::f8_lnk()
 {
+	bool c = (m_w & C) != 0;
 	CLR_OZCS();
-	if (m_w & C)
+	if (c)
 		m_a = do_add(m_a,1);
 	SET_SZ(m_a);
 }

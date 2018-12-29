@@ -424,11 +424,10 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gp);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
@@ -444,9 +443,9 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	m_spr_old[1]->set_pritype(2);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-58, -2)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(-58, -2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -493,11 +492,10 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gp);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	//VSYSTEM_GGA(config, "gga", 0);
 
@@ -530,8 +528,7 @@ MACHINE_CONFIG_START(f1gp2_state::f1gp2)
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_MODIFY("k053936")
-	MCFG_K053936_OFFSETS(-48, -21)
+	m_k053936->set_offsets(-48, -21);
 MACHINE_CONFIG_END
 
 

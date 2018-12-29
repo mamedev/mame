@@ -34,7 +34,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(beehive_60_r);
 	DECLARE_WRITE8_MEMBER(beehive_62_w);
@@ -306,7 +306,7 @@ MACHINE_CONFIG_START(beehive_state::beehive)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 /* ROM definition */

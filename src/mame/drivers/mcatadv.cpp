@@ -454,11 +454,10 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mcatadv_state, screen_vblank_mcatadv))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcatadv)
-	MCFG_PALETTE_ADD("palette", 0x2000/2)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcatadv);
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x2000/2);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 

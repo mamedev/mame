@@ -147,7 +147,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK, 882, 9, 729, 315, 0, 300); // 80x24+1
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	PALETTE(config, m_palette, 3).set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	GFXDECODE(config, m_gfxdecode, m_palette, chars);
 
 	H46505(config, m_crtc, MASTER_CLOCK / 9);
@@ -171,7 +171,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_ctc->set_clk<1>(MASTER_CLOCK / 18);
 	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_ctc->zc_callback<0>().append(m_acia, FUNC(acia6850_device::write_rxc));
-//	m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_rxc));
+//  m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_rxc));
 
 	I8748(config, "kbdmcu", XTAL(6'000'000));
 }

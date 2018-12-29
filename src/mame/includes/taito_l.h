@@ -83,6 +83,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 
+	static rgb_t tc0090lvc_xBGRBBBBGGGGRRRR(uint32_t raw);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void l_system_video(machine_config &config);
 	void l_system_pal12bit(machine_config &config);

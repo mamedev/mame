@@ -44,7 +44,7 @@ private:
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
 	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(albazc);
+	void albazc_palette(palette_device &palette) const;
 	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hanaroku_map(address_map &map);
@@ -63,17 +63,14 @@ private:
 
 /* video */
 
-PALETTE_INIT_MEMBER(albazc_state, albazc)
+void albazc_state::albazc_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	int r, g, b;
-
-	for (i = 0; i < 0x200; i++)
+	uint8_t const *const color_prom(memregion("proms")->base());
+	for (int i = 0; i < 0x200; i++)
 	{
-		b = (color_prom[i * 2 + 1] & 0x1f);
-		g = ((color_prom[i * 2 + 1] & 0xe0) | ((color_prom[i * 2 + 0]& 0x03) <<8)) >> 5;
-		r = (color_prom[i * 2 + 0] & 0x7c) >> 2;
+		int const b = (color_prom[i * 2 + 1] & 0x1f);
+		int const g = ((color_prom[i * 2 + 1] & 0xe0) | ((color_prom[i * 2 + 0] & 0x03) <<8)) >> 5;
+		int const r = (color_prom[i * 2 + 0] & 0x7c) >> 2;
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -296,12 +293,11 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(albazc_state, screen_update_hanaroku)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hanaroku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_hanaroku)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(albazc_state, albazc)
+	PALETTE(config, "palette", FUNC(albazc_state::albazc_palette), 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

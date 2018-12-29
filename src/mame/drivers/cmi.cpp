@@ -106,6 +106,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -2195,9 +2196,9 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cmi_state, cmi_iix_vblank))
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("msm5832", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_msm5832, 32.768_kHz_XTAL);
 
 	I8214(config, m_i8214[0], 1000000); // cmi_8214_intf_1
 	m_i8214[0]->int_wr_callback().set(FUNC(cmi_state::i8214_1_int_w));

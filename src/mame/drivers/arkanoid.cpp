@@ -1366,10 +1366,10 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1440,10 +1440,10 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexa)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1483,10 +1483,10 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

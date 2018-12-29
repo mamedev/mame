@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -33,8 +33,9 @@ BGFX_DECLARE_EMBEDDED_SHADER(fs_clear7);
 
 namespace bgfx { namespace gnm
 {
-	RendererContextI* rendererCreate()
+	RendererContextI* rendererCreate(const Init& _init)
 	{
+		BX_UNUSED(_init);
 		return NULL;
 	}
 

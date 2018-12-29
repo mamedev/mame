@@ -16,7 +16,7 @@ source was very helpful in many areas particularly the sprites.)
 The Taito Z system has a number of similarities with the Taito F2 system,
 and uses some of the same custom Taito components.
 
-TaitoZ supports 5 separate layers of graphics - one 64x64 tiled scrolling
+Taito Z supports 5 separate layers of graphics - one 64x64 tiled scrolling
 background plane of 8x8 tiles, a similar foreground plane, another optional
 plane used for drawing a road (e.g. Chasehq), a sprite plane [with varying
 properties], and a text plane with character definitions held in ram.
@@ -57,7 +57,7 @@ Most Z system games have a Z80 as well, which takes over sound duties.
 Commands are written to it by the one of the 68000s.
 
 The memory map for the Taito Z games is similar in outline but usually
-shuffled around: some games have different i/o because of analogue
+shuffled around: some games have different I/O because of analogue
 sticks, light guns, cockpit hardware etc.
 
 
@@ -3213,9 +3213,8 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3287,9 +3286,8 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chasehq)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_chasehq);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3363,9 +3361,8 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3434,9 +3431,8 @@ MACHINE_CONFIG_START(taitoz_state::bshark_base)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_bshark)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3522,9 +3518,8 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_sci)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3603,9 +3598,8 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chasehq)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_chasehq);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3679,9 +3673,8 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_aquajack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3760,9 +3753,8 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_spacegun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taitoz);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
@@ -3830,9 +3822,8 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_dblaxle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblaxle)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dblaxle);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3904,9 +3895,9 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_racingb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblaxle)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dblaxle);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 4096);
+
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0480SCP(config, m_tc0480scp, 0);

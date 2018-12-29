@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,9 +7,10 @@
 #define BX_READERWRITER_H_HEADER_GUARD
 
 #include "allocator.h"
-#include "error.h"
 #include "endian.h"
+#include "error.h"
 #include "filepath.h"
+#include "string.h"
 #include "uint32_t.h"
 
 BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,         BX_MAKEFOURCC('R', 'W', 0, 1) );
@@ -256,10 +257,19 @@ namespace bx
 	int32_t write(WriterI* _writer, const void* _data, int32_t _size, Error* _err = NULL);
 
 	/// Write C string.
-	inline int32_t write(WriterI* _writer, const char* _str, Error* _err = NULL);
+	int32_t write(WriterI* _writer, const char* _str, Error* _err = NULL);
 
 	/// Write string view.
-	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err = NULL);
+	int32_t write(WriterI* _writer, const StringView& _str, Error* _err = NULL);
+
+	/// Write formated string.
+	int32_t write(WriterI* _writer, const StringView& _format, va_list _argList, Error* _err);
+
+	/// Write formated string.
+	int32_t write(WriterI* _writer, Error* _err, const StringView* _format, ...);
+
+	/// Write formated string.
+	int32_t write(WriterI* _writer, Error* _err, const char* _format, ...);
 
 	/// Write repeat the same value.
 	int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err = NULL);
@@ -275,9 +285,6 @@ namespace bx
 	/// Write value as big endian.
 	template<typename Ty>
 	int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err = NULL);
-
-	/// Write formated string.
-	int32_t writePrintf(WriterI* _writer, const char* _format, ...);
 
 	/// Skip _offset bytes forward.
 	int64_t skip(SeekerI* _seeker, int64_t _offset);

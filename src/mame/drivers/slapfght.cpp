@@ -922,7 +922,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
 	/* sound hardware */
@@ -974,7 +974,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
@@ -1047,7 +1047,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */

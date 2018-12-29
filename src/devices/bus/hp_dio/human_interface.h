@@ -59,6 +59,7 @@ private:
 	void dmack_w_in(int channel, uint8_t data) override;
 	uint8_t dmack_r_in(int channel) override;
 	void update_gpib_irq();
+	void update_gpib_dma();
 
 	required_device<i8042_device> m_iocpu;
 	required_device<hp_hil_mlc_device> m_mlc;
@@ -83,7 +84,10 @@ private:
 	bool m_kbd_nmi;
 
 	bool m_gpib_irq_line;
+	bool m_gpib_dma_line;
+
 	bool m_old_latch_enable;
+	bool m_gpib_dma_enable;
 
 	uint8_t m_hil_data;
 	uint8_t m_latch_data;

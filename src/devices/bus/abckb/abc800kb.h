@@ -55,7 +55,7 @@ private:
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_ioport_array<12> m_x;
 
 	int m_row;

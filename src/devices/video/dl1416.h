@@ -45,6 +45,7 @@ class dl1414_device : public device_t
 {
 public:
 	template <typename Object> devcb_base &set_update_handler(Object &&cb) { return m_update_cb.set_callback(std::forward<Object>(cb)); }
+	auto update() { return m_update_cb.bind(); }
 
 	// signal-level interface
 	DECLARE_WRITE_LINE_MEMBER(wr_w); // write strobe (rising edge)

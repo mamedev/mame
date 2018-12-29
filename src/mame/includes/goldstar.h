@@ -52,10 +52,10 @@ public:
 	void init_wcherry();
 	void init_super9();
 	DECLARE_VIDEO_START(goldstar);
-	DECLARE_PALETTE_INIT(cm);
+	void cm_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(cherrym);
-	DECLARE_PALETTE_INIT(cmast91);
-	DECLARE_PALETTE_INIT(lucky8);
+	void cmast91_palette(palette_device &palette) const;
+	void lucky8_palette(palette_device &palette) const;
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -185,6 +185,7 @@ protected:
 	READ8_MEMBER(fixedval58_r) { return 0x58; }
 	READ8_MEMBER(fixedval68_r) { return 0x68; }
 	READ8_MEMBER(fixedval74_r) { return 0x74; }
+	READ8_MEMBER(fixedval7d_r) { return 0x7d; }
 	READ8_MEMBER(fixedval80_r) { return 0x80; }
 	READ8_MEMBER(fixedval82_r) { return 0x82; }
 	READ8_MEMBER(fixedval84_r) { return 0x84; }
@@ -221,10 +222,11 @@ public:
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
+	void init_luckylad();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
-	DECLARE_PALETTE_INIT(magodds);
+	void magodds_palette(palette_device &palette) const;
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

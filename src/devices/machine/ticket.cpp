@@ -27,6 +27,7 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device, "ticket_dispenser", "Ticket Dispenser")
+DEFINE_DEVICE_TYPE(HOPPER, hopper_device, "coin_hopper", "Coin Hopper")
 
 
 
@@ -38,22 +39,31 @@ DEFINE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device, "ticket_dispenser"
 //  ticket_dispenser_device - constructor
 //-------------------------------------------------
 
-ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TICKET_DISPENSER, tag, owner, clock),
-		m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
-		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
-		m_period(attotime::from_msec(100)),
-		m_hopper_type(false),
-		m_motoron(0),
-		m_ticketdispensed(0),
-		m_ticketnotdispensed(0),
-		m_status(0),
-		m_power(0),
-		m_timer(nullptr),
-		m_output(*this, "led2") // TODO: probably shouldn't be hardcoded
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_motor_sense(TICKET_MOTOR_ACTIVE_LOW)
+	, m_status_sense(TICKET_STATUS_ACTIVE_LOW)
+	, m_period(attotime::from_msec(100))
+	, m_hopper_type(false)
+	, m_motoron(0)
+	, m_ticketdispensed(0)
+	, m_ticketnotdispensed(0)
+	, m_status(0)
+	, m_power(0)
+	, m_timer(nullptr)
+	, m_output(*this, "led2") // TODO: probably shouldn't be hardcoded
 {
 }
 
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ticket_dispenser_device(mconfig, TICKET_DISPENSER, tag, owner, clock)
+{
+}
+
+hopper_device::hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ticket_dispenser_device(mconfig, HOPPER, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  ~ticket_dispenser_device - destructor

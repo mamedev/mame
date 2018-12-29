@@ -62,7 +62,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<cop400_cpu_device> m_maincpu;
 	optional_ioport_array<6> m_inp_matrix; // max 6
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -313,24 +313,23 @@ static INPUT_PORTS_START( ctstein )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue Button")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ctstein_state::ctstein)
-
+void ctstein_state::ctstein(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, ctstein_state, write_g))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, ctstein_state, write_l))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, ctstein_state, read_l))
+	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_g().set(FUNC(ctstein_state::write_g));
+	m_maincpu->write_l().set(FUNC(ctstein_state::write_l));
+	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_maincpu->read_l().set(FUNC(ctstein_state::read_l));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ctstein);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -455,39 +454,36 @@ static INPUT_PORTS_START( h2hsoccerc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(h2hbaskbc_state::h2hbaskbc)
-
+void h2hbaskbc_state::h2hbaskbc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP420, 850000) // approximation - RC osc. R=43K, C=101pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, h2hbaskbc_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, h2hbaskbc_state, write_g))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, h2hbaskbc_state, write_l))
-	MCFG_COP400_READ_IN_CB(READ8(*this, h2hbaskbc_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	COP420(config, m_maincpu, 850000); // approximation - RC osc. R=43K, C=101pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(h2hbaskbc_state::write_d));
+	m_maincpu->write_g().set(FUNC(h2hbaskbc_state::write_g));
+	m_maincpu->write_l().set(FUNC(h2hbaskbc_state::write_l));
+	m_maincpu->read_in().set(FUNC(h2hbaskbc_state::read_in));
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_h2hbaskbc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(h2hbaskbc_state::h2hhockeyc)
+void h2hbaskbc_state::h2hhockeyc(machine_config &config)
+{
 	h2hbaskbc(config);
-
-	/* basic machine hardware */
 	config.set_default_layout(layout_h2hhockeyc);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(h2hbaskbc_state::h2hsoccerc)
+void h2hbaskbc_state::h2hsoccerc(machine_config &config)
+{
 	h2hbaskbc(config);
-
-	/* basic machine hardware */
 	config.set_default_layout(layout_h2hsoccerc);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -581,31 +577,32 @@ static INPUT_PORTS_START( einvaderc )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(einvaderc_state::einvaderc)
-
+void einvaderc_state::einvaderc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP444L, 850000) // approximation - RC osc. R=47K, C=100pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, einvaderc_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, einvaderc_state, write_g))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, einvaderc_state, write_sk))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, einvaderc_state, write_so))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, einvaderc_state, write_l))
+	COP444L(config, m_maincpu, 850000); // approximation - RC osc. R=47K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->read_in().set_ioport("IN.0");
+	m_maincpu->write_d().set(FUNC(einvaderc_state::write_d));
+	m_maincpu->write_g().set(FUNC(einvaderc_state::write_g));
+	m_maincpu->write_sk().set(FUNC(einvaderc_state::write_sk));
+	m_maincpu->write_so().set(FUNC(einvaderc_state::write_so));
+	m_maincpu->write_l().set(FUNC(einvaderc_state::write_l));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(913, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 913-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(913, 1080);
+	screen.set_visarea(0, 913-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_einvaderc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -710,26 +707,25 @@ static INPUT_PORTS_START( unkeinv )
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, unkeinv_state, position_changed, nullptr)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(unkeinv_state::unkeinv)
-
+void unkeinv_state::unkeinv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP421, 850000) // frequency guessed
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, unkeinv_state, write_g))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, unkeinv_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, unkeinv_state, write_l))
-	MCFG_COP400_READ_L_CB(READ8(*this, unkeinv_state, read_l))
-	MCFG_COP400_READ_L_TRISTATE_CB(CONSTANT(0xff))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	COP421(config, m_maincpu, 850000); // frequency guessed
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_g().set(FUNC(unkeinv_state::write_g));
+	m_maincpu->write_d().set(FUNC(unkeinv_state::write_d));
+	m_maincpu->write_l().set(FUNC(unkeinv_state::write_l));
+	m_maincpu->read_l().set(FUNC(unkeinv_state::read_l));
+	m_maincpu->read_l_tristate().set_constant(0xff);
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_unkeinv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -866,27 +862,26 @@ void lchicken_state::machine_start()
 	save_item(NAME(m_motor_pos));
 }
 
-MACHINE_CONFIG_START(lchicken_state::lchicken)
-
+void lchicken_state::lchicken(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, lchicken_state, write_l))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, lchicken_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, lchicken_state, write_g))
-	MCFG_COP400_READ_G_CB(READ8(*this, lchicken_state, read_g))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, lchicken_state, write_so))
-	MCFG_COP400_READ_SI_CB(READLINE(*this, lchicken_state, read_si))
+	COP421(config, m_maincpu, 850000); // approximation - RC osc. R=12K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_l().set(FUNC(lchicken_state::write_l));
+	m_maincpu->write_d().set(FUNC(lchicken_state::write_d));
+	m_maincpu->write_g().set(FUNC(lchicken_state::write_g));
+	m_maincpu->read_g().set(FUNC(lchicken_state::read_g));
+	m_maincpu->write_so().set(FUNC(lchicken_state::write_so));
+	m_maincpu->read_si().set(FUNC(lchicken_state::read_si));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("chicken_motor", lchicken_state, motor_sim_tick, attotime::from_msec(6000/0x100)) // ~6sec for a full rotation
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "chicken_motor").configure_periodic(FUNC(lchicken_state::motor_sim_tick), attotime::from_msec(6000/0x100)); // ~6sec for a full rotation
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_lchicken);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -976,25 +971,24 @@ static INPUT_PORTS_START( funjacks )
 	PORT_CONFSETTING(    0x08, "2" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(funjacks_state::funjacks)
-
+void funjacks_state::funjacks(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, funjacks_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, funjacks_state, write_l))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, funjacks_state, write_g))
-	MCFG_COP400_READ_L_CB(READ8(*this, funjacks_state, read_l))
-	MCFG_COP400_READ_G_CB(READ8(*this, funjacks_state, read_g))
+	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=56pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(funjacks_state::write_d));
+	m_maincpu->write_l().set(FUNC(funjacks_state::write_l));
+	m_maincpu->write_g().set(FUNC(funjacks_state::write_g));
+	m_maincpu->read_l().set(FUNC(funjacks_state::read_l));
+	m_maincpu->read_g().set(FUNC(funjacks_state::read_g));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_funjacks);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1071,25 +1065,24 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(funrlgl_state::funrlgl)
-
+void funrlgl_state::funrlgl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, funrlgl_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, funrlgl_state, write_l))
-	MCFG_COP400_READ_L_TRISTATE_CB(CONSTANT(0xff))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, funrlgl_state, write_g))
-	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
+	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=51K, C=91pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(funrlgl_state::write_d));
+	m_maincpu->write_l().set(FUNC(funrlgl_state::write_l));
+	m_maincpu->read_l_tristate().set_constant(0xff);
+	m_maincpu->write_g().set(FUNC(funrlgl_state::write_g));
+	m_maincpu->read_g().set_ioport("IN.0");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_funrlgl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1207,25 +1200,24 @@ static INPUT_PORTS_START( mdallas )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("North") // N
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mdallas_state::mdallas)
-
+void mdallas_state::mdallas(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, mdallas_state, write_l))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, mdallas_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, mdallas_state, write_g))
-	MCFG_COP400_READ_IN_CB(READ8(*this, mdallas_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	COP444L(config, m_maincpu, 1000000); // approximation - RC osc. R=57K, C=101pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_l().set(FUNC(mdallas_state::write_l));
+	m_maincpu->write_d().set(FUNC(mdallas_state::write_d));
+	m_maincpu->write_g().set(FUNC(mdallas_state::write_g));
+	m_maincpu->read_in().set(FUNC(mdallas_state::read_in));
+	m_maincpu->write_so().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mdallas);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1291,23 +1283,22 @@ static INPUT_PORTS_START( plus1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(plus1_state::plus1)
-
+void plus1_state::plus1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, plus1_state, write_d))
-	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, plus1_state, write_l))
-	MCFG_COP400_READ_L_CB(READ8(*this, plus1_state, read_l))
+	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=51K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(plus1_state::write_d));
+	m_maincpu->read_g().set_ioport("IN.0");
+	m_maincpu->write_l().set(FUNC(plus1_state::write_l));
+	m_maincpu->read_l().set(FUNC(plus1_state::read_l));
 
 	/* no visual feedback! */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1419,25 +1410,24 @@ static INPUT_PORTS_START( lightfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(lightfgt_state::lightfgt)
-
+void lightfgt_state::lightfgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, lightfgt_state, write_so))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, lightfgt_state, write_d))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, lightfgt_state, write_l))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_COP400_READ_G_CB(READ8(*this, lightfgt_state, read_g))
+	COP421(config, m_maincpu, 950000); // approximation - RC osc. R=82K, C=56pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_so().set(FUNC(lightfgt_state::write_so));
+	m_maincpu->write_d().set(FUNC(lightfgt_state::write_d));
+	m_maincpu->write_l().set(FUNC(lightfgt_state::write_l));
+	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_maincpu->read_g().set(FUNC(lightfgt_state::read_g));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_lightfgt);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1573,27 +1563,29 @@ base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
 
 */
 
-MACHINE_CONFIG_START(bship82_state::bship82)
-
+void bship82_state::bship82(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, bship82_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, bship82_state, read_l))
-	MCFG_COP400_READ_IN_CB(READ8(*this, bship82_state, read_in))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, bship82_state, write_so))
-	MCFG_COP400_READ_SI_CB(IOPORT("IN.4"))
+	COP420(config, m_maincpu, 750000); // approximation - RC osc. R=14K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(bship82_state::write_d));
+	m_maincpu->write_g().set("dac", FUNC(dac_byte_interface::data_w));
+	m_maincpu->read_l().set(FUNC(bship82_state::read_l));
+	m_maincpu->read_in().set(FUNC(bship82_state::read_in));
+	m_maincpu->write_so().set(FUNC(bship82_state::write_so));
+	m_maincpu->read_si().set_ioport("IN.4");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_bship82);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // see above
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.125); // see above
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -1705,22 +1697,22 @@ static INPUT_PORTS_START( qkracer )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Tables")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(qkracer_state::qkracer)
-
+void qkracer_state::qkracer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, qkracer_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, qkracer_state, write_g))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, qkracer_state, write_l))
-	MCFG_COP400_READ_IN_CB(READ8(*this, qkracer_state, read_in))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, qkracer_state, write_sk))
+	COP420(config, m_maincpu, 1000000); // approximation - RC osc. R=47K, C=100pF
+	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(qkracer_state::write_d));
+	m_maincpu->write_g().set(FUNC(qkracer_state::write_g));
+	m_maincpu->write_l().set(FUNC(qkracer_state::write_l));
+	m_maincpu->read_in().set(FUNC(qkracer_state::read_in));
+	m_maincpu->write_sk().set(FUNC(qkracer_state::write_sk));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_qkracer);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1796,26 +1788,28 @@ static INPUT_PORTS_START( vidchal )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // TODO: light sensor
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vidchal_state::vidchal)
-
+void vidchal_state::vidchal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", COP420, 900000) // approximation
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, vidchal_state, write_d))
-	MCFG_COP400_WRITE_G_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, vidchal_state, write_l))
-	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, vidchal_state, write_sk))
+	COP420(config, m_maincpu, 900000); // approximation
+	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->write_d().set(FUNC(vidchal_state::write_d));
+	m_maincpu->write_g().set("dac", FUNC(dac_byte_interface::data_w));
+	m_maincpu->write_l().set(FUNC(vidchal_state::write_l));
+	m_maincpu->read_in().set_ioport("IN.0");
+	m_maincpu->write_sk().set(FUNC(vidchal_state::write_sk));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_cop400_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_vidchal);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.125); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 

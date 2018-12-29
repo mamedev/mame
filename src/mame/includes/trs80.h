@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/com8116.h"
@@ -65,6 +65,10 @@ public:
 	void init_trs80l2();
 	void init_trs80();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_WRITE8_MEMBER(port_ff_w);
@@ -92,7 +96,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( trs80_cmd );
 	DECLARE_MACHINE_RESET(lnw80);
-	DECLARE_PALETTE_INIT(lnw80);
+	void lnw80_palette(palette_device &palette) const;
 	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -121,8 +125,6 @@ private:
 	uint8_t m_size_store;
 	uint16_t m_timeout;
 	floppy_image_device *m_floppy;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;

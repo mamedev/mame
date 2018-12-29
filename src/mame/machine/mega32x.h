@@ -31,7 +31,7 @@ public:
 	}
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
@@ -118,6 +118,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
@@ -246,8 +247,5 @@ protected:
 
 DECLARE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device)
 DECLARE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device)
-
-#define MCFG_SEGA_32X_PALETTE(_palette_tag) \
-	downcast<sega_32x_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_MACHINE_MEGA32X_H

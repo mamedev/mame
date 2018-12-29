@@ -146,17 +146,17 @@ public:
 	static constexpr auto CPU_CLK_PAL         = DOT_CLK_PAL / 2;
 	static constexpr auto CPU_CLK_NTSC        = DOT_CLK_NTSC / 2;
 
-	static constexpr unsigned CHAR_WIDTH          = 6;
+	static constexpr unsigned CH_WIDTH            = 6;
 
-	static constexpr unsigned HSYNC_START         = 56 * CHAR_WIDTH;
-	static constexpr unsigned HSYNC_END           = 60 * CHAR_WIDTH;
-	static constexpr unsigned HBLANK_START        = 54 * CHAR_WIDTH;
-	static constexpr unsigned HBLANK_END          =  5 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_START_PAL    =  9 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_START_NTSC   = 10 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_START        = 10 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_END          = 50 * CHAR_WIDTH;
-	static constexpr unsigned SCREEN_WIDTH        = 60 * CHAR_WIDTH;
+	static constexpr unsigned HSYNC_START         = 56 * CH_WIDTH;
+	static constexpr unsigned HSYNC_END           = 60 * CH_WIDTH;
+	static constexpr unsigned HBLANK_START        = 54 * CH_WIDTH;
+	static constexpr unsigned HBLANK_END          =  5 * CH_WIDTH;
+	static constexpr unsigned SCREEN_START_PAL    =  9 * CH_WIDTH;
+	static constexpr unsigned SCREEN_START_NTSC   = 10 * CH_WIDTH;
+	static constexpr unsigned SCREEN_START        = 10 * CH_WIDTH;
+	static constexpr unsigned SCREEN_END          = 50 * CH_WIDTH;
+	static constexpr unsigned SCREEN_WIDTH        = 60 * CH_WIDTH;
 
 	static constexpr unsigned TOTAL_SCANLINES_PAL             = 312;
 	static constexpr unsigned SCANLINE_VBLANK_START_PAL       = 304;
@@ -239,7 +239,7 @@ protected:
 	inline void write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, uint8_t data);
 	inline int read_pcb(offs_t pma, offs_t cma, uint8_t pmd);
 	inline void update_prd_changed_timer();
-	inline rgb_t get_rgb(int i, int c, int l);
+	static rgb_t get_rgb(int i, int c, int l);
 	inline int get_lines();
 	inline uint16_t get_pmemsize(int cols, int rows);
 	inline uint16_t get_pma();
@@ -288,7 +288,7 @@ private:
 	uint8_t m_wnfreq;                 // white noise range select
 	uint8_t m_wnamp;                  // white noise output amplitude
 
-	DECLARE_PALETTE_INIT(cdp1869);
+	void cdp1869_palette(palette_device &palette) const;
 };
 
 

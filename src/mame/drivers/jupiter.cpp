@@ -28,6 +28,7 @@ ToDo: (both)
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
@@ -333,15 +334,15 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// devices
 	FD1771(config, INS1771N1_TAG, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(jupiter3_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

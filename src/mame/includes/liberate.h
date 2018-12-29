@@ -88,7 +88,7 @@ private:
 	DECLARE_MACHINE_START(liberate);
 	DECLARE_MACHINE_RESET(liberate);
 	DECLARE_VIDEO_START(liberate);
-	DECLARE_PALETTE_INIT(liberate);
+	void liberate_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(prosport);
 	DECLARE_VIDEO_START(boomrang);
 	DECLARE_VIDEO_START(prosoccr);

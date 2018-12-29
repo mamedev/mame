@@ -40,12 +40,12 @@
 class meyc8088_state : public driver_device
 {
 public:
-	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat"),
-		m_switches(*this, {"C0", "C1", "C2", "C3"}),
+		m_switches(*this, "C%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -77,7 +77,7 @@ private:
 	DECLARE_WRITE8_MEMBER(lights2_w);
 	DECLARE_WRITE8_MEMBER(common_w);
 
-	DECLARE_PALETTE_INIT(meyc8088);
+	void meyc8088_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
@@ -131,9 +131,9 @@ static const res_net_info meyc8088_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
+void meyc8088_state:: meyc8088_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, meyc8088_decode_info, meyc8088_net_info);
@@ -395,8 +395,7 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meyc8088_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
+	PALETTE(config, "palette", FUNC(meyc8088_state::meyc8088_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

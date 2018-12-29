@@ -262,8 +262,8 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(votrpss_state::kbd_put));
 
 	i8251_device &uart(I8251(config, "uart", 0));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

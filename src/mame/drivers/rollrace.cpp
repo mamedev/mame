@@ -275,12 +275,11 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rollrace_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rollrace)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rollrace);
+	PALETTE(config, m_palette, FUNC(rollrace_state::rollrace_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

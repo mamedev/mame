@@ -47,14 +47,14 @@
 class tomcat_state : public driver_device
 {
 public:
-	tomcat_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_tms(*this, "tms"),
-		m_shared_ram(*this, "shared_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_dsp(*this, "dsp"),
-		m_adc(*this, "adc"),
-		m_mainlatch(*this, "mainlatch")
+	tomcat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_tms(*this, "tms")
+		, m_shared_ram(*this, "shared_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_dsp(*this, "dsp")
+		, m_adc(*this, "adc")
+		, m_mainlatch(*this, "mainlatch")
 	{ }
 
 	void tomcat(machine_config &config);
@@ -74,7 +74,7 @@ private:
 	DECLARE_READ16_MEMBER(tomcat_320bio_r);
 	DECLARE_READ8_MEMBER(tomcat_nvram_r);
 	DECLARE_WRITE8_MEMBER(tomcat_nvram_w);
-	DECLARE_READ_LINE_MEMBER(dsp_BIO_r);
+	DECLARE_READ_LINE_MEMBER(dsp_bio_r);
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
 	virtual void machine_start() override;
 	void dsp_map(address_map &map);
@@ -84,11 +84,11 @@ private:
 	required_device<tms5220_device> m_tms;
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t m_nvram[0x800];
-	int m_dsp_BIO;
+	int m_dsp_bio;
 	int m_dsp_idle;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
+	required_device<tms32010_device> m_dsp;
 	required_device<adc0808_device> m_adc;
 	required_device<ls259_device> m_mainlatch;
 };
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(tomcat_state::mres_w)
 	// When Low: Reset TMS320
 	// When High: Release reset of TMS320
 	if (state)
-		m_dsp_BIO = 0;
+		m_dsp_bio = 0;
 	m_dsp->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -178,29 +178,29 @@ READ16_MEMBER(tomcat_state::tomcat_inputs2_r)
 
 READ16_MEMBER(tomcat_state::tomcat_320bio_r)
 {
-	m_dsp_BIO = 1;
+	m_dsp_bio = 1;
 	m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
 	return 0;
 }
 
-READ_LINE_MEMBER(tomcat_state::dsp_BIO_r)
+READ_LINE_MEMBER(tomcat_state::dsp_bio_r)
 {
-	if ( m_dsp->pc() == 0x0001 )
+	if (m_dsp->pc() == 0x0001)
 	{
-		if ( m_dsp_idle == 0 )
+		if (m_dsp_idle == 0)
 		{
 			m_dsp_idle = 1;
-			m_dsp_BIO = 0;
+			m_dsp_bio = 0;
 		}
-		return !m_dsp_BIO;
+		return !m_dsp_bio;
 	}
-	else if ( m_dsp->pc() == 0x0003 )
+	else if (m_dsp->pc() == 0x0003)
 	{
-		if ( m_dsp_BIO == 1 )
+		if (m_dsp_bio == 1)
 		{
 			m_dsp_idle = 0;
-			m_dsp_BIO = 0;
-			m_maincpu->resume(SUSPEND_REASON_SPIN );
+			m_dsp_bio = 0;
+			m_maincpu->resume(SUSPEND_REASON_SPIN);
 			return 0;
 		}
 		else
@@ -211,7 +211,7 @@ READ_LINE_MEMBER(tomcat_state::dsp_BIO_r)
 	}
 	else
 	{
-		return !m_dsp_BIO;
+		return !m_dsp_bio;
 	}
 }
 
@@ -302,10 +302,10 @@ void tomcat_state::machine_start()
 	subdevice<nvram_device>("nvram")->set_base(m_nvram, 0x800);
 
 	save_item(NAME(m_nvram));
-	save_item(NAME(m_dsp_BIO));
+	save_item(NAME(m_dsp_bio));
 	save_item(NAME(m_dsp_idle));
 
-	m_dsp_BIO = 0;
+	m_dsp_bio = 0;
 }
 
 MACHINE_CONFIG_START(tomcat_state::tomcat)
@@ -314,11 +314,11 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert, 12.096_MHz_XTAL / 16 / 16 / 16 / 12)
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP( dsp_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, tomcat_state, dsp_BIO_r))
+	TMS32010(config, m_dsp, 16_MHz_XTAL);
+	m_dsp->set_addrmap(AS_PROGRAM, &tomcat_state::dsp_map);
+	m_dsp->bio().set(FUNC(tomcat_state::dsp_bio_r));
 
-	MCFG_DEVICE_ADD("soundcpu", M6502, 14.318181_MHz_XTAL / 8 )
+	MCFG_DEVICE_ADD("soundcpu", M6502, 14.318181_MHz_XTAL / 8)
 	MCFG_DEVICE_DISABLE()
 	MCFG_DEVICE_PROGRAM_MAP( sound_map)
 
@@ -368,8 +368,8 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 280, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_TOMCAT, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_TOMCAT(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

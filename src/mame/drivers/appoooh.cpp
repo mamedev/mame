@@ -457,12 +457,10 @@ MACHINE_CONFIG_START(appoooh_state::appoooh)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_appoooh)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_appoooh);
+	PALETTE(config, m_palette, FUNC(appoooh_state::appoooh_palette), 32*8+32*8);
 MACHINE_CONFIG_END
 
 
@@ -479,24 +477,23 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robowres)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robowres);
+	PALETTE(config, m_palette, FUNC(appoooh_state::robowres_palette), 32*8+32*8);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(appoooh_state::robowrese)
+void appoooh_state::robowrese(machine_config &config)
+{
 	robowres(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5179_device &maincpu(SEGA_315_5179(config.replace(), m_maincpu, 18432000/6)); /* ??? the main xtal is 18.432 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &appoooh_state::main_map);
+	maincpu.set_addrmap(AS_IO, &appoooh_state::main_portmap);
+	maincpu.set_vblank_int("screen", FUNC(appoooh_state::vblank_irq));
+	maincpu.set_addrmap(AS_OPCODES, &appoooh_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *

@@ -49,6 +49,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
@@ -417,7 +418,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(p8k_state::p8k)
 	/* basic machine hardware */
-	z80_device& maincpu(Z80(config, "maincpu", XTAL(4'000'000)));
+	z80_device& maincpu(Z80(config, "maincpu", 16_MHz_XTAL / 4));
 	maincpu.set_daisy_config(p8k_daisy_chain);
 	maincpu.set_addrmap(AS_PROGRAM, &p8k_state::p8k_memmap);
 	maincpu.set_addrmap(AS_IO, &p8k_state::p8k_iomap);
@@ -425,7 +426,7 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k)
 
 	/* peripheral hardware */
-	z80dma_device& dma(Z80DMA(config, "dma", XTAL(4'000'000)));
+	z80dma_device& dma(Z80DMA(config, "dma", 16_MHz_XTAL / 4));
 	dma.out_busreq_callback().set(FUNC(p8k_state::p8k_dma_irq_w));
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dma.in_mreq_callback().set(FUNC(p8k_state::memory_read_byte));
@@ -449,7 +450,7 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	// Baud Gen 0, Baud Gen 1, Baud Gen 2,
 	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
+	z80sio_device& sio(Z80SIO(config, "sio", 16_MHz_XTAL / 4));
 	sio.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	sio.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -459,7 +460,7 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 
-	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(4'000'000)));
+	z80sio_device& sio1(Z80SIO(config, "sio1", 16_MHz_XTAL / 4));
 	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80pio_device& pio0(Z80PIO(config, "pio0", 1229000));
@@ -472,7 +473,7 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pa_callback().set_ioport("DSW");
 
-	I8272A(config, m_i8272, true);
+	I8272A(config, m_i8272, 16_MHz_XTAL / 8, true);
 	m_i8272->drq_wr_callback().set("dma", FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)

@@ -90,7 +90,7 @@ protected:
 	void io_rw(address_space &space, uint16_t offset);
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_PALETTE_INIT(psion);
+	void psion_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);

@@ -82,7 +82,7 @@ void twincobr_state::twincobr_create_tilemaps()
 	m_tx_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(twincobr_state,toaplan0)
+void twincobr_state::video_start()
 {
 	m_spritegen->alloc_sprite_bitmap(*m_screen);
 

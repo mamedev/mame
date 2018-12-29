@@ -212,9 +212,9 @@ void dmv_k801_device::io_read(address_space &space, int ifsel, offs_t offset, ui
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }
 
@@ -224,9 +224,9 @@ void dmv_k801_device::io_write(address_space &space, int ifsel, offs_t offset, u
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }
 
@@ -236,9 +236,9 @@ void dmv_k211_device::io_read(address_space &space, int ifsel, offs_t offset, ui
 	if ((BIT(jumpers, 0) && ifsel == 0) || (BIT(jumpers, 1) && ifsel == 1))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }
 
@@ -248,8 +248,8 @@ void dmv_k211_device::io_write(address_space &space, int ifsel, offs_t offset, u
 	if ((BIT(jumpers, 0) && ifsel == 0) || (BIT(jumpers, 1) && ifsel == 1))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }

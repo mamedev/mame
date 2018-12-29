@@ -15,20 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CRT_NUM_LEVELS(_lev) \
-	downcast<crt_device &>(*device).set_num_levels(_lev);
-
-#define MCFG_CRT_OFFSETS(_xoffs, _yoffs) \
-	downcast<crt_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_CRT_SIZE(_width, _height) \
-	downcast<crt_device &>(*device).set_size(_width, _height);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

@@ -387,12 +387,12 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_SCREEN_UPDATE_DRIVER(gridcomp_state, screen_update_110x)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240) // XXX 66 Hz refresh
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir3_w))
-
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("keyboard", GRID_KEYBOARD, 0)
-	MCFG_GRID_KEYBOARD_CB(PUT(gridcomp_state, kbd_put))
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	grid_keyboard_device &keyboard(GRID_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(gridcomp_state::kbd_put));
 
 	i7220_device &i7220(I7220(config, "i7220", XTAL(4'000'000)));
 	i7220.set_data_size(3); // 3 1-Mbit MBM's

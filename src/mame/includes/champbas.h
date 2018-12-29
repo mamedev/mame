@@ -62,7 +62,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_PALETTE_INIT(champbas);
+	void champbas_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
 
 	uint32_t screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -118,7 +118,7 @@ public:
 protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
 
-	DECLARE_PALETTE_INIT(exctsccr);
+	void exctsccr_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
 
 	uint32_t screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

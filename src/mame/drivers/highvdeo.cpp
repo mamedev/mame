@@ -137,6 +137,9 @@ public:
 	void tv_tcf(machine_config &config);
 	void tv_vcf(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_shared_ptr<uint16_t> m_blit_ram;
 	optional_memory_bank m_mainbank;
@@ -171,7 +174,6 @@ private:
 	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
 	DECLARE_READ8_MEMBER(nmi_clear_r);
 	DECLARE_WRITE8_MEMBER(nmi_clear_w);
-	virtual void machine_start() override;
 	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1242,7 +1244,7 @@ MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_tourvisn)
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &highvdeo_state::ramdac_map);
 
@@ -1280,8 +1282,7 @@ MACHINE_CONFIG_START(highvdeo_state::tv_tcf)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGGBBBBB)
+	m_palette->set_format(palette_device::RGB_565, 0x100);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(highvdeo_state::newmcard)
@@ -1327,7 +1328,7 @@ MACHINE_CONFIG_START(highvdeo_state::brasil)
 	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1357,7 +1358,7 @@ MACHINE_CONFIG_START(highvdeo_state::grancapi)
 	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1381,7 +1382,7 @@ MACHINE_CONFIG_START(highvdeo_state::magicbom)
 	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

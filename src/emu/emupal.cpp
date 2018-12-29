@@ -18,22 +18,323 @@
 
 DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "palette")
 
-palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 entries)
-	: device_t(mconfig, PALETTE, tag, owner, (uint32_t)0),
-		device_palette_interface(mconfig, *this),
-		m_entries(0),
-		m_indirect_entries(0),
-		m_enable_shadows(0),
-		m_enable_hilights(0),
-		m_membits(0),
-		m_membits_supplied(false),
-		m_endianness(),
-		m_endianness_supplied(false),
-		m_prom_region(*this, finder_base::DUMMY_TAG),
-		m_init(palette_init_delegate()),
-		m_raw_to_rgb(raw_to_rgb_converter())
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries, u32 indirect)
+	: palette_device(mconfig, tag, owner, 0U)
 {
 	set_entries(entries);
+	set_indirect_entries(indirect);
+	set_init(std::move(init));
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, black_t, u32 entries)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_all_black), tag, this), entries)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome), tag, this), 2)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_inv_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), tag, this), 2)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_hi_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), tag, this), 3)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_3b_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rgb), tag, this), 8)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rbg_3b_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rbg), tag, this), 8)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_3b_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_grb), tag, this), 8)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, gbr_3b_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_gbr), tag, this), 8)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, brg_3b_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_brg), tag, this), 8)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_3b_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_bgr), tag, this), 8)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_555), tag, this), 32768)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_555_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_grb_555), tag, this), 32768)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_555), tag, this), 32768)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_565_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_565), tag, this), 65536)
+{
+}
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_565_t)
+	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_565), tag, this), 65536)
+{
+}
+
+
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, PALETTE, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, m_entries(0)
+	, m_indirect_entries(0)
+	, m_enable_shadows(0)
+	, m_enable_hilights(0)
+	, m_membits(0)
+	, m_membits_supplied(false)
+	, m_endianness()
+	, m_endianness_supplied(false)
+	, m_prom_region(*this, finder_base::DUMMY_TAG)
+	, m_init()
+	, m_raw_to_rgb()
+{
+}
+
+
+palette_device &palette_device::set_format(int bytes_per_entry, raw_to_rgb_converter::raw_to_rgb_func func, u32 entries)
+{
+	set_format(raw_to_rgb_converter(bytes_per_entry, func));
+	set_entries(entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rgb_332_t, u32 entries)
+{
+	set_format(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(bgr_233_t, u32 entries)
+{
+	set_format(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 0,3,6>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rgb_332_inv_t, u32 entries)
+{
+	set_format(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 5,2,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(bgr_233_inv_t, u32 entries)
+{
+	set_format(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 0,3,6>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrgb_333_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 6,3,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrbg_333_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 6,0,3>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbgr_333_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 0,3,6>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrgb_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 8,4,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrbg_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 8,0,4>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbrg_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 4,0,8>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbgr_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 0,4,8>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rgbx_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 12,8,4>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(gbrx_444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 4,12,8>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(irgb_4444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 12,8,4,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rgbi_4444_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 0,12,8,4>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrgb_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xgrb_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 5,10,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xgbr_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 0,10,5>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbrg_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 5,0,10>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbgr_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 0,5,10>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rgbx_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 11,6,1>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(grbx_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 6,11,1>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(brgx_555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 6,1,11>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrbg_inv_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::inverted_rgb_decoder<5,5,5, 10,0,5>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(irgb_1555_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rgb_565_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,6,5, 11,5,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(bgr_565_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::standard_rgb_decoder<5,6,5, 0,5,11>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xrgb_888_t, u32 entries)
+{
+	set_format(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,8,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xgrb_888_t, u32 entries)
+{
+	set_format(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,16,0>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbrg_888_t, u32 entries)
+{
+	set_format(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,0,16>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(xbgr_888_t, u32 entries)
+{
+	set_format(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 0,8,16>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rgbx_888_t, u32 entries)
+{
+	set_format(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 24,16,8>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(grbx_888_t, u32 entries)
+{
+	set_format(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,24,8>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(bgrx_888_t, u32 entries)
+{
+	set_format(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,16,24>, entries);
+	return *this;
+}
+
+palette_device &palette_device::set_format(rrrrggggbbbbrgbx_t, u32 entries)
+{
+	set_format(2, &raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder, entries);
+	return *this;
 }
 
 
@@ -346,7 +647,7 @@ void palette_device::palette_init_3bit_bgr(palette_device &palette)
     bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 -------------------------------------------------*/
 
-void palette_device::palette_init_RRRRGGGGBBBB_proms(palette_device &palette)
+void palette_device::palette_init_rgb_444_proms(palette_device &palette)
 {
 	if (!m_prom_region.found())
 		throw emu_fatalerror("Unable to find color PROM region '%s'.", m_prom_region.finder_tag());
@@ -385,49 +686,46 @@ void palette_device::palette_init_RRRRGGGGBBBB_proms(palette_device &palette)
 
 
 /*-------------------------------------------------
-    RRRRR_GGGGG_BBBBB/BBBBB_GGGGG_RRRRR -
     standard 5-5-5 palette for games using a
     15-bit color space
 -------------------------------------------------*/
 
-void palette_device::palette_init_RRRRRGGGGGBBBBB(palette_device &palette)
+void palette_device::palette_init_rgb_555(palette_device &palette)
 {
-	int i;
-
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 10, 5, 0));
 }
 
 
-void palette_device::palette_init_BBBBBGGGGGRRRRR(palette_device &palette)
+void palette_device::palette_init_grb_555(palette_device &palette)
 {
-	int i;
+	for (int i = 0; i < 0x8000; i++)
+		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 5, 10, 0));
+}
 
-	for (i = 0; i < 0x8000; i++)
+
+void palette_device::palette_init_bgr_555(palette_device &palette)
+{
+	for (int i = 0; i < 0x8000; i++)
 		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 0, 5, 10));
 }
 
 
 
 /*-------------------------------------------------
-    RRRRR_GGGGGG_BBBBB/BBBBB_GGGGGG_RRRRR -
     standard 5-6-5 palette for games using a
     16-bit color space
 -------------------------------------------------*/
 
-void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
+void palette_device::palette_init_rgb_565(palette_device &palette)
 {
-	int i;
-
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
 }
 
-void palette_device::palette_init_BBBBBGGGGGGRRRRR(palette_device &palette)
+void palette_device::palette_init_bgr_565(palette_device &palette)
 {
-	int i;
-
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 0, 5, 11));
 }
 
@@ -443,8 +741,8 @@ rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(u32 raw)
 rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(u32 raw)
 {
 	u8 const r = pal5bit(((raw >> 11) & 0x1e) | ((raw >> 3) & 0x01));
-	u8 const g = pal5bit(((raw >>  7) & 0x1e) | ((raw >> 2) & 0x01));
-	u8 const b = pal5bit(((raw >>  3) & 0x1e) | ((raw >> 1) & 0x01));
+	u8 const g = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 2) & 0x01));
+	u8 const b = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 1) & 0x01));
 	return rgb_t(r, g, b);
 }
 
@@ -461,21 +759,5 @@ rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw)
 	u8 const r = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
 	u8 const g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
 	u8 const b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
-	return rgb_t(r, g, b);
-}
-
-rgb_t raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit0_decoder(u32 raw)
-{
-	u8 const b = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 14) & 0x01));
-	u8 const g = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 13) & 0x01));
-	u8 const r = pal5bit(((raw << 1) & 0x1e) | ((raw >> 12) & 0x01));
-	return rgb_t(r, g, b);
-}
-
-rgb_t raw_to_rgb_converter::xBGRBBBBGGGGRRRR_bit4_decoder(u32 raw)
-{
-	u8 const b = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
-	u8 const g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
-	u8 const r = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
 	return rgb_t(r, g, b);
 }

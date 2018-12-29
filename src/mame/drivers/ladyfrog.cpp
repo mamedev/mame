@@ -288,33 +288,31 @@ void ladyfrog_state::machine_reset()
 	m_snd_data = 0;
 }
 
-MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
-
+void ladyfrog_state::ladyfrog(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(ladyfrog_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ladyfrog_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ladyfrog_state::ladyfrog_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ladyfrog_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(ladyfrog_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ladyfrog_state, irq0_line_hold, 2*60)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ladyfrog_state::ladyfrog_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(ladyfrog_state::irq0_line_hold), attotime::from_hz(2*60));
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) // black borders in ladyfrog gameplay are correct
-	MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
-	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1); // black borders in ladyfrog gameplay are correct
+	screen.set_raw(XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8); // pixel clock appears to run at 8 MHz
+	screen.set_screen_update(FUNC(ladyfrog_state::screen_update_ladyfrog));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladyfrog)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ladyfrog);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -326,29 +324,32 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	aysnd.port_b_write_callback().set(FUNC(ladyfrog_state::unk_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
-	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
+	MSM5232(config, m_msm, XTAL(8'000'000)/4);
+	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6);
+	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
+	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
+	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1
+	m_msm->add_route(3, "mono", 1.0);   // pin 31 16'-1
+	m_msm->add_route(4, "mono", 1.0);   // pin 36  2'-2
+	m_msm->add_route(5, "mono", 1.0);   // pin 35  4'-2
+	m_msm->add_route(6, "mono", 1.0);   // pin 34  8'-2
+	m_msm->add_route(7, "mono", 1.0);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(ladyfrog_state::toucheme)
+void ladyfrog_state::toucheme(machine_config &config)
+{
 	ladyfrog(config);
 	MCFG_VIDEO_START_OVERRIDE(ladyfrog_state,toucheme)
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( ladyfrog )

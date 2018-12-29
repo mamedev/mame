@@ -74,14 +74,13 @@ READ8_MEMBER(n2a03_device::apu_read_mem)
 	return mintf->program->read_byte(offset);
 }
 
-MACHINE_CONFIG_START(n2a03_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
-	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(*this, n2a03_device, apu_irq))
-	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(*this, n2a03_device, apu_read_mem))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
-
-MACHINE_CONFIG_END
+void n2a03_device::device_add_mconfig(machine_config &config)
+{
+	NES_APU(config, m_apu, DERIVED_CLOCK(1,1));
+	m_apu->irq().set(FUNC(n2a03_device::apu_irq));
+	m_apu->mem_read().set(FUNC(n2a03_device::apu_read_mem));
+	m_apu->add_route(ALL_OUTPUTS, ":mono", 0.50);
+}
 
 
 #include "cpu/m6502/n2a03.hxx"

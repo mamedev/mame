@@ -182,10 +182,10 @@ MACHINE_CONFIG_START(xbox_state::xbox)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
-	MCFG_USB_PORT_ADD(":pci:02.0:port1", usb_xbox, nullptr, false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port2", usb_xbox, nullptr, false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port3", usb_xbox, "xbox_controller", false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_xbox, "xbox_controller", false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_xbox, nullptr, false);
 
 /* sound hardware */
 	SPEAKER(config, "mono").front_center();

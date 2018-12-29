@@ -983,7 +983,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(hp2645_state , screen_update)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp2645_state, scanline_timer, "screen", 0, 1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 	config.set_default_layout(layout_hp2640);
 
 	// RS232
@@ -998,8 +998,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 
 	// Beep
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep" , BEEP , BEEP_FREQUENCY)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
+	BEEP(config, m_beep, BEEP_FREQUENCY).add_route(ALL_OUTPUTS, "mono", 1.00);
 	MCFG_TIMER_DRIVER_ADD("timer_beep" , hp2645_state , timer_beep_exp)
 
 MACHINE_CONFIG_END

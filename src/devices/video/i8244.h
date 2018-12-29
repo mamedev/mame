@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ_LINE_MEMBER(vblank);
 	DECLARE_READ_LINE_MEMBER(hblank);
-	DECLARE_PALETTE_INIT(i8244);
+	void i8244_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

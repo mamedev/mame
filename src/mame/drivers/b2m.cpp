@@ -202,10 +202,9 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(b2m_state, screen_update_b2m)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(b2m_state, b2m)
+	PALETTE(config, m_palette, FUNC(b2m_state::b2m_palette), 4);
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(0);

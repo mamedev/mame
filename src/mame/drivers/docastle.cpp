@@ -626,28 +626,20 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	m_crtc->out_hsync_callback().set(FUNC(docastle_state::docastle_tint));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
+	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_docastle)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_docastle);
+	PALETTE(config, m_palette, FUNC(docastle_state::docastle_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("sn3", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("sn4", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SN76489A(config, "sn1", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SN76489A(config, "sn2", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SN76489A(config, "sn3", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SN76489A(config, "sn4", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(docastle_state::dorunrun)
@@ -678,7 +670,7 @@ MACHINE_CONFIG_START(docastle_state::idsoccer)
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) // Crystal verified on American Soccer board.
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, docastle_state, idsoccer_adpcm_int)) // interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 6 kHz ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

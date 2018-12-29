@@ -326,23 +326,20 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_bladestl)
-	MCFG_PALETTE_ADD("palette", 32 + 16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bladestl);
+	PALETTE(config, "palette", FUNC(bladestl_state::bladestl_palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
 
-	MCFG_K007342_ADD(m_k007342)
-	MCFG_K007342_GFXNUM(0)
-	MCFG_K007342_CALLBACK_OWNER(bladestl_state, bladestl_tile_callback)
-	MCFG_K007342_GFXDECODE("gfxdecode")
+	K007342(config, m_k007342, 0);
+	m_k007342->set_gfxnum(0);
+	m_k007342->set_tile_callback(FUNC(bladestl_state::bladestl_tile_callback), this);
+	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_K007420_ADD(m_k007420)
-	MCFG_K007420_BANK_LIMIT(0x3ff)
-	MCFG_K007420_CALLBACK_OWNER(bladestl_state, bladestl_sprite_callback)
-	MCFG_K007420_PALETTE("palette")
+	K007420(config, m_k007420, 0);
+	m_k007420->set_bank_limit(0x3ff);
+	m_k007420->set_sprite_callback(FUNC(bladestl_state::bladestl_sprite_callback), this);
+	m_k007420->set_palette_tag("palette");
 
-	MCFG_K051733_ADD("k051733")
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	/* the initialization order is important, the port callbacks being

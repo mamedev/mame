@@ -163,6 +163,7 @@ decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const 
 	, m_rombank2(*this, "dmdbank2")
 	, m_rambank(*this, "dmdram")
 	, m_ram(*this, RAM_TAG)
+	, m_rom(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -172,15 +173,12 @@ void decodmd_type2_device::device_start()
 
 void decodmd_type2_device::device_reset()
 {
-	uint8_t* ROM;
 	uint8_t* RAM = m_ram->pointer();
-	m_rom = memregion(m_gfxtag);
 
 	memset(RAM,0,0x3000);
 
-	ROM = m_rom->base();
-	m_rombank1->configure_entries(0, 32, &ROM[0x0000], 0x4000);
-	m_rombank2->configure_entry(0, &ROM[0x78000]);
+	m_rombank1->configure_entries(0, 32, &m_rom[0x0000], 0x4000);
+	m_rombank2->configure_entry(0, &m_rom[0x78000]);
 	m_rambank->configure_entry(0, &RAM[0]);
 	m_rombank1->set_entry(0);
 	m_rombank2->set_entry(0);

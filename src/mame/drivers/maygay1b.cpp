@@ -767,13 +767,13 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_DEVICE_ADD("maincpu", MC6809, M1_MASTER_CLOCK/2) // claimed to be 4 MHz
 	MCFG_DEVICE_PROGRAM_MAP(m1_memmap)
 
-	MCFG_DEVICE_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, maygay1b_state, mcu_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, maygay1b_state, mcu_port2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port3_w))
+	I80C51(config, m_mcu, 2000000); //  EP840034.A-P-80C51AVW
+	m_mcu->port_in_cb<0>().set(FUNC(maygay1b_state::mcu_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(maygay1b_state::mcu_port0_w));
+	m_mcu->port_out_cb<1>().set(FUNC(maygay1b_state::mcu_port1_w));
+	m_mcu->port_in_cb<2>().set(FUNC(maygay1b_state::mcu_port2_r));
+	m_mcu->port_out_cb<2>().set(FUNC(maygay1b_state::mcu_port2_w));
+	m_mcu->port_out_cb<3>().set(FUNC(maygay1b_state::mcu_port3_w));
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, M1_DUART_CLOCK)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygay1b_state, duart_irq_handler))

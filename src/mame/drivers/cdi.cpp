@@ -930,39 +930,37 @@ READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 	return machine().rand();
 }
 
-MACHINE_CONFIG_START(cdi_state::quizard1)
+void cdi_state::quizard1(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1)
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+	i8751_device &mcu(I8751(config, "mcu", 8000000));
+	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
+//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cdi_state::quizard2)
+void cdi_state::quizard2(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
-MACHINE_CONFIG_END
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2)
+}
 
-MACHINE_CONFIG_START(cdi_state::quizard3)
+void cdi_state::quizard3(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
-MACHINE_CONFIG_END
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3)
+}
 
-MACHINE_CONFIG_START(cdi_state::quizard4)
+void cdi_state::quizard4(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4)
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
-
-MACHINE_CONFIG_END
-
-
-
-
+	i8751_device &mcu(I8751(config, "mcu", 8000000));
+	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
+//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+}
 
 /*************************
 *        Rom Load        *

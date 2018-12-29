@@ -28,8 +28,8 @@
 class jr200_state : public driver_device
 {
 public:
-	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jr200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_mn1271_ram(*this, "mn1271_ram"),
@@ -49,7 +49,8 @@ public:
 		m_row8(*this, "ROW8"),
 		m_row9(*this, "ROW9"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void jr200(machine_config &config);
 
@@ -552,10 +553,10 @@ MACHINE_CONFIG_START(jr200_state::jr200)
 	MCFG_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr200)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 

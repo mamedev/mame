@@ -146,8 +146,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 
 void tc0091lvc_device::device_add_mconfig(machine_config &config)
 {
-	palette_device &palette(PALETTE(config, "palette", 256));
-	palette.set_format(PALETTE_FORMAT_xBGRBBBBGGGGRRRR_bit0); /* TODO: correct? */
+	PALETTE(config, "palette").set_format(2, &tc0091lvc_device::tc0091lvc_xBGRBBBBGGGGRRRR, 256);
 }
 
 void tc0091lvc_device::device_start()
@@ -183,6 +182,15 @@ device_memory_interface::space_config_vector tc0091lvc_device::memory_space_conf
 	};
 }
 
+
+rgb_t tc0091lvc_device::tc0091lvc_xBGRBBBBGGGGRRRR(uint32_t raw)
+{
+	/* TODO: correct? */
+	u8 const r = ((raw & 0x00f) << 1) | ((raw & 0x1000) >> 12);
+	u8 const g = ((raw & 0x0f0) >> 3) | ((raw & 0x2000) >> 13);
+	u8 const b = ((raw & 0xf00) >> 7) | ((raw & 0x4000) >> 14);
+	return rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+}
 
 void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip )
 {

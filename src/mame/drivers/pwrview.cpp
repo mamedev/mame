@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
@@ -419,7 +420,7 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	m_pit->set_clk<2>(XTAL(16'000'000)/16);
 
 	// floppy disk controller
-	UPD765A(config, "fdc", true, true); // Rockwell R7675P
+	UPD765A(config, "fdc", 8'000'000, true, true); // Rockwell R7675P
 	//fdc.intrq_wr_callback().set("pic1", FUNC(pic8259_device::ir6_w));
 	//fdc.drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
