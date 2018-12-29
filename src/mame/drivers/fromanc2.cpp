@@ -521,12 +521,10 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromanc2);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	PALETTE(config, m_lpalette).set_format(palette_device::GRBx_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::GRBx_555, 2048);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -536,7 +534,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	MCFG_SCREEN_PALETTE(m_lpalette)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -544,7 +542,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	MCFG_SCREEN_PALETTE(m_rpalette)
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc2)
 
@@ -581,12 +579,10 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromancr);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_lpalette).set_format(palette_device::xGRB_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::xGRB_555, 2048);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -596,7 +592,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	MCFG_SCREEN_PALETTE(m_lpalette)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -604,7 +600,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	MCFG_SCREEN_PALETTE(m_rpalette)
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromancr)
 
@@ -642,12 +638,10 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	//m_uart->out_rts_callback().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromancr);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_lpalette).set_format(palette_device::xRGB_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::xRGB_555, 2048);
 
 	config.set_default_layout(layout_dualhsxs);
 

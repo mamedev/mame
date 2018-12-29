@@ -73,13 +73,13 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(kingofb);
-	DECLARE_PALETTE_INIT(kingofb);
+	void kingofb_palette(palette_device &palette);
 	DECLARE_VIDEO_START(ringking);
-	DECLARE_PALETTE_INIT(ringking);
+	void ringking_palette(palette_device &palette);
 	uint32_t screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kingofb_interrupt);
-	void palette_init_common( palette_device &palette, const uint8_t *color_prom, void (kingofb_state::*get_rgb_data)(const uint8_t *, int, int *, int *, int *) );
+	void palette_init_common(palette_device &palette, const uint8_t *color_prom, void (kingofb_state::*get_rgb_data)(const uint8_t *, int, int *, int *, int *));
 	void kingofb_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data );
 	void ringking_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data );
 	void kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

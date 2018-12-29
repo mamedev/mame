@@ -188,7 +188,7 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0010, "Pot Wheel" ) // Preliminary
 	PORT_DIPSETTING(      0x0008, "Opt Wheel" ) // Preliminary
-    PORT_DIPSETTING(      0x0000, "invalid, breaks game" )   // Time goes to 0 rally fast!
+	PORT_DIPSETTING(      0x0000, "invalid, breaks game" )   // Time goes to 0 rally fast!
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -381,12 +381,11 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 	MCFG_SCREEN_SIZE(0x180, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0x100-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blmbycar)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2000);
 
 	BLMBYCAR_SPRITES(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag("gfxdecode");

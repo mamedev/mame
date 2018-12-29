@@ -2303,11 +2303,9 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
 	}
 }
 
-PALETTE_INIT_MEMBER(pc8801_state, pc8801)
+void pc8801_state::pc8801_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<0x10;i++) //text + bitmap
+	for(int i = 0; i< 0x10; i++) //text + bitmap
 		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
@@ -2370,7 +2368,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	d8255_slave.in_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_r));
 	d8255_slave.out_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, INPUT_LINE_IRQ0);
 
 	#if USE_PROPER_I8214
@@ -2395,11 +2393,10 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
 	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc8801)
-	MCFG_PALETTE_ADD("palette", 0x10)
-	MCFG_PALETTE_INIT_OWNER(pc8801_state, pc8801)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
+	PALETTE(config, m_palette, FUNC(pc8801_state::pc8801_palette), 0x10);
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 

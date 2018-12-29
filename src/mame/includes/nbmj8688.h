@@ -125,12 +125,12 @@ private:
 	DECLARE_WRITE8_MEMBER(barline_output_w);
 
 	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
-	DECLARE_PALETTE_INIT(mbmj8688_12bit);
+	void mbmj8688_12bit(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);
-	DECLARE_PALETTE_INIT(mbmj8688_16bit);
-	DECLARE_PALETTE_INIT(mbmj8688_lcd);
+	void mbmj8688_16bit(palette_device &palette) const;
+	void mbmj8688_lcd(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_8bit);
-	DECLARE_PALETTE_INIT(mbmj8688_8bit);
+	void mbmj8688_8bit(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
 	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit);

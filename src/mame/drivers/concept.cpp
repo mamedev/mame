@@ -225,13 +225,11 @@ void concept_state::concept(machine_config &config)
 	screen.set_palette("palette");
 
 	/* Is the palette black on white or white on black??? */
-	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
 	MM58274C(config, m_mm58274, 0);

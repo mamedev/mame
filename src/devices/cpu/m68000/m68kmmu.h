@@ -1320,17 +1320,6 @@ int m68851_buserror(uint32_t& addr)
 		return true;
 	}
 
-
-	const int ps = (m_mmu_tc >> 16) & 0xf;
-	for(int i = 0; i < MMU_ATC_ENTRIES; i++)
-	{
-		if ((m_mmu_atc_tag[i] & M68K_MMU_ATC_VALID) &&
-				((m_mmu_atc_data[i] >> ps) << (ps -8)) == ((addr >> ps) << (ps == 8)))
-		{
-			MMULOG("%s: set B in ATC entry %d\n", __func__, i);
-			m_mmu_atc_data[i] |= M68K_MMU_ATC_BUSERROR;
-		}
-	}
 	addr = m_mmu_last_logical_addr;
 	return false;
 }

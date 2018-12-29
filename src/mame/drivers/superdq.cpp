@@ -34,8 +34,8 @@
 class superdq_state : public driver_device
 {
 public:
-	superdq_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	superdq_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_laserdisc(*this, "laserdisc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -45,6 +45,11 @@ public:
 
 	void superdq(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	uint8_t m_ld_in_latch;
@@ -53,20 +58,19 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_tilemap;
 	int m_color_bank;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	DECLARE_WRITE8_MEMBER(superdq_videoram_w);
 	DECLARE_WRITE8_MEMBER(superdq_io_w);
 	DECLARE_READ8_MEMBER(superdq_ld_r);
 	DECLARE_WRITE8_MEMBER(superdq_ld_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(superdq);
+	void superdq_palette(palette_device &palette) const;
 	uint32_t screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superdq_vblank);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void superdq_io(address_map &map);
 	void superdq_map(address_map &map);
 };
@@ -98,41 +102,39 @@ uint32_t superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(superdq_state, superdq)
+void superdq_state::superdq_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 	static const int resistances[3] = { 820, 390, 200 };
 	double rweights[3], gweights[3], bweights[2];
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
 	compute_resistor_weights(0, 255, -1.0,
 			3,  &resistances[0], rweights, 220, 0,
 			3,  &resistances[0], gweights, 220, 0,
 			2,  &resistances[1], bweights, 220, 0);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < palette.entries(); i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 7) & 0x01;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		r = combine_3_weights(rweights, bit2, bit1, bit0);
+		// red component
+		bit0 = BIT(color_prom[i], 7);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 5);
+		int const r = combine_3_weights(rweights, bit2, bit1, bit0);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 4) & 0x01;
-		bit1 = (color_prom[i] >> 3) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = combine_3_weights(gweights, bit2, bit1, bit0);
+		// green component
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 3);
+		bit2 = BIT(color_prom[i], 2);
+		int const g = combine_3_weights(gweights, bit2, bit1, bit0);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 1) & 0x01;
-		bit1 = (color_prom[i] >> 0) & 0x01;
-		b = combine_2_weights(bweights, bit1, bit0);
+		// blue component
+		bit0 = BIT(color_prom[i], 1);
+		bit1 = BIT(color_prom[i], 0);
+		int const b = combine_2_weights(bweights, bit1, bit0);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -345,21 +347,19 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, superdq_state, screen_update_superdq)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette);
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superdq)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(superdq_state, superdq)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superdq);
+	PALETTE(config, m_palette, FUNC(superdq_state::superdq_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("snsnd", SN76496, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
+	SN76496(config, "snsnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "lspeaker", 0.8);
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

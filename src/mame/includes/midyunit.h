@@ -94,7 +94,7 @@ private:
 		TIMER_AUTOERASE_LINE
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<palette_device> m_palette;

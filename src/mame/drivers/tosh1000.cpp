@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 
-	MCFG_TOSH1000_BRAM_ADD("bram")
+	TOSH1000_BRAM(config, m_bram, 0);
 MACHINE_CONFIG_END
 
 

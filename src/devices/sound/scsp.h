@@ -15,29 +15,17 @@
 				// driver code indicates should be 4, but sounds distorted then
 
 
-#define MCFG_SCSP_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCSP_EXTS_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
-
-
 class scsp_device : public device_t,
 	public device_sound_interface,
 	public device_rom_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP incorrections, etc
+
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 22'579'200);
 
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_exts_callback(Object &&cb) { return m_exts_cb.set_callback(std::forward<Object>(cb)); }
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto main_irq_cb() { return m_main_irq_cb.bind(); }
-	auto exts_cb() { return m_exts_cb.bind(); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
@@ -50,6 +38,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
 	virtual void rom_bank_updated() override;
@@ -106,7 +95,6 @@ private:
 
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
-	devcb_read16       m_exts_cb;
 
 	union
 	{
@@ -162,6 +150,8 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
+	stream_sample_t *m_exts0;
+	stream_sample_t *m_exts1;
 
 	int m_length;
 
@@ -183,7 +173,6 @@ private:
 	TIMER_CALLBACK_MEMBER( timerC_cb );
 	int Get_AR(int base, int R);
 	int Get_DR(int base, int R);
-	int Get_RR(int base, int R);
 	void Compute_EG(SCSP_SLOT *slot);
 	int EG_Update(SCSP_SLOT *slot);
 	uint32_t Step(SCSP_SLOT *slot);

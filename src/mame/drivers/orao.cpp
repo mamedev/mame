@@ -185,7 +185,7 @@ MACHINE_CONFIG_START(orao_state::orao)
 	MCFG_SCREEN_UPDATE_DRIVER(orao_state, screen_update_orao)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* audio hardware */

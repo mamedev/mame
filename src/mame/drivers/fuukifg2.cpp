@@ -461,14 +461,12 @@ MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki16_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki16)
-	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_fuuki16)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	MCFG_DEVICE_ADD("fuukivid", FUUKI_VIDEO, 0)
-	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
+	FUUKI_VIDEO(config, m_fuukivid, 0, m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

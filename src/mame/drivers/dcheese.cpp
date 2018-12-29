@@ -53,8 +53,7 @@
 
 void dcheese_state::update_irq_state()
 {
-	int i;
-	for (i = 1; i < 5; i++)
+	for (int i = 1; i < 5; i++)
 		m_maincpu->set_input_line(i, m_irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -398,8 +397,7 @@ MACHINE_CONFIG_START(dcheese_state::dcheese)
 	MCFG_SCREEN_UPDATE_DRIVER(dcheese_state, screen_update_dcheese)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 65536)
-	MCFG_PALETTE_INIT_OWNER(dcheese_state, dcheese)
+	PALETTE(config, "palette", FUNC(dcheese_state::dcheese_palette), 65536);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

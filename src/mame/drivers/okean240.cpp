@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(okean240_state::okean240t)
 	MCFG_SCREEN_UPDATE_DRIVER(okean240_state, screen_update_okean240)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(okean240_state::okean240a)
@@ -574,8 +574,8 @@ MACHINE_CONFIG_START(okean240_state::okean240)
 	MCFG_DEVICE_REMOVE("uart")
 	MCFG_DEVICE_REMOVE("rs232")
 	subdevice<pit8253_device>("pit")->out_handler<1>().set_nop();
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(okean240_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(okean240_state::kbd_put));
 MACHINE_CONFIG_END
 
 /* ROM definition */

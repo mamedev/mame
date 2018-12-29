@@ -79,26 +79,26 @@ private:
 
 
 //class bbc_procyon_device :
-//	public device_t,
-//	public device_bbc_1mhzbus_interface
+//  public device_t,
+//  public device_bbc_1mhzbus_interface
 //{
 //public:
-//	// construction/destruction
-//	bbc_procyon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+//  // construction/destruction
+//  bbc_procyon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 //
 //protected:
-//	// device-level overrides
-//	virtual void device_start() override;
+//  // device-level overrides
+//  virtual void device_start() override;
 //
-//	// optional information overrides
-//	virtual void device_add_mconfig(machine_config &config) override;
-//	virtual const tiny_rom_entry *device_rom_region() const override;
+//  // optional information overrides
+//  virtual void device_add_mconfig(machine_config &config) override;
+//  virtual const tiny_rom_entry *device_rom_region() const override;
 //
-//	virtual DECLARE_READ8_MEMBER(fred_r) override;
-//	virtual DECLARE_WRITE8_MEMBER(fred_w) override;
+//  virtual DECLARE_READ8_MEMBER(fred_r) override;
+//  virtual DECLARE_WRITE8_MEMBER(fred_w) override;
 //
 //private:
-//	required_device<ieee488_device> m_ieee;
+//  required_device<ieee488_device> m_ieee;
 //};
 
 

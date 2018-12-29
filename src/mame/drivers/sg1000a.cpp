@@ -494,14 +494,15 @@ MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sg1000a_state::sg1000ax)
+void sg1000a_state::sg1000ax(machine_config &config)
+{
 	sg1000a(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5033, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5033_device &maincpu(SEGA_315_5033(config.replace(), m_maincpu, XTAL(3'579'545)));
+	maincpu.set_addrmap(AS_PROGRAM, &sg1000a_state::program_map);
+	maincpu.set_addrmap(AS_IO, &sg1000a_state::io_map);
+	maincpu.set_addrmap(AS_OPCODES, &sg1000a_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 MACHINE_CONFIG_START(sg1000a_state::sderbys)
 	sg1000a(config);

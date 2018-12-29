@@ -38,7 +38,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<gaelco_wrally_sprites_device> m_sprites;
-	
+
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_shared_ptr_array<uint16_t, 2> m_scroll;

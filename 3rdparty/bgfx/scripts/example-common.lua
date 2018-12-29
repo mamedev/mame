@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2018 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
@@ -30,8 +30,8 @@ project ("example-common")
 	files {
 		path.join(BGFX_DIR, "3rdparty/ib-compress/**.cpp"),
 		path.join(BGFX_DIR, "3rdparty/ib-compress/**.h"),
-		path.join(BGFX_DIR, "3rdparty/ocornut-imgui/**.cpp"),
-		path.join(BGFX_DIR, "3rdparty/ocornut-imgui/**.h"),
+		path.join(BGFX_DIR, "3rdparty/dear-imgui/**.cpp"),
+		path.join(BGFX_DIR, "3rdparty/dear-imgui/**.h"),
 		path.join(BGFX_DIR, "examples/common/**.cpp"),
 		path.join(BGFX_DIR, "examples/common/**.cpp"),
 		path.join(BGFX_DIR, "examples/common/**.h"),
@@ -90,7 +90,7 @@ project ("example-common")
 			path.join(BGFX_DIR, "examples/common/**.mm"),
 		}
 
-	configuration { "winphone8* or winstore8* or durango"}
+	configuration { "winstore* or durango"}
 		files {
 			path.join(BGFX_DIR, "examples/common/**.cx"),
 		}

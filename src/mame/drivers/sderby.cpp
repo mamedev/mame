@@ -613,11 +613,10 @@ MACHINE_CONFIG_START(sderby_state::sderby)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -638,11 +637,10 @@ MACHINE_CONFIG_START(sderby_state::sderbya)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -663,11 +661,10 @@ MACHINE_CONFIG_START(sderby_state::luckboom)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -688,11 +685,10 @@ MACHINE_CONFIG_START(sderby_state::spacewin)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
@@ -713,11 +709,10 @@ MACHINE_CONFIG_START(sderby_state::shinygld)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 verified */
@@ -738,11 +733,10 @@ MACHINE_CONFIG_START(sderby_state::pmroulet)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 0x1000);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */

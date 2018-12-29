@@ -205,7 +205,7 @@ void capr1_state::cspin2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &capr1_state::cspin2_map);
 	//m_maincpu->set_periodic_int(FUNC(capr1_state::nmi_line_pulse), attotime::from_hz(20));
 
-	te7750_device &te7750(TE7750(config, "te7750", 0)); // guess
+	te7750_device &te7750(TE7750(config, "te7750")); // guess
 	te7750.ios_cb().set_constant(7);
 	te7750.in_port1_cb().set_ioport("IN1");
 	te7750.in_port2_cb().set_ioport("IN2");

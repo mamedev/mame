@@ -96,7 +96,7 @@ private:
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart8251;
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic8259;
@@ -465,13 +465,14 @@ static const z80_daisy_config k7070_daisy_chain[] =
  *
  * (framebuffer and terminal should be slot devices.)
  */
-MACHINE_CONFIG_START(a7150_state::a7150)
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(9'832'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(a7150_mem)
-	MCFG_DEVICE_IO_MAP(a7150_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
-	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
+void a7150_state::a7150(machine_config &config)
+{
+	I8086(config, m_maincpu, XTAL(9'832'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
+	m_maincpu->set_addrmap(AS_IO, &a7150_state::a7150_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
 	i8087.set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
@@ -555,12 +556,14 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, "loopback"));
 	rs232b.rxd_handler().set(Z80SIO_TAG, FUNC(z80sio_device::rxb_w));
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS( XTAL(16'000'000), 737,0,640, 431,0,400 )
-	MCFG_SCREEN_UPDATE_DRIVER(a7150_state, screen_update_k7072)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw(XTAL(16'000'000), 737,0,640, 431,0,400);
+	screen.set_screen_update(FUNC(a7150_state::screen_update_k7072));
+	screen.set_palette(m_palette);
+
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+}
 
 /* ROM definition */
 ROM_START( a7150 )

@@ -253,11 +253,10 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_timelimt)
-	MCFG_PALETTE_ADD("palette", 64+32)
-	MCFG_PALETTE_INIT_OWNER(timelimt_state, timelimt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_timelimt);
+	PALETTE(config, m_palette, FUNC(timelimt_state::timelimt_palette), 64+32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

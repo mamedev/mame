@@ -48,19 +48,20 @@ DEFINE_DEVICE_TYPE(DECOBSMT, decobsmt_device, "decobsmt", "Data East/Sega/Stern 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(decobsmt_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6809_TAG, MC6809E, XTAL(24'000'000) / 12) // 68B09E U6 (E & Q = 2 MHz according to manual)
-	MCFG_DEVICE_PROGRAM_MAP(decobsmt_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
+void decobsmt_device::device_add_mconfig(machine_config &config)
+{
+	MC6809E(config, m_ourcpu, XTAL(24'000'000) / 12); // 68B09E U6 (E & Q = 2 MHz according to manual)
+	m_ourcpu->set_addrmap(AS_PROGRAM, &decobsmt_device::decobsmt_map);
+	m_ourcpu->set_periodic_int(FUNC(decobsmt_device::decobsmt_firq_interrupt), attotime::from_hz(489)); /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(BSMT_TAG, BSMT2000, XTAL(24'000'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, bsmt_map)
-	MCFG_BSMT2000_READY_CALLBACK(decobsmt_device, bsmt_ready_callback)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
-MACHINE_CONFIG_END
+	BSMT2000(config, m_bsmt, XTAL(24'000'000));
+	m_bsmt->set_addrmap(0, &decobsmt_device::bsmt_map);
+	m_bsmt->set_ready_callback(FUNC(decobsmt_device::bsmt_ready_callback));
+	m_bsmt->add_route(0, "lspeaker", 2.0);
+	m_bsmt->add_route(1, "rspeaker", 2.0);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

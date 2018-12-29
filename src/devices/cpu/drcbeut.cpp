@@ -475,7 +475,10 @@ void drc_label_list::block_end(drcuml_block &block)
 	// free all of the pending fixup requests
 	label_fixup *fixup;
 	while ((fixup = m_fixup_list.detach_head()) != nullptr)
+	{
+		fixup->~label_fixup();
 		m_cache.dealloc(fixup, sizeof(*fixup));
+	}
 
 	// make sure the label list is clear, and fatalerror if we missed anything
 	reset(true);
@@ -488,16 +491,15 @@ void drc_label_list::block_end(drcuml_block &block)
 //  undefined
 //-------------------------------------------------
 
-drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_delegate callback, void *param)
+drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_delegate const &callback, void *param)
 {
-	label_entry *curlabel = find_or_allocate(label);
+	label_entry *const curlabel = find_or_allocate(label);
 
 	// if no code pointer, request an OOB callback
-	if (curlabel->m_codeptr == nullptr && !callback.isnull())
+	if (!curlabel->m_codeptr && !callback.isnull())
 	{
 		label_fixup *fixup = reinterpret_cast<label_fixup *>(m_cache.alloc(sizeof(*fixup)));
-		fixup->m_callback = callback;
-		fixup->m_label = curlabel;
+		new (fixup) label_fixup{ nullptr, curlabel, callback };
 		m_fixup_list.append(*fixup);
 		m_cache.request_oob_codegen(m_oob_callback_delegate, fixup, param);
 	}

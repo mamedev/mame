@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "i8271.h"
+#include "imagedev/floppy.h"
 
 DEFINE_DEVICE_TYPE(I8271, i8271_device, "i8271", "Intel 8271 FDC")
 

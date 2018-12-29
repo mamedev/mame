@@ -470,10 +470,9 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
+	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 

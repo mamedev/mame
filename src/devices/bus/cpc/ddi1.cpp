@@ -40,19 +40,18 @@ const tiny_rom_entry *cpc_ddi1_device::device_rom_region() const
 }
 
 // device machine config
-MACHINE_CONFIG_START(cpc_ddi1_device::device_add_mconfig)
-	UPD765A(config, m_fdc, true, true);
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
+void cpc_ddi1_device::device_add_mconfig(machine_config &config)
+{
+	UPD765A(config, m_fdc, DERIVED_CLOCK(1, 1), true, true); // pin 50 clock multiplied to 8 MHz, then divided back down through SMC FDC9229BT
+	FLOPPY_CONNECTOR(config, m_connector, ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	// pass-through
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-
-MACHINE_CONFIG_END
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));
+	exp.irq_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::irq_w));
+	exp.nmi_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::nmi_w));
+	exp.romdis_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::romdis_w));  // ROMDIS
+}
 
 
 //**************************************************************************
@@ -73,9 +72,8 @@ cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag,
 
 void cpc_ddi1_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
+	address_space &space = m_slot->cpu().space(AS_IO);
 
 	space.install_write_handler(0xfa7e,0xfa7f,write8_delegate(FUNC(cpc_ddi1_device::motor_w),this));
 	space.install_readwrite_handler(0xfb7e,0xfb7f,read8_delegate(FUNC(cpc_ddi1_device::fdc_r),this),write8_delegate(FUNC(cpc_ddi1_device::fdc_w),this));

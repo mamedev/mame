@@ -48,7 +48,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 
-	DECLARE_PALETTE_INIT(sub);
+	void sub_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_WRITE8_MEMBER(attr_w);
 	DECLARE_WRITE8_MEMBER(vram_w);

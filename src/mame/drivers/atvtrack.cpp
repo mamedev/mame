@@ -571,56 +571,56 @@ INPUT_PORTS_END
 
 #define ATV_CPU_CLOCK XTAL(33'000'000)*6
 
-MACHINE_CONFIG_START(atvtrack_state::atvtrack)
+void atvtrack_state::atvtrack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(1)
-	MCFG_SH4_MD2(0)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(atvtrack_main_map)
-	MCFG_DEVICE_IO_MAP(atvtrack_main_port)
-	MCFG_CPU_FORCE_NO_DRC()
+	SH4LE(config, m_maincpu, ATV_CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 1);
+	m_maincpu->set_md(2, 0);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(ATV_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atvtrack_state::atvtrack_main_map);
+	m_maincpu->set_addrmap(AS_IO, &atvtrack_state::atvtrack_main_port);
+	m_maincpu->set_force_no_drc(true);
 
-	MCFG_DEVICE_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(1)
-	MCFG_SH4_MD2(0)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(atvtrack_sub_map)
-	MCFG_DEVICE_IO_MAP(atvtrack_sub_port)
-	MCFG_CPU_FORCE_NO_DRC()
+	SH4LE(config, m_subcpu, ATV_CPU_CLOCK);
+	m_subcpu->set_md(0, 1);
+	m_subcpu->set_md(1, 1);
+	m_subcpu->set_md(2, 0);
+	m_subcpu->set_md(3, 0);
+	m_subcpu->set_md(4, 0);
+	m_subcpu->set_md(5, 1);
+	m_subcpu->set_md(6, 0);
+	m_subcpu->set_md(7, 1);
+	m_subcpu->set_md(8, 0);
+	m_subcpu->set_sh4_clock(ATV_CPU_CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &atvtrack_state::atvtrack_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &atvtrack_state::atvtrack_sub_port);
+	m_subcpu->set_force_no_drc(true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(atvtrack_state, screen_update_atvtrack)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(atvtrack_state::screen_update_atvtrack));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x1000);
+}
 
-MACHINE_CONFIG_START(smashdrv_state::smashdrv)
+void smashdrv_state::smashdrv(machine_config &config)
+{
 	atvtrack(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(smashdrv_main_map)
-	MCFG_DEVICE_IO_MAP(smashdrv_main_port)
-
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &smashdrv_state::smashdrv_main_map);
+	m_maincpu->set_addrmap(AS_IO, &smashdrv_state::smashdrv_main_port);
+}
 
 
 ROM_START( atvtrack )

@@ -716,14 +716,12 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384,0,256,264,16,240) // 59.18 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	TECMO_SPRITE(config, m_sprgen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

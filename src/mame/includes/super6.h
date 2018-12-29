@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"

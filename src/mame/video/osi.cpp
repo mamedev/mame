@@ -6,7 +6,7 @@
 
 /* Palette Initialization */
 
-PALETTE_INIT_MEMBER(sb2m600_state, osi630)
+void sb2m600_state::osi630_palette(palette_device &palette) const
 {
 	/* black and white */
 	palette.set_pen_color(0, 0x00, 0x00, 0x00); // black
@@ -27,15 +27,13 @@ PALETTE_INIT_MEMBER(sb2m600_state, osi630)
 
 void sb2m600_state::video_start()
 {
-	uint16_t addr;
-
-	/* randomize video memory contents */
-	for (addr = 0; addr < OSI600_VIDEORAM_SIZE; addr++)
+	// randomize video memory contents
+	for (uint16_t addr = 0; addr < OSI600_VIDEORAM_SIZE; addr++)
 		m_video_ram[addr] = machine().rand() & 0xff;
 
-	/* randomize color memory contents */
+	// randomize color memory contents
 	if (m_color_ram)
-		for (addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
+		for (uint16_t addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
 			m_color_ram[addr] = machine().rand() & 0x0f;
 }
 
@@ -43,23 +41,21 @@ void sb2m600_state::video_start()
 
 uint32_t sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, bit, sx;
-
 	if (m_32)
 	{
-		for (y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
 			uint16_t videoram_addr = (y >> 4) * 64;
-			int line = (y >> 1) & 0x07;
+			int const line = (y >> 1) & 0x07;
 			int x = 0;
 
-			for (sx = 0; sx < 64; sx++)
+			for (int sx = 0; sx < 64; sx++)
 			{
 				uint8_t videoram_data = m_video_ram[videoram_addr];
 				uint16_t charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
 				uint8_t charrom_data = m_p_chargen[charrom_addr];
 
-				for (bit = 0; bit < 8; bit++)
+				for (int bit = 0; bit < 8; bit++)
 				{
 					bool color = BIT(charrom_data, 7);
 
@@ -80,19 +76,19 @@ uint32_t sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	}
 	else
 	{
-		for (y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
 			uint16_t videoram_addr = (y >> 3) * 32;
-			int line = y & 0x07;
+			int const line = y & 0x07;
 			int x = 0;
 
-			for (sx = 0; sx < 32; sx++)
+			for (int sx = 0; sx < 32; sx++)
 			{
 				uint8_t videoram_data = m_video_ram[videoram_addr];
-				uint16_t charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
+				uint16_t const charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
 				uint8_t charrom_data = m_p_chargen[charrom_addr];
 
-				for (bit = 0; bit < 8; bit++)
+				for (int bit = 0; bit < 8; bit++)
 				{
 					bool color = BIT(charrom_data, 7);
 
@@ -118,21 +114,19 @@ uint32_t sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, bit, sx;
-
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
 		uint16_t videoram_addr = (y >> 4) * 64;
-		int line = (y >> 1) & 0x07;
+		int const line = (y >> 1) & 0x07;
 		int x = 0;
 
-		for (sx = 0; sx < 64; sx++)
+		for (int sx = 0; sx < 64; sx++)
 		{
 			uint8_t videoram_data = m_video_ram[videoram_addr++];
-			uint16_t charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
+			uint16_t const charrom_addr = ((videoram_data << 3) | line) & 0x7ff;
 			uint8_t charrom_data = m_p_chargen[charrom_addr];
 
-			for (bit = 0; bit < 8; bit++)
+			for (int bit = 0; bit < 8; bit++)
 			{
 				bitmap.pix16(y, x) = BIT(charrom_data, 7);
 				x++;
@@ -154,7 +148,7 @@ MACHINE_CONFIG_START(sb2m600_state::osi600_video)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(uk101_state::uk101_video)
@@ -165,7 +159,7 @@ MACHINE_CONFIG_START(uk101_state::uk101_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sb2m600_state::osi630_video)
@@ -176,6 +170,5 @@ MACHINE_CONFIG_START(sb2m600_state::osi630_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8+2)
-	MCFG_PALETTE_INIT_OWNER(sb2m600_state, osi630)
+	PALETTE(config, "palette", FUNC(sb2m600_state::osi630_palette), 8+2);
 MACHINE_CONFIG_END

@@ -101,7 +101,7 @@ MACHINE_CONFIG_START(c900_state::c900)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c900)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	Z8036(config, "cio", 6'000'000);
 

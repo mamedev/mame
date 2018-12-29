@@ -6,7 +6,9 @@
 #pragma once
 
 #include "audio/m72.h"
+#include "cpu/nec/v25.h"
 #include "emupal.h"
+#include "screen.h"
 
 class m90_state : public driver_device
 {
@@ -22,6 +24,7 @@ public:
 		, m_audio(*this, "m72")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 	{ }
 
 	void m90(machine_config &config);
@@ -50,6 +53,7 @@ private:
 	optional_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	tilemap_t *m_pf_layer[2][2];
 	uint8_t m_last_pf[2];

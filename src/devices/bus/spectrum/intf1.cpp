@@ -39,20 +39,21 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(spectrum_intf1_device::device_add_mconfig)
+void spectrum_intf1_device::device_add_mconfig(machine_config &config)
+{
 	/* rs232 */
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	/* microdrive */
-	MCFG_MICRODRIVE_ADD("mdv1")
-	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE("mdv2", microdrive_image_device, comms_in_w))
-	MCFG_MICRODRIVE_ADD("mdv2")
+	MICRODRIVE(config, m_mdv1, 0);
+	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
+	MICRODRIVE(config, m_mdv2, 0);
 
 	/* passthru */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
-MACHINE_CONFIG_END
+}
 
 const tiny_rom_entry *spectrum_intf1_device::device_rom_region() const
 {

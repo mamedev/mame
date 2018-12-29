@@ -243,7 +243,7 @@ FLOPPY_FORMATS_END
 void fdc37c93x_device::device_add_mconfig(machine_config &config)
 {
 	// floppy disc controller
-	smc37c78_device &fdcdev(SMC37C78(config, floppy_controller_fdcdev));
+	smc37c78_device &fdcdev(SMC37C78(config, floppy_controller_fdcdev, 24'000'000));
 	fdcdev.intrq_wr_callback().set(FUNC(fdc37c93x_device::irq_floppy_w));
 	fdcdev.drq_wr_callback().set(FUNC(fdc37c93x_device::drq_floppy_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats);

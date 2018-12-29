@@ -59,6 +59,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/timer.h"

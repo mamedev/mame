@@ -56,9 +56,11 @@ public:
 
 	void jungleyo(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	/* video-related */
-	virtual void video_start() override;
 	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jungleyo_map(address_map &map);
@@ -124,7 +126,7 @@ MACHINE_CONFIG_START(jungleyo_state::jungleyo)
 	MCFG_DEVICE_PROGRAM_MAP(jungleyo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jungleyo_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jungleyo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_jungleyo);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -134,8 +136,7 @@ MACHINE_CONFIG_START(jungleyo_state::jungleyo)
 	MCFG_SCREEN_UPDATE_DRIVER(jungleyo_state, screen_update_jungleyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

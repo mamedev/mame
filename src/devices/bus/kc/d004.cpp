@@ -152,18 +152,18 @@ void kc_d004_device::device_reset()
 
 void kc_d004_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_cpu, XTAL(8'000'000)/2);
+	Z80(config, m_cpu, 8_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &kc_d004_device::kc_d004_mem);
 	m_cpu->set_addrmap(AS_IO, &kc_d004_device::kc_d004_io);
 	m_cpu->set_daisy_config(kc_d004_daisy_chain);
 
-	z80ctc_device &ctc(Z80CTC(config, Z80CTC_TAG, XTAL(8'000'000)/2));
+	z80ctc_device &ctc(Z80CTC(config, Z80CTC_TAG, 8_MHz_XTAL / 2));
 	ctc.intr_callback().set_inputline(Z80_TAG, 0);
 	ctc.zc_callback<0>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<1>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg2));
 	ctc.zc_callback<2>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg3));
 
-	UPD765A(config, m_fdc, 0);
+	UPD765A(config, m_fdc, 8_MHz_XTAL);
 	m_fdc->set_ready_line_connected(false);
 	m_fdc->set_select_lines_connected(false);
 	m_fdc->intrq_wr_callback().set(FUNC(kc_d004_device::fdc_irq));

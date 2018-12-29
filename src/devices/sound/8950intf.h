@@ -6,21 +6,6 @@
 #pragma once
 
 
-#define MCFG_Y8950_IRQ_HANDLER(cb) \
-	downcast<y8950_device &>(*device).set_irq_handler((DEVCB_##cb));
-
-#define MCFG_Y8950_KEYBOARD_READ_HANDLER(cb) \
-	downcast<y8950_device &>(*device).set_keyboard_read_handler((DEVCB_##cb));
-
-#define MCFG_Y8950_KEYBOARD_WRITE_HANDLER(cb) \
-	downcast<y8950_device &>(*device).set_keyboard_write_handler((DEVCB_##cb));
-
-#define MCFG_Y8950_IO_READ_HANDLER(cb) \
-	downcast<y8950_device &>(*device).set_io_read_handler((DEVCB_##cb));
-
-#define MCFG_Y8950_IO_WRITE_HANDLER(cb) \
-	downcast<y8950_device &>(*device).set_io_write_handler((DEVCB_##cb));
-
 class y8950_device : public device_t,
 	public device_sound_interface,
 	public device_rom_interface
@@ -29,11 +14,11 @@ public:
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_keyboard_read_handler(Object &&cb) { return m_keyboard_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_keyboard_write_handler(Object &&cb) { return m_keyboard_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_io_read_handler(Object &&cb) { return m_io_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_io_write_handler(Object &&cb) { return m_io_write_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_irq_handler.bind(); }
+	auto keyboard_read() { return m_keyboard_read_handler.bind(); }
+	auto keyboard_write() { return m_keyboard_write_handler.bind(); }
+	auto io_read() { return m_io_read_handler.bind(); }
+	auto io_write() { return m_io_write_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

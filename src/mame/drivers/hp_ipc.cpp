@@ -366,6 +366,7 @@ Software to look for
 #include "bus/hp_hil/hil_devices.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/hp_ipc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/mm58167.h"
 #include "machine/ram.h"
@@ -805,7 +806,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
 	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
@@ -823,7 +824,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
 	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 

@@ -127,7 +127,7 @@ private:
 	DECLARE_WRITE8_MEMBER(laserdisc_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dleuro);
+	void dleuro_palette(palette_device &palette) const;
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
 
@@ -203,11 +203,9 @@ static const z80_daisy_config dleuro_daisy_chain[] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dlair_state,dleuro)
+void dlair_state::dleuro_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		palette.set_pen_color(2 * i + 0, rgb_t(0, 0, 0));
 		palette.set_pen_color(2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
@@ -224,14 +222,11 @@ PALETTE_INIT_MEMBER(dlair_state,dleuro)
 
 uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	int x, y;
-
-	/* redraw the overlay */
-	for (y = 0; y < 32; y++)
-		for (x = 0; x < 32; x++)
+	// redraw the overlay
+	for (int y = 0; y < 32; y++)
+		for (int x = 0; x < 32; x++)
 		{
-			uint8_t *base = &videoram[y * 64 + x * 2 + 1];
+			uint8_t const *const base = &m_videoram[y * 64 + x * 2 + 1];
 			// TODO: opaque?
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
@@ -785,15 +780,13 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair)
-	MCFG_PALETTE_ADD("palette", 16)
-
-	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dlair)
+	PALETTE(config, m_palette, FUNC(dlair_state::dleuro_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

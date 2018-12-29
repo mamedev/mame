@@ -5,7 +5,7 @@
 
 /******************************************************************************/
 
-void deco32_state::pri_w(u32 data, u32 mem_mask)
+void deco32_state::pri_w(u32 data)
 {
 	m_pri = data;
 }
@@ -241,31 +241,31 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 	const pen_t *pens = m_deco_ace->pens();
 	const pen_t *pal0 = &pens[gfx0->colorbase()];
 	const pen_t *pal1 = &pens[gfx1->colorbase()];
-	const pen_t *pal2 = &pens[m_gfxdecode->gfx((m_pri&1) ? 1 : 2)->colorbase()];
-	int x,y;
+	const pen_t *pal2 = &pens[m_gfxdecode->gfx((m_pri & 1) ? 1 : 2)->colorbase()];
 	bitmap_ind16& sprite0_mix_bitmap = m_sprgen[0]->get_sprite_temp_bitmap();
 	bitmap_ind16& sprite1_mix_bitmap = m_sprgen[1]->get_sprite_temp_bitmap();
 
-
 	/* Mix sprites into main bitmap, based on priority & alpha */
-	for (y=8; y<248; y++) {
-		uint8_t* tilemapPri=&screen.priority().pix8(y);
-		uint16_t* sprite0=&sprite0_mix_bitmap.pix16(y);
-		uint16_t* sprite1=&sprite1_mix_bitmap.pix16(y);
-		uint32_t* destLine=&bitmap.pix32(y);
-		uint16_t* alphaTilemap=&m_tilemap_alpha_bitmap->pix16(y);
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint8_t* tilemapPri = &screen.priority().pix8(y);
+		uint16_t* sprite0 = &sprite0_mix_bitmap.pix16(y);
+		uint16_t* sprite1 = &sprite1_mix_bitmap.pix16(y);
+		uint32_t* destLine = &bitmap.pix32(y);
+		uint16_t* alphaTilemap = &m_tilemap_alpha_bitmap->pix16(y);
 
-		for (x=0; x<320; x++) {
-			uint16_t priColAlphaPal0=sprite0[x];
-			uint16_t priColAlphaPal1=sprite1[x];
-			uint16_t pri0=(priColAlphaPal0&0x6000)>>13;
-			uint16_t pri1=(priColAlphaPal1&0x6000)>>13;
-			uint16_t col0=((priColAlphaPal0&0x1f00)>>8) % gfx0->colors();
-			uint16_t col1=((priColAlphaPal1&0x0f00)>>8) % gfx1->colors();
-			uint16_t alpha1=priColAlphaPal1&0x8000;
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			uint16_t const priColAlphaPal0 = sprite0[x];
+			uint16_t const priColAlphaPal1 = sprite1[x];
+			uint16_t const pri0 = (priColAlphaPal0 & 0x6000) >> 13;
+			uint16_t const pri1 = (priColAlphaPal1 & 0x6000) >> 13;
+			uint16_t const col0 = (((priColAlphaPal0 & 0x1f00) >> 8) % gfx0->colors()) * gfx0->granularity();
+			uint16_t const col1 = (((priColAlphaPal1 & 0x0f00) >> 8) % gfx1->colors()) * gfx1->granularity();
+			uint16_t const alpha1 = priColAlphaPal1 & 0x8000;
 
 			// Apply sprite bitmap 0 according to priority rules
-			if ((priColAlphaPal0&0xff)!=0)
+			if ((priColAlphaPal0 & 0xff) != 0)
 			{
 				/*
 				    Sprite 0 priority rules:
@@ -275,24 +275,24 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 				    2 = Sprite under top two playfields
 				    3 = Sprite under all playfields
 				*/
-				if ((pri0&0x3)==0 || (pri0&0x3)==1 || ((pri0&0x3)==2 && mixAlphaTilemap)) // Spri0 on top of everything, or under alpha playfield
+				if ((pri0 & 0x3) == 0 || (pri0 & 0x3) == 1 || ((pri0 & 0x3) == 2 && mixAlphaTilemap)) // Spri0 on top of everything, or under alpha playfield
 				{
-					destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->granularity() * col0)];
+					destLine[x] = pal0[(priColAlphaPal0 & 0xff) + col0];
 				}
-				else if ((pri0&0x3)==2) // Spri0 under top playfield
+				else if ((pri0 & 0x3) == 2) // Spri0 under top playfield
 				{
-					if (tilemapPri[x]<4)
-						destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->granularity() * col0)];
+					if (tilemapPri[x] < 4)
+						destLine[x] = pal0[(priColAlphaPal0 & 0xff) + col0];
 				}
 				else // Spri0 under top & middle playfields
 				{
-					if (tilemapPri[x]<2)
-						destLine[x]=pal0[(priColAlphaPal0&0xff) + (gfx0->granularity() * col0)];
+					if (tilemapPri[x] < 2)
+						destLine[x] = pal0[(priColAlphaPal0 & 0xff) + col0];
 				}
 			}
 
 			// Apply sprite bitmap 1 according to priority rules
-			if ((priColAlphaPal1&0xff)!=0)
+			if ((priColAlphaPal1 & 0xff) != 0)
 			{
 				// Apply alpha for this pixel based on Ace setting
 				if (alpha1)
@@ -307,24 +307,24 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 					*/
 
 					/* Alpha values are tied to ACE ram... */
-					//int alpha=m_deco_ace->get_alpha(((priColAlphaPal1&0xf0)>>4)/2);
-					//if (alpha<0)
-					//  alpha=0;
+					//int alpha = m_deco_ace->get_alpha(((priColAlphaPal1 & 0xf0) >> 4) / 2);
+					//if (alpha < 0)
+					//  alpha = 0;
 
 					/* I don't really understand how object ACE ram is really hooked up,
 					    the only obvious place in Night Slashers is the stagecoach in level 2 */
 
-					if (pri1==0 && (((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0 && (pri0&0x3)!=1 && (pri0&0x3)!=2))))
+					if (pri1 == 0 && (((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1 && (pri0 & 0x3) != 2))))
 					{
-						if ((m_pri&1)==0 || ((m_pri&1)==1 && tilemapPri[x]<4) || ((m_pri&1)==1 && mixAlphaTilemap))
-							destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
+						if ((m_pri & 1) == 0 || ((m_pri & 1) == 1 && tilemapPri[x] < 4) || ((m_pri & 1) == 1 && mixAlphaTilemap))
+							destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
 					}
-					else if (pri1==1 && ((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0 && (pri0&0x3)!=1 && (pri0&0x3)!=2)))
-						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
-					else if (pri1==2)// TOdo
-						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
-					else if (pri1==3)// TOdo
-						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)], 0x80);
+					else if (pri1 == 1 && ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0 && (pri0 & 0x3) != 1 && (pri0 & 0x3) != 2)))
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
+					else if (pri1 == 2) // TOdo
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
+					else if (pri1 == 3) // TOdo
+						destLine[x] = alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1 & 0xff) + col1], 0x80);
 				}
 				else
 				{
@@ -333,33 +333,33 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 
 					    Pri 0 - Under sprite 0 pri 0, over all tilemaps
 					*/
-					if (pri1==0 && ((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0)))
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
-					else if (pri1==1) // todo
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
-					else if (pri1==2) // todo
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
-					else if (pri1==3) // todo
-						destLine[x]=pal1[(priColAlphaPal1&0xff) + (gfx1->granularity() * col1)];
+					if (pri1 == 0 && ((priColAlphaPal0 & 0xff) == 0 || ((pri0 & 0x3) != 0)))
+						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
+					else if (pri1 == 1) // todo
+						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
+					else if (pri1 == 2) // todo
+						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
+					else if (pri1 == 3) // todo
+						destLine[x] = pal1[(priColAlphaPal1 & 0xff) + col1];
 				}
 			}
 
 			/* Optionally mix in alpha tilemap */
 			if (mixAlphaTilemap)
 			{
-				uint16_t p=alphaTilemap[x];
-				if (p&0xf)
+				uint16_t p = alphaTilemap[x];
+				if (p & 0xf)
 				{
 					/* Alpha tilemap under top two sprite 0 priorities */
-					if (((priColAlphaPal0&0xff)==0 || (pri0&0x3)==2 || (pri0&0x3)==3)
-						&& ((priColAlphaPal1&0xff)==0 || (pri1&0x3)==2 || (pri1&0x3)==3 || alpha1))
+					if (((priColAlphaPal0 & 0xff) == 0 || (pri0 & 0x3) == 2 || (pri0 & 0x3) == 3)
+						&& ((priColAlphaPal1 & 0xff) == 0 || (pri1 & 0x3) == 2 || (pri1 & 0x3) == 3 || alpha1))
 					{
 						/* Alpha values are tied to ACE ram */
-						int alpha=m_deco_ace->get_alpha(0x17 + (((p&0xf0)>>4)/2));
-						if (alpha<0)
-							alpha=0;
+						int alpha = m_deco_ace->get_alpha(0x17 + (((p & 0xf0) >> 4) / 2));
+						if (alpha < 0)
+							alpha = 0;
 
-						destLine[x]=alpha_blend_r32(destLine[x], pal2[p], alpha);
+						destLine[x] = alpha_blend_r32(destLine[x], pal2[p], alpha);
 					}
 				}
 			}

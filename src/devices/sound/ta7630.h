@@ -11,16 +11,6 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TA7630_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), TA7630, (0))
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -32,7 +22,7 @@ class ta7630_device : public device_t
 {
 public:
 	// construction/destruction
-	ta7630_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ta7630_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// filter setters
 	void set_device_volume(device_sound_interface *device,uint8_t value);

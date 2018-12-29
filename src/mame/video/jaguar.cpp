@@ -137,7 +137,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/jaguar.h"

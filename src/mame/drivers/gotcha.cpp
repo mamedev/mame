@@ -280,15 +280,14 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
 	screen.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotcha)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gotcha);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 768);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(1)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, -1) // aligned to 2nd instruction screen in attract
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(1);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, -1); // aligned to 2nd instruction screen in attract
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

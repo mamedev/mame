@@ -42,12 +42,12 @@ ROM_START(ieee488)
 ROM_END
 
 //ROM_START(procyon)
-//	ROM_REGION(0x2000, "exp_rom", 0)
-//	ROM_DEFAULT_BIOS("ieee198")
-//	ROM_SYSTEM_BIOS(0, "ieee198", "IEEE 1.98")
-//	ROMX_LOAD("ieee-1.98.rom", 0x0000, 0x2000, CRC(c2bbe17b) SHA1(96930b54d987dd1e4a87f546f7cd65fc1f0b9578), ROM_BIOS(0))
-//	ROM_SYSTEM_BIOS(1, "ieee192", "IEEE 1.92")
-//	ROMX_LOAD("ieee-1.92.rom", 0x0000, 0x2000, CRC(87e5f701) SHA1(673eab99031ca88aa90e6deade39b653f8c6b9da), ROM_BIOS(1))
+//  ROM_REGION(0x2000, "exp_rom", 0)
+//  ROM_DEFAULT_BIOS("ieee198")
+//  ROM_SYSTEM_BIOS(0, "ieee198", "IEEE 1.98")
+//  ROMX_LOAD("ieee-1.98.rom", 0x0000, 0x2000, CRC(c2bbe17b) SHA1(96930b54d987dd1e4a87f546f7cd65fc1f0b9578), ROM_BIOS(0))
+//  ROM_SYSTEM_BIOS(1, "ieee192", "IEEE 1.92")
+//  ROMX_LOAD("ieee-1.92.rom", 0x0000, 0x2000, CRC(87e5f701) SHA1(673eab99031ca88aa90e6deade39b653f8c6b9da), ROM_BIOS(1))
 //ROM_END
 
 //-------------------------------------------------
@@ -78,7 +78,7 @@ MACHINE_CONFIG_START(bbc_ieee488_device::device_add_mconfig)
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_tms9914, tms9914_device, ren_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_dev", 0, cbm_ieee488_devices, nullptr)
 
-	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
 MACHINE_CONFIG_END
@@ -137,7 +137,7 @@ const tiny_rom_entry *bbc_ieee488_device::device_rom_region() const
 
 //const tiny_rom_entry *bbc_procyon_device::device_rom_region() const
 //{
-//	return ROM_NAME(procyon);
+//  return ROM_NAME(procyon);
 //}
 
 //**************************************************************************
@@ -166,9 +166,9 @@ bbc_b488_device::bbc_b488_device(const machine_config &mconfig, const char *tag,
 }
 
 //bbc_procyon_device::bbc_procyon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//	: device_t(mconfig, BBC_PROCYON, tag, owner, clock)
-//	, device_bbc_1mhzbus_interface(mconfig, *this)
-//	, m_ieee(*this, IEEE488_TAG)
+//  : device_t(mconfig, BBC_PROCYON, tag, owner, clock)
+//  , device_bbc_1mhzbus_interface(mconfig, *this)
+//  , m_ieee(*this, IEEE488_TAG)
 //{
 //}
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(bbc_b488_device::fred_w)
 
 	//if (offset >= 0x20 && offset < 0x28)
 	//{
-	//	data = mc68488_device->reg8_r(space, offset & 0x07);
+	//  data = mc68488_device->reg8_r(space, offset & 0x07);
 	//}
 
 	//return data;
@@ -268,6 +268,6 @@ WRITE8_MEMBER(bbc_b488_device::fred_w)
 //{
 	//if (offset >= 0x20 && offset < 0x28)
 	//{
-	//	mc68488_device->reg8_w(space, offset & 0x07, data);
+	//  mc68488_device->reg8_w(space, offset & 0x07, data);
 	//}
 //}

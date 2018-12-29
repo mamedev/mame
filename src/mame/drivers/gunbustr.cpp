@@ -44,13 +44,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gunbustr.h"
+
 #include "audio/taito_en.h"
 #include "machine/taitoio.h"
-#include "includes/gunbustr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
+
 #include "screen.h"
 
 
@@ -254,22 +256,21 @@ MACHINE_CONFIG_START(gunbustr_state::gunbustr)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunbustr)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunbustr);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
-	MCFG_TC0480SCP_OFFSETS(0x20, 0x07)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
-	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_offsets(0x20, 0x07);
+	m_tc0480scp->set_offsets_tx(-1, -1);
+	m_tc0480scp->set_offsets_flip(-1, 0);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
+	TAITO_EN(config, "taito_en", 0);
 MACHINE_CONFIG_END
 
 /***************************************************************************/

@@ -31,14 +31,12 @@ tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const ch
 
 
 // machine configs
-MACHINE_CONFIG_START(tms1000c_cpu_device::device_add_mconfig)
-
+void tms1000c_cpu_device::device_add_mconfig(machine_config &config)
+{
 	// microinstructions PLA, output PLA
-	MCFG_PLA_ADD("mpla", 8, 16, 32)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-	MCFG_PLA_ADD("opla", 5, 8, 32)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-MACHINE_CONFIG_END
+	PLA(config, "mpla", 8, 16, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
+}
 
 
 // microinstructions decode (different order, no active-negative)

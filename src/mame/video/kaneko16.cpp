@@ -102,17 +102,6 @@ uint32_t kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_in
 
 /* Berlwall and Gals Panic have an additional hi-color layers */
 
-PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
-{
-	int i;
-
-	/* first 2048 colors are dynamic */
-
-	/* initialize 555 RGB lookup */
-	for (i = 0; i < 32768; i++)
-		palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
-}
-
 VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 {
 	uint8_t *RAM  =   memregion("gfx3")->base();

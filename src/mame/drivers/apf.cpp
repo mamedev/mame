@@ -73,6 +73,7 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "formats/apf_apt.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

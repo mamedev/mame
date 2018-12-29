@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1119,7 +1119,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

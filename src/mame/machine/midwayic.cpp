@@ -249,14 +249,15 @@ WRITE8_MEMBER(midway_serial_pic_emu_device::write_c)
 //  printf("%s: write_c %02x\n", machine().describe_context().c_str(), data);
 }
 
-MACHINE_CONFIG_START(midway_serial_pic_emu_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pic", PIC16C57, 12000000)    /* ? Mhz */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, midway_serial_pic_emu_device, write_a))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, midway_serial_pic_emu_device, read_b))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, midway_serial_pic_emu_device, write_b))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, midway_serial_pic_emu_device, read_c))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, midway_serial_pic_emu_device, write_c))
-MACHINE_CONFIG_END
+void midway_serial_pic_emu_device::device_add_mconfig(machine_config &config)
+{
+	pic16c57_device &pic(PIC16C57(config, "pic", 12000000));    /* ? Mhz */
+	pic.write_a().set(FUNC(midway_serial_pic_emu_device::write_a));
+	pic.read_b().set(FUNC(midway_serial_pic_emu_device::read_b));
+	pic.write_b().set(FUNC(midway_serial_pic_emu_device::write_b));
+	pic.read_c().set(FUNC(midway_serial_pic_emu_device::read_c));
+	pic.write_c().set(FUNC(midway_serial_pic_emu_device::write_c));
+}
 
 
 /*************************************

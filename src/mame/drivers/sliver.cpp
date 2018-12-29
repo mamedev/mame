@@ -111,7 +111,7 @@ private:
 	int m_tmp_counter;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8051_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -523,10 +523,10 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("obj_actel", sliver_state, obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
-	MCFG_DEVICE_ADD("audiocpu", I8051, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
-	MCFG_DEVICE_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sliver_state, oki_setbank))
+	I8051(config, m_audiocpu, 8000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sliver_state::soundmem_prg);
+	m_audiocpu->set_addrmap(AS_IO, &sliver_state::soundmem_io);
+	m_audiocpu->port_out_cb<1>().set(FUNC(sliver_state::oki_setbank));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

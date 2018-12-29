@@ -87,6 +87,7 @@ using util::BIT;
 #include "cpu/mcs40/mcs40dasm.h"
 #include "cpu/mcs48/mcs48dsm.h"
 #include "cpu/mcs51/mcs51dasm.h"
+#include "cpu/mcs51/axc51-core_dasm.h"
 #include "cpu/mcs96/i8x9xd.h"
 #include "cpu/mcs96/i8xc196d.h"
 #include "cpu/melps4/melps4d.h"
@@ -315,6 +316,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "arm7thumbb",      be,  0, []() -> util::disasm_interface * { arm7_unidasm.t_flag = true; return new arm7_disassembler(&arm7_unidasm); } },
 	{ "asap",            le,  0, []() -> util::disasm_interface * { return new asap_disassembler; } },
 	{ "avr8",            le,  0, []() -> util::disasm_interface * { return new avr8_disassembler; } },
+	{ "axc51core",       le,  0, []() -> util::disasm_interface * { return new axc51core_disassembler; } },
 	{ "capricorn",       le,  0, []() -> util::disasm_interface * { return new capricorn_disassembler; } },
 	{ "ccpu",            le,  0, []() -> util::disasm_interface * { return new ccpu_disassembler; } },
 	{ "cdp1801",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1801); } },

@@ -177,8 +177,8 @@ private:
 	DECLARE_MACHINE_RESET(schaser_sh);
 	DECLARE_MACHINE_START(claybust);
 
-	DECLARE_PALETTE_INIT(rollingc);
-	DECLARE_PALETTE_INIT(sflush);
+	void rollingc_palette(palette_device &palette) const;
+	void sflush_palette(palette_device &palette) const;
 
 	uint32_t screen_update_invadpt2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

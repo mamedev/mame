@@ -370,17 +370,18 @@ void segajw_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(segajw_state::segajw)
+void segajw_state::segajw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,8000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(segajw_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segajw_state, irq4_line_hold)
+	M68000(config, m_maincpu, 8000000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segajw_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(segajw_audiocpu_map)
-	MCFG_DEVICE_IO_MAP(segajw_audiocpu_io_map)
+	Z80(config, m_audiocpu, 4000000); // unknown clock
+	m_audiocpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_audiocpu_map);
+	m_audiocpu->set_addrmap(AS_IO, &segajw_state::segajw_audiocpu_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2000))
+	config.m_minimum_quantum = attotime::from_hz(2000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
@@ -399,19 +400,20 @@ MACHINE_CONFIG_START(segajw_state::segajw)
 	io1c.out_pg_callback().set(FUNC(segajw_state::coinlockout_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_SIZE(720, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 448-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	screen.set_size(720, 480);
+	screen.set_visarea(0, 720-1, 0, 448-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
-	MCFG_HD63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
+	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));
+	hd63484.set_addrmap(0, &segajw_state::segajw_hd63484_map); // unknown clock
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -421,10 +423,10 @@ MACHINE_CONFIG_START(segajw_state::segajw)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 8000000)   // unknown clock
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 5))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 8000000));   // unknown clock
+	ymsnd.irq_handler().set_inputline("maincpu", 5);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /***************************************************************************
 

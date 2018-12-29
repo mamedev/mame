@@ -69,7 +69,6 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
 
 #include "emu.h"
 #include "keytro.h"
-#include "cpu/mcs51/mcs51.h"
 
 
 /***************************************************************************
@@ -421,17 +420,18 @@ void pc_kbd_keytronic_pc3270_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc_kbd_keytronic_pc3270_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("kb_keytr", I8051, 11060250)
-	MCFG_DEVICE_PROGRAM_MAP(keytronic_pc3270_program)
-	MCFG_DEVICE_IO_MAP(keytronic_pc3270_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, pc_kbd_keytronic_pc3270_device, p1_read))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, pc_kbd_keytronic_pc3270_device, p1_write))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, pc_kbd_keytronic_pc3270_device, p2_read))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, pc_kbd_keytronic_pc3270_device, p2_write))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, pc_kbd_keytronic_pc3270_device, p3_read))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, pc_kbd_keytronic_pc3270_device, p3_write))
-MACHINE_CONFIG_END
+void pc_kbd_keytronic_pc3270_device::device_add_mconfig(machine_config &config)
+{
+	I8051(config, m_cpu, 11060250);
+	m_cpu->set_addrmap(AS_PROGRAM, &pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program);
+	m_cpu->set_addrmap(AS_IO, &pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io);
+	m_cpu->port_in_cb<1>().set(FUNC(pc_kbd_keytronic_pc3270_device::p1_read));
+	m_cpu->port_out_cb<1>().set(FUNC(pc_kbd_keytronic_pc3270_device::p1_write));
+	m_cpu->port_in_cb<2>().set(FUNC(pc_kbd_keytronic_pc3270_device::p2_read));
+	m_cpu->port_out_cb<2>().set(FUNC(pc_kbd_keytronic_pc3270_device::p2_write));
+	m_cpu->port_in_cb<3>().set(FUNC(pc_kbd_keytronic_pc3270_device::p3_read));
+	m_cpu->port_out_cb<3>().set(FUNC(pc_kbd_keytronic_pc3270_device::p3_write));
+}
 
 
 ioport_constructor pc_kbd_keytronic_pc3270_device::device_input_ports() const

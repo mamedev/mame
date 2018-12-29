@@ -38,13 +38,13 @@
 class gameking_state : public driver_device
 {
 public:
-	gameking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gameking_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_io_joy(*this, "JOY"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void gameking(machine_config &config);
 	void gameking3(machine_config &config);
@@ -52,10 +52,12 @@ public:
 
 	void init_gameking();
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(gameking);
+
+private:
+	void gameking_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(lcd_r);
@@ -181,18 +183,17 @@ static INPUT_PORTS_START( gameking )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
 INPUT_PORTS_END
 
-static const unsigned char gameking_palette[] =
+static constexpr rgb_t gameking_pens[] =
 {
-	255, 255, 255,
-	127, 127, 127,
-	63, 63, 63,
-	0, 0, 0
+	{ 255, 255, 255 },
+	{ 127, 127, 127 },
+	{  63,  63,  63 },
+	{   0,   0,   0 }
 };
 
-PALETTE_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::gameking_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(gameking_palette) / 3; i++)
-		palette.set_pen_color(i, gameking_palette[i*3], gameking_palette[i*3+1], gameking_palette[i*3+2]);
+	palette.set_pen_colors(0, gameking_pens);
 }
 
 
@@ -297,10 +298,9 @@ MACHINE_CONFIG_START(gameking_state::gameking)
 	MCFG_SCREEN_SIZE(48, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48-1, 0, 32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gameking_state, screen_update_gameking)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gameking_palette) * 3)
-	MCFG_PALETTE_INIT_OWNER(gameking_state, gameking )
+	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gameking_cart")

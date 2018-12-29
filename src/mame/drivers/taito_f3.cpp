@@ -476,8 +476,8 @@ void taito_f3_state::f3(machine_config &config)
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_taito_f3);
-	PALETTE(config, m_palette, 0x2000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_f3);
+	PALETTE(config, m_palette).set_entries(0x2000);
 
 	/* sound hardware */
 	TAITO_EN(config, m_taito_en, 0);
@@ -569,8 +569,8 @@ void taito_f3_state::bubsympb(machine_config &config)
 	m_screen->set_screen_update(FUNC(taito_f3_state::screen_update_f3));
 	m_screen->screen_vblank().set(FUNC(taito_f3_state::screen_vblank_f3));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_bubsympb);
-	PALETTE(config, m_palette, 0x2000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bubsympb);
+	PALETTE(config, m_palette).set_entries(0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

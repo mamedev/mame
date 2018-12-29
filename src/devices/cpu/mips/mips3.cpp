@@ -80,7 +80,7 @@
 #define IS_FR1      (SR & SR_FR)
 
 /* size of the execution code cache */
-#define DRC_CACHE_SIZE				(32 * 1024 * 1024)
+#define DRC_CACHE_SIZE              (32 * 1024 * 1024)
 
 
 

@@ -380,11 +380,10 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 20*16-1, 0*16, 15*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_oneshot)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oneshot)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_oneshot);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	SPEAKER(config, "mono").front_center();
 

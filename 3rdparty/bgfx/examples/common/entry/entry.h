@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -8,6 +8,7 @@
 
 #include "dbg.h"
 #include <bx/bx.h>
+#include <bx/filepath.h>
 #include <bx/string.h>
 
 namespace bx { struct FileReaderI; struct FileWriterI; struct AllocatorI; }
@@ -252,7 +253,7 @@ namespace entry
 	void setWindowPos(WindowHandle _handle, int32_t _x, int32_t _y);
 	void setWindowSize(WindowHandle _handle, uint32_t _width, uint32_t _height);
 	void setWindowTitle(WindowHandle _handle, const char* _title);
-	void toggleWindowFrame(WindowHandle _handle);
+	void setWindowFlags(WindowHandle _handle, uint32_t _flags, bool _enabled);
 	void toggleFullscreen(WindowHandle _handle);
 	void setMouseLock(WindowHandle _handle, bool _lock);
 	void setCurrentDir(const char* _dir);
@@ -272,6 +273,7 @@ namespace entry
 		uint32_t     m_height;
 		MouseState   m_mouse;
 		void*        m_nwh;
+		bx::FilePath m_dropFile;
 	};
 
 	bool processWindowEvents(WindowState& _state, uint32_t& _debug, uint32_t& _reset);

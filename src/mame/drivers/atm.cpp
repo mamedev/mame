@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(atm_state::atm)
 	MCFG_DEVICE_OPCODES_MAP(atm_switch)
 	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
-	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
+	BETA_DISK(config, m_beta, 0);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atm)
 

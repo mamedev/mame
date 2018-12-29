@@ -3711,76 +3711,79 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segas16b_state::system16b)
-
+void segas16b_state::system16b(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	M68000(config, m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, MASTER_CLOCK_10MHz/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::sound_portmap);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK_10MHz)
-	MCFG_SEGA_315_5195_CPU("maincpu")
-	MCFG_SEGA_315_5195_MAPPER_HANDLER(segas16b_state, memory_mapper)
-	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", 0))
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK_10MHz, m_maincpu);
+	m_mapper->set_mapper(FUNC(segas16b_state::memory_mapper), this);
+	m_mapper->pbf().set_inputline(m_soundcpu, 0);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas16b)
-	MCFG_PALETTE_ADD("palette", 2048*3)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_segas16b);
+	PALETTE(config, "palette").set_entries(2048*3);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2).add_route(ALL_OUTPUTS, "mono", 0.43);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_UPD7759_MD(0)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas16b_state,upd7759_generate_nmi))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->md_w(0);
+	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.48);
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_mc8123)
+void segas16b_state::system16b_mc8123(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_soundcpu, MASTER_CLOCK_10MHz/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::sound_portmap);
+	m_soundcpu->set_addrmap(AS_OPCODES, &segas16b_state::sound_decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1089a)
+void segas16b_state::system16b_fd1089a(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
-	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1089b)
+void segas16b_state::system16b_fd1089b(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
-	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1094)
+void segas16b_state::system16b_fd1094(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
-	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas16b_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+}
 
 void segas16b_state::aceattacb_fd1094(machine_config &config)
 {
@@ -3794,22 +3797,20 @@ void segas16b_state::aceattacb_fd1094(machine_config &config)
 	m_cxdio->in_portb_cb().set_ioport("HANDX2");
 }
 
-
-MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
+void segas16b_state::system16b_i8751(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, i8751_main_cpu_vblank)
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::i8751_main_cpu_vblank));
 
-	MCFG_DEVICE_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SERVICE"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16b_state, spin_68k_w))
+	I8751(config, m_mcu, MASTER_CLOCK_8MHz);
+	m_mcu->set_addrmap(AS_IO, &segas16b_state::mcu_io_map);
+	m_mcu->port_in_cb<1>().set_ioport("SERVICE");
+	m_mcu->port_out_cb<1>().set(FUNC(segas16b_state::spin_68k_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set_inputline(m_mcu, INPUT_LINE_IRQ0);
+}
 
 // same as the above, but with custom Sega ICs
 
@@ -3820,35 +3821,37 @@ void segas16b_state::rom_5797_fragment(machine_config &config)
 	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
 }
 
-MACHINE_CONFIG_START(segas16b_state::system16b_5797)
+void segas16b_state::system16b_5797(machine_config &config)
+{
 	system16b(config);
 	rom_5797_fragment(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_i8751_5797)
+void segas16b_state::system16b_i8751_5797(machine_config &config)
+{
 	system16b_i8751(config);
 	rom_5797_fragment(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1094_5797)
+void segas16b_state::system16b_fd1094_5797(machine_config &config)
+{
 	system16b_fd1094(config);
 	rom_5797_fragment(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_split)
+void segas16b_state::system16b_split(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system16b_bootleg_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map_x)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_bootleg_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas16b_state::decrypted_opcodes_map_x);
 
-	MCFG_DEVICE_REMOVE("mapper")
+	config.device_remove("mapper");
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
-	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::bootleg_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-MACHINE_CONFIG_END
+}
 
 void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
 {
@@ -3876,44 +3879,39 @@ void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pa
 //  printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
 }
 
-MACHINE_CONFIG_START(segas16b_state::fpointbl)
+void segas16b_state::fpointbl(machine_config &config)
+{
 	system16b(config);
 
-	MCFG_DEVICE_REMOVE("mapper")
-	MCFG_DEVICE_REMOVE("sprites")
+	config.device_remove("mapper");
+	config.device_remove("sprites");
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fpointbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::fpointbl_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(fpointbl_sound_map)
-	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::fpointbl_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::bootleg_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
-	MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(-2) // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(75); // these align the pieces with the playfield
+	m_sprites->set_local_originy(-2); // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
-	MCFG_DEVICE_MODIFY("segaic16vid")
-	MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB(segas16b_state, tilemap_16b_fpointbl_fill_latch)
+	m_segaic16vid->set_pagelatch_cb(FUNC(segas16b_state::tilemap_16b_fpointbl_fill_latch), this);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(segas16b_state::fpointbla)
+void segas16b_state::fpointbla(machine_config &config)
+{
 	fpointbl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(map_fpointbla)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::map_fpointbla);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas16b_state::decrypted_opcodes_map_fpointbla);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
 
-	MCFG_DEVICE_MODIFY("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
-	MACHINE_CONFIG_END
+	m_sprites->set_local_originx(60); // these align the pieces with the playfield
+}
 
 MACHINE_CONFIG_START(segas16b_state::lockonph)
 
@@ -3938,8 +3936,8 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -3964,23 +3962,23 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segas16b_state::atomicp) // 10MHz CPU Clock verified
+void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
+{
 	system16b(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REMOVE("soundcpu")
-	MCFG_DEVICE_REMOVE("sprites")
+	config.device_remove("soundcpu");
+	config.device_remove("sprites");
 
-	MCFG_DEVICE_MODIFY("mapper")
-	MCFG_SEGA_315_5195_PBF_CALLBACK(NOOP)
+	m_mapper->pbf().set_nop();
 
 	// sound hardware
-	MCFG_DEVICE_REMOVE("ym2151")
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	config.device_remove("ym2151");
+	YM2413(config, m_ym2413, XTAL(20'000'000)/4); // 20MHz OSC divided by 4 (verified)
+	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REMOVE("upd")
-MACHINE_CONFIG_END
+	config.device_remove("upd");
+}
 
 
 MACHINE_CONFIG_START(segas16b_state::system16c)

@@ -12,17 +12,17 @@
 #include "sgi.h"
 #include "cpu/mips/mips3.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_READS		(1 << 1)
-#define LOG_WRITES		(1 << 2)
-#define LOG_RPSS		(1 << 3)
-#define LOG_WATCHDOG	(1 << 4)
-#define LOG_MEMCFG		(1 << 5)
-#define LOG_MEMCFG_EXT	(1 << 6)
-#define LOG_EEPROM		(1 << 7)
-#define LOG_DEFAULT		(LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_READS       (1 << 1)
+#define LOG_WRITES      (1 << 2)
+#define LOG_RPSS        (1 << 3)
+#define LOG_WATCHDOG    (1 << 4)
+#define LOG_MEMCFG      (1 << 5)
+#define LOG_MEMCFG_EXT  (1 << 6)
+#define LOG_EEPROM      (1 << 7)
+#define LOG_DEFAULT     (LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_MC, sgi_mc_device, "sgi_mc", "SGI Memory Controller")

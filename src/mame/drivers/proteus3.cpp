@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_proteus3)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
 	PIA6821(config, m_pia, 0);
@@ -402,8 +402,8 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(proteus3_state::kbd_put));
 
 	/* cassette */
 	ACIA6850(config, m_acia1, 0);

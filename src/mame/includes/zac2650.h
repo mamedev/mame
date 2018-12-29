@@ -25,6 +25,9 @@ public:
 
 	void tinvader(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -49,8 +52,7 @@ private:
 	DECLARE_WRITE8_MEMBER(zac_s2636_w);
 	DECLARE_READ8_MEMBER(tinvader_port_0_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(zac2650);
+	void zac2650_palette(palette_device &palette) const;
 	uint32_t screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int SpriteCollision(int first,int second);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

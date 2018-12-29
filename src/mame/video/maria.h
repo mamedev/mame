@@ -14,8 +14,8 @@ public:
 	// construction/destruction
 	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
-	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_dmacpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
 	void interrupt(int lines);
 	void startdma(int lines);
@@ -64,12 +64,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_MARIA, atari_maria_device)
-
-#define MCFG_MARIA_SCREEN(screen_tag) \
-	downcast<atari_maria_device &>(*device).set_screen_tag(screen_tag);
-
-#define MCFG_MARIA_DMACPU(cpu_tag) \
-	downcast<atari_maria_device &>(*device).set_cpu_tag(cpu_tag);
-
 
 #endif // MAME_VIDEO_MARIA_H

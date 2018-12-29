@@ -18,7 +18,7 @@ public:
 	simpl156_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen(*this, "tilegen"),
 		m_eeprom(*this, "eeprom"),
 		m_okimusic(*this, "okimusic") ,
 		m_mainram(*this, "mainram"),
@@ -42,7 +42,7 @@ public:
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_okimusic;
 	/* memory pointers */

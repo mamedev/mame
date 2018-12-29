@@ -91,7 +91,7 @@ MACHINE_CONFIG_START(compis_hrg_device::device_add_mconfig)
 	m_crtc->set_display_pixels_callback(FUNC(compis_hrg_device::display_pixels), this);
 	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 
@@ -109,7 +109,7 @@ MACHINE_CONFIG_START(compis_uhrg_device::device_add_mconfig)
 	m_crtc->set_display_pixels_callback(FUNC(compis_uhrg_device::display_pixels), this);
 	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 

@@ -55,7 +55,7 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_dac(*this, "dac")
 		, m_cass(*this, "cassette")
-		{ }
+	{ }
 
 	void homelab3(machine_config &config);
 	void brailab4(machine_config &config);
@@ -767,7 +767,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -799,7 +799,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

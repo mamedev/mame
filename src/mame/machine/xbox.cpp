@@ -917,29 +917,24 @@ MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
-	MCFG_DEVICE_ADD(":pci:00.0", NV2A_HOST, 0, m_maincpu)
-	MCFG_DEVICE_ADD(":pci:00.3", NV2A_RAM, 0)
-	MCFG_DEVICE_ADD(":pci:01.0", MCPX_LPC, 0)
-	MCFG_DEVICE_ADD(":pci:01.1", MCPX_SMBUS, 0)
-	MCFG_MCPX_SMBUS_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_smbus_interrupt_changed))
-	MCFG_DEVICE_ADD(":pci:01.1:10", XBOX_PIC16LC, 0)
-	MCFG_DEVICE_ADD(":pci:01.1:45", XBOX_CX25871, 0)
-	MCFG_DEVICE_ADD(":pci:01.1:54", XBOX_EEPROM, 0)
-	MCFG_DEVICE_ADD(":pci:02.0", MCPX_OHCI, 0)
-	MCFG_MCPX_OHCI_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_ohci_usb_interrupt_changed))
-	MCFG_DEVICE_ADD(":pci:03.0", MCPX_OHCI, 0)
-	MCFG_DEVICE_ADD(":pci:04.0", MCPX_ETH, 0)
-	MCFG_DEVICE_ADD(":pci:05.0", MCPX_APU, 0, m_maincpu)
-	MCFG_DEVICE_ADD(":pci:06.0", MCPX_AC97_AUDIO, 0)
-	MCFG_DEVICE_ADD(":pci:06.1", MCPX_AC97_MODEM, 0)
-	MCFG_DEVICE_ADD(":pci:08.0", PCI_BRIDGE, 0, 0x10de01b8, 0)
-	MCFG_DEVICE_ADD(":pci:09.0", MCPX_IDE, 0)
-	MCFG_MCPX_IDE_INTERRUPT_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
-	MCFG_DEVICE_ADD(":pci:1e.0", NV2A_AGP, 0, 0x10de01b7, 0)
-	MCFG_DEVICE_ADD(":pci:1e.0:00.0", NV2A_GPU, 0)
-	MCFG_MCPX_NV2A_GPU_CPU(m_maincpu)
-	MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_nv2a_interrupt_changed))
+	PCI_ROOT(config, ":pci", 0);
+	NV2A_HOST(config, ":pci:00.0", 0, m_maincpu);
+	NV2A_RAM(config, ":pci:00.3", 0);
+	MCPX_LPC(config, ":pci:01.0", 0);
+	MCPX_SMBUS(config, ":pci:01.1", 0).interrupt_handler().set(FUNC(xbox_base_state::xbox_smbus_interrupt_changed));
+	XBOX_PIC16LC(config, ":pci:01.1:10", 0);
+	XBOX_CX25871(config, ":pci:01.1:45", 0);
+	XBOX_EEPROM(config, ":pci:01.1:54", 0);
+	MCPX_OHCI(config, ":pci:02.0", 0).interrupt_handler().set(FUNC(xbox_base_state::xbox_ohci_usb_interrupt_changed));
+	MCPX_OHCI(config, ":pci:03.0", 0);
+	MCPX_ETH(config, ":pci:04.0", 0);
+	MCPX_APU(config, ":pci:05.0", 0, m_maincpu);
+	MCPX_AC97_AUDIO(config, ":pci:06.0", 0);
+	MCPX_AC97_MODEM(config, ":pci:06.1", 0);
+	PCI_BRIDGE(config, ":pci:08.0", 0, 0x10de01b8, 0);
+	MCPX_IDE(config, ":pci:09.0", 0).interrupt_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0);
+	NV2A_GPU(config, ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(FUNC(xbox_base_state::xbox_nv2a_interrupt_changed));
 
 	pic8259_device &pic8259_1(PIC8259(config, "pic8259_1", 0));
 	pic8259_1.out_int_callback().set(FUNC(xbox_base_state::xbox_pic8259_1_set_int_line));

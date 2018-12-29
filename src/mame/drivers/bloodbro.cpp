@@ -546,9 +546,8 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	crtc.layer_en_callback().set(FUNC(bloodbro_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(bloodbro_state::layer_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bloodbro)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bloodbro);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -560,11 +559,12 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set(m_ymsnd, FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set(m_ymsnd, FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bloodbro_state::weststry)
@@ -580,9 +580,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_weststry)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	m_palette->set_format(palette_device::xBGR_444, 1024);
 
 	// Bootleg video hardware is non-Seibu
 	MCFG_SCREEN_MODIFY("screen")
@@ -599,8 +597,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, bloodbro_state, weststry_opl_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_MODIFY("seibu_sound")
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(*this, bloodbro_state, weststry_opl_w))
+	m_seibu_sound->ym_write_callback().set(FUNC(bloodbro_state::weststry_opl_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bloodbro_state::skysmash)

@@ -392,7 +392,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(airraid_state::airraid)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)        /* verified on pcb */
+	MCFG_DEVICE_ADD(m_maincpu, Z80,XTAL(12'000'000)/2)        /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
 
@@ -403,10 +403,9 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
-	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
+	AIRRAID_VIDEO(config, m_airraid_video, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -416,13 +415,13 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_ROM("audiocpu")
+	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 MACHINE_CONFIG_END
 
 

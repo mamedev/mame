@@ -547,7 +547,7 @@ HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-PALETTE_INIT_MEMBER(psion_state, psion)
+void psion_state::psion_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -582,17 +582,15 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)
+	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
@@ -600,8 +598,8 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
 	/* Datapack */
-	MCFG_PSION_DATAPACK_ADD("pack1")
-	MCFG_PSION_DATAPACK_ADD("pack2")
+	PSION_DATAPACK(config, m_pack1, 0);
+	PSION_DATAPACK(config, m_pack2, 0);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion2")

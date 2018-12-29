@@ -102,7 +102,7 @@ protected:
 class upd7759_device : public upd775x_device
 {
 public:
-	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drqcallback.set_callback(std::forward<Object>(cb)); }
+	auto drq() { return m_drqcallback.bind(); }
 
 	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
@@ -142,11 +142,5 @@ protected:
 
 DECLARE_DEVICE_TYPE(UPD7759, upd7759_device)
 DECLARE_DEVICE_TYPE(UPD7756, upd7756_device)
-
-#define MCFG_UPD7759_MD(_md) \
-	downcast<upd7759_device &>(*device).md_w(_md);
-
-#define MCFG_UPD7759_DRQ_CALLBACK(_write) \
-	downcast<upd7759_device &>(*device).set_drq_callback(DEVCB_##_write);
 
 #endif // MAME_SOUND_UPD7759_H

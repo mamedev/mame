@@ -166,7 +166,7 @@ static INPUT_PORTS_START( pc4 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pc4_state, pc4)
+void pc4_state::pc4_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -231,14 +231,12 @@ MACHINE_CONFIG_START(pc4_state::pc4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc4_state, pc4)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc4)
+	PALETTE(config, "palette", FUNC(pc4_state::pc4_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pc4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RP5C01(config, "rtc", XTAL(32'768));
 MACHINE_CONFIG_END

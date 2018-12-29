@@ -319,11 +319,10 @@ MACHINE_CONFIG_START(matmania_state::matmania)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_matmania)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_matmania)
-	MCFG_PALETTE_ADD("palette", 64+16)
-	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_matmania);
+	PALETTE(config, m_palette, FUNC(matmania_state::matmania_palette), 64 + 16);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -331,7 +330,6 @@ MACHINE_CONFIG_START(matmania_state::matmania)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
-
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -361,11 +359,10 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_maniach)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_maniach)
-	MCFG_PALETTE_ADD("palette", 64+16)
-	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_maniach);
+	PALETTE(config, m_palette, FUNC(matmania_state::matmania_palette), 64 + 16);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -113,17 +113,18 @@ INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(whitestar_state::whitestar)
+void whitestar_state::whitestar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(whitestar_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(whitestar_state, whitestar_firq_interrupt,  976) // value taken from PinMAME
+	MC6809E(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &whitestar_state::whitestar_map);
+	m_maincpu->set_periodic_int(FUNC(whitestar_state::whitestar_firq_interrupt), attotime::from_hz(976));  // value taken from PinMAME
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 
-	MCFG_DECODMD_TYPE2_ADD("decodmd",":dmdcpu")
-MACHINE_CONFIG_END
+	DECODMD2(config, m_decodmd, 0, "dmdcpu");
+}
 
 // 8Mbit ROMs are mapped oddly: the first 4Mbit of each of the ROMs goes in order u17, u21, u36, u37
 // then the second 4Mbit of each of the ROMs in the same order starting at 0x200000

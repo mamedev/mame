@@ -45,11 +45,11 @@ public:
 	~seibu_sound_device() {}
 
 	//  configuration
-	void set_rom_tag(const char *tag) { m_sound_rom.set_tag(tag); }
-	void set_rombank_tag(const char *tag) { m_rom_bank.set_tag(tag); }
-	template<class Object> devcb_base &set_int_callback(Object &&object)  { return m_int_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_ym_read_callback(Object &&object)  { return m_ym_read_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_ym_write_callback(Object &&object) { return m_ym_write_cb.set_callback(std::forward<Object>(object)); }
+	template <typename T> void set_rom_tag(T &&tag) { m_sound_rom.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_rombank_tag(T &&tag) { m_rom_bank.set_tag(std::forward<T>(tag)); }
+	auto int_callback()  { return m_int_cb.bind(); }
+	auto ym_read_callback()  { return m_ym_read_cb.bind(); }
+	auto ym_write_callback() { return m_ym_write_cb.bind(); }
 
 	u8 main_r(offs_t offset);
 	void main_w(offs_t offset, u8 data);
@@ -180,19 +180,6 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                     \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                     \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-#define MCFG_SEIBU_SOUND_CPU(_audiocputag) \
-	downcast<seibu_sound_device &>(*device).set_int_callback(DEVCB_INPUTLINE(_audiocputag, 0)); \
-	downcast<seibu_sound_device &>(*device).set_rom_tag(_audiocputag);
-
-#define MCFG_SEIBU_SOUND_ROMBANK(_banktag) \
-	downcast<seibu_sound_device &>(*device).set_rombank_tag(_banktag);
-
-#define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
-	downcast<seibu_sound_device &>(*device).set_ym_read_callback(DEVCB_##_devcb);
-
-#define MCFG_SEIBU_SOUND_YM_WRITE_CB(_devcb) \
-	downcast<seibu_sound_device &>(*device).set_ym_write_callback(DEVCB_##_devcb);
 
 /**************************************************************************/
 

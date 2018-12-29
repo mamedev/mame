@@ -509,11 +509,10 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_splash)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_MACHINE_START_OVERRIDE(splash_state, splash )
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
@@ -572,11 +571,10 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_splash)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_MACHINE_START_OVERRIDE(splash_state, roldfrog )
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
@@ -661,11 +659,10 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(funystrp_state, screen_update_funystrp)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_splash)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

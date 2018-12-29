@@ -369,11 +369,9 @@ MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crbaloon_state,  vblank_irq)
 
-
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crbaloon)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(crbaloon_state, crbaloon)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_crbaloon);
+	PALETTE(config, "palette", FUNC(crbaloon_state::crbaloon_palette), 32);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)

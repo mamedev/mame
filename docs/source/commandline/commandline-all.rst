@@ -1109,19 +1109,22 @@ Core Sound Options
 
 .. _mame-commandline-sound:
 
-**-sound** *<dsound|sdl|coreaudio|xaudio|portaudio|none>*
+**-sound** *<dsound|coreaudio|sdl|xaudio2|portaudio|none>*
 
-	Specifies which sound subsystem to use. '*none*' disables sound altogether.
+	Specifies which sound subsystem to use. Selecting *none* disables sound output altogether (sound hardware is still emulated). On Windows, *dsound*, *xaudio2*, *portaudio* and *none* are available. On macOS, *coreaudio*, *sdl*, *portaudio* and *none* are available. On other operating systems, *sdl*, *portaudio* and *none* are available. (Special build options allow *sdl* to be used on Windows, or *portaudio* to be disabled.)
 
 	The default is *dsound* on Windows. On Mac, *coreaudio* is the default. On all other platforms, *sdl* is the default.
 
 	On Windows and Linux, *portaudio* is likely to give the lowest possible latency, where on Mac *coreaudio* provides the best results.
 
+	When using the *sdl* sound subsystem, the audio API to use may be selected by setting the *SDL_AUDIODRIVER* environment variable.  Available audio APIs depend on the operating system.  On Windows, it may be necessary to set *SDL_AUDIODRIVER=directsound* if no sound output is produced by default.
+
 .. _mame-commandline-audiolatency:
 
 **-audio_latency** *<value>*
 
-	This controls the amount of latency built into the audio streaming. By default MAME tries to keep the DirectSound audio buffer between 1/5 and 2/5 full. On some systems, this is pushing it too close to the edge, and you get poor sound sometimes. The latency parameter controls the lower threshold. The default is *1* (meaning lower=1/5 and upper=2/5). Set it to 2 (**-audio_latency 2**) to keep the sound buffer between 2/5 and 3/5 full. If you crank it up to 4, you can *definitely* notice audio lag.
+	The exact behavior depends on the selected audio output module.  Smaller values provide less audio delay while requiring better system performance.  Higher values increase audio delay but may help avoid buffer under-runs and audio interruptions.  The default is *1*.
+
 
 
 

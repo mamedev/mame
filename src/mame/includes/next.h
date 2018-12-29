@@ -6,6 +6,7 @@
 #define MAME_INCLUDES_NEXT_H
 
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"

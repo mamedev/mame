@@ -174,7 +174,7 @@ uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uin
 	}
 	else if (offset >= 0xfc60 && offset < 0xfc70)
 	{
-		data = m_duart->read(space, offset & 0x0f);
+		data = m_duart->read(offset & 0x0f);
 	}
 	else if (offset >= 0xfc70 && offset < 0xfc90)
 	{
@@ -200,7 +200,7 @@ void electron_m2105_device::expbus_w(address_space &space, offs_t offset, uint8_
 	}
 	else if (offset >= 0xfc60 && offset < 0xfc70)
 	{
-		m_duart->write(space, offset & 0x0f, data);
+		m_duart->write(offset & 0x0f, data);
 	}
 	else if (offset >= 0xfc70 && offset < 0xfc90)
 	{

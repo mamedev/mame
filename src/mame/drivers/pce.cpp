@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_PCE_CD_ADD("pce_cd")
+	PCE_CD(config, m_cd, 0);
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
 MACHINE_CONFIG_END
@@ -412,7 +412,7 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pce_list","pce")
 
-	MCFG_PCE_CD_ADD("pce_cd")
+	PCE_CD(config, m_cd, 0);
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
 MACHINE_CONFIG_END

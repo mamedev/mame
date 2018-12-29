@@ -294,15 +294,15 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(xtheball_state::xtheball)
 
-	MCFG_DEVICE_ADD("maincpu", TMS34010, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(10000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(xtheball_state, scanline_update)     /* scanline updater (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(xtheball_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
+	TMS34010(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xtheball_state::main_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(10000000);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(xtheball_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(xtheball_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(xtheball_state::from_shiftreg));
+	m_maincpu->set_periodic_int(FUNC(xtheball_state::irq1_line_hold), attotime::from_hz(15000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

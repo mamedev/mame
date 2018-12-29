@@ -11,6 +11,7 @@
 #pragma once
 
 #include "cpu/m6502/n2a03.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/eepromser.h"
 #include "machine/i8257.h"
 #include "machine/latch8.h"
@@ -172,7 +173,7 @@ public:
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
+	optional_device<mcs48_cpu_device> m_soundcpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<n2a03_device> m_dev_n2a03a; /* dkong3 */
 	optional_device<n2a03_device> m_dev_n2a03b; /* dkong3 */
@@ -298,13 +299,13 @@ private:
 	DECLARE_MACHINE_RESET(ddk);
 	DECLARE_VIDEO_START(dkong);
 	DECLARE_VIDEO_START(dkong_base);
-	DECLARE_PALETTE_INIT(dkong2b);
+	void dkong2b_palette(palette_device &palette);
 	DECLARE_MACHINE_START(dkong3);
-	DECLARE_PALETTE_INIT(dkong3);
+	void dkong3_palette(palette_device &palette);
 	DECLARE_MACHINE_START(radarscp);
-	DECLARE_PALETTE_INIT(radarscp);
+	void radarscp_palette(palette_device &palette);
 	DECLARE_MACHINE_START(radarscp1);
-	DECLARE_PALETTE_INIT(radarscp1);
+	void radarscp1_palette(palette_device &palette);
 	DECLARE_MACHINE_START(s2650);
 	DECLARE_MACHINE_RESET(strtheat);
 	DECLARE_MACHINE_RESET(drakton);

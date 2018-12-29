@@ -1076,7 +1076,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	return image_init_result::PASS;
 }
 
-PALETTE_INIT_MEMBER(x07_state, x07)
+void x07_state::x07_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -1495,9 +1495,8 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(x07_state, x07)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x07)
+	PALETTE(config, "palette", FUNC(x07_state::x07_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_x07);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

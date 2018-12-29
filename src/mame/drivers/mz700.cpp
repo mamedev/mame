@@ -386,8 +386,8 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8)
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz700)
 
