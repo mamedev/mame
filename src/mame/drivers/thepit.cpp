@@ -737,26 +737,24 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)
-	MCFG_PALETTE_ADD("palette", 32+8)
-	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thepit);
+	PALETTE(config, m_palette, FUNC(thepit_state::thepit_palette), 32+8);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", PIXEL_CLOCK/4));
+	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 void thepit_state::fitter(machine_config &config)
@@ -799,8 +797,7 @@ MACHINE_CONFIG_START(thepit_state::suprmous)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
+	m_palette->set_init(FUNC(thepit_state::suprmous_palette));
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
 MACHINE_CONFIG_END
 

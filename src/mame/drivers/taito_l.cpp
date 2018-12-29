@@ -1465,13 +1465,10 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitol_state, screen_vblank_taitol))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", taito_l)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
+	GFXDECODE(config, m_gfxdecode, m_palette, taito_l);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 256);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 MACHINE_CONFIG_END
@@ -1518,9 +1515,9 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	ymsnd.add_route(2, "mono", 0.20);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("slave")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag("slave");
+	ciu.set_slave_tag(m_audio_cpu);
 MACHINE_CONFIG_END
 
 
@@ -1538,10 +1535,7 @@ MACHINE_CONFIG_START(champwr_state::champwr)
 	MCFG_DEVICE_PROGRAM_MAP(champwr_2_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, champwr_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, champwr_state, msm5205_volume_w))
+	subdevice<ym2203_device>("ymsnd")->port_b_write_callback().set(FUNC(champwr_state::msm5205_volume_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384_kHz_XTAL)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, champwr_state, msm5205_vck)) /* VCK function */
@@ -1591,9 +1585,9 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("slave")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt.set_master_tag("slave");
+	tc0140syt.set_slave_tag(m_audio_cpu);
 MACHINE_CONFIG_END
 
 

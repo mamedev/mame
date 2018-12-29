@@ -145,14 +145,15 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'869'600) / 8) // clk unknown
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL(18'869'600) / 8)); // clk unknown
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(mx2178_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL(18'869'600) / 30));
 	acia_clock.signal_handler().set("acia1", FUNC(acia6850_device::write_txc));

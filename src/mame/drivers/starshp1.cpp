@@ -28,7 +28,7 @@ INTERRUPT_GEN_MEMBER(starshp1_state::starshp1_interrupt)
 WRITE_LINE_MEMBER(starshp1_state::attract_w)
 {
 	m_attract = state;
-	m_discrete->write(machine().dummy_space(), STARSHP1_ATTRACT, state);
+	m_discrete->write(STARSHP1_ATTRACT, state);
 
 	machine().bookkeeping().coin_lockout_w(0, !m_attract);
 	machine().bookkeeping().coin_lockout_w(1, !m_attract);
@@ -38,7 +38,7 @@ WRITE_LINE_MEMBER(starshp1_state::attract_w)
 WRITE_LINE_MEMBER(starshp1_state::phasor_w)
 {
 	m_phasor = state;
-	m_discrete->write(machine().dummy_space(), STARSHP1_PHASOR_ON, state);
+	m_discrete->write(STARSHP1_PHASOR_ON, state);
 }
 
 
@@ -92,13 +92,13 @@ WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
 		m_ship_size = data;
 		break;
 	case 2:
-		m_discrete->write(space, STARSHP1_NOISE_AMPLITUDE, data);
+		m_discrete->write(STARSHP1_NOISE_AMPLITUDE, data);
 		break;
 	case 3:
-		m_discrete->write(space, STARSHP1_TONE_PITCH, data);
+		m_discrete->write(STARSHP1_TONE_PITCH, data);
 		break;
 	case 4:
-		m_discrete->write(space, STARSHP1_MOTOR_SPEED, data);
+		m_discrete->write(STARSHP1_MOTOR_SPEED, data);
 		break;
 	case 5:
 		m_circle_hpos = data;
@@ -319,12 +319,10 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_SCREEN_RAW_PARAMS(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(starshp1_state, screen_update_starshp1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, starshp1_state, screen_vblank_starshp1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starshp1)
-	MCFG_PALETTE_ADD("palette", 19)
-	MCFG_PALETTE_INDIRECT_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(starshp1_state, starshp1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_starshp1)
+	PALETTE(config, m_palette, FUNC(starshp1_state::starshp1_palette), 19, 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

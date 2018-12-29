@@ -24,12 +24,8 @@ Todo:
 Game Status:
 - Inbuilt ROM and PDA functions all work
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- All carts appear to work except:
-- - Lost World: freeze just after entering Stage 2 (the nest).
-- --- If you do nothing it freezes at the point where the stegasaurus
-      should turn around. So, straight away start moving to the right
-      and you can keep playing.
-- Weblink and Internet are of no use as there is nothing to connect to.
+- All carts appear to work, from my limited testing.
+-- indy500 skips some speech just before the trial race starts.
 
 ***************************************************************************/
 
@@ -57,7 +53,7 @@ void gamecom_state::gamecom_mem_map(address_map &map)
 	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
 	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
 	map(0x8000, 0x9FFF).bankr("bank4");                                   /* External ROM/Flash. Controlled by MMU4 */
-	map(0xA000, 0xDFFF).ram().share("videoram");             /* VRAM */
+	map(0xA000, 0xDFFF).writeonly().share("videoram").nopr();             /* VRAM - writeonly, returns 0 on read, as expected by lostwrld */
 	map(0xE000, 0xFFFF).ram().share("nvram");           /* Extended I/O, Extended RAM */
 }
 
@@ -239,13 +235,13 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
 	INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(gamecom_state, gamecom)
+void gamecom_state::gamecom_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0x00, 0x00, 0x00 ); // Black
-	palette.set_pen_color(1, 0x0F, 0x4F, 0x2F ); // Gray 1
-	palette.set_pen_color(2, 0x6F, 0x8F, 0x4F ); // Gray 2
-	palette.set_pen_color(3, 0x8F, 0xCF, 0x8F ); // Grey 3
-	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
+	palette.set_pen_color(0, 0x00, 0x00, 0x00); // Black
+	palette.set_pen_color(1, 0x0f, 0x4f, 0x2f); // Gray 1
+	palette.set_pen_color(2, 0x6f, 0x8f, 0x4f); // Gray 2
+	palette.set_pen_color(3, 0x8f, 0xcf, 0x8f); // Grey 3
+	palette.set_pen_color(4, 0xdf, 0xff, 0x8f); // White
 }
 
 uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -261,11 +257,11 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 
 MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	MCFG_DEVICE_PROGRAM_MAP( gamecom_mem_map)
-	MCFG_SM8500_DMA_CB( WRITE8( *this, gamecom_state, gamecom_handle_dma ) )
-	MCFG_SM8500_TIMER_CB( WRITE8( *this, gamecom_state, gamecom_update_timers ) )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
+	SM8500(config, m_maincpu, XTAL(11'059'200)/2);   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamecom_state::gamecom_mem_map);
+	m_maincpu->dma_cb().set(FUNC(gamecom_state::gamecom_handle_dma));
+	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
+	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -281,8 +277,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_SCREEN_PALETTE("palette")
 
 	config.set_default_layout(layout_gamecom);
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
+	PALETTE(config, "palette", FUNC(gamecom_state::gamecom_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

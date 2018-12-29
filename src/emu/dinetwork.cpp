@@ -53,7 +53,8 @@ void device_network_interface::recv_cb(u8 *buf, int len)
 	if (result)
 	{
 		// stop receiving more data from the network
-		m_dev->stop();
+		if (m_dev)
+			m_dev->stop();
 
 		// schedule receive complete callback
 		m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
@@ -65,7 +66,8 @@ TIMER_CALLBACK_MEMBER(device_network_interface::recv_complete)
 	recv_complete_cb(param);
 
 	// start receiving data from the network again
-	m_dev->start();
+	if (m_dev)
+		m_dev->start();
 }
 
 void device_network_interface::set_promisc(bool promisc)

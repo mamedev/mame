@@ -345,9 +345,8 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, munchmo_state, vblank_irq))
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_mnchmobl)
-	MCFG_PALETTE_ADD(m_palette, 256)
-	MCFG_PALETTE_INIT_OWNER(munchmo_state, munchmo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mnchmobl);
+	PALETTE(config, m_palette, FUNC(munchmo_state::munchmo_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -355,13 +354,13 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_DEVICE_ADD(m_ay8910[0], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[0], XTAL(15'000'000)/8);
+	//m_ay8910[0]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD(m_ay8910[1], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[1], XTAL(15'000'000)/8);
+	//m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

@@ -859,27 +859,25 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_tubep)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32 + 256*64)
-
-	MCFG_PALETTE_INIT_OWNER(tubep_state,tubep)
+	PALETTE(config, "palette", FUNC(tubep_state::tubep_palette), 32 + 256*64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_0_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay1(AY8910(config, "ay1", 19968000 / 8 / 2));
+	ay1.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_0_w));
+	ay1.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_0_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_1_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_1_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay2(AY8910(config, "ay2", 19968000 / 8 / 2));
+	ay2.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_1_w));
+	ay2.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_1_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_2_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_2_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay3(AY8910(config, "ay3", 19968000 / 8 / 2));
+	ay3.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_2_w));
+	ay3.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_2_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
 MACHINE_CONFIG_END
 
 
@@ -909,8 +907,7 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_DEVICE_PROGRAM_MAP(rjammer_sound_map)
 	MCFG_DEVICE_IO_MAP(rjammer_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
@@ -932,32 +929,31 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_rjammer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_PALETTE_INIT_OWNER(tubep_state,rjammer)
+	PALETTE(config, "palette", FUNC(tubep_state::rjammer_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_0_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay1(AY8910(config, "ay1", 19968000 / 8 / 2));
+	ay1.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_0_w));
+	ay1.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_0_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_1_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_1_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay2(AY8910(config, "ay2", 19968000 / 8 / 2));
+	ay2.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_1_w));
+	ay2.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_1_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_2_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_2_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay3(AY8910(config, "ay3", 19968000 / 8 / 2));
+	ay3.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_2_w));
+	ay3.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_2_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tubep_state, rjammer_adpcm_vck))          /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz (changes at run time) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert
+// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert, Robbbert
 /***************************************************************************
 
     Galaxian-derived hardware
@@ -837,7 +837,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 
 					/* low bit goes to 0.22uF capacitor = 220000pF  */
 					/* high bit goes to 0.047uF capacitor = 47000pF */
-					m_discrete->write(space, NODE(3 * which + chan + 11), bits);
+					m_discrete->write(NODE(3 * which + chan + 11), bits);
 				}
 			}
 		}
@@ -2155,6 +2155,54 @@ void galaxian_state::mshuttle_portmap(address_map &map)
 	map(0x08, 0x08).w(FUNC(galaxian_state::mshuttle_ay8910_control_w));
 	map(0x09, 0x09).w(FUNC(galaxian_state::mshuttle_ay8910_data_w));
 	map(0x0c, 0x0c).r(FUNC(galaxian_state::mshuttle_ay8910_data_r));
+}
+
+void galaxian_state::fourplay_map(address_map &map)
+{
+	map(0x0000,0x3fff).bankr("bank1");
+	map(0x4000,0x47ff).ram();
+	map(0x5000,0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800,0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000,0x6000).portr("IN0");
+	map(0x6800,0x6800).portr("IN1");
+	map(0x7000,0x7000).portr("IN2");
+	map(0x7800,0x7fff).r("watchdog",FUNC(watchdog_timer_device::reset_r));
+	map(0x6000,0x6001).w(FUNC(galaxian_state::start_lamp_w));
+	map(0x6002,0x6002).nopw();  // AM_WRITE(coin_lock_w)
+	map(0x6003,0x6003).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x6004,0x6007).w("cust",FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x6800,0x6807).w("cust",FUNC(galaxian_sound_device::sound_w));
+	map(0x7001,0x7001).w(FUNC(galaxian_state::irq_enable_w));
+	map(0x7002,0x7003).w(FUNC(galaxian_state::fourplay_rombank_w));
+	map(0x7004,0x7004).w(FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7005,0x7005).nopw();  /* bit 3 of rombank select - always 0 */
+	map(0x7006,0x7006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007,0x7007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7008,0x7008).nopw();  /* bit 4 of rombank select - always 0 */
+	map(0x7800,0x7800).w("cust",FUNC(galaxian_sound_device::pitch_w));
+}
+
+void galaxian_state::videight_map(address_map &map)
+{
+	map(0x0000,0x3fff).bankr("bank1");
+	map(0x4000,0x47ff).ram();
+	map(0x5000,0x53ff).mirror(0x400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800,0x58ff).mirror(0x700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000,0x6000).portr("IN0");
+	map(0x6800,0x6800).portr("IN1");
+	map(0x7000,0x7000).portr("IN2");
+	map(0x7800,0x7fff).r("watchdog",FUNC(watchdog_timer_device::reset_r));
+	map(0x6000,0x6002).w(FUNC(galaxian_state::videight_gfxbank_w));
+	map(0x6003,0x6003).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x6004,0x6007).w("cust",FUNC(galaxian_sound_device::lfo_freq_w));
+	map(0x6800,0x6807).w("cust",FUNC(galaxian_sound_device::sound_w));
+	map(0x6808,0x68ff).nopw();
+	map(0x7001,0x7001).w(FUNC(galaxian_state::irq_enable_w));
+	map(0x7002,0x7005).w(FUNC(galaxian_state::videight_rombank_w));
+	map(0x7006,0x7006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007,0x7007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7008,0x7008).nopw();  /* bit 4 of rombank select - always 0 */
+	map(0x7800,0x7800).w("cust",FUNC(galaxian_sound_device::pitch_w));
 }
 
 
@@ -5871,6 +5919,11 @@ static GFXDECODE_START(gfx_tenspot)
 	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout_0x80, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
+static GFXDECODE_START(gfx_videight)
+	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8*32, GALAXIAN_XSCALE,1)
+	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 8*32, GALAXIAN_XSCALE,1)
+GFXDECODE_END
+
 
 /*************************************
  *
@@ -5944,9 +5997,8 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
+	PALETTE(config, m_palette, FUNC(galaxian_state::galaxian_palette), 32);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
@@ -5985,7 +6037,7 @@ void galaxian_state::konami_base(machine_config &config)
 	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_0_w));
 
 	I8255A(config, m_ppi8255[1]);
-	m_ppi8255[1]->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255[1]->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
 	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
@@ -5999,17 +6051,17 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
 	MCFG_DEVICE_PROGRAM_MAP(frogger_sound_map)
 	MCFG_DEVICE_IO_MAP(frogger_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, frogger_sound_timer_r))
-	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
+	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
+	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
+	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
+	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
 	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
@@ -6023,24 +6075,24 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
+	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
+	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
+	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
+	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_SOUND_ROUTE(0, "konami", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "konami", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "konami", 1.0, 5)
+	AY8910(config, m_ay8910[1], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[1]->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_ay8910[1]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[1]->add_route(0, "konami", 1.0, 3);
+	m_ay8910[1]->add_route(1, "konami", 1.0, 4);
+	m_ay8910[1]->add_route(2, "konami", 1.0, 5);
 
 	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -6065,7 +6117,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::galaxian)
 	galaxian_base(config);
-	galaxian_audio(config);
+
+	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::victoryc)
@@ -6128,8 +6185,7 @@ MACHINE_CONFIG_START(galaxian_state::zigzag)
 	MCFG_DEVICE_PROGRAM_MAP(zigzag_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) /* matches PCB video - unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.5); /* matches PCB video - unconfirmed */
 MACHINE_CONFIG_END
 
 
@@ -6138,9 +6194,8 @@ MACHINE_CONFIG_START(galaxian_state::gmgalax)
 
 	/* banked video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
-	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
+	m_palette->set_entries(64);
+	m_palette->set_init(FUNC(galaxian_state::galaxian_palette));
 MACHINE_CONFIG_END
 
 
@@ -6151,7 +6206,11 @@ MACHINE_CONFIG_START(galaxian_state::mooncrst)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
-	mooncrst_audio(config);
+	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::moonqsr)
@@ -6193,11 +6252,9 @@ MACHINE_CONFIG_START(galaxian_state::fantastc)
 	MCFG_DEVICE_PROGRAM_MAP(fantastc_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[1], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
 MACHINE_CONFIG_END
 
 
@@ -6231,8 +6288,7 @@ MACHINE_CONFIG_START(galaxian_state::jumpbug)
 	MCFG_DEVICE_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)    /* matches PCB video - unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5);   /* matches PCB video - unconfirmed */
 MACHINE_CONFIG_END
 
 
@@ -6245,11 +6301,10 @@ MACHINE_CONFIG_START(galaxian_state::checkman)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, 1789750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], 1789750).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -6266,12 +6321,12 @@ MACHINE_CONFIG_START(galaxian_state::checkmaj)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, 1620000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 2)
+	AY8910(config, m_ay8910[0], 1620000);
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 2);
 MACHINE_CONFIG_END
 
 
@@ -6297,7 +6352,7 @@ MACHINE_CONFIG_START(galaxian_state::kingball)
 	MCFG_DEVICE_PROGRAM_MAP(kingball_sound_map)
 	MCFG_DEVICE_IO_MAP(kingball_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.53) // unknown DAC
@@ -6408,12 +6463,11 @@ MACHINE_CONFIG_START(galaxian_state::jungsub)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state, irq0_line_hold)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK / 3 / 2 / 2) // clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
@@ -6428,16 +6482,16 @@ MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware is a pair of AY-3-8912 */
-	MCFG_DEVICE_ADD("8910.0", AY8912, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, explorer_sound_latch_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8912(config, m_ay8910[0], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
+	m_ay8910[0]->port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("8910.1", AY8912, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8912(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
+	m_ay8910[0]->port_a_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
@@ -6449,12 +6503,12 @@ MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
 	MCFG_DEVICE_IO_MAP(takeoff_sound_portmap)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("8910.0")
-	MCFG_DEVICE_REMOVE("8910.1")
+	config.device_remove("8910.0");
+	config.device_remove("8910.1");
 
-	MCFG_DEVICE_ADD("8912", AY8912, XTAL(12'000'000) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, explorer_sound_latch_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8912_device &ay8912(AY8912(config, "8912", XTAL(12'000'000) / 8));
+	ay8912.port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
+	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to above
@@ -6468,15 +6522,15 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[0], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	AY8910(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25); /* matches PCB, needs verification */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::scorpion)
@@ -6493,13 +6547,12 @@ MACHINE_CONFIG_START(galaxian_state::scorpion)
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::scorpion_protection_w));
 
 	/* extra AY8910 with I/O ports */
-	MCFG_DEVICE_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, galaxian_state, scorpion_digitalker_control_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[2], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[2]->port_a_write_callback().set(m_digitalker, FUNC(digitalker_device::digitalker_data_w));
+	m_ay8910[2]->port_b_write_callback().set(FUNC(galaxian_state::scorpion_digitalker_control_w));
+	m_ay8910[2]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DIGITALKER_ADD("digitalker", 4_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	DIGITALKER(config, m_digitalker, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.16);
 MACHINE_CONFIG_END
 
 
@@ -6519,12 +6572,11 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	I8255A(config, m_ppi8255[2]);
 	m_ppi8255[2]->in_pa_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	/* port on 2nd 8910 is used for communication */
-	MCFG_DEVICE_MODIFY("8910.1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("soundlatch2", generic_latch_8_device, write))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, galaxian_state, sfx_sample_control_w))
+	m_ay8910[1]->port_a_write_callback().set("soundlatch2", FUNC(generic_latch_8_device::write));
+	m_ay8910[1]->port_b_write_callback().set(FUNC(galaxian_state::sfx_sample_control_w));
 
 	/* DAC for the sample player */
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // 16-pin IC (not identified by schematics)
@@ -6617,8 +6669,7 @@ MACHINE_CONFIG_START(galaxian_state::quaak)
 	konami_base(config);
 	konami_sound_2x_ay8910(config);
 
-	MCFG_DEVICE_MODIFY("8910.0")
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, frogger_sound_timer_r))
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
 
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -6679,8 +6730,30 @@ MACHINE_CONFIG_START(galaxian_state::moonwar)
 
 	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::moonwar_port_select_w));
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(galaxian_state,moonwar) // bullets are less yellow
+	m_palette->set_init(FUNC(galaxian_state::moonwar_palette)); // bullets are less yellow
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::fourplay)
+	galaxian(config);
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fourplay_map)
+
+	/* video hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
+	m_palette->set_entries(64);
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::videight)
+	galaxian(config);
+
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(videight_map)
+
+	/* video hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videight)
+	m_palette->set_entries(8 * 32);
 MACHINE_CONFIG_END
 
 
@@ -6692,16 +6765,15 @@ MACHINE_CONFIG_END
 
 void galaxian_state::decode_mooncrst(int length, uint8_t *dest)
 {
-	uint8_t *rom = memregion("maincpu")->base();
-	int offs;
+	uint8_t const *const rom = memregion("maincpu")->base();
 
-	for (offs = 0; offs < length; offs++)
+	for (int offs = 0; offs < length; offs++)
 	{
-		uint8_t data = rom[offs];
+		uint8_t const data = rom[offs];
 		uint8_t res = data;
-		if (BIT(data,1)) res ^= 0x40;
-		if (BIT(data,5)) res ^= 0x04;
-		if ((offs & 1) == 0) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
+		if (BIT(data, 1)) res ^= 0x40;
+		if (BIT(data, 5)) res ^= 0x04;
+		if (!BIT(offs, 0)) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
 		dest[offs] = res;
 	}
 }
@@ -7043,6 +7115,26 @@ void galaxian_state::init_victoryc()
 	decode_victoryc();
 }
 
+
+void galaxian_state::init_fourplay()
+{
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->set_entry(0);
+
+	/* video extensions */
+	common_init(NULL, NULL, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
+}
+
+void galaxian_state::init_videight()
+{
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->set_entry(0);
+
+	/* video extensions */
+	common_init(NULL, NULL, &galaxian_state::videight_extend_tile_info, &galaxian_state::videight_extend_sprite_info);
+}
+
+
 /*************************************
  *
  *  Moon Cresta-derived games
@@ -7149,7 +7241,7 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	dstregion = memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	PALETTE_INIT_NAME(galaxian)(*m_palette);
+	galaxian_palette(*m_palette);
 }
 
 void galaxian_state::init_tenspot()
@@ -9416,6 +9508,32 @@ ROM_START( tenspot )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
 	ROM_END
+
+
+ROM_START( fourplay )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "fourplay.bin", 0x10000, 0x10000, CRC(b42b2c2c) SHA1(f3b6f136b39e7a6adadecb9acf906fcfe649f398) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "graph1.bin",   0x0000, 0x1000, CRC(359c0c1f) SHA1(9e39baae4ab5763db236d0a49a6665d2e69cba11) )
+	ROM_LOAD( "graph2.bin",   0x1000, 0x1000, CRC(b22a51c9) SHA1(cccfbab0c92dba81e3451de72d1f1899226e30e2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+ROM_START( videight )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "videight.bin", 0x10000, 0x20000, CRC(0601db09) SHA1(0c9cd1afb0034946261219bf42b2f9b1ed5bdb17) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "v8g1.bin",     0x0000, 0x8000, CRC(af771e33) SHA1(cdc960c5f548e19da4eabdaf8b789ca8ffb6a29f) )
+	ROM_LOAD( "v8g2.bin",     0x8000, 0x8000, CRC(776c34e6) SHA1(de70a29f73469a58ab15acb95aaad1efeb4de08d) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "v8c.bin",      0x0000, 0x0100, CRC(b35a6ca8) SHA1(d9195215bf2482a1b02a019bb708a9981eb0bdf8) )
+ROM_END
+
 
 /*************************************
  *
@@ -12499,6 +12617,10 @@ GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     galaxian_state, init_
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    galaxian_state, init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
 
+// Multigames
+GAME( 2002, fourplay,    0,        fourplay,   galaxian,   galaxian_state, init_fourplay,   ROT90, "Macro", "Four Play", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, videight,    0,        videight,   warofbug,   galaxian_state, init_videight,   ROT90, "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
+
 
 
 /*************************************
@@ -12719,3 +12841,4 @@ GAME( 1982, losttombh,   losttomb, scobra,     losttomb,   galaxian_state, init_
 GAME( 1984, spdcoin,     0,        scobra,     spdcoin,    galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Speed Coin (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, superbon,    0,        scobra,     superbon,   galaxian_state, init_superbon,   ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+

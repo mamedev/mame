@@ -59,8 +59,8 @@ constexpr uint8_t TILE_WIDTH = 6;
 class othello_state : public driver_device
 {
 public:
-	othello_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	othello_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "ay%u", 0U),
@@ -120,7 +120,7 @@ private:
 	template<int Shift> void n7751_rom_addr_w(uint8_t data);
 	void n7751_rom_select_w(uint8_t data);
 
-	DECLARE_PALETTE_INIT(othello);
+	void othello_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void audio_map(address_map &map);
@@ -149,14 +149,12 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 	}
 }
 
-PALETTE_INIT_MEMBER(othello_state, othello)
+void othello_state::othello_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
-	{
 		palette.set_pen_color(i, rgb_t(0xff, 0x00, 0xff));
-	}
 
-	/* only colors  2,3,7,9,c,d,f are used */
+	// only colors  2,3,7,9,c,d,f are used
 	palette.set_pen_color(0x02, rgb_t(0x00, 0xff, 0x00));
 	palette.set_pen_color(0x03, rgb_t(0xff, 0x7f, 0x00));
 	palette.set_pen_color(0x07, rgb_t(0x00, 0x00, 0x00));
@@ -183,8 +181,6 @@ READ8_MEMBER(othello_state::unk_87_r)
 WRITE8_MEMBER(othello_state::unk_8a_w)
 {
 	/*
-
-
 	m_n7751_command = (data & 0x07);
 	m_n7751->set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	//m_n7751->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
@@ -387,25 +383,25 @@ void othello_state::machine_reset()
 	m_n7751_busy = 0;
 }
 
-MACHINE_CONFIG_START(othello_state::othello)
-
+void othello_state::othello(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", othello_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &othello_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &othello_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(othello_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_IO_MAP(audio_portmap)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(3'579'545)));
+	audiocpu.set_addrmap(AS_PROGRAM, &othello_state::audio_map);
+	audiocpu.set_addrmap(AS_IO, &othello_state::audio_portmap);
 
-	MCFG_DEVICE_ADD(m_n7751, N7751, XTAL(6'000'000))
-	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, othello_state, n7751_command_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, othello_state, n7751_rom_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, othello_state, n7751_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
+	N7751(config, m_n7751, XTAL(6'000'000));
+	m_n7751->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
+	m_n7751->p2_in_cb().set(FUNC(othello_state::n7751_command_r));
+	m_n7751->bus_in_cb().set(FUNC(othello_state::n7751_rom_r));
+	m_n7751->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_n7751->p2_out_cb().set(FUNC(othello_state::n7751_p2_w));
+	m_n7751->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(othello_state::n7751_rom_addr_w<0>));
@@ -414,36 +410,35 @@ MACHINE_CONFIG_START(othello_state::othello)
 	m_i8243->p7_out_cb().set(FUNC(othello_state::n7751_rom_select_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*6, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*6-1, 0*8, 64*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*6, 64*8);
+	screen.set_visarea(0*8, 64*6-1, 0*8, 64*8-1);
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
 
-	MCFG_PALETTE_ADD(m_palette, 0x10)
-	MCFG_PALETTE_INIT_OWNER(othello_state, othello)
+	PALETTE(config, m_palette, FUNC(othello_state::othello_palette), 0x10);
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */)   /* H46505 @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(TILE_WIDTH)
-	MCFG_MC6845_UPDATE_ROW_CB(othello_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 1000000 /* ? MHz */));   /* H46505 @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(TILE_WIDTH);
+	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD(m_ay[0], AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	AY8910(config, m_ay[0], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	AY8910(config, m_ay[1], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD(m_ay[1], AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
-
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 ROM_START( othello )
 	ROM_REGION( 0x10000, "maincpu", 0 )

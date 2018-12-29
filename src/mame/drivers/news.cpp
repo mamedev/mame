@@ -147,10 +147,8 @@ MACHINE_CONFIG_START(news_state::news)
 	MCFG_SCREEN_UPDATE_DRIVER(news_state, screen_update_news)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_news)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_news);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

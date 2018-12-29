@@ -294,20 +294,16 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(6*8+2, 64*8-1-(10*8)-2, 2*8, 32*8-1-(2*8))
 	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silkroad)
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_silkroad);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000).set_membits(16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (was 1056000)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)

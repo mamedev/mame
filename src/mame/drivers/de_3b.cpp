@@ -236,30 +236,34 @@ void de_3b_state::init_de_3b()
 {
 }
 
-MACHINE_CONFIG_START(de_3b_state::de_3b)
+void de_3b_state::de_3b(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_3b_state,display_r),WRITE8(*this, de_3b_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_3b_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_3b_state,switch_r),WRITE8(*this, de_3b_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_3b_state,lamps_w))
-	MCFG_DECOCPU_DMDSTATUS(READ8(*this, de_3b_state,dmd_status_r))
+	decocpu_type3b_device &decocpu(DECOCPU3B(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_3b_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_3b_state::display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_3b_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_3b_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_3b_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_3b_state::lamps_w));
+	decocpu.dmdstatus_read_callback().set(FUNC(de_3b_state::dmd_status_r));
 
 	genpin_audio(config);
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 
-	MCFG_DECODMD_TYPE3_ADD("decodmd",":cpu3")
-MACHINE_CONFIG_END
+	DECODMD3(config, m_dmdtype3, 0, "cpu3");
+}
 
 
-MACHINE_CONFIG_START(de_3b_state::detest)
+void de_3b_state::detest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
+	DECOCPU3B(config, "decocpu", XTAL(8'000'000) / 2, "maincpu");
 
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------------------
 / Batman Forever 4.0

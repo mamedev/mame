@@ -51,6 +51,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/msm5832.h"
 #include "machine/timer.h"
@@ -535,15 +536,16 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mycom_state, crtc_update_row)
+	MC6845(config, m_crtc, 1008000);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
 
 	SPEAKER(config, "mono").front_center();
 

@@ -166,6 +166,7 @@ Afega stands for "Art-Fiction Electronic Game"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
 #include "machine/nmk004.h"
+#include "machine/nmk112.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -4031,16 +4032,15 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tharrier)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL / 8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -4069,17 +4069,16 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4112,9 +4111,8 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4128,11 +4126,12 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 #define BIOSHIP_CRYSTAL1 10000000
@@ -4149,17 +4148,16 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bioship)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bioship);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4188,17 +4186,16 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4230,9 +4227,8 @@ MACHINE_CONFIG_START(nmk16_state::vandykeb)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4255,17 +4251,16 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000) /* (verified on pcb) */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4299,9 +4294,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4315,11 +4309,12 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::tdragon)
@@ -4333,17 +4328,16 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4380,17 +4374,16 @@ MACHINE_CONFIG_START(nmk16_state::ssmissin)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) /* 1 Mhz, pin 7 high */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
@@ -4409,17 +4402,16 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_strahl)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4448,17 +4440,16 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4493,17 +4484,16 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4532,17 +4522,16 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8 ) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4571,17 +4560,16 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, XTAL(16'000'000)/2); /* verified on pcb */
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4614,17 +4602,16 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -4639,9 +4626,9 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::tdragon2)
@@ -4659,17 +4646,16 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -4684,9 +4670,9 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 // TODO : Sound system is different
@@ -4711,18 +4697,16 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -4737,9 +4721,9 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::bjtwin)
@@ -4753,10 +4737,8 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bjtwin)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bjtwin);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
 
@@ -4769,9 +4751,9 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 
@@ -4816,17 +4798,16 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -4861,17 +4842,16 @@ MACHINE_CONFIG_START(nmk16_tomagic_state::tomagic)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 12000000/4) // K-666 (YM3812) 3Mhz? */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -5385,10 +5365,8 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_afega)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stagger1)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stagger1);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,afega)
 
@@ -5396,13 +5374,13 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(4'000'000))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.30);
+	ymsnd.add_route(1, "rspeaker", 0.30);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
@@ -5476,18 +5454,16 @@ MACHINE_CONFIG_START(nmk16_state::firehawk)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grdnstrm)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grdnstrm);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -5517,18 +5493,16 @@ MACHINE_CONFIG_START(nmk16_state::twinactn)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -7870,8 +7844,8 @@ rom13.7     27C040   /
 rom10.112   27C040   \  Main Program
 rom11.107   27C040   /
 
-
-
+NOTE: An original (undumped) PCB has been seen with the program ROM labeled as  B-2000 N U107 v1.2
+      It has not been verified the current set is the same v1.2 or some other revision
 
 ***************************************************************************/
 

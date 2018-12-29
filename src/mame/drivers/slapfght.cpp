@@ -922,21 +922,21 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(16'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(16'000'000)/8));
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(16'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(16'000'000)/8));
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 
@@ -974,21 +974,21 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(36'000'000)/24)); // 1.5MHz
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(36'000'000)/24)); // 1.5MHz
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::tigerhb1)
@@ -1047,21 +1047,21 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(36'000'000)/24)); // 1.5MHz
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(36'000'000)/24)); // 1.5MHz
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::slapfighb1)

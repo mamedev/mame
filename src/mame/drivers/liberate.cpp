@@ -764,25 +764,22 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_liberate)
-	MCFG_PALETTE_ADD("palette", 33)
-	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_liberate)
+	PALETTE(config, m_palette, FUNC(liberate_state::liberate_palette), 33);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberate)
@@ -854,25 +851,22 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prosport)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

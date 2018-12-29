@@ -45,6 +45,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
@@ -319,12 +320,13 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mbc200)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 8_MHz_XTAL / 4) // HD46505SP
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
+	H46505(config, m_crtc, 8_MHz_XTAL / 4); // HD46505SP
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mbc200_state::update_row), this);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -351,8 +353,8 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(mbc200_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(mbc200_state::kbd_put));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")

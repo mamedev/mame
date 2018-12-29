@@ -70,7 +70,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(flyball);
+	void flyball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -405,11 +405,11 @@ static GFXDECODE_START( gfx_flyball )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(flyball_state, flyball)
+void flyball_state::flyball_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x3F, 0x3F, 0x3F));  /* tiles, ball */
-	palette.set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(2, rgb_t(0xFF ,0xFF, 0xFF));  /* sprites */
+	palette.set_pen_color(0, rgb_t(0x3f, 0x3f, 0x3f));  // tiles, ball
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(2, rgb_t(0xff ,0xff, 0xff));  // sprites
 	palette.set_pen_color(3, rgb_t(0x00, 0x00, 0x00));
 }
 
@@ -479,12 +479,11 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(flyball_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flyball)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(flyball_state, flyball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_flyball)
+	PALETTE(config, m_palette, FUNC(flyball_state::flyball_palette), 4);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

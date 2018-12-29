@@ -280,36 +280,36 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madmotor)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 1, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 2, 1)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(3)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_BAC06(config, m_tilegen[2], 0);
+	m_tilegen[2]->set_gfx_region_wide(0, 2, 1);
+	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(3);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 21470000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, 21470000/6)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", 21470000/6));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.add_route(0, "mono", 0.45);
+	ym2.add_route(1, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

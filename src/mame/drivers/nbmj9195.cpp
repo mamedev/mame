@@ -2541,7 +2541,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
@@ -2579,7 +2579,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV3)
 	MSCOUTM_TMZ84C011_MAIN_PORTS
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nb22090)

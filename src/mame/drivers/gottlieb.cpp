@@ -201,6 +201,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/dac.h"
 #include "speaker.h"
 
 
@@ -673,14 +674,15 @@ static const char *const qbert_knocker_names[] =
 	nullptr   /* end of array */
 };
 
-MACHINE_CONFIG_START(gottlieb_state::qbert_knocker)
+void gottlieb_state::qbert_knocker(machine_config &config)
+{
 	SPEAKER(config, "knocker", 0.0, 0.0, 1.0);
 
-	MCFG_DEVICE_ADD("knocker_sam", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(qbert_knocker_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "knocker", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_knocker_sample);
+	m_knocker_sample->set_channels(1);
+	m_knocker_sample->set_samples_names(qbert_knocker_names);
+	m_knocker_sample->add_route(ALL_OUTPUTS, "knocker", 1.0);
+}
 
 
 
@@ -1756,60 +1758,60 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
-
+void gottlieb_state::gottlieb_core(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, CPU_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(gottlieb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gottlieb_state, interrupt)
+	I8088(config, m_maincpu, CPU_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gottlieb_state::interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK);
+	m_screen->set_screen_update(FUNC(gottlieb_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode);
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	// basic speaker configuration
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::gottlieb1)
+void gottlieb_state::gottlieb1(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::gottlieb2)
+void gottlieb_state::gottlieb2(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::g2laser)
+void gottlieb_state::g2laser(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))
-	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update)
-	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
+	PIONEER_PR8210(config, m_laserdisc, 0);
+	m_laserdisc->set_audio(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this));
+	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
+	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
+	m_laserdisc->set_overlay_palette("palette");
+	m_laserdisc->add_route(0, "speaker", 1.0);
+	m_laserdisc->set_screen(m_screen);
 	/* right channel is processed as data */
 
-	MCFG_DEVICE_REMOVE("screen")
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-MACHINE_CONFIG_END
+	SCREEN(config.replace(), m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
+	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
+}
 
 
 
@@ -1820,65 +1822,66 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-MACHINE_CONFIG_START(gottlieb_state::gottlieb1_votrax)
+void gottlieb_state::gottlieb1_votrax(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::reactor)
+void gottlieb_state::reactor(machine_config &config)
+{
 	gottlieb1_votrax(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(reactor_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::reactor_map);
 
-	MCFG_DEVICE_REMOVE("nvram")
-MACHINE_CONFIG_END
+	config.device_remove("nvram");
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::qbert)
+void gottlieb_state::qbert(machine_config &config)
+{
 	gottlieb1_votrax(config);
 
 	/* sound hardware */
 	qbert_knocker(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::tylz)
+void gottlieb_state::tylz(machine_config &config)
+{
 	gottlieb1_votrax(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(gottlieb_state::screwloo)
+void gottlieb_state::screwloo(machine_config &config)
+{
 	gottlieb2(config);
 
 	MCFG_VIDEO_START_OVERRIDE(gottlieb_state,screwloo)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gottlieb_state::cobram3)
+void gottlieb_state::cobram3(machine_config &config)
+{
 	gottlieb_core(config);
-	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
-	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_r2_sound->enable_cobram3_mods();
 
-	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))
-	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update)
-	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
+	PIONEER_PR8210(config, m_laserdisc, 0);
+	m_laserdisc->set_audio(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this));
+	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
+	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
+	m_laserdisc->set_overlay_palette("palette");
+	m_laserdisc->add_route(0, "speaker", 1.0);
+	m_laserdisc->set_screen(m_screen);
 	/* right channel is processed as data */
 
-	MCFG_DEVICE_REMOVE("screen")
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	SCREEN(config.replace(), m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
+	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("r2sound:dac")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "r2sound", 1.00)
-MACHINE_CONFIG_END
+	subdevice<dac_8bit_r2r_device>("r2sound:dac")->reset_routes();
+	subdevice<dac_8bit_r2r_device>("r2sound:dac")->add_route(ALL_OUTPUTS, "r2sound", 1.00);
+}
 
 
 /*************************************

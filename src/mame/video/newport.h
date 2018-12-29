@@ -10,17 +10,17 @@
 #pragma once
 
 #include "cpu/mips/mips3.h"
-#include "machine/ioc2.h"
+#include "machine/hpc3.h"
 
 class newport_video_device : public device_t
 {
 public:
 	template <typename T, typename U>
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&ioc2_tag)
+	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&hpc3_tag)
 		: newport_video_device(mconfig, tag, owner, (uint32_t)0) // TODO: Use actual pixel clock
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_ioc2.set_tag(std::forward<U>(ioc2_tag));
+		m_hpc3.set_tag(std::forward<U>(hpc3_tag));
 	}
 
 	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -184,7 +184,7 @@ private:
 	void do_rex3_command();
 
 	required_device<mips3_device> m_maincpu;
-	required_device<ioc2_device> m_ioc2;
+	required_device<hpc3_device> m_hpc3;
 	vc2_t  m_vc2;
 	xmap_t m_xmap0;
 	xmap_t m_xmap1;

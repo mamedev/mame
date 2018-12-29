@@ -63,23 +63,30 @@ class molecula_state : public driver_device
 {
 public:
 	molecula_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_filecpu(*this, "filecpu")
+		: driver_device(mconfig, type, tag)
+		, m_filecpu(*this, "filecpu")
 	{ }
 
 	void molecula(machine_config &config);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	// devices
 	required_device<cpu_device> m_filecpu;
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	uint8_t *m_file_rom;
 	uint8_t *m_app_rom;
 	std::unique_ptr<uint8_t[]> m_file_ram;
 	std::unique_ptr<uint8_t[]> m_app_ram;
+
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_WRITE8_MEMBER(file_w);
 
@@ -95,18 +102,12 @@ private:
 	uint8_t app_ram_enable;
 	uint8_t file_ram_enable;
 
-	DECLARE_PALETTE_INIT(molecula);
+	void molecula_palette(palette_device &palette) const;
 
 	void molecula_app_io(address_map &map);
 	void molecula_app_map(address_map &map);
 	void molecula_file_io(address_map &map);
 	void molecula_file_map(address_map &map);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 };
 
 void molecula_state::video_start()
@@ -292,7 +293,7 @@ void molecula_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(molecula_state, molecula)
+void molecula_state::molecula_palette(palette_device &palette) const
 {
 }
 
@@ -324,13 +325,11 @@ MACHINE_CONFIG_START(molecula_state::molecula)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_molecula)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(molecula_state, molecula)
+	PALETTE(config, "palette", FUNC(molecula_state::molecula_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 

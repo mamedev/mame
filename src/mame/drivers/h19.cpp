@@ -536,13 +536,14 @@ MACHINE_CONFIG_START(h19_state::h19)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
+	MC6845(config, m_crtc, MC6845_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
 	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);

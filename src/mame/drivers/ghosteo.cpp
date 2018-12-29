@@ -601,19 +601,19 @@ void ghosteo_state::machine_reset()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
 }
 
-MACHINE_CONFIG_START(ghosteo_state::ghosteo)
-
+void ghosteo_state::ghosteo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM9, 200000000)
+	ARM9(config, m_maincpu, 200000000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(455, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(455, 262);
+	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_screen_update("s3c2410", FUNC(s3c2410_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, "palette").set_entries(256);
 
 	S3C2410(config, m_s3c2410, 12000000);
 	m_s3c2410->set_palette_tag("palette");
@@ -639,33 +639,33 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
-	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, ghosteo_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, ghosteo_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, ghosteo_state, qs1000_p3_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	qs1000_device &qs1000(QS1000(config, "qs1000", XTAL(24'000'000)));
+	qs1000.set_external_rom(true);
+	qs1000.p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
+	qs1000.p1_out().set(FUNC(ghosteo_state::qs1000_p1_w));
+	qs1000.p2_out().set(FUNC(ghosteo_state::qs1000_p2_w));
+	qs1000.p3_out().set(FUNC(ghosteo_state::qs1000_p3_w));
+	qs1000.add_route(0, "lspeaker", 1.0);
+	qs1000.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(ghosteo_state::bballoon)
+void ghosteo_state::bballoon(machine_config &config)
+{
 	ghosteo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bballoon_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::bballoon_map);
 	I2CMEM(config, "i2cmem", 0).set_data_size(256);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(ghosteo_state::touryuu)
+void ghosteo_state::touryuu(machine_config &config)
+{
 	ghosteo(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(touryuu_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ghosteo_state::touryuu_map);
 	I2CMEM(config, "i2cmem", 0).set_data_size(1024);
-MACHINE_CONFIG_END
+}
 
 
 /*

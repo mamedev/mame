@@ -558,6 +558,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_xscale(1.0f)
 	, m_yscale(1.0f)
 	, m_screen_vblank(*this)
+	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_video_attributes(0)
 	, m_svg_region(nullptr)
@@ -715,6 +716,7 @@ void screen_device::device_resolve_objects()
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.resolve_safe();
+	m_scanline_cb.resolve();
 
 	// assign our format to the palette before it starts
 	if (m_palette)
@@ -785,7 +787,7 @@ void screen_device::device_start()
 	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
 
 	// allocate a timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
 		m_scanline_timer = timer_alloc(TID_SCANLINE);
 
 	// configure the screen with the default parameters
@@ -796,7 +798,7 @@ void screen_device::device_start()
 	m_vblank_end_time = attotime(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
 		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
@@ -899,9 +901,13 @@ void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		// subsequent scanlines when scanline updates are enabled
 		case TID_SCANLINE:
-
-			// force a partial update to the current scanline
-			update_partial(param);
+			if (m_video_attributes & VIDEO_UPDATE_SCANLINE)
+			{
+				// force a partial update to the current scanline
+				update_partial(param);
+			}
+			if (m_scanline_cb)
+				m_scanline_cb(param);
 
 			// compute the next visible scanline
 			param++;
@@ -1051,9 +1057,6 @@ void screen_device::set_visible_area(int min_x, int max_x, int min_y, int max_y)
 
 bool screen_device::update_partial(int scanline)
 {
-	// validate arguments
-	assert(scanline >= 0);
-
 	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames

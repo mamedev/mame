@@ -1301,16 +1301,15 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_discrete(*this, "discrete"),
 		m_ay8910(*this, "ay8910"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void goldnpkr_base(machine_config &config);
 	void wildcard(machine_config &config);
 	void wildcrdb(machine_config &config);
 	void witchcrd(machine_config &config);
@@ -1349,16 +1348,24 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 
-	DECLARE_PALETTE_INIT(witchcrd);
-
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	required_device<cpu_device> m_maincpu;
-	required_device_array<pia6821_device, 2> m_pia;
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+
+	void witchcrd_palette(palette_device &palette) const;
+
+	void goldnpkr_base(machine_config &config);
+
+	required_device<cpu_device> m_maincpu;
+	required_device_array<pia6821_device, 2> m_pia;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 private:
 	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
@@ -1375,10 +1382,9 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldnpkr);
+	void goldnpkr_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(wcrdxtnd);
-	DECLARE_PALETTE_INIT(wcrdxtnd);
+	void wcrdxtnd_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
 
@@ -1395,14 +1401,10 @@ private:
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	optional_device<discrete_device> m_discrete;
 	optional_device<ay8910_device> m_ay8910;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	output_finder<5> m_lamps;
 
 	tilemap_t *m_bg_tilemap;
@@ -1511,9 +1513,8 @@ uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
+void goldnpkr_state::goldnpkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1522,42 +1523,36 @@ PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
     ---- x---   intensity.
     xxxx ----   unused.
 */
-	int i;
 
-	/* 0000IBGR */
-	if (color_prom == nullptr) return;
+	// 0000IBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
+		constexpr int intenmin = 0xe0;
+//      constexpr int intenmin = 0xc2;    // 2.5 Volts (75.757575% of the whole range)
+		constexpr int intenmax = 0xff;    // 3.3 Volts (the whole range)
 
-		intenmin = 0xe0;
-//      intenmin = 0xc2;    /* 2.5 Volts (75.757575% of the whole range) */
-		intenmax = 0xff;    /* 3.3 Volts (the whole range) */
+		// intensity component
+		int const inten = BIT(color_prom[i], 3);
 
-		/* intensity component */
-		inten = (color_prom[i] >> 3) & 0x01;
+		// red component
+		int const r = BIT(color_prom[i], 0) * (inten ? intenmax : intenmin);
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * intenmin) + (inten * (bit0 * (intenmax - intenmin)));
+		// green component
+		int const g = BIT(color_prom[i], 1) * (inten ? intenmax : intenmin);
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
-
+		// blue component
+		int const b = BIT(color_prom[i], 2) * (inten ? intenmax : intenmin);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
+void goldnpkr_state::witchcrd_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1573,39 +1568,32 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
     ---- x---   blue killer.
     xxxx ----   unused.
 */
-	int i;
 
-	/* 0000KBGR */
+	// 0000KBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	if (color_prom == nullptr) return;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// blue killer (from schematics)
+		int const bk = BIT(color_prom[i], 3);
 
-		/* blue killer (from schematics) */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
+		// blue component
+		int const b = bk * BIT(color_prom[i], 2) * 0xff;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::wcrdxtnd_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.
@@ -1617,32 +1605,25 @@ PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
     ---- x---   intensity / blue killer.
     xxxx ----   unused.
 */
-	int i;
+	// 0000KBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	/* 0000KBGR */
-
-	if (color_prom == nullptr) return;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// blue killer (from schematics)
+		int const bk = BIT(color_prom[i], 3);
 
-		/* blue killer (from schematics) */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
-		//if ((b == 0) & (bk = 1))   --> needs better implementation
+		// blue component
+		int b = bk * BIT(color_prom[i], 2) * 0xff;
+		//if (!b & bk)   --> needs better implementation
 		//  b = 0x3f;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
@@ -1803,8 +1784,8 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	m_discrete->write(space, NODE_01, data >> 3 & 0x01);
-	m_discrete->write(space, NODE_10, data & 0x07);
+	m_discrete->write(NODE_01, data >> 3 & 0x01);
+	m_discrete->write(NODE_10, data & 0x07);
 }
 
 WRITE8_MEMBER(goldnpkr_state::pia0_a_w)
@@ -4315,11 +4296,11 @@ MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
 *              Machine Drivers               *
 *********************************************/
 
-MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
-
+void goldnpkr_state::goldnpkr_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(goldnpkr_map)
+	M6502(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::goldnpkr_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -4333,231 +4314,205 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (31+1)*8);          /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1); /* From MC6845 init, registers 01 & 06. */
+	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	screen.set_palette(m_palette);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 68B45 or 6845s @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 68B45 or 6845s @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, goldnpkr)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldnpkr);
+	PALETTE(config, m_palette, FUNC(goldnpkr_state::goldnpkr_palette), 256);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::goldnpkr)
+void goldnpkr_state::goldnpkr(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::pottnpkr)
+void goldnpkr_state::pottnpkr(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pottnpkr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::pottnpkr_map);
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, pottnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::witchcrd)
+void goldnpkr_state::witchcrd(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(witchcrd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::witchcrd_map);
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wcfalcon)
+void goldnpkr_state::wcfalcon(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(witchcrd_falcon_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::witchcrd_falcon_map);
 
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w)); /* port A out, custom handler due to address + data are muxed */
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);    /* guess, seems ok */
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wildcard)
+void goldnpkr_state::wildcard(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wildcard_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcard_map);
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
+void goldnpkr_state::wcrdxtnd(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wcrdxtnd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wcrdxtnd_map);
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wcrdxtnd)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, wcrdxtnd)
+	m_gfxdecode->set_info(gfx_wcrdxtnd);
+	m_palette->set_init(FUNC(goldnpkr_state::wcrdxtnd_palette));
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
+void goldnpkr_state::wildcrdb(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wildcrdb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_map);
 
-	MCFG_DEVICE_ADD("mcu", Z80, MASTER_CLOCK/4)    /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(wildcrdb_mcu_map)
-	MCFG_DEVICE_IO_MAP(wildcrdb_mcu_io_map)
+	z80_device &mcu(Z80(config, "mcu", MASTER_CLOCK/4));    /* guess */
+	mcu.set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_mcu_map);
+	mcu.set_addrmap(AS_IO, &goldnpkr_state::wildcrdb_mcu_io_map);
 
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w));
 
 	/* video hardware */
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);    /* guess, seems ok */
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::genie)
+void goldnpkr_state::genie(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(genie_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::genie_map);
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::geniea)
+void goldnpkr_state::geniea(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(goldnpkr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::goldnpkr_map);
 
 //  m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 //  m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::mondial)
+void goldnpkr_state::mondial(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mondial_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::mondial_map);
 
 	MCFG_MACHINE_START_OVERRIDE(goldnpkr_state, mondial)
 	MCFG_MACHINE_RESET_OVERRIDE(goldnpkr_state, mondial)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(goldnpkr_state::bchancep)
+void goldnpkr_state::bchancep(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bchancep_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::bchancep_map);
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pia0_a_r));
 	m_pia[0]->readpb_handler().set(FUNC(goldnpkr_state::pia0_b_r));
@@ -4571,9 +4526,8 @@ MACHINE_CONFIG_START(goldnpkr_state::bchancep)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, pottnpkr_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -4707,11 +4661,11 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&blitz_state::megadpkr_banked_map).set_data_width(8).set_addr_width(16).set_stride(0x4000);
 
-	MCFG_DEVICE_ADD("mcu", M68705P5, CPU_CLOCK) /* unknown */
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, blitz_state, mcu_portb_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(*this, blitz_state, mcu_portc_w))
+	M68705P5(config, m_mcu, CPU_CLOCK); /* unknown */
+	m_mcu->portb_w().set(FUNC(blitz_state::mcu_portb_w));
+	m_mcu->portc_w().set(FUNC(blitz_state::mcu_portc_w));
 
-	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
+	M48T02(config, "timekpr", 0);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
@@ -4729,16 +4683,16 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldnpkr);
+	PALETTE(config, m_palette, FUNC(blitz_state::witchcrd_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

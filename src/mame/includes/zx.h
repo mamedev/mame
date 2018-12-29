@@ -27,11 +27,12 @@
 class zx_state : public driver_device
 {
 public:
-	zx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, "cassette"),
+		m_softlist(*this, "cass_list"),
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
@@ -72,7 +73,6 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(zx);
 	void zx_tape_input();
 	void zx_ula_hsync();
 
@@ -90,9 +90,10 @@ private:
 		TIMER_ULA_HSYNC
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
+	required_device<software_list_device> m_softlist;
 	optional_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_gfx1;

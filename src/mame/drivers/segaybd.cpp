@@ -1271,24 +1271,24 @@ INPUT_PORTS_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segaybd_state::yboard)
-
+void segaybd_state::yboard(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaybd_state::main_map);
 
-	MCFG_DEVICE_ADD("subx", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(subx_map)
+	M68000(config, m_subx, MASTER_CLOCK/4);
+	m_subx->set_addrmap(AS_PROGRAM, &segaybd_state::subx_map);
 
-	MCFG_DEVICE_ADD("suby", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(suby_map)
+	M68000(config, m_suby, MASTER_CLOCK/4);
+	m_suby->set_addrmap(AS_PROGRAM, &segaybd_state::suby_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, SOUND_CLOCK/8);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segaybd_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segaybd_state::sound_portmap);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MB3773(config, "watchdog"); // IC95
 
@@ -1303,80 +1303,79 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	io.out_ph_callback().set(FUNC(segaybd_state::output2_w));
 	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
-	MCFG_MSM6253_IN0_ANALOG_PORT("ADC.0")
-	MCFG_MSM6253_IN1_ANALOG_PORT("ADC.1")
-	MCFG_MSM6253_IN2_ANALOG_PORT("ADC.2")
-	MCFG_MSM6253_IN3_ANALOG_READ(segaybd_state, analog_mux)
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_tag<0>("ADC.0");
+	adc.set_input_tag<1>("ADC.1");
+	adc.set_input_tag<2>("ADC.2");
+	adc.set_input_cb<3>(FUNC(segaybd_state::analog_mux));
 
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_suby")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_suby")
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_suby", 0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(342,262)   // to be verified
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segaybd_state,screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(342,262);   // to be verified
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segaybd_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 
-	MCFG_DEVICE_ADD("bsprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("ysprites", SEGA_YBOARD_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_bsprites, 0);
+	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
-	MCFG_PALETTE_ADD("palette", 8192*3)
+	PALETTE(config, m_palette).set_entries(8192*3);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/8)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/8));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.43);
+	ymsnd.add_route(1, "rspeaker", 0.43);
 
-	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
-	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/8));
+	pcm.set_bank(segapcm_device::BANK_12M | segapcm_device::BANK_MASKF8);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
 
 // irq at 0x28 is from MB8421, and irq at 0x38 probably from MB89372?
-MACHINE_CONFIG_START(segaybd_state::yboard_link)
+void segaybd_state::yboard_link(machine_config &config)
+{
 	yboard(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(main_map_link)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaybd_state::main_map_link);
 
-	MCFG_DEVICE_ADD("linkcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(link_map)
-	MCFG_DEVICE_IO_MAP(link_portmap)
+	Z80(config, m_linkcpu, XTAL(16'000'000)/2); // 8 Mhz
+	m_linkcpu->set_addrmap(AS_PROGRAM, &segaybd_state::link_map);
+	m_linkcpu->set_addrmap(AS_IO, &segaybd_state::link_portmap);
 
 	mb8421_device &mb8421(MB8421(config, "mb8421"));
 	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));
 	mb8421.intr_callback().set(FUNC(segaybd_state::mb8421_intr));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)
+void segaybd_state::yboard_deluxe(machine_config &config)
+{
 	yboard(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)
-	MCFG_DEVICE_PROGRAM_MAP(motor_map)
-//  MCFG_DEVICE_IO_MAP(motor_portmap)
-
-MACHINE_CONFIG_END
+	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // 8 Mhz(guessed)
+	motorcpu.set_addrmap(AS_PROGRAM, &segaybd_state::motor_map);
+//  motorcpu.set_addrmap(AS_IO, &segaybd_state::motor_portmap);
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS

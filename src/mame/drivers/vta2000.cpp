@@ -47,7 +47,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(vta2000);
+	void vta2000_palette(palette_device &palette) const;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -181,7 +181,7 @@ static GFXDECODE_START( gfx_vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(vta2000_state, vta2000)
+void vta2000_state::vta2000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
@@ -221,13 +221,11 @@ MACHINE_CONFIG_START(vta2000_state::vta2000)
 	MCFG_SCREEN_UPDATE_DRIVER(vta2000_state, screen_update_vta2000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
+	PALETTE(config, "palette", FUNC(vta2000_state::vta2000_palette), 3);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vta2000)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -244,5 +242,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS */
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
 COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING )

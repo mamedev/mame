@@ -1440,28 +1440,27 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'636'363)/8)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(28'636'363)/8));
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -1469,11 +1468,12 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(raiden2_state::xsedae)
@@ -1517,18 +1517,17 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
-	MCFG_RAIDEN2COP_PALETTERAM_OUT_CB(WRITE16(m_palette, palette_device, write16))
-	MCFG_RAIDEN2COP_HOST_CPU("maincpu")
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -1542,11 +1541,12 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 /* ROM LOADING */

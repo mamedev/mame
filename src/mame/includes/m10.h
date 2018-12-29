@@ -5,6 +5,10 @@
     IREM M-10,M-11 and M-15 based hardware
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_M10_H
+#define MAME_INCLUDES_M10_H
+
+#pragma once
 
 #include "sound/samples.h"
 #include "machine/74123.h"
@@ -36,8 +40,8 @@
 class m10_state : public driver_device
 {
 public:
-	m10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m10_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_memory(*this, "memory"),
 		m_rom(*this, "rom"),
 		m_videoram(*this, "videoram"),
@@ -49,7 +53,8 @@ public:
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void m15(machine_config &config);
 	void headoni(machine_config &config);
@@ -114,7 +119,7 @@ private:
 	DECLARE_MACHINE_START(m10);
 	DECLARE_MACHINE_RESET(m10);
 	DECLARE_VIDEO_START(m10);
-	DECLARE_PALETTE_INIT(m10);
+	void m10_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(m15);
 	uint32_t screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -130,3 +135,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_M10_H

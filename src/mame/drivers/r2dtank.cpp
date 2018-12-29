@@ -56,8 +56,8 @@ RAM = 4116 (x11)
 class r2dtank_state : public driver_device
 {
 public:
-	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
@@ -68,7 +68,8 @@ public:
 		m_pia_main(*this, "pia_main"),
 		m_pia_audio(*this, "pia_audio"),
 		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2") { }
+		m_ay2(*this, "ay2")
+	{ }
 
 	void r2dtank(machine_config &config);
 
@@ -455,13 +456,14 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(r2dtank_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("74123", ttl74123_device, a_w))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row), this);
+	crtc.out_de_callback().set("74123", FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */
 
@@ -491,17 +493,17 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, (4000000 / 4))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, (4000000 / 4));
+	m_ay1->port_a_read_callback().set_ioport("DSWB");
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, (4000000 / 4))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay2, (4000000 / 4));
+	m_ay2->port_a_read_callback().set_ioport("IN1");
+	m_ay2->port_b_read_callback().set_ioport("DSWA");
+	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 MACHINE_CONFIG_END
 

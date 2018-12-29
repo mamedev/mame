@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(littlerb_state::littlerb)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // 10MHz rated part, near 16Mhz XTAL
 	MCFG_DEVICE_PROGRAM_MAP(littlerb_main)
 
-	MCFG_INDER_VIDEO_ADD("inder_vid") // XTAL(40'000'000)
+	INDER_VIDEO(config, m_indervid, 0); // XTAL(40'000'000)
 
 	// TODO: not accurate - driven by XTAL(6'000'000)?
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))

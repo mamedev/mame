@@ -419,18 +419,17 @@ MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spdodgeb)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(spdodgeb_state, spdodgeb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spdodgeb);
+	PALETTE(config, m_palette, FUNC(spdodgeb_state::spdodgeb_palette), 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))

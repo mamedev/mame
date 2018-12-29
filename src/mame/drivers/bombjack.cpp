@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_IO_MAP(audio_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -372,9 +372,8 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	screen.screen_vblank().set(FUNC(bombjack_state::vblank_irq));
 	screen.screen_vblank().append_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombjack)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombjack);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
 
 
 	/* sound hardware */

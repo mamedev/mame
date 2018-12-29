@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
@@ -273,12 +274,13 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD("h46505", H46505, "screen", XTAL(22'000'000)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(peoplepc_state, update_row)
+	h46505_device &crtc(H46505(config, "h46505", XTAL(22'000'000)/8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(peoplepc_state::update_row), this);
 
 	I8257(config, m_dmac, XTAL(14'745'600)/3);
 	m_dmac->out_hrq_cb().set(FUNC(peoplepc_state::hrq_w));
@@ -288,7 +290,7 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::mdma_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)

@@ -221,29 +221,33 @@
 class mpu12wbk_state : public driver_device
 {
 public:
-	mpu12wbk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mpu12wbk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void mpu12wbk(machine_config &config);
 
 	void init_mpu12wbk();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_WRITE8_MEMBER(mpu12wbk_videoram_w);
 	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mpu12wbk);
+	void mpu12wbk_palette(palette_device &palette) const;
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	void mpu12wbk_map(address_map &map);
 };
 
@@ -296,7 +300,7 @@ uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
+void mpu12wbk_state::mpu12wbk_palette(palette_device &palette) const
 {
 }
 
@@ -507,14 +511,14 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mpu12wbk)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(mpu12wbk_state, mpu12wbk)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mpu12wbk);
+	PALETTE(config, "palette", FUNC(mpu12wbk_state::mpu12wbk_palette), 512);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/4)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

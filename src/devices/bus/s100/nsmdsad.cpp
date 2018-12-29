@@ -109,5 +109,5 @@ void s100_mds_ad_device::device_reset()
 
 uint8_t s100_mds_ad_device::s100_smemr_r(address_space &space, offs_t offset)
 {
-	return 0;
+	return 0xff;
 }

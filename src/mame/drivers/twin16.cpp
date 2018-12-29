@@ -60,7 +60,7 @@ Known Issues:
 
 
 
-int twin16_state::spriteram_process_enable(  )
+int twin16_state::spriteram_process_enable()
 {
 	return (m_CPUA_register & 0x40) == 0;
 }
@@ -649,126 +649,123 @@ void twin16_state::machine_start()
 	save_item(NAME(m_CPUB_register));
 }
 
-MACHINE_CONFIG_START(twin16_state::twin16)
+void twin16_state::twin16(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'432'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, XTAL(18'432'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &twin16_state::main_map);
 
-	MCFG_DEVICE_ADD("sub", M68000, XTAL(18'432'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, XTAL(18'432'000)/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &twin16_state::sub_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &twin16_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, twin16_state, screen_vblank_twin16))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
+	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twin16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twin16);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->set_membits(8);
+	m_palette->enable_shadows();
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, twin16_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12) // estimated with gradius2 OST
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.12)
+	K007232(config, m_k007232, XTAL(3'579'545));
+	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.12); // estimated with gradius2 OST
+	m_k007232->add_route(0, "rspeaker", 0.12);
+	m_k007232->add_route(1, "lspeaker", 0.12);
+	m_k007232->add_route(1, "rspeaker", 0.12);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+}
 
-MACHINE_CONFIG_START(twin16_state::devilw)
+void twin16_state::devilw(machine_config &config)
+{
 	twin16(config);
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(60000); // watchdog reset otherwise
+}
 
-MACHINE_CONFIG_START(fround_state::fround)
+void fround_state::fround(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'432'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(fround_map)
+	M68000(config, m_maincpu, XTAL(18'432'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fround_state::fround_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fround_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, twin16_state, screen_vblank_twin16))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
+	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fround)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fround);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->set_membits(8);
+	m_palette->enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, twin16_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.12)
+	K007232(config, m_k007232, XTAL(3'579'545));
+	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.12);
+	m_k007232->add_route(0, "rspeaker", 0.12);
+	m_k007232->add_route(1, "lspeaker", 0.12);
+	m_k007232->add_route(1, "rspeaker", 0.12);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+}
 
-MACHINE_CONFIG_START(twin16_state::miaj)
+void twin16_state::miaj(machine_config &config)
+{
 	twin16(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
-MACHINE_CONFIG_END
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
+}
 
-MACHINE_CONFIG_START(cuebrickj_state::cuebrickj)
+void cuebrickj_state::cuebrickj(machine_config &config)
+{
 	twin16(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

@@ -39,7 +39,7 @@ public:
 
 	void mark_all_dirty(void);
 	void init_scroll(int flip);
-	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int prival = 0);
+	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int prival = 0, int primask = 0xff);
 
 protected:
 	// device-level overrides

@@ -576,11 +576,10 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT_CLASS(4, unico_state, unico_R6G6B6X)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &unico_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -621,11 +620,10 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT_CLASS(4, zeropnt_state, unico_R6G6B6X)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &zeropnt_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -669,19 +667,16 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT_CLASS(4, zeropnt2_state, unico_R6G6B6X)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &zeropnt2_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70); /* 3.579545 MHz */
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, zeropnt_oki_map)

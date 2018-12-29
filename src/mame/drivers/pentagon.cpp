@@ -291,17 +291,17 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
 	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
-	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
+	BETA_DISK(config, m_beta, 0);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pentagon)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
+	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", XTAL(14'000'000)/8));
+	ay8912.add_route(0, "lspeaker", 0.50);
+	ay8912.add_route(1, "lspeaker", 0.25);
+	ay8912.add_route(1, "rspeaker", 0.25);
+	ay8912.add_route(2, "rspeaker", 0.50);
 
 	MCFG_DEVICE_REMOVE("exp")
 

@@ -1294,22 +1294,20 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_btime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_btime)
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	PALETTE(config, m_palette, FUNC(btime_state::btime_palette)).set_format(palette_device::BGR_233_inverted, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	ay8910_device &ay1(AY8910(config, "ay1", HCLK2));
 	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
@@ -1361,9 +1359,8 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(btime_state,lnc)
+	m_palette->set_entries(8);
+	m_palette->set_init(FUNC(btime_state::lnc_palette));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
@@ -1430,8 +1427,7 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
+	m_palette->set_entries(64);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
@@ -1460,14 +1456,12 @@ MACHINE_CONFIG_START(btime_state::disco)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(disco_audio_map)
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	m_soundlatch->set_separate_acknowledge(true);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_disco)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32)
+	m_palette->set_entries(32);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 

@@ -129,8 +129,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	MCFG_DEVICE_ADD("mea8000", MEA8000, 15000000 / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "measnd", 1.0)
 	SPEAKER(config, "aysnd").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, 15000000 / 8) // clock line marked as CK2 and derived from 15MHz crystal
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.25)
+	AY8910(config, "ay", 15000000 / 8).add_route(ALL_OUTPUTS, "aysnd", 0.25); // clock line marked as CK2 and derived from 15MHz crystal
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_nop(); // DADIS

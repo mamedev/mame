@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
@@ -72,10 +71,9 @@ void jade_state::jade(machine_config &config)
 	Z80CTC(config, "ctc1", 4_MHz_XTAL);
 
 	z80ctc_device &ctc2(Z80CTC(config, "ctc2", 4_MHz_XTAL));
+	ctc2.set_clk<0>(4_MHz_XTAL / 2);
 	ctc2.zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
 	ctc2.zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
-
-	CLOCK(config, "trg0", 4_MHz_XTAL / 2).signal_handler().set("ctc2", FUNC(z80ctc_device::trg0));
 
 	/* Devices */
 	z80sio_device& sio(Z80SIO(config, "sio", 4_MHz_XTAL));

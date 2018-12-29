@@ -264,7 +264,7 @@ void pdc_device::device_add_mconfig(machine_config &config)
 	//MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	/* Floppy Disk Controller - uPD765a - NEC D765AC-2 */
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 4'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pdc_device::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_dma8237, FUNC(am9517a_device::dreq0_w)); //.invert();
 

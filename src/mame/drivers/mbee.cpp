@@ -666,10 +666,9 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mono)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_mono)
 
-	MCFG_PALETTE_ADD("palette", 100)
-	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
+	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, mono)
 
@@ -679,12 +678,13 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 12_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbee_state, crtc_vs))
+	SY6545_1(config, m_crtc, 12_MHz_XTAL / 8);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 3)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 3)
@@ -723,10 +723,9 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_standard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_standard)
 
-	MCFG_PALETTE_ADD("palette", 100)
-	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
+	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, standard)
 
@@ -736,12 +735,13 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13.5_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbee_state, crtc_vs))
+	SY6545_1(config, m_crtc, 13.5_MHz_XTAL / 8);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
@@ -770,8 +770,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	MCFG_DEVICE_IO_MAP(mbeeppc_io)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_premium)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
+	m_palette->set_init(FUNC(mbee_state::premium_palette));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));

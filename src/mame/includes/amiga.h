@@ -416,7 +416,7 @@ public:
 
 	DECLARE_VIDEO_START( amiga );
 	DECLARE_VIDEO_START( amiga_aga );
-	DECLARE_PALETTE_INIT( amiga );
+	void amiga_palette(palette_device &palette) const;
 
 	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

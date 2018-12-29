@@ -23,7 +23,7 @@ PCB Layout
                                      TPC1020
 DSW1 62256   62256                   (PLCC84)
     DM1000A DM1000B
-DSW2    68000      TPC1020           62256
+DSW2  MC68000P12   TPC1020           62256
                    (PLCC84)          62256
 12MHz 32MHz
 
@@ -32,7 +32,7 @@ Notes:
           *: Unknown PLCC84 chip (surface scratched)
       VSync: 60Hz
       HSync: 15.625kHz
-  68K clock: 16MHz
+  68K clock: 12MHz
 
 */
 
@@ -375,19 +375,19 @@ void drgnmst_state::machine_reset()
 
 MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* Confirmed */
+	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) /* Confirmed */
 	MCFG_DEVICE_PROGRAM_MAP(drgnmst_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
-	MCFG_PIC16C5x_READ_A_CB(READ8(*this, drgnmst_state, pic16c5x_port0_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, drgnmst_state, pcm_banksel_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, drgnmst_state, snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, drgnmst_state, oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, snd_control_w))
+	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
+	m_audiocpu->read_a().set(FUNC(drgnmst_state::pic16c5x_port0_r));
+	m_audiocpu->write_a().set(FUNC(drgnmst_state::pcm_banksel_w));
+	m_audiocpu->read_b().set(FUNC(drgnmst_state::snd_command_r));
+	m_audiocpu->write_b().set(FUNC(drgnmst_state::oki_w));
+	m_audiocpu->read_c().set(FUNC(drgnmst_state::snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(drgnmst_state::snd_control_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnmst);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -395,19 +395,18 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT_CLASS(2, drgnmst_state, drgnmst_IIIIRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(2, &drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, drgnmst_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -449,6 +448,42 @@ ROM_START( drgnmst )
 	ROM_LOAD16_BYTE( "dm1008", 0x000000, 0x100000, CRC(b8572be3) SHA1(29aab76821e0a56033cf06b0a1890b11804da8d8) )
 ROM_END
 
+ROM_START( drgnmst2 ) // only the maincpu ROMs were provided for this set
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "even", 0x00000, 0x80000, CRC(63eae56a) SHA1(24939923be09dea523d74ecd72d7d1587469b6dc) )
+	ROM_LOAD16_BYTE( "odd", 0x00001, 0x80000, CRC(35734a49) SHA1(8e9b40ca68c1dd3b2d6c262b833f71333fb43209) )
+
+	ROM_REGION( 0x400, "audiocpu", ROMREGION_ERASE00 ) /* PIC16C55 Code */
+//  ROM_LOAD( "pic16c55", 0x0000, 0x400, CRC(531c9f8d) SHA1(8ec180b0566f2ce1e08f0347e5ad402c73b44049) )
+	/* ROM will be copied here by the init code from the USER1 region */
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "pic16c55.hex", 0x000, 0x0b7b, CRC(f17011e7) SHA1(8f3bd94ffb528f661eed77d89e5b772442d2f5a6) )
+
+	ROM_REGION( 0x140000, "oki1", 0 ) /* OKI-0 Samples */
+	ROM_LOAD( "dm1001", 0x00000, 0x100000, CRC(63566f7f) SHA1(0fe6cb67a5d99cd54e46e9889ea121097756b9ef) )
+
+	ROM_REGION( 0x200000, "oki2", 0 ) /* OKI-1 Samples */
+	ROM_LOAD( "dm1002", 0x00000, 0x200000, CRC(0f1a874e) SHA1(8efc39f8ff7e6e7138b19959bd083b9df002acca) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprites (16x16x4) */
+	ROM_LOAD16_BYTE( "dm1003", 0x000000, 0x080000, CRC(0ca10e81) SHA1(abebd8437764110278c8b7e583d846db27e205ec) )
+	ROM_CONTINUE(0x400000, 0x080000)
+	ROM_CONTINUE(0x100000, 0x080000)
+	ROM_CONTINUE(0x500000, 0x080000)
+	ROM_LOAD16_BYTE( "dm1005", 0x000001, 0x080000, CRC(4c2b1db5) SHA1(35d799cd13540e2aca1d1164291fe4c9938ed0ce) )
+	ROM_CONTINUE(0x400001, 0x080000)
+	ROM_CONTINUE(0x100001, 0x080000)
+	ROM_CONTINUE(0x500001, 0x080000)
+	ROM_LOAD16_BYTE( "dm1004", 0x200000, 0x040000, CRC(1a9ac249) SHA1(c15c7399dcb24dcab05887e3711e5b31bb7f31e8) )
+	ROM_CONTINUE(0x600000, 0x040000)
+	ROM_LOAD16_BYTE( "dm1006", 0x200001, 0x040000, CRC(c46da6fc) SHA1(f2256f02c833bc1074681729bd2b95fa6f3350cf) )
+	ROM_CONTINUE(0x600001, 0x040000)
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */
+	ROM_LOAD16_BYTE( "dm1007", 0x000001, 0x100000, CRC(d5ad81c4) SHA1(03df467b218682a02245a6e8f500ab83de382448) )
+	ROM_LOAD16_BYTE( "dm1008", 0x000000, 0x100000, CRC(b8572be3) SHA1(29aab76821e0a56033cf06b0a1890b11804da8d8) )
+ROM_END
 
 uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
 {
@@ -522,7 +557,7 @@ void drgnmst_state::init_drgnmst()
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			m_audiocpu->pic16c5x_set_config(data);
+			m_audiocpu->set_config(data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}
@@ -531,4 +566,5 @@ void drgnmst_state::init_drgnmst()
 }
 
 
-GAME( 1994, drgnmst, 0, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst,        0, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst2, drgnmst, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )

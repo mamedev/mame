@@ -334,15 +334,16 @@
 class fortecar_state : public driver_device
 {
 public:
-	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fortecar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_vram(*this, "vram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamps(*this, "lamp%u", 0U) { }
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	void fortecar(machine_config &config);
 
@@ -366,7 +367,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ayporta_w);
 	DECLARE_WRITE8_MEMBER(ayportb_w);
 
-	DECLARE_PALETTE_INIT(fortecar);
+	void fortecar_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void fortecar_map(address_map &map);
@@ -407,9 +408,8 @@ uint32_t fortecar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::fortecar_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /* Video resistors...
 
 O1 (LS374) R1K  RED
@@ -423,35 +423,36 @@ O8 (LS374) R220 BLUE
 
 R = 82 Ohms Pull Down.
 */
-	static const int resistances_rg[3] = { 1000, 510, 220 };
-	static const int resistances_b [2] = { 510, 220 };
-	double weights_r[3], weights_g[3], weights_b[2];
+	static constexpr int resistances_rg[3] = { 1000, 510, 220 };
+	static constexpr int resistances_b [2] = { 510, 220 };
 
+	double weights_r[3], weights_g[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3,  resistances_rg, weights_r,  82, 0,
 			3,  resistances_rg, weights_g,  82, 0,
 			2,  resistances_b,  weights_b,  82, 0);
 
+	uint8_t const *const color_prom = memregion("proms")->base();
 	for (int i = 0; i < 512; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -698,7 +699,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)    /* driven by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	EEPROM_93C56_16BIT(config, "eeprom").default_value(0);
 
@@ -712,21 +713,21 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 
 	V3021(config, "rtc");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fortecar)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fortecar);
+	PALETTE(config, m_palette, FUNC(fortecar_state::fortecar_palette), 0x200);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 1.5 MHz, measured */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* 1.5 MHz, measured */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortecar_state, ayporta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortecar_state, ayportb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));   /* 1.5 MHz, measured */
+	aysnd.port_a_write_callback().set(FUNC(fortecar_state::ayporta_w));
+	aysnd.port_b_write_callback().set(FUNC(fortecar_state::ayportb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

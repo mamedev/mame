@@ -39,7 +39,6 @@ TODO:
 #include "includes/spcforce.h"
 
 #include "cpu/i8085/i8085.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
@@ -58,7 +57,7 @@ void spcforce_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-WRITE8_MEMBER(spcforce_state::SN76496_latch_w)
+WRITE8_MEMBER(spcforce_state::sn76496_latch_w)
 {
 	m_sn76496_latch = data;
 }
@@ -78,22 +77,22 @@ WRITE_LINE_MEMBER(spcforce_state::write_sn3_ready)
 	m_sn3_ready = state;
 }
 
-READ8_MEMBER(spcforce_state::SN76496_select_r)
+READ8_MEMBER(spcforce_state::sn76496_select_r)
 {
-	if (~m_sn76496_select & 0x40) return m_sn1_ready;
-	if (~m_sn76496_select & 0x20) return m_sn2_ready;
-	if (~m_sn76496_select & 0x10) return m_sn3_ready;
+	if (!BIT(m_sn76496_select, 6)) return m_sn1_ready;
+	if (!BIT(m_sn76496_select, 5)) return m_sn2_ready;
+	if (!BIT(m_sn76496_select, 4)) return m_sn3_ready;
 
 	return 0;
 }
 
-WRITE8_MEMBER(spcforce_state::SN76496_select_w)
+WRITE8_MEMBER(spcforce_state::sn76496_select_w)
 {
 	m_sn76496_select = data;
 
-	if (~data & 0x40) m_sn1->write(m_sn76496_latch);
-	if (~data & 0x20) m_sn2->write(m_sn76496_latch);
-	if (~data & 0x10) m_sn3->write(m_sn76496_latch);
+	if (!BIT(data, 6)) m_sn[0]->write(m_sn76496_latch);
+	if (!BIT(data, 5)) m_sn[1]->write(m_sn76496_latch);
+	if (!BIT(data, 4)) m_sn[2]->write(m_sn76496_latch);
 }
 
 READ_LINE_MEMBER(spcforce_state::t0_r)
@@ -250,27 +249,25 @@ static GFXDECODE_START( gfx_spcforce )
 GFXDECODE_END
 
 
-/* 1-bit RGB palette */
-static const int colortable_source[] =
+// 1-bit RGB palette
+static constexpr int COLORTABLE_SOURCE[] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
-	0, 0, 1, 2, 3, 4, 5, 6,  /* not sure about these, but they are only used */
-	0, 7, 0, 1, 2, 3, 4, 5,  /* to change the text color. During the game,   */
-	0, 6, 7, 0, 1, 2, 3, 4,  /* only color 0 is used, which is correct.      */
+	0, 0, 1, 2, 3, 4, 5, 6,  // not sure about these, but they are only used
+	0, 7, 0, 1, 2, 3, 4, 5,  // to change the text color. During the game,
+	0, 6, 7, 0, 1, 2, 3, 4,  // only color 0 is used, which is correct.
 	0, 5, 6, 7, 0, 1, 2, 3,
 	0, 4, 5, 6, 7, 0, 1, 2,
 	0, 3, 4, 5, 6, 7, 0, 1,
 	0, 2, 3, 4, 5, 6, 7, 0
 };
 
-PALETTE_INIT_MEMBER(spcforce_state, spcforce)
+void spcforce_state::spcforce_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < ARRAY_LENGTH(COLORTABLE_SOURCE); i++)
 	{
-		int data = colortable_source[i];
-		rgb_t color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
+		int const data = COLORTABLE_SOURCE[i];
+		rgb_t const color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
 
 		palette.set_pen_color(i, color);
 	}
@@ -283,21 +280,21 @@ INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
 		device.execute().set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(spcforce_state::spcforce)
-
+void spcforce_state::spcforce(machine_config &config)
+{
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_DEVICE_ADD("maincpu", I8085A, 8000000 * 2)        /* 4.00 MHz??? */
-	MCFG_DEVICE_PROGRAM_MAP(spcforce_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spcforce_state,  vblank_irq)
+	I8085A(config, m_maincpu, 8000000 * 2);        /* 4.00 MHz??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spcforce_state::spcforce_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spcforce_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", I8035, 6144000)        /* divisor ??? */
-	MCFG_DEVICE_PROGRAM_MAP(spcforce_sound_map)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, spcforce_state, SN76496_latch_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, spcforce_state, SN76496_select_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, spcforce_state, SN76496_select_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, spcforce_state, t0_r))
+	I8035(config, m_audiocpu, 6144000);        /* divisor ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spcforce_state::spcforce_sound_map);
+	m_audiocpu->bus_in_cb().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_audiocpu->p1_out_cb().set(FUNC(spcforce_state::sn76496_latch_w));
+	m_audiocpu->p2_in_cb().set(FUNC(spcforce_state::sn76496_select_r));
+	m_audiocpu->p2_out_cb().set(FUNC(spcforce_state::sn76496_select_w));
+	m_audiocpu->t0_in_cb().set(FUNC(spcforce_state::t0_r));
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<3>().set(FUNC(spcforce_state::flip_screen_w));
@@ -305,35 +302,34 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	m_mainlatch->q_out_cb<7>().set(FUNC(spcforce_state::unknown_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(spcforce_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spcforce)
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
-	MCFG_PALETTE_INIT_OWNER(spcforce_state, spcforce)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spcforce);
+	PALETTE(config, m_palette, FUNC(spcforce_state::spcforce_palette), ARRAY_LENGTH(COLORTABLE_SOURCE));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, spcforce_state, write_sn1_ready))
+	SN76496(config, m_sn[0], 2000000);
+	m_sn[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_sn[0]->ready_cb().set(FUNC(spcforce_state::write_sn1_ready));
 
-	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, spcforce_state, write_sn2_ready))
+	SN76496(config, m_sn[1], 2000000);
+	m_sn[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_sn[1]->ready_cb().set(FUNC(spcforce_state::write_sn2_ready));
 
-	MCFG_DEVICE_ADD("sn3", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, spcforce_state, write_sn3_ready))
-MACHINE_CONFIG_END
+	SN76496(config, m_sn[2], 2000000);
+	m_sn[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_sn[2]->ready_cb().set(FUNC(spcforce_state::write_sn3_ready));
+}
 
 void spcforce_state::meteors(machine_config &config)
 {

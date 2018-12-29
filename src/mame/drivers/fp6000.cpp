@@ -32,8 +32,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_gvram(*this, "gvram"),
 		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc"),
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
@@ -312,9 +312,10 @@ MACHINE_CONFIG_START(fp6000_state::fp6000)
 	MCFG_SCREEN_UPDATE_DRIVER(fp6000_state, screen_update_fp6000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, 16000000/5);    /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)

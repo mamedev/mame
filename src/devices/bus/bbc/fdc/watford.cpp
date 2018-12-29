@@ -67,9 +67,9 @@ ROM_END
 
 void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 {
-	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
-	m_fdc->intrq_wr_callback().set(FUNC(bbc_weddb2_device::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(bbc_weddb2_device::fdc_drq_w));
+	WD1772(config, m_fdc, 8_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
@@ -77,9 +77,9 @@ void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 
 void bbc_weddb3_device::device_add_mconfig(machine_config &config)
 {
-	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
-	m_fdc->intrq_wr_callback().set(FUNC(bbc_weddb3_device::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(bbc_weddb3_device::fdc_drq_w));
+	WD1770(config, m_fdc, DERIVED_CLOCK(1, 1));
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
@@ -112,7 +112,6 @@ bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, devi
 
 bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_watfordfdc_device(mconfig, BBC_WEDDB2, tag, owner, clock)
-	, m_dfs_rom(*this, "dfs_rom")
 	, m_fdc(*this, "wd1772")
 	, m_floppy0(*this, "wd1772:0")
 	, m_floppy1(*this, "wd1772:1")
@@ -122,7 +121,6 @@ bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *
 
 bbc_weddb3_device::bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: bbc_watfordfdc_device(mconfig, BBC_WEDDB3, tag, owner, clock)
-	, m_dfs_rom(*this, "dfs_rom")
 	, m_fdc(*this, "wd1770")
 	, m_floppy0(*this, "wd1770:0")
 	, m_floppy1(*this, "wd1770:1")
@@ -142,20 +140,6 @@ void bbc_weddb2_device::device_start()
 void bbc_weddb3_device::device_start()
 {
 	save_item(NAME(m_drive_control));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_weddb2_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
-}
-
-void bbc_weddb3_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
 }
 
 
@@ -250,14 +234,4 @@ WRITE8_MEMBER(bbc_weddb3_device::write)
 		// bit 5: reset
 		if (!BIT(data, 5)) m_fdc->soft_reset();
 	}
-}
-
-WRITE_LINE_MEMBER(bbc_watfordfdc_device::fdc_intrq_w)
-{
-	m_slot->intrq_w(state);
-}
-
-WRITE_LINE_MEMBER(bbc_watfordfdc_device::fdc_drq_w)
-{
-	m_slot->drq_w(state);
 }

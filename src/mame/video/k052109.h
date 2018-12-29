@@ -10,18 +10,6 @@
 typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
 
-#define MCFG_K052109_CB(_class, _method) \
-	downcast<k052109_device &>(*device).set_k052109_callback(k052109_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K052109_CHARRAM(_ram) \
-	downcast<k052109_device &>(*device).set_ram(_ram);
-
-#define MCFG_K052109_SCREEN_TAG(_tag) \
-	downcast<k052109_device &>(*device).set_screen_tag(_tag);
-
-#define MCFG_K052109_IRQ_HANDLER(_devcb) \
-	downcast<k052109_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
 
 class k052109_device : public device_t, public device_gfx_interface
 {
@@ -34,12 +22,10 @@ public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
-	template <class Object> devcb_base &set_irq_handler(Object &&cb)
-	{ return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	void set_k052109_callback(k052109_cb_delegate callback) { m_k052109_cb = callback; }
-	void set_ram(bool ram);
-	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb = k052109_cb_delegate(std::forward<T>(args)...); }
+	void set_char_ram(bool ram);
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	/*
 	The callback is passed:

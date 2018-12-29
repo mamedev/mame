@@ -145,7 +145,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_ipc;
+	required_device<i8749_device> m_ipc;
 	required_device<zx8301_device> m_zx8301;
 	required_device<zx8302_device> m_zx8302;
 	required_device<speaker_sound_device> m_speaker;
@@ -903,13 +903,13 @@ MACHINE_CONFIG_START(ql_state::ql)
 	MCFG_DEVICE_ADD(m_maincpu, M68008, X1/2)
 	MCFG_DEVICE_PROGRAM_MAP(ql_mem)
 
-	MCFG_DEVICE_ADD(I8749_TAG, I8749, X4)
-	MCFG_DEVICE_IO_MAP(ipc_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ql_state, ipc_port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ql_state, ipc_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ql_state, ipc_port2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ql_state, ipc_t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ql_state, ipc_bus_r))
+	I8749(config, m_ipc, X4);
+	m_ipc->set_addrmap(AS_IO, &ql_state::ipc_io);
+	m_ipc->p1_out_cb().set(FUNC(ql_state::ipc_port1_w));
+	m_ipc->p2_in_cb().set(FUNC(ql_state::ipc_port2_r));
+	m_ipc->p2_out_cb().set(FUNC(ql_state::ipc_port2_w));
+	m_ipc->t1_in_cb().set(FUNC(ql_state::ipc_t1_r));
+	m_ipc->bus_in_cb().set(FUNC(ql_state::ipc_bus_r));
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -946,9 +946,9 @@ MACHINE_CONFIG_START(ql_state::ql)
 	m_zx8302->out_raw2_callback().set(FUNC(ql_state::zx8302_raw2_w));
 	m_zx8302->in_raw2_callback().set(FUNC(ql_state::zx8302_raw2_r));
 
-	MCFG_MICRODRIVE_ADD(MDV_1)
-	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE(MDV_2, microdrive_image_device, comms_in_w))
-	MCFG_MICRODRIVE_ADD(MDV_2)
+	MICRODRIVE(config, m_mdv1, 0);
+	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
+	MICRODRIVE(config, m_mdv2, 0);
 
 	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
 	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE
@@ -962,8 +962,8 @@ MACHINE_CONFIG_START(ql_state::ql)
 
 	MCFG_DEVICE_ADD("rom", QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_cards, nullptr)
 
-	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
-	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(*this, ql_state, qimi_extintl_w))
+	QIMI(config, m_qimi, 0);
+	m_qimi->extint_wr_callback().set(FUNC(ql_state::qimi_extintl_w));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")

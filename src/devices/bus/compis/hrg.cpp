@@ -86,12 +86,12 @@ MACHINE_CONFIG_START(compis_hrg_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE(UPD7220_TAG, upd7220_device, screen_update)
 
-	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, 2252500) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(0, hrg_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_hrg_device, display_pixels)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD7220(config, m_crtc, 2252500); // unknown clock
+	m_crtc->set_addrmap(0, &compis_hrg_device::hrg_map);
+	m_crtc->set_display_pixels_callback(FUNC(compis_hrg_device::display_pixels), this);
+	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 
@@ -104,12 +104,12 @@ MACHINE_CONFIG_START(compis_uhrg_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 800-1)
 	MCFG_SCREEN_UPDATE_DEVICE(UPD7220_TAG, upd7220_device, screen_update)
 
-	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, 2252500*2) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(0, uhrg_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_uhrg_device, display_pixels)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD7220(config, m_crtc, 2252500*2); // unknown clock
+	m_crtc->set_addrmap(0, &compis_uhrg_device::uhrg_map);
+	m_crtc->set_display_pixels_callback(FUNC(compis_uhrg_device::display_pixels), this);
+	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 

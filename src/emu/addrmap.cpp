@@ -1108,7 +1108,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 
 			// error if not found
 			if (!found)
-				osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				osd_printf_error("%s space memory map entry %X-%X references nonexistent region '%s'\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 		}
 
 		// make sure all devices exist

@@ -71,10 +71,11 @@ public:
 
 	void init_i7000();
 
-private:
+protected:
 	void video_start() override;
 	void machine_start() override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -85,7 +86,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_PALETTE_INIT(i7000);
+	void i7000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 
 	DECLARE_READ8_MEMBER(i7000_kbd_r);
@@ -240,7 +241,7 @@ void i7000_state::machine_start()
 	}
 }
 
-PALETTE_INIT_MEMBER(i7000_state, i7000)
+void i7000_state::i7000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x33, 0x33, 0x33));
 	palette.set_pen_color(1, rgb_t(0xBB, 0xBB, 0xBB));
@@ -356,14 +357,14 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_SCREEN_UPDATE_DRIVER(i7000_state, screen_update_i7000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_i7000)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_i7000);
+	PALETTE(config, "palette", FUNC(i7000_state::i7000_palette), 2);
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(20'000'000)) /* (?) */
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_ADDR_CHANGED_CB(i7000_state, crtc_addr)
+	r6545_1_device &crtc(R6545_1(config, "crtc", XTAL(20'000'000))); /* (?) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(true);
+	crtc.set_char_width(8);
+	crtc.set_on_update_addr_change_callback(FUNC(i7000_state::crtc_addr), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

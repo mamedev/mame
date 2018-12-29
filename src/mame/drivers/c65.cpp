@@ -94,7 +94,7 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(c65);
+	void c65_palette(palette_device &palette);
 	void init_c65();
 	void init_c65pal();
 
@@ -632,7 +632,7 @@ void c65_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(c65_state, c65)
+void c65_state::c65_palette(palette_device &palette)
 {
 	for (int i = 0; i < 0x100; i++)
 		PalEntryFlush(i);
@@ -714,12 +714,11 @@ MACHINE_CONFIG_START(c65_state::c65)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c65)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_c65)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(c65_state, c65)
+	PALETTE(config, m_palette, FUNC(c65_state::c65_palette), 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

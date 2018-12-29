@@ -15,6 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "formats/abc800_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 

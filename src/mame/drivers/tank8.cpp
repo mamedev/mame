@@ -8,6 +8,7 @@ Atari Tank 8 driver
 
 #include "emu.h"
 #include "includes/tank8.h"
+
 #include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 #include "speaker.h"
@@ -48,17 +49,17 @@ WRITE8_MEMBER(tank8_state::int_reset_w)
 
 WRITE8_MEMBER(tank8_state::crash_w)
 {
-	m_discrete->write(space, TANK8_CRASH_EN, data);
+	m_discrete->write(TANK8_CRASH_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::explosion_w)
 {
-	m_discrete->write(space, TANK8_EXPLOSION_EN, data);
+	m_discrete->write(TANK8_EXPLOSION_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bugle_w)
 {
-	m_discrete->write(space, TANK8_BUGLE_EN, data);
+	m_discrete->write(TANK8_BUGLE_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bug_w)
@@ -66,20 +67,20 @@ WRITE8_MEMBER(tank8_state::bug_w)
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
 		case 0:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 		case 1:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,7.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,7.0);
 			break;
 		case 2:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,2.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,2.0);
 			break;
 		case 3:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,16.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,16.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 	}
 
@@ -87,12 +88,12 @@ WRITE8_MEMBER(tank8_state::bug_w)
 
 WRITE8_MEMBER(tank8_state::attract_w)
 {
-	m_discrete->write(space, TANK8_ATTRACT_EN, data);
+	m_discrete->write(TANK8_ATTRACT_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::motor_w)
 {
-	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
+	m_discrete->write(NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
 void tank8_state::tank8_cpu_map(address_map &map)
@@ -343,12 +344,10 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
 	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tank8)
-	MCFG_PALETTE_ADD("palette", 20)
-	MCFG_PALETTE_INDIRECT_ENTRIES(10)
-	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tank8)
+	PALETTE(config, m_palette, FUNC(tank8_state::tank8_palette), 20, 10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

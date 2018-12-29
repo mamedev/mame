@@ -223,15 +223,15 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // right?
 
-	PALETTE(config, m_palette, 0x200/2).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 24_MHz_XTAL / 24)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 24_MHz_XTAL / 24));
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 ROM_START( hotblock )

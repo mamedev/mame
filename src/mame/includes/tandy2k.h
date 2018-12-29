@@ -8,6 +8,7 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/tandy2k_dsk.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"

@@ -272,22 +272,20 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kncljoe_state, screen_update_kncljoe)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kncljoe)
-	MCFG_PALETTE_ADD("palette", 16*8+16*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
-	MCFG_PALETTE_INIT_OWNER(kncljoe_state, kncljoe)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kncljoe);
+	PALETTE(config, m_palette, FUNC(kncljoe_state::kncljoe_palette), 16*8+16*8, 128+16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kncljoe_state, unused_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay8910, XTAL(3'579'545)/4); /* verified on pcb */
+	m_ay8910->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910->port_b_write_callback().set(FUNC(kncljoe_state::unused_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

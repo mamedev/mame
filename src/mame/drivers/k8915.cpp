@@ -14,7 +14,6 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
-#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
@@ -150,12 +149,10 @@ MACHINE_CONFIG_START(k8915_state::k8915)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'915'200) / 2)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(4'915'200) / 2));
+	ctc.set_clk<2>(XTAL(4'915'200) / 2);
 	ctc.zc_callback<2>().set("sio", FUNC(z80sio_device::rxtxcb_w));
 
 	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'915'200) / 2));

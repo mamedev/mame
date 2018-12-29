@@ -47,7 +47,7 @@ class z80ctc_channel_device : public device_t
 
 public:
 	// construction/destruction
-	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	// device-level overrides
@@ -84,6 +84,8 @@ public:
 
 	auto intr_callback() { return m_intr_cb.bind(); }
 	template <int Channel> auto zc_callback() { return m_zc_cb[Channel].bind(); } // m_zc_cb[3] not supported on a standard ctc, only used for the tmpz84c015
+	template <int Channel> void set_clk(u32 clock) { channel_config(Channel).set_clock(clock); }
+	template <int Channel> void set_clk(const XTAL &xtal) { channel_config(Channel).set_clock(xtal); }
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -93,7 +95,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( trg2 );
 	DECLARE_WRITE_LINE_MEMBER( trg3 );
 
-	u16 get_channel_constant(u8 channel) const { return m_channel[channel]->m_tconst; }
+	u16 get_channel_constant(int ch) const { return m_channel[ch]->m_tconst; }
 
 protected:
 	// device-level overrides
@@ -110,6 +112,8 @@ protected:
 private:
 	// internal helpers
 	void interrupt_check();
+
+	z80ctc_channel_device &channel_config(int ch) { return *subdevice<z80ctc_channel_device>(m_channel[ch].finder_tag()); }
 
 	// internal state
 	devcb_write_line   m_intr_cb;              // interrupt callback

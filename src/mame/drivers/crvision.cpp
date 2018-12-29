@@ -734,13 +734,14 @@ static void crvision_cart(device_slot_interface &device)
 }
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( creativision )
+    creativision machine configuration
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_state::creativision)
+void crvision_state::creativision(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(2'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(crvision_map)
+	M6502(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &crvision_state::crvision_map);
 
 	// devices
 	PIA6821(config, m_pia, 0);
@@ -749,38 +750,38 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
 	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::command_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_status_in", 0);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	OUTPUT_LATCH(config, "cent_ctrl_out").bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
-	MCFG_SN76496_READY_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, m_psg, XTAL(2'000'000));
+	m_psg->ready_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
+	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);
 
 	// internal ram
-	RAM(config, RAM_TAG)
-		.set_default_size("1K") // MAIN RAM
-		.set_extra_options("15K"); // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+	RAM(config, m_ram);
+	m_ram->set_default_size("1K"); // main RAM
+	m_ram->set_extra_options("15K"); // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "crvision")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( ntsc )
@@ -816,10 +817,11 @@ void crvision_pal_state::pal(machine_config &config)
     MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(laser2001_state::lasr2001)
+void laser2001_state::lasr2001(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(17'734'470)/9)
-	MCFG_DEVICE_PROGRAM_MAP(lasr2001_map)
+	M6502(config, m_maincpu, XTAL(17'734'470)/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &laser2001_state::lasr2001_map);
 
 	// devices
 	PIA6821(config, m_pia, 0);
@@ -831,13 +833,14 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	m_pia->ca2_handler().set(FUNC(laser2001_state::pia_ca2_w));
 	m_pia->cb2_handler().set(FUNC(laser2001_state::pia_cb2_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, laser2001_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(laser2001_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// video hardware
 	tms9929a_device &vdp(TMS9929A(config, TMS9929_TAG, XTAL(10'738'635)));
@@ -848,23 +851,24 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, laser2001_state, write_psg_ready))
+	SN76489A(config, m_psg, XTAL(17'734'470)/9);
+	m_psg->ready_cb().set(FUNC(laser2001_state::write_psg_ready));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
+	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	RAM(config, m_ram);
+	m_ram->set_default_size("16K");
+	m_ram->set_extra_options("32K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
-	MCFG_SOFTWARE_LIST_ADD("cart_list2","laser2001_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
+	SOFTWARE_LIST(config, "cart_list2").set_original("laser2001_cart");
+}
 
 /***************************************************************************
     ROMS

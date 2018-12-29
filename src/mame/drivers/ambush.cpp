@@ -60,8 +60,8 @@
 class ambush_state : public driver_device
 {
 public:
-	ambush_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ambush_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_outlatch(*this, "outlatch%u", 1),
 		m_video_ram(*this, "video_ram"),
@@ -79,10 +79,10 @@ public:
 	void dkong3abl(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(ambush);
-	DECLARE_PALETTE_INIT(mario);
-	DECLARE_PALETTE_INIT(mariobla);
-	DECLARE_PALETTE_INIT(dkong3);
+	void ambush_palette(palette_device &palette) const;
+	void mario_palette(palette_device &palette) const;
+	void mariobla_palette(palette_device &palette) const;
+	void dkong3_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -306,126 +306,126 @@ INPUT_PORTS_END
 //  PALETTES
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( ambush_state, ambush )
+void ambush_state::ambush_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("colors")->base();
+	uint8_t const *const color_prom = memregion("colors")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
 		// red component
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// green component
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER( ambush_state, mario )
+void ambush_state::mario_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("colors")->base();
+	uint8_t const *const color_prom = memregion("colors")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
 		// red component
-		bit0 = (color_prom[i] >> 5) & 1;
-		bit1 = (color_prom[i] >> 6) & 1;
-		bit2 = (color_prom[i] >> 7) & 1;
-		r = 255 - (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		bit0 = BIT(color_prom[i], 5);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const r = 255 - (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
 		// green component
-		bit0 = (color_prom[i] >> 2) & 1;
-		bit1 = (color_prom[i] >> 3) & 1;
-		bit2 = (color_prom[i] >> 4) & 1;
-		g = 255 - (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		bit2 = BIT(color_prom[i], 4);
+		int const g = 255 - (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
 		// blue component
-		bit0 = (color_prom[i] >> 0) & 1;
-		bit1 = (color_prom[i] >> 1) & 1;
-		b = 255 - (0x55 * bit0 + 0xaa * bit1);
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const b = 255 - (0x55 * bit0 + 0xaa * bit1);
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(ambush_state, mariobla)
+void ambush_state::mariobla_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("colors")->base();
+	uint8_t const *const color_prom = memregion("colors")->base();
 
 	for (int c = 0; c < palette.entries(); c++)
 	{
-		int i = bitswap<9>(c, 2, 7, 6, 8, 5, 4, 3, 1, 0);
-		int bit0, bit1, bit2, r, g, b;
+		int const i = bitswap<9>(c, 2, 7, 6, 8, 5, 4, 3, 1, 0);
+		int bit0, bit1, bit2;
 
 		// red component
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// green component
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(c, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER( ambush_state, dkong3 )
+void ambush_state::dkong3_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("colors")->base();
+	uint8_t const *const color_prom = memregion("colors")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
+		int bit0, bit1, bit2, bit3;
 
 		// red component
-		bit0 = (color_prom[i] >> 4) & 0x01;
-		bit1 = (color_prom[i] >> 5) & 0x01;
-		bit2 = (color_prom[i] >> 6) & 0x01;
-		bit3 = (color_prom[i] >> 7) & 0x01;
-		r = 255 - (0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3);
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		bit2 = BIT(color_prom[i], 6);
+		bit3 = BIT(color_prom[i], 7);
+		int const r = 255 - (0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3);
 
 		// green component
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		g = 255 - (0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3);
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const g = 255 - (0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3);
 
 		// blue component
-		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
-		b = 255 - (0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3);
+		bit0 = BIT(color_prom[i + 0x200], 0);
+		bit1 = BIT(color_prom[i + 0x200], 1);
+		bit2 = BIT(color_prom[i + 0x200], 2);
+		bit3 = BIT(color_prom[i + 0x200], 3);
+		int const b = 255 - (0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3);
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -740,23 +740,23 @@ MACHINE_CONFIG_START(ambush_state::ambush_base)
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ambush)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ambush);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
+	PALETTE(config, "palette", FUNC(ambush_state::ambush_palette), 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8912_device &ay1(AY8912(config, "ay1", XTAL(18'432'000)/6/2));
+	ay1.port_a_read_callback().set_ioport("buttons");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8912_device &ay2(AY8912(config, "ay2", XTAL(18'432'000)/6/2));
+	ay2.port_a_read_callback().set_ioport("joystick");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ambush_state::ambush)
+void ambush_state::ambush(machine_config &config)
+{
 	ambush_base(config);
 
 	// addressable latches at 8B and 8C
@@ -768,7 +768,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	LS259(config, m_outlatch[1]);
 	m_outlatch[1]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_2_w));
 	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_2_w));
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ambush_state::mariobl)
 	ambush_base(config);
@@ -787,23 +787,21 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mariobl)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
+	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mario_palette));
 
-	MCFG_DEVICE_REPLACE("ay1", AY8910, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", XTAL(18'432'000)/6/2));
+	ay1.port_a_read_callback().set_ioport("buttons");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", XTAL(18'432'000)/6/2));
+	ay2.port_a_read_callback().set_ioport("joystick");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::mariobla)
 	mariobl(config);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(ambush_state, mariobla)
+	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mariobla_palette));
 
 	auto &outlatch(*subdevice<ls259_device>("outlatch"));
 	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
@@ -812,12 +810,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
+
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dkong3abl)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(ambush_state, dkong3)
+	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::dkong3_palette));
 MACHINE_CONFIG_END
 
 

@@ -261,8 +261,8 @@ void mc1000_state::mc1000_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x04, 0x04).rw(FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
 	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::bus_w));
-//  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-//  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
+//  map(0x10, 0x10).w(m_crtc, FUNC(mc6845_device::address_w));
+//  map(0x11, 0x11).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x12, 0x12).w(FUNC(mc1000_state::mc6845_ctrl_w));
 	map(0x20, 0x20).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0x40, 0x40).r(AY8910_TAG, FUNC(ay8910_device::data_r));

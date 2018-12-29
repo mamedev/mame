@@ -353,7 +353,9 @@ WRITE8_MEMBER( play_2_state::psg_w )
 }
 
 // **************** Machine *****************************
-MACHINE_CONFIG_START(play_2_state::play_2)
+
+void play_2_state::play_2(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 2.95_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &play_2_state::play_2_map);
@@ -371,8 +373,7 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	/* Video */
 	config.set_default_layout(layout_play_2);
 
-	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock2_w))
+	CLOCK(config, "xpoint", 60).signal_handler().set(FUNC(play_2_state::clock2_w)); // crossing-point detector
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
 	TTL7474(config, m_4013a, 0);
@@ -391,24 +392,25 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1863_ADD("1863", 0, 2.95_MHz_XTAL / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	CDP1863(config, m_1863, 0);
+	m_1863->set_clock2(2.95_MHz_XTAL / 8);
+	m_1863->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(play_2_state::zira)
+void play_2_state::zira(machine_config &config)
+{
 	play_2(config);
-	MCFG_DEVICE_ADD("cop402", COP402, 2_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(zira_sound_map)
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false)
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, play_2_state, sound_d_w))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, play_2_state, sound_g_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, play_2_state, psg_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, play_2_state, psg_w))
-	MCFG_COP400_READ_IN_CB(READ8(*this, play_2_state, sound_in_r))
+	cop402_cpu_device &cop402(COP402(config, "cop402", 2_MHz_XTAL));
+	cop402.set_addrmap(AS_PROGRAM, &play_2_state::zira_sound_map);
+	cop402.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	cop402.write_d().set(FUNC(play_2_state::sound_d_w));
+	cop402.write_g().set(FUNC(play_2_state::sound_g_w));
+	cop402.read_l().set(FUNC(play_2_state::psg_r));
+	cop402.write_l().set(FUNC(play_2_state::psg_w));
+	cop402.read_in().set(FUNC(play_2_state::sound_in_r));
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 2_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	AY8910(config, m_aysnd1, 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 void play_2_state::init_zira()
 {

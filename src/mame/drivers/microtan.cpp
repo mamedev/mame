@@ -227,15 +227,13 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_microtan)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD(m_ay8910[0], AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD(m_ay8910[1], AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", 0.5)

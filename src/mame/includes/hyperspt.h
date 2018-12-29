@@ -16,8 +16,8 @@
 class hyperspt_state : public driver_device
 {
 public:
-	hyperspt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hyperspt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll"),
 		m_videoram(*this, "videoram"),
@@ -30,7 +30,8 @@ public:
 		m_vlm(*this, "vlm"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void hyperspt(machine_config &config);
 	void roadf(machine_config &config);
@@ -71,7 +72,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(hyperspt);
+	void hyperspt_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(roadf);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

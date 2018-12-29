@@ -4,10 +4,10 @@
 
     NEC PC-9801-118 sound card
 
-    YMF288 + some extra ports
+    YMF297 + some extra ports
 
     TODO:
-    - preliminary, presumably needs CS-4231 too, it's an extended clone of the already emulated AD1848 used on the Windows Sound System
+    - preliminary, presumably needs CS-4232 too, it's an extended clone of the already emulated AD1848 used on the Windows Sound System
     - verify sound irq;
 
 ***************************************************************************/
@@ -19,7 +19,8 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_X2 XTAL(2'457'600)
+#define XTAL_5B 24.576_MHz_XTAL
+#define XTAL_5D 33.8688_MHz_XTAL
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -38,18 +39,19 @@ WRITE_LINE_MEMBER(pc9801_118_device::sound_irq)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc9801_118_device::device_add_mconfig)
+void pc9801_118_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("opn3", YM2608, MAIN_CLOCK_X2*4) // actually YMF288, unknown clock / divider, might be X1 x 5 actually
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc9801_118_device, sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_118_device, opn_porta_r))
-	//MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc9801_state, opn_portb_r))
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, pc9801_state, opn_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_118_device, opn_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	YM2608(config, m_opn3, XTAL_5B * 2 / 5); // actually YMF297-F, unknown clock / divider, more likely uses 5D clock
+	m_opn3->irq_handler().set(FUNC(pc9801_118_device::sound_irq));
+	m_opn3->port_a_read_callback().set(FUNC(pc9801_118_device::opn_porta_r));
+	//m_opn3->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
+	//m_opn3->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
+	m_opn3->port_b_write_callback().set(FUNC(pc9801_118_device::opn_portb_w));
+	m_opn3->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	m_opn3->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+}
 
 
 //-------------------------------------------------

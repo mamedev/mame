@@ -105,7 +105,7 @@ public:
 		, m_ms7004(*this, "ms7004")
 		, m_screen(*this, "screen")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void ksm(machine_config &config);
 
@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
@@ -461,8 +461,8 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	m_i8251kbd->rts_handler().set(FUNC(ksm_state::write_brga));
 	m_i8251kbd->dtr_handler().set(FUNC(ksm_state::write_brgb));
 
-	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
+	MS7004(config, m_ms7004, 0);
+	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)

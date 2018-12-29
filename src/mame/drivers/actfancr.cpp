@@ -307,25 +307,25 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
 
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 2)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 2);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(1);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -368,25 +368,25 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
 
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(1);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)

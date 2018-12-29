@@ -135,13 +135,14 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000)) // clk unknown
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(sys9002_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL(2'000'000))); // clk unknown
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(sys9002_state::crtc_update_row), this);
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 614400));
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
@@ -164,6 +165,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
+	uart2.rxrdy_handler().set_inputline("maincpu", I8085_RST55_LINE);
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
 	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));

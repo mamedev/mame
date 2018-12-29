@@ -127,7 +127,8 @@ void jpms80_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(jpms80_state::jpms80)
+void jpms80_state::jpms80(machine_config &config)
+{
 	// CPU TMS9980A, standard variant; no line connections
 	TMS9980A(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpms80_state::jpms80_map);
@@ -155,9 +156,8 @@ MACHINE_CONFIG_START(jpms80_state::jpms80)
 	TMS9902(config, m_acc, 10_MHz_XTAL / 4);
 	m_acc->int_cb().set_inputline(m_maincpu, INT_9980A_LEVEL3);
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 10_MHz_XTAL / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	AY8912(config, "aysnd", 10_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 void jpms80_state::init_jpms80()
 {

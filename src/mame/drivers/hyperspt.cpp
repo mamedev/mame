@@ -324,15 +324,13 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_hyperspt)
-	MCFG_PALETTE_ADD(m_palette, 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hyperspt);
+	PALETTE(config, m_palette, FUNC(hyperspt_state::hyperspt_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
@@ -380,7 +378,7 @@ MACHINE_CONFIG_START(hyperspt_state::hypersptb)
 	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 

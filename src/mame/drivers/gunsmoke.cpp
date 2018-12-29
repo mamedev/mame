@@ -321,18 +321,16 @@ MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gunsmoke_state, screen_update_gunsmoke)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gunsmoke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_gunsmoke)
 
-	MCFG_PALETTE_ADD("palette", 32*4+16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(gunsmoke_state, gunsmoke)
+	PALETTE(config, m_palette, FUNC(gunsmoke_state::gunsmoke_palette), 32*4 + 16*16 + 16*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.22)

@@ -48,6 +48,7 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
@@ -433,14 +434,15 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* crtc */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13608000 / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ts803_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
+	sy6545_1_device &crtc(SY6545_1(config, "crtc", 13608000 / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(ts803_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(ts803_state::crtc_update_addr), this);
 
 	clock_device &sti_clock(CLOCK(config, "sti_clock", 16_MHz_XTAL / 13));
 	sti_clock.signal_handler().set("sti", FUNC(z80sti_device::tc_w));

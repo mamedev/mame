@@ -1483,18 +1483,17 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikes)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(1);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1502,9 +1501,9 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1533,13 +1532,12 @@ MACHINE_CONFIG_START(aerofgt_state::spikes91)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8+4, 224+4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spikes91)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spikes91)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spikes91);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1569,13 +1567,12 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikesb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikesb)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikesb);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1614,27 +1611,26 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kickball)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kickball);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(1);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0) // still accessed as if it exists, in clone hardware?
+	//VSYSTEM_GGA(config, "gga", 0); // still accessed as if it exists, in clone hardware?
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) // K-666 (YM3812)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1661,18 +1657,17 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikes)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(1);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1705,23 +1700,22 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(2);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old2", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_gfx_region(3);
+	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
@@ -1729,9 +1723,9 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000) ) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1762,28 +1756,27 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(2);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old2", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_gfx_region(3);
+	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	/* sound hardware */
 
@@ -1819,24 +1812,23 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spinlbrk)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024) // doesn't fully initialize palette at start-up ...
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 1024); // doesn't fully initialize palette at start-up ...
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_pritype(1);
+	m_spr_old[0]->set_gfx_region(2);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old2", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, spinbrk_tile_callback ) // rom lookup
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback), this); // rom lookup
+	m_spr_old[0]->set_pritype(1);
+	m_spr_old[1]->set_gfx_region(3);
+	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
 
@@ -1844,9 +1836,9 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1878,23 +1870,22 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(2);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old2", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_gfx_region(3);
+	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -1902,9 +1893,9 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1937,23 +1928,22 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(2);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old2", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[1], 0);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_gfx_region(3);
+	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -1961,9 +1951,9 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2008,16 +1998,15 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerofgt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerofgt)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( aerofgt_state, aerofgt_tile_callback )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_tile_callback), this);
+	m_spr->set_gfx_region(2);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -2025,9 +2014,9 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2058,22 +2047,20 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboot)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerfboot)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerfboot);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
@@ -2098,13 +2085,12 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboo2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerfboo2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerfboo2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -2136,25 +2122,23 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+14, 44*8-1+4, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_wbbc97)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wbbc97)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wbbc97);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	//VSYSTEM_GGA(config, "gga", 0);
 
-	MCFG_DEVICE_ADD("vsystem_spr_old1", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old[0], 0);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_gfx_region(1);
+	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

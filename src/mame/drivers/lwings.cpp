@@ -954,17 +954,16 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lwings)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("2203a", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -1004,17 +1003,16 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // the 16-pixel black border on left edge is correct, test mode actually uses that area
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lwings)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1048,7 +1046,7 @@ MACHINE_CONFIG_START(lwings_state::trojan)
 
 	/* sound hardware */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("5205", MSM5205, XTAL(384'000))    /* verified on PCB */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* slave mode */

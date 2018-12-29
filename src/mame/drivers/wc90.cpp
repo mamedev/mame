@@ -370,18 +370,16 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_wc90)
-	MCFG_PALETTE_ADD(m_palette, 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	MCFG_DEVICE_ADD(m_sprgen, TECMO_SPRITE, 0)
+	TECMO_SPRITE(config, m_sprgen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -395,11 +393,11 @@ MACHINE_CONFIG_START(wc90_state::wc90t)
 	MCFG_VIDEO_START_OVERRIDE(wc90_state, wc90t )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(wc90_state::pac90)
+void wc90_state::pac90(machine_config &config)
+{
 	wc90(config);
-	MCFG_DEVICE_MODIFY("spritegen")
-	MCFG_TECMO_SPRITE_YOFFSET(16) // sprites need shifting, why?
-MACHINE_CONFIG_END
+	m_sprgen->set_yoffset(16); // sprites need shifting, why?
+}
 
 
 ROM_START( twcup90 )

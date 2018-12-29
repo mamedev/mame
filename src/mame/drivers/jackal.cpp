@@ -380,20 +380,16 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jackal_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackal)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x200)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackal);
+	PALETTE(config, m_palette, FUNC(jackal_state::jackal_palette));
+	m_palette->set_format(palette_device::xBGR_555, 0x300, 0x200);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	YM2151(config, "ymsnd", SOUND_CLOCK).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // verified on pcb
 MACHINE_CONFIG_END
 
 /*************************************

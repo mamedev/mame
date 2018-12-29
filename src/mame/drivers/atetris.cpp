@@ -354,7 +354,7 @@ void atetris_state::atetris_base(machine_config &config)
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_atetris);
 
-	PALETTE(config, "palette", 256).set_format(PALETTE_FORMAT_RRRGGGBB);
+	PALETTE(config, "palette").set_format(palette_device::RGB_332, 256);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* note: these parameters are from published specs, not derived */
@@ -530,7 +530,7 @@ ROM_START( atetrisb3 )
 
 	// 8749 (10 MHz OSC) emulates POKEYs
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) BAD_DUMP )
+	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) ) // dumped via normal methods and confirmed good via decap
 	ROM_FILL( 0x06e2, 1, 0x96 ) // patch illegal opcode
 
 	// currently unused

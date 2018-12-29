@@ -1825,9 +1825,7 @@ MACHINE_CONFIG_START(namcos2_state::base_noio)
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 
@@ -1857,17 +1855,16 @@ MACHINE_CONFIG_START(namcos2_state::assaultp)
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(namcos2_state::base3)
+void namcos2_state::base3(machine_config &config)
+{
 	base(config);
 
 	m_c140->reset_routes();
 	m_c140->add_route(0, "lspeaker", 0.45);
 	m_c140->add_route(1, "rspeaker", 0.45);
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YM2151(config.replace(), "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.579545MHz */
+}
 
 MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_DEVICE_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
@@ -1919,9 +1916,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 
@@ -1971,9 +1966,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap_noio)
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::finallap)
@@ -2052,9 +2045,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::sgunner2)
@@ -2108,9 +2099,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::suzuka8h)
@@ -2167,9 +2156,7 @@ MACHINE_CONFIG_START(namcos2_state::suzuka8h)
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos2_state::luckywld)
@@ -2244,10 +2231,8 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	m_c140->add_route(0, "lspeaker", 1.0);
 	m_c140->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, YM2151_SOUND_CLOCK) /* 3.579545MHz */
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+//  ymsnd.irq_handler().set_inputline("audiocpu", 1);
 MACHINE_CONFIG_END
 
 

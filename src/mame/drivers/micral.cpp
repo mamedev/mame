@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
 	CRT5037(config, m_crtc, 4000000 / 8);  // xtal freq unknown

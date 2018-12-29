@@ -455,17 +455,15 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_himesiki)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_himesiki);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym2203", YM2203, CLK2/4) // ??
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))

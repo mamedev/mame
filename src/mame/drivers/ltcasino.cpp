@@ -66,12 +66,13 @@ Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
 class ltcasino_state : public driver_device
 {
 public:
-	ltcasino_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ltcasino_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_tile_num_ram(*this, "tile_nuram"),
 		m_tile_atr_ram(*this, "tile_atr_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void init_mv4in1();
 	void ltcasino(machine_config &config);
@@ -91,7 +92,7 @@ private:
 	DECLARE_WRITE8_MEMBER(tile_atr_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(ltcasino);
+	void ltcasino_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);
@@ -100,7 +101,7 @@ private:
 
 /* Video */
 
-PALETTE_INIT_MEMBER(ltcasino_state, ltcasino)
+void ltcasino_state::ltcasino_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 64; i++)
 	{
@@ -756,19 +757,17 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_ltcasino)
-	MCFG_PALETTE_ADD("palette", 2*64)
-	MCFG_PALETTE_INIT_OWNER(ltcasino_state, ltcasino)
-
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ltcasino);
+	PALETTE(config, "palette", FUNC(ltcasino_state::ltcasino_palette), 2*64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/18) /* 1.024MHz ?? (or 18.432MHz/16 = 1.152MHz) - not verified */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN6"))
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000)/18)); /* 1.024MHz ?? (or 18.432MHz/16 = 1.152MHz) - not verified */
+	aysnd.port_a_read_callback().set_ioport("BUTTONS");
+	aysnd.port_b_read_callback().set_ioport("IN6");
 	//ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.4);
 MACHINE_CONFIG_END
 
 

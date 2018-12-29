@@ -177,12 +177,14 @@ WRITE8_MEMBER(dc_state::pvr_irq)
 	dc_update_interrupt_status();
 }
 
-void dc_maple_irq(running_machine &machine)
+WRITE8_MEMBER(dc_state::maple_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
-
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
-	state->dc_update_interrupt_status();
+	switch(data) {
+	case maple_dc_device::DMA_MAPLE_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
+		break;
+	}
+	dc_update_interrupt_status();
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)

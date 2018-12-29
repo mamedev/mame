@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#ifndef MAME_INCLUDES_NAMCOS1_H
+#define MAME_INCLUDES_NAMCOS1_H
+
+#pragma once
+
 #include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/c117.h"
@@ -139,3 +144,5 @@ private:
 	void sub_map(address_map &map);
 	void virtual_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NAMCOS1_H

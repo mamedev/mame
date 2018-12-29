@@ -313,8 +313,7 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(arcadia_amiga_state,amiga)
+	PALETTE(config, m_palette, FUNC(arcadia_amiga_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(arcadia_amiga_state,amiga)
 

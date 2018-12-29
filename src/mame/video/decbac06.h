@@ -7,16 +7,6 @@
 
 #include <memory>
 
-#define MCFG_BAC06_BOOTLEG_DISABLE_8x8 \
-	downcast<deco_bac06_device &>(*device).disable_8x8();
-
-#define MCFG_BAC06_BOOTLEG_DISABLE_16x16 \
-	downcast<deco_bac06_device &>(*device).disable_16x16();
-
-#define MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL \
-	downcast<deco_bac06_device &>(*device).disable_rc_scroll();
-
-
 class deco_bac06_device : public device_t
 {
 public:
@@ -92,7 +82,7 @@ public:
 
 	/* 8-bit accessors */
 
-	/* for dec8.cpp, pcktgal.cpp */
+	/* for dec8.cpp, pcktgal.cpp (Big endian CPU (6809, etc) based games) */
 	u8 pf_data_8bit_r(offs_t offset);
 	void pf_data_8bit_w(offs_t offset, u8 data);
 
@@ -103,7 +93,7 @@ public:
 	u8 pf_rowscroll_8bit_r(offs_t offset);
 	void pf_rowscroll_8bit_w(offs_t offset, u8 data);
 
-	/* for hippodrm (dec0.cpp) and actfancr / triothep (H6280 based games)*/
+	/* for hippodrm (dec0.cpp) and actfancr / triothep (Little endian CPU (HuC6280, etc) based games)*/
 	void pf_control0_8bit_packed_w(offs_t offset, u8 data);
 	void pf_control1_8bit_swap_w(offs_t offset, u8 data);
 	u8 pf_data_8bit_swap_r(offs_t offset);
@@ -149,11 +139,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device)
-
-#define MCFG_DECO_BAC06_GFXDECODE(_gfxtag) \
-	downcast<deco_bac06_device &>(*device).set_gfxdecode_tag(_gfxtag);
-
-#define MCFG_DECO_BAC06_GFX_REGION_WIDE(_8x8, _16x16, _wide) \
-	downcast<deco_bac06_device &>(*device).set_gfx_region_wide(_8x8, _16x16, _wide);
 
 #endif // MAME_VIDEO_DECOBAC06_H

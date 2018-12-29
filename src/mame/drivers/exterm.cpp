@@ -374,22 +374,22 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(exterm_state::exterm)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, TMS34010, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false)
-	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8)
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1)
-	MCFG_TMS340X0_SCANLINE_IND16_CB(exterm_state, scanline_update)
-	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_master)
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_master)
+	TMS34010(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exterm_state::master_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(40000000/8);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_ind16_callback(FUNC(exterm_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(exterm_state::to_shiftreg_master));
+	m_maincpu->set_shiftreg_out_callback(FUNC(exterm_state::from_shiftreg_master));
 
-	MCFG_DEVICE_ADD(m_slave, TMS34010, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(slave_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true)
-	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8)
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1)
-	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_slave)
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_slave)
+	TMS34010(config, m_slave, 40000000);
+	m_slave->set_addrmap(AS_PROGRAM, &exterm_state::slave_map);
+	m_slave->set_halt_on_reset(true);
+	m_slave->set_pixel_clock(40000000/8);
+	m_slave->set_pixels_per_clock(1);
+	m_slave->set_shiftreg_in_callback(FUNC(exterm_state::to_shiftreg_slave));
+	m_slave->set_shiftreg_out_callback(FUNC(exterm_state::from_shiftreg_slave));
 
 	M6502(config, m_audiocpu, 2000000).set_addrmap(AS_PROGRAM, &exterm_state::sound_master_map);
 	M6502(config, m_audioslave, 2000000).set_addrmap(AS_PROGRAM, &exterm_state::sound_slave_map);
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 	GENERIC_LATCH_8(config, m_soundlatch[1]).data_pending_callback().set_inputline(m_audioslave, M6502_IRQ_LINE);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -406,9 +406,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2048+32768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_INIT_OWNER(exterm_state, exterm)
+	PALETTE(config, "palette", FUNC(exterm_state::exterm_palette)).set_format(palette_device::xRGB_555, 2048+32768);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
@@ -425,8 +423,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_DEVICE_ADD(m_ym2151, YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2151(config, m_ym2151, 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 

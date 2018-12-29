@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/firetrk.h"
+
 #include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 #include "speaker.h"
@@ -37,7 +38,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::service_mode_switch_changed)
 
 INPUT_CHANGED_MEMBER(firetrk_state::firetrk_horn_changed)
 {
-	m_discrete->write(generic_space(), FIRETRUCK_HORN_EN, newval);
+	m_discrete->write(FIRETRUCK_HORN_EN, newval);
 }
 
 
@@ -81,7 +82,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	m_leds[3] = BIT(~data, 3);
 
 	/* BIT4 => ATTRACT     */
-	m_discrete->write(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
+	m_discrete->write(FIRETRUCK_ATTRACT_EN, data & 0x10);
 	machine().bookkeeping().coin_lockout_w(0, !(data & 0x10));
 	machine().bookkeeping().coin_lockout_w(1, !(data & 0x10));
 
@@ -91,7 +92,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	/* BIT6 => UNUSED      */
 
 	/* BIT7 => BELL OUT    */
-	m_discrete->write(space, FIRETRUCK_BELL_EN, data & 0x80);
+	m_discrete->write(FIRETRUCK_BELL_EN, data & 0x80);
 }
 
 
@@ -101,7 +102,7 @@ WRITE8_MEMBER(firetrk_state::superbug_output_w)
 	m_leds[0] = BIT(offset, 0);
 
 	/* BIT1 => ATTRACT    */
-	m_discrete->write(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
+	m_discrete->write(SUPERBUG_ATTRACT_EN, offset & 0x02);
 	machine().bookkeeping().coin_lockout_w(0, !(offset & 0x02));
 	machine().bookkeeping().coin_lockout_w(1, !(offset & 0x02));
 
@@ -122,7 +123,7 @@ WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 	m_leds[1] = BIT(~data, 1);
 
 	/* BIT2 => ATTRACT       */
-	m_discrete->write(space, MONTECAR_ATTRACT_INV, data & 0x04);
+	m_discrete->write(MONTECAR_ATTRACT_INV, data & 0x04);
 
 	/* BIT3 => UNUSED        */
 	/* BIT4 => UNUSED        */
@@ -142,8 +143,8 @@ WRITE8_MEMBER(firetrk_state::montecar_output_2_w)
 {
 	m_flash = data & 0x80;
 
-	m_discrete->write(space, MONTECAR_BEEPER_EN, data & 0x10);
-	m_discrete->write(space, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
+	m_discrete->write(MONTECAR_BEEPER_EN, data & 0x10);
+	m_discrete->write(MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
 }
 
 
@@ -867,12 +868,11 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_firetrk)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 28)
-	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
+	PALETTE(config, m_palette, FUNC(firetrk_state::firetrk_palette), 28);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_firetrk)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -896,10 +896,6 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbug)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(28)
-	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
-
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("discrete", DISCRETE, superbug_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -920,9 +916,8 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(46)
-	MCFG_PALETTE_INIT_OWNER(firetrk_state,montecar)
+	m_palette->set_entries(46);
+	m_palette->set_init(FUNC(firetrk_state::montecar_palette));
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("discrete", DISCRETE, montecar_discrete)

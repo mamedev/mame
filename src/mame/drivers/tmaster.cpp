@@ -113,8 +113,8 @@ Chips:
 class tmaster_state : public driver_device
 {
 public:
-	tmaster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -386,10 +386,9 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(32'000'000))
 	MCFG_CESBLIT_COMPUTE_ADDR(tmaster_compute_addr)

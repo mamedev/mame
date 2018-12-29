@@ -123,10 +123,17 @@ public:
 
 	void marinedt(machine_config &config);
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(marinedt);
+	void marinedt_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_READ8_MEMBER(pc3259_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -140,12 +147,6 @@ private:
 
 	void marinedt_io(address_map &map);
 	void marinedt_map(address_map &map);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -587,44 +588,41 @@ void marinedt_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(marinedt_state, marinedt)
+void marinedt_state::marinedt_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	int bit0, bit1, bit2;
-	int r, g, b;
-
-	for (i = 0; i < 64; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 64; i++)
 	{
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-//      bit2 = (color_prom[i] >> 2) & 0x01;
-		r = (0x55 * bit0 + 0xaa * bit1);
+		int bit0, bit1, bit2;
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		g = (0x55 * bit0 + 0xaa * bit1);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		//bit2 = BIT(color_prom[i], 2);
+		int const r = (0x55 * bit0) + (0xaa * bit1);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 5) & 0x01;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = (0x55 * bit0 + 0xaa * bit1);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		int const g = (0x55 * bit0) + (0xaa * bit1);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 5);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int b = (0x55 * bit0) + (0xaa * bit1);
 		// matches yellow haired siren
-		if(bit2 == 0)
-			b/=2;
+		if (bit2 == 0)
+			b /= 2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
-		b = color_prom[i+0x60];
-		palette.set_pen_color(64+31-i, rgb_t(0, 0, b));
-		palette.set_pen_color(64+63-i, rgb_t(0xff, 0, b));
+		int const b = color_prom[i + 0x60];
+		palette.set_pen_color(64 + 31 - i, rgb_t(0, 0, b));
+		palette.set_pen_color(64 + 63 - i, rgb_t(0xff, 0, b));
 	}
 }
 
@@ -642,15 +640,13 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256) // template to get ~60 fps
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marinedt)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_marinedt);
 
-	MCFG_PALETTE_ADD("palette", 64+64)
-	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)
+	PALETTE(config, "palette", FUNC(marinedt_state::marinedt_palette), 64 + 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	//AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 

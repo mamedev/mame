@@ -420,17 +420,16 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicross)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seicross);
+	PALETTE(config, m_palette, FUNC(seicross_state::seicross_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seicross_state, portB_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, seicross_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000) / 12));
+	aysnd.port_b_read_callback().set(FUNC(seicross_state::portB_r));
+	aysnd.port_b_write_callback().set(FUNC(seicross_state::portB_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

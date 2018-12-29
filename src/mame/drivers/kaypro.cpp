@@ -213,10 +213,10 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kayproii)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -302,20 +302,19 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro484)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kaypro484)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(kaypro_state, kaypro)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_kaypro484);
+	PALETTE(config, m_palette, FUNC(kaypro_state::kaypro_palette), 3);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beep, 950).add_route(ALL_OUTPUTS, "mono", 1.00); // piezo-device needs to be measured
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2000000) /* comes out of ULA - needs to be measured */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(7)
-	MCFG_MC6845_UPDATE_ROW_CB(kaypro_state, kaypro484_update_row)
+	MC6845(config, m_crtc, 2000000); // comes out of ULA - needs to be measured
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(7);
+	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
 
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 

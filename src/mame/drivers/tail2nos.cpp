@@ -256,36 +256,35 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tail2nos)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tail2nos);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(-4)
-	MCFG_K051316_OFFSETS(-89, -14)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(tail2nos_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_bpp(-4);
+	m_k051316->set_offsets(-89, -14);
+	m_k051316->set_wrap(1);
+	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback), this);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tail2nos_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000)));  /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_b_write_callback().set(FUNC(tail2nos_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

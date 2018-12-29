@@ -89,9 +89,8 @@ public:
 		, m_ics(*this, "ics")
 		, m_priority_ram(*this, "priority_ram")
 		, m_vbowl_trackball(*this, "vbowl_trackball")
-		, m_generic_paletteram_16(*this, "paletteram")
-		, m_gfx_region(*this, "blitter")
-		, m_gfx2_region(*this, "blitter_hi")
+		, m_gfx(*this, "blitter")
+		, m_gfx2(*this, "blitter_hi")
 	{
 	}
 
@@ -143,11 +142,10 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_priority_ram;
 	optional_shared_ptr<uint16_t> m_vbowl_trackball;
-	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 
 	/* memory regions */
-	required_memory_region m_gfx_region;
-	optional_memory_region m_gfx2_region;
+	required_region_ptr<uint8_t> m_gfx;
+	optional_region_ptr<uint8_t> m_gfx2;
 
 	std::unique_ptr<uint8_t[]> m_layer[8];
 	uint16_t m_priority;
@@ -186,7 +184,6 @@ private:
 	DECLARE_WRITE16_MEMBER(igs011_priority_w);
 	DECLARE_READ16_MEMBER(igs011_layers_r);
 	DECLARE_WRITE16_MEMBER(igs011_layers_w);
-	DECLARE_WRITE16_MEMBER(igs011_palette);
 	DECLARE_WRITE16_MEMBER(igs011_blit_x_w);
 	DECLARE_WRITE16_MEMBER(igs011_blit_y_w);
 	DECLARE_WRITE16_MEMBER(igs011_blit_gfx_lo_w);
@@ -275,15 +272,15 @@ private:
 	void drgnwrld_gfx_decrypt();
 	void prot_mem_range_set();
 
-	void drgnwrld(address_map &map);
-	void drgnwrld_igs012(address_map &map);
-	void lhb(address_map &map);
-	void lhb2(address_map &map);
-	void nkishusp(address_map &map);
-	void vbowl(address_map &map);
-	void vbowlhk(address_map &map);
-	void wlcc(address_map &map);
-	void xymg(address_map &map);
+	void drgnwrld_mem(address_map &map);
+	void drgnwrld_igs012_mem(address_map &map);
+	void lhb_mem(address_map &map);
+	void lhb2_mem(address_map &map);
+	void nkishusp_mem(address_map &map);
+	void vbowl_mem(address_map &map);
+	void vbowlhk_mem(address_map &map);
+	void wlcc_mem(address_map &map);
+	void xymg_mem(address_map &map);
 };
 
 
@@ -451,25 +448,6 @@ WRITE16_MEMBER(igs011_state::igs011_layers_w)
 
 /***************************************************************************
 
-    Palette (r5g5b5)
-
-    offset + 0x000: xRRRRRGG
-    offset + 0x800: GGGBBBBB
-
-***************************************************************************/
-
-WRITE16_MEMBER(igs011_state::igs011_palette)
-{
-	int rgb;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	rgb = (m_generic_paletteram_16[offset & 0x7ff] & 0xff) | ((m_generic_paletteram_16[offset | 0x800] & 0xff) << 8);
-	m_palette->set_pen_color(offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
-}
-
-/***************************************************************************
-
     Blitter
 
 ***************************************************************************/
@@ -533,12 +511,6 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	uint8_t trans_pen, clear_pen, pen_hi, *dest;
 	uint8_t pen = 0;
 
-	uint8_t *gfx      =   m_gfx_region->base();
-	int gfx_size    =   m_gfx_region->bytes();
-
-	uint8_t *gfx2     =   (m_gfx2_region != nullptr) ? m_gfx2_region->base() : nullptr;
-	int gfx2_size   =   (m_gfx2_region != nullptr) ? m_gfx2_region->bytes() : 0;
-
 	const rectangle &clip = m_screen->visible_area();
 
 	COMBINE_DATA(&blitter.flags);
@@ -570,14 +542,14 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	if (depth4)
 	{
 		z   *=  2;
-		if (gfx2 && (blitter.gfx_hi & 0x80))    trans_pen = 0x1f;   // lhb2
+		if (m_gfx2 && (blitter.gfx_hi & 0x80))  trans_pen = 0x1f;   // lhb2
 		else                                    trans_pen = 0x0f;
 
 		clear_pen = blitter.pen | 0xf0;
 	}
 	else
 	{
-		if (gfx2)   trans_pen = 0x1f;   // vbowl
+		if (m_gfx2) trans_pen = 0x1f;   // vbowl
 		else        trans_pen = 0xff;
 
 		clear_pen = blitter.pen;
@@ -599,13 +571,13 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 			// fetch the pixel
 			if (!clear)
 			{
-				if (depth4)     pen = (gfx[(z/2)%gfx_size] >> ((z&1)?4:0)) & 0x0f;
-				else            pen = gfx[z%gfx_size];
+				if (depth4)     pen = (m_gfx[(z/2)%m_gfx.length()] >> ((z&1)?4:0)) & 0x0f;
+				else            pen = m_gfx[z%m_gfx.length()];
 
-				if ( gfx2 )
+				if ( m_gfx2 )
 				{
 					pen &= 0x0f;
-					if ( gfx2[(z/8)%gfx2_size] & (1 << (z & 7)) )
+					if ( m_gfx2[(z/8)%m_gfx2.length()] & (1 << (z & 7)) )
 						pen |= 0x10;
 				}
 			}
@@ -2575,7 +2547,7 @@ void igs011_state::init_nkishusp()
 
 ***************************************************************************/
 
-void igs011_state::drgnwrld(address_map &map)
+void igs011_state::drgnwrld_mem(address_map &map)
 {
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
 //  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE(igs011_prot1_w )
@@ -2584,7 +2556,8 @@ void igs011_state::drgnwrld(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
-	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x500000, 0x500001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700003).w("ymsnd", FUNC(ym3812_device::write)).umask16(0x00ff);
@@ -2610,9 +2583,9 @@ void igs011_state::drgnwrld(address_map &map)
 	map(0xa88000, 0xa88001).r(FUNC(igs011_state::igs_3_dips_r));
 }
 
-void igs011_state::drgnwrld_igs012(address_map &map)
+void igs011_state::drgnwrld_igs012_mem(address_map &map)
 {
-	drgnwrld(map);
+	drgnwrld_mem(map);
 
 	// IGS012
 	map(0x001600, 0x00160f).w(FUNC(igs011_state::igs012_prot_swap_w)).mirror(0x01c000); // swap (a5 / 55)
@@ -2654,7 +2627,7 @@ WRITE16_MEMBER(igs011_state::lhb_okibank_w)
 //  popmessage("oki %04x",data);
 }
 
-void igs011_state::lhb(address_map &map)
+void igs011_state::lhb_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
@@ -2672,7 +2645,8 @@ void igs011_state::lhb(address_map &map)
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
 	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700001).portr("COIN");
 	map(0x700002, 0x700005).r(FUNC(igs011_state::lhb_inputs_r));
@@ -2696,7 +2670,7 @@ void igs011_state::lhb(address_map &map)
 	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_5_dips_r));
 }
 
-void igs011_state::xymg(address_map &map)
+void igs011_state::xymg_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
@@ -2715,7 +2689,8 @@ void igs011_state::xymg(address_map &map)
 	map(0x1f0000, 0x1f3fff).ram().share("nvram"); // extra ram
 	map(0x200000, 0x200fff).ram().share("priority_ram");
 	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700003).w(FUNC(igs011_state::xymg_igs003_w));
 	map(0x700002, 0x700003).r(FUNC(igs011_state::xymg_igs003_r));
@@ -2737,7 +2712,7 @@ void igs011_state::xymg(address_map &map)
 	map(0x888000, 0x888001).r(FUNC(igs011_state::igs_3_dips_r));
 }
 
-void igs011_state::wlcc(address_map &map)
+void igs011_state::wlcc_mem(address_map &map)
 {
 //  wlcc: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
@@ -2752,7 +2727,8 @@ void igs011_state::wlcc(address_map &map)
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
 	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x800000, 0x800003).w(FUNC(igs011_state::wlcc_igs003_w));
@@ -2777,7 +2753,7 @@ void igs011_state::wlcc(address_map &map)
 
 
 
-void igs011_state::lhb2(address_map &map)
+void igs011_state::lhb2_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
@@ -2796,7 +2772,8 @@ void igs011_state::lhb2(address_map &map)
 	map(0x208000, 0x208003).w(FUNC(igs011_state::lhb2_igs003_w));
 	map(0x208002, 0x208003).r(FUNC(igs011_state::lhb2_igs003_r));
 	map(0x20c000, 0x20cfff).ram().share("priority_ram");
-	map(0x210000, 0x211fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x211000, 0x211fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
 	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
@@ -2819,7 +2796,7 @@ void igs011_state::lhb2(address_map &map)
 
 
 
-void igs011_state::nkishusp(address_map &map)
+void igs011_state::nkishusp_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
@@ -2839,7 +2816,8 @@ void igs011_state::nkishusp(address_map &map)
 	map(0x208000, 0x208003).w(FUNC(igs011_state::lhb2_igs003_w));
 	map(0x208002, 0x208003).r(FUNC(igs011_state::lhb2_igs003_r));
 	map(0x20c000, 0x20cfff).ram().share("priority_ram");
-	map(0x210000, 0x211fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x211000, 0x211fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
 	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
@@ -2922,7 +2900,7 @@ WRITE16_MEMBER(igs011_state::vbowl_link_1_w){ }
 WRITE16_MEMBER(igs011_state::vbowl_link_2_w){ }
 WRITE16_MEMBER(igs011_state::vbowl_link_3_w){ }
 
-void igs011_state::vbowl(address_map &map)
+void igs011_state::vbowl_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
@@ -2956,7 +2934,8 @@ void igs011_state::vbowl(address_map &map)
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share("priority_ram");
 	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x401fff).ram().w(FUNC(igs011_state::igs011_palette)).share("paletteram");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600000, 0x600007).rw(FUNC(igs011_state::ics2115_word_r), FUNC(igs011_state::ics2115_word_w));
 	map(0x700000, 0x700003).ram().share("vbowl_trackball");
@@ -2993,9 +2972,9 @@ void igs011_state::vbowl(address_map &map)
 }
 
 
-void igs011_state::vbowlhk(address_map &map)
+void igs011_state::vbowlhk_mem(address_map &map)
 {
-	vbowl(map);
+	vbowl_mem(map);
 	map(0x800000, 0x800003).w(FUNC(igs011_state::vbowlhk_igs003_w));
 	map(0x50f600, 0x50f7ff).r(FUNC(igs011_state::vbowlhk_igs011_prot2_r));   // read
 }
@@ -4181,53 +4160,51 @@ static GFXDECODE_START( gfx_igs011_hi )
 GFXDECODE_END
 #endif
 
-MACHINE_CONFIG_START(igs011_state::igs011_base)
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(22'000'000)/3)
+void igs011_state::igs011_base(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(22'000'000)/3);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs011_state, screen_update_igs011)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(igs011_state::screen_update_igs011));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011)
-
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000/4);
+	m_palette->set_membits(8);
+//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(22'000'000)/21, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
+	OKIM6295(config, m_oki, XTAL(22'000'000)/21, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev5_timer_irq_cb )
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(igs011_state::drgnwrld)
+void igs011_state::drgnwrld(machine_config &config)
+{
 	igs011_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(drgnwrld)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev5_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-MACHINE_CONFIG_START(igs011_state::drgnwrld_igs012)
+void igs011_state::drgnwrld_igs012(machine_config &config)
+{
 	drgnwrld(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(drgnwrld_igs012)
-MACHINE_CONFIG_END
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_igs012_mem);
+}
 
 
 INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
@@ -4246,16 +4223,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(igs011_state::lhb)
+void igs011_state::lhb(machine_config &config)
+{
 	igs011_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(lhb)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, lhb_vblank_irq)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lhb_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::lhb_vblank_irq));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 	// irq 3 points to an apparently unneeded routine
-MACHINE_CONFIG_END
-
-
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
 {
@@ -4263,56 +4238,50 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
 }
 
 
-MACHINE_CONFIG_START(igs011_state::wlcc)
+void igs011_state::wlcc(machine_config &config)
+{
 	igs011_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wlcc)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::wlcc_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+}
 
 
-
-MACHINE_CONFIG_START(igs011_state::xymg)
+void igs011_state::xymg(machine_config &config)
+{
 	igs011_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(xymg)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymg_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+}
 
 
-
-MACHINE_CONFIG_START(igs011_state::lhb2)
+void igs011_state::lhb2(machine_config &config)
+{
 	igs011_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(lhb2)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb2_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev5_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_igs011_hi)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
 
-
-MACHINE_CONFIG_START(igs011_state::nkishusp)
+void igs011_state::nkishusp(machine_config &config)
+{
 	igs011_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nkishusp)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::nkishusp_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_igs011_hi)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
-
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
 
 WRITE_LINE_MEMBER(igs011_state::sound_irq)
@@ -4320,30 +4289,29 @@ WRITE_LINE_MEMBER(igs011_state::sound_irq)
 //   m_maincpu->set_input_line(3, state);
 }
 
-MACHINE_CONFIG_START(igs011_state::vbowl)
+void igs011_state::vbowl(machine_config &config)
+{
 	igs011_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(vbowl)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::vbowl_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lev3_timer_irq_cb), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs011_state, screen_vblank_vbowl))
-//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
+	m_screen->screen_vblank().set(FUNC(igs011_state::screen_vblank_vbowl));
+//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
-	MCFG_DEVICE_REMOVE("oki")
-	MCFG_ICS2115_ADD("ics", 0)
-	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs011_state, sound_irq))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_CONFIG_END
+	config.device_remove("oki");
+	ICS2115(config, m_ics, 0);
+	m_ics->irq().set(FUNC(igs011_state::sound_irq));
+	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+}
 
-MACHINE_CONFIG_START(igs011_state::vbowlhk)
+void igs011_state::vbowlhk(machine_config &config)
+{
 	vbowl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(vbowlhk)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::vbowlhk_mem);
+}
 
 
 /***************************************************************************

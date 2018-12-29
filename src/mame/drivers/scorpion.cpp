@@ -303,7 +303,7 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_scorpion)
 
-	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
+	BETA_DISK(config, m_beta, 0);
 
 	/* internal ram */
 	m_ram->set_default_size("256K");

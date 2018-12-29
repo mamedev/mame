@@ -289,7 +289,7 @@ void itgamble_state::itgamble(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_itgamble);
-	PALETTE(config, m_palette, 0x200);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

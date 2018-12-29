@@ -431,12 +431,11 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactn)
-	MCFG_PALETTE_ADD("palette", 0x2800/2)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactn);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800/2);
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
-	MCFG_TECMO_SPRITE_GFX_REGION(2)
+	TECMO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(8,10,4);
@@ -448,8 +447,8 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -486,12 +485,11 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactnp)
-	MCFG_PALETTE_ADD("palette", 0x2800/2)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactnp);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800/2);
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
-	MCFG_TECMO_SPRITE_GFX_REGION(2)
+	TECMO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(12,14,8);
@@ -503,8 +501,8 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	/* sound hardware  - different? */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

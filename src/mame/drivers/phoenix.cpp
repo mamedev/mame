@@ -440,81 +440,75 @@ MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 }
 
 
-MACHINE_CONFIG_START(phoenix_state::phoenix)
-
+void phoenix_state::phoenix(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
+	I8085A(config, m_maincpu, CPU_CLOCK);  /* 2.75 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::phoenix_memory_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(phoenix_state::screen_update_phoenix));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
+	PALETTE(config, m_palette, FUNC(phoenix_state::phoenix_palette), 256);
 
-	MCFG_PALETTE_INIT_OWNER(phoenix_state,phoenix)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_TMS36XX_ADD("tms", 372)
-	MCFG_TMS36XX_TYPE(MM6221AA)
-	MCFG_TMS36XX_DECAY_TIMES(0.50, 0, 0, 1.05, 0, 0)
-	MCFG_TMS36XX_TUNE_SPEED(0.21)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	tms36xx_device &tms(TMS36XX(config, "tms", 372));
+	tms.set_subtype(tms36xx_device::subtype::MM6221AA);
+	tms.set_decays(0.50, 0, 0, 1.05, 0, 0);
+	tms.set_tune_speed(0.21);
+	tms.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("cust", PHOENIX_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	PHOENIX_SOUND(config, "cust").add_route(ALL_OUTPUTS, "mono", 0.4);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, 120000, phoenix_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", 120000, phoenix_discrete).add_route(ALL_OUTPUTS, "mono", 0.6);
+}
 
-
-MACHINE_CONFIG_START(phoenix_state::pleiads)
+void phoenix_state::pleiads(machine_config &config)
+{
 	phoenix(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pleiads_memory_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::pleiads_memory_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pleiads)
+	m_gfxdecode->set_info(gfx_pleiads);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(phoenix_state,pleiads)
+	m_palette->set_init(FUNC(phoenix_state::pleiads_palette));
 
 	/* sound hardware */
-	MCFG_TMS36XX_REPLACE("tms", 247)
-	MCFG_TMS36XX_TYPE(TMS3615)
-	MCFG_TMS36XX_DECAY_TIMES(0.33, 0.33, 0, 0.33, 0, 0.33)
+	tms36xx_device &tms(TMS36XX(config.replace(), "tms", 247));
+	tms.set_subtype(tms36xx_device::subtype::TMS3615);
+	tms.set_decays(0.33, 0.33, 0, 0.33, 0, 0.33);
 	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
 	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
 	// harmonics (5 1/3' and 2 2/3')
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	tms.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_REMOVE("cust")
-	MCFG_DEVICE_ADD("pleiads_custom", PLEIADS_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	config.device_remove("cust");
+	PLEIADS_SOUND(config, "pleiads_custom").add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_REMOVE("discrete")
-MACHINE_CONFIG_END
+	config.device_remove("discrete");
+}
 
 
 /* Same as Phoenix, but uses an AY8910 and an extra visible line (column) */
 
-MACHINE_CONFIG_START(phoenix_state::survival)
-
+void phoenix_state::survival(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
-	MCFG_I8085A_SID(READLINE(*this, phoenix_state, survival_sid_callback))
-	MCFG_DEVICE_PROGRAM_MAP(survival_memory_map)
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, CPU_CLOCK));  /* 5.50 MHz */
+	maincpu.in_sid_func().set(FUNC(phoenix_state::survival_sid_callback));
+	maincpu.set_addrmap(AS_PROGRAM, &phoenix_state::survival_memory_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
@@ -523,36 +517,36 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	/* schematics fairly identical to phoenix, however the interesting
 	 * page is missing
 	 */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(phoenix_state::screen_update_phoenix));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
+	PALETTE(config, m_palette, FUNC(phoenix_state::survival_palette), 256);
 
-	MCFG_PALETTE_INIT_OWNER(phoenix_state,survival)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: check clock */
-	MCFG_DEVICE_ADD("aysnd", AY8910, 11000000/4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, phoenix_state, survival_protection_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 11000000/4));
+	aysnd.port_b_read_callback().set(FUNC(phoenix_state::survival_protection_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /* Uses a Z80 */
-MACHINE_CONFIG_START(phoenix_state::condor)
+void phoenix_state::condor(machine_config &config)
+{
 	phoenix(config);
 
 	/* basic machine hardware */
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */
-	MCFG_DEVICE_REPLACE("maincpu", Z80, 11000000/4)    /* 2.75 MHz??? */
-	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, 11000000/4);    /* 2.75 MHz??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::phoenix_memory_map);
+}
 
 
 /***************************************************************************

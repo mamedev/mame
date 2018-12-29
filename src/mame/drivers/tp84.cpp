@@ -360,18 +360,16 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tp84_state, screen_update_tp84)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tp84_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tp84)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(tp84_state, tp84)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tp84);
+	PALETTE(config, m_palette, FUNC(tp84_state::tp84_palette), 4096, 256);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
@@ -382,12 +380,8 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_DEVICE_ADD("y2404_3", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
 
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD("filter3", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	for (auto &filter : m_filter)
+		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tp84_state::tp84b)

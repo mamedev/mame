@@ -5,6 +5,10 @@
     Psikyo Games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PSIKYO_H
+#define MAME_INCLUDES_PSIKYO_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
@@ -137,3 +141,5 @@ private:
 	void sngkace_sound_io_map(address_map &map);
 	void sngkace_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PSIKYO_H

@@ -159,29 +159,29 @@ static void vector06_floppies(device_slot_interface &device)
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(vector06_state::vector06)
+void vector06_state::vector06(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
-	MCFG_DEVICE_PROGRAM_MAP(vector06_mem)
-	MCFG_DEVICE_IO_MAP(vector06_io)
-	MCFG_I8085A_STATUS(WRITE8(*this, vector06_state, vector06_status_callback))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vector06_state,  vector06_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vector06_state,vector06_irq_callback)
+	I8080(config, m_maincpu, 3000000); // actual speed is wrong due to unemulated latency
+	m_maincpu->set_addrmap(AS_PROGRAM, &vector06_state::vector06_mem);
+	m_maincpu->set_addrmap(AS_IO, &vector06_state::vector06_io);
+	m_maincpu->out_status_func().set(FUNC(vector06_state::vector06_status_callback));
+	m_maincpu->set_vblank_int("screen", FUNC(vector06_state::vector06_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(vector06_state::vector06_irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256+64, 256+64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256+64-1, 0, 256+64-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vector06_state, screen_update_vector06)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(256+64, 256+64);
+	m_screen->set_visarea(0, 256+64-1, 0, 256+64-1);
+	m_screen->set_screen_update(FUNC(vector06_state::screen_update_vector06));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(vector06_state, vector06)
+	PALETTE(config, m_palette, palette_device::BLACK, 16);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	I8255(config, m_ppi8255);
@@ -196,26 +196,23 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	m_ppi8255_2->out_pb_callback().set(FUNC(vector06_state::vector06_romdisk_portb_w));
 	m_ppi8255_2->out_pc_callback().set(FUNC(vector06_state::vector06_romdisk_portc_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 
 	KR1818VG93(config, m_fdc, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","vector06_flop")
+	FLOPPY_CONNECTOR(config, "wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("vector06_flop");
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vector06_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,emr")
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "vector06_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vector06_cart", "bin,emr");
+	SOFTWARE_LIST(config, "cart_list").set_original("vector06_cart");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("320K").set_default_value(0);
 
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(1500000);
@@ -226,9 +223,8 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	m_pit8253->out_handler<2>().set(FUNC(vector06_state::speaker_w));
 
 	// optional
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1773400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay, 1773400).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /* ROM definition */
 

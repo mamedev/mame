@@ -346,8 +346,8 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m3_state, screen_update_trs80m3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trs80m3)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_trs80m3);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

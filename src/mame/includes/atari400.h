@@ -14,6 +14,8 @@
 #ifndef MAME_INCLUDES_ATARI400_H
 #define MAME_INCLUDES_ATARI400_H
 
+#pragma once
+
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 #include "sound/pokey.h"
@@ -34,6 +36,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gtia(*this, "gtia")
 		, m_antic(*this, "antic")
+		, m_pokey(*this, "pokey")
 		, m_screen(*this, "screen")
 		, m_keyboard(*this, "keyboard.%u", 0)
 		, m_keypad(*this, "keypad.%u", 0)
@@ -44,7 +47,7 @@ public:
 protected:
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(atari);
+	void atari_palette(palette_device &palette) const;
 
 	POKEY_INTERRUPT_CB_MEMBER(interrupt_cb);
 	POKEY_KEYBOARD_CB_MEMBER(a5200_keypads);
@@ -53,6 +56,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gtia_device> m_gtia;
 	required_device<antic_device> m_antic;
+	required_device<pokey_device> m_pokey;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_keyboard;
 	optional_ioport_array<4> m_keypad;

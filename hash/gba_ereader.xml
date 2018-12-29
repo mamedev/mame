@@ -5,6 +5,15 @@
 <!--It's based in No-Intro e-reader set-->
 <!--ereader interface is dummy yet-->
 <!--Author: Shideravan-->
+
+<!--
+ e-Reader cart hardware info (USA version):
+   PCB: AGB-PES-10
+   U1: U1 MASK ROM AGB [MX23L6406-12C]
+   U2: U2 512K/1M FLASH AGB [MX29L010TC-15]
+   U3: U3 PGA [Nintendo PGA Y39 0305KU001]
+-->
+
 <softwarelist name="gba_ereader" description="Nintendo Game Boy Advance (e-cards)">
 	<software name="acrs1adm">
 		<description>Animal Crossing-e - Series 1 - Admiral (USA)</description>

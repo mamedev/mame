@@ -230,14 +230,19 @@ Country :
 
 /******************************************************************************/
 
-void bbusters_state::machine_start()
+void bbusters_state_base::machine_start()
 {
 	m_gun_recoil.resolve();
+}
+
+void bbusters_state::machine_start()
+{
+	bbusters_state_base::machine_start();
 
 	save_item(NAME(m_gun_select));
 }
 
-WRITE8_MEMBER(bbusters_state::sound_cpu_w)
+WRITE8_MEMBER(bbusters_state_base::sound_cpu_w)
 {
 	m_soundlatch[0]->write(space, 0, data&0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -280,7 +285,7 @@ READ16_MEMBER(bbusters_state::kludge_r)
 }
 
 template<int Layer>
-WRITE16_MEMBER(bbusters_state::pf_w)
+WRITE16_MEMBER(bbusters_state_base::pf_w)
 {
 	COMBINE_DATA(&m_pf_data[Layer][offset]);
 	m_pf_tilemap[Layer]->mark_tile_dirty(offset);
@@ -318,11 +323,6 @@ void bbusters_state::bbusters_map(address_map &map)
 }
 
 /*******************************************************************************/
-
-void mechatt_state::machine_start()
-{
-	m_gun_recoil.resolve();
-}
 
 WRITE16_MEMBER(mechatt_state::two_gun_output_w)
 {
@@ -367,7 +367,7 @@ void mechatt_state::mechatt_map(address_map &map)
 
 /******************************************************************************/
 
-void bbusters_state::sound_map(address_map &map)
+void bbusters_state_base::sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
@@ -656,19 +656,18 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	screen.screen_vblank().append(m_spriteram[1], FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bbusters)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bbusters);
+	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
+	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -698,18 +697,17 @@ MACHINE_CONFIG_START(mechatt_state::mechatt)
 	screen.screen_vblank().set(m_spriteram[0], FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mechatt)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mechatt);
+	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 1024);
 
-	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2608, 8000000)
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

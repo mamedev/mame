@@ -212,7 +212,9 @@ uint32_t mips3_device::compute_config_register()
 {
 	/* set the cache line size to 32 bytes */
 	uint32_t configreg = 0x00026030;
-	int divisor;
+
+	m_dcache = nullptr;
+	m_icache = nullptr;
 
 	// NEC VR series does not use a 100% compatible COP0/TLB implementation
 	if (m_flavor == MIPS3_TYPE_VR4300)
@@ -252,13 +254,13 @@ uint32_t mips3_device::compute_config_register()
 	else
 	{
 		/* set the data cache size */
-				if (c_icache_size <= 0x01000) configreg |= 0 << 6;
-		else if (c_icache_size <= 0x02000) configreg |= 1 << 6;
-		else if (c_icache_size <= 0x04000) configreg |= 2 << 6;
-		else if (c_icache_size <= 0x08000) configreg |= 3 << 6;
-		else if (c_icache_size <= 0x10000) configreg |= 4 << 6;
-		else if (c_icache_size <= 0x20000) configreg |= 5 << 6;
-		else if (c_icache_size <= 0x40000) configreg |= 6 << 6;
+				if (c_dcache_size <= 0x01000) configreg |= 0 << 6;
+		else if (c_dcache_size <= 0x02000) configreg |= 1 << 6;
+		else if (c_dcache_size <= 0x04000) configreg |= 2 << 6;
+		else if (c_dcache_size <= 0x08000) configreg |= 3 << 6;
+		else if (c_dcache_size <= 0x10000) configreg |= 4 << 6;
+		else if (c_dcache_size <= 0x20000) configreg |= 5 << 6;
+		else if (c_dcache_size <= 0x40000) configreg |= 6 << 6;
 		else                                   configreg |= 7 << 6;
 
 		/* set the instruction cache size */
@@ -271,9 +273,8 @@ uint32_t mips3_device::compute_config_register()
 		else if (c_icache_size <= 0x40000) configreg |= 6 << 9;
 		else                                   configreg |= 7 << 9;
 
-
 		/* set the system clock divider */
-		divisor = 2;
+		int divisor = 2;
 		if (c_system_clock != 0)
 		{
 			divisor = m_cpu_clock / c_system_clock;
@@ -326,8 +327,10 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x2d23;
 
 		case MIPS3_TYPE_R5000:
-		case MIPS3_TYPE_QED5271:
 			return 0x2300;
+
+		case MIPS3_TYPE_QED5271:
+			return 0x2800;
 
 		case MIPS3_TYPE_RM7000:
 			return 0x2700;

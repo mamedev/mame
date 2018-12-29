@@ -5,7 +5,12 @@
     Gyruss
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GYRUSS_H
+#define MAME_INCLUDES_GYRUSS_H
 
+#pragma once
+
+#include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
@@ -13,8 +18,8 @@
 class gyruss_state : public driver_device
 {
 public:
-	gyruss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gyruss_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
@@ -37,7 +42,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_audiocpu_2;
+	required_device<i8039_device> m_audiocpu_2;
 	required_device<discrete_device> m_discrete;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -68,7 +73,7 @@ private:
 	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gyruss);
+	void gyruss_palette(palette_device &palette) const;
 	uint32_t screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -80,3 +85,5 @@ private:
 	void main_cpu1_map(address_map &map);
 	void main_cpu2_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GYRUSS_H

@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
@@ -73,8 +74,8 @@
 class apc_state : public driver_device
 {
 public:
-	apc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
@@ -973,7 +974,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
@@ -988,17 +989,17 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_screen->set_size(640, 494);
 	m_screen->set_visarea(0*8, 640-1, 0*8, 494-1);
 
-	MCFG_PALETTE_ADD_3BIT_BRG(m_palette)
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
 
-	MCFG_DEVICE_ADD(m_hgdc1, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc1, 3579545); // unk clock
+	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
+	m_hgdc1->set_draw_text_callback(FUNC(apc_state::hgdc_draw_text), this);
 
-	MCFG_DEVICE_ADD(m_hgdc2, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc2, 3579545); // unk clock
+	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
+	m_hgdc2->set_display_pixels_callback(FUNC(apc_state::hgdc_display_pixels), this);
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();

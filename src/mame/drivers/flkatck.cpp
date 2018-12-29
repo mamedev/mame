@@ -211,54 +211,50 @@ void flkatck_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(flkatck_state::flkatck)
-
+void flkatck_state::flkatck(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(flkatck_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flkatck_state,  flkatck_interrupt)
+	HD6309(config, m_maincpu, 3000000*4); /* HD63C09EP, 24/8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &flkatck_state::flkatck_map);
+	m_maincpu->set_vblank_int("screen", FUNC(flkatck_state::flkatck_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* NEC D780C-1, 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(flkatck_sound_map)
+	Z80(config, m_audiocpu, 3579545);   /* NEC D780C-1, 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &flkatck_state::flkatck_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(37*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(flkatck_state, screen_update_flkatck)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(37*8, 32*8);
+	screen.set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(flkatck_state::screen_update_flkatck));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flkatck)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_flkatck);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
-	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
+	K007121(config, m_k007121, 0);
+	m_k007121->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, flkatck_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(flkatck_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.50);
+	m_k007232->add_route(0, "rspeaker", 0.50);
+	m_k007232->add_route(1, "lspeaker", 0.50);
+	m_k007232->add_route(1, "rspeaker", 0.50);
+}
 
 
 

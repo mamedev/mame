@@ -473,16 +473,14 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_terracre)
-	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_terracre);
+	PALETTE(config, m_palette, FUNC(terracre_state::terracre_palette), 1*16+16*16+16*256, 256);
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -519,7 +517,7 @@ MACHINE_CONFIG_START(amazon_state::amazon_1412m2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(amazon_1412m2_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(16'000'000)) // divided by 4 maybe
+	NB1412M2(config, m_prot, XTAL(16'000'000)); // divided by 4 maybe
 MACHINE_CONFIG_END
 
 

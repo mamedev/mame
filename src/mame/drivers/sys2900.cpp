@@ -156,7 +156,7 @@ MACHINE_CONFIG_START(sys2900_state::sys2900)
 	MCFG_SCREEN_UPDATE_DRIVER(sys2900_state, screen_update_sys2900)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	Z80CTC(config, "ctc", 0);
 	Z80PIO(config, "pio", 0);

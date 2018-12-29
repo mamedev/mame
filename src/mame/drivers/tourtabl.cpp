@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "machine/6532riot.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6507.h"
 #include "machine/watchdog.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
@@ -76,7 +76,6 @@ void tourtabl_state::main_map(address_map &map)
 	map(0x0400, 0x047f).ram();
 	map(0x0500, 0x051f).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x0800, 0x1fff).rom();
-	map(0xe800, 0xffff).rom();
 }
 
 
@@ -155,10 +154,11 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(tourtabl_state::tourtabl)
+void tourtabl_state::tourtabl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6507(config, m_maincpu, MASTER_CLOCK / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tourtabl_state::main_map);
 
 	riot6532_device &riot1(RIOT6532(config, "riot1", MASTER_CLOCK / 3));
 	riot1.in_pa_callback().set_ioport("RIOT0_SWA");
@@ -173,42 +173,34 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tourtabl_state, tourtabl_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tourtabl_state, tourtabl_get_databus_contents))
+	tia_ntsc_video_device &tia(TIA_NTSC_VIDEO(config, "tia_video", 0, "tia"));
+	tia.read_input_port_callback().set(FUNC(tourtabl_state::tourtabl_read_input_port));
+	tia.databus_contents_callback().set(FUNC(tourtabl_state::tourtabl_get_databus_contents));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
-	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-	MCFG_SCREEN_PALETTE("tia_video:palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200);
+	screen.set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+	screen.set_palette("tia_video:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK/114)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	TIA(config, "tia", MASTER_CLOCK/114).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( tourtabl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "030751.ab2", 0x0800, 0x0800, CRC(4479a6f7) SHA1(bf3fd859614533a592f831e3539ea0a9d1964c82) )
-	ROM_RELOAD(             0xE800, 0x0800 )
 	ROM_LOAD( "030752.ab3", 0x1000, 0x0800, CRC(c92c49dc) SHA1(cafcf13e1b1087b477a667d1e785f5e2be187b0d) )
-	ROM_RELOAD(             0xF000, 0x0800 )
 	ROM_LOAD( "030753.ab4", 0x1800, 0x0800, CRC(3978b269) SHA1(4fa05c655bb74711eb99428f36df838ec70da699) )
-	ROM_RELOAD(             0xF800, 0x0800 )
 ROM_END
 
 
 ROM_START( tourtab2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "030929.ab2", 0x0800, 0x0800, CRC(fcdfafa2) SHA1(f35ab83366a334a110fbba0cef09f4db950dbb68) )
-	ROM_RELOAD(             0xE800, 0x0800 )
 	ROM_LOAD( "030752.ab3", 0x1000, 0x0800, CRC(c92c49dc) SHA1(cafcf13e1b1087b477a667d1e785f5e2be187b0d) )
-	ROM_RELOAD(             0xF000, 0x0800 )
 	ROM_LOAD( "030753.ab4", 0x1800, 0x0800, CRC(3978b269) SHA1(4fa05c655bb74711eb99428f36df838ec70da699) )
-	ROM_RELOAD(             0xF800, 0x0800 )
 ROM_END
 
 

@@ -1366,19 +1366,19 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000)/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW) // all outputs are tied together with no resistors, and pin 26 is low
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL(12'000'000)/4)); /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
+	aysnd.set_flags(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW); // all outputs are tied together with no resistors, and pin 26 is low
+	aysnd.port_a_read_callback().set_ioport("UNUSED");
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
 MACHINE_CONFIG_END
 
 void arkanoid_state::p3mcu(machine_config &config)
@@ -1390,15 +1390,16 @@ void arkanoid_state::p3mcu(machine_config &config)
 	m_mcuintf->portb_r_cb().set_ioport("MUX");
 }
 
-MACHINE_CONFIG_START(arkanoid_state::p3mcuay)
+void arkanoid_state::p3mcuay(machine_config &config)
+{
 	p3mcu(config);
 
-	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4) // AY-3-8910A
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", XTAL(12'000'000)/4)); // AY-3-8910A
+	aysnd.set_flags(AY8910_SINGLE_OUTPUT);
+	aysnd.port_a_read_callback().set_ioport("UNUSED");
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
+}
 
 MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	arkanoid(config);
@@ -1410,15 +1411,16 @@ MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(arkanoid_state::aysnd)
+void arkanoid_state::aysnd(machine_config &config)
+{
 	bootleg(config);
 
-	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", XTAL(12'000'000)/4));
+	aysnd.set_flags(AY8910_SINGLE_OUTPUT);
+	aysnd.port_a_read_callback().set_ioport("UNUSED");
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
+}
 
 
 MACHINE_CONFIG_START(arkanoid_state::hexa)
@@ -1438,17 +1440,17 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexa)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(12'000'000)/4/2)); /* Imported from arkanoid - correct? */
+	aysnd.port_a_read_callback().set_ioport("INPUTS");
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::hexaa)
@@ -1481,17 +1483,17 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(12'000'000)/4/2)); /* Imported from arkanoid - correct? */
+	aysnd.port_a_read_callback().set_ioport("INPUTS");
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

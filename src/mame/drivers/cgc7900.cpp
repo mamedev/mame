@@ -463,16 +463,9 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(28'480'000)/4)
 	MCFG_DEVICE_PROGRAM_MAP(cgc7900_mem)
 
-	MCFG_DEVICE_ADD(I8035_TAG, I8035, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(keyboard_mem)
-	//MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, ))
-	//MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ))
-	//MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ))
-	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ))
-	//MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ))
-	//MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ))
-	//MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, ))
-	MCFG_DEVICE_DISABLE()
+	i8035_device &kbmcu(I8035(config, I8035_TAG, 1000000));
+	kbmcu.set_addrmap(AS_PROGRAM, &cgc7900_state::keyboard_mem);
+	kbmcu.set_disable();
 
 /*  MCFG_DEVICE_ADD(AM2910_TAG, AM2910, XTAL(17'360'000))
     MCFG_DEVICE_PROGRAM_MAP(omti10_mem)*/
@@ -482,12 +475,11 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(28'480'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, AY8910_TAG, XTAL(28'480'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(cgc7900_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(cgc7900_state::kbd_put));
 
 	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL(32'768))
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0x0>))

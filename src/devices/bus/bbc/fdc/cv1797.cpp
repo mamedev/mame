@@ -55,8 +55,8 @@ ROM_END
 void bbc_cv1797_device::device_add_mconfig(machine_config &config)
 {
 	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
-	m_fdc->intrq_wr_callback().set(FUNC(bbc_cv1797_device::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(bbc_cv1797_device::fdc_drq_w));
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cv1797_device::motor_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
@@ -79,7 +79,6 @@ const tiny_rom_entry *bbc_cv1797_device::device_rom_region() const
 bbc_cv1797_device::bbc_cv1797_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_CV1797, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
-	, m_dfs_rom(*this, "dfs_rom")
 	, m_fdc(*this, "fd1797")
 	, m_floppy0(*this, "fd1797:0")
 	, m_floppy1(*this, "fd1797:1")
@@ -94,15 +93,6 @@ bbc_cv1797_device::bbc_cv1797_device(const machine_config &mconfig, const char *
 void bbc_cv1797_device::device_start()
 {
 	save_item(NAME(m_drive_control));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_cv1797_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
 }
 
 
@@ -155,16 +145,6 @@ WRITE8_MEMBER(bbc_cv1797_device::write)
 		// bit 6: reset
 		//if (BIT(data, 6)) m_fdc->soft_reset();
 	}
-}
-
-WRITE_LINE_MEMBER(bbc_cv1797_device::fdc_intrq_w)
-{
-	m_slot->intrq_w(state);
-}
-
-WRITE_LINE_MEMBER(bbc_cv1797_device::fdc_drq_w)
-{
-	m_slot->drq_w(state);
 }
 
 WRITE_LINE_MEMBER(bbc_cv1797_device::motor_w)

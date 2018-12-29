@@ -188,7 +188,6 @@ other supported games as well.
 #include "includes/m72.h"
 #include "includes/iremipt.h"
 
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
@@ -341,13 +340,6 @@ READ8_MEMBER(m72_state::mcu_data_r)
 	return (m_dpram->right_r(space, offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
-INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
-{
-	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	//m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
-	device.execute().set_input_line(1, ASSERT_LINE);
-}
-
 READ8_MEMBER(m72_state::mcu_sample_r)
 {
 	uint8_t sample;
@@ -358,12 +350,9 @@ READ8_MEMBER(m72_state::mcu_sample_r)
 WRITE8_MEMBER(m72_state::mcu_port1_w)
 {
 	m_mcu_sample_latch = data;
-	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
 
-WRITE8_MEMBER(m72_state::mcu_port3_w)
-{
-	logerror("port3: %02x\n", data);
+	// FIXME: this can't be the NMI trigger
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(m72_state::mcu_low_w)
@@ -1812,121 +1801,116 @@ static GFXDECODE_START( gfx_majtitle )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(m72_state::m72_audio_chips)
+void m72_state::m72_audio_chips(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+	m_soundcpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	IREM_M72_AUDIO(config, "m72");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 MACHINE_CONFIG_START(m72_state::m72_base)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",V30,MASTER_CLOCK/2/2)    /* 16 MHz external freq (8MHz internal) */
-	MCFG_DEVICE_PROGRAM_MAP(m72_map)
-	MCFG_DEVICE_IO_MAP(m72_portmap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-	MCFG_DEVICE_ADD("soundcpu",Z80, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_ram_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	V30(config, m_maincpu, MASTER_CLOCK/2/2);    /* 16 MHz external freq (8MHz internal) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m72_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
+
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_ram_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_portmap);
 
 	PIC8259(config, m_upd71059c, 0);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m72)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
+	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,m72)
 
 	m72_audio_chips(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(m72_state::m72)
+void m72_state::m72(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, fake_nmi, 128*55)   /* clocked by V1? (Vigilante) */
-							/* IRQs are generated by main Z80 and YM2151 */
-MACHINE_CONFIG_END
+	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(128*55));   /* clocked by V1? (Vigilante) */
+	/* IRQs are generated by main Z80 and YM2151 */
+}
 
-MACHINE_CONFIG_START(m72_state::m72_8751)
+void m72_state::m72_8751(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m72_protected_map)
-	MCFG_DEVICE_IO_MAP(m72_protected_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m72_protected_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_protected_portmap);
 
 	MB8421_MB8431_16BIT(config, m_dpram);
 	//m_dpram->intl_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w)); // not actually used?
 	m_dpram->intr_callback().set_inputline("mcu", MCS51_INT0_LINE);
 
-	MCFG_GENERIC_LATCH_8_ADD("mculatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", MCS51_INT1_LINE))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &mculatch(GENERIC_LATCH_8(config, "mculatch"));
+	mculatch.data_pending_callback().set_inputline(m_mcu, MCS51_INT1_LINE);
+	mculatch.set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* Uses its own XTAL */
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, m72_state, mcu_port1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, m72_state, mcu_port3_w))
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, XTAL(8'000'000)); /* Uses its own XTAL */
+	m_mcu->set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	m_mcu->port_out_cb<1>().set(FUNC(m72_state::mcu_port1_w));
+}
 
 
-MACHINE_CONFIG_START(m72_state::rtype)
+void m72_state::rtype(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rtype_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::rtype_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype_sound_portmap);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IO_MAP(rtype_sound_portmap)
+	config.device_remove("m72");
+	config.device_remove("dac");
+	config.device_remove("vref");
+}
 
-	MCFG_DEVICE_REMOVE("m72")
-	MCFG_DEVICE_REMOVE("dac")
-	MCFG_DEVICE_REMOVE("vref")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(m72_state::m72_xmultipl)
+void m72_state::m72_xmultipl(machine_config &config)
+{
 	m72_8751(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(xmultiplm72_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::xmultiplm72_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
-								/* IRQs are generated by main Z80 and YM2151 */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(128*55)); /* clocked by V1? (Vigilante) */
+	/* IRQs are generated by main Z80 and YM2151 */
+}
 
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(m72_state::m72_dbreed)
+void m72_state::m72_dbreed(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dbreedm72_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreedm72_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
-								/* IRQs are generated by main Z80 and YM2151 */
-MACHINE_CONFIG_END
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(128*55)); /* clocked by V1? (Vigilante) */
+	/* IRQs are generated by main Z80 and YM2151 */
+}
 
 
 
@@ -1977,7 +1961,7 @@ MACHINE_CONFIG_START(m72_state::rtype2)
 	MCFG_DEVICE_IO_MAP(m84_portmap)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_ADD(m_soundcpu, Z80, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
 	MCFG_DEVICE_IO_MAP(rtype2_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
@@ -2020,7 +2004,7 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 	MCFG_DEVICE_PROGRAM_MAP(kengo_map)
 	MCFG_DEVICE_IO_MAP(m84_v33_portmap)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_ADD(m_soundcpu, Z80, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
 	MCFG_DEVICE_IO_MAP(rtype2_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
@@ -2045,11 +2029,11 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 	m72_audio_chips(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(m72_state::kengo)
+void m72_state::kengo(machine_config &config)
+{
 	cosmccop(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_V25_CONFIG(gunforce_decryption_table)
-MACHINE_CONFIG_END
+	subdevice<v35_device>("maincpu")->set_decryption_table(gunforce_decryption_table);
+}
 
 
 /****************************************** M82 ***********************************************/
@@ -2067,7 +2051,7 @@ MACHINE_CONFIG_START(m72_state::m82)
 	MCFG_DEVICE_PROGRAM_MAP(m82_map)
 	MCFG_DEVICE_IO_MAP(m82_portmap)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_ADD(m_soundcpu, Z80, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
 	MCFG_DEVICE_IO_MAP(rtype2_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
@@ -2102,7 +2086,7 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	MCFG_DEVICE_PROGRAM_MAP(rtype2_map)
 	MCFG_DEVICE_IO_MAP(poundfor_portmap)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_ADD(m_soundcpu, Z80, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
 	MCFG_DEVICE_IO_MAP(poundfor_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, fake_nmi, 128*55)   /* clocked by V1? (Vigilante) */
@@ -2819,11 +2803,11 @@ ROM_START( lohtj )
 ROM_END
 
 /*
-CPU cpu: nec v30
-cpu: z80 (sharp LH0080B z80b-cpu)
-cpu: 2x YM2203C
+nec v30
+z80 (sharp LH0080B z80b-cpu)
+2x YM2203C
 
-quarzi: 16mhz vicino al v30 e 28mhz vicino allo z80 e ym2203c
+Crystals: 16MHz near the v30 and 28MHz near the z80 and ym2203c
 */
 
 ROM_START( lohtb )
@@ -2909,6 +2893,48 @@ ROM_START( lohtb2 )
 	ROM_LOAD( "loht-a1.bin",   0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
 ROM_END
 
+ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1997 and 'IRGM BORP.'
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9.9", 0x00001, 0x20000, CRC(f1e4ebb7) SHA1(976ec822f57f36bc097deb5d3d86e7c2c1b247ed) )
+	ROM_LOAD16_BYTE( "1.1", 0x00000, 0x20000, CRC(b9384e93) SHA1(5b882ecd68fdf7a6307af0e1aca2ab1782911227) )
+
+	ROM_LOAD16_BYTE( "i-10.10",  0x40001, 0x10000, CRC(79e007ec) SHA1(b2e4cc4a47f5f127ba9a1a00eaaf067464314ea0) )
+	ROM_RELOAD(                      0xc0001, 0x10000 )
+	ROM_LOAD16_BYTE( "i-11.11",  0x60001, 0x10000, CRC(254ea4d5) SHA1(07277bbe2ea6678f0de1f28e40be794880b3faff) )
+	ROM_RELOAD(                      0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "i-2.2",    0x40000, 0x10000, CRC(b951346e) SHA1(82fa3c4a09a86b74b98c31aaea5c0629ddff83a0) )
+	ROM_RELOAD(                      0xc0000, 0x10000 )
+	ROM_LOAD16_BYTE( "i-3.3",    0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
+	ROM_RELOAD(                      0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, BAD_DUMP CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) ) // undumped, using the dump from lohtb2 for now
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "i-8.8",   0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
+	ROM_LOAD( "i-7.7",   0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
+	ROM_LOAD( "i-15.15", 0x20000, 0x10000, CRC(45220b01) SHA1(83715cf155f91c82067d69f14b3b01ed77777b7d) )
+	ROM_LOAD( "i-14.14", 0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4) )
+	ROM_LOAD( "i-6.6",   0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
+	ROM_LOAD( "i-5.5",   0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
+	ROM_LOAD( "i-13.13", 0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
+	ROM_LOAD( "i-12.12", 0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
+
+	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_LOAD( "i-20.20",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) ) /* tiles #1 */
+	ROM_LOAD( "r-21.21",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
+	ROM_LOAD( "i-19.19",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
+	ROM_LOAD( "i-22.22",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
+
+	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_LOAD( "r-25.25",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) ) /* tiles #2 */
+	ROM_LOAD( "r-26.26",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
+	ROM_LOAD( "r-24.24",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
+	ROM_LOAD( "i-23.23",  0x30000, 0x10000, CRC(2e2a085d) SHA1(ed2eed6c30d44b176bd99eb386482b2a19e3b9cb) )
+
+	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_LOAD( "i-4.4",   0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+ROM_END
 
 ROM_START( xmultiplm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -3810,6 +3836,7 @@ GAME( 1988, imgfightj,   imgfight, m72_8751,     imgfight,     m72_state, init_m
 GAME( 1989, loht,        0,        m72,          loht,         m72_state, init_loht,       ROT0,   "Irem", "Legend of Hero Tonma", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
 GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // waits for japan warning screen, works with our mcu dump (Japan Version)
 GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
 
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 

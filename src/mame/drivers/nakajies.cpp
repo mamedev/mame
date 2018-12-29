@@ -300,11 +300,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 
-private:
-	required_device<cpu_device> m_maincpu;
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
@@ -327,6 +327,13 @@ private:
 	DECLARE_WRITE8_MEMBER( bank6_w );
 	DECLARE_WRITE8_MEMBER( bank7_w );
 
+	void nakajies_palette(palette_device &palette) const;
+	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
+	void nakajies_io_map(address_map &map);
+	void nakajies_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+
 	/* IRQ handling */
 	uint8_t   m_irq_enabled;
 	uint8_t   m_irq_active;
@@ -346,10 +353,6 @@ private:
 	/* Banking */
 	uint8_t   m_bank[8];
 	uint8_t   *m_bank_base[8];
-	DECLARE_PALETTE_INIT(nakajies);
-	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
-	void nakajies_io_map(address_map &map);
-	void nakajies_map(address_map &map);
 };
 
 
@@ -710,7 +713,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 }
 
 
-PALETTE_INIT_MEMBER(nakajies_state, nakajies)
+void nakajies_state::nakajies_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -759,14 +762,12 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wales210)
-	MCFG_PALETTE_ADD( "palette", 2 )
-	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_wales210);
+	PALETTE(config, "palette", FUNC(nakajies_state::nakajies_palette), 2);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
 	RP5C01(config, "rtc", XTAL(32'768));

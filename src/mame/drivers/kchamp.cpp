@@ -431,19 +431,17 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kchamp)
+	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    /* verified on pcb */
 
@@ -489,19 +487,17 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kchamp)
+	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
 

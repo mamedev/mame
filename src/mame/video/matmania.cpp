@@ -44,31 +44,33 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(matmania_state, matmania)
+void matmania_state::matmania_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 64; i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
+		int bit0, bit1, bit2, bit3;
 
 		bit0 = BIT(color_prom[0], 0);
 		bit1 = BIT(color_prom[0], 1);
 		bit2 = BIT(color_prom[0], 2);
 		bit3 = BIT(color_prom[0], 3);
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		bit0 = BIT(color_prom[0], 4);
 		bit1 = BIT(color_prom[0], 5);
 		bit2 = BIT(color_prom[0], 6);
 		bit3 = BIT(color_prom[0], 7);
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		bit0 = BIT(color_prom[64], 0);
 		bit1 = BIT(color_prom[64], 1);
 		bit2 = BIT(color_prom[64], 2);
 		bit3 = BIT(color_prom[64], 3);
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

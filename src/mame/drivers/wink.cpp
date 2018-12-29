@@ -26,12 +26,13 @@
 class wink_state : public driver_device
 {
 public:
-	wink_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wink_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void wink(machine_config &config);
 
@@ -415,19 +416,17 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wink_state, nmi_clock_w))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wink)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_wink);
+	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 12000000 / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, wink_state, sound_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8912_device &aysnd(AY8912(config, "aysnd", 12000000 / 8));
+	aysnd.port_a_read_callback().set(FUNC(wink_state::sound_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /***************************************************************************

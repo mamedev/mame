@@ -293,31 +293,28 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	MCFG_SCREEN_UPDATE_DRIVER(mrflea_state, screen_update_mrflea)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrflea)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrflea);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", 2000000));
+	ay1.port_a_read_callback().set_ioport("IN1");
+	ay1.port_b_read_callback().set_ioport("IN0");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000) // not used for sound?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.25); // not used for sound?
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay3(AY8910(config, "ay3", 2000000));
+	ay3.port_a_read_callback().set_ioport("DSW2");
+	ay3.port_b_read_callback().set_ioport("DSW1");
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay4", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNKNOWN"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, mrflea_state, mrflea_data1_w))
+	ay8910_device &ay4(AY8910(config, "ay4", 2000000));
+	ay4.port_a_read_callback().set_ioport("UNKNOWN");
+	ay4.port_b_write_callback().set(FUNC(mrflea_state::mrflea_data1_w));
+	ay4.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /*************************************

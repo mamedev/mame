@@ -9,7 +9,7 @@
  * Generic pll class for floppy controllers with analog plls
  */
 
-#include "imagedev/floppy.h"
+class floppy_image_device;
 
 class fdc_pll_t {
 public:

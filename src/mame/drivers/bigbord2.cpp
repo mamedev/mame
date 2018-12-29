@@ -72,6 +72,7 @@ X - change banks
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
@@ -559,10 +560,9 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, MAIN_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bigbord2_state, clock_w))
+	CLOCK(config, "ctc_clock", MAIN_CLOCK).signal_handler().set(FUNC(bigbord2_state::clock_w));
 
 	/* devices */
 	Z80DMA(config, m_dma, MAIN_CLOCK);
@@ -595,11 +595,12 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 16_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(m_ctc1, z80ctc_device, trg3))
+	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 
 	ls259_device &proglatch(LS259(config, "proglatch")); // U41
 	proglatch.q_out_cb<6>().set("outlatch1", FUNC(ls259_device::clear_w)); // FCRST - also resets the 8877
@@ -619,8 +620,8 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // U96
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(bigbord2_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(bigbord2_state::kbd_put));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

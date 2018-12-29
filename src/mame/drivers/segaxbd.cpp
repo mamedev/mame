@@ -375,7 +375,6 @@ public:
 	void init_lastsurv();
 	void init_loffire();
 	void init_smgp();
-	void init_rascot();
 	void init_gprider();
 
 protected:
@@ -519,8 +518,9 @@ WRITE8_MEMBER(segaxbd_state::pc_0_w)
 
 	m_segaic16vid->set_display_enable(data & 0x20);
 
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	if (m_soundcpu2 != nullptr)
+	if (m_soundcpu.found())
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_soundcpu2.found())
 		m_soundcpu2->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -571,31 +571,6 @@ WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
-}
-
-
-//-------------------------------------------------
-//  rascot_excs_r - /EXCS region reads for Rascot
-//-------------------------------------------------
-
-READ16_MEMBER( segaxbd_state::rascot_excs_r )
-{
-	//logerror("%06X:rascot_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
-
-	// probably receives commands from the server here
-	//return machine().rand() & 0xff;
-
-	return 0xff;
-}
-
-
-//-------------------------------------------------
-//  rascot_excs_w - /EXCS region writes for Rascot
-//-------------------------------------------------
-
-WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
-{
-	//logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
 
 
@@ -747,6 +722,39 @@ READ8_MEMBER(segaxbd_state::smgp_motor_r)
 WRITE8_MEMBER(segaxbd_state::smgp_motor_w)
 {
 	// TODO
+}
+
+
+//-------------------------------------------------
+//  commram_r - banked reads from the MB8421
+//  dual-port communications RAM for Royal Ascot
+//-------------------------------------------------
+
+READ8_MEMBER(segaxbd_rascot_state::commram_r)
+{
+	return m_commram->right_r(space, m_commram_bank << 3 | offset);
+}
+
+
+//-------------------------------------------------
+//  commram_w - banked writes to the MB8421
+//  dual-port communications RAM for Royal Ascot
+//-------------------------------------------------
+
+WRITE8_MEMBER(segaxbd_rascot_state::commram_w)
+{
+	m_commram->right_w(space, m_commram_bank << 3 | offset, data);
+}
+
+
+//-------------------------------------------------
+//  commram_bank_w - set bank for MB8421 in blocks
+//  of 8 bytes
+//-------------------------------------------------
+
+WRITE8_MEMBER(segaxbd_rascot_state::commram_bank_w)
+{
+	m_commram_bank = data;
 }
 
 
@@ -971,7 +979,14 @@ void segaxbd_state::sub_map(address_map &map)
 	map(0x0e8000, 0x0e800f).mirror(0x003ff0).rw("cmptimer_subx", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
 	map(0x0ec000, 0x0ecfff).mirror(0x001000).ram().share("roadram");
 	map(0x0ee000, 0x0effff).rw("segaic16road", FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
-//  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE(excs_r, excs_w)
+}
+
+void segaxbd_rascot_state::sub_map(address_map &map)
+{
+	segaxbd_state::sub_map(map);
+	map(0x0f0000, 0x0f000f).mirror(0x70).r(FUNC(segaxbd_rascot_state::commram_r)).umask16(0x00ff);
+	map(0x0f0000, 0x0f000f).w(FUNC(segaxbd_rascot_state::commram_w)).umask16(0x00ff);
+	map(0x0f0011, 0x0f0011).w(FUNC(segaxbd_rascot_state::commram_bank_w));
 }
 
 
@@ -1066,21 +1081,17 @@ void segaxbd_state::smgp_comm_portmap(address_map &map)
 
 
 //**************************************************************************
-//  RASCOT UNKNOWN Z80 CPU ADDRESS MAPS
+//  RASCOT LINK CPU ADDRESS MAP
 //**************************************************************************
 
-// Z80, unknown function
-void segaxbd_state::rascot_z80_map(address_map &map)
+void segaxbd_rascot_state::comm_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xafff).ram();
-}
-
-void segaxbd_state::rascot_z80_portmap(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0xff);
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa7ff).rw(m_commram, FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xc000, 0xc001).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xe003, 0xe003).nopw(); // ?
 }
 
 
@@ -1661,29 +1672,29 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
-
+void segaxbd_state::xboard_base_mconfig(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_state::main_map);
 
-	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, MASTER_CLOCK/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segaxbd_state::sub_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, SOUND_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segaxbd_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segaxbd_state::sound_portmap);
 
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "backup2", nvram_device::DEFAULT_ALL_0);
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MB3773(config, "watchdog");
 
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
 
 	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
 	m_cmptimer_1->m68kint_callback().set(FUNC(segaxbd_state::timer_irq_w));
@@ -1704,34 +1715,34 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	m_iochip[1]->in_portd_cb().set_ioport("IO1PORTD");
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segaxbd)
-	MCFG_PALETTE_ADD("palette", 8192*3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaxbd);
+	PALETTE(config, m_palette).set_entries(8192*3);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segaxbd_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segaxbd_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("sprites", SEGA_XBOARD_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SEGA_XBOARD_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
+	m_segaic16vid->set_screen(m_screen);
 
-	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
+	SEGAIC16_ROAD(config, m_segaic16road, 0);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.43);
+	ymsnd.add_route(1, "rspeaker", 0.43);
 
-	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
+	pcm.set_bank(segapcm_device::BANK_512);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_REGULAR, segaxbd_regular_state, "segaxbd_pcb_reg", "Sega X-Board PCB (regular)")
@@ -1741,14 +1752,15 @@ segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, cons
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_regular_state::device_add_mconfig)
-
+void segaxbd_regular_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_xboard)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_REGULAR, 0)
-MACHINE_CONFIG_END
+void segaxbd_new_state::sega_xboard(machine_config &config)
+{
+	SEGA_XBD_REGULAR(config, "mainpcb", 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_FD1094, segaxbd_fd1094_state, "segaxbd_pcb_fd1094", "Sega X-Board PCB (FD1094)")
@@ -1758,26 +1770,27 @@ segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const 
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_fd1094_state::device_add_mconfig)
-
+void segaxbd_fd1094_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_fd1094_state::main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_fd1094_state::decrypted_opcodes_map);
+}
 
+void segaxbd_new_state::sega_xboard_fd1094(machine_config &config)
+{
+	SEGA_XBD_FD1094(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_xboard_fd1094)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_FD1094, 0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(segaxbd_new_state_double::sega_xboard_fd1094_double)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_FD1094, 0)
-	MCFG_DEVICE_ADD("subpcb", SEGA_XBD_FD1094, 0)
+void segaxbd_new_state_double::sega_xboard_fd1094_double(machine_config &config)
+{
+	SEGA_XBD_FD1094(config, "mainpcb", 0);
+	SEGA_XBD_FD1094(config, "subpcb", 0);
 
 	//MCFG_QUANTUM_PERFECT_CPU("mainpcb:maincpu") // doesn't help..
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************
@@ -1799,9 +1812,10 @@ void segaxbd_aburner2_state::device_add_mconfig(machine_config &config)
 	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::aburner2_motor_w));
 }
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_aburner2)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_ABURNER2_DEVICE, 0)
-MACHINE_CONFIG_END
+void segaxbd_new_state::sega_aburner2(machine_config &config)
+{
+	SEGA_XBD_ABURNER2_DEVICE(config, "mainpcb", 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV_FD1094, segaxbd_lastsurv_fd1094_state, "segaxbd_pcb_lastsurv_fd1094", "Sega X-Board PCB (Last Survivor, FD1094)")
@@ -1811,13 +1825,13 @@ segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_confi
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_lastsurv_fd1094_state::device_add_mconfig)
-
+void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_lastsurv_fd1094_state::main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_lastsurv_fd1094_state::decrypted_opcodes_map);
 
 	// basic machine hardware
 	// TODO: network board
@@ -1826,15 +1840,15 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_fd1094_state::device_add_mconfig)
 	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
 
 	// sound hardware - ym2151 stereo is reversed
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
-MACHINE_CONFIG_END
+	subdevice<ym2151_device>("ymsnd")->reset_routes();
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "rspeaker", 0.43);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "lspeaker", 0.43);
+}
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_lastsurv_fd1094)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV_FD1094, 0)
-MACHINE_CONFIG_END
+void segaxbd_new_state::sega_lastsurv_fd1094(machine_config &config)
+{
+	SEGA_XBD_LASTSURV_FD1094(config, "mainpcb", 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV, segaxbd_lastsurv_state, "segaxbd_pcb_lastsurv", "Sega X-Board PCB (Last Survivor)")
@@ -1844,8 +1858,8 @@ segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_lastsurv_state::device_add_mconfig)
-
+void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
 
 	// basic machine hardware
@@ -1855,15 +1869,15 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_state::device_add_mconfig)
 	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
 
 	// sound hardware - ym2151 stereo is reversed
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
-MACHINE_CONFIG_END
+	subdevice<ym2151_device>("ymsnd")->reset_routes();
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "rspeaker", 0.43);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "lspeaker", 0.43);
+}
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_lastsurv)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV, 0)
-MACHINE_CONFIG_END
+void segaxbd_new_state::sega_lastsurv(machine_config &config)
+{
+	SEGA_XBD_LASTSURV(config, "mainpcb", 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP_FD1094, segaxbd_smgp_fd1094_state, "segaxbd_pcb_smgp_fd1094", "Sega X-Board PCB (SMGP, FD1094)")
@@ -1873,25 +1887,26 @@ segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconf
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
+void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_smgp_fd1094_state::decrypted_opcodes_map);
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(smgp_sound2_map)
-	MCFG_DEVICE_IO_MAP(smgp_sound2_portmap)
+	Z80(config, m_soundcpu2, SOUND_CLOCK/4);
+	m_soundcpu2->set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_sound2_map);
+	m_soundcpu2->set_addrmap(AS_IO, &segaxbd_smgp_fd1094_state::smgp_sound2_portmap);
 
-	MCFG_DEVICE_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
-	MCFG_DEVICE_PROGRAM_MAP(smgp_comm_map)
-	MCFG_DEVICE_IO_MAP(smgp_comm_portmap)
+	z80_device &commcpu(Z80(config, "commcpu", XTAL(16'000'000)/2)); // Z80E
+	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_comm_map);
+	commcpu.set_addrmap(AS_IO, &segaxbd_smgp_fd1094_state::smgp_comm_portmap);
 
-	MCFG_DEVICE_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
-	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
-	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
+	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // not verified
+	motorcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_airdrive_map);
+	motorcpu.set_addrmap(AS_IO, &segaxbd_smgp_fd1094_state::smgp_airdrive_portmap);
 
 	m_cmptimer_1->zint_callback().append_inputline(m_soundcpu2, INPUT_LINE_NMI);
 
@@ -1902,15 +1917,16 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	SPEAKER(config, "rearleft").front_left();
 	SPEAKER(config, "rearright").front_right();
 
-	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
-	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
+	pcm2.set_bank(segapcm_device::BANK_512);
+	pcm2.add_route(0, "rearleft", 1.0);
+	pcm2.add_route(1, "rearright", 1.0);
+}
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp_fd1094)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_FD1094, 0)
-MACHINE_CONFIG_END
+void segaxbd_new_state::sega_smgp_fd1094(machine_config &config)
+{
+	SEGA_XBD_SMGP_FD1094(config, "mainpcb", 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP, segaxbd_smgp_state, "segaxbd_pcb_smgp", "Sega X-Board PCB (SMGP)")
@@ -1920,21 +1936,22 @@ segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
+void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(smgp_sound2_map)
-	MCFG_DEVICE_IO_MAP(smgp_sound2_portmap)
+	Z80(config, m_soundcpu2, SOUND_CLOCK/4);
+	m_soundcpu2->set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_sound2_map);
+	m_soundcpu2->set_addrmap(AS_IO, &segaxbd_smgp_state::smgp_sound2_portmap);
 
-	MCFG_DEVICE_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
-	MCFG_DEVICE_PROGRAM_MAP(smgp_comm_map)
-	MCFG_DEVICE_IO_MAP(smgp_comm_portmap)
+	z80_device &commcpu(Z80(config, "commcpu", XTAL(16'000'000)/2)); // Z80E
+	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_comm_map);
+	commcpu.set_addrmap(AS_IO, &segaxbd_smgp_state::smgp_comm_portmap);
 
-	MCFG_DEVICE_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
-	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
-	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
+	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // not verified
+	motorcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_airdrive_map);
+	motorcpu.set_addrmap(AS_IO, &segaxbd_smgp_state::smgp_airdrive_portmap);
 
 	m_cmptimer_1->zint_callback().append_inputline(m_soundcpu2, INPUT_LINE_NMI);
 
@@ -1945,36 +1962,53 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	SPEAKER(config, "rearleft").front_left();
 	SPEAKER(config, "rearright").front_right();
 
-	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
-	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
+	pcm2.set_bank(segapcm_device::BANK_512);
+	pcm2.add_route(0, "rearleft", 1.0);
+	pcm2.add_route(1, "rearright", 1.0);
+}
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP, 0)
-MACHINE_CONFIG_END
+void segaxbd_new_state::sega_smgp(machine_config &config)
+{
+	SEGA_XBD_SMGP(config, "mainpcb", 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_RASCOT, segaxbd_rascot_state, "segaxbd_pcb_rascot", "Sega X-Board PCB (Royal Ascot)")
 
 segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, SEGA_XBD_RASCOT, tag, owner, clock)
+	, m_commram(*this, "commram")
+	, m_usart(*this, "usart")
 {
 }
 
-MACHINE_CONFIG_START(segaxbd_rascot_state::device_add_mconfig)
+void segaxbd_rascot_state::device_add_mconfig(machine_config &config)
+{
 	segaxbd_state::xboard_base_mconfig(config);
 
-	// basic machine hardware
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(rascot_z80_map)
-	MCFG_DEVICE_IO_MAP(rascot_z80_portmap)
-MACHINE_CONFIG_END
+	m_subcpu->set_addrmap(AS_PROGRAM, &segaxbd_rascot_state::sub_map);
 
-MACHINE_CONFIG_START(segaxbd_new_state::sega_rascot)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_RASCOT, 0)
-MACHINE_CONFIG_END
+	// basic machine hardware
+	config.device_remove("soundcpu");
+	config.device_remove("ymsnd");
+	config.device_remove("pcm");
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
+	m_cmptimer_1->zint_callback().set_nop();
+
+	cpu_device &commcpu(Z80(config, "commcpu", 8'000'000)); // clock unknown
+	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_rascot_state::comm_map);
+
+	MB8421(config, m_commram).intl_callback().set_inputline("commcpu", INPUT_LINE_IRQ0);
+
+	I8251(config, m_usart, 2'000'000); // clock unknown
+}
+
+void segaxbd_new_state::sega_rascot(machine_config &config)
+{
+	SEGA_XBD_RASCOT(config, "mainpcb", 0);
+}
 
 
 //**************************************************************************
@@ -4599,12 +4633,8 @@ ROM_START( rascot )
 	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
-	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
-	// is this really a sound ROM, or a terminal / link ROM? accesses unexpected addresses
+	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // link ROM?
 	ROM_LOAD( "epr-14221a",    0x00000, 0x10000, CRC(0d429ac4) SHA1(9cd4c7e858874f372eb3e409ba37964f1ebf07d5) )
-
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	// none??
 
 	// identification needed
 	ROM_REGION( 0x40000, "satellite", 0 )
@@ -4660,17 +4690,14 @@ void segaxbd_new_state::init_smgp()
 	m_mainpcb->install_smgp();
 }
 
-void segaxbd_new_state::init_rascot()
+void segaxbd_rascot_state::device_start()
 {
-	// patch out bootup link test
-	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("mainpcb:subcpu")->base());
-	rom[0xb78/2] = 0x601e; // subROM checksum test
-	rom[0x57e/2] = 0x4e71;
-	rom[0x5d0/2] = 0x6008;
-	rom[0x606/2] = 0x4e71;
+	segaxbd_state::device_start();
 
-	// map /EXCS space
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0f0000, 0x0f3fff, read16_delegate(FUNC(segaxbd_state::rascot_excs_r), (segaxbd_state*)m_mainpcb), write16_delegate(FUNC(segaxbd_state::rascot_excs_w), (segaxbd_state*)m_mainpcb));
+	m_commram_bank = 0;
+	save_item(NAME(m_commram_bank));
+
+	m_usart->write_cts(0);
 }
 
 void segaxbd_state::install_gprider(void)
@@ -4739,7 +4766,7 @@ GAME( 1990, gprideru,gprider,  sega_xboard_fd1094_double, gprider_double, segaxb
 GAME( 1990, gpriderj,gprider,  sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161) (Twin setup)", 0 )
 
 // X-Board + other boards?
-GAME( 1991, rascot,    0,        sega_rascot,  rascot,   segaxbd_new_state, init_rascot,  ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, rascot,    0,        sega_rascot,  rascot,   segaxbd_new_state, empty_init,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // decrypted bootlegs
 

@@ -111,7 +111,10 @@ void xavix2000_device::device_start()
 {
 	xavix_device::device_start();
 
+	state_add(SXAVIX_J, "J", m_j).callimport().formatstr("%8s");;
+	state_add(SXAVIX_K, "K", m_k).callimport().formatstr("%8s");;
 	state_add(SXAVIX_L, "L", m_l).callimport().formatstr("%8s");;
+	state_add(SXAVIX_M, "M", m_m).callimport().formatstr("%8s");;
 	state_add(SXAVIX_PA, "PA", m_pa).callimport().formatstr("%8s");
 	state_add(SXAVIX_PB, "PB", m_pb).callimport().formatstr("%8s");
 }
@@ -128,7 +131,13 @@ void xavix2000_device::state_import(const device_state_entry &entry)
 
 	switch(entry.index())
 	{
+	case SXAVIX_J:
+		break;
+	case SXAVIX_K:
+		break;
 	case SXAVIX_L:
+		break;
+	case SXAVIX_M:
 		break;
 	case SXAVIX_PA:
 		break;
@@ -143,8 +152,17 @@ void xavix2000_device::state_string_export(const device_state_entry &entry, std:
 
 	switch(entry.index())
 	{
+	case SXAVIX_J:
+		str = string_format("%02x", m_j);
+		break;
+	case SXAVIX_K:
+		str = string_format("%02x", m_k);
+		break;
 	case SXAVIX_L:
-		str = string_format("%08x", m_l);
+		str = string_format("%02x", m_l);
+		break;
+	case SXAVIX_M:
+		str = string_format("%02x", m_m);
 		break;
 	case SXAVIX_PA:
 		str = string_format("%08x", m_pa);

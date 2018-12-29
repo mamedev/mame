@@ -222,7 +222,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 
 	/*MCFG_PCI_BUS_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
-	SMC37C78(config, m_smc37c78, 0);
+	SMC37C78(config, m_smc37c78, 24'000'000);
 	m_smc37c78->intrq_wr_callback().set(FUNC(bebox_state::fdc_interrupt));
 	m_smc37c78->drq_wr_callback().set(m_dma8237[0], FUNC(am9517a_device::dreq2_w));
 

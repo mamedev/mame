@@ -5,6 +5,10 @@
     Flak Attack / MX5000
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_FLKATCK_H
+#define MAME_INCLUDES_FLKATCK_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -14,8 +18,8 @@
 class flkatck_state : public driver_device
 {
 public:
-	flkatck_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	flkatck_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
@@ -24,7 +28,8 @@ public:
 		m_k007232(*this, "k007232"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void flkatck(machine_config &config);
 
@@ -68,3 +73,5 @@ private:
 	void flkatck_map(address_map &map);
 	void flkatck_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FLKATCK_H

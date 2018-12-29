@@ -305,14 +305,14 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_DEVICE_PROGRAM_MAP(hostmem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
 
-	MCFG_DEVICE_ADD("vgb", TMS34010, 40_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(vgbmem)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(40_MHz_XTAL / 8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, micro3d_state, tms_interrupt))
+	TMS34010(config, m_vgb, 40_MHz_XTAL);
+	m_vgb->set_addrmap(AS_PROGRAM, &micro3d_state::vgbmem);
+	m_vgb->set_halt_on_reset(false);
+	m_vgb->set_pixel_clock(40_MHz_XTAL / 8);
+	m_vgb->set_pixels_per_clock(4);
+	m_vgb->set_scanline_ind16_callback(FUNC(micro3d_state::scanline_update));
+	m_vgb->output_int().set(FUNC(micro3d_state::tms_interrupt));
+	m_vgb->set_screen("screen");
 
 	MCFG_DEVICE_ADD("drmath", AM29000, 32_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
@@ -321,15 +321,15 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
 	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("audiocpu", I8051, 11.0592_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
-	MCFG_DEVICE_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p3_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, micro3d_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, micro3d_state, data_to_i8031))
+	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &micro3d_state::soundmem_prg);
+	m_audiocpu->set_addrmap(AS_IO, &micro3d_state::soundmem_io);
+	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_r));
+	m_audiocpu->port_out_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_w));
+	m_audiocpu->port_in_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_r));
+	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_w));
+	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
+	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
 	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))
@@ -350,13 +350,12 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(BBBBBRRRRRGGGGGx)
+	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
 	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
@@ -372,7 +371,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
 	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
 
-	ADC0844(config, m_adc, 0);
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));
 	m_adc->ch1_callback().set_ioport("THROTTLE");
 	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));

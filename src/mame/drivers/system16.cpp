@@ -2070,9 +2070,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
@@ -2081,26 +2079,24 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_7759_map)
-	MCFG_DEVICE_IO_MAP(sound_7759_io_map)
+void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
+{
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sound_7759_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_7759_io_map);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
-	MCFG_DEVICE_ADD("7759", UPD7759)
-	MCFG_UPD7759_MD(0)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas1x_bootleg_state,sound_cause_nmi))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->md_w(0);
+	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.48);
+}
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 	/* TODO:
@@ -2115,9 +2111,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
 	MCFG_DEVICE_ADD("5205", MSM5205, 220000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, tturfbl_msm5205_callback))
@@ -2178,12 +2172,12 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries(2048*SHADOW_COLORS_MULTIPLIER);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::shinobi_datsu)
@@ -2193,7 +2187,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::shinobi_datsu)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(shinobib_map)
 
-	MCFG_DEVICE_ADD("sprites", BOOTLEG_SYS16A_SPRITES, 0, 189-117, 0, 1, 2, 3, 4, 5, 6, 7)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_shinobi )
 	MCFG_SCREEN_MODIFY("screen")
@@ -2210,7 +2204,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::passshtb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(passshtb_map)
 
-	MCFG_DEVICE_ADD("sprites", BOOTLEG_SYS16A_SPRITES, 0, 189-117, 1, 0, 3, 2, 5, 4, 7, 6)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 1, 0, 3, 2, 5, 4, 7, 6);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_passsht )
 	MCFG_SCREEN_MODIFY("screen")
@@ -2228,7 +2222,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::passsht4b)
 	MCFG_DEVICE_PROGRAM_MAP(passht4b_map)
 
 	// wrong
-	MCFG_DEVICE_ADD("sprites", BOOTLEG_SYS16A_SPRITES, 0, 189-117, 1, 0, 3, 2, 5, 4, 7, 6)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 1, 0, 3, 2, 5, 4, 7, 6);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_passsht )
 	MCFG_SCREEN_MODIFY("screen")
@@ -2246,8 +2240,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::wb3bb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wb3bbl_map)
 
-	MCFG_DEVICE_ADD("sprites", BOOTLEG_SYS16A_SPRITES, 0, 189-117, 4, 0, 5, 1, 6, 2, 7, 3)
-	MCFG_BOOTLEG_SYS16A_SPRITES_YORIGIN(0)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 4, 0, 5, 1, 6, 2, 7, 3);
+	m_sprites->set_local_originy(0);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_wb3bl )
 	MCFG_SCREEN_MODIFY("screen")
@@ -2275,23 +2269,21 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette", palette_device::BLACK, 2048*SHADOW_COLORS_MULTIPLIER);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 2048*SHADOW_COLORS_MULTIPLIER)
-
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-121);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
 	goldnaxeb_base(config);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+	subdevice<palette_device>("palette")->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
 	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
@@ -2304,8 +2296,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb2)
 	MCFG_DEVICE_PROGRAM_MAP(goldnaxeb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x2000*SHADOW_COLORS_MULTIPLIER)
+	subdevice<palette_device>("palette")->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
 	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
@@ -2330,9 +2321,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb2)
 
 	datsu_ym2151_msm5205(config);
 
-	MCFG_DEVICE_MODIFY("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
-
+	m_sprites->set_local_originx(189-107);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::tturfbl)
@@ -2344,8 +2333,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::tturfbl)
 
 	datsu_ym2151_msm5205(config);
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-107);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::dduxbl)
@@ -2355,8 +2344,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::dduxbl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(dduxbl_map)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
 MACHINE_CONFIG_END
@@ -2368,8 +2357,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(eswatbl_map)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-124);
 
 	z80_ym2151_upd7759(config);
 MACHINE_CONFIG_END
@@ -2381,8 +2370,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(eswatbl2_map)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-121);
 
 	datsu_2x_ym2203_msm5205(config);
 MACHINE_CONFIG_END
@@ -2394,8 +2383,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::tetrisbl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(tetrisbl_map)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
 MACHINE_CONFIG_END
@@ -2406,8 +2395,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::altbeastbl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(tetrisbl_map)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-112);
 
 	datsu_2x_ym2203_msm5205(config);
 	MCFG_DEVICE_MODIFY("5205")
@@ -2447,19 +2436,19 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-107);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("3438.0", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
@@ -2503,16 +2492,16 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-107);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
 	// 1 OKI M6295 instead of original sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2598,13 +2587,13 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sys16);
+	PALETTE(config, "palette").set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-124);
 
 	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
 

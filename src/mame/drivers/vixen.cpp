@@ -551,7 +551,7 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 	m_256 = !BIT(data, 4);
 
 	// beep enable
-	m_discrete->write(space, NODE_01, !BIT(data, 5));
+	m_discrete->write(NODE_01, !BIT(data, 5));
 }
 
 //-------------------------------------------------
@@ -755,7 +755,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

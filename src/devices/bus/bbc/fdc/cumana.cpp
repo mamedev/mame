@@ -61,7 +61,7 @@ ROM_END
 
 void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	MB8877(config, m_fdc, DERIVED_CLOCK(1, 8));
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
@@ -72,7 +72,7 @@ void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 
 void bbc_cumana2_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	MB8877(config, m_fdc, DERIVED_CLOCK(1, 8));
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
@@ -106,7 +106,6 @@ bbc_cumanafdc_device::bbc_cumanafdc_device(const machine_config &mconfig, device
 	m_fdc(*this, "mb8877a"),
 	m_floppy0(*this, "mb8877a:0"),
 	m_floppy1(*this, "mb8877a:1"),
-	m_dfs_rom(*this, "dfs_rom"),
 	m_drive_control(0)
 {
 }
@@ -131,15 +130,6 @@ bbc_cumana2_device::bbc_cumana2_device(const machine_config &mconfig, const char
 void bbc_cumanafdc_device::device_start()
 {
 	save_item(NAME(m_drive_control));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_cumanafdc_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
 }
 
 

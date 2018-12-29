@@ -2182,14 +2182,6 @@ MACHINE_START_MEMBER(x1_state,x1)
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
-PALETTE_INIT_MEMBER(x1_state,x1)
-{
-	int i;
-
-	for(i=0;i<(0x10+0x1000);i++)
-		palette.set_pen_color(i,rgb_t(0x00,0x00,0x00));
-}
-
 FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
@@ -2235,14 +2227,14 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(x1_state, screen_update_x1)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
+	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
@@ -2264,13 +2256,13 @@ MACHINE_CONFIG_START(x1_state::x1)
 	SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
+	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
+	ay.port_a_read_callback().set_ioport("P1");
+	ay.port_b_read_callback().set_ioport("P2");
+	ay.add_route(0, "lspeaker", 0.25);
+	ay.add_route(0, "rspeaker", 0.25);
+	ay.add_route(1, "lspeaker", 0.5);
+	ay.add_route(2, "rspeaker", 0.5);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -2308,9 +2300,9 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 
 	m_fdc->drq_wr_callback().set(FUNC(x1_state::fdc_drq_w));
 
-	MCFG_DEVICE_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker",  0.50)
+	YM2151(config, m_ym, MAIN_CLOCK/8); //option board
+	m_ym->add_route(0, "lspeaker", 0.50);
+	m_ym->add_route(1, "rspeaker", 0.50);
 MACHINE_CONFIG_END
 
 /*************************************

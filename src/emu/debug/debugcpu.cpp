@@ -1513,7 +1513,7 @@ void device_debug::interrupt_hook(int irqline)
 
 void device_debug::exception_hook(int exception)
 {
-	// see if this matches a pending interrupt request
+	// see if this matches an exception breakpoint
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
 		m_device.machine().debugger().cpu().set_execution_stopped();
@@ -1522,6 +1522,37 @@ void device_debug::exception_hook(int exception)
 	}
 }
 
+
+//-------------------------------------------------
+//  privilege_hook - called when privilege level is
+//  changed
+//-------------------------------------------------
+
+void device_debug::privilege_hook()
+{
+	bool matched = 1;
+
+	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
+	{
+		if (m_privilege_condition && !m_privilege_condition->is_empty())
+		{
+			try
+			{
+				matched = m_privilege_condition->execute();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		if (matched)
+		{
+			m_device.machine().debugger().cpu().set_execution_stopped();
+			m_device.machine().debugger().console().printf("Stopped due to privilege change\n", m_device.tag());
+			compute_debug_flags();
+		}
+	}
+}
 
 //-------------------------------------------------
 //  instruction_hook - called by the CPU cores
@@ -1856,6 +1887,21 @@ void device_debug::go_milliseconds(u64 milliseconds)
 	m_device.machine().rewind_invalidate();
 	m_stoptime = m_device.machine().time() + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
+	m_device.machine().debugger().cpu().set_execution_running();
+}
+
+
+//-------------------------------------------------
+//  go_privilege - execute until execution
+//  level changes
+//-------------------------------------------------
+
+void device_debug::go_privilege(const char *condition)
+{
+	assert(m_exec != nullptr);
+	m_device.machine().rewind_invalidate();
+	m_privilege_condition = std::make_unique<parsed_expression>(&m_symtable, condition);
+	m_flags |= DEBUG_FLAG_STOP_PRIVILEGE;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
 
@@ -2741,7 +2787,8 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	  m_address(address & space.addrmask()),
 	  m_length(length),
 	  m_condition(&symbols, (condition != nullptr) ? condition : "1"),
-	  m_action((action != nullptr) ? action : "")
+	  m_action((action != nullptr) ? action : ""),
+	  m_installing(false)
 {
 	std::fill(std::begin(m_start_address), std::end(m_start_address), 0);
 	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
@@ -2813,10 +2860,6 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
 												 if (m_enabled)
 												 {
-													 if (u32(mode) & u32(m_type) & u32(read_or_write::READ))
-														 m_phr->remove();
-													 if (u32(mode) & u32(m_type) & u32(read_or_write::WRITE))
-														 m_phw->remove();
 													 install(mode);
 												 }
 											 });
@@ -2824,11 +2867,11 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 
 device_debug::watchpoint::~watchpoint()
 {
+	m_space.remove_change_notifier(m_notifier);
 	if (m_phr)
 		m_phr->remove();
 	if (m_phw)
 		m_phw->remove();
-	m_space.remove_change_notifier(m_notifier);
 }
 
 void device_debug::watchpoint::setEnabled(bool value)
@@ -2840,16 +2883,25 @@ void device_debug::watchpoint::setEnabled(bool value)
 			install(read_or_write::READWRITE);
 		else
 		{
+			m_installing = true;
 			if(m_phr)
 				m_phr->remove();
 			if(m_phw)
 				m_phw->remove();
+			m_installing = false;
 		}
 	}
 }
 
 void device_debug::watchpoint::install(read_or_write mode)
 {
+	if (m_installing)
+		return;
+	m_installing = true;
+	if ((u32(mode) & u32(read_or_write::READ)) && m_phr)
+		m_phr->remove();
+	if ((u32(mode) & u32(read_or_write::WRITE)) && m_phw)
+		m_phw->remove();
 	std::string name = util::string_format("wp@%x", m_address);
 	switch (m_space.data_width())
 	{
@@ -2926,6 +2978,7 @@ void device_debug::watchpoint::install(read_or_write mode)
 			}
 		break;
 	}
+	m_installing = false;
 }
 
 void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask)

@@ -26,6 +26,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(enable);
 
 	template <class Object> devcb_base &set_keypress_callback(Object &&cb) { return m_out_keypress_func.set_callback(std::forward<Object>(cb)); }
+	auto keypress() { return m_out_keypress_func.bind(); }
 
 	enum class KEYBOARD_TYPE
 	{

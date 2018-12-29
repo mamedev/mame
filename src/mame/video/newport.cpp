@@ -29,15 +29,15 @@
 #include "emu.h"
 #include "video/newport.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_VC2			(1 << 1)
-#define LOG_CMAP0		(1 << 2)
-#define LOG_CMAP1		(1 << 3)
-#define LOG_XMAP0		(1 << 4)
-#define LOG_XMAP1		(1 << 5)
-#define LOG_REX3 		(1 << 6)
-#define LOG_COMMANDS	(1 << 7)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_VC2         (1 << 1)
+#define LOG_CMAP0       (1 << 2)
+#define LOG_CMAP1       (1 << 3)
+#define LOG_XMAP0       (1 << 4)
+#define LOG_XMAP1       (1 << 5)
+#define LOG_REX3        (1 << 6)
+#define LOG_COMMANDS    (1 << 7)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device, "newport_video", "SGI Ne
 newport_video_device::newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NEWPORT_VIDEO, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_ioc2(*this, finder_base::DUMMY_TAG)
+	, m_hpc3(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -239,13 +239,12 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
-			uint32_t ram_pixel = (*src) & 0xf8f8f8;
 			uint32_t cursor_pixel = 0;
 			if (x >= (m_vc2.m_cursor_x - 31) && x <= m_vc2.m_cursor_x && y >= (m_vc2.m_cursor_y - 31) && y <= m_vc2.m_cursor_y && enable_cursor)
 			{
 				cursor_pixel = get_cursor_pixel(x - ((int)m_vc2.m_cursor_x - 31), y - ((int)m_vc2.m_cursor_y - 31));
 			}
-			*dest++ = cursor_pixel ? cursor_pixel : ram_pixel;
+			*dest++ = cursor_pixel ? cursor_pixel : *src;
 			src++;
 		}
 	}
@@ -716,7 +715,7 @@ WRITE_LINE_MEMBER(newport_video_device::vblank_w)
 	{
 		m_rex3.m_status |= 0x20;
 		if (BIT(m_vc2.m_display_ctrl, 0))
-			m_ioc2->raise_local1_irq(ioc2_device::INT3_LOCAL1_RETRACE);
+			m_hpc3->raise_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 	}
 }
 
@@ -939,7 +938,7 @@ READ32_MEMBER(newport_video_device::rex3_r)
 		LOGMASKED(LOG_REX3, "REX3 Status Read: %08x\n", m_rex3.m_status);
 		uint32_t old_status = m_rex3.m_status;
 		m_rex3.m_status = 0;
-		m_ioc2->lower_local1_irq(ioc2_device::INT3_LOCAL1_RETRACE);
+		m_hpc3->lower_local_irq(1, ioc2_device::INT3_LOCAL1_RETRACE);
 		return old_status;
 	}
 	case 0x133c/4:

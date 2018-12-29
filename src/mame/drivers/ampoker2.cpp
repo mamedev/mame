@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders:Roberto Fresca, Grull Osgo
 /********************************************************************************
 
   AMERICAN POKER 2
@@ -8,8 +8,8 @@
   Company:  Novomatic.
   Year:     1990.
 
-  Driver by Roberto Fresca, with a lot of help of Grull Osgo.
-  Based on a preliminary work of Curt Coder.
+  Driver by Roberto Fresca & Grull Osgo.
+
 
   --- Supported Sets ---
 
@@ -281,9 +281,26 @@
   --- DRIVER UPDATES ---
 
 
+  [2018-12-02]
+
+  - Fixed the NVRAM size to 0x800.
+
+
+  [2018-11-10]
+
+  Piccolo Poker 100 from Admiral/Novomatic.
+  - Protection understood, documented, and completelly simulated.
+  - Removed the ugly patch/hack in the driver_init that formerly allows to boot.
+  - Some clean-ups...
+  - Added technical notes.
+
+
+  (2010-10 till 2018-10: untracked changes)
+
+
   [2010-09-28]
 
-  Piccolo Poker 100 from Admiral - Novomatic.
+  Piccolo Poker 100 from Admiral/Novomatic.
   - Added a workaround to get the game booting.
   - Created inputs from the scratch.
   - Promoted to 'working'.
@@ -374,9 +391,6 @@
 
 *********************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL(6'000'000)
-
 #include "emu.h"
 #include "includes/ampoker2.h"
 
@@ -388,6 +402,10 @@
 
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
+
+
+#define MASTER_CLOCK    XTAL(6'000'000)
+
 
 void ampoker2_state::machine_start()
 {
@@ -600,7 +618,7 @@ WRITE8_MEMBER(ampoker2_state::watchdog_reset_w)
 void ampoker2_state::program_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xe000, 0xefff).ram().w(FUNC(ampoker2_state::videoram_w)).share("videoram");
 }
 
@@ -1092,6 +1110,7 @@ static INPUT_PORTS_START( piccolop )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )  // protection... fixed low by hardware to be always active.
 
 	PORT_START("IN7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)    // lack of v-sync if low
@@ -1170,14 +1189,12 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_SCREEN_UPDATE_DRIVER(ampoker2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ampoker2)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(ampoker2_state, ampoker2)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ampoker2);
+	PALETTE(config, "palette", FUNC(ampoker2_state::ampoker2_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4)  /* 1.5 MHz, measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);  /* 1.5 MHz, measured */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ampoker2_state::sigma2k)
@@ -1311,58 +1328,52 @@ ROM_START( videomat )   /* polish bootleg */
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
 ROM_END
 
-ROM_START( sigmapkr )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sigmapkr.u6", 0x0000, 0x10000, CRC(aa3f429a) SHA1(8c82e86de7280590ba157860cbf9783f893f8554) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "sigmapkr.u47", 0x0000, 0x4000, CRC(49eb69a8) SHA1(22be5870d501d229aa56fb18146ec0d8f8eea72e) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s147an_spkr.u48", 0x0000, 0x0200, CRC(3d8683d0) SHA1(1d99cd89db1b3c8e14bdafab05d1f70ad5bc604d) )
-ROM_END
-
-ROM_START( sigma2k )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sigma2k.u6", 0x0000, 0x10000, CRC(608d1771) SHA1(0ec94d780565472c7e68da7e3ce19aea3f1ab4a5) )
-
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "sigma2k.u47", 0x0000, 0x10000, CRC(3ed7b9df) SHA1(788a90ffa6cb0bfebf607815a695a5afe930945c) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s147an_s2k.u48", 0x0000, 0x0200, CRC(715361cc) SHA1(cac239399c9ec5d7498e49a906fb5b934ef7f4dc) )
-ROM_END
 
 /*
 
-Rabbit Poker, or Arizona Poker 1.1 ??
+  Piccolo Poker (Admiral, licensed by Novomatic).
+  Seems a interesting American Poker II variant.
 
-American Poker 2 board
-program rom on small daughter board
-with GAL22V10 and PIC16F84A
-prom not dumped
+  Roms have swapped halves. Rechecked on PCB.
+
+  The protection is based on a stuck bit at RAM offset $C416.
+  $C416 is the RAM image of input port 16h. Seems that bit6 is
+  fixed active by hardware and is checked by the program when
+  the game initializes and when the operator & supervisor keys
+  are active.
+
+  The contents of this RAM offset is AND'ed with 0xE0 to clear
+  the previous values, and then compared with 0x40 to check if
+  this input line (inexistent in other hardware) is active.
+
+  1382: 41            ld   b,c
+  1383: 80            add  a,b
+  1384: 00            nop  ------\
+  1385: 00            nop         |  Obvious patch...
+  1386: 00            nop         |  Dunno what was there originally.
+  1387: 00            nop  ------/
+  1388: 3E 08         ld   a,$08
+  138A: D3 37         out  ($37),a   ; Sets bit3 to keep happy the watchdog reset.
+  138C: 32 01 C0      ld   ($C001),a
+  138F: 18 FE         jr   $138F     ; INFINITE LOOP ---> THE TRAP.
+
+  1541: 21 16 C4      ld   hl,$C416  ; Load $C416 into HL...
+  1544: CB 4E         bit  1,(hl)
+  1546: 7E            ld   a,(hl)    ; Load the $C416 contents...
+  1547: E6 E0         and  $E0       ; AND $E0 (clear the five inputs)
+  1549: FE 40         cp   $40       ; Compare with $40. Is the bit6 active?
+  154B: C2 88 13      jp   nz,$1388  ; Not?... Jumps to the TRAP. The game freezes.
+
+  154E: FD 21 AA C0   ld   iy,$C0AA  ; Else continue...
+  1552: 11 16 C5      ld   de,$C516
+  1555: 21 88 57      ld   hl,$5788
+  1558: 06 08         ld   b,$08
+  155A: 1A            ld   a,(de)
+  155B: BE            cp   (hl)
+  155C: C2 13 2A      jp   nz,$2A13
 
 */
-ROM_START( rabbitpk )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "poldi_ren.u6", 0x0000, 0x10000, CRC(ef0d5b47) SHA1(5d209c803ab8ced08953d24202a364ce1aa677c2) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "poldi_graf.u47", 0x0000, 0x4000, CRC(f1807f39) SHA1(631645272c7508104749e0ff1357bd74098851d5) )
-
-	ROM_REGION( 0x200, "proms", 0 )  /* not dumped. using the ampoker2 one instead */
-	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
-ROM_END
-
-/*
-
-Piccolo Poker (Admiral, licensed by Novomatic).
-Seems a interesting American Poker II variant.
-
-Roms have swapped halves.
-Rechecked on PCB.
-
-*/
 ROM_START( piccolop )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v4.1.bin", 0x4000, 0x4000, CRC(ae092c43) SHA1(191e233310d59d3b4eb71c7081799835efcae069) )
@@ -1380,39 +1391,59 @@ ROM_END
 
 
 /*
+  Rabbit Poker, or Arizona Poker 1.1 ??
+
+  American Poker 2 board
+  program rom on small daughter board
+  with GAL22V10 and PIC16F84A
+  prom not dumped
+
+*/
+
+ROM_START( rabbitpk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "poldi_ren.u6", 0x0000, 0x10000, CRC(ef0d5b47) SHA1(5d209c803ab8ced08953d24202a364ce1aa677c2) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "poldi_graf.u47", 0x0000, 0x4000, CRC(f1807f39) SHA1(631645272c7508104749e0ff1357bd74098851d5) )
+
+	ROM_REGION( 0x200, "proms", 0 )  /* not dumped. using the ampoker2 one instead */
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
+/*
 Arizona 10. This one has way more Italian text than rabbitpk. Also has Arizona in the graphics ROM, instead of Rabbit.
 
 PCB is marked: "029 lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
 PCB is marked: "029 ls" and "PKR 92" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
-PCB is labeled: "8/98rb013" on component side 
+PCB is labeled: "8/98rb013" on component side
 
 Devices
-1x 	TMPZ84C00AP-6 		u1 	8-bit Microprocessor - main
-1x 	KC89C72 		u11 	Programmable Sound Generator - sound
-1x 	PIC16F84-04/P 		on small piggyback at u6 	8bit CMOS Microcontroller (internal ROM not dumped)
-1x 	TDA2003 		u16 	Audio Amplifier - sound
-1x 	oscillator 	6.000MHz 	oz1 	
-
+1x  TMPZ84C00AP-6       u1  8-bit Microprocessor - main
+1x  KC89C72         u11     Programmable Sound Generator - sound
+1x  PIC16F84-04/P       on small piggyback at u6    8bit CMOS Microcontroller (internal ROM not dumped)
+1x  TDA2003         u16     Audio Amplifier - sound
+1x  oscillator  6.000MHz    oz1
 
 ROMs
-1x 	NM27C256 	2 	dumped
-1x 	M27C512 	1 	dumped
-1x 	AM27S29APC 	u48 	dumped
+1x  NM27C256    2   dumped
+1x  M27C512     1   dumped
+1x  AM27S29APC  u48     dumped
 
 RAMs
-1x 	MB8416A-15L 	u39,u40
-1x 	LC3517B-15 	u7
+1x  MB8416A-15L     u39,u40
+1x  LC3517B-15  u7
 
 PLDs
-2x 	PALCE16V8H-25-PC/4 	u8,u41 	read protected
-1x 	GAL22V10D-25LP 	on small piggyback at u6 	read protected
+2x  PALCE16V8H-25-PC/4  u8,u41  read protected
+1x  GAL22V10D-25LP  on small piggyback at u6    read protected
 
 Others
 1x 28x2 JAMMA edge connector
 1x 10 legs connector (CN1)
 1x trimmer (volume)(P1)
 1x 8 DIP switches bank (DIP)
-1x battery 3.6V (BAT1) 
+1x battery 3.6V (BAT1)
 */
 
 ROM_START( arizna10 )
@@ -1434,6 +1465,33 @@ ROM_START( arizna10 )
 	ROM_LOAD( "palce16v8h.u41", 0x200, 0x117, NO_DUMP )
 	ROM_LOAD( "gal22v10d.u6",   0x400, 0x2e5, NO_DUMP ) // on small piggyback at u6
 ROM_END
+
+
+/******** Sigma sets ********/
+
+ROM_START( sigmapkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sigmapkr.u6", 0x0000, 0x10000, CRC(aa3f429a) SHA1(8c82e86de7280590ba157860cbf9783f893f8554) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "sigmapkr.u47", 0x0000, 0x4000, CRC(49eb69a8) SHA1(22be5870d501d229aa56fb18146ec0d8f8eea72e) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an_spkr.u48", 0x0000, 0x0200, CRC(3d8683d0) SHA1(1d99cd89db1b3c8e14bdafab05d1f70ad5bc604d) )
+ROM_END
+
+
+ROM_START( sigma2k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sigma2k.u6", 0x0000, 0x10000, CRC(608d1771) SHA1(0ec94d780565472c7e68da7e3ce19aea3f1ab4a5) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "sigma2k.u47", 0x0000, 0x10000, CRC(3ed7b9df) SHA1(788a90ffa6cb0bfebf607815a695a5afe930945c) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an_s2k.u48", 0x0000, 0x0200, CRC(715361cc) SHA1(cac239399c9ec5d7498e49a906fb5b934ef7f4dc) )
+ROM_END
+
 
 /*************************
 *      Driver Init       *
@@ -1458,48 +1516,6 @@ void ampoker2_state::init_rabbitpk()
 	}
 }
 
-void ampoker2_state::init_piccolop()
-{
-/*
-  The protection is based on a stuck bit at RAM offset $C416.
-
-  1382: 41            ld   b,c
-  1383: 80            add  a,b
-  1384: 00            nop  ------\
-  1385: 00            nop         |  Obvious patch...
-  1386: 00            nop         |  Dunno if was made originally.
-  1387: 00            nop  ------/
-  1388: 3E 08         ld   a,$08
-  138A: D3 37         out  ($37),a   ; Sets bit3 to keep happy the watchdog reset.
-  138C: 32 01 C0      ld   ($C001),a
-  138F: 18 FE         jr   $138F     ; INFINITE LOOP --- WTH???
-
-  1541: 21 16 C4      ld   hl,$C416  ; Load $C416 into HL...
-  1544: CB 4E         bit  1,(hl)
-  1546: 7E            ld   a,(hl)    ; Load the $C416 contents...
-  1547: E6 E0         and  $E0       ; AND $E0
-  1549: FE 40         cp   $40       ; Compare with $40
-  154B: C2 88 13      jp   nz,$1388  ; Jumps to stuck!
-
-  154E: FD 21 AA C0   ld   iy,$C0AA  ; Else continue...
-  1552: 11 16 C5      ld   de,$C516
-  1555: 21 88 57      ld   hl,$5788
-  1558: 06 08         ld   b,$08
-  155A: 1A            ld   a,(de)
-  155B: BE            cp   (hl)
-  155C: C2 13 2A      jp   nz,$2A13
-
-*/
-
-	uint8_t *rom = memregion("maincpu")->base();
-
-	// NOP'ing the mortal jump...
-	rom[0x154b] = 0x00;
-	rom[0x154c] = 0x00;
-	rom[0x154d] = 0x00;
-
-}
-
 
 /*************************
 *      Game Drivers      *
@@ -1515,8 +1531,10 @@ GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,
 GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  ampoker2_state, empty_init,    ROT0, "bootleg",           "American Poker 95",                         MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Poker De Win",                              MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Videomat (Polish bootleg)",                 MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAME(  1991, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, empty_init,    ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                         MACHINE_SUPPORTS_SAVE )
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)",        MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1995, arizna10, ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg (Ri.Bi)",   "Arizona 10 (v1.1)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_ampoker2 ) // undumped PIC for protection?
+
+// different games not based on american poker 2
 GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker",                               MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
 GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker 2000",                          MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
-GAME(  1991, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, init_piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                         MACHINE_SUPPORTS_SAVE )
-GAMEL( 1995, arizna10, ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg (Ri.Bi)",   "Arizona 10 (v1.1)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_ampoker2 ) // undumped PIC for protection?

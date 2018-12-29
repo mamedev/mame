@@ -225,20 +225,20 @@ void _1942p_state::_1942p_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 
-	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942p_state::_1942_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942p_state::_1942_bgvideoram_w)).share("bg_videoram");
 
 	map(0xe000, 0xefff).ram();
 
 	map(0xce00, 0xcfff).ram().share("spriteram");
 
-	map(0xdc02, 0xdc03).w(FUNC(_1942_state::_1942_scroll_w));
-	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
-	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
+	map(0xdc02, 0xdc03).w(FUNC(_1942p_state::_1942_scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942p_state::_1942_c804_w));
+	map(0xc805, 0xc805).w(FUNC(_1942p_state::_1942_palette_bank_w));
 
 	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::_1942p_palette_w)).share("protopal");
 
-	map(0xf400, 0xf400).w(FUNC(_1942_state::_1942_bankswitch_w));
+	map(0xf400, 0xf400).w(FUNC(_1942p_state::_1942_bankswitch_w));
 	map(0xf500, 0xf500).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf600, 0xf600).w(FUNC(_1942p_state::_1942p_f600_w));
 
@@ -578,9 +578,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942)
 
-	MCFG_PALETTE_ADD(m_palette, 64*4+4*32*8+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942)
+	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -634,20 +632,18 @@ MACHINE_CONFIG_START(_1942p_state::_1942p)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* 4 MHz - verified on PCB */
 	MCFG_DEVICE_PROGRAM_MAP(_1942p_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _1942_state,  irq0_line_hold) // note, powerups won't move down the screen with the original '1942' logic.
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _1942p_state, irq0_line_hold) // note, powerups won't move down the screen with the original '1942' logic.
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK_1942P)  /* 4 MHz - verified on PCB */
 	MCFG_DEVICE_PROGRAM_MAP(_1942p_sound_map)
 	MCFG_DEVICE_IO_MAP(_1942p_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1942p_state, irq0_line_hold, 4*60)
 
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942p)
 
-	MCFG_PALETTE_ADD(m_palette, 0x500)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_INIT_OWNER(_1942p_state, 1942p)
+	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

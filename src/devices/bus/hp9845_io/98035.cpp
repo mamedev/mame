@@ -756,12 +756,13 @@ const tiny_rom_entry *hp98035_io_card_device::device_rom_region() const
 	return ROM_NAME(hp98035);
 }
 
-MACHINE_CONFIG_START(hp98035_io_card_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("np" , HP_NANOPROCESSOR , XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(np_program_map)
-	MCFG_DEVICE_IO_MAP(np_io_map)
-	MCFG_HP_NANO_DC_CHANGED(WRITE8(*this, hp98035_io_card_device , dc_w))
-MACHINE_CONFIG_END
+void hp98035_io_card_device::device_add_mconfig(machine_config &config)
+{
+	HP_NANOPROCESSOR(config, m_cpu, XTAL(1'000'000));
+	m_cpu->set_addrmap(AS_PROGRAM, &hp98035_io_card_device::np_program_map);
+	m_cpu->set_addrmap(AS_IO, &hp98035_io_card_device::np_io_map);
+	m_cpu->dc_changed().set(FUNC(hp98035_io_card_device::dc_w));
+}
 
 // device type definition
 DEFINE_DEVICE_TYPE(HP98035_IO_CARD, hp98035_io_card_device, "hp98035", "HP98035 card")

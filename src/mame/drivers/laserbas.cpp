@@ -73,14 +73,18 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 class laserbas_state : public driver_device
 {
 public:
-	laserbas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	laserbas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac%u", 1U)
 	{ }
 
 	void laserbas(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	/* misc */
@@ -96,6 +100,11 @@ private:
 	int m_scl;
 	bool     m_flipscreen;
 	uint64_t m_z1data;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_device_array<dac_byte_interface, 6> m_dac;
+
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(videoctrl_w);
@@ -107,12 +116,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	required_device_array<dac_byte_interface, 6> m_dac;
 	void laserbas_io(address_map &map);
 	void laserbas_memory(address_map &map);
 };
@@ -184,7 +187,7 @@ WRITE8_MEMBER(laserbas_state::vram_w)
 
 WRITE8_MEMBER(laserbas_state::videoctrl_w)
 {
-	if(!(offset&1))
+	if (!(offset&1))
 	{
 		m_vrambank = data & 0x40; // layer select
 		m_flipscreen = !(data & 0x80);
@@ -393,13 +396,13 @@ MACHINE_CONFIG_START(laserbas_state::laserbas)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 3000000/4) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(laserbas_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(laserbas_state::crtc_update_row), this);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(RRRGGGBB)
+	PALETTE(config, m_palette).set_format(palette_device::RGB_332, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

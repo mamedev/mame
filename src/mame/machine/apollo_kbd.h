@@ -27,16 +27,6 @@
 #undef putchar
 #endif
 
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_APOLLO_KBD_TX_CALLBACK(_cb) \
-	downcast<apollo_kbd_device &>(*device).set_tx_cb(DEVCB_##_cb);
-
-#define MCFG_APOLLO_KBD_GERMAN_CALLBACK(_cb) \
-	downcast<apollo_kbd_device &>(*device).set_german_cb(DEVCB_##_cb);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -50,8 +40,8 @@ public:
 	// construction/destruction
 	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return m_tx_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_german_cb(Object &&cb) { return m_german_r.set_callback(std::forward<Object>(cb)); }
+	auto tx_cb() { return m_tx_w.bind(); }
+	auto german_cb() { return m_german_r.bind(); }
 
 private:
 	// device-level overrides

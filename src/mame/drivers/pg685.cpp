@@ -82,6 +82,7 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
@@ -440,10 +441,11 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
 
 	// sound hardware
 
@@ -489,10 +491,11 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
 
 	// sound hardware
 
@@ -540,10 +543,11 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row_oua12)
+	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row_oua12), this);
 
 	// sound hardware
 

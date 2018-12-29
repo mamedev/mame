@@ -12,58 +12,6 @@
 #pragma once
 
 
-#define MCFG_MC6845_ADD(_tag, _variant, _screen_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, _variant, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag)
-
-#define MCFG_MOS8563_ADD(_tag, _screen_tag, _clock, _map) \
-	MCFG_DEVICE_ADD(_tag, MOS8563, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_ADDRESS_MAP(0, _map)
-
-#define MCFG_MOS8568_ADD(_tag, _screen_tag, _clock, _map) \
-	MCFG_DEVICE_ADD(_tag, MOS8568, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_ADDRESS_MAP(0, _map)
-
-
-#define MCFG_MC6845_SHOW_BORDER_AREA(_show) \
-	downcast<mc6845_device &>(*device).set_show_border_area(_show);
-
-#define MCFG_MC6845_VISAREA_ADJUST(_minx, _maxx, _miny, _maxy) \
-	downcast<mc6845_device &>(*device).set_visarea_adjust(_minx, _maxx, _miny, _maxy);
-
-#define MCFG_MC6845_CHAR_WIDTH(_pixels) \
-	downcast<mc6845_device &>(*device).set_char_width(_pixels);
-
-#define MCFG_MC6845_RECONFIGURE_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_reconfigure_callback(&_class::_method, #_class "::" #_method, this);
-
-#define MCFG_MC6845_BEGIN_UPDATE_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_begin_update_callback(&_class::_method, #_class "::" #_method, this);
-
-#define MCFG_MC6845_UPDATE_ROW_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_update_row_callback(&_class::_method, #_class "::" #_method, this);
-
-#define MCFG_MC6845_END_UPDATE_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_end_update_callback(&_class::_method, #_class "::" #_method, this);
-
-#define MCFG_MC6845_ADDR_CHANGED_CB(_class, _method) \
-	downcast<mc6845_device &>(*device).set_on_update_addr_change_callback(&_class::_method, #_class "::" #_method, this);
-
-#define MCFG_MC6845_OUT_DE_CB(_write) \
-	downcast<mc6845_device &>(*device).set_out_de_callback(DEVCB_##_write);
-
-#define MCFG_MC6845_OUT_CUR_CB(_write) \
-	downcast<mc6845_device &>(*device).set_out_cur_callback(DEVCB_##_write);
-
-#define MCFG_MC6845_OUT_HSYNC_CB(_write) \
-	downcast<mc6845_device &>(*device).set_out_hsync_callback(DEVCB_##_write);
-
-#define MCFG_MC6845_OUT_VSYNC_CB(_write) \
-	downcast<mc6845_device &>(*device).set_out_vsync_callback(DEVCB_##_write);
-
-
 /* callback definitions */
 #define MC6845_RECONFIGURE(name)  void name(int width, int height, const rectangle &visarea, attoseconds_t frame_period)
 
@@ -107,10 +55,6 @@ public:
 	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb = end_update_delegate(std::forward<T>(args)...); }
 	template <typename... T> void set_on_update_addr_change_callback(T &&... args) { m_on_update_addr_changed_cb = on_update_addr_changed_delegate(std::forward<T>(args)...); }
 
-	template <class Object> devcb_base &set_out_de_callback(Object &&cb) { return m_out_de_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_cur_callback(Object &&cb) { return m_out_cur_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_hsync_callback(Object &&cb) { return m_out_hsync_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_vsync_callback(Object &&cb) { return m_out_vsync_cb.set_callback(std::forward<Object>(cb)); }
 	auto out_de_callback() { return m_out_de_cb.bind(); }
 	auto out_cur_callback() { return m_out_cur_cb.bind(); }
 	auto out_hsync_callback() { return m_out_hsync_cb.bind(); }

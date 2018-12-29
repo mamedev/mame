@@ -902,9 +902,8 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(apache3_state, screen_update_apache3)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apache3)
-	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
 
 	/* apache 3 schematics state
 	bit 4:  250
@@ -920,10 +919,10 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -955,11 +954,9 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(roundup5_state, screen_update_roundup5)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_roundup5)
-	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
+	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
@@ -967,10 +964,10 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -1038,9 +1035,8 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_cyclwarr)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
-	MCFG_PALETTE_ADD("palette", 8192 + 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192 + 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 
@@ -1048,13 +1044,13 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+//  m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)

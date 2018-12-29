@@ -692,28 +692,26 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tehkanwc)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tehkanwc);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 768).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay1(YM2149(config, "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay2(YM2149(config, "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tehkanwc_state, adpcm_int)) /* interrupt function */
@@ -721,18 +719,19 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tehkanwc_state::tehkanwcb)
+void tehkanwc_state::tehkanwcb(machine_config &config)
+{
 	tehkanwc(config);
-	MCFG_DEVICE_REPLACE("ay1", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 void tehkanwc_state::init_teedoff()

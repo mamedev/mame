@@ -12,6 +12,7 @@
 #include "bus/pc1512/mouse.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/buffer.h"
 #include "machine/ins8250.h"

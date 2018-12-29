@@ -6,16 +6,6 @@
 #pragma once
 
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_K005289_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, K005289, _clock)
-#define MCFG_K005289_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, K005289, _clock)
-
-
 // ======================> k005289_device
 
 class k005289_device : public device_t,

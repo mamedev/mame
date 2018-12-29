@@ -146,7 +146,7 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 #include "emu.h"
 #include "cpu/i86/i86.h"
 //#include "bus/s100/s100.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
@@ -693,9 +693,10 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 14.318181_MHz_XTAL / 8)    /* unknown clock, hand tuned to get ~50/~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MC6845(config, m_crtc, 14.318181_MHz_XTAL / 8);    /* unknown clock, hand tuned to get ~50/~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
 	PIC8259(config, m_picm, 0);
 	m_picm->out_int_callback().set_inputline(m_maincpu, 0);

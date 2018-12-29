@@ -48,28 +48,11 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_UART | LOG_UNKNOWN_IO)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
 #define SPG_DEBUG_AUDIO     (0)
-
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-static const uint32_t s_visual_debug_palette[8] = {
-	0xff000000,
-	0xff0000ff,
-	0xff00ff00,
-	0xff00ffff,
-	0xffff0000,
-	0xffff00ff,
-	0xffffff00,
-	0xffffffff
-};
-#define SPG_VDB_BLACK 0
-#define SPG_VDB_WAVE 1
-#define SPG_VDB_EDD 2
-#define SPG_VDB_VOL 4
-#endif
 
 #define IO_IRQ_ENABLE       m_io_regs[0x21]
 #define IO_IRQ_STATUS       m_io_regs[0x22]
@@ -94,9 +77,6 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_scrollram(*this, "scrollram")
 	, m_paletteram(*this, "paletteram")
 	, m_spriteram(*this, "spriteram")
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-	, m_audio_screen(*this, finder_base::DUMMY_TAG)
-#endif
 {
 }
 
@@ -123,9 +103,6 @@ void spg2xx_device::map(address_map &map)
 
 void spg2xx_device::device_start()
 {
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-	m_audio_debug_buffer = std::make_unique<uint8_t[]>(1024*768);
-#endif
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
 	m_portc_out.resolve_safe();
@@ -170,6 +147,10 @@ void spg2xx_device::device_reset()
 
 	m_io_regs[0x23] = 0x0028;
 	m_uart_rx_available = false;
+	memset(m_uart_rx_fifo, 0, ARRAY_LENGTH(m_uart_rx_fifo));
+	m_uart_rx_fifo_start = 0;
+	m_uart_rx_fifo_end = 0;
+	m_uart_rx_fifo_count = 0;
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
@@ -506,30 +487,6 @@ void spg2xx_device::apply_fade(const rectangle &cliprect)
 	}
 }
 
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-uint32_t spg2xx_device::debug_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	for (int y = 0; y < 768; y++)
-	{
-		for (int x = 0; x < 1024; x++)
-		{
-			bitmap.pix32(y, x) = s_visual_debug_palette[m_audio_debug_buffer[y*1024+x]];
-		}
-	}
-	return 0;
-}
-
-void spg2xx_device::advance_debug_pos()
-{
-	m_audio_debug_x++;
-	if (m_audio_debug_x == 1024)
-	{
-		m_audio_debug_x = 0;
-	}
-}
-#endif
-
 uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 3 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
@@ -861,11 +818,18 @@ void spg2xx_device::uart_rx(uint8_t data)
 				IO_IRQ_STATUS |= 0x0100;
 				check_irqs(0x0100);
 			}
+			m_uart_rx_available = true;
 		}
+	}
+	else if (m_uart_rx_fifo_count == ARRAY_LENGTH(m_uart_rx_fifo))
+	{
+		m_io_regs[0x37] |= 0x4000;
 	}
 	else
 	{
-		m_io_regs[0x37] |= 0x4000;
+		m_uart_rx_fifo[m_uart_rx_fifo_end] = data;
+		m_uart_rx_fifo_end = (m_uart_rx_fifo_end + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
+		m_uart_rx_fifo_count++;
 	}
 }
 
@@ -947,21 +911,29 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x31: // UART Status
-		val |= 0x81;//(m_uart_rx_available ? 0x81 : 0);
+		val |= (m_uart_rx_available ? 0x81 : 0);
 		LOGMASKED(LOG_UART, "io_r: UART Status = %04x\n", val);
 		break;
 
 	case 0x36: // UART RX Data
 		if (m_uart_rx_available)
 		{
-			m_uart_rx_available = false;
-			m_io_regs[0x36] = 0;
+			if (m_uart_rx_fifo_count)
+			{
+				m_io_regs[0x36] = m_uart_rx_fifo[m_uart_rx_fifo_start];
+				m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
+				m_uart_rx_fifo_count--;
+			}
+			else
+			{
+				m_uart_rx_available = false;
+			}
 		}
 		else
 		{
 			m_io_regs[0x37] |= 0x2000;
 		}
-		LOGMASKED(LOG_UART, "io_r: UART Rx Data = %04x\n", val);
+		LOGMASKED(LOG_UART, "%s: io_r: UART Rx Data = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x37: // UART Rx FIFO Control
@@ -1319,10 +1291,14 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		m_io_regs[offset] &= ~data;
 		break;
 
-	case 0x33: // UART Baud Rate
-		LOGMASKED(LOG_UART, "io_w: UART Baud Rate = %d\n", 27000000 / (0x10000 - data));
+	case 0x33: // UART Baud Rate (low byte)
+	case 0x34: // UART Baud Rate (high byte)
+	{
 		m_io_regs[offset] = data;
+		const uint32_t divisor = 16 * (0x10000 - ((m_io_regs[0x34] << 8) | m_io_regs[0x33]));
+		LOGMASKED(LOG_UART, "io_w: UART Baud Rate (%s byte): Baud rate = %d\n", offset == 0x33 ? "low" : "high", 27000000 / divisor);
 		break;
+	}
 
 	case 0x35: // UART TX Data
 		LOGMASKED(LOG_UART, "io_w: UART Tx Data = %02x\n", data & 0x00ff);
@@ -2234,39 +2210,10 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		int32_t right_total = 0;
 		int32_t active_count = 0;
 
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-		for (int y = 0; y < 768; y++)
-		{
-			m_audio_debug_buffer[y*1024 + m_audio_debug_x] = 0;
-		}
-#endif
 		for (uint32_t ch_index = 0; ch_index < 16; ch_index++)
 		{
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-			uint32_t debug_y = 0;
-			if (m_channel_debug < 0)
-				debug_y = ch_index * 48;
-#endif
 			if (!get_channel_status(ch_index))
 			{
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-				if (m_channel_debug == -1)
-				{
-					m_audio_debug_buffer[(debug_y + 47)*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
-					int edd_y = (int)((float)get_edd(ch_index) * 0.375f);
-					m_audio_debug_buffer[(debug_y + (47 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
-					int vol_y = (int)((float)get_volume(ch_index) * 0.375f);
-					m_audio_debug_buffer[(debug_y + (47 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
-				}
-				else if (ch_index == m_channel_debug)
-				{
-					m_audio_debug_buffer[(debug_y + 767)*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
-					int edd_y = (int)((float)get_edd(ch_index) * 3.74f);
-					m_audio_debug_buffer[(debug_y + (767 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
-					int vol_y = (int)((float)get_volume(ch_index) * 3.74f);
-					m_audio_debug_buffer[(debug_y + (767 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
-				}
-#endif
 				continue;
 			}
 
@@ -2276,26 +2223,6 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			if (playing)
 			{
 				int32_t sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] ^ 0x8000);
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-				if (m_channel_debug == -1)
-				{
-					int sample_y = (int)((float)m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] / 1365.0f);
-					m_audio_debug_buffer[(debug_y + (47 - sample_y))*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
-					int edd_y = (int)((float)get_edd(ch_index) * 0.375f);
-					m_audio_debug_buffer[(debug_y + (47 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
-					int vol_y = (int)((float)get_volume(ch_index) * 0.375f);
-					m_audio_debug_buffer[(debug_y + (47 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
-				}
-				else if (ch_index == m_channel_debug)
-				{
-					int sample_y = (int)((float)m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA] / 136.0f);
-					m_audio_debug_buffer[(debug_y + (767 - sample_y))*1024 + m_audio_debug_x] |= SPG_VDB_WAVE;
-					int edd_y = (int)((float)get_edd(ch_index) * 0.375f);
-					m_audio_debug_buffer[(debug_y + (767 - edd_y))*1024 + m_audio_debug_x] |= SPG_VDB_EDD;
-					int vol_y = (int)((float)get_volume(ch_index) * 0.375f);
-					m_audio_debug_buffer[(debug_y + (767 - vol_y))*1024 + m_audio_debug_x] |= SPG_VDB_VOL;
-				}
-#endif
 				if (!(m_audio_regs[AUDIO_CONTROL] & AUDIO_CONTROL_NOINT_MASK))
 				{
 					int32_t prev_sample = (int16_t)(m_audio_regs[(ch_index << 4) | AUDIO_WAVE_DATA_PREV] ^ 0x8000);
@@ -2329,10 +2256,6 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			}
 		}
 
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-		advance_debug_pos();
-#endif
-
 		if (active_count)
 		{
 			left_total /= active_count;
@@ -2345,15 +2268,7 @@ void spg2xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			*out_l++ = 0;
 			*out_r++ = 0;
 		}
-
-#if SPG2XX_VISUAL_AUDIO_DEBUG
-		for (int y = 0; y < 768; y++)
-		{
-			m_audio_debug_buffer[y*1024 + m_audio_debug_x] = 7;
-		}
-#endif
 	}
-	//printf("\n");
 }
 
 inline void spg2xx_device::stop_channel(const uint32_t channel)
@@ -2519,7 +2434,6 @@ bool spg2xx_device::fetch_sample(address_space &space, const uint32_t channel)
 
 inline void spg2xx_device::loop_channel(const uint32_t channel)
 {
-	//printf("Looping from %08x to %08x\n", m_sample_addr[channel], get_loop_addr(channel));
 	m_sample_addr[channel] = get_loop_addr(channel);
 	m_sample_shift[channel] = 0;
 }

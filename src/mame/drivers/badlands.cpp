@@ -165,7 +165,7 @@ Measurements -
 
 #include "emu.h"
 #include "includes/badlands.h"
-
+#include "emupal.h"
 
 
 /*************************************
@@ -460,13 +460,14 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	palette_device &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::IRGB_1555, 256);
+	palette.set_membits(8);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, badlands_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -483,9 +484,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 		.int_callback().set_inputline("maincpu", M68K_IRQ_2);
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	YM2151(config, "ymsnd", ATARI_CLOCK_14MHz/4).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
 MACHINE_CONFIG_END
 
 

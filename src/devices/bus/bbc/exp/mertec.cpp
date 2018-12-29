@@ -46,7 +46,7 @@ const tiny_rom_entry *bbc_mertec_device::device_rom_region() const
 
 void bbc_mertec_device::device_add_mconfig(machine_config &config)
 {
-	PIA6821(config, m_pia, 16_MHz_XTAL / 16);
+	PIA6821(config, m_pia, DERIVED_CLOCK(1, 8));
 	//m_pia->readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
 	//m_pia->writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
 	//m_pia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
@@ -65,7 +65,7 @@ void bbc_mertec_device::device_add_mconfig(machine_config &config)
 	//m_userport->cb2_handler().set(m_pia, FUNC(via6522_device::write_cb2));
 
 	/* 2mhz bus port */
-	BBC_1MHZBUS_SLOT(config, m_2mhzbus, bbc_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_2mhzbus, DERIVED_CLOCK(1, 4), bbc_1mhzbus_devices, nullptr);
 	m_2mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::irq_w));
 	m_2mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_exp_slot_device::nmi_w));
 }
@@ -97,18 +97,6 @@ bbc_mertec_device::bbc_mertec_device(const machine_config &mconfig, const char *
 
 void bbc_mertec_device::device_start()
 {
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_mertec_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(0, m_ext_rom->base() + 0x0000);
-	machine().root_device().membank("bank5")->configure_entry(0, m_ext_rom->base() + 0x1000);
-	machine().root_device().membank("bank4")->configure_entry(1, m_ext_rom->base() + 0x4000);
-	machine().root_device().membank("bank5")->configure_entry(1, m_ext_rom->base() + 0x5000);
 }
 
 

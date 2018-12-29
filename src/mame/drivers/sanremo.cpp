@@ -112,12 +112,13 @@
 class sanremo_state : public driver_device
 {
 public:
-	sanremo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sanremo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U) { }
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	void sanremo(machine_config &config);
 
@@ -138,7 +139,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_WRITE8_MEMBER(banksel_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_PALETTE_INIT(sanremo);
+	void sanremo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sanremo_map(address_map &map);
 	void sanremo_portmap(address_map &map);
@@ -181,15 +182,15 @@ uint32_t sanremo_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(sanremo_state, sanremo)
+void sanremo_state::sanremo_palette(palette_device &palette) const
 {
-	int index;
+	// high intensity BGR
+	for (int index = 0; index < 0x8; index++)
+		palette.set_pen_color(index, rgb_t(pal1bit(BIT(index, 0)), pal1bit(BIT(index, 1)), pal1bit(BIT(index, 2))));
 
-	for (index = 0; index < 0x8; index++)
-		palette.set_pen_color(index, rgb_t(pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1)));
-
-	for (index = 0x8; index < 0x10; index++)
-		palette.set_pen_color(index, rgb_t(pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1)));
+	// low intensity BGR
+	for (int index = 0x8; index < 0x10; index++)
+		palette.set_pen_color(index, rgb_t(pal2bit(BIT(index, 0)), pal2bit(BIT(index, 1)), pal2bit(BIT(index, 2))));
 }
 
 
@@ -199,30 +200,30 @@ PALETTE_INIT_MEMBER(sanremo_state, sanremo)
 
 WRITE8_MEMBER(sanremo_state::lamps_w)
 {
-/*  LAMPS:
+	/*  LAMPS:
 
-    7654 3210
-    ---- ---x  DISCARD 1
-    ---- --x-  DISCARD 2
-    ---- -x--  DISCARD 3
-    ---- x---  DISCARD 4
-    ---x ----  DISCARD 5
-    --x- ----  START
-    -x-- ----  BET
-    x--- ----  (always on)
-*/
+		7654 3210
+		---- ---x  DISCARD 1
+		---- --x-  DISCARD 2
+		---- -x--  DISCARD 3
+		---- x---  DISCARD 4
+		---x ----  DISCARD 5
+		--x- ----  START
+		-x-- ----  BET
+		x--- ----  (always on)
+	*/
 	for (int n = 0; n < 7; n++)
 		m_lamps[n] = BIT(data, n);
 }
 
 WRITE8_MEMBER(sanremo_state::banksel_w)
 {
-/*  GFX banks selector.
+	/*  GFX banks selector.
 
-    7654 3210
-    ---x xxxx  GFX banks selector
-    xxx- ----  unknown
-*/
+		7654 3210
+		---x xxxx  GFX banks selector
+		xxx- ----  unknown
+	*/
 	m_banksel = data & 0x1f;
 }
 
@@ -373,23 +374,23 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_SCREEN_UPDATE_DRIVER(sanremo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	// *** MC6845 init ***
 	//
 	// Register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
 	// Value:     0x45  0x30  0x36  0x0A  0x28  0x00  0x26  0x27  0x00  0x07  0x20  0x0B  0x00  0x00  0x00  0x00  0x00  0x00.
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sanremo)
-	MCFG_PALETTE_ADD("palette", 0x10)
-	MCFG_PALETTE_INIT_OWNER(sanremo_state, sanremo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sanremo);
+	PALETTE(config, "palette", FUNC(sanremo_state::sanremo_palette), 0x10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &ay8910(AY8910(config, "ay8910", SND_CLOCK));
+	ay8910.port_a_read_callback().set_ioport("DSW");
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 

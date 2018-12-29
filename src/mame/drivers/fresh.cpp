@@ -34,17 +34,21 @@ rom 5 and 6 are prg roms
 class fresh_state : public driver_device
 {
 public:
-	fresh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fresh_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_2_videoram(*this, "bg_videoram_2"),
 		m_attr_videoram(*this, "attr_videoram"),
 		m_attr_2_videoram(*this, "attr_videoram_2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void fresh(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	tilemap_t *m_bg_tilemap;
@@ -54,6 +58,10 @@ private:
 	required_shared_ptr<uint16_t> m_bg_2_videoram;
 	required_shared_ptr<uint16_t> m_attr_videoram;
 	required_shared_ptr<uint16_t> m_attr_2_videoram;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(fresh_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fresh_attr_videoram_w);
@@ -97,12 +105,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(fake_scanline);
 
-
-	virtual void video_start() override;
 	uint32_t screen_update_fresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void fresh_map(address_map &map);
 };
 
@@ -608,12 +611,10 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
-	MCFG_PALETTE_FORMAT(XBGR)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fresh)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x1000); // or 0xc00
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fresh);
 
 	/* sound hw? */
 	SPEAKER(config, "mono").front_center();

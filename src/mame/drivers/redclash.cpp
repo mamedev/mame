@@ -359,14 +359,12 @@ MACHINE_CONFIG_START(redclash_state::zerohour)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
-	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_redclash);
+	PALETTE(config, m_palette, FUNC(redclash_state::redclash_palette), 4*8 + 4*16 + 32, 32 + 32);
 
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -386,14 +384,12 @@ MACHINE_CONFIG_START(redclash_state::redclash)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
-	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_redclash);
+	PALETTE(config, m_palette, FUNC(redclash_state::redclash_palette), 4*8 + 4*16 + 32, 32 + 32);
 
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

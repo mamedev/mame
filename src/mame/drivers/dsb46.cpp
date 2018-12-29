@@ -33,7 +33,6 @@ Both roms contain Z80 code.
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
-#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -113,15 +112,10 @@ static const z80_daisy_config daisy_chain[] =
 void dsb46_state::dsb46(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dsb46_state::dsb46_mem);
 	m_maincpu->set_addrmap(AS_IO, &dsb46_state::dsb46_io);
 	m_maincpu->set_daisy_config(daisy_chain);
-
-	/* video hardware */
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1.8432_MHz_XTAL));
-	ctc_clock.signal_handler().set("ctc1", FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append("ctc1", FUNC(z80ctc_device::trg2));
 
 	/* Devices */
 	z80sio_device& sio(Z80SIO(config, "sio", 24_MHz_XTAL / 6));
@@ -136,8 +130,10 @@ void dsb46_state::dsb46(machine_config &config)
 
 	z80ctc_device &ctc1(Z80CTC(config, "ctc1", 24_MHz_XTAL / 6));
 	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc1.set_clk<0>(1.8432_MHz_XTAL);
 	ctc1.zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
 	ctc1.zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
+	ctc1.set_clk<2>(1.8432_MHz_XTAL);
 	ctc1.zc_callback<2>().set("sio", FUNC(z80sio_device::rxcb_w));
 	ctc1.zc_callback<2>().append("sio", FUNC(z80sio_device::txcb_w));
 }

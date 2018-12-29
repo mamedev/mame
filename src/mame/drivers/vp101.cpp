@@ -253,19 +253,14 @@ void vp10x_state::video_start()
 
 uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint32_t *video_ram;
-	uint32_t word;
-	uint32_t *line;
-	int y, x;
-
-	for (y = 0; y < 240; y++)
+	for (int y = 0; y < 240; y++)
 	{
-		line = &bitmap.pix32(y);
-		video_ram = (const uint32_t *) &m_mainram[(0x7400000/4) + (y * (0x1000/4)) + 4];
+		uint32_t *line = &bitmap.pix32(y);
+		const uint32_t *video_ram = (const uint32_t *) &m_mainram[(0x7400000/4) + (y * (0x1000/4)) + 4];
 
-		for (x = 0; x < 320; x++)
+		for (int x = 0; x < 320; x++)
 		{
-			word = *(video_ram++);
+			uint32_t word = *(video_ram++);
 			video_ram++;
 			*line++ = word;
 		}
@@ -276,23 +271,19 @@ uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 // TODO: Palette is not at 0, where is it?
 uint32_t vp10x_state::vp50_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *video_ram;
-	uint32_t *line;
-	int y, x;
-	int r,g,b;
 	const uint16_t *pal_ram = (const uint16_t *) &m_mainram[0];
 
-	for (y = 0; y < 240; y++)
+	for (int y = 0; y < 240; y++)
 	{
-		line = &bitmap.pix32(y);
-		video_ram = (const uint8_t *) &m_mainram[(0x10000/4)+(y * 100)];
+		uint32_t *line = &bitmap.pix32(y);
+		const uint8_t *video_ram = (const uint8_t *) &m_mainram[(0x10000/4)+(y * 100)];
 
-		for (x = 0; x < 400; x++)
+		for (int x = 0; x < 400; x++)
 		{
 			// assume 565
-			r = pal_ram[video_ram[x]] >> 11;
-			g = (pal_ram[video_ram[x]] >> 5) & 0x3f;
-			b = pal_ram[video_ram[x]] & 0x1f;
+			int r = pal_ram[video_ram[x]] >> 11;
+			int g = (pal_ram[video_ram[x]] >> 5) & 0x3f;
+			int b = pal_ram[video_ram[x]] & 0x1f;
 
 			*line++ = (r << 19) | (g << 10) | (b << 3);
 		}
@@ -368,42 +359,44 @@ static INPUT_PORTS_START( vp50 )
 	PORT_BIT( 0xfffffff0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vp10x_state::vp101)
-	MCFG_DEVICE_ADD("maincpu", VR5500LE, 400000000)
-	MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+void vp10x_state::vp101(machine_config &config)
+{
+	VR5500LE(config, m_maincpu, 400000000);
+	m_maincpu->set_dcache_size(32768);
+	m_maincpu->set_system_clock(100000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::main_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(vp10x_state, screen_update)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(vp10x_state::screen_update));
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 319, 0, 239);
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 	m_ata->dmarq_handler().set(FUNC(vp10x_state::dmarq_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vp10x_state::vp50)
-	MCFG_DEVICE_ADD("maincpu", TX4925LE, 200000000)
-	MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
-	MCFG_DEVICE_PROGRAM_MAP(vp50_map)
+void vp10x_state::vp50(machine_config &config)
+{
+	TX4925LE(config, m_maincpu, 200000000);
+	m_maincpu->set_dcache_size(32768);
+	m_maincpu->set_system_clock(100000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::vp50_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(vp10x_state, vp50_screen_update)
-	MCFG_SCREEN_SIZE(400, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(vp10x_state::vp50_screen_update));
+	screen.set_size(400, 240);
+	screen.set_visarea(0, 399, 0, 239);
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 ROM_START(jnero)
 	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */

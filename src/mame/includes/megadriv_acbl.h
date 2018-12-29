@@ -24,6 +24,7 @@ public:
 	void init_topshoot();
 	void init_puckpkmn();
 	void init_hshavoc();
+	void init_barek3();
 
 private:
 	DECLARE_WRITE16_MEMBER(bl_710000_w);

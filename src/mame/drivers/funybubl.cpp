@@ -238,17 +238,16 @@ MACHINE_CONFIG_START(funybubl_state::funybubl)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, 512-12*8-1, 16, 256-16-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funybubl)
-	MCFG_PALETTE_ADD("palette", 0xc00/4)
-	MCFG_PALETTE_FORMAT_CLASS(4, funybubl_state, funybubl_R6B6G6)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_funybubl);
+	PALETTE(config, m_palette).set_format(4, &funybubl_state::funybubl_R6B6G6, 0xc00/4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)

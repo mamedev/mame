@@ -22,7 +22,7 @@ class te7750_device : public device_t
 {
 public:
 	// construction/destruction
-	te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	auto in_port1_cb() { return m_input_cb[0].bind(); }
@@ -50,6 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
+	te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -71,7 +73,16 @@ private:
 	u8                  m_data_dir[9];
 };
 
-// device type definition
+// ======================> te7752_device
+
+class te7752_device : public te7750_device
+{
+public:
+	te7752_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+// device type definitions
 DECLARE_DEVICE_TYPE(TE7750, te7750_device)
+DECLARE_DEVICE_TYPE(TE7752, te7752_device)
 
 #endif // MAME_MACHINE_TE7750_H

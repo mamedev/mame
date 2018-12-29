@@ -520,7 +520,8 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_i8243(*this, "i8243"),
 		m_beeper_off(*this, "beeper_off"),
-		m_beeper(*this, "beeper")
+		m_beeper(*this, "beeper"),
+		m_irq_on(*this, "irq_on")
 	{ }
 
 	void cc10(machine_config &config);
@@ -546,6 +547,7 @@ private:
 	optional_device<i8243_device> m_i8243;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
+	optional_device<timer_device> m_irq_on;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); }
@@ -1660,46 +1662,48 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(fidelz80_state::bcc)
-
+void fidelz80_state::bcc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(bcc_map)
-	MCFG_DEVICE_IO_MAP(bcc_io)
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::bcc_map);
+	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::bcc_io);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_bcc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-MACHINE_CONFIG_START(fidelz80_state::scc)
-
+void fidelz80_state::scc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3.9_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(scc_map)
-	MCFG_DEVICE_IO_MAP(scc_io)
+	Z80(config, m_maincpu, 3.9_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::scc_map);
+	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::scc_io);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-MACHINE_CONFIG_START(fidelz80_state::cc10)
-
+void fidelz80_state::cc10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(cc10_map)
-	MCFG_DEVICE_IO_MAP(vcc_io)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::cc10_map);
+	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vcc_io);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::cc10_ppi_porta_w));
@@ -1710,22 +1714,22 @@ MACHINE_CONFIG_START(fidelz80_state::cc10)
 	m_ppi8255->tri_pb_callback().set_constant(0);
 	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_cc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1360) // approximation, from 556 timer ic
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_TIMER_DRIVER_ADD("beeper_off", fidelz80_state, beeper_off_callback)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 1360); // approximation, from 556 timer ic
+	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	TIMER(config, "beeper_off").configure_generic(FUNC(fidelz80_state::beeper_off_callback));
+}
 
-MACHINE_CONFIG_START(fidelz80_state::vcc)
-
+void fidelz80_state::vcc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(vcc_map)
-	MCFG_DEVICE_IO_MAP(vcc_io)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::vcc_map);
+	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vcc_io);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vcc_ppi_porta_w));
@@ -1736,25 +1740,25 @@ MACHINE_CONFIG_START(fidelz80_state::vcc)
 	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vcc);
 
 	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidelz80_state, vcc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
-MACHINE_CONFIG_END
+	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	m_speech->ext_read().set(FUNC(fidelz80_state::vcc_speech_r));
+	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
+}
 
-MACHINE_CONFIG_START(fidelz80_state::vsc)
-
+void fidelz80_state::vsc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
-	MCFG_DEVICE_PROGRAM_MAP(vsc_map)
-	MCFG_DEVICE_IO_MAP(vsc_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 587) // 555 timer, measured
+	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::vsc_map);
+	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vsc_io);
+	m_maincpu->set_periodic_int(FUNC(fidelz80_state::nmi_line_pulse), attotime::from_hz(587)); // 555 timer, measured
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vsc_ppi_porta_w));
@@ -1766,31 +1770,31 @@ MACHINE_CONFIG_START(fidelz80_state::vsc)
 	m_z80pio->in_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_r));
 	m_z80pio->out_pb_callback().set(FUNC(fidelz80_state::vsc_pio_portb_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidelz80_state, vcc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
-MACHINE_CONFIG_END
+	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	m_speech->ext_read().set(FUNC(fidelz80_state::vcc_speech_r));
+	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
+}
 
-MACHINE_CONFIG_START(fidelz80_state::vbrc)
-
+void fidelz80_state::vbrc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(vbrc_main_map)
-	MCFG_DEVICE_IO_MAP(vbrc_main_io)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	Z80(config, m_maincpu, 5_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::vbrc_main_map);
+	m_maincpu->set_addrmap(AS_IO, &fidelz80_state::vbrc_main_io);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_DEVICE_ADD("mcu", I8041, 5_MHz_XTAL)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, fidelz80_state, vbrc_mcu_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, fidelz80_state, vbrc_mcu_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(m_i8243, i8243_device, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t1_r))
+	I8041(config, m_mcu, 5_MHz_XTAL);
+	m_mcu->p1_out_cb().set(FUNC(fidelz80_state::vbrc_mcu_p1_w));
+	m_mcu->p2_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_p2_r));
+	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));
+	m_mcu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+	m_mcu->t0_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t0_r));
+	m_mcu->t1_in_cb().set(FUNC(fidelz80_state::vbrc_mcu_t1_r));
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<0>));
@@ -1798,34 +1802,35 @@ MACHINE_CONFIG_START(fidelz80_state::vbrc)
 	m_i8243->p6_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<2>));
 	m_i8243->p7_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<3>));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_vbrc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_BSY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
-MACHINE_CONFIG_END
+	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
+	m_speech->bsy().set_inputline("maincpu", Z80_INPUT_LINE_WAIT);
+	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
+}
 
-MACHINE_CONFIG_START(fidelz80_state::dsc)
-
+void fidelz80_state::dsc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
-	MCFG_DEVICE_PROGRAM_MAP(dsc_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidelz80_state, irq_on, attotime::from_hz(523)) // from 555 timer (22nF, 120K, 2.7K)
-	MCFG_TIMER_START_DELAY(attotime::from_hz(523) - attotime::from_usec(41)) // active for 41us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidelz80_state, irq_off, attotime::from_hz(523))
+	Z80(config, m_maincpu, 3.9_MHz_XTAL); // 3.9MHz resonator
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidelz80_state::dsc_map);
+	TIMER(config, m_irq_on).configure_periodic(FUNC(fidelz80_state::irq_on), attotime::from_hz(523)); // from 555 timer (22nF, 120K, 2.7K)
+	m_irq_on->set_start_delay(attotime::from_hz(523) - attotime::from_usec(41)); // active for 41us
+	TIMER(config, "irq_off").configure_periodic(FUNC(fidelz80_state::irq_off), attotime::from_hz(523));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_dsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
 

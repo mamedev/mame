@@ -5,6 +5,10 @@
     Knuckle Joe
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_BLOODBRO_H
+#define MAME_INCLUDES_BLOODBRO_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
@@ -14,8 +18,8 @@
 class kncljoe_state : public driver_device
 {
 public:
-	kncljoe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kncljoe_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_scrollregs(*this, "scrollregs"),
 		m_spriteram(*this, "spriteram"),
@@ -25,7 +29,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ay8910(*this, "aysnd"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void kncljoe(machine_config &config);
 
@@ -68,10 +73,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(kncljoe);
+	void kncljoe_palette(palette_device &palette) const;
 	uint32_t screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BLOODBRO_H

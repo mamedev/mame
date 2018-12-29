@@ -29,8 +29,8 @@ public:
 	texture_manager() { }
 	~texture_manager();
 
-	bgfx_texture* create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, void* data = nullptr, uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
-	bgfx_texture* create_png_texture(std::string path, std::string file_name, std::string texture_name, uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP, uint32_t screen = -1);
+	bgfx_texture* create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, void* data = nullptr, uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+	bgfx_texture* create_png_texture(std::string path, std::string file_name, std::string texture_name, uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP, uint32_t screen = -1);
 	void add_provider(std::string name, bgfx_texture_handle_provider* texture);
 	void remove_provider(std::string name, bool delete_provider = false);
 	bgfx::TextureHandle create_or_update_mame_texture(uint32_t format, int width, int height

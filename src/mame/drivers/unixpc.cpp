@@ -19,6 +19,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
 #include "machine/bankdev.h"
@@ -371,7 +372,7 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 
 	config.set_default_layout(layout_unixpc);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");

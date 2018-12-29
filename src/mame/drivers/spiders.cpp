@@ -209,18 +209,6 @@
 
 /*************************************
  *
- *  Prototypes
- *
- *************************************/
-
-
-
-
-
-
-
-/*************************************
- *
  *  PIA1 - Main CPU
  *
  *************************************/
@@ -533,15 +521,14 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic60", ttl74123_device, a_w))
-
-	/* 74LS123 */
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row), this);
+	crtc.out_de_callback().set("ic60", FUNC(ttl74123_device::a_w));
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");

@@ -246,7 +246,7 @@ READ8_MEMBER(pbaction_tecfri_state::maintosub_r)
 READ8_MEMBER(pbaction_tecfri_state::subcpu_r)
 {
 	return 0x00; // other values stop the flippers from working? are there different inputs from the custom cabinet in here somehow?
-//	return m_subtomainlatch->read(space, offset);
+//  return m_subtomainlatch->read(space, offset);
 }
 
 WRITE8_MEMBER(pbaction_tecfri_state::subcpu_w)
@@ -264,7 +264,7 @@ void pbaction_tecfri_state::sub_map(address_map &map)
 	map(0x8008, 0x8008).w(FUNC(pbaction_tecfri_state::sub8008_w));
 
 	map(0x8010, 0x8010).r(FUNC(pbaction_tecfri_state::maintosub_r));
-	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::subtomain_w));	
+	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::subtomain_w));
 }
 
 void pbaction_tecfri_state::sub_io_map(address_map &map)
@@ -469,26 +469,20 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pbaction_state, screen_update_pbaction)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pbaction_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbaction)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pbaction);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 12_MHz_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, 12_MHz_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("ay3", AY8910, 12_MHz_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay2", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay3", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 void pbaction_state::pbactionx(machine_config &config)
@@ -521,7 +515,7 @@ void pbaction_tecfri_state::machine_start()
 void pbaction_tecfri_state::pbactiont(machine_config &config)
 {
 	pbaction(config);
-	
+
 	m_maincpu->set_addrmap(AS_IO, &pbaction_tecfri_state::main_io_map);
 
 	Z80(config, m_subcpu, 4_MHz_XTAL);

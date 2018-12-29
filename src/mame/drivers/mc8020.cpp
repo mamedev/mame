@@ -18,7 +18,6 @@ ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "emupal.h"
@@ -313,7 +312,7 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	MCFG_SCREEN_UPDATE_DRIVER(mc8020_state, screen_update_mc8020)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
 	z80pio_device& pio(Z80PIO(config, "pio", XTAL(2'457'600)));
@@ -321,11 +320,9 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	pio.in_pb_callback().set(FUNC(mc8020_state::port_b_r));
 	pio.out_pb_callback().set(FUNC(mc8020_state::port_b_w));
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(2'457'600) / 64) // guess
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
-
 	z80ctc_device &ctc(Z80CTC(config, "ctc", XTAL(2'457'600)));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<2>(XTAL(2'457'600) / 64); // guess
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().append("ctc", FUNC(z80ctc_device::trg0));
 MACHINE_CONFIG_END

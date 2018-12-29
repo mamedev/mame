@@ -261,7 +261,7 @@ public:
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
-	{}
+	{ }
 
 	void spc1500(machine_config &config);
 
@@ -291,7 +291,7 @@ private:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_PALETTE_INIT(spc);
+	void spc_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
@@ -507,7 +507,7 @@ WRITE8_MEMBER( spc1500_state::palet_w)
 	}
 }
 
-PALETTE_INIT_MEMBER(spc1500_state,spc)
+void spc1500_state::spc_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0x00,0x00,0xff));
@@ -893,13 +893,16 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
-	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
+
+	PALETTE(config, m_palette, FUNC(spc1500_state::spc_palette), 8);
+
+	MC6845(config, m_vdg, (VDP_CLOCK/48)); //unknown divider
+	m_vdg->set_screen("screen");
+	m_vdg->set_show_border_area(false);
+	m_vdg->set_char_width(8);
+	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row), this);
+	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig), this);
+
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
 	I8255(config, m_pio);
@@ -912,10 +915,10 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1500_state, psga_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, spc1500_state, psgb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_sound, XTAL(4'000'000) / 2);
+	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
+	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")

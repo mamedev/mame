@@ -722,10 +722,11 @@ MACHINE_CONFIG_START(can09_state::can09)
 	RAM(config, RAM_TAG).set_default_size("768K");
 
 	// CRTC  init
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CAN09_CPU_CLOCK) // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	//MCFG_MC6845_UPDATE_ROW_CB(can09_state, crtc_update_row) // not written yet
+	h46505_device &crtc(H46505(config, "crtc", CAN09_CPU_CLOCK)); // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	//crtc.set_update_row_callback(FUNC(can09_state::crtc_update_row), this); // not written yet
 
 	/* Setup loop from data table in ROM: 0xFFCB 0xE020 (CRTC register number), 0xFFD0 0xE021 (CRTC register value)
 	    Reg  Value Comment
@@ -756,7 +757,7 @@ MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_SCREEN_RAW_PARAMS(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576)
 	MCFG_SCREEN_UPDATE_DRIVER(can09_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Floppy */
 	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used

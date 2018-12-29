@@ -91,18 +91,18 @@ private:
 	void xferinfo_cmd();
 	void dispatch_command();
 
-	uint8_t		m_sasr;
-	uint8_t		m_regs[WD_AUXILIARY_STATUS+1];
-	uint8_t		m_fifo[FIFO_SIZE];
-	int			m_fifo_pos;
-	uint8_t		m_temp_input[TEMP_INPUT_LEN];
-	int			m_temp_input_pos;
-	uint8_t		m_busphase;
-	uint8_t		m_identify;
-	bool		m_read_pending;
-	emu_timer	*m_cmd_timer;
-	emu_timer	*m_service_req_timer;
-	emu_timer	*m_deassert_cip_timer;
+	uint8_t     m_sasr;
+	uint8_t     m_regs[WD_AUXILIARY_STATUS+1];
+	uint8_t     m_fifo[FIFO_SIZE];
+	int         m_fifo_pos;
+	uint8_t     m_temp_input[TEMP_INPUT_LEN];
+	int         m_temp_input_pos;
+	uint8_t     m_busphase;
+	uint8_t     m_identify;
+	bool        m_read_pending;
+	emu_timer   *m_cmd_timer;
+	emu_timer   *m_service_req_timer;
+	emu_timer   *m_deassert_cip_timer;
 	devcb_write_line m_irq_cb; /* irq callback */
 };
 

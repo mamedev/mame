@@ -5,11 +5,16 @@
     Century CVS System
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_CVS_H
+#define MAME_INCLUDES_CVS_H
 
-#include "sound/dac.h"
-#include "sound/tms5110.h"
+#pragma once
+
+#include "cpu/s2650/s2650.h"
 #include "machine/gen_latch.h"
 #include "machine/s2636.h"
+#include "sound/dac.h"
+#include "sound/tms5110.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -86,7 +91,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_ctl_w);
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_pdc_w);
 	DECLARE_VIDEO_START(cvs);
-	DECLARE_PALETTE_INIT(cvs);
+	void cvs_palette(palette_device &palette) const;
 	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
 	TIMER_CALLBACK_MEMBER(cvs_393hz_timer_cb);
@@ -133,9 +138,9 @@ protected:
 	uint16_t     m_speech_rom_bit_address;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_speechcpu;
+	required_device<s2650_device> m_maincpu;
+	optional_device<s2650_device> m_audiocpu;
+	optional_device<s2650_device> m_speechcpu;
 	optional_device<dac_byte_interface> m_dac2;
 	optional_device<dac_bit_interface> m_dac3;
 	optional_device<tms5110_device> m_tms5110;
@@ -153,3 +158,5 @@ protected:
 	                                           by allocating twice the amount,
 	                                           we can use the same gfx_layout */
 };
+
+#endif // MAME_INCLUDES_CVS_H

@@ -28,7 +28,6 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
-#include "machine/clock.h"
 #include "sound/beep.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
@@ -289,14 +288,11 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	m_screen->set_palette("palette");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-	clock_device &baudclk(CLOCK(config, "baudclk", 921600));
-	baudclk.signal_handler().set("ctc", FUNC(z80ctc_device::trg2));
-	baudclk.signal_handler().append("pit", FUNC(pit8253_device::write_clk1));
-	baudclk.signal_handler().append("pit", FUNC(pit8253_device::write_clk2));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	pit8253_device &pit(PIT8253(config, "pit", 0)); // КР580ВИ53
+	pit.set_clk<1>(921600);
+	pit.set_clk<2>(921600);
 	pit.out_handler<1>().set(m_uart, FUNC(z80sio_device::txcb_w));
 	pit.out_handler<2>().set(m_uart, FUNC(z80sio_device::rxcb_w));
 
@@ -321,6 +317,7 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4'000'000));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<2>(921600);
 	ctc.zc_callback<2>().set(m_uart, FUNC(z80sio_device::txca_w));
 	ctc.zc_callback<2>().append(m_uart, FUNC(z80sio_device::rxca_w));
 

@@ -459,8 +459,8 @@
 class _5clown_state : public driver_device
 {
 public:
-	_5clown_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	_5clown_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ay8910(*this, "ay8910"),
@@ -474,6 +474,10 @@ public:
 	void fclown(machine_config &config);
 
 	void init_fclown();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -507,9 +511,7 @@ private:
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(_5clown);
+	void _5clown_palette(palette_device &palette) const;
 	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void fcaudio_map(address_map &map);
@@ -578,42 +580,36 @@ uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(_5clown_state, _5clown)
+void _5clown_state::_5clown_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-/*
-    7654 3210
-    ---- ---x   RED component.
-    ---- --x-   GREEN component.
-    ---- -x--   BLUE component.
-    ---- x---   background killer.
-    xxxx ----   unused.
-*/
-	int i;
+	/*
+		7654 3210
+		---- ---x   RED component.
+		---- --x-   GREEN component.
+		---- -x--   BLUE component.
+		---- x---   background killer.
+		xxxx ----   unused.
+	*/
 
 	/* 0000KBGR */
 
-	if (color_prom == nullptr) return;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (i = 0;i < m_palette->entries();i++)
+	for (int i = 0; i < m_palette->entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// background killer
+		int const bk = BIT(color_prom[i], 3);
 
-		/* background killer */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
+		// blue component
+		int const b = bk * BIT(color_prom[i], 2) * 0xff;
 
 		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -1053,16 +1049,16 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fclown)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fclown);
+	PALETTE(config, m_palette, FUNC(_5clown_state::_5clown_palette), 256);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

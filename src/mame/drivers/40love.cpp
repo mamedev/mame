@@ -427,7 +427,7 @@ void fortyl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xc801).w(m_ay, FUNC(ay8910_device::address_data_w));
+	map(0xc800, 0xc801).w(m_ay, FUNC(ym2149_device::address_data_w));
 	map(0xca00, 0xca0d).w(m_msm, FUNC(msm5232_device::write));
 	map(0xcc00, 0xcc00).w(FUNC(fortyl_state::sound_control_0_w));
 	map(0xce00, 0xce00).w(FUNC(fortyl_state::sound_control_1_w));
@@ -672,133 +672,80 @@ void fortyl_state::machine_reset()
 	m_snd_ctrl3 = 0;
 }
 
-MACHINE_CONFIG_START(fortyl_state::_40love)
-
+void fortyl_state::common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,8000000/2) /* OK */
-	MCFG_DEVICE_PROGRAM_MAP(_40love_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000/2);
+	m_maincpu->set_vblank_int("screen", FUNC(fortyl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* OK */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
+	Z80(config, m_audiocpu, 8000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fortyl_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(fortyl_state::irq0_line_hold), attotime::from_hz(2*60)); /* source/number of IRQs is unknown */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6) /* OK */
+	TAITO68705_MCU(config, m_bmcu, 18432000/6); /* OK */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* high interleave to ensure proper synchronization of CPUs */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* high interleave to ensure proper synchronization of CPUs */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(128,128+255, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(128,128+255, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(fortyl_state::screen_update_fortyl));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_40love)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_40love);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_TA7630_ADD("ta7630")
+	TA7630(config, m_ta7630);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	YM2149(config, m_ay, 2000000);
+	m_ay->port_a_write_callback().set(FUNC(fortyl_state::sound_control_2_w));
+	m_ay->port_b_write_callback().set(FUNC(fortyl_state::sound_control_3_w));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
-	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "speaker", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "speaker", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "speaker", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "speaker", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "speaker", 1.0)    // pin 33 16'-2
+	MSM5232(config, m_msm, 8000000/4);
+	m_msm->set_capacitors(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6); /* 1.0 uF capacitors (verified on real PCB) */
+	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
+	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
+	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
+	m_msm->add_route(3, "speaker", 1.0);   // pin 31 16'-1
+	m_msm->add_route(4, "speaker", 1.0);   // pin 36  2'-2
+	m_msm->add_route(5, "speaker", 1.0);   // pin 35  4'-2
+	m_msm->add_route(6, "speaker", 1.0);   // pin 34  8'-2
+	m_msm->add_route(7, "speaker", 1.0);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.2); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(fortyl_state::undoukai)
+void fortyl_state::_40love(machine_config &config)
+{
+	common(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fortyl_state::_40love_map);
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(undoukai_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fortyl_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(128,128+255, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_40love)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	MCFG_TA7630_ADD("ta7630")
-
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
-
-	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
-	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "speaker", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "speaker", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "speaker", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "speaker", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "speaker", 1.0)    // pin 33 16'-2
-	// pin 1 SOLO  8'       not mapped
-	// pin 2 SOLO 16'       not mapped
-	// pin 22 Noise Output  not mapped
-
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+void fortyl_state::undoukai(machine_config &config)
+{
+	common(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fortyl_state::undoukai_map);
+}
 
 /*******************************************************************************/
 

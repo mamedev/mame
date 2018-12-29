@@ -213,17 +213,16 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_citycon)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_citycon)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RGBx_444, 640+1024);   // 640 real palette + 1024 virtual palette
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	AY8910(config, "aysnd", MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "mono", 0.40); // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 

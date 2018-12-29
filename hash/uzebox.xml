@@ -1402,4 +1402,28 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="wuergrtm_d">
+		<description>Wuergertime (Demo)</description>
+		<year>2012</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Jan Kandziora"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="49092">
+				<rom name="wuergertime-demo-20121208.bin" size="49092" crc="689c2d87" sha1="a8d0e72b1ffbe1db31f5b79d970655bb4c9b4769" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrgrtm_md" cloneof="wuergrtm_d">
+		<description>Wuergertime with Music (Demo)</description>
+		<year>2016</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Jan Kandziora and D3thAdd3r"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56234">
+				<rom name="wuergertime-demo-with-music-20161120.bin" size="56234" crc="7c6d32ad" sha1="0f84d9dabfe68f35488674e0c737f9bd58acf106" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

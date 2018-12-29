@@ -69,8 +69,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
-#include "machine/clock.h"
 #include "machine/msm5832.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -1133,7 +1133,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);
@@ -1163,14 +1163,12 @@ MACHINE_CONFIG_START(attache_state::attache)
 	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->set_clk<0>(8_MHz_XTAL / 26); // 307.692 KHz
+	m_ctc->set_clk<1>(8_MHz_XTAL / 26); // 307.692 KHz
 	m_ctc->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<0>().append(m_sio, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	clock_device &brc(CLOCK(config, "brc", 8_MHz_XTAL / 26)); // 307.692 KHz
-	brc.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	brc.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 
 	AM9517A(config, m_dma, 8_MHz_XTAL / 4);
 	m_dma->out_hreq_callback().set(FUNC(attache_state::hreq_w));
@@ -1181,7 +1179,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
@@ -1216,7 +1214,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);
@@ -1246,14 +1244,12 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->set_clk<0>(8_MHz_XTAL / 26); // 307.692 KHz
+	m_ctc->set_clk<1>(8_MHz_XTAL / 26); // 307.692 KHz
 	m_ctc->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<0>().append(m_sio, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	clock_device &brc(CLOCK(config, "brc", 8_MHz_XTAL / 26)); // 307.692 KHz
-	brc.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	brc.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 
 	I8255A(config, m_ppi, 0);
 	m_ppi->out_pa_callback().set(FUNC(attache816_state::x86_comms_w));
@@ -1271,7 +1267,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);

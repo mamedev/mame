@@ -52,7 +52,7 @@ documentation still exists.
 
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 
 /*
@@ -68,27 +68,27 @@ These are yet to be implemented.
 
 */
 
-static const unsigned char dgnbeta_palette[] =
+static constexpr rgb_t dgnbeta_pens[] =
 {
-	/*normal brightness */
-	0x00,0x00,0x00,     /* black */
-	0x80,0x00,0x00,     /* red */
-	0x00,0x80,0x00,     /* green */
-	0x80,0x80,0x00,     /* yellow */
-	0x00,0x00,0x80,     /* blue */
-	0x80,0x00,0x80,     /* magenta */
-	0x00,0x80,0x80,     /* cyan */
-	0x80,0x80,0x80,     /* white */
+	//normal brightness
+	{ 0x00, 0x00, 0x00 },   // black
+	{ 0x80, 0x00, 0x00 },   // red
+	{ 0x00, 0x80, 0x00 },   // green
+	{ 0x80, 0x80, 0x00 },   // yellow
+	{ 0x00, 0x00, 0x80 },   // blue
+	{ 0x80, 0x00, 0x80 },   // magenta
+	{ 0x00, 0x80, 0x80 },   // cyan
+	{ 0x80, 0x80, 0x80 },   // white
 
-	/*enhanced brightness*/
-	0x00,0x00,0x00,     /* black */
-	0xFF,0x00,0x00,     /* red */
-	0x00,0xFF,0x00,     /* green */
-	0xFF,0xFF,0x00,     /* yellow */
-	0x00,0x00,0xFF,     /* blue */
-	0xFF,0x00,0xFF,     /* magenta */
-	0x00,0xFF,0xFF,     /* cyan */
-	0xFF,0xFF,0xFF      /* white */
+	//enhanced brightness
+	{ 0x00, 0x00, 0x00 },   // black
+	{ 0xff, 0x00, 0x00 },   // red
+	{ 0x00, 0xff, 0x00 },   // green
+	{ 0xff, 0xff, 0x00 },   // yellow
+	{ 0x00, 0x00, 0xff },   // blue
+	{ 0xff, 0x00, 0xff },   // magenta
+	{ 0x00, 0xff, 0xff },   // cyan
+	{ 0xff, 0xff, 0xff }    // white
 };
 
 /*
@@ -284,11 +284,9 @@ static INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(dgn_beta_state, dgn)
+void dgn_beta_state::dgn_beta_palette(palette_device &palette) const
 {
-	for ( int i = 0; i < sizeof(dgnbeta_palette) / 3; i++ ) {
-		palette.set_pen_color(i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
-	}
+	palette.set_pen_colors(0, dgnbeta_pens);
 }
 
 /* F4 Character Displayer */
@@ -338,9 +336,8 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dgnbeta)
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dgnbeta)
+	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), ARRAY_LENGTH(dgnbeta_pens));
 
 	/* PIA 0 at $FC20-$FC23 I46 */
 	PIA6821(config, m_pia_0, 0);
@@ -385,11 +382,12 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", 12.288_MHz_XTAL / 16)    //XTAL is guessed
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, dgn_beta_state, dgnbeta_vsync_changed))
+	HD6845(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(16); /*?*/
+	m_mc6845->set_update_row_callback(FUNC(dgn_beta_state::crtc_update_row), this);
+	m_mc6845->out_vsync_callback().set(FUNC(dgn_beta_state::dgnbeta_vsync_changed));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K,384K,512K,640K,768K");

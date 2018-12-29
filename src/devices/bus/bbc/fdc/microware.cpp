@@ -55,9 +55,9 @@ ROM_END
 
 void bbc_microware_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 16_MHz_XTAL / 16); // Replay advert suggests Type R8272 UDM DFS
-	m_fdc->intrq_wr_callback().set(FUNC(bbc_microware_device::fdc_intrq_w));
-	m_fdc->drq_wr_callback().set(FUNC(bbc_microware_device::fdc_drq_w));
+	WD2793(config, m_fdc, DERIVED_CLOCK(1, 8)); // Replay advert suggests Type R8272 UDM DFS
+	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
+	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_microware_device::motor_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies_525, "525qd", floppy_formats).enable_sound(true);
@@ -80,7 +80,6 @@ const tiny_rom_entry *bbc_microware_device::device_rom_region() const
 bbc_microware_device::bbc_microware_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_MICROWARE, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
-	, m_dfs_rom(*this, "dfs_rom")
 	, m_fdc(*this, "wd2793")
 	, m_floppy0(*this, "wd2793:0")
 	, m_floppy1(*this, "wd2793:1")
@@ -95,15 +94,6 @@ bbc_microware_device::bbc_microware_device(const machine_config &mconfig, const 
 void bbc_microware_device::device_start()
 {
 	save_item(NAME(m_drive_control));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_microware_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
 }
 
 
@@ -157,16 +147,6 @@ WRITE8_MEMBER(bbc_microware_device::write)
 
 		// bit 4: ??? interrupt
 	}
-}
-
-WRITE_LINE_MEMBER(bbc_microware_device::fdc_intrq_w)
-{
-	m_slot->intrq_w(state);
-}
-
-WRITE_LINE_MEMBER(bbc_microware_device::fdc_drq_w)
-{
-	m_slot->drq_w(state);
 }
 
 WRITE_LINE_MEMBER(bbc_microware_device::motor_w)

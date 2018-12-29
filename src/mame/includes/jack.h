@@ -6,6 +6,10 @@
     Jack the Giant Killer
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_JACK_H
+#define MAME_INCLUDES_JACK_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -13,8 +17,8 @@
 class jack_state : public driver_device
 {
 public:
-	jack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_spriteram(*this, "spriteram"),
@@ -77,7 +81,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
 	DECLARE_VIDEO_START(joinem);
-	DECLARE_PALETTE_INIT(joinem);
+	void joinem_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(striv);
 	DECLARE_MACHINE_RESET(striv);
 	DECLARE_MACHINE_START(joinem);
@@ -103,3 +107,5 @@ private:
 	void striv_map(address_map &map);
 	void unclepoo_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_JACK_H

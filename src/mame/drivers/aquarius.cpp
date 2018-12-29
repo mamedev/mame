@@ -363,23 +363,20 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_SIZE(40 * 8, 25 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarius)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
 	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
+	PALETTE(config, m_palette, FUNC(aquarius_state::aquarius_palette), 512, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(3'579'545)/2)); // ??? AY-3-8914
+	ay8910.port_a_read_callback().set_ioport("RIGHT");
+	ay8910.port_b_read_callback().set_ioport("LEFT");
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )

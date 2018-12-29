@@ -554,20 +554,17 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_talbot)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_talbot)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -599,20 +596,17 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbas)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_champbas)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -711,30 +705,24 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
-	MCFG_DEVICE_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay1", 1940000).add_route(ALL_OUTPUTS, "speaker", 0.08); /* VR has a factory mark and this is the value read */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay2", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay3", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("ay4", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay4", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
 	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
@@ -775,20 +763,17 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

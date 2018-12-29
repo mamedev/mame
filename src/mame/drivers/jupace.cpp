@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("set_irq", ace_state, set_irq, SCREEN_TAG, 31*8, 264)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("clear_irq", ace_state, clear_irq, SCREEN_TAG, 32*8, 264)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
 
@@ -779,8 +779,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(6'500'000) / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, AY8910_TAG, XTAL(6'500'000) / 2).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	SP0256(config, m_sp0256, XTAL(3'000'000));
 	m_sp0256->add_route(ALL_OUTPUTS, "mono", 0.25);

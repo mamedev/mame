@@ -59,11 +59,11 @@ WRITE8_MEMBER(madalien_state::madalien_output_w)
 
 WRITE8_MEMBER(madalien_state::madalien_portA_w)
 {
-	m_discrete->write(space, MADALIEN_8910_PORTA, data);
+	m_discrete->write(MADALIEN_8910_PORTA, data);
 }
 WRITE8_MEMBER(madalien_state::madalien_portB_w)
 {
-	m_discrete->write(space, MADALIEN_8910_PORTB, data);
+	m_discrete->write(MADALIEN_8910_PORTB, data);
 }
 
 

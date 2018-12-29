@@ -1916,17 +1916,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(segas24_state::system24)
-
+void segas24_state::system24(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu1_map);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", segas24_state, irq_vbl, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(segas24_state::irq_vbl), "screen", 0, 1);
 
 	M68000(config, m_subcpu, MASTER_CLOCK/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu2_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", VIDEO_CLOCK/2));
 	io.in_pa_callback().set_ioport("P1");
@@ -1940,36 +1940,37 @@ MACHINE_CONFIG_START(segas24_state::system24)
 	io.out_cnt1_callback().set(FUNC(segas24_state::cnt1));
 	io.out_cnt2_callback().set("ymsnd", FUNC(ym2151_device::reset_w));
 
-	MCFG_TIMER_DRIVER_ADD("irq_timer", segas24_state, irq_timer_cb)
-	MCFG_TIMER_DRIVER_ADD("irq_timer_clear", segas24_state, irq_timer_clear_cb)
-	MCFG_TIMER_ADD_NONE("frc_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_frc", segas24_state, irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
+	TIMER(config, "irq_timer").configure_generic(FUNC(segas24_state::irq_timer_cb));
+	TIMER(config, "irq_timer_clear").configure_generic(FUNC(segas24_state::irq_timer_clear_cb));
+	TIMER(config, "frc_timer").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "irq_frc").configure_periodic(FUNC(segas24_state::irq_frc_cb), attotime::from_hz(FRC_CLOCK_MODE1));
 
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0xfff)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_DEVICE_ADD("sprite", S24SPRITE, 0)
-	MCFG_DEVICE_ADD("mixer", S24MIXER, 0)
+	S24TILE(config, m_vtile, 0, 0xfff).set_palette("palette");
+	S24SPRITE(config, m_vsprite, 0);
+	S24MIXER(config, m_vmixer, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
-	MCFG_SCREEN_UPDATE_DRIVER(segas24_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
+	m_screen->set_screen_update(FUNC(segas24_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192*2)
+	PALETTE(config, m_palette).set_entries(8192*2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, segas24_state,irq_ym))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set(FUNC(segas24_state::irq_ym));
+	ymsnd.add_route(0, "lspeaker", 0.50);
+	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 void segas24_state::system24_rom(machine_config &config)
 {
@@ -2000,7 +2001,8 @@ void segas24_state::system24_floppy_rom(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::rombd_cpu2_map);
 }
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
+void segas24_state::system24_floppy_hotrod(machine_config &config)
+{
 	system24_floppy(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::hotrod_cpu1_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::hotrod_cpu2_map);
@@ -2013,14 +2015,14 @@ MACHINE_CONFIG_START(segas24_state::system24_floppy_hotrod)
 	upd2.set_portx_tag("DIAL3");
 	upd2.set_porty_tag("DIAL4");
 
-	MCFG_DEVICE_ADD("adc1", MSM6253, 0) // IC5 - 33k/33p R/C clock
-	MCFG_MSM6253_IN0_ANALOG_PORT("PEDAL1")
-	MCFG_MSM6253_IN1_ANALOG_PORT("PEDAL2")
-	MCFG_MSM6253_IN2_ANALOG_PORT("PEDAL3")
-	MCFG_MSM6253_IN3_ANALOG_PORT("PEDAL4")
+	msm6253_device &adc1(MSM6253(config, "adc1", 0)); // IC5 - 33k/33p R/C clock
+	adc1.set_input_tag<0>("PEDAL1");
+	adc1.set_input_tag<1>("PEDAL2");
+	adc1.set_input_tag<2>("PEDAL3");
+	adc1.set_input_tag<3>("PEDAL4");
 
-	MCFG_DEVICE_ADD("adc2", MSM6253, 0) // IC2 - 33k/33p R/C clock
-MACHINE_CONFIG_END
+	MSM6253(config, "adc2", 0); // IC2 - 33k/33p R/C clock
+}
 
 void segas24_state::system24_floppy_fd1094(machine_config &config)
 {
@@ -2030,7 +2032,8 @@ void segas24_state::system24_floppy_fd1094(machine_config &config)
 	m_subcpu->set_addrmap(AS_OPCODES, &segas24_state::decrypted_opcodes_map);
 }
 
-MACHINE_CONFIG_START(segas24_state::system24_floppy_fd_upd)
+void segas24_state::system24_floppy_fd_upd(machine_config &config)
+{
 	system24_floppy_fd1094(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::roughrac_cpu1_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::roughrac_cpu2_map);
@@ -2038,7 +2041,7 @@ MACHINE_CONFIG_START(segas24_state::system24_floppy_fd_upd)
 	upd4701_device &upd4701(UPD4701A(config, "upd4701")); // IC4 on 834-6510 I/O board
 	upd4701.set_portx_tag("DIAL1");
 	upd4701.set_porty_tag("DIAL2");
-MACHINE_CONFIG_END
+}
 
 void segas24_state::dcclub(machine_config &config)
 {

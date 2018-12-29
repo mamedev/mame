@@ -38,7 +38,7 @@ public:
 private:
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	DECLARE_MACHINE_RESET(dealem_vid);
-	DECLARE_PALETTE_INIT(dealem);
+	void dealem_palette(palette_device &palette) const;
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -86,40 +86,39 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
+void mpu4dealem_state::dealem_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i, len;
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_r[3], weights_g[3], weights_b[2];
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
+	double weights_r[3], weights_g[3], weights_b[2];
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistances_rg, weights_r,  1000,   0,
 			3,  resistances_rg, weights_g,  1000,   0,
 			2,  resistances_b,  weights_b,  1000,   0);
 
-	len = memregion("proms")->bytes();
-	for (i = 0; i < len; i++)
+	uint8_t const *color_prom = memregion("proms")->base();
+	unsigned const len = memregion("proms")->bytes();
+	for (int i = 0; i < len; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
 		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
 		/* green component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
 		/* blue component */
-		bit0 = BIT(*color_prom,6);
-		bit1 = BIT(*color_prom,7);
-		b = combine_2_weights(weights_b, bit0, bit1);
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -127,19 +126,16 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 
 uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
 	int count = 0;
-
-	for (y = 0; y < 32; y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 40; x++)
+		for (int x = 0; x < 40; x++)
 		{
-			int tile = m_dealem_videoram[count + 0x1000] | (m_dealem_videoram[count] << 8);
+			int const tile = m_dealem_videoram[count + 0x1000] | (m_dealem_videoram[count] << 8);
 			count++;
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x * 8,y * 8);
+			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8);
 		}
 	}
-
 	return 0;
 }
 
@@ -227,13 +223,13 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dealem)
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)
+	PALETTE(config, "palette", FUNC(mpu4dealem_state::dealem_palette), 32);
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8) /* HD68B45 */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mpu4dealem_state, dealem_vsync_changed))
+	hd6845_device &crtc(HD6845(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set(FUNC(mpu4dealem_state::dealem_vsync_changed));
 MACHINE_CONFIG_END
 
 

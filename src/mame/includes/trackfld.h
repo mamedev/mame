@@ -22,8 +22,8 @@
 class trackfld_state : public driver_device
 {
 public:
-	trackfld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	trackfld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram2(*this, "spriteram2"),
 		m_scroll(*this, "scroll"),
 		m_spriteram(*this, "spriteram"),
@@ -39,7 +39,8 @@ public:
 		m_dac(*this, "dac"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void reaktor(machine_config &config);
 	void atlantol(machine_config &config);
@@ -121,7 +122,7 @@ private:
 	DECLARE_MACHINE_START(trackfld);
 	DECLARE_MACHINE_RESET(trackfld);
 	DECLARE_VIDEO_START(trackfld);
-	DECLARE_PALETTE_INIT(trackfld);
+	void trackfld_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(atlantol);
 	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

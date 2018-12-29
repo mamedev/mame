@@ -216,14 +216,15 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 class halleys_state : public driver_device
 {
 public:
-	halleys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	halleys_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_blitter_ram(*this, "blitter_ram"),
 		m_io_ram(*this, "io_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void benberob(machine_config &config);
 	void halleys(machine_config &config);
@@ -232,6 +233,10 @@ public:
 	void init_benberob();
 	void init_halleys();
 	void init_halleysp();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	uint16_t *m_render_layer[MAX_LAYERS];
@@ -277,9 +282,7 @@ private:
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
 	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(halleys);
+	void halleys_palette(palette_device &palette);
 	uint32_t screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(blitter_reset);
@@ -1129,14 +1132,13 @@ READ8_MEMBER(halleys_state::collision_id_r)
 //**************************************************************************
 // Video Initializations and Updates
 
-PALETTE_INIT_MEMBER(halleys_state, halleys)
+void halleys_state::halleys_palette(palette_device &palette)
 {
-	uint32_t d, r, g, b, i, j, count;
 	// allocate memory for internal palette
 	m_internal_palette = std::make_unique<uint32_t[]>(PALETTE_SIZE);
-	uint32_t *pal_ptr = m_internal_palette.get();
+	uint32_t *const pal_ptr = m_internal_palette.get();
 
-	for (count=0; count<1024; count++)
+	for (uint32_t count = 0; count < 1024; count++)
 	{
 		pal_ptr[count] = 0;
 		palette.set_pen_color(count, rgb_t(0, 0, 0));
@@ -1151,13 +1153,13 @@ PALETTE_INIT_MEMBER(halleys_state, halleys)
 	// 256-1023: palette mirrors
 
 	// 1024-1279: gray shades
-	for (i=0; i<16; i++)
+	for (uint32_t i = 0; i < 16; i++)
 	{
-		d = (i<<6&0xc0) | (i<<2&0x30) | (i&0x0c) | (i>>2&0x03) | BG_RGB;
-		for (count=0; count<16; count++)
+		uint32_t const d = (i << 6 & 0xc0) | (i << 2 & 0x30) | (i & 0x0c) | (i >> 2 & 0x03) | BG_RGB;
+		for (uint32_t count = 0; count < 16; count++)
 		{
-			r = i << 4;
-			g = r + count + BG_MONO;
+			uint32_t r = i << 4;
+			uint32_t const g = r + count + BG_MONO;
 			r += i;
 			pal_ptr[g] = d;
 			palette.set_pen_color(g, rgb_t(r, r, r));
@@ -1165,15 +1167,15 @@ PALETTE_INIT_MEMBER(halleys_state, halleys)
 	}
 
 	// 1280-1535: RGB
-	for (d=0; d<256; d++)
+	for (uint32_t d = 0; d < 256; d++)
 	{
-		j = d + BG_RGB;
+		uint32_t const j = d + BG_RGB;
 		pal_ptr[j] = j;
 
-		i = d>>6 & 0x03;
-		r = d>>2 & 0x0c; r |= i;
-		g = d    & 0x0c; g |= i;
-		b = d<<2 & 0x0c; b |= i;
+		uint32_t const i = (d>>6 & 0x03);
+		uint32_t const r = (d>>2 & 0x0c) | i;
+		uint32_t const g = (d    & 0x0c) | i;
+		uint32_t const b = (d<<2 & 0x0c) | i;
 
 		palette.set_pen_color(j, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
@@ -1231,27 +1233,26 @@ READ8_MEMBER(halleys_state::paletteram_r)
 
 WRITE8_MEMBER(halleys_state::paletteram_w)
 {
-	uint32_t d, r, g, b, i, j;
-	uint32_t *pal_ptr = m_internal_palette.get();
+	uint32_t *const pal_ptr = m_internal_palette.get();
 
 	m_paletteram[offset] = data;
-	d = (uint32_t)data;
-	j = d | BG_RGB;
+	uint32_t const d = uint32_t(data);
+	uint32_t const j = d | BG_RGB;
 	pal_ptr[offset] = j;
-	pal_ptr[offset+SP_2BACK] = j;
-	pal_ptr[offset+SP_ALPHA] = j;
-	pal_ptr[offset+SP_COLLD] = j;
+	pal_ptr[offset + SP_2BACK] = j;
+	pal_ptr[offset + SP_ALPHA] = j;
+	pal_ptr[offset + SP_COLLD] = j;
 
 	// 8-bit RGB format: IIRRGGBB
-	i = d>>6 & 0x03;
-	r = d>>2 & 0x0c; r |= i;  r = r<<4 | r;
-	g = d    & 0x0c; g |= i;  g = g<<4 | g;
-	b = d<<2 & 0x0c; b |= i;  b = b<<4 | b;
+	uint32_t i = (d>>6 & 0x03);
+	uint32_t r = (d>>2 & 0x0c) | i;  r = r<<4 | r;
+	uint32_t g = (d    & 0x0c) | i;  g = g<<4 | g;
+	uint32_t b = (d<<2 & 0x0c) | i;  b = b<<4 | b;
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
-	m_palette->set_pen_color(offset+SP_2BACK, rgb_t(r, g, b));
-	m_palette->set_pen_color(offset+SP_ALPHA, rgb_t(r, g, b));
-	m_palette->set_pen_color(offset+SP_COLLD, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset + SP_2BACK, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset + SP_ALPHA, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset + SP_COLLD, rgb_t(r, g, b));
 
 	halleys_decode_rgb(&r, &g, &b, offset, 0);
 	m_palette->set_pen_color(offset+0x20, rgb_t(r, g, b));
@@ -1667,12 +1668,12 @@ void halleys_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4801).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x4801, 0x4801).r("ay2", FUNC(ay8910_device::data_r));
-	map(0x4802, 0x4803).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x4803, 0x4803).r("ay3", FUNC(ay8910_device::data_r));
-	map(0x4804, 0x4805).w("ay4", FUNC(ay8910_device::address_data_w));
-	map(0x4805, 0x4805).r("ay4", FUNC(ay8910_device::data_r));
+	map(0x4800, 0x4801).w("ay2", FUNC(ym2149_device::address_data_w));
+	map(0x4801, 0x4801).r("ay2", FUNC(ym2149_device::data_r));
+	map(0x4802, 0x4803).w("ay3", FUNC(ym2149_device::address_data_w));
+	map(0x4803, 0x4803).r("ay3", FUNC(ym2149_device::data_r));
+	map(0x4804, 0x4805).w("ay4", FUNC(ym2149_device::address_data_w));
+	map(0x4805, 0x4805).r("ay4", FUNC(ym2149_device::data_r));
 	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xefff).rom(); // space for diagnostic ROM
 }
@@ -1947,28 +1948,24 @@ MACHINE_CONFIG_START(halleys_state::halleys)
 	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY)
 	MCFG_SCREEN_UPDATE_DRIVER(halleys_state, screen_update_halleys)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(halleys_state, halleys)
+	PALETTE(config, m_palette, FUNC(halleys_state::halleys_palette), PALETTE_SIZE);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "ay1", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "ay2", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "ay3", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay4", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, halleys_state, sndnmi_msk_w)) // port Bwrite
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ym2149_device &ay4(YM2149(config, "ay4", XTAL(6'000'000)/4)); /* verified on pcb */
+	ay4.port_b_write_callback().set(FUNC(halleys_state::sndnmi_msk_w));
+	ay4.add_route(ALL_OUTPUTS, "mono", 0.15);
 MACHINE_CONFIG_END
 
 

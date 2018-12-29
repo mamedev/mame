@@ -530,18 +530,18 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinsan)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(10'000'000)/8));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinsan_state, adpcm_int_w))

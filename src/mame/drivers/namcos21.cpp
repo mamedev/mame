@@ -858,7 +858,6 @@ void namcos21_state::configure_c148_standard(machine_config &config)
 	m_slave_intc->link_c148_device(m_master_intc);
 }
 
-// winrun, winrungp, winrun91
 MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_DEVICE_PROGRAM_MAP(winrun_master_map)
@@ -891,10 +890,9 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_FORMAT(XBRG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
 
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
 	m_namcos21_3d->set_fixed_palbase(0x4000);
@@ -910,9 +908,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
 MACHINE_CONFIG_END
 
 

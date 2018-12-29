@@ -644,14 +644,14 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_othunder)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_OFFSETS(4, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_tx_region(2);
+	m_tc0100scn->set_offsets(4, 0);
+	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn->set_palette_tag(m_palette);
 
-	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -672,9 +672,9 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_maincpu);
+	m_tc0140syt->set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 

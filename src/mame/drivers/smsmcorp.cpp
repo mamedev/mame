@@ -581,13 +581,12 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "aysnd", XTAL(16'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(smsmfg_state::sureshot)

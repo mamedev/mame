@@ -147,8 +147,8 @@ MACHINE_CONFIG_START(mephisto_modena_state::modena)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
+	MEPHISTO_BUTTONS_BOARD(config, m_board, 0);
+	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_modena);
 
 	/* sound hardware */

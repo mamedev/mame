@@ -871,7 +871,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
 
-	SNES_PPU(config, m_ppu, 0);
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 

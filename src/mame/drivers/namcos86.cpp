@@ -178,7 +178,6 @@ TODO:
 #include "includes/namcos86.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6801.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -1047,113 +1046,96 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-MACHINE_CONFIG_START(namcos86_state::hopmappy)
-
+void namcos86_state::hopmappy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu1", MC6809E, XTAL(49'152'000)/32)
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
+	MC6809E(config, m_cpu1, XTAL(49'152'000)/32);
+	m_cpu1->set_addrmap(AS_PROGRAM, &namcos86_state::cpu1_map);
+	m_cpu1->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(49'152'000)/32)
-	MCFG_DEVICE_PROGRAM_MAP(hopmappy_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
+	MC6809E(config, m_cpu2, XTAL(49'152'000)/32);
+	m_cpu2->set_addrmap(AS_PROGRAM, &namcos86_state::hopmappy_cpu2_map);
+	m_cpu2->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_assert));
 
-	hd63701_cpu_device &mcu(HD63701(config, "mcu", XTAL(49'152'000)/8));    /* or compatible 6808 with extra instructions */
-	mcu.set_addrmap(AS_PROGRAM, &namcos86_state::hopmappy_mcu_map);
-	mcu.in_p1_cb().set_ioport("IN2");
-	mcu.in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
-	mcu.out_p1_cb().set(FUNC(namcos86_state::coin_w));
-	mcu.out_p2_cb().set(FUNC(namcos86_state::led_w));
-	mcu.set_vblank_int("screen", FUNC(namcos86_state::irq0_line_hold));   /* ??? */
+	HD63701(config, m_mcu, XTAL(49'152'000)/8);    /* or compatible 6808 with extra instructions */
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::hopmappy_mcu_map);
+	m_mcu->in_p1_cb().set_ioport("IN2");
+	m_mcu->in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
+	m_mcu->out_p1_cb().set(FUNC(namcos86_state::coin_w));
+	m_mcu->out_p2_cb().set(FUNC(namcos86_state::led_w));
+	m_mcu->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_hold));   /* ??? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(48000)) /* heavy interleaving needed to avoid hangs in rthunder */
+	config.m_minimum_quantum = attotime::from_hz(48000); /* heavy interleaving needed to avoid hangs in rthunder */
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos86_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(49'152'000)/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8);
+	screen.set_screen_update(FUNC(namcos86_state::screen_update));
+	screen.screen_vblank().set(FUNC(namcos86_state::screen_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos86)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(namcos86_state, namcos86)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos86);
+	PALETTE(config, m_palette, FUNC(namcos86_state::namcos86_palette), 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "mono", 0.0)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
+	YM2151(config, "ymsnd", 3579580).add_route(0, "mono", 0.0).add_route(1, "mono", 0.60);   /* only right channel is connected */
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
+	m_cus30->set_voices(8);
+	m_cus30->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(namcos86_state::roishtar)
+void namcos86_state::roishtar(machine_config &config)
+{
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(roishtar_cpu2_map)
+	m_cpu2->set_addrmap(AS_PROGRAM, &namcos86_state::roishtar_cpu2_map);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::roishtar_mcu_map);
+}
 
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_PROGRAM_MAP(roishtar_mcu_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(namcos86_state::genpeitd)
+void namcos86_state::genpeitd(machine_config &config)
+{
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(genpeitd_cpu2_map)
-
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_PROGRAM_MAP(genpeitd_mcu_map)
+	m_cpu2->set_addrmap(AS_PROGRAM, &namcos86_state::genpeitd_cpu2_map);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::genpeitd_mcu_map);
 
 	/* sound hardware */
-	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_63701X(config, m_63701x, 6000000);
+	m_63701x->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(namcos86_state::rthunder)
+void namcos86_state::rthunder(machine_config &config)
+{
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(rthunder_cpu2_map)
-
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_PROGRAM_MAP(rthunder_mcu_map)
+	m_cpu2->set_addrmap(AS_PROGRAM, &namcos86_state::rthunder_cpu2_map);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::rthunder_mcu_map);
 
 	/* sound hardware */
-	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_63701X(config, m_63701x, 6000000);
+	m_63701x->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(namcos86_state::wndrmomo)
+void namcos86_state::wndrmomo(machine_config &config)
+{
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(wndrmomo_cpu2_map)
-
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_PROGRAM_MAP(wndrmomo_mcu_map)
+	m_cpu2->set_addrmap(AS_PROGRAM, &namcos86_state::wndrmomo_cpu2_map);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos86_state::wndrmomo_mcu_map);
 
 	/* sound hardware */
-	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
+	NAMCO_63701X(config, m_63701x, 6000000);
+	m_63701x->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

@@ -2594,21 +2594,21 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calomega)
-	MCFG_PALETTE_ADD("palette", 256) /* or 128? is the upper half of the PROMs really valid colors? */
-	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
+	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256); // or 128? is the upper half of the PROMs really valid colors?
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 6845 @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 6845 @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8912", AY8912, SND_CLOCK) /* confirmed */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))                /* from schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK)); /* confirmed */
+	ay8912.port_a_read_callback().set_ioport("SW3");                /* from schematics */
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	/* acia */
 	ACIA6850(config, m_acia6850_0, 0);
@@ -2628,8 +2628,7 @@ MACHINE_CONFIG_START(calomega_state::s903mod)
 	MCFG_DEVICE_PROGRAM_MAP(s903mod_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(CONSTANT(0))
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2651,8 +2650,7 @@ MACHINE_CONFIG_START(calomega_state::sys905)
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(CONSTANT(0))
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2682,8 +2680,7 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))    /* From PCB pic. Value is stored at $0539 */
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_ioport("SW2");    /* From PCB pic. Value is stored at $0539 */
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 

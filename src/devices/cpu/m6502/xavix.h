@@ -12,9 +12,6 @@
 
 #include "m6502.h"
 
-#define MCFG_XAVIX_VECTOR_CALLBACK(_class, _method) \
-	downcast<xavix_device &>(*device).set_vector_callback(xavix_device::xavix_interrupt_vector_delegate(&_class::_method, #_class "::" #_method, this));
-
 class xavix_device : public m6502_device {
 public:
 	xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -32,11 +29,35 @@ public:
 	O(brk_xav_imp);
 	O(rti_xav_imp);
 
+	O(xavora_idx);
+	O(xavora_idy);
+	O(xavand_idx);
+	O(xavand_idy);
+	O(xaveor_idx);
+	O(xaveor_idy);
+	O(xavadc_idx);
+	O(xavadc_idy);
+	O(xavsta_idx);
+	O(xavsta_idy);
+	O(xavlda_idx);
 	O(xavlda_idy);
+	O(xavcmp_idx);
+	O(xavcmp_idy);
+	O(xavsbc_idx);
+	O(xavsbc_idy);
 
 	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 
 	template <typename Object> void set_vector_callback(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
+	void set_vector_callback(xavix_interrupt_vector_delegate callback) { m_vector_callback = callback; }
+	template <class FunctionClass> void set_vector_callback(const char *devname, int16_t (FunctionClass::*callback)(int, int), const char *name)
+	{
+		set_vector_callback(xavix_interrupt_vector_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_vector_callback(int16_t (FunctionClass::*callback)(int, int), const char *name)
+	{
+		set_vector_callback(xavix_interrupt_vector_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 
 #undef O

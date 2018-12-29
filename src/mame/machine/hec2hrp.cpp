@@ -376,7 +376,7 @@ WRITE8_MEMBER(hec2hrp_state::color_b_w)
 	if (data & 0x40) m_hector_color[2] |= 8; else m_hector_color[2] &= 7;
 
 	/* Play bit*/
-	m_discrete->write(space, NODE_01,  (data & 0x80) ? 0:1 );
+	m_discrete->write(NODE_01,  (data & 0x80) ? 0:1 );
 }
 
 
@@ -788,26 +788,25 @@ static DISCRETE_SOUND_START( hec2hrp_discrete )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
+void hec2hrp_state::hector_audio(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);  /* Sound level for cassette, as it is in mono => output channel=0*/
+	WAVE(config, "wave", m_cassette).add_route(0, "mono", 0.25);  /* Sound level for cassette, as it is in mono => output channel=0*/
 
-	MCFG_DEVICE_ADD("sn76477", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(680))                  // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(47), RES_K(180))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(100))               // feedback_res
-	MCFG_SN76477_VCO_PARAMS(2, CAP_N(47), RES_K(1000))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(2)                       // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(180))     // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(1.00001), RES_K(10000))   // oneshot caps + res
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(47), RES_K(330), CAP_P(390));
+	m_sn->set_decay_res(RES_K(680));
+	m_sn->set_attack_params(CAP_U(47), RES_K(180));
+	m_sn->set_amp_res(RES_K(33));
+	m_sn->set_feedback_res(RES_K(100));
+	m_sn->set_vco_params(2, CAP_N(47), RES_K(1000));
+	m_sn->set_pitch_voltage(2);
+	m_sn->set_slf_params(CAP_U(0.1), RES_K(180));
+	m_sn->set_oneshot_params(CAP_U(1.00001), RES_K(10000));
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.1);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, hec2hrp_discrete) /* Son 1bit*/
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, hec2hrp_discrete).add_route(ALL_OUTPUTS, "mono", 1.0); /* 1-bit sound */
+}
 
 /*  DISK II drive for:
         Hector HRX

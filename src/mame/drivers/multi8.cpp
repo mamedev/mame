@@ -580,24 +580,25 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_multi8)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, multi8_state, ym2203_porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8912(config, m_aysnd, 1500000); //unknown clock / divider
+	m_aysnd->port_a_write_callback().set(FUNC(multi8_state::ym2203_porta_w));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.50);
 	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(3'579'545)/2)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(multi8_state, crtc_update_row)
+	H46505(config, m_crtc, XTAL(3'579'545)/2);    /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(multi8_state::crtc_update_row), this);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(multi8_state::porta_r));

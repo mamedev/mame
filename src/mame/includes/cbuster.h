@@ -5,6 +5,10 @@
     Crude Buster
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CBUSTER_H
+#define MAME_INCLUDES_CBUSTER_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "cpu/h6280/h6280.h"
@@ -63,3 +67,5 @@ public:
 	void sound_map(address_map &map);
 	void twocrude_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CBUSTER_H

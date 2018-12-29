@@ -35,8 +35,10 @@
 class neoprint_state : public driver_device
 {
 public:
-	neoprint_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+
+	neoprint_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_npvidram(*this, "npvidram"),
 		m_npvidregs(*this, "npvidregs"),
 		m_maincpu(*this, "maincpu"),
@@ -57,10 +59,11 @@ public:
 	void init_nprsp();
 	void init_unkneo();
 
-	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
-
 	DECLARE_READ8_MEMBER(neoprint_calendar_r);
 	DECLARE_WRITE8_MEMBER(neoprint_calendar_w);
 	DECLARE_READ8_MEMBER(neoprint_unk_r);
@@ -80,9 +83,6 @@ private:
 	void neoprint_audio_map(address_map &map);
 	void neoprint_map(address_map &map);
 	void nprsp_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	required_shared_ptr<uint16_t> m_npvidram;
 	required_shared_ptr<uint16_t> m_npvidregs;
@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(neoprint_state::neoprint)
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_neoprint)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_neoprint);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -520,15 +520,14 @@ MACHINE_CONFIG_START(neoprint_state::neoprint)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_neoprint)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -556,7 +555,7 @@ MACHINE_CONFIG_START(neoprint_state::nprsp)
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_neoprint)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_neoprint);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -564,17 +563,16 @@ MACHINE_CONFIG_START(neoprint_state::nprsp)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_nprsp)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_MACHINE_RESET_OVERRIDE(neoprint_state,nprsp)
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
