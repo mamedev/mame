@@ -12,7 +12,6 @@
 
 */
 
-#define DE156CPU ARM
 #include "emu.h"
 #include "machine/adc0808.h"
 #include "machine/decocrpt.h"
@@ -376,8 +375,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	m_adc->in_callback<1>().set_ioport("PADDLE1");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_backfire)
 	config.set_default_layout(layout_dualhsxs);
@@ -388,7 +386,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, backfire_state, vbl_interrupt))
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -397,54 +395,53 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SET_SCREEN("lscreen")
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x40)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_screen(m_lscreen);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x40);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SET_SCREEN("lscreen")
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x10)
-	MCFG_DECO16IC_PF2_COL_BANK(0x50)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(backfire_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(2)
-	MCFG_DECO16IC_PF12_16X16_BANK(3)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_screen(m_lscreen);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x10);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x50);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
+	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_VIDEO_SET_SCREEN("lscreen")
-	MCFG_DECO_SPRITE_GFX_REGION(4)
-	MCFG_DECO_SPRITE_PRIORITY_CB(backfire_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_screen(m_lscreen);
+	m_sprgen[0]->set_gfx_region(4);
+	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback), this);
+	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	MCFG_VIDEO_SET_SCREEN("rscreen")
-	MCFG_DECO_SPRITE_GFX_REGION(5)
-	MCFG_DECO_SPRITE_PRIORITY_CB(backfire_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-
+	DECO_SPRITE(config, m_sprgen[1], 0);
+	m_sprgen[1]->set_screen("rscreen");
+	m_sprgen[1]->set_gfx_region(5);
+	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback), this);
+	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

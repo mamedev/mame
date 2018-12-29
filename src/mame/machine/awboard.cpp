@@ -177,13 +177,6 @@ aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-void aw_rom_board::static_set_keyregion(device_t &device, const char *keyregion)
-{
-	aw_rom_board &dev = downcast<aw_rom_board &>(device);
-	dev.m_keyregion.set_tag(keyregion);
-}
-
-
 /*
 We are using 20 bits keys with the following subfields' structure:
 bits 0-15 is a 16-bits XOR

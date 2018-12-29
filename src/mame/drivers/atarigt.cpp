@@ -65,7 +65,7 @@
 
 /*************************************
  *
- *  Initialization
+ *  Interrupt handling
  *
  *************************************/
 
@@ -75,6 +75,18 @@ void atarigt_state::update_interrupts()
 	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
+{
+	scanline_int_write_line(1);
+}
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
 
 MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 {
@@ -819,11 +831,16 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_ATARIRLE_ADD("rle", modesc)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
+
+	/* sound hardware */
+	ATARI_CAGE(config, m_cage, 0);
+	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarigt_state::tmek)
+void atarigt_state::tmek(machine_config &config)
+{
 	atarigt(config);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16); // should be 447 kHz according to schematics, but that fails the self-test
@@ -832,29 +849,22 @@ MACHINE_CONFIG_START(atarigt_state::tmek)
 	m_adc->in_callback<6>().set_ioport("AN2");
 	m_adc->in_callback<7>().set_ioport("AN3");
 
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-MACHINE_CONFIG_END
+	m_cage->set_speedup(0x4fad);
+}
 
-MACHINE_CONFIG_START(atarigt_state::primrage)
+void atarigt_state::primrage(machine_config &config)
+{
 	atarigt(config);
 
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-MACHINE_CONFIG_END
+	m_cage->set_speedup(0x42f2);
+}
 
-MACHINE_CONFIG_START(atarigt_state::primrage20)
+void atarigt_state::primrage20(machine_config &config)
+{
 	atarigt(config);
 
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-MACHINE_CONFIG_END
+	m_cage->set_speedup(0x48a4);
+}
 
 /*************************************
  *

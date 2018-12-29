@@ -231,8 +231,8 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	BEEP(config, "beeper", 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(z9001_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(z9001_state::kbd_put));
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 
 	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(9'830'400) / 4));

@@ -23,13 +23,13 @@ DEFINE_DEVICE_TYPE(M68307, m68307_cpu_device, "mc68307", "MC68307")
 */
 READ8_MEMBER( m68307_cpu_device::m68307_internal_serial_r )
 {
-	if (offset&1) return m_duart->read(*m_program, offset>>1);
+	if (offset&1) return m_duart->read(offset>>1);
 	return 0x0000;
 }
 
 WRITE8_MEMBER(m68307_cpu_device::m68307_internal_serial_w)
 {
-	if (offset & 1) m_duart->write(*m_program, offset >> 1, data);
+	if (offset & 1) m_duart->write(offset >> 1, data);
 }
 
 

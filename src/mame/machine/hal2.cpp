@@ -9,12 +9,12 @@
 #include "emu.h"
 #include "machine/hal2.h"
 
-#define LOG_UNKNOWN		(1 << 0U)
-#define LOG_READS		(1 << 1U)
-#define LOG_WRITES		(1 << 2U)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_READS | LOG_WRITES)
+#define LOG_UNKNOWN     (1 << 0U)
+#define LOG_READS       (1 << 1U)
+#define LOG_WRITES      (1 << 2U)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_HAL2, hal2_device, "hal2", "SGI HAL2")

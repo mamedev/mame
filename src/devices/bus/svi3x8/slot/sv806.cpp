@@ -46,7 +46,7 @@ void sv806_device::device_add_mconfig(machine_config &config)
 	screen.set_raw((XTAL(12'000'000) / 6) * 8, 864, 0, 640, 317, 0, 192);
 	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	HD6845(config, m_crtc, XTAL(12'000'000) / 6);
 	m_crtc->set_screen("80col");

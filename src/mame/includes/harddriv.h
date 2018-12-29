@@ -553,7 +553,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<ls259_device> m_latch;
 	required_device<dac_word_interface> m_dac;
-	required_device<cpu_device> m_sounddsp;
+	required_device<tms32010_device> m_sounddsp;
 	required_shared_ptr<uint16_t> m_sounddsp_ram;
 	required_region_ptr<uint8_t>  m_sound_rom;
 

@@ -107,6 +107,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
@@ -134,10 +139,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(imolagp);
+	void imolagp_palette(palette_device &palette) const;
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void imolagp_master_io(address_map &map);
 	void imolagp_master_map(address_map &map);
@@ -152,16 +154,16 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(imolagp_state, imolagp)
+void imolagp_state::imolagp_palette(palette_device &palette) const
 {
 	// palette seems like 3bpp + intensity
 	// this still needs to be verified
 	for (int i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(i*4+0, 0, 0, 0);
-		palette.set_pen_color(i*4+1, pal1bit(i >> 2)/2, pal1bit(i >> 1)/2, pal1bit(i >> 0)/2);
-		palette.set_pen_color(i*4+2, 0, 0, 0);
-		palette.set_pen_color(i*4+3, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i*4 + 0, 0, 0, 0);
+		palette.set_pen_color(i*4 + 1, pal1bit(i >> 2) / 2, pal1bit(i >> 1) / 2, pal1bit(i >> 0) / 2);
+		palette.set_pen_color(i*4 + 2, 0, 0, 0);
+		palette.set_pen_color(i*4 + 3, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 }
 
@@ -179,19 +181,19 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			const uint8_t *source = &m_videoram[layer][(y & 0xff) * 0x40];
-			uint16_t *dest = &bitmap.pix16(y & 0xff);
+			uint8_t const *const source = &m_videoram[layer][(y & 0xff) * 0x40];
+			uint16_t *const dest = &bitmap.pix16(y & 0xff);
 			for (int i = 0; i < 0x40; i++)
 			{
-				uint8_t data = source[i];
-				if (data || layer == 0)
+				uint8_t const data = source[i];
+				if (data || !layer)
 				{
 					// one color per each 4 pixels
-					uint8_t color = (data & 0xf0) >> 3;
-					uint8_t x = (i << 2) - (m_scroll ^ 3);
+					uint8_t const color = (data & 0xf0) >> 3;
+					uint8_t const x = (i << 2) - (m_scroll ^ 3);
 					for (int x2 = 0; x2 < 4; x2++)
 					{
-						uint8_t offset = x + x2;
+						uint8_t const offset = x + x2;
 						if (offset >= cliprect.min_x && offset <= cliprect.max_x)
 							dest[offset] = color | (data >> x2 & 1);
 					}
@@ -542,8 +544,7 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, imolagp_state, vblank_irq))
 
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)
+	PALETTE(config, "palette", FUNC(imolagp_state::imolagp_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

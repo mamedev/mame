@@ -883,7 +883,7 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(abc1600_state,abc1600_int_ack)
 
 	// video hardware
-	MCFG_ABC1600_MOVER_ADD()
+	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);
 
 	// devices
 	abc1600_mac_device &mac(ABC1600_MAC(config, "mac", 0));

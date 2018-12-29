@@ -2,16 +2,16 @@
 // copyright-holders:Ryan Holtz
 /*********************************************************************
 
-	SGI Indigo workstation
+    SGI Indigo workstation
 
-	To-Do:
-	- IP12 (R3000):
-	 * Everything
-	- IP20 (R4000):
-	 * Figure out why the keyboard/mouse diagnostic fails
-	 * Work out a proper RAM mapping, or why the installer bails due
-	   to trying to access virtual address ffffa02c:
-	   88002584: lw        $sp,-$5fd4($0)
+    To-Do:
+    - IP12 (R3000):
+     * Everything
+    - IP20 (R4000):
+     * Figure out why the keyboard/mouse diagnostic fails
+     * Work out a proper RAM mapping, or why the installer bails due
+       to trying to access virtual address ffffa02c:
+       88002584: lw        $sp,-$5fd4($0)
 
 **********************************************************************/
 
@@ -25,16 +25,16 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define ENABLE_ENTRY_GFX	(1)
+#define ENABLE_ENTRY_GFX    (1)
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_INT			(1 << 1)
-#define LOG_DSP			(1 << 2)
-#define LOG_GFX			(1 << 3)
-#define LOG_GFX_CMD		(1 << 4)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_DSP | LOG_GFX | LOG_GFX_CMD)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_INT         (1 << 1)
+#define LOG_DSP         (1 << 2)
+#define LOG_GFX         (1 << 3)
+#define LOG_GFX_CMD     (1 << 4)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_INT | LOG_DSP | LOG_GFX | LOG_GFX_CMD)
 
-#define VERBOSE			(LOG_UNKNOWN)
+#define VERBOSE         (LOG_UNKNOWN)
 #include "logmacro.h"
 
 class indigo_state : public driver_device
@@ -69,48 +69,48 @@ protected:
 
 	enum
 	{
-		REX15_PAGE0_SET				= 0x00000000,
-		REX15_PAGE0_GO				= 0x00000800,
-		REX15_PAGE1_SET				= 0x00004790,
-		REX15_PAGE1_GO				= 0x00004f90,
+		REX15_PAGE0_SET             = 0x00000000,
+		REX15_PAGE0_GO              = 0x00000800,
+		REX15_PAGE1_SET             = 0x00004790,
+		REX15_PAGE1_GO              = 0x00004f90,
 
-		REX15_P0REG_COMMAND			= 0x00000000,
-		REX15_P0REG_XSTARTI			= 0x0000000c,
-		REX15_P0REG_YSTARTI			= 0x0000001c,
-		REX15_P0REG_XYMOVE			= 0x00000034,
-		REX15_P0REG_COLORREDI		= 0x00000038,
-		REX15_P0REG_COLORGREENI		= 0x00000040,
-		REX15_P0REG_COLORBLUEI		= 0x00000048,
-		REX15_P0REG_COLORBACK		= 0x0000005c,
-		REX15_P0REG_ZPATTERN		= 0x00000060,
-		REX15_P0REG_XENDI			= 0x00000084,
-		REX15_P0REG_YENDI			= 0x00000088,
+		REX15_P0REG_COMMAND         = 0x00000000,
+		REX15_P0REG_XSTARTI         = 0x0000000c,
+		REX15_P0REG_YSTARTI         = 0x0000001c,
+		REX15_P0REG_XYMOVE          = 0x00000034,
+		REX15_P0REG_COLORREDI       = 0x00000038,
+		REX15_P0REG_COLORGREENI     = 0x00000040,
+		REX15_P0REG_COLORBLUEI      = 0x00000048,
+		REX15_P0REG_COLORBACK       = 0x0000005c,
+		REX15_P0REG_ZPATTERN        = 0x00000060,
+		REX15_P0REG_XENDI           = 0x00000084,
+		REX15_P0REG_YENDI           = 0x00000088,
 
-		REX15_P1REG_WCLOCKREV		= 0x00000054,
-		REX15_P1REG_CFGDATA			= 0x00000058,
-		REX15_P1REG_CFGSEL			= 0x0000005c,
-		REX15_P1REG_VC1_ADDRDATA	= 0x00000060,
-		REX15_P1REG_CFGMODE			= 0x00000068,
-		REX15_P1REG_XYOFFSET		= 0x0000006c,
+		REX15_P1REG_WCLOCKREV       = 0x00000054,
+		REX15_P1REG_CFGDATA         = 0x00000058,
+		REX15_P1REG_CFGSEL          = 0x0000005c,
+		REX15_P1REG_VC1_ADDRDATA    = 0x00000060,
+		REX15_P1REG_CFGMODE         = 0x00000068,
+		REX15_P1REG_XYOFFSET        = 0x0000006c,
 
-		REX15_OP_NOP				= 0x00000000,
-		REX15_OP_DRAW				= 0x00000001,
+		REX15_OP_NOP                = 0x00000000,
+		REX15_OP_DRAW               = 0x00000001,
 
-		REX15_OP_FLAG_BLOCK			= 0x00000008,
-		REX15_OP_FLAG_LENGTH32		= 0x00000010,
-		REX15_OP_FLAG_QUADMODE		= 0x00000020,
-		REX15_OP_FLAG_XYCONTINUE	= 0x00000080,
-		REX15_OP_FLAG_STOPONX		= 0x00000100,
-		REX15_OP_FLAG_STOPONY		= 0x00000200,
-		REX15_OP_FLAG_ENZPATTERN	= 0x00000400,
-		REX15_OP_FLAG_LOGICSRC		= 0x00080000,
-		REX15_OP_FLAG_ZOPAQUE		= 0x00800000,
-		REX15_OP_FLAG_ZCONTINUE		= 0x01000000,
+		REX15_OP_FLAG_BLOCK         = 0x00000008,
+		REX15_OP_FLAG_LENGTH32      = 0x00000010,
+		REX15_OP_FLAG_QUADMODE      = 0x00000020,
+		REX15_OP_FLAG_XYCONTINUE    = 0x00000080,
+		REX15_OP_FLAG_STOPONX       = 0x00000100,
+		REX15_OP_FLAG_STOPONY       = 0x00000200,
+		REX15_OP_FLAG_ENZPATTERN    = 0x00000400,
+		REX15_OP_FLAG_LOGICSRC      = 0x00080000,
+		REX15_OP_FLAG_ZOPAQUE       = 0x00800000,
+		REX15_OP_FLAG_ZCONTINUE     = 0x01000000,
 
-		REX15_WRITE_ADDR			= 0x00,
-		REX15_PALETTE_RAM			= 0x01,
-		REX15_PIXEL_READ_MASK		= 0x02,
-		REX15_CONTROL				= 0x06
+		REX15_WRITE_ADDR            = 0x00,
+		REX15_PALETTE_RAM           = 0x01,
+		REX15_PIXEL_READ_MASK       = 0x02,
+		REX15_CONTROL               = 0x06
 	};
 
 	struct lg1_t
@@ -328,8 +328,8 @@ void indigo_state::do_rex_command()
 		}
 	}
 	else if (m_lg1.m_command == 0x300005a1 ||
-             m_lg1.m_command == 0x300005a9 ||
-             m_lg1.m_command == 0x300005b9)
+			 m_lg1.m_command == 0x300005a9 ||
+			 m_lg1.m_command == 0x300005b9)
 	{
 		bool xycontinue = (m_lg1.m_command & REX15_OP_FLAG_XYCONTINUE);
 		uint32_t start_x = xycontinue ? m_lg1.m_x_curr_i : m_lg1.m_x_start_i;
@@ -567,7 +567,7 @@ void indigo_state::indigo_base(machine_config &config)
 	screen.set_visarea(0, 1024-1, 0, 768-1);
 	screen.set_screen_update(FUNC(indigo_state::screen_update));
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 }

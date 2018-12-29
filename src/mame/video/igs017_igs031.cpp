@@ -87,7 +87,7 @@ device_memory_interface::space_config_vector igs017_igs031_device::memory_space_
 	};
 }
 
-uint16_t const igs017_igs031_device::palette_callback_straight(uint16_t bgr)
+uint16_t igs017_igs031_device::palette_callback_straight(uint16_t bgr) const
 {
 	return bgr;
 }

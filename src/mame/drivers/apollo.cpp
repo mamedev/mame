@@ -701,11 +701,11 @@ void apollo_state::dn3500_map(address_map &map)
 		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
 		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-		map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-		map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+		map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-		map(0x05e800, 0x05ec07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-		map(0x0a0000, 0x0bffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
 //      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
 //      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
@@ -773,11 +773,11 @@ void apollo_state::dn3000_map(address_map &map)
 		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
 		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-		map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-		map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+		map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-		map(0x05e800, 0x05ec07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-		map(0x0a0000, 0x0bffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 }
 
 void apollo_state::dsp3000_map(address_map &map)
@@ -843,11 +843,11 @@ void apollo_state::dn5500_map(address_map &map)
 	// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
 	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-	map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-	map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+	map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+	map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-	map(0x05e800, 0x05ec07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-	map(0x0a0000, 0x0bffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+	map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+	map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
 //  AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
 //  AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
@@ -1063,8 +1063,8 @@ MACHINE_CONFIG_START(apollo_state::dn3500)
 	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 #ifdef APOLLO_XXL
-	MCFG_DEVICE_ADD(APOLLO_STDIO_TAG, APOLLO_STDIO, 0)
-	MCFG_APOLLO_STDIO_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
+	apollo_stdio_device &stdio(APOLLO_STDIO(config, APOLLO_STDIO_TAG, 0));
+	stdio.tx_callback().set(m_sio, FUNC(apollo_sio::rx_b_w));
 #endif
 MACHINE_CONFIG_END
 
@@ -1088,30 +1088,32 @@ MACHINE_CONFIG_START(apollo_state::dsp3500)
 	config.set_default_layout(layout_apollo_dsp);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apollo_state::dn3500_19i)
+void apollo_state::dn3500_19i(machine_config &config)
+{
 	dn3500(config);
 	/* video hardware 19" monochrome */
-	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_MONO19I(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn3500_15i)
+void apollo_state::dn3500_15i(machine_config &config)
+{
 	dn3500(config);
 	/* video hardware is 15" monochrome or color */
-	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_GRAPHICS(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
 MACHINE_CONFIG_START(apollo_state::dn3000)
 	dn3500(config);
 	MCFG_DEVICE_REPLACE(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_DEVICE_PROGRAM_MAP(dn3000_map)
-	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
+	config.device_remove( APOLLO_SIO2_TAG );
 	m_ram->set_default_size("8M").set_extra_options("4M");
 
 	// FIXME: is this interrupt really only connected on DN3000?
@@ -1134,29 +1136,31 @@ MACHINE_CONFIG_START(apollo_state::dsp3000)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M");
 
-	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
+	config.device_remove( APOLLO_SIO2_TAG );
 
 	/* terminal hardware */
 	config.set_default_layout(layout_apollo_dsp);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apollo_state::dn3000_19i)
+void apollo_state::dn3000_19i(machine_config &config)
+{
 	dn3000(config);
 	/* video hardware 19" monochrome */
-	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_MONO19I(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn3000_15i)
+void apollo_state::dn3000_15i(machine_config &config)
+{
 	dn3000(config);
 	/* video hardware 15" monochrome */
-	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_GRAPHICS(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
 MACHINE_CONFIG_START(apollo_state::dn5500)
 	dn3500(config);
@@ -1185,23 +1189,25 @@ MACHINE_CONFIG_START(apollo_state::dsp5500)
 	config.set_default_layout(layout_apollo_dsp);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(apollo_state::dn5500_19i)
+void apollo_state::dn5500_19i(machine_config &config)
+{
 	dn5500(config);
 	/* video hardware 19" monochrome */
-	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_MONO19I(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn5500_15i)
+void apollo_state::dn5500_15i(machine_config &config)
+{
 	dn5500(config);
 	/* video hardware 15" monochrome */
-	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_GRAPHICS(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
 /***************************************************************************
  ROM Definitions

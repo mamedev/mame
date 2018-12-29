@@ -24,13 +24,6 @@
 // mingw has this defined for 32-bit compiles
 #undef i386
 
-
-#define MCFG_I386_SMIACT(_devcb) \
-	downcast<i386_device &>(*device).set_smiact(DEVCB_##_devcb);
-
-#define MCFG_I486_FERR_HANDLER(_devcb) \
-	downcast<i386_device &>(*device).set_ferr(DEVCB_##_devcb);
-
 #define X86_NUM_CPUS        4
 
 class i386_device : public cpu_device, public device_vtlb_interface, public i386_disassembler::config
@@ -40,8 +33,8 @@ public:
 	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_smiact(Object &&cb) { return m_smiact.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ferr(Object &&cb) { return m_ferr_handler.set_callback(std::forward<Object>(cb)); }
+	auto smiact() { return m_smiact.bind(); }
+	auto ferr() { return m_ferr_handler.bind(); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
@@ -1618,8 +1611,13 @@ public:
 	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual void opcode_cpuid() override;
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	uint8_t m_processor_name_string[48];
 };
 
 

@@ -286,12 +286,10 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(carpolo_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, carpolo_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carpolo)
-	MCFG_PALETTE_ADD("palette", 12*2+2*16+4*2)
-	MCFG_PALETTE_INIT_OWNER(carpolo_state,carpolo)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carpolo);
+	PALETTE(config, m_palette, FUNC(carpolo_state::carpolo_palette), 12*2+2*16+4*2);
 MACHINE_CONFIG_END
 
 

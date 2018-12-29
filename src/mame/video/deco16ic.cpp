@@ -621,7 +621,9 @@ READ16_MEMBER( deco16ic_device::pf2_data_r )
 
 WRITE16_MEMBER( deco16ic_device::pf_control_w )
 {
-	screen().update_partial(screen().vpos());
+	// update until current scanline (inclusive if we're in hblank)
+	int ydelta = (screen().hpos() > screen().visible_area().right()) ? 0 : 1;
+	screen().update_partial(screen().vpos() - ydelta);
 
 	COMBINE_DATA(&m_pf12_control[offset]);
 }

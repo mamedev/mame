@@ -161,10 +161,11 @@ Notes:
 class dgpix_state : public driver_device
 {
 public:
-	dgpix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dgpix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vblank(*this, "VBLANK") { }
+		m_vblank(*this, "VBLANK")
+	{ }
 
 	void dgpix(machine_config &config);
 
@@ -451,8 +452,7 @@ MACHINE_CONFIG_START(dgpix_state::dgpix)
 	MCFG_SCREEN_UPDATE_DRIVER(dgpix_state, screen_update_dgpix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
-
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	// KS0164 sound chip

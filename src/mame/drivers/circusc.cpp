@@ -363,7 +363,6 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -371,13 +370,11 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circusc_state, screen_update_circusc)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, circusc_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circusc)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(circusc_state, circusc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circusc);
+	PALETTE(config, m_palette, FUNC(circusc_state::circusc_palette), 16*16 + 16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

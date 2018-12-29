@@ -10,6 +10,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
@@ -536,12 +537,12 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(osbexec_state::screen_update));
-	m_screen->set_raw(MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240);    /* May not be correct */
+	m_screen->set_raw(MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240);    // May not be correct
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(m_pia[0], FUNC(pia6821_device::cb1_w));
 	m_screen->screen_vblank().append(m_rtc, FUNC(ripple_counter_device::clock_w)).invert();
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)

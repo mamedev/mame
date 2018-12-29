@@ -688,7 +688,7 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
 	// Tied to 1: READY
 	// Tied to 0: TC
-	I8272A(config, m_floppy_ctrl, false);
+	I8272A(config, m_floppy_ctrl, 8'000'000, false);
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 

@@ -454,8 +454,8 @@ void igs_incdec_device::device_reset()
 class igs017_state : public driver_device
 {
 public:
-	igs017_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	igs017_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_remap_addr(-1),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -541,10 +541,10 @@ private:
 	DECLARE_WRITE8_MEMBER(mgcs_magic_w);
 	DECLARE_READ8_MEMBER(mgcs_magic_r);
 
-	uint16_t const mgcs_palette_bitswap(uint16_t bgr);
-	uint16_t const lhzb2a_palette_bitswap(uint16_t bgr);
-	uint16_t const tjsb_palette_bitswap(uint16_t bgr);
-	uint16_t const slqz2_palette_bitswap(uint16_t bgr);
+	uint16_t mgcs_palette_bitswap(uint16_t bgr) const;
+	uint16_t lhzb2a_palette_bitswap(uint16_t bgr) const;
+	uint16_t tjsb_palette_bitswap(uint16_t bgr) const;
+	uint16_t slqz2_palette_bitswap(uint16_t bgr) const;
 
 	u8 sdmg2_keys_r();
 	DECLARE_WRITE8_MEMBER(sdmg2_magic_w);
@@ -623,26 +623,26 @@ void igs017_state::video_start()
 }
 
 // palette bitswap callbacks
-uint16_t const igs017_state::mgcs_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr) const
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
 	return bitswap<16>(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
-uint16_t const igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr) const
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 	return bitswap<16>(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
-uint16_t const igs017_state::tjsb_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr) const
 {
 	// bitswap
 	return bitswap<16>(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
-uint16_t const igs017_state::slqz2_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr) const
 {
 	return bitswap<16>(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
@@ -3496,7 +3496,7 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
@@ -3578,7 +3578,7 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
@@ -3612,14 +3612,14 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
@@ -3668,7 +3668,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));    // VSync 60Hz, HSync 15.3kHz
+	m_screen->set_refresh_hz(60);    // VSync 60Hz, HSync 15.3kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
@@ -3702,14 +3702,14 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
@@ -3743,7 +3743,7 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));    // VSync 60Hz, HSync 15.3kHz
+	m_screen->set_refresh_hz(60);    // VSync 60Hz, HSync 15.3kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
@@ -3786,7 +3786,7 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
@@ -3821,7 +3821,7 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
@@ -3860,7 +3860,7 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);

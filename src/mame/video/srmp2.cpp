@@ -10,32 +10,24 @@ Functions to emulate the video hardware of the machine.
 #include "emu.h"
 #include "includes/srmp2.h"
 
-PALETTE_INIT_MEMBER(srmp2_state,srmp2)
+void srmp2_state::srmp2_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int col;
-
-		col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
-		palette.set_pen_color(i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
+		int const col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i ^ 0x0f, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
 	}
 }
 
 
-PALETTE_INIT_MEMBER(srmp2_state,srmp3)
+void srmp2_state::srmp3_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int col;
-
-		col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
-		palette.set_pen_color(i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
+		int const col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i,pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
 	}
 }
 

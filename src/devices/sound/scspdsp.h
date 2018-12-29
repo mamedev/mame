@@ -29,7 +29,7 @@ struct SCSPDSP
 //output
 	int16_t EFREG[16];    //EFREG, 16 bit signed
 
-	int Stopped;
+	bool Stopped;
 	int LastStep;
 
 	void Init();

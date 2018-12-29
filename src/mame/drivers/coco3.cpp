@@ -286,8 +286,8 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	MCFG_COCO_VHD_ADD(VHD0_TAG)
-	MCFG_COCO_VHD_ADD(VHD1_TAG)
+	COCO_VHD(config, m_vhd_0, 0);
+	COCO_VHD(config, m_vhd_1, 0);
 
 	// video hardware
 	config.set_default_layout(layout_coco3);

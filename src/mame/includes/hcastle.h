@@ -73,7 +73,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(hcastle);
+	void hcastle_palette(palette_device &palette) const;
 	uint32_t screen_update_hcastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint8_t *sbank, int bank );
 	DECLARE_WRITE8_MEMBER(volume_callback);

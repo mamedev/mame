@@ -53,14 +53,14 @@ class _3x3puzzle_state : public driver_device
 {
 public:
 	_3x3puzzle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_videoram1(*this, "videoram1"),
-			m_videoram2(*this, "videoram2"),
-			m_videoram3(*this, "videoram3"),
-			m_maincpu(*this, "maincpu"),
-			m_oki(*this, "oki"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen")
+		: driver_device(mconfig, type, tag)
+		, m_videoram1(*this, "videoram1")
+		, m_videoram2(*this, "videoram2")
+		, m_videoram3(*this, "videoram3")
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 	{ }
 
 	void _3x3puzzle(machine_config &config);
@@ -403,10 +403,9 @@ MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_3x3puzzle)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_3x3puzzle);
 
-	MCFG_PALETTE_ADD("palette", 0x600/2)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x600 / 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

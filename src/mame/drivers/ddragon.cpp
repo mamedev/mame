@@ -960,14 +960,13 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
@@ -1033,14 +1032,13 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
@@ -1086,14 +1084,13 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
@@ -1120,8 +1117,8 @@ MACHINE_CONFIG_START(darktowr_state::darktowr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(darktowr_map)
 
-	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000))
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, darktowr_state, mcu_port_a_w))
+	M68705P3(config, m_mcu, XTAL(4'000'000));
+	m_mcu->porta_w().set(FUNC(darktowr_state::mcu_port_a_w));
 
 	ADDRESS_MAP_BANK(config, "darktowr_bank").set_map(&darktowr_state::darktowr_banked_map).set_options(ENDIANNESS_BIG, 8, 17, 0x4000);
 

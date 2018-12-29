@@ -201,7 +201,7 @@ void zerozone_state::zerozone(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_zerozone);
 
-	PALETTE(config, "palette", 256).set_format(PALETTE_FORMAT_RRRRGGGGBBBBRGBx);
+	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

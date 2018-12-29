@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "includes/blktiger.h"
 
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -296,16 +295,16 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)  /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(blktiger_map)
 	MCFG_DEVICE_IO_MAP(blktiger_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(blktiger_sound_map)
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(24'000'000)/4) /* ??? */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, blktiger_state, blktiger_from_main_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, blktiger_state, blktiger_to_main_w))
+	I8751(config, m_mcu, XTAL(24'000'000)/4); /* ??? */
+	m_mcu->port_in_cb<0>().set(FUNC(blktiger_state::blktiger_from_main_r));
+	m_mcu->port_out_cb<0>().set(FUNC(blktiger_state::blktiger_to_main_w));
 	// other ports unknown
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
+	//m_mcu->set_vblank_int("screen", FUNC(blktiger_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -317,14 +316,13 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blktiger_state, screen_update_blktiger)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blktiger)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

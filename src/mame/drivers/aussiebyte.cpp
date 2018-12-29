@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_crt8002);
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

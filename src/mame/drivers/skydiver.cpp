@@ -107,7 +107,7 @@
  *
  *************************************/
 
-static const int colortable_source[] =
+static constexpr unsigned colortable_source[] =
 {
 	0x02, 0x00,
 	0x02, 0x01,
@@ -115,22 +115,13 @@ static const int colortable_source[] =
 	0x01, 0x02
 };
 
-PALETTE_INIT_MEMBER(skydiver_state, skydiver)
+void skydiver_state::skydiver_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	constexpr rgb_t colors[]{ rgb_t::black(), rgb_t::white(), rgb_t(0xa0, 0xa0, 0xa0) }; // black, white, grey
+	for (unsigned i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 	{
-		rgb_t color;
-
-		switch (colortable_source[i])
-		{
-		case 0:   color = rgb_t::black(); break;
-		case 1:   color = rgb_t::white(); break;
-		default:  color = rgb_t(0xa0, 0xa0, 0xa0); break; /* grey */
-		}
-
-		palette.set_pen_color(i, color);
+		assert(colortable_source[i] < ARRAY_LENGTH(colors));
+		palette.set_pen_color(i, colors[colortable_source[i]]);
 	}
 }
 
@@ -384,18 +375,15 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skydiver)
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
-	MCFG_PALETTE_INIT_OWNER(skydiver_state, skydiver)
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_skydiver)
+	PALETTE(config, m_palette, FUNC(skydiver_state::skydiver_palette), ARRAY_LENGTH(colortable_source));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, skydiver_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, skydiver_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

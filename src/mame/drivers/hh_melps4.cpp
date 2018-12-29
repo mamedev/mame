@@ -36,7 +36,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m58846_device> m_maincpu;
 	optional_ioport_array<4> m_inp_matrix; // max 4
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
@@ -297,13 +297,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M58846, 600_kHz_XTAL)
-	MCFG_MELPS4_READ_K_CB(READ16(*this, cfrogger_state, input_r))
-	MCFG_MELPS4_WRITE_S_CB(WRITE8(*this, cfrogger_state, plate_w))
-	MCFG_MELPS4_WRITE_F_CB(WRITE8(*this, cfrogger_state, plate_w))
-	MCFG_MELPS4_WRITE_G_CB(WRITE8(*this, cfrogger_state, plate_w))
-	MCFG_MELPS4_WRITE_D_CB(WRITE16(*this, cfrogger_state, grid_w))
-	MCFG_MELPS4_WRITE_T_CB(WRITELINE(*this, cfrogger_state, speaker_w))
+	M58846(config, m_maincpu, 600_kHz_XTAL);
+	m_maincpu->read_k().set(FUNC(cfrogger_state::input_r));
+	m_maincpu->write_s().set(FUNC(cfrogger_state::plate_w));
+	m_maincpu->write_f().set(FUNC(cfrogger_state::plate_w));
+	m_maincpu->write_g().set(FUNC(cfrogger_state::plate_w));
+	m_maincpu->write_d().set(FUNC(cfrogger_state::grid_w));
+	m_maincpu->write_t().set(FUNC(cfrogger_state::speaker_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -412,14 +412,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gjungler_state::gjungler)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M58846, 600_kHz_XTAL)
-	MCFG_MELPS4_READ_K_CB(READ16(*this, gjungler_state, input_r))
-	MCFG_MELPS4_WRITE_S_CB(WRITE8(*this, gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_F_CB(WRITE8(*this, gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_G_CB(WRITE8(*this, gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_U_CB(WRITE8(*this, gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_D_CB(WRITE16(*this, gjungler_state, grid_w))
-	MCFG_MELPS4_WRITE_T_CB(WRITELINE(*this, gjungler_state, speaker_w))
+	M58846(config, m_maincpu, 600_kHz_XTAL);
+	m_maincpu->read_k().set(FUNC(gjungler_state::input_r));
+	m_maincpu->write_s().set(FUNC(gjungler_state::plate_w));
+	m_maincpu->write_f().set(FUNC(gjungler_state::plate_w));
+	m_maincpu->write_g().set(FUNC(gjungler_state::plate_w));
+	m_maincpu->write_u().set(FUNC(gjungler_state::plate_w));
+	m_maincpu->write_d().set(FUNC(gjungler_state::grid_w));
+	m_maincpu->write_t().set(FUNC(gjungler_state::speaker_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")

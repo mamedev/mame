@@ -14,6 +14,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65sc02.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
@@ -140,7 +141,7 @@ public:
 
 	DECLARE_VIDEO_START(bbc);
 
-	DECLARE_PALETTE_INIT(bbc);
+	void bbc_colours(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(tape_timer_cb);
 	TIMER_CALLBACK_MEMBER(reset_timer_cb);

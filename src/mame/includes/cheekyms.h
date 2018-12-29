@@ -31,28 +31,30 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(port_40_w);
-	DECLARE_WRITE8_MEMBER(port_80_w);
-
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-
-	TILE_GET_INFO_MEMBER(get_tile_info);
-
-	DECLARE_PALETTE_INIT(cheekyms);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cheekyms(machine_config &config);
-	void io_map(address_map &map);
-	void main_map(address_map &map);
+
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+private:
+	DECLARE_WRITE8_MEMBER(port_40_w);
+	DECLARE_WRITE8_MEMBER(port_80_w);
+
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void cheekyms_palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip);
 
-private:
+	void io_map(address_map &map);
+	void main_map(address_map &map);
+
 	// devices
 	required_device<cpu_device>             m_maincpu;
 	required_device<cheekyms_audio_device>  m_sound_board;

@@ -499,11 +499,10 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(lockon_state, screen_update_lockon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lockon_state, screen_vblank_lockon))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockon)
-	MCFG_PALETTE_ADD("palette", 1024 + 2048)
-	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockon);
+	PALETTE(config, m_palette, FUNC(lockon_state::lockon_palette), 1024 + 2048);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

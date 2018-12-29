@@ -881,9 +881,8 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	outlatch.q_out_cb<3>().set(FUNC(turbo_state::start_lamp_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::turbo_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -921,9 +920,8 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::subroc3d_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -969,9 +967,8 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::buckrog_palette), 1024);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -992,16 +989,17 @@ MACHINE_CONFIG_START(turbo_state::buckrogu)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(turbo_state::buckroge)
+void turbo_state::buckroge(machine_config &config)
+{
 	buckrog(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(buckrog_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5014_device &maincpu(SEGA_315_5014(config.replace(), m_maincpu, MASTER_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &turbo_state::buckrog_map);
+	maincpu.set_addrmap(AS_OPCODES, &turbo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(turbo_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 /*************************************
  *

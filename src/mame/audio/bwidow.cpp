@@ -148,32 +148,29 @@ static DISCRETE_SOUND_START(gravitar_discrete)
 
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_START(bwidow_state::bwidow_audio)
+void bwidow_state::bwidow_audio(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8) /* C/D3 */
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
-	MCFG_POKEY_OUTPUT_OPAMP(BW_R51, BW_C31, 5.0)
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK / 8)); /* C/D3 */
+	pokey1.allpot_r().set_ioport("DSW0");
+	pokey1.set_output_opamp(BW_R51, BW_C31, 5.0);
+	pokey1.add_route(0, "discrete", 1.0, 0);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK / 8) /* B3 */
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
-	MCFG_POKEY_OUTPUT_OPAMP(BW_R47, BW_C32, 5.0)
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK / 8)); /* B3 */
+	pokey2.allpot_r().set_ioport("DSW1");
+	pokey2.set_output_opamp(BW_R47, BW_C32, 5.0);
+	pokey2.add_route(0, "discrete", 1.0, 1);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, bwidow_discrete)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, "discrete", bwidow_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	//MCFG_QUANTUM_PERFECT_CPU("pokey1")
+}
 
-MACHINE_CONFIG_END
+void bwidow_state::gravitar_audio(machine_config &config)
+{
+	subdevice<pokey_device>("pokey1")->set_output_opamp_low_pass(BW_R51, GRAV_C34, 5.0); /* BW_C31 ignored */
 
-MACHINE_CONFIG_START(bwidow_state::gravitar_audio)
-	MCFG_DEVICE_MODIFY("pokey1")
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(BW_R51, GRAV_C34, 5.0) /* BW_C31 ignored */
-
-	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(gravitar_discrete)
-MACHINE_CONFIG_END
+	subdevice<discrete_sound_device>("discrete")->set_intf(gravitar_discrete);
+}

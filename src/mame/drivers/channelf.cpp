@@ -21,12 +21,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#ifndef VERBOSE
-#define VERBOSE 0
-#endif
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
 #define MASTER_CLOCK_PAL    2000000  /* PAL unit has a separate crystal at 4.000 MHz */
 #define PAL_VBLANK_TIME     4623
 
@@ -227,8 +221,7 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
+	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -254,8 +247,7 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
+	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -282,8 +274,7 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
+	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -310,8 +301,7 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
+	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -346,7 +336,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS           INIT        COMPANY         FULLNAME                                FLAGS */
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS           INIT        COMPANY         FULLNAME                                FLAGS
 CONS( 1976, channelf, 0,        0,        channelf, channelf, channelf_state, empty_init, "Fairchild",    "Channel F",                            0 )
 CONS( 1977, sabavdpl, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "SABA",         "SABA Videoplay",                       0 )
 CONS( 197?, luxorves, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "Luxor",        "Luxor Video Entertainment System",     0 )

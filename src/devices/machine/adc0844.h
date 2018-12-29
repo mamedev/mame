@@ -34,7 +34,7 @@ class adc0844_device : public device_t
 {
 public:
 	// construction/destruction
-	adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto intr_callback() { return m_intr_cb.bind(); }
@@ -70,7 +70,7 @@ class adc0848_device : public adc0844_device
 {
 public:
 	// construction/destruction
-	adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto ch5_callback() { return m_ch5_cb.bind(); }

@@ -578,17 +578,16 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seicupbl_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	//crtc.layer_en_callback().set(FUNC(seicupbl_state::tilemap_enable_w));
 	//crtc.layer_scroll_callback().set(FUNC(seicupbl_state::tile_scroll_w));
 	//crtc.reg_1a_callback().set(FUNC(seicupbl_state::tile_vreg_1a_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicupbl_csb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seicupbl_csb);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 //  MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
 

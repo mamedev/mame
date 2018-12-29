@@ -394,7 +394,7 @@ void playmark_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 					color,
 					flipx,0,
 					sx + m_xoffset,sy + m_yoffset,
-					screen.priority(),m_pri_masks[pri],0);
+					screen.priority(),m_pri_masks[pri],m_sprtranspen);
 	}
 }
 
@@ -431,7 +431,7 @@ void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 
 					code,
 					color,
 					flipx,0,
-					sx + m_xoffset,sy + m_yoffset, 0);
+					sx + m_xoffset,sy + m_yoffset, m_sprtranspen);
 	}
 }
 

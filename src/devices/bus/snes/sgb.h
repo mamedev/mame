@@ -51,11 +51,12 @@ protected:
 
 	void supergb_map(address_map &map);
 
-private:
 	required_device<lr35902_cpu_device> m_sgb_cpu;
 	required_device<gameboy_sound_device> m_sgb_apu;
 	required_device<sgb_ppu_device> m_sgb_ppu;
 	required_device<gb_cart_slot_device> m_cartslot;
+
+private:
 	required_memory_region m_region_bios;
 
 	void lcd_render(uint32_t *source);

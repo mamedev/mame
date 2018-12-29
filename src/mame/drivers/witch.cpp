@@ -989,23 +989,22 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_witch)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_witch)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	es8712_device &essnd(ES8712(config, "essnd", 0));
+	essnd.msm_write_handler().set("msm", FUNC(msm5205_device::data_w));
+	essnd.set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	msm5205_device &msm(MSM5205(config, "msm", MSM5202_CLOCK));   /* actually MSM5202 */
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	ym2203_device &ym1(YM2203(config, "ym1", YM2203_CLOCK));     /* 3 MHz */
 	ym1.port_a_read_callback().set_ioport("YM_PortA");
@@ -1027,8 +1026,7 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 0x200+0x80)
+	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
 
 //  MCFG_PALETTE_FORMAT(IIBBGGRR)

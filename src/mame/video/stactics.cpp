@@ -60,26 +60,25 @@ tilt the mirror up and down, and the monitor left and right.
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(stactics_state,stactics)
+void stactics_state::stactics_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x400; i++)
+	for (int i = 0; i < 0x400; i++)
 	{
-		int bit0 = (color_prom[i] >> 0) & 0x01;
-		int bit1 = (color_prom[i] >> 1) & 0x01;
-		int bit2 = (color_prom[i] >> 2) & 0x01;
-		int bit3 = (color_prom[i] >> 3) & 0x01;
+		int const bit0 = BIT(color_prom[i], 0);
+		int const bit1 = BIT(color_prom[i], 1);
+		int const bit2 = BIT(color_prom[i], 2);
+		int const bit3 = BIT(color_prom[i], 3);
 
-		/* red component */
-		int r = 0xff * bit0;
+		// red component
+		int const r = 0xff * bit0;
 
-		/* green component */
-		int g = 0xff * bit1 - 0xcc * bit3;
+		// green component
+		int const g = 0xff * bit1 - 0xcc * bit3;
 
-		/* blue component */
-		int b = 0xff * bit2;
+		// blue component
+		int const b = 0xff * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -437,7 +436,5 @@ MACHINE_CONFIG_START(stactics_state::stactics_video)
 	MCFG_SCREEN_UPDATE_DRIVER(stactics_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-
-	MCFG_PALETTE_INIT_OWNER(stactics_state,stactics)
+	PALETTE(config, "palette", FUNC(stactics_state::stactics_palette), 0x400);
 MACHINE_CONFIG_END

@@ -178,11 +178,11 @@ private:
 
 	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(miniboy7);
+	void miniboy7_palette(palette_device &palette) const;
 
 	void miniboy7_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	required_shared_ptr<uint8_t> m_videoram_a;
@@ -256,48 +256,50 @@ MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 	}
 }
 
-PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
+void miniboy7_state::miniboy7_palette(palette_device &palette) const
 {
-/*
-    prom bits
-    7654 3210
-    ---- ---x   red component?.
-    ---- --x-   green component?.
-    ---- -x--   blue component?.
-    ---- x---   intensity?.
-    xxxx ----   unused.
-*/
-	int i;
+	/*
+		prom bits
+		7654 3210
+		---- ---x   red component?.
+		---- --x-   green component?.
+		---- -x--   blue component?.
+		---- x---   intensity?.
+		xxxx ----   unused.
+	*/
 
 	/* 0000IBGR */
-	if (m_proms == nullptr) return;
+	if (!m_proms)
+		return;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
+		int const intenmin = 0xe0;
+//      int const intenmin = 0xc2;
+		int const intenmax = 0xff;
 
-		intenmin = 0xe0;
-//      intenmin = 0xc2;
-		intenmax = 0xff;
+		// intensity component
+		int const inten = BIT(m_proms[i], 3);
 
-		/* intensity component */
-		inten = (m_proms[i] >> 3) & 0x01;
+		// red component
+		int const r = BIT(m_proms[i], 0) * (inten ? intenmax : intenmin);
 
-		/* red component */
-		bit0 = (m_proms[i] >> 0) & 0x01;
-		r = (bit0 * intenmin) + (inten * (bit0 * (intenmax - intenmin)));
+		// green component
+		int const g = BIT(m_proms[i], 1) * (inten ? intenmax : intenmin);
 
-		/* green component */
-		bit1 = (m_proms[i] >> 1) & 0x01;
-		g = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
-
-		/* blue component */
-		bit2 = (m_proms[i] >> 2) & 0x01;
-		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
-
+		// blue component
+		int const b = BIT(m_proms[i], 2) * (inten ? intenmax : intenmin);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+}
+
+void miniboy7_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_ay_pb));
+	save_item(NAME(m_gpri));
 }
 
 void miniboy7_state::machine_reset()
@@ -536,8 +538,7 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_miniboy7)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
+	PALETTE(config, m_palette, FUNC(miniboy7_state::miniboy7_palette), 256);
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 12)); /* guess */
 	crtc.set_screen("screen");

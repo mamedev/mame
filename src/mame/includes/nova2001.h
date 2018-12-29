@@ -56,8 +56,8 @@ private:
 	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
 
 	DECLARE_VIDEO_START(nova2001);
-	DECLARE_PALETTE_INIT(nova2001);
-	DECLARE_PALETTE_DECODER(BBGGRRII);
+	void nova2001_palette(palette_device &palette) const;
+	static rgb_t BBGGRRII(uint32_t raw);
 	DECLARE_MACHINE_START(ninjakun);
 	DECLARE_VIDEO_START(ninjakun);
 	DECLARE_VIDEO_START(pkunwar);

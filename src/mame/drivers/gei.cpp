@@ -992,7 +992,7 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	PALETTE(config, "palette", palette_device::GBR_3BIT);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1031,8 +1031,7 @@ MACHINE_CONFIG_START(gei_state::quizvid)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(quizvid_map)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_3BIT_GRB("palette")
+	PALETTE(config.replace(), "palette", palette_device::GRB_3BIT);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::gselect)

@@ -3,31 +3,31 @@
 #include "emu.h"
 #include "includes/pcktgal.h"
 
-PALETTE_INIT_MEMBER(pcktgal_state, pcktgal)
+void pcktgal_state::pcktgal_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (int i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i] >> 4) & 0x01;
-		bit1 = (color_prom[i] >> 5) & 0x01;
-		bit2 = (color_prom[i] >> 6) & 0x01;
-		bit3 = (color_prom[i] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[i + palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[i + palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[i + palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		bit2 = BIT(color_prom[i], 6);
+		bit3 = BIT(color_prom[i], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + palette.entries()], 0);
+		bit1 = BIT(color_prom[i + palette.entries()], 1);
+		bit2 = BIT(color_prom[i + palette.entries()], 2);
+		bit3 = BIT(color_prom[i + palette.entries()], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -63,19 +63,19 @@ void pcktgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t pcktgal_state::screen_update_pcktgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool flip = m_tilegen1->get_flip_state();
-	m_tilegen1->set_flip_screen(flip);
-	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	bool flip = m_tilegen->get_flip_state();
+	m_tilegen->set_flip_screen(flip);
+	m_tilegen->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(bitmap, cliprect, flip);
 	return 0;
 }
 
 uint32_t pcktgal_state::screen_update_pcktgalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool flip = m_tilegen1->get_flip_state();
-	m_tilegen1->set_flip_screen(flip);
+	bool flip = m_tilegen->get_flip_state();
+	m_tilegen->set_flip_screen(flip);
 	// the bootleg doesn't properly set the tilemap registers, because it's on non-original hardware, which probably doesn't have the flexible tilemaps.
-	m_tilegen1->deco_bac06_pf_draw_bootleg(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);
+	m_tilegen->deco_bac06_pf_draw_bootleg(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);
 	draw_sprites(bitmap, cliprect, flip);
 	return 0;
 }

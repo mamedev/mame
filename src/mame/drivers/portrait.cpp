@@ -262,7 +262,6 @@ MACHINE_CONFIG_START(portrait_state::portrait)
 	MCFG_DEVICE_ADD("audiocpu", I8039, 3120000)  /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(portrait_sound_map)
 
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -271,20 +270,17 @@ MACHINE_CONFIG_START(portrait_state::portrait)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 0*8, 40*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(portrait_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portrait)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x40)
-	MCFG_PALETTE_INIT_OWNER(portrait_state, portrait)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_portrait);
+	PALETTE(config, m_palette, FUNC(portrait_state::portrait_palette), 0x800, 0x40);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("tms", TMS5200, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	TMS5200(config, m_tms, 640000).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

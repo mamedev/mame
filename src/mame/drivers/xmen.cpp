@@ -321,20 +321,18 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -364,9 +362,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -392,13 +388,13 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	m_k052109->set_palette("palette");
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_SET_SCREEN("screen")
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_screen(m_screen);
+	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 

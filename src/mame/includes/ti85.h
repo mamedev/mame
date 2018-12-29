@@ -185,10 +185,10 @@ private:
 	DECLARE_READ8_MEMBER(ti84pse_port_0056_r);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ti85);
+	void ti85_palette(palette_device &palette);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_MACHINE_RESET(ti83p);
-	DECLARE_PALETTE_INIT(ti82);
+	void ti82_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(ti86);
 	DECLARE_MACHINE_START(ti83p);
 	DECLARE_MACHINE_START(ti83pse);

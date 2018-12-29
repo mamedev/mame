@@ -23,23 +23,21 @@ void starshp1_state::set_pens()
 }
 
 
-PALETTE_INIT_MEMBER(starshp1_state, starshp1)
+void starshp1_state::starshp1_palette(palette_device &palette) const
 {
-	int i;
-
-	static const uint16_t colortable_source[] =
+	static constexpr uint16_t colortable_source[] =
 	{
-		0, 3,       /* 0x00 - 0x01 - alpha numerics */
-		0, 2,       /* 0x02 - 0x03 - sprites (Z=0) */
-		0, 5,       /* 0x04 - 0x05 - sprites (Z=1) */
-		0, 2, 4, 6, /* 0x06 - 0x09 - spaceship (EXPLODE=0) */
-		0, 6, 6, 7, /* 0x0a - 0x0d - spaceship (EXPLODE=1) */
-		5, 2,       /* 0x0e - 0x0f - star field */
-		7,          /* 0x10        - phasor */
-		5, 7        /* 0x11        - circle */
+		0, 3,       // 0x00 - 0x01 - alpha numerics
+		0, 2,       // 0x02 - 0x03 - sprites (Z=0)
+		0, 5,       // 0x04 - 0x05 - sprites (Z=1)
+		0, 2, 4, 6, // 0x06 - 0x09 - spaceship (EXPLODE=0)
+		0, 6, 6, 7, // 0x0a - 0x0d - spaceship (EXPLODE=1)
+		5, 2,       // 0x0e - 0x0f - star field
+		7,          // 0x10        - phasor
+		5, 7        // 0x11        - circle
 	};
 
-	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (unsigned i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 		palette.set_pen_indirect(i, colortable_source[i]);
 }
 

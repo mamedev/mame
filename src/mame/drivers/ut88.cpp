@@ -202,9 +202,9 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 28*8-1)
 	MCFG_VIDEO_START_OVERRIDE(ut88_state,ut88)
 	MCFG_SCREEN_UPDATE_DRIVER(ut88_state, screen_update_ut88)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ut88)
 
 	/* audio hardware */

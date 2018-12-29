@@ -117,11 +117,11 @@ static GFXDECODE_START( gfx_mm1 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( mm1_state, mm1 )
+void mm1_state::mm1_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x00,0x00,0x00));
-	palette.set_pen_color(1, rgb_t(0x00,0x7F,0x0A)); // dark green ("highlight" mode color)
-	palette.set_pen_color(2, rgb_t(0x08,0xD0,0x1A)); // bright green (normal color)
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x0a)); // dark green ("highlight" mode color)
+	palette.set_pen_color(2, rgb_t(0x08, 0xd0, 0x1a)); // bright green (normal color)
 }
 
 
@@ -137,9 +137,8 @@ MACHINE_CONFIG_START(mm1_state::mm1m6_video)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 375-1 )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'720'000), ...)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mm1)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(mm1_state, mm1)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm1);
+	PALETTE(config, m_palette, FUNC(mm1_state::mm1_palette), 3);
 
 	MCFG_DEVICE_ADD(I8275_TAG, I8275, XTAL(18'720'000)/8)
 	MCFG_I8275_CHARACTER_WIDTH(HORIZONTAL_CHARACTER_PIXELS)

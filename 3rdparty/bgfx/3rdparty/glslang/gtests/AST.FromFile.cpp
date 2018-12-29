@@ -41,12 +41,26 @@ namespace {
 
 using CompileToAstTest = GlslangTest<::testing::TestWithParam<std::string>>;
 
+#ifdef NV_EXTENSIONS
+using CompileToAstTestNV = GlslangTest<::testing::TestWithParam<std::string>>;
+#endif
+
 TEST_P(CompileToAstTest, FromFile)
 {
     loadFileCompileAndCheck(GlobalTestSettings.testRoot, GetParam(),
-                            Source::GLSL, Semantics::OpenGL,
+                            Source::GLSL, Semantics::OpenGL, glslang::EShTargetVulkan_1_0,
                             Target::AST);
 }
+
+#ifdef NV_EXTENSIONS
+// Compiling GLSL to SPIR-V under OpenGL semantics (NV extensions enabled).
+TEST_P(CompileToAstTestNV, FromFile)
+{
+    loadFileCompileAndCheck(GlobalTestSettings.testRoot, GetParam(),
+                            Source::GLSL, Semantics::OpenGL, glslang::EShTargetVulkan_1_0,
+                            Target::AST);
+}
+#endif
 
 // clang-format off
 INSTANTIATE_TEST_CASE_P(
@@ -85,6 +99,7 @@ INSTANTIATE_TEST_CASE_P(
         "cppComplexExpr.vert",
         "cppDeepNest.frag",
         "cppPassMacroName.frag",
+        "cppRelaxSkipTokensErrors.vert",
         "badChars.frag",
         "pointCoord.frag",
         "array.frag",
@@ -106,6 +121,7 @@ INSTANTIATE_TEST_CASE_P(
         "310.tese",
         "310implicitSizeArrayError.vert",
         "310AofA.vert",
+        "310runtimeArray.vert",
         "320.comp",
         "320.vert",
         "320.geom",
@@ -184,11 +200,15 @@ INSTANTIATE_TEST_CASE_P(
         "loopsArtificial.frag",
         "matrix.frag",
         "matrix2.frag",
+        "mixedArrayDecls.frag",
+        "nonuniform.frag",
         "newTexture.frag",
         "Operations.frag",
         "overlongLiteral.frag",
         "prepost.frag",
+        "runtimeArray.vert",
         "simpleFunctionCall.frag",
+        "stringToDouble.vert",
         "structAssignment.frag",
         "structDeref.frag",
         "structure.frag",
@@ -210,9 +230,21 @@ INSTANTIATE_TEST_CASE_P(
         "precise.tesc",
         "precise_struct_block.vert",
         "maxClipDistances.vert",
+        "findFunction.frag",
+        "constantUnaryConversion.comp"
     })),
     FileNameAsCustomTestSuffix
 );
+
+#ifdef NV_EXTENSIONS
+INSTANTIATE_TEST_CASE_P(
+    Glsl, CompileToAstTestNV,
+    ::testing::ValuesIn(std::vector<std::string>({
+        "nvShaderNoperspectiveInterpolation.frag",
+    })),
+    FileNameAsCustomTestSuffix
+);
+#endif
 // clang-format on
 
 }  // anonymous namespace

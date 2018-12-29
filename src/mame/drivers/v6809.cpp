@@ -50,6 +50,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -294,7 +295,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
 
 	/* sound hardware */
@@ -310,8 +311,8 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row), this);
 	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr), this);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(v6809_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)

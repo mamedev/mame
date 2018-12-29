@@ -38,8 +38,8 @@
 class kongambl_state : public driver_device
 {
 public:
-	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kongambl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_k053252(*this, "k053252"),
 		m_k055673(*this, "k055673"),
@@ -51,7 +51,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")
-		{ }
+	{ }
 
 	void kongambl(machine_config &config);
 
@@ -665,28 +665,27 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD
 	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(kongambl_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -48+1, -23)
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -48+1, -23);
+	m_k055673->set_palette(m_palette);
 
 #if CUSTOM_DRAW
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tasman);
 #endif
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(kongambl_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8TASMAN, 0, 0);
+	m_k056832->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -220,7 +220,7 @@ void mc2661_device::rcv_complete()
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( mc2661_device::read )
+uint8_t mc2661_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -260,7 +260,7 @@ READ8_MEMBER( mc2661_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( mc2661_device::write )
+void mc2661_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{

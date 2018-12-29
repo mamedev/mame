@@ -127,11 +127,10 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc_state, kc_scanline, "screen", 0, 1)
 
-	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(kc_state, kc85 )
+	PALETTE(config, "palette", FUNC(kc_state::kc85_palette), KC85_PALETTE_SIZE);
 
-	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL(4'000'000))
-	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(*this, kc_state, keyboard_cb))
+	kc_keyboard_device &keyboard(KC_KEYBOARD(config, "keyboard", XTAL(4'000'000)));
+	keyboard.out_wr_callback().set(FUNC(kc_state::keyboard_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -208,11 +207,10 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc85_4_state, kc_scanline, "screen", 0, 1)
 
-	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(kc85_4_state, kc85 )
+	PALETTE(config, "palette", FUNC(kc85_4_state::kc85_palette), KC85_PALETTE_SIZE);
 
-	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL(4'000'000))
-	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(*this, kc_state, keyboard_cb))
+	kc_keyboard_device &keyboard(KC_KEYBOARD(config, "keyboard", XTAL(4'000'000)));
+	keyboard.out_wr_callback().set(FUNC(kc_state::keyboard_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

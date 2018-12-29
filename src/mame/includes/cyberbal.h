@@ -17,6 +17,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cyberbal_base_state : public atarigen_state
@@ -94,6 +95,7 @@ public:
 		m_playfield2(*this, "playfield2"),
 		m_alpha2(*this, "alpha2"),
 		m_mob2(*this, "mob2"),
+		m_rpalette(*this, "rpalette"),
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen")
 	{ }
@@ -147,6 +149,7 @@ private:
 	required_device<tilemap_device> m_playfield2;
 	required_device<tilemap_device> m_alpha2;
 	required_device<atari_motion_objects_device> m_mob2;
+	required_device<palette_device> m_rpalette;
 	required_device<screen_device> m_lscreen;
 	required_device<screen_device> m_rscreen;
 

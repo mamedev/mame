@@ -478,14 +478,13 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SCREEN_SIZE(304, 224)
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rpunch)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rpunch);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2); // verified from rpunch schematics
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
@@ -529,14 +528,13 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_SCREEN_SIZE(304, 224)
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_svolleybl)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_svolleybl);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2);
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 

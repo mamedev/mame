@@ -24,8 +24,8 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 
-	READ8_MEMBER( read ) override;
-	WRITE8_MEMBER( write ) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:

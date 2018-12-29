@@ -69,7 +69,6 @@ keeping track of it in a variable in the driver.
 #include "emu.h"
 #include "includes/dgnalpha.h"
 #include "sound/ay8910.h"
-#include "imagedev/flopdrv.h"
 
 //-------------------------------------------------
 //  device_start

@@ -79,7 +79,7 @@ public:
 
 	uint32_t screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_VIDEO_START(williams);
-	DECLARE_PALETTE_INIT(williams);
+	void williams_palette(palette_device &palette) const;
 
 protected:
 	enum

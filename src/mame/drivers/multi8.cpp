@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_multi8)
 
 	/* Audio */

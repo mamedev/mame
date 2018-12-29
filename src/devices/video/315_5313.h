@@ -13,7 +13,7 @@
 
 
 #define MCFG_SEGA315_5313_IS_PAL(_bool) \
-	downcast<sega315_5313_device &>(*device).set_signal_type(_bool);
+	downcast<sega315_5313_device &>(*device).set_is_pal(_bool);
 
 #define MCFG_SEGA315_5313_INT_CB(_devcb) \
 	downcast<sega315_5313_device &>(*device).set_int_callback(DEVCB_##_devcb);
@@ -34,10 +34,10 @@
 	downcast<sega315_5313_device &>(*device).set_alt_timing(_data);
 
 #define MCFG_SEGA315_5313_PAL_WRITE_BASE(_data) \
-	downcast<sega315_5313_device &>(*device).set_palwrite_base(_data);
+	downcast<sega315_5313_device &>(*device).set_pal_write_base(_data);
 
 #define MCFG_SEGA315_5313_PALETTE(_palette_tag) \
-	downcast<sega315_5313_device &>(*device).set_palette_tag(_palette_tag);
+	downcast<sega315_5313_device &>(*device).set_palette(_palette_tag);
 
 
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
@@ -70,9 +70,13 @@ public:
 	template <class Object> devcb_base &set_sndirqline_callback(Object &&cb) { return m_sndirqline_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_lv6irqline_callback(Object &&cb) { return m_lv6irqline_callback.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_lv4irqline_callback(Object &&cb) { return m_lv4irqline_callback.set_callback(std::forward<Object>(cb)); }
+	auto snd_irq() { return m_sndirqline_callback.bind(); }
+	auto lv6_irq() { return m_lv6irqline_callback.bind(); }
+	auto lv4_irq() { return m_lv4irqline_callback.bind(); }
+
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
-	void set_palwrite_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
-	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	void set_pal_write_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
+	template <typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	template <typename Object> void set_md_32x_scanline(Object &&cb) { m_32x_scanline_func = std::forward<Object>(cb); }
 	template <typename Object> void set_md_32x_interrupt(Object &&cb) { m_32x_interrupt_func = std::forward<Object>(cb); }

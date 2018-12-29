@@ -1071,9 +1071,9 @@ MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cxhumax_state, screen_update_cxhumax)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
+	GENERIC_TERMINAL(config, m_terminal, 0);
 MACHINE_CONFIG_END
 
 ROM_START( hxhdci2k )

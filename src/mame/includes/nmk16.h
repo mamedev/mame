@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
 #include "machine/nmk004.h"

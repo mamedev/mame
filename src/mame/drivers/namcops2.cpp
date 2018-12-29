@@ -894,7 +894,7 @@ private:
 	void ps2_map(address_map &map);
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<mips3_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void video_start() override;
@@ -919,25 +919,27 @@ void namcops2_state::ps2_map(address_map &map)
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(namcops2_state::system246)
-	MCFG_DEVICE_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_DEVICE_PROGRAM_MAP(ps2_map)
+void namcops2_state::system246(machine_config &config)
+{
+	R5000LE(config, m_maincpu, 294000000); // actually R5900 @ 294 MHz
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcops2_state::ps2_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(namcops2_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(namcops2_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
 
-	MCFG_PALETTE_ADD("palette", 65536)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(65536);
+}
 
-MACHINE_CONFIG_START(namcops2_state::system256)
+void namcops2_state::system256(machine_config &config)
+{
 	system246(config);
-MACHINE_CONFIG_END
+}
 
 #define SYSTEM246_BIOS  \
 	ROM_LOAD( "r27v1602f.7d", 0x000000, 0x200000, CRC(2b2e41a2) SHA1(f0a74bbcaf801f3fd0b7002ebd0118564aae3528) )

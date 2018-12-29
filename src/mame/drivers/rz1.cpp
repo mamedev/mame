@@ -61,7 +61,7 @@ public:
 
 	void rz1(machine_config &config);
 
-	DECLARE_PALETTE_INIT(rz1);
+	void rz1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
@@ -335,7 +335,7 @@ void rz1_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(rz1_state, rz1)
+void rz1_state::rz1_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t(92, 83, 88));    // lcd pixel on
@@ -346,7 +346,8 @@ PALETTE_INIT_MEMBER(rz1_state, rz1)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START( rz1_state::rz1 )
+void rz1_state::rz1(machine_config &config)
+{
 	UPD7811(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rz1_state::map);
 	m_maincpu->pa_in_cb().set(FUNC(rz1_state::port_a_r));
@@ -364,8 +365,7 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(rz1_state, rz1)
+	PALETTE(config, "palette", FUNC(rz1_state::rz1_palette), 3);
 
 	HD44780(config, m_hd44780, 0);
 	m_hd44780->set_lcd_size(1, 16);
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 	UPD934G(config, m_pg[1], 1280000);
 	m_pg[1]->data_callback().set(FUNC(rz1_state::upd934g_b_data_r));
 	m_pg[1]->add_route(ALL_OUTPUTS, "speaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

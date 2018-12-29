@@ -7,19 +7,32 @@
 
 #include "machine/naomibd.h"
 
-#define MCFG_NAOMI_GDROM_BOARD_ADD(_tag, _image_tag, _pic_tag, _eeprom_tag, _irq_cb) \
-	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_GDROM_BOARD, _eeprom_tag, _irq_cb) \
-	downcast<naomi_gdrom_board &>(*device).set_tags(_image_tag, _pic_tag);
 
 class naomi_gdrom_board : public naomi_board
 {
 public:
+	template <typename T, typename U>
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&eeprom_tag, const char *_image_tag, U &&picregion_tag)
+		: naomi_gdrom_board(mconfig, tag, owner, clock)
+	{
+		eeprom.set_tag(std::forward<T>(eeprom_tag));
+		set_image_tag(_image_tag);
+		picdata.set_tag(std::forward<U>(picregion_tag));
+	}
+
+	template <typename T>
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *_image_tag, T &&picregion_tag)
+		: naomi_gdrom_board(mconfig, tag, owner, clock)
+	{
+		picdata.set_tag(std::forward<T>(picregion_tag));
+		set_image_tag(_image_tag);
+	}
+
 	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_tags(const char *_image_tag, const char *_pic_tag)
+	void set_image_tag(const char *_image_tag)
 	{
 		image_tag = _image_tag;
-		pic_tag = _pic_tag;
 	}
 
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
@@ -37,7 +50,8 @@ protected:
 private:
 	enum { FILENAME_LENGTH=24 };
 
-	const char *image_tag, *pic_tag;
+	const char *image_tag;
+	optional_region_ptr<uint8_t> picdata;
 
 	uint32_t dimm_cur_address;
 

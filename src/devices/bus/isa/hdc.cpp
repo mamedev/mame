@@ -216,10 +216,10 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("primary").c_str()));
+		img = subdevice<harddisk_image_device>("primary");
 		break;
 	case 1:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("slave").c_str()));
+		img = subdevice<harddisk_image_device>("slave");
 		break;
 	}
 	if ( img == nullptr )

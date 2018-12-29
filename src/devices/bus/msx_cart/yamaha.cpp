@@ -46,7 +46,8 @@ msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, cons
 }
 
 
-MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
+void msx_cart_sfg_device::device_add_mconfig(machine_config &config)
+{
 	// YM2151 (OPM)
 	// YM3012 (DAC)
 	// YM2148 (MKS)
@@ -64,13 +65,11 @@ MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
 	m_ym2148->port_read_handler().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
 	m_ym2148->irq_handler().set(FUNC(msx_cart_sfg_device::ym2148_irq_w));
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
+	MSX_AUDIO_KBDC_PORT(config, m_kbdc, msx_audio_keyboards, nullptr);
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE("ym2148", ym2148_device, write_rxd))
-MACHINE_CONFIG_END
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("ym2148", FUNC(ym2148_device::write_rxd));
+}
 
 
 ROM_START( msx_sfg01 )

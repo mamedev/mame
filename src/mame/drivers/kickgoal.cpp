@@ -34,7 +34,6 @@ lev 7 : 0x7c : 0000 0000 - x
 #include "includes/kickgoal.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -202,7 +201,7 @@ void kickgoal_state::kickgoal_program_map(address_map &map)
 	map(0x900000, 0x90ffff).nopw(); // during startup
 	map(0x900000, 0x900005).w(FUNC(kickgoal_state::kickgoal_eeprom_w));
 	map(0x900006, 0x900007).r(FUNC(kickgoal_state::kickgoal_eeprom_r));
-	
+
 	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
 	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
 	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
@@ -361,7 +360,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
 	case 0x02: m_okibank->set_entry(1); break;
 	case 0x01: m_okibank->set_entry(3); break;
 	default: m_okibank->set_entry(2); break; // not used
-	}	
+	}
 }
 
 READ8_MEMBER(kickgoal_state::soundio_port_b_r)
@@ -426,14 +425,14 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(12'000'000)/3)  /* 4MHz ? */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, kickgoal_state, soundio_port_a_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, kickgoal_state, soundio_port_b_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, kickgoal_state, soundio_port_b_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, kickgoal_state, soundio_port_c_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, kickgoal_state, soundio_port_c_w))
+	PIC16C57(config, m_audiocpu, XTAL(12'000'000)/3);  /* 4MHz ? */
+	m_audiocpu->write_a().set(FUNC(kickgoal_state::soundio_port_a_w));
+	m_audiocpu->read_b().set(FUNC(kickgoal_state::soundio_port_b_r));
+	m_audiocpu->write_b().set(FUNC(kickgoal_state::soundio_port_b_w));
+	m_audiocpu->read_c().set(FUNC(kickgoal_state::soundio_port_c_r));
+	m_audiocpu->write_c().set(FUNC(kickgoal_state::soundio_port_c_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
@@ -444,11 +443,10 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kickgoal)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kickgoal);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
 
@@ -482,11 +480,10 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actionhw)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_actionhw);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
 

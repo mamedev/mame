@@ -82,6 +82,7 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"

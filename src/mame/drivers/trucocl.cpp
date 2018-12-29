@@ -198,9 +198,8 @@ MACHINE_CONFIG_START(trucocl_state::trucocl)
 	MCFG_SCREEN_UPDATE_DRIVER(trucocl_state, screen_update_trucocl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trucocl)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(trucocl_state, trucocl)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_trucocl);
+	PALETTE(config, "palette", FUNC(trucocl_state::trucocl_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

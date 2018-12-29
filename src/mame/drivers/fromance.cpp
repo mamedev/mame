@@ -928,8 +928,8 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 14318180 / 2) // clock not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, 14318181 / 2); // clock not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
@@ -973,8 +973,8 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
@@ -1018,8 +1018,8 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 

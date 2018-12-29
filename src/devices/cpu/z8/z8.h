@@ -30,6 +30,7 @@ protected:
 	{
 		Z8_PC, Z8_SP, Z8_RP,
 		Z8_IMR, Z8_IRQ, Z8_IPR,
+		Z8_P0, Z8_P1, Z8_P2, Z8_P3,
 		Z8_P01M, Z8_P3M, Z8_P2M,
 		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR,
 
@@ -66,14 +67,17 @@ protected:
 
 	void program_map(address_map &map);
 	void preprogrammed_map(address_map &map);
+	void register_map(address_map &map);
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	address_space_config m_register_config;
 
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
+	address_space *m_regs;
 
 	// callbacks
 	devcb_read8 m_input_cb[4];
@@ -81,43 +85,93 @@ private:
 
 	uint32_t m_rom_size;
 
-	/* registers */
-	uint16_t m_pc;              /* program counter */
-	uint16_t m_ppc;             /* program counter at last opcode fetch */
-	uint8_t m_r[256];           /* register file */
-	uint8_t m_input[4];         /* port input latches */
-	uint8_t m_output[4];        /* port output latches */
-	uint8_t m_t0;               /* timer 0 current count */
-	uint8_t m_t1;               /* timer 1 current count */
+	// basic registers
+	uint16_t m_pc;              // program counter
+	uint16_t m_ppc;             // program counter at last opcode fetch
+	PAIR16 m_sp;                // stack pointer (8-bit for internal stack, 16-bit for external stack)
+	uint8_t m_rp;               // register pointer
+	uint8_t m_flags;            // condition flags
+	uint8_t m_imr;              // interrupt mask
+	uint8_t m_irq;              // interrupt request
+	uint8_t m_ipr;              // interrupt priority
 
-	/* fake registers */
-	uint16_t m_fake_sp;         /* fake stack pointer */
-	uint8_t m_fake_r[16];       /* fake working registers */
+	// port registers
+	uint8_t m_input[4];         // port input latches
+	uint8_t m_output[4];        // port output latches
+	uint8_t m_p01m;             // port 0/1 mode
+	uint8_t m_p2m;              // port 2 mode
+	uint8_t m_p3m;              // port 3 mode
 
-	/* interrupts */
-	int m_irq_line[4];          /* IRQ line state */
+	// timer registers
+	uint8_t m_tmr;              // timer mode
+	uint8_t m_t[2];             // initial values
+	uint8_t m_count[2];         // current counts
+	uint8_t m_pre[2];           // prescalers
+
+	// fake registers
+	uint8_t m_fake_r[16];       // fake working registers
+
+	// interrupts
+	int m_irq_line[4];          // IRQ line state
 	bool m_irq_taken;
+	bool m_irq_initialized;     // IRQ must be unlocked by EI after reset
 
-	/* execution logic */
-	int m_icount;             /* instruction counter */
+	// execution logic
+	int32_t m_icount;           // instruction counter
 
-	/* timers */
+	// timers
 	emu_timer *m_t0_timer;
 	emu_timer *m_t1_timer;
 
 	TIMER_CALLBACK_MEMBER( t0_tick );
 	TIMER_CALLBACK_MEMBER( t1_tick );
 
+	void request_interrupt(int irq);
 	void take_interrupt(int irq);
 	void process_interrupts();
+
+	uint8_t p0_read();
+	void p0_write(uint8_t data);
+	uint8_t p1_read();
+	void p1_write(uint8_t data);
+	uint8_t p2_read();
+	void p2_write(uint8_t data);
+	uint8_t p3_read();
+	void p3_write(uint8_t data);
+	uint8_t sio_read();
+	void sio_write(uint8_t data);
+	uint8_t tmr_read();
+	void tmr_write(uint8_t data);
+	uint8_t t0_read();
+	void t0_write(uint8_t data);
+	uint8_t t1_read();
+	void t1_write(uint8_t data);
+	void pre0_write(uint8_t data);
+	void pre1_write(uint8_t data);
+	void p01m_write(uint8_t data);
+	void p2m_write(uint8_t data);
+	void p3m_write(uint8_t data);
+	void ipr_write(uint8_t data);
+	uint8_t irq_read();
+	void irq_write(uint8_t data);
+	uint8_t imr_read();
+	void imr_write(uint8_t data);
+	uint8_t flags_read();
+	void flags_write(uint8_t data);
+	uint8_t rp_read();
+	void rp_write(uint8_t data);
+	uint8_t sph_read();
+	void sph_write(uint8_t data);
+	uint8_t spl_read();
+	void spl_write(uint8_t data);
 
 	inline uint16_t mask_external_address(uint16_t addr);
 	inline uint8_t fetch();
 	inline uint8_t fetch_opcode();
 	inline uint16_t fetch_word();
-	inline uint8_t register_read(uint8_t offset);
+	inline uint8_t register_read(uint8_t offset) { return m_regs->read_byte(offset); }
 	inline uint16_t register_pair_read(uint8_t offset);
-	inline void register_write(uint8_t offset, uint8_t data);
+	inline void register_write(uint8_t offset, uint8_t data) { m_regs->write_byte(offset, data); }
 	inline void register_pair_write(uint8_t offset, uint16_t data);
 	inline uint8_t get_working_register(int offset);
 	inline uint8_t get_register(uint8_t offset);

@@ -8,7 +8,7 @@
 #include "machine/i8255.h"
 #include "emupal.h"
 
-typedef device_delegate<uint16_t const (uint16_t)> igs017_igs031_palette_scramble_delegate;
+typedef device_delegate<uint16_t (uint16_t)> igs017_igs031_palette_scramble_delegate;
 
 
 class igs017_igs031_device : public device_t,

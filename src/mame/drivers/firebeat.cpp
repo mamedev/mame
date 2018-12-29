@@ -177,8 +177,8 @@ struct IBUTTON
 class firebeat_state : public driver_device
 {
 public:
-	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	firebeat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_work_ram(*this, "work_ram"),
@@ -1165,9 +1165,9 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 
 void firebeat_state::cdrom_config(device_t *device)
 {
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 static void firebeat_ata_devices(device_slot_interface &device)
@@ -1178,9 +1178,9 @@ static void firebeat_ata_devices(device_slot_interface &device)
 MACHINE_CONFIG_START(firebeat_state::firebeat)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(firebeat_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firebeat_state,  firebeat_interrupt)
+	PPC403GCX(config, m_maincpu, XTAL(64'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_map);
+	m_maincpu->set_vblank_int("screen", FUNC(firebeat_state::firebeat_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
@@ -1193,23 +1193,21 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
-
-	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
+	m_ata->slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	K057714(config, m_gcu[0], 0);
 	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_0)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
+	screen.set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
@@ -1217,11 +1215,11 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
-	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.irq_handler().set(FUNC(firebeat_state::sound_irq_callback));
+	ymz.set_addrmap(0, &firebeat_state::ymz280b_map);
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
 
 	PC16552D(config, "duart_com", 0);  // pgmd to 9600baud
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
@@ -1231,14 +1229,14 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	midi_chan0.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch0_irq_callback));
 	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
 	midi_chan1.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch1_irq_callback));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(firebeat_state::firebeat2)
-
+void firebeat_state::firebeat2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(firebeat2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
+	PPC403GCX(config, m_maincpu, XTAL(64'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat2_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(firebeat_state::firebeat_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
@@ -1251,12 +1249,10 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
-
-	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
+	m_ata->slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	K057714(config, m_gcu[0], 0);
 	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));
@@ -1264,21 +1260,21 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	K057714(config, m_gcu[1], 0);
 	m_gcu[1]->irq_callback().set(FUNC(firebeat_state::gcu1_interrupt));
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_0)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	lscreen.set_size(640, 480);
+	lscreen.set_visarea(0, 639, 0, 479);
+	lscreen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
+	lscreen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	rscreen.set_size(640, 480);
+	rscreen.set_visarea(0, 639, 0, 479);
+	rscreen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_1));
+	rscreen.set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
@@ -1286,11 +1282,11 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
-	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.irq_handler().set(FUNC(firebeat_state::sound_irq_callback));
+	ymz.set_addrmap(0, &firebeat_state::ymz280b_map);
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
 
 	PC16552D(config, "duart_com", 0);
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
@@ -1301,26 +1297,27 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
 	midi_chan1.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch1_irq_callback));
 
-	MCFG_MIDI_KBD_ADD("kbd0", WRITELINE(midi_chan0, ins8250_uart_device, rx_w), 31250)
-	MCFG_MIDI_KBD_ADD("kbd1", WRITELINE(midi_chan1, ins8250_uart_device, rx_w), 31250)
-MACHINE_CONFIG_END
+	MIDI_KBD(config, m_kbd[0], 31250).tx_callback().set(midi_chan0, FUNC(ins8250_uart_device::rx_w));
+	MIDI_KBD(config, m_kbd[1], 31250).tx_callback().set(midi_chan1, FUNC(ins8250_uart_device::rx_w));
+}
 
-MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
+void firebeat_state::firebeat_spu(machine_config &config)
+{
 	firebeat(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", M68000, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(spu_map)
+	M68000(config, m_audiocpu, 16000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &firebeat_state::spu_map);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sputimer", firebeat_state, spu_timer_callback, attotime::from_hz(1000));
+	TIMER(config, "sputimer").configure_periodic(FUNC(firebeat_state::spu_timer_callback), attotime::from_hz(1000));
 
-	MCFG_DEVICE_ADD("rf5c400", RF5C400, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	rf5c400_device &rf5c400(RF5C400(config, "rf5c400", XTAL(16'934'400)));
+	rf5c400.add_route(0, "lspeaker", 1.0);
+	rf5c400.add_route(1, "rspeaker", 1.0);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_state::spu_ata_interrupt));
-MACHINE_CONFIG_END
+}
 
 /*****************************************************************************/
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
