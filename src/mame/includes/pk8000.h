@@ -33,7 +33,7 @@ protected:
 	DECLARE_READ8_MEMBER(color_r);
 	DECLARE_WRITE8_MEMBER(color_w);
 
-	DECLARE_PALETTE_INIT(pk8000);
+	void pk8000_palette(palette_device &palette) const;
 	uint32_t video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *videomem);
 
 	uint8_t m_text_start;

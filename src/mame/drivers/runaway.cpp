@@ -369,7 +369,7 @@ void runaway_state::runaway(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_runaway);
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

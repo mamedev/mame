@@ -67,12 +67,12 @@ void superqix_state::video_start()
 	save_item(NAME(*m_fg_bitmap[1]));
 }
 
-PALETTE_DECODER_MEMBER( superqix_state_base, BBGGRRII )
+rgb_t superqix_state_base::BBGGRRII(uint32_t raw)
 {
-	uint8_t i = raw & 3;
-	uint8_t r = (raw >> 0) & 0x0c;
-	uint8_t g = (raw >> 2) & 0x0c;
-	uint8_t b = (raw >> 4) & 0x0c;
+	uint8_t const i = raw & 3;
+	uint8_t const r = (raw >> 0) & 0x0c;
+	uint8_t const g = (raw >> 2) & 0x0c;
+	uint8_t const b = (raw >> 4) & 0x0c;
 
 	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
 }

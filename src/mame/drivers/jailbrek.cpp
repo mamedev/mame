@@ -271,15 +271,13 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jailbrek)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
+	PALETTE(config, m_palette, FUNC(jailbrek_state::jailbrek_palette), 512, 32);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jailbrek_state, vblank_irq))
 
 	/* sound hardware */

@@ -222,10 +222,10 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 //  add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sega315_5313_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, DERIVED_CLOCK(1, 15))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.5, 0)
-MACHINE_CONFIG_END
+void sega315_5313_device::device_add_mconfig(machine_config &config)
+{
+	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+}
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 {
@@ -249,18 +249,11 @@ void sega315_5313_device::device_start()
 	m_32x_interrupt_func.bind_relative_to(*owner());
 	m_32x_scanline_helper_func.bind_relative_to(*owner());
 
-	m_vram  = std::make_unique<uint16_t[]>(0x10000/2);
-	m_cram  = std::make_unique<uint16_t[]>(0x80/2);
-	m_vsram = std::make_unique<uint16_t[]>(0x80/2);
-	m_regs = std::make_unique<uint16_t[]>(0x40/2);
-	m_internal_sprite_attribute_table = std::make_unique<uint16_t[]>(0x400/2);
-
-	memset(m_vram.get(), 0x00, 0x10000);
-	memset(m_cram.get(), 0x00, 0x80);
-	memset(m_vsram.get(), 0x00, 0x80);
-	memset(m_regs.get(), 0x00, 0x40);
-	memset(m_internal_sprite_attribute_table.get(), 0x00, 0x400);
-
+	m_vram  = make_unique_clear<uint16_t[]>(0x10000/2);
+	m_cram  = make_unique_clear<uint16_t[]>(0x80/2);
+	m_vsram = make_unique_clear<uint16_t[]>(0x80/2);
+	m_regs = make_unique_clear<uint16_t[]>(0x40/2);
+	m_internal_sprite_attribute_table = make_unique_clear<uint16_t[]>(0x400/2);
 
 	save_pointer(NAME(m_vram), 0x10000/2);
 	save_pointer(NAME(m_cram), 0x80/2);
@@ -292,18 +285,11 @@ void sega315_5313_device::device_start()
 	m_highpri_renderline = std::make_unique<uint8_t[]>(320);
 	m_video_renderline = std::make_unique<uint32_t[]>(320);
 
-	m_palette_lookup = std::make_unique<uint16_t[]>(0x40);
-	m_palette_lookup_sprite = std::make_unique<uint16_t[]>(0x40);
+	m_palette_lookup = make_unique_clear<uint16_t[]>(0x40);
+	m_palette_lookup_sprite = make_unique_clear<uint16_t[]>(0x40);
 
-	m_palette_lookup_shadow = std::make_unique<uint16_t[]>(0x40);
-	m_palette_lookup_highlight = std::make_unique<uint16_t[]>(0x40);
-
-	memset(m_palette_lookup.get(),0x00,0x40*2);
-	memset(m_palette_lookup_sprite.get(),0x00,0x40*2);
-
-	memset(m_palette_lookup_shadow.get(),0x00,0x40*2);
-	memset(m_palette_lookup_highlight.get(),0x00,0x40*2);
-
+	m_palette_lookup_shadow = make_unique_clear<uint16_t[]>(0x40);
+	m_palette_lookup_highlight = make_unique_clear<uint16_t[]>(0x40);
 
 	if (!m_use_alt_timing)
 		m_render_bitmap = std::make_unique<bitmap_rgb32>(320, 512); // allocate maximum sizes we're going to use, it's safer.

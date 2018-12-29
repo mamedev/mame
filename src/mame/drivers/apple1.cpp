@@ -134,7 +134,6 @@ private:
 
 	emu_timer *m_ready_start_timer, *m_ready_end_timer, *m_kbd_strobe_timer;
 
-	DECLARE_PALETTE_INIT(apple2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
@@ -605,7 +604,7 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));

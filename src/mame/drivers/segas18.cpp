@@ -1307,18 +1307,18 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
  *
  *************************************/
 
-MACHINE_CONFIG_START(segas18_state::system18)
-
+void segas18_state::system18(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(system18_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_state::system18_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas18_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, 8000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas18_state::sound_portmap);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	SEGA_315_5195_MEM_MAPPER(config, m_mapper, 10000000, m_maincpu);
 	m_mapper->set_mapper(FUNC(segas18_state::memory_mapper), this);
@@ -1336,27 +1336,36 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	m_io->out_cnt1_callback().set(m_segaic16vid, FUNC(segaic16_video_device::set_display_enable));
 	m_io->out_cnt2_callback().set(FUNC(segas18_state::set_vdp_enable));
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 15000000, "maincpu") // ??? Frequency is a complete guess
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_sndirqline_callback_s18));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_lv6irqline_callback_s18));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_lv4irqline_callback_s18));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x2000);
-	MCFG_SEGA315_5313_PALETTE("palette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.0)
+	SEGA315_5313(config, m_vdp, 15000000, m_maincpu); // ??? Frequency is a complete guess
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(segas18_state::vdp_sndirqline_callback_s18));
+	m_vdp->lv6_irq().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
+	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
+	m_vdp->set_alt_timing(1);
+	m_vdp->set_pal_write_base(0x2000);
+	m_vdp->set_palette(m_palette);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.0);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);
 
 	// video hardware
+<<<<<<< HEAD
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.23) // verified on pcb
 	MCFG_SCREEN_SIZE(342,262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
+=======
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57.23); // verified on pcb
+	m_screen->set_size(342,262);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas18_state::screen_update));
+	m_screen->set_palette(m_palette);
+>>>>>>> b49825bf25c256656556d97beb12625504356adb
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas18)
-	MCFG_PALETTE_ADD("palette", 2048*3+2048 + 64*3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas18);
+	PALETTE(config, m_palette).set_entries(2048*3+2048 + 64*3);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -1364,28 +1373,28 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
+	ym3438_device &ym1(YM3438(config, "ym1", 8000000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
+	ym1.irq_handler().set_inputline("soundcpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ym2", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym3438_device &ym2(YM3438(config, "ym2", 8000000));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C68, 10000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
-MACHINE_CONFIG_END
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10000000));
+	rfsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	rfsnd.set_addrmap(0, &segas18_state::pcm_map);
+}
 
-
-MACHINE_CONFIG_START(segas18_state::system18_fd1094)
+void segas18_state::system18_fd1094(machine_config &config)
+{
 	system18(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REPLACE("maincpu", FD1094, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(system18_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_state::system18_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas18_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas18_state::irq4_line_hold));
+}
 
 void segas18_state::lghost_fd1094(machine_config &config)
 {
@@ -1435,33 +1444,33 @@ void segas18_state::wwally(machine_config &config)
 	m_upd4701[2]->set_porty_tag("TRACKY3");
 }
 
-MACHINE_CONFIG_START(segas18_state::system18_i8751)
+void segas18_state::system18_i8751(machine_config &config)
+{
 	system18(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_REMOVE()
+	m_maincpu->set_vblank_int(device_interrupt_delegate(), nullptr);
 
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, 8000000);
+	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
+}
 
-MACHINE_CONFIG_START(segas18_state::system18_fd1094_i8751)
+void segas18_state::system18_fd1094_i8751(machine_config &config)
+{
 	system18_fd1094(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_REMOVE()
+	m_maincpu->set_vblank_int(device_interrupt_delegate(), nullptr);
 
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, 8000000);
+	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
+}
 
 
 

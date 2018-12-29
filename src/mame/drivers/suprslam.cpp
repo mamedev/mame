@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	io.porte_input_cb().set_ioport("DSW2");
 	io.porth_output_cb().set(FUNC(suprslam_state::spr_ctrl_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprslam)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprslam);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -295,10 +295,9 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suprslam_state, screen_update_suprslam)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x800);
 
 	VSYSTEM_SPR(config, m_spr, 0);
 	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::suprslam_tile_callback), this);

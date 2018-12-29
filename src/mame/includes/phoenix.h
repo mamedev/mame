@@ -36,9 +36,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_RESET(phoenix);
 	DECLARE_VIDEO_START(phoenix);
-	DECLARE_PALETTE_INIT(phoenix);
-	DECLARE_PALETTE_INIT(survival);
-	DECLARE_PALETTE_INIT(pleiads);
+	void phoenix_palette(palette_device &palette) const;
+	void survival_palette(palette_device &palette) const;
+	void pleiads_palette(palette_device &palette) const;
 	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(survival_protection_r);
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);

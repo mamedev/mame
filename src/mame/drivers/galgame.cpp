@@ -21,10 +21,11 @@
 class galaxygame_state : public driver_device
 {
 public:
-	galaxygame_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galaxygame_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void galaxygame(machine_config &config);
 
@@ -342,7 +343,7 @@ void galaxygame_state::galaxygame(machine_config &config)
 	screen.set_screen_update(FUNC(galaxygame_state::screen_update_galaxygame));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 }
 
 ROM_START(galgame)

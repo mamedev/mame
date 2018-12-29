@@ -977,15 +977,15 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	m_screen->set_screen_update(FUNC(gaelco3d_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", 32768).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: front mono */
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: left rear */
-	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: right rear */
-	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: seat speaker */
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: front mono
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: left rear
+	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: right rear
+	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 1.0);  // speedup: seat speaker
 }
 
 

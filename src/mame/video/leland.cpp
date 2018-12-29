@@ -513,8 +513,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(leland_state::leland_video)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_leland)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 1024);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -522,13 +521,12 @@ MACHINE_CONFIG_START(leland_state::leland_video)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(leland_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ataxx_state::ataxx_video)
 	leland_video(config);
 
 	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_ataxx)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	m_palette->set_format(palette_device::xRGB_444, 1024);
 MACHINE_CONFIG_END

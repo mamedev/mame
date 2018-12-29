@@ -602,8 +602,8 @@ MACHINE_CONFIG_START(imds2ioc_device::device_add_mconfig)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update("ioccrtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_imds2);
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_imds2);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_iocbeep, IOC_BEEP_FREQ).add_route(ALL_OUTPUTS, "mono", 1.00);

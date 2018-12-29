@@ -117,13 +117,14 @@ Eproms are 27512,27010,274001
 class multigam_state : public driver_device
 {
 public:
-	multigam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	multigam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu"),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
-		m_dsw(*this, "DSW") { }
+		m_dsw(*this, "DSW")
+	{ }
 
 	void multigam(machine_config &config);
 	void supergm3(machine_config &config);
@@ -135,6 +136,11 @@ public:
 	void init_multigm3();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -177,6 +183,7 @@ private:
 	int m_vrom4k;
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
+
 	DECLARE_WRITE8_MEMBER(multigam_nt_w);
 	DECLARE_READ8_MEMBER(multigam_nt_r);
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
@@ -195,10 +202,6 @@ private:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(multigam);
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);

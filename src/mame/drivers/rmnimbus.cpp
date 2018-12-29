@@ -130,7 +130,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* Backing storage */
 	WD2793(config, m_fdc, 1000000);

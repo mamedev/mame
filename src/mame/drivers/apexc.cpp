@@ -377,7 +377,7 @@ void apexc_state::apexc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apexc);
 
-	PALETTE(config, m_palette, ARRAY_LENGTH(palette_table)).set_init(FUNC(apexc_state::palette_init_apexc));
+	PALETTE(config, m_palette, FUNC(apexc_state::apexc_palette), ARRAY_LENGTH(palette_table));
 
 	APEXC_CYLINDER(config, m_cylinder);
 	APEXC_TAPE_PUNCHER(config, m_tape_puncher);

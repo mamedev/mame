@@ -235,13 +235,13 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
 	INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(gamecom_state, gamecom)
+void gamecom_state::gamecom_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0x00, 0x00, 0x00 ); // Black
-	palette.set_pen_color(1, 0x0F, 0x4F, 0x2F ); // Gray 1
-	palette.set_pen_color(2, 0x6F, 0x8F, 0x4F ); // Gray 2
-	palette.set_pen_color(3, 0x8F, 0xCF, 0x8F ); // Grey 3
-	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
+	palette.set_pen_color(0, 0x00, 0x00, 0x00); // Black
+	palette.set_pen_color(1, 0x0f, 0x4f, 0x2f); // Gray 1
+	palette.set_pen_color(2, 0x6f, 0x8f, 0x4f); // Gray 2
+	palette.set_pen_color(3, 0x8f, 0xcf, 0x8f); // Grey 3
+	palette.set_pen_color(4, 0xdf, 0xff, 0x8f); // White
 }
 
 uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -277,8 +277,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_SCREEN_PALETTE("palette")
 
 	config.set_default_layout(layout_gamecom);
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
+	PALETTE(config, "palette", FUNC(gamecom_state::gamecom_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

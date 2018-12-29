@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 
 //  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skimaxx)
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

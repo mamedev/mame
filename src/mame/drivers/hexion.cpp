@@ -274,9 +274,7 @@ void hexion_state::hexion(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hexion);
-	PALETTE(config, m_palette, 256);
-	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms));
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

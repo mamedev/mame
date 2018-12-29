@@ -207,12 +207,13 @@
 class gluck2_state : public driver_device
 {
 public:
-	gluck2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	gluck2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram") { }
+		m_colorram(*this, "colorram")
+	{ }
 
 	void gluck2(machine_config &config);
 
@@ -505,7 +506,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gluck2)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16));    /* guess */
 	crtc.set_screen("screen");

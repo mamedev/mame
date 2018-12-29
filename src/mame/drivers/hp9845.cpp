@@ -3639,8 +3639,8 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	HP98X5_IO_SYS(config , m_io_sys , 0);
-	m_io_sys->irl().set([this](int state) { m_ppu->set_input_line(HPHYBRID_IRL , state); });
-	m_io_sys->irh().set([this](int state) { m_ppu->set_input_line(HPHYBRID_IRH , state); });
+	m_io_sys->irl().set_inputline(m_ppu, HPHYBRID_IRL);
+	m_io_sys->irh().set_inputline(m_ppu, HPHYBRID_IRH);
 	m_io_sys->sts().set(m_ppu , FUNC(hp_5061_3001_cpu_device::status_w));
 	m_io_sys->flg().set(m_ppu , FUNC(hp_5061_3001_cpu_device::flag_w));
 	m_io_sys->dmar().set(m_ppu , FUNC(hp_5061_3001_cpu_device::dmar_w));

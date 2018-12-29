@@ -265,9 +265,7 @@ void rollerg_state::rollerg(machine_config &config)
 	screen.set_screen_update(FUNC(rollerg_state::screen_update_rollerg));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 1024));
-	palette.enable_shadows();
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024).enable_shadows();
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette("palette");

@@ -33,8 +33,8 @@
 class pcjr_state : public driver_device
 {
 public:
-	pcjr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pcjr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pic8259(*this, "pic8259"),
 		m_pit8253(*this, "pit8253"),

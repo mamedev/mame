@@ -99,68 +99,68 @@
     1c                                  Zoom Y? low bits
     1e                                  Zoom Y? high bits *
 
-	24                                  1->0 in funcube3 and staraudi
+    24                                  1->0 in funcube3 and staraudi
     26                                  1->0 during INT0, before writing sprites
-	                                    (probably creates a custom format sprite list at 0x0000 by processing the list at 0x3000)
+                                        (probably creates a custom format sprite list at 0x0000 by processing the list at 0x3000)
 
     30          fedc ba98 7654 321-
                 ---- ---- ---- ---0     Disable video
 
     32..3f                              ?
 
-	Global X offset values based on penbros
+    Global X offset values based on penbros
 
-	0x1c0 - when zoom is smallest
-	counts up to 0x7ff
-	then 0x00 when finished
+    0x1c0 - when zoom is smallest
+    counts up to 0x7ff
+    then 0x00 when finished
 
-	counts up to 0x089 when zooming in
+    counts up to 0x089 when zooming in
 
-	Zoom values (both x and y) based on penbros and others (x flip/unflip logic is reverse of y logic)
+    Zoom values (both x and y) based on penbros and others (x flip/unflip logic is reverse of y logic)
 
-	(unflipped gfx)
-	0x7f5 00 = smallest
-	0x7ff 00 = normal
-	0x7ff xx = larger
+    (unflipped gfx)
+    0x7f5 00 = smallest
+    0x7ff 00 = normal
+    0x7ff xx = larger
 
-	(flipped gfx, negative zoom factor!, used instead of flipscreen bits in some cases)
-	0x00b 00 = smallest
-	0x001 00 = normal
-	0x001 xx = larger
+    (flipped gfx, negative zoom factor!, used instead of flipscreen bits in some cases)
+    0x00b 00 = smallest
+    0x001 00 = normal
+    0x001 xx = larger
 
 ***************************************************************************/
 
 /***************************************************************************
-  
+
   NON-BUGS
 
   grdians : After the fire rowscroll effect in the intro there is a small artifact
             left scrolling at the top of the screen when the next image is displayed
-			See 4:24 in https://www.youtube.com/watch?v=cvHGFEsB_cM
-   
+            See 4:24 in https://www.youtube.com/watch?v=cvHGFEsB_cM
+
 ***************************************************************************/
 
 WRITE16_MEMBER(seta2_state::vregs_w)
 {
 	/* 02/04 = horizontal display start/end
-			   mj4simai = 0065/01E5 (0180 visible area)
-			   myangel =  005D/01D5 (0178 visible area)
-			   pzlbowl =  0058/01D8 (0180 visible area)
-			   penbros =  0065/01A5 (0140 visible area)
-			   grdians =  0059/0188 (012f visible area)
+	           mj4simai = 0065/01E5 (0180 visible area)
+	           myangel =  005D/01D5 (0178 visible area)
+	           pzlbowl =  0058/01D8 (0180 visible area)
+	           penbros =  0065/01A5 (0140 visible area)
+	           grdians =  0059/0188 (012f visible area)
 	   06    = horizontal total?
-			   mj4simai = 0204
-			   myangel =  0200
-			   pzlbowl =  0204
-			   penbros =  01c0
-			   grdians =  019a
+	           mj4simai = 0204
+	           myangel =  0200
+	           pzlbowl =  0204
+	           penbros =  01c0
+	           grdians =  019a
 	*/
 
 	uint16_t olddata = m_vregs[offset];
 
 	COMBINE_DATA(&m_vregs[offset]);
 
-//	popmessage("%04x %04x", m_vregs[0x1e/2],  m_vregs[0x1c/2]);
+//  popmessage("%04x %04x", m_vregs[0x1e/2],  m_vregs[0x1c/2]);
 
 	if (m_vregs[offset] != olddata)
 		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
@@ -233,7 +233,7 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 						m_private_spriteram[i + 3] |= 0x4000;
 					}
 
-					break;  
+					break;
 				}
 			}
 
@@ -337,7 +337,7 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 					int pen_shift = 15 - shadow;
 					int pen_mask = (1 << pen_shift) - 1;
 					dest[sx] = ((dest[sx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
-				}					
+				}
 			}
 		}
 	}
@@ -362,7 +362,7 @@ inline void seta2_state::get_tile(uint16_t* spriteram, int is_16x16, int x, int 
 	if (is_16x16)
 	{
 		code &= ~3;
-		
+
 		if (!flipx)
 		{
 			if (x & 8)
@@ -419,7 +419,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	// HACK: this inverts the zoom on all sprites, thus flipping the screen and altering positions as the origin becomes the right hand side, not left, see star audition (by default) or deer hunting when you turn on horizontal flip
 	// TODO: properly render negative zoom sprites
-	if (global_xzoom & 0x400) 
+	if (global_xzoom & 0x400)
 	{
 		global_xoffset -= 0x14f;
 	}
@@ -454,7 +454,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (special)
 		{
 			use_shadow = 0;
-		//	which_gfx = 4 << 8;
+		//  which_gfx = 4 << 8;
 			global_yoffset = -0x90;
 			global_xoffset = 0x80;
 		}
@@ -590,7 +590,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 					int realfirstline = firstline;
 
-					if (firstline < cliprect.min_y)	realfirstline = cliprect.min_y;
+					if (firstline < cliprect.min_y) realfirstline = cliprect.min_y;
 					if (endline > cliprect.max_y) endline = cliprect.max_y;
 
 					for (int realline = realfirstline; realline <= endline; realline++)
@@ -627,7 +627,7 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 		{
 			m_tmp68301->external_interrupt_1();
 			logerror("external int (vpos is %d)\n", m_screen->vpos());
-		    m_screen->update_partial(m_screen->vpos() - 1);
+			m_screen->update_partial(m_screen->vpos() - 1);
 		}
 	}
 }

@@ -111,6 +111,11 @@ public:
 	{
 		configure_scanline(expired_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), screen, first_vpos, increment);
 	}
+	template <class FunctionClass> void configure_scanline(const char *devname, void (FunctionClass::*callback)(timer_device &, void *, s32),
+		const char *name, const char *screen, int first_vpos, int increment)
+	{
+		configure_scanline(expired_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), screen, first_vpos, increment);
+	}
 
 	template <typename Object> void set_callback(Object &&cb) { m_callback = std::forward<Object>(cb); }
 	template <class FunctionClass> void set_callback(void (FunctionClass::*callback)(timer_device &, void *, s32), const char *name)

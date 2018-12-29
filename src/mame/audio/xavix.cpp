@@ -483,8 +483,18 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 		{
 			if (data & bit)
 			{
-				// period should be based on m_sndtimer[t] at least, maybe also some other regs?
-				m_sound_timer[t]->adjust(attotime::from_usec(1000), t, attotime::from_usec(1000));
+				/* period should be based on m_sndtimer[t] at least, maybe also some other regs?
+
+				   rad_crdn : sound_timer0_w 06
+				   ddrfammt, popira etc. : sound_timer3_w 80
+				   so higher value definitely needs to be faster? (unless there's another multiplier elsewhere)
+
+				   11 is too fast (popira checked on various tracks, finish before getting to 100% then jump to 100%) where is this multiplier coming from? clock divided?
+				   10 seems close to correct for ddrfammt, popira, might need fine tuning.  seems too slow for rad_crdn / rad_bass?
+				   tweaked to 10.3f stay in time with the first song in https://www.youtube.com/watch?v=3x1C9bhC2rc
+				*/
+				attotime period = attotime::from_hz(10.3f * (m_sndtimer[t]));
+				m_sound_timer[t]->adjust(period, t, period);
 			}
 			else
 			{

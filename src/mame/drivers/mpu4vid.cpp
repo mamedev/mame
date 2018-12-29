@@ -1309,7 +1309,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4vid_state,mpu4_vid)
 	MCFG_VIDEO_START_OVERRIDE (mpu4vid_state,mpu4_vid)
 
-	PALETTE(config, m_palette, ef9369_device::NUMCOLORS);
+	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 
 	EF9369(config, "ef9369").set_color_update_callback(FUNC(mpu4vid_state::ef9369_color_update));
 

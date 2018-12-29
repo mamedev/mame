@@ -7,8 +7,8 @@
 
 **********************************************************************
 
-	Known Issues:
-	- Currently the FC expansion port is emulated as a control port
+    Known Issues:
+    - Currently the FC expansion port is emulated as a control port
 
 **********************************************************************/
 

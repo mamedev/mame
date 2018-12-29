@@ -493,8 +493,7 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
 	ADDRESS_MAP_BANK(config, "vrambank").set_map(&crgolf_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
 
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(crgolf_state, crgolf)
+	PALETTE(config, m_palette, FUNC(crgolf_state::crgolf_palette), 0x20);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -535,12 +534,7 @@ MACHINE_CONFIG_START(crgolf_state::mastrglf)
 	MCFG_DEVICE_IO_MAP(mastrglf_subio)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
-	MCFG_DEVICE_REMOVE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(crgolf_state, mastrglf)
-
-
+	PALETTE(config.replace(), m_palette, FUNC(crgolf_state::mastrglf_palette), 0x100);
 MACHINE_CONFIG_END
 
 

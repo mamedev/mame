@@ -286,9 +286,7 @@ void tunhunt_state::tunhunt(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tunhunt);
-	PALETTE(config, m_palette, 0x1a);
-	m_palette->set_indirect_entries(16);
-	m_palette->set_init(FUNC(tunhunt_state::palette_init_tunhunt));
+	PALETTE(config, m_palette, FUNC(tunhunt_state::tunhunt_palette), 0x1a, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -44,22 +44,23 @@ device_sound_interface::~device_sound_interface()
 
 device_sound_interface &device_sound_interface::add_route(u32 output, const char *target, double gain, u32 input, u32 mixoutput)
 {
-	assert(!device().started());
-	m_route_list.emplace_back(sound_route{ output, input, mixoutput, float(gain), device().mconfig().current_device(), target });
-	return *this;
+	return add_route(output, device().mconfig().current_device(), target, gain, input, mixoutput);
 }
 
 device_sound_interface &device_sound_interface::add_route(u32 output, device_sound_interface &target, double gain, u32 input, u32 mixoutput)
 {
-	assert(!device().started());
-	m_route_list.emplace_back(sound_route{ output, input, mixoutput, float(gain), target.device(), DEVICE_SELF });
-	return *this;
+	return add_route(output, target.device(), DEVICE_SELF, gain, input, mixoutput);
 }
 
 device_sound_interface &device_sound_interface::add_route(u32 output, speaker_device &target, double gain, u32 input, u32 mixoutput)
 {
+	return add_route(output, target, DEVICE_SELF, gain, input, mixoutput);
+}
+
+device_sound_interface &device_sound_interface::add_route(u32 output, device_t &base, const char *target, double gain, u32 input, u32 mixoutput)
+{
 	assert(!device().started());
-	m_route_list.emplace_back(sound_route{ output, input, mixoutput, float(gain), target, DEVICE_SELF });
+	m_route_list.emplace_back(sound_route{ output, input, mixoutput, float(gain), base, target });
 	return *this;
 }
 

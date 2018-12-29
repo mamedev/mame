@@ -109,8 +109,8 @@ private:
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
 	DECLARE_READ8_MEMBER(pio_pa_r);
 
-	DECLARE_PALETTE_DECODER(IIBBGGRR);
-	DECLARE_PALETTE_INIT(radar);
+	static rgb_t IIBBGGRR(uint32_t raw);
+	void radar_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);

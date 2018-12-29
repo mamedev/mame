@@ -236,9 +236,8 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usgames)
-	MCFG_PALETTE_ADD("palette", 2*256)
-	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_usgames);
+	PALETTE(config, "palette", FUNC(usgames_state::usgames_palette), 2*256);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 18_MHz_XTAL / 16));
 	crtc.set_screen("screen");

@@ -221,7 +221,7 @@ void piggypas_state::piggypas(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 8-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2);
+	PALETTE(config, "palette").set_entries(2);
 	config.set_default_layout(layout_piggypas);
 
 	hd44780_device &hd44780(HD44780(config, "hd44780"));

@@ -102,7 +102,7 @@ private:
 		uint8_t* chr;     // direct access to the memory
 	};
 
-	DECLARE_PALETTE_INIT(playch10);
+	void playch10_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(playch10_hboard);
 	DECLARE_VIDEO_START(playch10_hboard);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

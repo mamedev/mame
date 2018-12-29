@@ -348,10 +348,7 @@ void simpsons_state::simpsons(machine_config &config)
 	screen.set_screen_update(FUNC(simpsons_state::screen_update_simpsons));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2048));
-	palette.enable_shadows();
-	palette.enable_hilights();
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows().enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");

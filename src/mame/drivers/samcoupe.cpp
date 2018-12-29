@@ -472,22 +472,16 @@ INPUT_PORTS_END
          nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
 
 */
-PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
+void samcoupe_state::samcoupe_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 128; i++)
 	{
-		uint8_t b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
-		uint8_t r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
-		uint8_t g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
+		uint8_t const b = bitswap<3>(i, 4, 0, 3);
+		uint8_t const r = bitswap<3>(i, 5, 1, 3);
+		uint8_t const g = bitswap<3>(i, 6, 2, 3);
 
-		r <<= 5;
-		g <<= 5;
-		b <<= 5;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal3bit(b));
 	}
-
-	palette.palette()->normalize_range(0, 127);
 }
 
 
@@ -515,11 +509,11 @@ void samcoupe_state::samcoupe(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH,  0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT,
-	                                      SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
+										  SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
 	m_screen->set_screen_update(FUNC(samcoupe_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", 128).set_init(FUNC(samcoupe_state::palette_init_samcoupe));
+	PALETTE(config, "palette", FUNC(samcoupe_state::samcoupe_palette), 128);
 
 	/* devices */
 	CENTRONICS(config, m_lpt1, centronics_devices, "printer");

@@ -73,7 +73,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flag_output_w);
 	DECLARE_WRITE8_MEMBER(main_ram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(quizshow);
+	void quizshow_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 
@@ -99,13 +99,13 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(quizshow_state, quizshow)
+void quizshow_state::quizshow_palette(palette_device &palette) const
 {
 	palette.set_indirect_color(0, rgb_t::black());
 	palette.set_indirect_color(1, rgb_t::white());
 
 	// normal, blink/off, invert, blink+invert
-	const int lut_pal[16] = {
+	constexpr int lut_pal[16] = {
 		0, 0, 1, 0,
 		0, 0, 0, 0,
 		1, 0, 0, 0,
@@ -118,10 +118,10 @@ PALETTE_INIT_MEMBER(quizshow_state, quizshow)
 
 TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
 {
-	uint8_t code = m_main_ram[tile_index];
+	uint8_t const code = m_main_ram[tile_index];
 
 	// d6: blink, d7: invert
-	uint8_t color = (code & (m_blink_state | 0x80)) >> 6;
+	uint8_t const color = (code & (m_blink_state | 0x80)) >> 6;
 
 	SET_TILE_INFO_MEMBER(0, code & 0x3f, color, 0);
 }
@@ -407,9 +407,7 @@ void quizshow_state::quizshow(machine_config &config)
 	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizshow);
-	PALETTE(config, m_palette, 8*2);
-	m_palette->set_indirect_entries(2);
-	m_palette->set_init(FUNC(quizshow_state::palette_init_quizshow));
+	PALETTE(config, m_palette, FUNC(quizshow_state::quizshow_palette), 8*2, 2);
 
 	/* sound hardware (discrete) */
 	SPEAKER(config, "speaker").front_center();

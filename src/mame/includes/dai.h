@@ -65,24 +65,21 @@ private:
 	DECLARE_WRITE8_MEMBER(dai_pit_w);
 	DECLARE_READ8_MEMBER(dai_keyboard_r);
 	DECLARE_WRITE8_MEMBER(dai_keyboard_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dai);
+	void dai_palette(palette_device &palette) const;
 	uint32_t screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);
 
 	void dai_io(address_map &map);
 	void dai_mem(address_map &map);
+
+	static const rgb_t s_palette[16];
+
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
-
-
-/*----------- defined in video/dai.c -----------*/
-
-extern const unsigned char dai_palette[16*3];
 
 
 #endif // MAME_INCLUDES_DAI_H

@@ -17,19 +17,19 @@
         DAC (1 channel; can be used as tone generator)
     512KB or 1MB of RAM
     1MB of BIOS ROM (banked)
-		P/N 18-5301 ABD \\ HN62318BFC26
+        P/N 18-5301 ABD \\ HN62318BFC26
     LCD, 240x128 pixels (40x16 chars in MDA-compatible text mode)
 
     To do:
-	- blue on green LCD palette
-	- native keyboard
-	- 1MB model
-	- identify RTC core
+    - blue on green LCD palette
+    - native keyboard
+    - 1MB model
+    - identify RTC core
     - everything else
 
-	Technical info:
+    Technical info:
     - http://web.archive.org/web/20071012040320/http://www.daniel-hertrich.de/download/95lx_devguide.zip
-	- http://cd.textfiles.com/blackphilesii/PHILES/HP95/HP95DEV.ZIP
+    - http://cd.textfiles.com/blackphilesii/PHILES/HP95/HP95DEV.ZIP
 
     Useful links:
     - https://hermocom.com/hplx/view-all-hp-palmtop-articles/41-95lx
@@ -43,12 +43,12 @@
     - http://web.archive.org/web/20150423014908/http://www.sp.uconn.edu/~mchem1/HPLX.shtml
         HPLX-L mailing list archive
 
-	Software:
-	- http://www.retroisle.com/others/hp95lx/software.php
-	- http://www.mizj.com/
-	- http://www.hp200lx.net/
-	- http://www.nic.funet.fi/index/misc/hp95lx/Index
-	- http://cd.textfiles.com/blackphilesii/PHILES/HP95/
+    Software:
+    - http://www.retroisle.com/others/hp95lx/software.php
+    - http://www.mizj.com/
+    - http://www.hp200lx.net/
+    - http://www.nic.funet.fi/index/misc/hp95lx/Index
+    - http://cd.textfiles.com/blackphilesii/PHILES/HP95/
 
 ***************************************************************************/
 
@@ -106,10 +106,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
 		, m_p_chargen(*this, "gfx1")
-		{ }
-
-	DECLARE_MACHINE_START(hp95lx);
-	DECLARE_MACHINE_RESET(hp95lx);
+	{ }
 
 	DECLARE_WRITE8_MEMBER(d300_w);
 	DECLARE_READ8_MEMBER(d300_r);
@@ -118,13 +115,11 @@ public:
 	DECLARE_WRITE8_MEMBER(f300_w);
 	DECLARE_READ8_MEMBER(f300_r);
 
-	DECLARE_PALETTE_INIT(hp95lx);
 	void hp95lx(machine_config &config);
-	void hp95lx_io(address_map &map);
-	void hp95lx_map(address_map &map);
-	void hp95lx_romdos(address_map &map);
-
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev_c000;
 	required_device<address_map_bank_device> m_bankdev_d000;
@@ -141,6 +136,8 @@ protected:
 	required_device<screen_device> m_screen;
 
 private:
+	void hp95lx_palette(palette_device &palette) const;
+
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -151,6 +148,10 @@ private:
 	DECLARE_READ8_MEMBER(video_register_r);
 	DECLARE_WRITE8_MEMBER(video_register_w);
 	DECLARE_WRITE8_MEMBER(debug_w);
+
+	void hp95lx_io(address_map &map);
+	void hp95lx_map(address_map &map);
+	void hp95lx_romdos(address_map &map);
 
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -174,7 +175,7 @@ private:
 };
 
 
-PALETTE_INIT_MEMBER(hp95lx_state, hp95lx)
+void hp95lx_state::hp95lx_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
@@ -253,7 +254,7 @@ uint32_t hp95lx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-MACHINE_START_MEMBER(hp95lx_state, hp95lx)
+void hp95lx_state::machine_start()
 {
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_rtcram));
@@ -271,7 +272,7 @@ MACHINE_START_MEMBER(hp95lx_state, hp95lx)
 	memcpy(m_p_chargen + 0x0400, memregion("romdos")->base() + 0xfb200, 0x0400);
 }
 
-MACHINE_RESET_MEMBER(hp95lx_state, hp95lx)
+void hp95lx_state::machine_reset()
 {
 	std::fill(std::begin(m_mapper), std::end(m_mapper), 0);
 	std::fill(std::begin(m_rtcram), std::end(m_rtcram), 0);
@@ -614,12 +615,12 @@ WRITE8_MEMBER(hp95lx_state::video_register_w)
 		m_disp_start_addr = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff);
 		break;
 
-	case 0x0d: 
+	case 0x0d:
 		m_disp_start_addr = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00);
 		break;
 
 	case 0x0e:
-		m_cursor_addr = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff); 
+		m_cursor_addr = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff);
 		break;
 
 	case 0x0f:
@@ -699,9 +700,9 @@ void hp95lx_state::hp95lx_io(address_map &map)
 	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x004f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0063).rw(FUNC(hp95lx_state::keyboard_r), FUNC(hp95lx_state::keyboard_w));
-//	map(0x0090, 0x009f).w(FUNC(hp95lx_state::debug_w));
+//  map(0x0090, 0x009f).w(FUNC(hp95lx_state::debug_w));
 	map(0x03b0, 0x03bf).rw(FUNC(hp95lx_state::video_r), FUNC(hp95lx_state::video_w));
-//	map(0x0070, 0x007f)	RTC
+//  map(0x0070, 0x007f) RTC
 	map(0xd300, 0xd30f).rw(FUNC(hp95lx_state::d300_r), FUNC(hp95lx_state::d300_w));
 	map(0xe300, 0xe30f).rw(FUNC(hp95lx_state::e300_r), FUNC(hp95lx_state::e300_w));
 	map(0xf300, 0xf31f).rw(FUNC(hp95lx_state::f300_r), FUNC(hp95lx_state::f300_w));
@@ -713,9 +714,6 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	MCFG_DEVICE_PROGRAM_MAP(hp95lx_map)
 	MCFG_DEVICE_IO_MAP(hp95lx_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-
-	MCFG_MACHINE_START_OVERRIDE(hp95lx_state, hp95lx)
-	MCFG_MACHINE_RESET_OVERRIDE(hp95lx_state, hp95lx)
 
 	ADDRESS_MAP_BANK(config, "bankdev_c000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 	ADDRESS_MAP_BANK(config, "bankdev_d000").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
@@ -733,8 +731,6 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_MACHINE_RESET_OVERRIDE(hp95lx_state, hp95lx)
-
 	ISA8(config, m_isabus, 0);
 	m_isabus->set_cputag("maincpu");
 
@@ -748,15 +744,14 @@ MACHINE_CONFIG_START(hp95lx_state::hp95lx)
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // card slot
 
-	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.  
+	// XXX When the AC adapter is plugged in, the LCD refresh rate is 73.14 Hz.
 	// XXX When the AC adapter is not plugged in (ie, running off of batteries) the refresh rate is 56.8 Hz.
 	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DRIVER(hp95lx_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128)
-
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hp95lx_state, hp95lx)
+
+	PALETTE(config, "palette", FUNC(hp95lx_state::hp95lx_palette), 2);
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END

@@ -377,9 +377,8 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo16)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(2);

@@ -14,12 +14,12 @@
 #include "includes/midxunit.h"
 #include "midwayic.h"
 
-#define LOG_IO		(1 << 0)
-#define LOG_UART	(1 << 1)
-#define LOG_UNKNOWN	(1 << 2)
-#define LOG_SOUND	(1 << 3)
+#define LOG_IO      (1 << 0)
+#define LOG_UART    (1 << 1)
+#define LOG_UNKNOWN (1 << 2)
+#define LOG_SOUND   (1 << 3)
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 /*************************************

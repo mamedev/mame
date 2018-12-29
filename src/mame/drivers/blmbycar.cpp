@@ -381,12 +381,11 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 	MCFG_SCREEN_SIZE(0x180, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0x100-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blmbycar)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2000);
 
 	BLMBYCAR_SPRITES(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag("gfxdecode");

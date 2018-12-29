@@ -166,6 +166,10 @@ public:
 	void init_hotslot();
 	void init_altaten();
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
@@ -183,9 +187,6 @@ private:
 	void magic10_map(address_map &map);
 	void magic10a_map(address_map &map);
 	void sgsafari_map(address_map &map);
-
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
 
 	tilemap_t *m_layer0_tilemap;
 	tilemap_t *m_layer1_tilemap;
@@ -750,12 +751,11 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(magic10_state, screen_update_magic10)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 256);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magic10)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magic10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -208,6 +208,7 @@ protected:
 public:
 	virtual ~ppc_device() override;
 
+	void set_cache_dirty() { m_cache_dirty = true; }
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
@@ -227,6 +228,7 @@ public:
 	void ppc_cfunc_printf_debug();
 	void ppc_cfunc_printf_probe();
 	void ppc_cfunc_unimplemented();
+	void ppc_cfunc_ppccom_mismatch();
 	void ppccom_tlb_fill();
 	void ppccom_update_fprf();
 	void ppccom_dcstore_callback();

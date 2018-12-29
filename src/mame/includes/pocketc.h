@@ -5,9 +5,10 @@
  * includes/pocketc.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_POCKETC_H
 #define MAME_INCLUDES_POCKETC_H
+
+#pragma once
 
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
@@ -33,15 +34,15 @@ public:
 	void pocketc_base(machine_config &config);
 
 protected:
+	static const device_timer_id TIMER_POWER_UP = 0;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_PALETTE_INIT(pocketc);
+	void pocketc_palette(palette_device &palette) const;
 
 	void pocketc_draw_special(bitmap_ind16 &bitmap,int x, int y, const char* const *fig, int color);
-
-	static const device_timer_id TIMER_POWER_UP = 0;
 
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_READ_LINE_MEMBER(brk_r);

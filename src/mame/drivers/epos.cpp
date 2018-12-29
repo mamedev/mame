@@ -475,8 +475,7 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+	PALETTE(config, m_palette, FUNC(epos_state::epos_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -501,8 +500,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 
 	// RAM-based palette instead of prom
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
-//  MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+	PALETTE(config, m_palette, palette_device::BLACK, 32);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

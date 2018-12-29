@@ -43,8 +43,8 @@ Lower board (MGP_01):
 class monzagp_state : public driver_device
 {
 public:
-	monzagp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	monzagp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -60,9 +60,12 @@ public:
 		m_in1(*this, "IN1"),
 		m_dsw(*this, "DSW"),
 		m_digits(*this, "digit%u%u", 0U, 0U)
-		{ }
+	{ }
 
 	void monzagp(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	DECLARE_READ8_MEMBER(port_r);
@@ -70,10 +73,13 @@ private:
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
-	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
-	DECLARE_PALETTE_INIT(monzagp);
+	void monzagp_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void monzagp_io(address_map &map);
+	void monzagp_map(address_map &map);
+
 	required_device<i8035_device> m_maincpu;
 	required_device<dp8350_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -89,9 +95,6 @@ private:
 	required_ioport m_in1;
 	required_ioport m_dsw;
 	output_finder<4, 7> m_digits;
-
-	void monzagp_io(address_map &map);
-	void monzagp_map(address_map &map);
 
 	uint8_t m_p1;
 	uint8_t m_p2;
@@ -111,14 +114,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(monzagp_state::time_tick_timer)
 	m_time_tick = !m_time_tick;
 }
 
-PALETTE_INIT_MEMBER(monzagp_state, monzagp)
+void monzagp_state::monzagp_palette(palette_device &palette) const
 {
-	static const int r_resistances[3] = { 220, 1000, 3300 };
-	static const int g_resistances[3] = { 100, 470 , 1500 };
-	static const int b_resistances[3] = { 100, 470 , 1500 };
-	double rweights[3], gweights[3], bweights[3];
+	static constexpr int r_resistances[3] = { 220, 1000, 3300 };
+	static constexpr int g_resistances[3] = { 100, 470 , 1500 };
+	static constexpr int b_resistances[3] = { 100, 470 , 1500 };
 
 	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[3];
 	compute_resistor_weights(0, 255, -1.0,
 			3, &r_resistances[0], rweights, 0, 0,
 			3, &g_resistances[0], gweights, 0, 0,
@@ -126,9 +129,9 @@ PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		int bit0 = 0, bit1 = 0, bit2 = 0;
-		uint8_t d = m_proms->base()[0x400 + i] ^ 0x0f;
+		uint8_t const d = m_proms->base()[0x400 + i] ^ 0x0f;
 
+		int bit0 = 0, bit1 = 0, bit2 = 0;
 		if (d & 0x08)
 		{
 			bit1 = BIT(i, 0);
@@ -136,16 +139,16 @@ PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 		}
 
 		// red component
-		bit0 = (d >> 2) & 0x01;
-		int r = combine_3_weights(rweights, bit0, bit1, bit2);
+		bit0 = BIT(d, 2);
+		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
 
 		// green component
-		bit0 = (d >> 1) & 0x01;
-		int g = combine_3_weights(gweights, bit0, bit1, bit2);
+		bit0 = BIT(d, 1);
+		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
-		bit0 = (d >> 0) & 0x01;
-		int b = combine_3_weights(bweights, bit0, bit1, bit2);
+		bit0 = BIT(d, 0);
+		int const b = combine_3_weights(bweights, bit0, bit1, bit2);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -520,9 +523,8 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 	m_crtc->refresh_control(0);
 	m_crtc->vsync_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ).invert(); // active low; no inverter should be needed
 
-	PALETTE(config, m_palette, 0x200).set_init(FUNC(monzagp_state::palette_init_monzagp));
-
-	GFXDECODE(config, "gfxdecode", "palette", gfx_monzagp);
+	PALETTE(config, m_palette, FUNC(monzagp_state::monzagp_palette), 0x200);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_monzagp);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("time_tick_timer", monzagp_state, time_tick_timer, attotime::from_hz(4))
 

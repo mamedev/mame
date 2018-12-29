@@ -923,9 +923,7 @@ void polepos_state::polepos(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
-	PALETTE(config, m_palette, 0x0f00);
-	m_palette->set_indirect_entries(128);
-	m_palette->set_init(FUNC(polepos_state::palette_init_polepos));
+	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
 
 	config.set_default_layout(layout_polepos);
 
@@ -1031,9 +1029,7 @@ void polepos_state::topracern(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
-	PALETTE(config, m_palette, 0x0f00);
-	m_palette->set_indirect_entries(128);
-	m_palette->set_init(FUNC(polepos_state::palette_init_polepos));
+	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
 
 	config.set_default_layout(layout_topracer);
 

@@ -21,13 +21,14 @@ class tim011_state : public driver_device
 {
 public:
 	tim011_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_fdc(*this, FDC9266_TAG),
-			m_floppy0(*this, FDC9266_TAG ":0:35dd"),
-			m_floppy1(*this, FDC9266_TAG ":1:35dd"),
-			m_floppy2(*this, FDC9266_TAG ":2:35dd"),
-			m_floppy3(*this, FDC9266_TAG ":3:35dd") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, FDC9266_TAG)
+		, m_floppy0(*this, FDC9266_TAG ":0:35dd")
+		, m_floppy1(*this, FDC9266_TAG ":1:35dd")
+		, m_floppy2(*this, FDC9266_TAG ":2:35dd")
+		, m_floppy3(*this, FDC9266_TAG ":3:35dd")
+	{ }
 
 	void tim011(machine_config &config);
 
@@ -159,7 +160,7 @@ MACHINE_CONFIG_START(tim011_state::tim011)
 	MCFG_SCREEN_UPDATE_DRIVER(tim011_state, screen_update_tim011)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 /* ROM definition */

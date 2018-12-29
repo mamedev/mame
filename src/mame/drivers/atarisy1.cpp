@@ -754,8 +754,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 1024);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy1_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarisy1_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
@@ -769,7 +768,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	/* video timing comes from an 82S163 (H) and an 82S129 (V) */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)

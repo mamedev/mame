@@ -561,8 +561,7 @@ void macrossp_state::macrossp(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(macrossp_state::screen_vblank_macrossp));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macrossp);
-
-	PALETTE(config, m_palette, 4096).set_format(PALETTE_FORMAT_RGBX);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_888, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

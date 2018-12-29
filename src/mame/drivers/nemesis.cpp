@@ -1491,7 +1491,7 @@ void nemesis_state::nemesis(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1558,7 +1558,7 @@ void nemesis_state::gx400(machine_config &config)
 	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1627,7 +1627,7 @@ void nemesis_state::konamigt(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1694,7 +1694,7 @@ void nemesis_state::rf2_gx400(machine_config &config)
 	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1753,8 +1753,7 @@ void nemesis_state::salamand(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(8);
 
 	/* sound hardware */
@@ -1804,8 +1803,7 @@ void nemesis_state::blkpnthr(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nemesis_state::blkpnthr_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(8);
 
 	/* sound hardware */
@@ -1850,8 +1848,7 @@ void nemesis_state::citybomb(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(8);
 
 	/* sound hardware */
@@ -1900,8 +1897,7 @@ void nemesis_state::nyanpani(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(8);
 
 	/* sound hardware */
@@ -1954,8 +1950,7 @@ void nemesis_state::hcrash(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(8);
 
 	/* sound hardware */
@@ -2717,7 +2712,7 @@ void nemesis_state::bubsys(machine_config &config)
 	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

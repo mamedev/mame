@@ -1000,7 +1000,7 @@ void aleck64_state::aleck64(machine_config &config)
 	screen.set_screen_update(FUNC(aleck64_state::screen_update_n64));
 	screen.screen_vblank().set(FUNC(aleck64_state::screen_vblank_n64));
 
-	PALETTE(config, "palette", 0x1000);
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

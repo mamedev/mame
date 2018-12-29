@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(13'516'800), 824, 48, 688, 274, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_kdt6);
 
 	MC6845(config, m_crtc, XTAL(13'516'800) / 8);

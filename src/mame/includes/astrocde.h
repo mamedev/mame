@@ -140,9 +140,9 @@ public:
 	void init_gorf();
 	void init_astrocde();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(astrocde);
+	void astrocade_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(profpac);
-	DECLARE_PALETTE_INIT(profpac);
+	void profpac_palette(palette_device &palette) const;
 	uint32_t screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);

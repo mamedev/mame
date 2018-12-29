@@ -4032,9 +4032,8 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tharrier)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
@@ -4070,9 +4069,8 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4113,9 +4111,8 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4151,9 +4148,8 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bioship)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bioship);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
 
@@ -4190,9 +4186,8 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4232,9 +4227,8 @@ MACHINE_CONFIG_START(nmk16_state::vandykeb)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4257,9 +4251,8 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4301,9 +4294,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4336,9 +4328,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4383,9 +4374,8 @@ MACHINE_CONFIG_START(nmk16_state::ssmissin)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4412,9 +4402,8 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_strahl)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
 
@@ -4451,9 +4440,8 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4496,9 +4484,8 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4535,9 +4522,8 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4574,9 +4560,8 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
@@ -4617,9 +4602,8 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
@@ -4662,9 +4646,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
@@ -4714,10 +4697,8 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
@@ -4756,10 +4737,8 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bjtwin)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bjtwin);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
 
@@ -4819,9 +4798,8 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
@@ -4864,9 +4842,8 @@ MACHINE_CONFIG_START(nmk16_tomagic_state::tomagic)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
@@ -5388,10 +5365,8 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_afega)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stagger1)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stagger1);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,afega)
 
@@ -5479,10 +5454,8 @@ MACHINE_CONFIG_START(nmk16_state::firehawk)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grdnstrm)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grdnstrm);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 
@@ -5520,10 +5493,8 @@ MACHINE_CONFIG_START(nmk16_state::twinactn)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 

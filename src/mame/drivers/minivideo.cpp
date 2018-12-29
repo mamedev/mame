@@ -35,8 +35,8 @@ class minivideo_state : public driver_device
 {
 public:
 	minivideo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void minivideo(machine_config &config);
@@ -101,8 +101,7 @@ void minivideo_state::minivideo(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx);
 
-	palette_device& palette(PALETTE(config, "palette", 8));
-	palette.set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	// sound hw?
 }
@@ -116,7 +115,7 @@ void minivideo_state::minivideo(machine_config &config)
 /*
 PCB is marked: "MINIVIDEO 1.3" on component side
 PCB is marked: "MINIVIDEO 1.3" and "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
-PCB is labelled: "LF1.3" on component side 
+PCB is labelled: "LF1.3" on component side
 */
 ROM_START( fiches )
 	ROM_REGION(0x8000, "maincpu", 0)
@@ -130,7 +129,7 @@ ROM_END
 
 /*
 PCB is marked: "MINIVIDEO 1.2" on component side
-PCB is marked: "MINIVIDEO 1.2" and "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side") 
+PCB is marked: "MINIVIDEO 1.2" and "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
 */
 ROM_START( fiches12 )
 	ROM_REGION(0x8000, "maincpu", 0)

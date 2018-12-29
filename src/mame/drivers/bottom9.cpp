@@ -322,9 +322,8 @@ void bottom9_state::bottom9(machine_config &config)
 	screen.screen_vblank().set(FUNC(bottom9_state::vblank_irq));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 1024);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K052109(config, m_k052109, 0); // 051961 on schematics
 	m_k052109->set_palette(m_palette);

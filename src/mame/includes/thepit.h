@@ -75,8 +75,8 @@ private:
 	TILE_GET_INFO_MEMBER(solid_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_PALETTE_INIT(thepit);
-	DECLARE_PALETTE_INIT(suprmous);
+	void thepit_palette(palette_device &palette) const;
+	void suprmous_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

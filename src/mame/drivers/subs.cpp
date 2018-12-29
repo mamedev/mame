@@ -35,12 +35,12 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(subs_state, subs)
+void subs_state::subs_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette.set_pen_color(1,rgb_t(0xff,0xff,0xff)); /* WHITE - modified on video invert */
-	palette.set_pen_color(2,rgb_t(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette.set_pen_color(3,rgb_t(0xff,0xff,0xff)); /* WHITE - modified on video invert*/
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // BLACK - modified on video invert
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); // BLACK - modified on video invert
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
 }
 
 
@@ -182,10 +182,9 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_subs)
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(subs_state, subs)
+	PALETTE(config, m_palette, FUNC(subs_state::subs_palette), 4);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -195,7 +194,7 @@ MACHINE_CONFIG_START(subs_state::subs)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subs_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
@@ -203,7 +202,7 @@ MACHINE_CONFIG_START(subs_state::subs)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subs_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 
 	/* sound hardware */

@@ -322,17 +322,15 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	H46505(config, m_crtc, MASTER_CLOCK/16);   /* hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedatk)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedatk);
+	PALETTE(config, m_palette, FUNC(speedatk_state::speedatk_palette), 0x100, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

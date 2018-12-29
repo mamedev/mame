@@ -125,7 +125,7 @@ void konami573_cassette_xi_device::device_add_mconfig(machine_config &config)
 {
 	X76F041( config, m_x76f041 );
 	DS2401( config, m_ds2401 );
-	ADC0838( config, m_adc0838, 0 );
+	ADC0838( config, m_adc0838 );
 }
 
 WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d0)

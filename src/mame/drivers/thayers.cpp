@@ -824,7 +824,7 @@ void thayers_state::thayers(machine_config &config)
 	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
-	PALETTE(config, "palette", 256);
+	PALETTE(config, "palette").set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

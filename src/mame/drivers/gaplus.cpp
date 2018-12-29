@@ -550,9 +550,7 @@ void gaplus_base_state::gaplus_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaplus);
-	PALETTE(config, m_palette, 64 * 4 + 64 * 8);
-	m_palette->set_indirect_entries(256);
-	m_palette->set_init(FUNC(gaplus_base_state::palette_init_gaplus));
+	PALETTE(config, m_palette, FUNC(gaplus_base_state::gaplus_palette), 64 * 4 + 64 * 8, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

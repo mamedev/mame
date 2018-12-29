@@ -439,7 +439,7 @@ static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
 	7,0, 7,1, 7,2, 7,3, 7,4, 7,5, 7,6, 7,7
 };
 
-PALETTE_INIT_MEMBER(arcadia_state, arcadia)
+void arcadia_state::palette_init(palette_device &palette) const
 {
 	for (int i = 0; i < 8; i++)
 		palette.set_indirect_color(i, arcadia_colors[i]);
@@ -491,14 +491,11 @@ void arcadia_state::arcadia(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arcadia);
-	PALETTE(config, m_palette, ARRAY_LENGTH(arcadia_palette));
-	m_palette->set_indirect_entries(8);
-	m_palette->set_init(FUNC(arcadia_state::palette_init_arcadia));
+	PALETTE(config, m_palette, FUNC(arcadia_state::palette_init), ARRAY_LENGTH(arcadia_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ARCADIA_SOUND(config, m_custom);
-	m_custom->add_route(ALL_OUTPUTS, "mono", 1.00);
+	ARCADIA_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cartridge */
 	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr);

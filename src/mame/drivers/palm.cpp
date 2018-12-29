@@ -48,29 +48,31 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<mc68328_device> m_lsi;
-	required_device<ram_device> m_ram;
-	uint8_t m_port_f_latch;
-	uint16_t m_spim_data;
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(palm_port_f_out);
 	DECLARE_READ8_MEMBER(palm_port_c_in);
 	DECLARE_READ8_MEMBER(palm_port_f_in);
 	DECLARE_WRITE16_MEMBER(palm_spim_out);
 	DECLARE_READ16_MEMBER(palm_spim_in);
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
-	DECLARE_PALETTE_INIT(palm);
+	void palm_palette(palette_device &palette) const;
 
+	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+	void palm_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc68328_device> m_lsi;
+	required_device<ram_device> m_ram;
+	uint8_t m_port_f_latch;
+	uint16_t m_spim_data;
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
-
-	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
-	void palm_map(address_map &map);
 };
 
 
@@ -158,7 +160,7 @@ void palm_state::machine_reset()
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-PALETTE_INIT_MEMBER(palm_state, palm)
+void palm_state::palm_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0x7b, 0x8c, 0x5a);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
@@ -198,8 +200,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD( "palette", 2 )
-	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
+	PALETTE(config, "palette", FUNC(palm_state::palm_palette), 2);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -53,7 +53,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cocktail_flip_w);
 	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
 	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
-	DECLARE_PALETTE_INIT(gridlee);
+	void gridlee_palette(palette_device &palette) const;
 	uint32_t screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_off_tick);
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);

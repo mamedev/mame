@@ -874,22 +874,17 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	GENERIC_LATCH_8(config, m_main_to_sound);
-	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
-
+	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 	GENERIC_LATCH_8(config, m_sound_to_main);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, MAIN_XTAL/8)
@@ -986,25 +981,18 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq).output_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-
-	GENERIC_LATCH_8(config, m_main_to_sound);
-	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
-
+	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 	GENERIC_LATCH_8(config, m_sound_to_main);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, MAIN_XTAL/8)

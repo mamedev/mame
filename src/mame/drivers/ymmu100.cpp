@@ -517,7 +517,7 @@ void mu100_state::mu100_map(address_map &map)
 
 u16 mu100_state::adc0_r()
 {
-	//	logerror("adc0_r\n");
+	//  logerror("adc0_r\n");
 	return 0;
 }
 
@@ -615,7 +615,7 @@ void mu100_state::p6_w(u16 data)
 
 u16 mu100_state::p6_r()
 {
-	//	logerror("plug in detect read\n");
+	//  logerror("plug in detect read\n");
 	return 0x00;
 }
 

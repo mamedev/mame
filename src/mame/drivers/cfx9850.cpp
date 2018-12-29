@@ -52,7 +52,7 @@ public:
 	DECLARE_READ8_MEMBER(in0_r);
 	required_shared_ptr<u8> m_video_ram;
 	required_shared_ptr<u8> m_display_ram;
-	DECLARE_PALETTE_INIT(cfx9850);
+	void cfx9850_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cfx9850(machine_config &config);
@@ -245,7 +245,7 @@ static INPUT_PORTS_START(cfx9850)
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(cfx9850_state, cfx9850)
+void cfx9850_state::cfx9850_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x00, 0x00, 0xff);
@@ -301,7 +301,7 @@ void cfx9850_state::cfx9850(machine_config &config)
 	screen.set_palette("palette");
 
 	// TODO: Verify amount of colors and palette. Colors can be changed by changing the contrast.
-	PALETTE(config, "palette", 4).set_init(FUNC(cfx9850_state::palette_init_cfx9850));
+	PALETTE(config, "palette", FUNC(cfx9850_state::cfx9850_palette), 4);
 }
 
 

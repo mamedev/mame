@@ -78,7 +78,7 @@ void dct11em_state::dct11em(machine_config &config)
 	screen.set_screen_update(FUNC(dct11em_state::screen_update_dct11em));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 }
 
 /* ROM definition */

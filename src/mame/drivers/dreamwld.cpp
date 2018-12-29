@@ -118,6 +118,7 @@ public:
 		, m_prot(*this, "prot")
 		, m_spritelut(*this, "spritelut")
 		, m_okibank(*this, "oki%ubank", 1)
+		, m_dsw(*this, "DSW")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -127,6 +128,11 @@ public:
 
 	void baryon(machine_config &config);
 	void dreamwld(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -138,6 +144,7 @@ private:
 	optional_memory_region m_prot;
 	required_memory_region m_spritelut;
 	optional_memory_bank_array<2> m_okibank;
+	required_ioport m_dsw;
 
 	std::unique_ptr<uint16_t[]> m_lineram16;
 
@@ -154,19 +161,18 @@ private:
 
 	/* misc */
 	int      m_protindex;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
 	DECLARE_READ32_MEMBER(protdata_r);
 	template<int Chip> DECLARE_WRITE32_MEMBER(okibank_w);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dreamwld);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void baryon_map(address_map &map);
 	void dreamwld_map(address_map &map);
 	void oki1_map(address_map &map);
@@ -428,7 +434,7 @@ void dreamwld_state::baryon_map(address_map &map)
 	map(0x804400, 0x805fff).ram().share("vregs");
 
 	map(0xc00000, 0xc00003).portr("INPUTS");
-	map(0xc00004, 0xc00007).portr("c00004");
+	map(0xc00004, 0xc00007).lr16("c00004", [this]() { return uint16_t(m_dsw->read()); });
 
 	map(0xc0000c, 0xc0000f).w(FUNC(dreamwld_state::okibank_w<0>)); // sfx
 	map(0xc00018, 0xc00018).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx
@@ -468,10 +474,6 @@ static INPUT_PORTS_START( dreamwld )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
@@ -539,10 +541,6 @@ static INPUT_PORTS_START( rolcrush )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
 	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW2:2" ) /* These might have some use, requires investigation of code */
@@ -600,10 +598,6 @@ static INPUT_PORTS_START( cutefght )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
@@ -665,10 +659,6 @@ static INPUT_PORTS_START( gaialast )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003,  0x0001, DEF_STR( Lives )  )  PORT_DIPLOCATION("SW2:1,2")
@@ -774,12 +764,10 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dreamwld_state, screen_vblank_dreamwld))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreamwld)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dreamwld);
 
 	SPEAKER(config, "mono").front_center();
 

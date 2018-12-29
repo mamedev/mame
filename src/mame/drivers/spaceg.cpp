@@ -221,7 +221,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sound2_w);
 	DECLARE_WRITE8_MEMBER(sound3_w);
 
-	DECLARE_PALETTE_INIT(spaceg);
+	void spaceg_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void spaceg_map(address_map &map);
@@ -240,31 +240,29 @@ void spaceg_state::driver_start()
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(spaceg_state, spaceg)
+void spaceg_state::spaceg_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 128; i++)
-		palette.set_pen_color (i, rgb_t(0x00,0x00,0x00));
+	for (int i = 0; i < 128; i++)
+		palette.set_pen_color(i, rgb_t(0x00, 0x00, 0x00));
 
 	// proms are currently undumped...
-	palette.set_pen_color (0, rgb_t(0x00,0x00,0x00)); //ok czarny
-	palette.set_pen_color (1, rgb_t(0x7f,0x00,0x00));//???
-	palette.set_pen_color (2, rgb_t(0xff,0xff,0xff)); //ok+ bialy
-	palette.set_pen_color (3, rgb_t(0xff,0x00,0x00)); //ok j.czerw.
-	palette.set_pen_color (4, rgb_t(0x3f,0x3f,0xff)); //ok j.niebieski
-	palette.set_pen_color (5, rgb_t(0x3f,0xff,0x3f)); //ok j.zielony
-	palette.set_pen_color (6, rgb_t(0xff,0xbf,0xbf)); //ok+ 'majtki'
-	palette.set_pen_color (7, rgb_t(0xff,0xff,0x00)); //ok+ zolty
+	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00)); //ok czarny
+	palette.set_pen_color( 1, rgb_t(0x7f, 0x00, 0x00));//???
+	palette.set_pen_color( 2, rgb_t(0xff, 0xff, 0xff)); //ok+ bialy
+	palette.set_pen_color( 3, rgb_t(0xff, 0x00, 0x00)); //ok j.czerw.
+	palette.set_pen_color( 4, rgb_t(0x3f, 0x3f, 0xff)); //ok j.niebieski
+	palette.set_pen_color( 5, rgb_t(0x3f, 0xff, 0x3f)); //ok j.zielony
+	palette.set_pen_color( 6, rgb_t(0xff, 0xbf, 0xbf)); //ok+ 'majtki'
+	palette.set_pen_color( 7, rgb_t(0xff, 0xff, 0x00)); //ok+ zolty
 
-	palette.set_pen_color (8, rgb_t(0xff,0x7f,0x00)); //ok+ pomaranczowy
-	palette.set_pen_color (9, rgb_t(0x3f,0xbf,0xff)); //ok j.niebieski (ciemniejszy od 13)
-	palette.set_pen_color (10, rgb_t(0x3f,0xbf,0x3f));    //ok+ c.zielony
-	palette.set_pen_color (11, rgb_t(0x00,0xff,0x00));    //ok j.zielony
-	palette.set_pen_color (12, rgb_t(0x7f,0x00,0x00));    //ok brazowy (c.czerw)
-	palette.set_pen_color (13, rgb_t(0x7f,0xbf,0xff));    //ok j.niebieski (jasniejszy od 9)
-	palette.set_pen_color (14, rgb_t(0x00,0xff,0xff));//???
-	palette.set_pen_color (15, rgb_t(0x7f,0x7f,0x7f));//???
+	palette.set_pen_color( 8, rgb_t(0xff, 0x7f, 0x00)); //ok+ pomaranczowy
+	palette.set_pen_color( 9, rgb_t(0x3f, 0xbf, 0xff)); //ok j.niebieski (ciemniejszy od 13)
+	palette.set_pen_color(10, rgb_t(0x3f, 0xbf, 0x3f));    //ok+ c.zielony
+	palette.set_pen_color(11, rgb_t(0x00, 0xff, 0x00));    //ok j.zielony
+	palette.set_pen_color(12, rgb_t(0x7f, 0x00, 0x00));    //ok brazowy (c.czerw)
+	palette.set_pen_color(13, rgb_t(0x7f, 0xbf, 0xff));    //ok j.niebieski (jasniejszy od 9)
+	palette.set_pen_color(14, rgb_t(0x00, 0xff, 0xff));//???
+	palette.set_pen_color(15, rgb_t(0x7f, 0x7f, 0x7f));//???
 }
 
 WRITE8_MEMBER(spaceg_state::zvideoram_w)
@@ -523,7 +521,7 @@ void spaceg_state::spaceg(machine_config &config)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline("maincpu", INPUT_LINE_NMI); // 60 Hz NMIs (verified)
 
-	PALETTE(config, m_palette, 16+128-16).set_init(FUNC(spaceg_state::palette_init_spaceg));
+	PALETTE(config, m_palette, FUNC(spaceg_state::spaceg_palette), 16+128-16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

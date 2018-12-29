@@ -219,31 +219,35 @@
 class tmspoker_state : public driver_device
 {
 public:
-	tmspoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tmspoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void tmspoker(machine_config &config);
 
 	void init_bus();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tmspoker);
+	void tmspoker_palette(palette_device &palette) const;
 	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	void tmspoker_cru_map(address_map &map);
 	void tmspoker_map(address_map &map);
@@ -285,7 +289,7 @@ uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
+void tmspoker_state::tmspoker_palette(palette_device &palette) const
 {
 }
 
@@ -577,10 +581,8 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmspoker)
-
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_tmspoker);
+	PALETTE(config, "palette", FUNC(tmspoker_state::tmspoker_palette), 256);
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/4)); /* guess */
 	crtc.set_screen("screen");

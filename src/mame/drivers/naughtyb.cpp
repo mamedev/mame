@@ -422,7 +422,7 @@ void naughtyb_state::naughtyb_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_naughtyb);
-	PALETTE(config, m_palette, 256).set_init(FUNC(naughtyb_state::palette_init_naughtyb));
+	PALETTE(config, m_palette, FUNC(naughtyb_state::naughtyb_palette), 256);
 
 	/* sound hardware */
 	/* uses the TMS3615NS for sound */

@@ -19,10 +19,11 @@
 class vt520_state : public driver_device
 {
 public:
-	vt520_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	vt520_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "maincpu") { }
+		m_rom(*this, "maincpu")
+	{ }
 
 	void vt520(machine_config &config);
 	void vt420(machine_config &config);
@@ -99,7 +100,7 @@ MACHINE_CONFIG_START(vt520_state::vt420)
 	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt520_state::vt520)
@@ -117,7 +118,7 @@ MACHINE_CONFIG_START(vt520_state::vt520)
 	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit

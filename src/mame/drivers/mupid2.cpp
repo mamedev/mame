@@ -3,13 +3,13 @@
 /***************************************************************************
 
     mupid/Infonova C2A2
-	Grundig PTC-100
+    Grundig PTC-100
 
-	- Z80
-	- 128 + 8 KB RAM
-	- Z80 SIO/0
-	- 8035
-	- M58990P-1 ADC
+    - Z80
+    - 128 + 8 KB RAM
+    - Z80 SIO/0
+    - 8035
+    - M58990P-1 ADC
 
 ***************************************************************************/
 
@@ -112,24 +112,24 @@ INPUT_PORTS_END
 
 READ8_MEMBER(mupid2_state::kbd_bus_r)
 {
-//	logerror("kbd_bus_r\n");
+//  logerror("kbd_bus_r\n");
 	return 0xff;
 }
 
 READ8_MEMBER(mupid2_state::kbd_p1_r)
 {
-//	logerror("kbd_p1_r\n");
+//  logerror("kbd_p1_r\n");
 	return 0xff;
 }
 
 WRITE8_MEMBER(mupid2_state::kbd_p1_w)
 {
-//	logerror("kbd_p1_w: %02x\n", data);
+//  logerror("kbd_p1_w: %02x\n", data);
 }
 
 WRITE8_MEMBER(mupid2_state::kbd_p2_w)
 {
-//	logerror("kbd_p2_w: %02x\n", data);
+//  logerror("kbd_p2_w: %02x\n", data);
 }
 
 
@@ -247,8 +247,7 @@ void mupid2_state::c2a2(machine_config &config)
 
 	M58990(config, "adc", 1000000);
 
-	PALETTE(config, m_palette, 32);
-	m_palette->set_init(DEVICE_SELF, FUNC(mupid2_state::palette_init));
+	PALETTE(config, m_palette, FUNC(mupid2_state::palette_init), 32);
 }
 
 

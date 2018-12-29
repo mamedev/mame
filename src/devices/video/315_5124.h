@@ -54,11 +54,14 @@ public:
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
-	void set_signal_type(bool is_pal) { m_is_pal = is_pal; }
+	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
 	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_csync_callback(Object &&cb) { return m_csync_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pause_callback(Object &&cb) { return m_pause_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_int_cb.bind(); }
+	auto csync() { return m_csync_cb.bind(); }
+	auto pause() { return m_pause_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( data_read );
 	DECLARE_WRITE8_MEMBER( data_write );
@@ -78,7 +81,6 @@ public:
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) { }
 
-	void sega315_5124(address_map &map);
 protected:
 	static constexpr unsigned SEGA315_5377_CRAM_SIZE        = 0x40; /* 32 colors x 2 bytes per color = 64 bytes */
 	static constexpr unsigned SEGA315_5124_CRAM_SIZE        = 0x20; /* 32 colors x 1 bytes per color = 32 bytes */
@@ -93,6 +95,8 @@ protected:
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const override { return 64+16; }
+
+	void sega315_5124(address_map &map);
 
 	void set_display_settings();
 	void set_frame_timing();
@@ -260,7 +264,7 @@ protected:
 #define MCFG_SEGA315_5124_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_SEGA315_5124_IS_PAL(_bool) \
-	downcast<sega315_5124_device &>(*device).set_signal_type(_bool);
+	downcast<sega315_5124_device &>(*device).set_is_pal(_bool);
 
 #define MCFG_SEGA315_5124_INT_CB(_devcb) \
 	downcast<sega315_5124_device &>(*device).set_int_callback(DEVCB_##_devcb);
@@ -275,7 +279,7 @@ protected:
 #define MCFG_SEGA315_5246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_SEGA315_5246_IS_PAL(_bool) \
-	downcast<sega315_5246_device &>(*device).set_signal_type(_bool);
+	downcast<sega315_5246_device &>(*device).set_is_pal(_bool);
 
 #define MCFG_SEGA315_5246_INT_CB(_devcb) \
 	downcast<sega315_5246_device &>(*device).set_int_callback(DEVCB_##_devcb);
@@ -290,7 +294,7 @@ protected:
 #define MCFG_SEGA315_5377_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_SEGA315_5377_IS_PAL(_bool) \
-	downcast<sega315_5377_device &>(*device).set_signal_type(_bool);
+	downcast<sega315_5377_device &>(*device).set_is_pal(_bool);
 
 #define MCFG_SEGA315_5377_INT_CB(_devcb) \
 	downcast<sega315_5377_device &>(*device).set_int_callback(DEVCB_##_devcb);

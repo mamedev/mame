@@ -1077,8 +1077,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos86);
-	PALETTE(config, m_palette, 4096);
-	m_palette->set_init(FUNC(namcos86_state::palette_init_namcos86));
+	PALETTE(config, m_palette, FUNC(namcos86_state::namcos86_palette), 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

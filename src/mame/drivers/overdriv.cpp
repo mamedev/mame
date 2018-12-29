@@ -340,8 +340,8 @@ void overdriv_state::overdriv(machine_config &config)
 
 	MC6809E(config, m_audiocpu, XTAL(3'579'545));                             /* 1.789 MHz?? This might be the right speed, but ROM testing */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_sound_map); /* takes a little too much (the counter wraps from 0000 to 9999). */
-												                              /* This might just mean that the video refresh rate is less than */
-												                              /* 60 fps, that's how I fixed it for now. */
+																			  /* This might just mean that the video refresh rate is less than */
+																			  /* 60 fps, that's how I fixed it for now. */
 
 	config.m_minimum_quantum = attotime::from_hz(12000);
 
@@ -353,9 +353,7 @@ void overdriv_state::overdriv(machine_config &config)
 	screen.set_screen_update(FUNC(overdriv_state::screen_update_overdriv));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2048));
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	palette.enable_shadows();
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback), this);

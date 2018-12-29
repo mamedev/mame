@@ -2066,16 +2066,15 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2109,16 +2108,15 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2150,16 +2148,15 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_jumpkids)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
 	m_sprgen->set_is_bootleg(true);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tumbleb)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2189,7 +2186,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2197,9 +2194,8 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	m_sprgen->set_transpen(15);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fncywld)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_fncywld)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
 
@@ -2230,7 +2226,7 @@ MACHINE_CONFIG_START(tumbleb_state::magipur)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -2238,9 +2234,8 @@ MACHINE_CONFIG_START(tumbleb_state::magipur)
 	m_sprgen->set_transpen(15);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fncywld)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fncywld);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
 
@@ -2297,8 +2292,7 @@ void tumbleb_state::htchctch(machine_config &config)
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tumbleb);
-
-	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2326,7 +2320,7 @@ void tumbleb_state::cookbib(machine_config &config)
 void tumbleb_state::chokchok(machine_config &config)
 {
 	htchctch(config);
-	m_palette->set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	m_palette->set_format(palette_device::xBGR_444, 1024);
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
 	m_oki->set_clock(4096000/4);
 }
@@ -2369,7 +2363,7 @@ void tumbleb_state::sdfight(machine_config &config)
 void tumbleb_state::metlsavr(machine_config &config)
 {
 	cookbib(config);
-	m_palette->set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	m_palette->set_format(palette_device::xBGR_444, 1024);
 
 	subdevice<ym2151_device>("ymsnd")->set_clock(3427190);
 }
@@ -2402,8 +2396,7 @@ void tumbleb_state::suprtrio(machine_config &config)
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprtrio);
-
-	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,suprtrio)
 
@@ -2441,7 +2434,7 @@ void tumbleb_state::pangpang(machine_config &config)
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tumbleb);
-	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,pangpang)
 

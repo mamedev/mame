@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "machine/74157.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/74157.h"

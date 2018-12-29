@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nanos)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
 	Z80CTC(config, m_ctc_0, XTAL(4'000'000));

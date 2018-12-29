@@ -338,7 +338,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	m_crtc->vrtc_wr_callback().set(m_7474, FUNC(ttl7474_device::clock_w));
 	m_crtc->set_screen("screen");
 
-	PALETTE(config, "palette", 3);
+	PALETTE(config, "palette").set_entries(3);
 
 	X2210(config, "nvram");
 

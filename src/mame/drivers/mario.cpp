@@ -362,19 +362,19 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mario_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mario)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mario);
+	PALETTE(config, m_palette, FUNC(mario_state::mario_palette), 256);
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mario_state::mario)
+void mario_state::mario(machine_config &config)
+{
 	mario_base(config);
 	mario_audio(config);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(mario_state::masao)
 	mario_base(config);

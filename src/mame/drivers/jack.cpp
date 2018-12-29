@@ -929,12 +929,11 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_jack)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_jack)
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -997,9 +996,7 @@ MACHINE_CONFIG_START(jack_state::joinem)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_joinem)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(jack_state, joinem)
+	PALETTE(config.replace(), m_palette, FUNC(jack_state::joinem_palette), 64);
 
 	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
 MACHINE_CONFIG_END
@@ -1016,8 +1013,7 @@ MACHINE_CONFIG_START(jack_state::unclepoo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256)
+	m_palette->set_entries(256);
 MACHINE_CONFIG_END
 
 

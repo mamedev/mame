@@ -298,16 +298,21 @@ void psikyo4_state::ps4_ymf_map(address_map &map)
 }
 
 
+CUSTOM_INPUT_MEMBER(psikyo4_state::system_r)
+{
+	return m_system->read();
+}
+
 static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)0)
 
 	PORT_START("P3_P4")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)4)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)4)
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
@@ -609,8 +614,8 @@ void psikyo4_state::ps4big(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette[0], gfx_ps4);
-	PALETTE(config, m_palette[0], (0x2000/4) + 1); /* palette + clear colour */
-	PALETTE(config, m_palette[1], (0x2000/4) + 1);
+	PALETTE(config, m_palette[0]).set_entries((0x2000/4) + 1); /* palette + clear colour */
+	PALETTE(config, m_palette[1]).set_entries((0x2000/4) + 1);
 
 	config.set_default_layout(layout_dualhsxs);
 

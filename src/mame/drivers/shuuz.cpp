@@ -245,8 +245,7 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shuuz)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 1024);
 
 	ATARI_VAD(config, m_vad, 0, m_screen);
 	m_vad->scanline_int_cb().set(FUNC(shuuz_state::scanline_int_write_line));

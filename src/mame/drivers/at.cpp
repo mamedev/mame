@@ -706,7 +706,7 @@ void megapc_state::megapc(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// video hardware
-	PALETTE(config, "palette", 256); // todo: really needed?
+	PALETTE(config, "palette").set_entries(256); // todo: really needed?
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("megapc");

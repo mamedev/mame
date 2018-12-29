@@ -5,9 +5,10 @@
  * includes/radio86.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_RADIO86_H
 #define MAME_INCLUDES_RADIO86_H
+
+#pragma once
 
 #include "machine/i8255.h"
 #include "machine/i8257.h"
@@ -26,8 +27,8 @@ public:
 		TIMER_RESET
 	};
 
-	radio86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	radio86_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
@@ -38,9 +39,9 @@ public:
 		m_bank1(*this, "bank1"),
 		m_io_line(*this, "LINE%u", 0),
 		m_io_cline(*this, "CLINE%u", 0),
-		m_palette(*this, "palette") { }
-
-	virtual void video_start() override;
+		m_palette(*this, "palette"),
+		m_charmap(*this, "gfx1")
+	{ }
 
 	uint8_t m_tape_value;
 	uint8_t m_mikrosha_font_page;
@@ -49,14 +50,13 @@ public:
 	uint8_t m_romdisk_lsb;
 	uint8_t m_romdisk_msb;
 	uint8_t m_disk_sel;
-	const uint8_t *m_charmap;
 	uint8_t radio_cpu_state_r();
 	uint8_t radio_io_r(offs_t offset);
 	void radio_io_w(offs_t offset, uint8_t data);
 	void radio86_pagesel(uint8_t data);
 	void init_radioram();
 	void init_radio86();
-	DECLARE_PALETTE_INIT(radio86);
+	void radio86_palette(palette_device &palette) const;
 	uint8_t radio86_8255_portb_r2();
 	uint8_t radio86_8255_portc_r2();
 	void radio86_8255_porta_w2(uint8_t data);
@@ -83,14 +83,7 @@ public:
 	void radio16(machine_config &config);
 	void radioram(machine_config &config);
 	void kr03(machine_config &config);
-	void impuls03_mem(address_map &map);
-	void mikron2_mem(address_map &map);
-	void radio86_16_mem(address_map &map);
-	void radio86_io(address_map &map);
-	void radio86_mem(address_map &map);
-	void radio86ram_mem(address_map &map);
-	void radio86rom_mem(address_map &map);
-	void rk7007_io(address_map &map);
+
 protected:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cart;    // for ROMDisk - only Radio86K & Orion?
@@ -106,8 +99,18 @@ protected:
 	virtual void machine_reset() override;
 
 	void radio86_init_keyboard();
-public:
+
+	void impuls03_mem(address_map &map);
+	void mikron2_mem(address_map &map);
+	void radio86_16_mem(address_map &map);
+	void radio86_io(address_map &map);
+	void radio86_mem(address_map &map);
+	void radio86ram_mem(address_map &map);
+	void radio86rom_mem(address_map &map);
+	void rk7007_io(address_map &map);
+
 	required_device<palette_device> m_palette;
+	optional_region_ptr<uint8_t> m_charmap;
 };
 
 

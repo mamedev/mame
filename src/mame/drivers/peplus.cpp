@@ -20,10 +20,10 @@
 
     History:
 
-    This form of video poker machine has the ability to use different game roms.  The operator
-    changes the game by placing the rom at U68 on the motherboard.  This driver currently supports
-    several PE+ game roms, but should work with all other compatible game roms as far as cpu, video,
-    sound, and inputs are concerned.  Some games can share the same color prom and graphic roms,
+    This form of video poker machine has the ability to use different game ROMs.  The operator
+    changes the game by placing the ROM at U68 on the motherboard.  This driver currently supports
+    several PE+ game ROMs, but should work with all other compatible game ROMs as far as CPU, video,
+    sound, and inputs are concerned.  Some games can share the same color PROM and graphic ROMs,
     but this is not always the case.  It is best to confirm the game, color and graphic combinations.
 
     The game code runs in two different modes, game mode and operator mode.  Game mode is what a
@@ -33,8 +33,8 @@
     has two additional inputs (jackpot reset and self-test) to navigate with, along with the
     normal buttons available to the player.
 
-    A normal machine keeps all coin counts and settings in a battery-backed ram, and will
-    periodically update an external eeprom for an even more secure backup.  This eeprom
+    A normal machine keeps all coin counts and settings in a battery-backed RAM, and will
+    periodically update an external EEPROM for an even more secure backup.  This EEPROM
     also holds the current game state in order to recover the player from a full power failure.
 
 
@@ -348,7 +348,7 @@ private:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void load_superdata(const char *bank_name);
-	DECLARE_PALETTE_INIT(peplus);
+	void peplus_palette(palette_device &palette) const;
 	void handle_lightpen();
 
 	void main_iomap(address_map &map);
@@ -973,36 +973,36 @@ uint32_t peplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(peplus_state, peplus)
+void peplus_state::peplus_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	uint32_t proms_size = memregion("proms")->bytes();
-/*  prom bits
-    7654 3210
-    ---- -xxx   red component.
-    --xx x---   green component.
-    xx-- ----   blue component.
-*/
+	uint8_t const *const color_prom = memregion("proms")->base();
+	uint32_t const proms_size = memregion("proms")->bytes();
+	/*  prom bits
+		7654 3210
+		---- -xxx   red component.
+		--xx x---   green component.
+		xx-- ----   blue component.
+	*/
 
-	for (int i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		/* red component */
-		int bit0 = (~color_prom[i % proms_size] >> 0) & 0x01;
-		int bit1 = (~color_prom[i % proms_size] >> 1) & 0x01;
-		int bit2 = (~color_prom[i % proms_size] >> 2) & 0x01;
-		int r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int bit0 = BIT(~color_prom[i % proms_size], 0);
+		int bit1 = BIT(~color_prom[i % proms_size], 1);
+		int bit2 = BIT(~color_prom[i % proms_size], 2);
+		int const r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* green component */
-		bit0 = (~color_prom[i % proms_size] >> 3) & 0x01;
-		bit1 = (~color_prom[i % proms_size] >> 4) & 0x01;
-		bit2 = (~color_prom[i % proms_size] >> 5) & 0x01;
-		int g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		bit0 = BIT(~color_prom[i % proms_size], 3);
+		bit1 = BIT(~color_prom[i % proms_size], 4);
+		bit2 = BIT(~color_prom[i % proms_size], 5);
+		int const g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* blue component */
-		bit0 = (~color_prom[i % proms_size] >> 6) & 0x01;
-		bit1 = (~color_prom[i % proms_size] >> 7) & 0x01;
+		bit0 = BIT(~color_prom[i % proms_size], 6);
+		bit1 = BIT(~color_prom[i % proms_size], 7);
 		bit2 = 0;
-		int b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int const b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -1373,7 +1373,7 @@ void peplus_state::machine_start()
 
 MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	I80C32(config, m_maincpu, XTAL(20'000'000)/2); /* 10MHz */
+	I80C32(config, m_maincpu, XTAL(20'000'000)/2); // 10MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &peplus_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &peplus_state::main_iomap);
 	m_maincpu->port_out_cb<1>().set(FUNC(peplus_state::paldata_w<0>));
@@ -1390,8 +1390,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_peplus);
-
-	PALETTE(config, m_palette, 16*16*2).set_init(FUNC(peplus_state::palette_init_peplus));
+	PALETTE(config, m_palette, FUNC(peplus_state::peplus_palette), 16*16*2);
 
 	R6545_1(config, m_crtc, XTAL(20'000'000)/8/3);
 	m_crtc->set_screen(m_screen);

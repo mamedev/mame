@@ -16,7 +16,7 @@
     Reading fdc has been commented out, until the code can be modified to
     work with new upd765 (was causing a hang at boot).
 
-	Schematics: https://archive.org/details/Io19839/page/n331
+    Schematics: https://archive.org/details/Io19839/page/n331
 
 ***************************************************************************************************/
 
@@ -92,7 +92,7 @@ private:
 	DECLARE_READ8_MEMBER(nmi_portb_r);
 	TIMER_CALLBACK_MEMBER(pio_timer);
 	DECLARE_VIDEO_START(pasopia7);
-	DECLARE_PALETTE_INIT(p7_lcd);
+	void p7_lcd_palette(palette_device &palette) const;
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pasopia7_io(address_map &map);
@@ -900,14 +900,12 @@ void pasopia7_state::machine_reset()
 	m_nmi_reset |= 4;
 }
 
-/* TODO: palette values are mostly likely to be wrong in there */
-PALETTE_INIT_MEMBER(pasopia7_state,p7_lcd)
+// TODO: palette values are mostly likely to be wrong in there
+void pasopia7_state::p7_lcd_palette(palette_device &palette) const
 {
-	int i;
-
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 
-	for( i = 1; i < 8; i++)
+	for (int i = 1; i < 8; i++)
 		palette.set_pen_color(i, 0x30, 0x38, 0x10);
 }
 
@@ -978,12 +976,12 @@ MACHINE_CONFIG_START(pasopia7_state::p7_raster)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
 	H46505(config, m_crtc, VDP_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");
@@ -1001,11 +999,10 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
+	PALETTE(config, m_palette, FUNC(pasopia7_state::p7_lcd_palette), 8);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia7);
 
 	H46505(config, m_crtc, LCD_CLOCK); /* unknown clock, hand tuned to get ~60 fps */
 	m_crtc->set_screen("screen");

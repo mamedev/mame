@@ -350,13 +350,12 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(BBBBBRRRRRGGGGGx)
+	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
 	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
@@ -372,7 +371,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
 	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
 
-	ADC0844(config, m_adc, 0);
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));
 	m_adc->ch1_callback().set_ioport("THROTTLE");
 	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));

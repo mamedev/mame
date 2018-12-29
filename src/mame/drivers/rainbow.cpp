@@ -781,9 +781,9 @@ private:
 // THIS MACRO * RESETS *  the PATTERN TO DEFAULT.
 // NOTE 2: m_patmult  MUST BE LOADED BEFORE !!
 #define OPTION_RESET_PATTERNS \
-	m_vpat = 0xff;								\
-	if (m_patmult == 0)  m_patmult = 0x01;		\
-	if (m_patcnt == 0)   m_patcnt = m_patmult;	\
+	m_vpat = 0xff;                              \
+	if (m_patmult == 0)  m_patmult = 0x01;      \
+	if (m_patcnt == 0)   m_patcnt = m_patmult;  \
 	if (m_patidx == 0)   m_patidx = 7;
 
 
@@ -793,8 +793,8 @@ private:
 	m_monitor_suggested = m_inp13->read();                  \
 	m_gdc_indirect_register = 0;                            \
 	m_gdc_color_map_index = 0;                              \
-	for (int i = 0; i < 256; i++)							\
-		m_gdc_scroll_buffer[i] = i;							\
+	for (int i = 0; i < 256; i++)                           \
+		m_gdc_scroll_buffer[i] = i;                         \
 	m_gdc_scroll_index = 0;                                 \
 	m_gdc_write_buffer_index = 0;                           \
 	m_gdc_write_mask = 0x00;                                \
@@ -2175,11 +2175,11 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 	return ((m_inp5->read() == 1 ? 0 : 1) |
 			(m_inp7->read() == 1 ? 0 : 4) | // Floppy is always present (bit 1 zero)
 #ifdef OLD_RAM_BOARD_PRESENT
-		    (m_inp8->read() > MOTHERBOARD_RAM ? 0 : 8) |
+			(m_inp8->read() > MOTHERBOARD_RAM ? 0 : 8) |
 #else
-		     8  |  // unverified
+			 8  |  // unverified
 #endif
-		     16 | 32 | 64 | 128); // unverified
+			 16 | 32 | 64 | 128); // unverified
 }
 
 //  [02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
@@ -2198,7 +2198,7 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 		is_mhfu_enabled = m_crtc->MHFU(MHFU_IS_ENABLED);
 
 	return (m_comm_port->ri_r() ? 0x01 : 0x00) |
-           (m_comm_port->si_r() ? 0x02 : 0x00) |
+		   (m_comm_port->si_r() ? 0x02 : 0x00) |
 		   (m_comm_port->dsr_r() ? 0x04 : 0x00) |
 		   (m_comm_port->cts_r() ? 0x08 : 0x00) |
 		   (m_comm_port->dcd_r() ? 0x10 : 0x00) |
@@ -2355,13 +2355,13 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 	}
 	// logerror(" RDY:%x  WG:%d ",fdc_ready,fdc_write_gate);
 	int data = (fdc_step ? 0x00 : 0x80) |
-		       (fdc_write_gate ? 0x00 : 0x40) |
-		       (tk00 ? 0x20 : 0x00) |  // ***** ALL LOW ACTIVE - EXCEPT tk00 :
-		       (last_dir ? 0x00 : 0x10) |
-		       (fdc_ready ? 0x00 : 0x08) |
-		       (m_int88 ? 0x00 : 0x04) |
-		       (m_intz80 ? 0x00 : 0x02) |
-		       (m_zflip ? 0x00 : 0x01);
+			   (fdc_write_gate ? 0x00 : 0x40) |
+			   (tk00 ? 0x20 : 0x00) |  // ***** ALL LOW ACTIVE - EXCEPT tk00 :
+			   (last_dir ? 0x00 : 0x10) |
+			   (fdc_ready ? 0x00 : 0x08) |
+			   (m_int88 ? 0x00 : 0x04) |
+			   (m_intz80 ? 0x00 : 0x02) |
+			   (m_zflip ? 0x00 : 0x01);
 
 	return data;
 }
@@ -3151,7 +3151,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		// NEXT: 32 BYTE COLOR MAP, LOADED TO $51
 
 		//if (m_gdc_indirect_register & GDC_SELECT_MODE_REGISTER) // 0x40
-		//		logerror(" *** SELECT MODE REGISTER");
+		//      logerror(" *** SELECT MODE REGISTER");
 
 		if (m_gdc_indirect_register & GDC_SELECT_SCROLL_MAP) // 0x80
 		{

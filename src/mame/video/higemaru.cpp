@@ -21,52 +21,50 @@ WRITE8_MEMBER(higemaru_state::higemaru_colorram_w)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(higemaru_state, higemaru)
+void higemaru_state::higemaru_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
+		// red component
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
+		// green component
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x20;
 
-	/* characters use colors 0-15 */
-	for (i = 0; i < 0x80; i++)
+	// characters use colors 0-15
+	for (int i = 0; i < 0x80; i++)
 	{
-		uint8_t ctabentry = color_prom[i] & 0x0f;
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites use colors 16-31 */
-	for (i = 0x80; i < 0x180; i++)
+	// sprites use colors 16-31
+	for (int i = 0x80; i < 0x180; i++)
 	{
-		uint8_t ctabentry = (color_prom[i + 0x80] & 0x0f) | 0x10;
+		uint8_t const ctabentry = (color_prom[i + 0x80] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -101,21 +99,18 @@ void higemaru_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(higemaru_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-void higemaru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void higemaru_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *spriteram = m_spriteram;
-	int offs;
 
-	for (offs = m_spriteram.bytes() - 16; offs >= 0; offs -= 16)
+	for (int offs = m_spriteram.bytes() - 16; offs >= 0; offs -= 16)
 	{
-		int code,col,sx,sy,flipx,flipy;
-
-		code = spriteram[offs] & 0x7f;
-		col = spriteram[offs + 4] & 0x0f;
-		sx = spriteram[offs + 12];
-		sy = spriteram[offs + 8];
-		flipx = spriteram[offs + 4] & 0x10;
-		flipy = spriteram[offs + 4] & 0x20;
+		int const code = spriteram[offs] & 0x7f;
+		int col = spriteram[offs + 4] & 0x0f;
+		int sx = spriteram[offs + 12];
+		int sy = spriteram[offs + 8];
+		int flipx = spriteram[offs + 4] & 0x10;
+		int flipy = spriteram[offs + 4] & 0x20;
 		if (flip_screen())
 		{
 			sx = 240 - sx;

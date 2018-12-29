@@ -2471,9 +2471,8 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	MCFG_SCREEN_UPDATE_DRIVER(nbmj8688_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 4096)
+	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_12bit), 4096);
 
-	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_12bit)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_12bit)
 
 	/* sound hardware */
@@ -2495,10 +2494,8 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256)
+	subdevice<palette_device>("palette")->set_entries(256).set_init(FUNC(nbmj8688_state::mbmj8688_8bit));
 
-	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_8bit)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
 MACHINE_CONFIG_END
 
@@ -2508,11 +2505,8 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_65536)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(65536)
+	subdevice<palette_device>("palette")->set_entries(65536).set_init(FUNC(nbmj8688_state::mbmj8688_16bit));
 
-	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_16bit)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_16bit)
 MACHINE_CONFIG_END
 
@@ -2629,8 +2623,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 65536)
-	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_16bit)
+	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_16bit), 65536);
 	config.set_default_layout(layout_nbmj8688);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2641,8 +2634,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	MCFG_SCREEN_UPDATE_DRIVER(nbmj8688_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette_lcd", 2)
-	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_lcd)
+	PALETTE(config, "palette_lcd", FUNC(nbmj8688_state::mbmj8688_lcd), 2);
 
 	screen_device &lcd0(SCREEN(config, "lcd0", SCREEN_TYPE_LCD));
 	lcd0.set_physical_aspect(15, 3);

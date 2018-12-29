@@ -75,8 +75,8 @@
 class pc100_state : public driver_device
 {
 public:
-	pc100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pc100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_rtc(*this, "rtc"),
@@ -687,14 +687,12 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc100)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(xxxxxxxBBBGGGRRR)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc100);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_333, 16);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /* ROM definition */

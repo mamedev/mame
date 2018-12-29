@@ -1113,7 +1113,7 @@ void taitojc_state::taitojc(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitojc_state::screen_update_taitojc));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 32768);
+	PALETTE(config, m_palette).set_entries(32768);
 
 	TC0780FPA(config, m_tc0780fpa, 0);
 

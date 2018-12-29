@@ -258,16 +258,16 @@ static GFXDECODE_START( gfx_triplhnt )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(triplhnt_state, triplhnt)
+void triplhnt_state::triplhnt_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xAF, 0xAF, 0xAF));  /* sprites */
+	palette.set_pen_color(0, rgb_t(0xaf, 0xaf, 0xaf));  // sprites
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(2, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(2, rgb_t(0xff, 0xff, 0xff));
 	palette.set_pen_color(3, rgb_t(0x50, 0x50, 0x50));
-	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));  /* tiles */
-	palette.set_pen_color(5, rgb_t(0x3F, 0x3F, 0x3F));
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));  // tiles
+	palette.set_pen_color(5, rgb_t(0x3f, 0x3f, 0x3f));
 	palette.set_pen_color(6, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(7, rgb_t(0x3F, 0x3F, 0x3F));
+	palette.set_pen_color(7, rgb_t(0x3f, 0x3f, 0x3f));
 }
 
 
@@ -303,7 +303,7 @@ void triplhnt_state::triplhnt(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_triplhnt);
-	PALETTE(config, m_palette, 8).set_init(FUNC(triplhnt_state::palette_init_triplhnt));
+	PALETTE(config, m_palette, FUNC(triplhnt_state::triplhnt_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

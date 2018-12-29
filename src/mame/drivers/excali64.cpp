@@ -76,7 +76,7 @@ public:
 	void excali64(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(excali64);
+	void excali64_palette(palette_device &palette);
 	DECLARE_WRITE8_MEMBER(ppib_w);
 	DECLARE_READ8_MEMBER(ppic_r);
 	DECLARE_WRITE8_MEMBER(ppic_w);
@@ -98,8 +98,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_MACHINE_RESET(excali64);
-	required_device<palette_device> m_palette;
-
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
@@ -111,6 +109,7 @@ private:
 	bool m_crtc_hs;
 	bool m_motor;
 	bool m_centronics_busy;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
@@ -457,7 +456,7 @@ GFXDECODE_END
 // The prom, the schematic, and the manual all contradict each other,
 // so the colours can only be described as wild guesses. Further, the 38
 // colour-load resistors are missing labels and values.
-PALETTE_INIT_MEMBER( excali64_state, excali64 )
+void excali64_state::excali64_palette(palette_device &palette)
 {
 	// do this here because driver_init hasn't run yet
 	m_p_videoram = memregion("videoram")->base();
@@ -490,13 +489,12 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	membank("bankw4")->configure_entry(2, &m_p_hiresram[0x0000]);
 
 	// Set up foreground colours
-	uint8_t r,g,b,i,code;
-	for (i = 0; i < 32; i++)
+	for (uint8_t i = 0; i < 32; i++)
 	{
-		code = m_p_chargen[0x1000+i];
-		r = (BIT(code, 0) ? 38 : 0) + (BIT(code, 1) ? 73 : 0) + (BIT(code, 2) ? 144 : 0);
-		b = (BIT(code, 3) ? 38 : 0) + (BIT(code, 4) ? 73 : 0) + (BIT(code, 5) ? 144 : 0);
-		g = (BIT(code, 6) ? 85 : 0) + (BIT(code, 7) ? 170 : 0);
+		uint8_t const code = m_p_chargen[0x1000+i];
+		uint8_t const r = (BIT(code, 0) ? 38 : 0) + (BIT(code, 1) ? 73 : 0) + (BIT(code, 2) ? 144 : 0);
+		uint8_t const b = (BIT(code, 3) ? 38 : 0) + (BIT(code, 4) ? 73 : 0) + (BIT(code, 5) ? 144 : 0);
+		uint8_t const g = (BIT(code, 6) ? 85 : 0) + (BIT(code, 7) ? 170 : 0);
 		palette.set_pen_color(i, r, g, b);
 	}
 
@@ -589,9 +587,10 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_SCREEN_SIZE(80*8, 24*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 40)
-	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excali64)
+
+	PALETTE(config, m_palette, FUNC(excali64_state::excali64_palette), 40);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_excali64);
+
 	MC6845(config, m_crtc, 16_MHz_XTAL / 16); // 1MHz for lowres; 2MHz for highres
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);

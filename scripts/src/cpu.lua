@@ -66,6 +66,26 @@ if (CPUS["8X300"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- 3DO Don's Super Performing Processor (DSPP)
+--@src/devices/cpu/dspp/dspp.h,CPUS["DSPP"] = true
+--------------------------------------------------
+
+if (CPUS["DSPP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/dspp/dspp.cpp",
+		MAME_DIR .. "src/devices/cpu/dspp/dspp.h",
+		MAME_DIR .. "src/devices/cpu/dspp/dsppdrc.cpp",
+		MAME_DIR .. "src/devices/cpu/dspp/dsppfe.cpp",
+		MAME_DIR .. "src/devices/cpu/dspp/dsppfe.h",
+	}
+end
+
+if (CPUS["DSPP"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dspp/dsppdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dspp/dsppdasm.h")
+end
+
+--------------------------------------------------
 -- ARCangent A4
 --@src/devices/cpu/arc/arc.h,CPUS["ARC"] = true
 --------------------------------------------------

@@ -1716,7 +1716,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaxbd);
-	PALETTE(config, m_palette, 8192*3);
+	PALETTE(config, m_palette).set_entries(8192*3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224);

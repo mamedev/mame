@@ -31,8 +31,8 @@ TODO:
 class horse_state : public driver_device
 {
 public:
-	horse_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	horse_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(horse_state::horse)
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

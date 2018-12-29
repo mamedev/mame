@@ -677,7 +677,7 @@ void tigeroad_state::tigeroad(machine_config &config)
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
 
-	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -753,7 +753,7 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
 
-	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

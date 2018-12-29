@@ -73,31 +73,27 @@ pen_t cosmic_state::magspot_map_color( uint8_t x, uint8_t y )
  * (1k to ground) so second version of table has blue set to 2/3
  */
 
-PALETTE_INIT_MEMBER(cosmic_state,panic)
+void cosmic_state::panic_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x10; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x10; i++)
 	{
-		int r = pal1bit(i >> 0);
-		int g = pal1bit(i >> 1);
-		int b = ((i & 0x0c) == 0x08) ? 0xaa : pal1bit(i >> 2);
+		int const r = pal1bit(i >> 0);
+		int const g = pal1bit(i >> 1);
+		int const b = ((i & 0x0c) == 0x08) ? 0xaa : pal1bit(i >> 2);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* background uses colors 0x00-0x0f */
-	for (i = 0; i < 0x0f; i++)
+	// background uses colors 0x00-0x0f
+	for (int i = 0; i < 0x0f; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* sprites use colors 0x00-0x07 */
-	for (i = 0x10; i < 0x30; i++)
-	{
-		uint8_t ctabentry = color_prom[i - 0x10] & 0x07;
-		palette.set_pen_indirect(i, ctabentry);
-	}
+	// sprites use colors 0x00-0x07
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i + 0x10, color_prom[i] & 0x07);
 
 	m_map_color = &cosmic_state::panic_map_color;
 }
@@ -112,31 +108,22 @@ PALETTE_INIT_MEMBER(cosmic_state,panic)
  *
  */
 
-PALETTE_INIT_MEMBER(cosmic_state,cosmica)
+void cosmic_state::cosmica_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x08; i++)
-	{
-		rgb_t color = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-		palette.set_indirect_color(i, color);
-	}
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x08; i++)
+		palette.set_indirect_color(i, rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2)));
 
-	/* background and sprites use colors 0x00-0x07 */
-	for (i = 0; i < 0x08; i++)
+	// background and sprites use colors 0x00-0x07
+	for (int i = 0; i < 0x08; i++)
 		palette.set_pen_indirect(i, i);
 
-	for (i = 0x08; i < 0x28; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t ctabentry;
-
-		ctabentry = (color_prom[i - 0x08] >> 0) & 0x07;
-		palette.set_pen_indirect(i + 0x00, ctabentry);
-
-		ctabentry = (color_prom[i - 0x08] >> 4) & 0x07;
-		palette.set_pen_indirect(i + 0x20, ctabentry);
+		palette.set_pen_indirect(i + 0x08, (color_prom[i] >> 0) & 0x07);
+		palette.set_pen_indirect(i + 0x28, (color_prom[i] >> 4) & 0x07);
 	}
 
 	m_map_color = &cosmic_state::cosmica_map_color;
@@ -152,15 +139,13 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmica)
  * It's possible that the background is dark gray and not black, as the
  * resistor chain would never drop to zero, Anybody know ?
  */
-PALETTE_INIT_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::cosmicg_palette(palette_device &palette)
 {
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int r = (i > 8) ? 0xff : 0xaa * ((i >> 0) & 1);
-		int g = 0xaa * ((i >> 1) & 1);
-		int b = 0xaa * ((i >> 2) & 1);
+		int const r = (i > 8) ? 0xff : 0xaa * BIT(i, 0);
+		int const g = 0xaa * BIT(i, 1);
+		int const b = 0xaa * BIT(i, 2);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -169,59 +154,51 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmicg)
 }
 
 
-PALETTE_INIT_MEMBER(cosmic_state,magspot)
+void cosmic_state::magspot_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x10; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x10; i++)
 	{
-		int r = ((i & 0x09) == 0x08) ? 0xaa : pal1bit(i >> 0);
-		int g = pal1bit(i >> 1);
-		int b = pal1bit(i >> 2);
+		int const r = ((i & 0x09) == 0x08) ? 0xaa : pal1bit(i >> 0);
+		int const g = pal1bit(i >> 1);
+		int const b = pal1bit(i >> 2);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* background uses colors 0x00-0x0f */
-	for (i = 0; i < 0x0f; i++)
+	// background uses colors 0x00-0x0f
+	for (int i = 0; i < 0x0f; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* sprites use colors 0x00-0x0f */
-	for (i = 0x10; i < 0x30; i++)
-	{
-		uint8_t ctabentry = color_prom[i - 0x10] & 0x0f;
-		palette.set_pen_indirect(i, ctabentry);
-	}
+	// sprites use colors 0x00-0x0f
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i + 0x10, color_prom[i] & 0x0f);
 
 	m_map_color = &cosmic_state::magspot_map_color;
 	m_magspot_pen_mask = 0x0f;
 }
 
 
-PALETTE_INIT_MEMBER(cosmic_state,nomnlnd)
+void cosmic_state::nomnlnd_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x10; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x10; i++)
 	{
-		rgb_t color = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		rgb_t const color = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 		palette.set_indirect_color(i, color);
 	}
 
-	/* background uses colors 0x00-0x07 */
-	for (i = 0; i < 0x07; i++)
+	// background uses colors 0x00-0x07
+	for (int i = 0; i < 0x07; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* sprites use colors 0x00-0x07 */
-	for (i = 0x10; i < 0x30; i++)
-	{
-		uint8_t ctabentry = color_prom[i - 0x10] & 0x07;
-		palette.set_pen_indirect(i, ctabentry);
-	}
+	// sprites use colors 0x00-0x07 */
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i + 0x10, color_prom[i] & 0x07);
 
 	m_map_color = &cosmic_state::magspot_map_color;
 	m_magspot_pen_mask = 0x07;
@@ -236,19 +213,16 @@ WRITE8_MEMBER(cosmic_state::cosmic_background_enable_w)
 
 void cosmic_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		int i;
 		uint8_t data = m_videoram[offs];
 
 		uint8_t x = offs << 3;
-		uint8_t y = offs >> 5;
+		uint8_t const y = offs >> 5;
 
 		pen_t pen = (this->*m_map_color)(x, y);
 
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			if (data & 0x80)
 			{

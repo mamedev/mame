@@ -1503,10 +1503,8 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	MCFG_SCREEN_UPDATE_DRIVER(lucky74_state, screen_update_lucky74)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lucky74)
-
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_lucky74);
+	PALETTE(config, "palette", FUNC(lucky74_state::lucky74_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

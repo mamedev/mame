@@ -1077,7 +1077,7 @@ void wecleman_state::wecleman(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wecleman);
 
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
@@ -1153,7 +1153,7 @@ void wecleman_state::hotchase(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotchase);
-	PALETTE(config, m_palette, 8192);
+	PALETTE(config, m_palette).set_entries(8192);
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 

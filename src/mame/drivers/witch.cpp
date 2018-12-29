@@ -989,11 +989,10 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_witch)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_witch)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1027,8 +1026,7 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 0x200+0x80)
+	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
 
 //  MCFG_PALETTE_FORMAT(IIBBGGRR)

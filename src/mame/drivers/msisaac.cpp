@@ -472,8 +472,7 @@ void msisaac_state::msisaac(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msisaac);
-	PALETTE(config, m_palette, 1024);
-	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

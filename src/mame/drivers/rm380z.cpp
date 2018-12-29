@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )

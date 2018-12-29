@@ -1600,6 +1600,7 @@ mystgard                        // (c) 1996
 one4all                         // (c) 2001
 orchidms                        // (c) 1999
 orchidmsa                       // (c) 1999
+orchidmsnz                      // (c) 2000
 oscara5                         // (c) 1996
 oscara5a                        // (c) 1996
 pantmag                         // (c) 1999
@@ -1640,6 +1641,7 @@ qnileu                          // (c) 1997
 qnileua                         // (c) 1997
 qnilev                          // (c) 1997
 qnilemax                        // (c) 1999
+qnilenz                         // (c) 1998
 qtbird                          // (c) 1994
 rainwrce                        // (c) 2000
 reelpwr                         // (c) 1996
@@ -1702,6 +1704,7 @@ aristmk6                        // (c) 2000
 5dragsp                         // (c) 2004
 5dragce                         // (c) 2007
 5koipp                          // (c) 2007
+15lions                         // (c) 2004
 50lions                         // (c) 2002
 50lionsm                        // (c) 2003
 50lionrr                        // (c) 2012
@@ -1840,6 +1843,7 @@ mskitty                         // (c) 2005
 mnytree                         // (c) 2000
 moonwalt                        // (c) 2007
 mchilli                         // (c) 2008
+mchilliq                        // (c) 2010
 mrwoo                           // (c) 200?
 mystarr                         // (c) 2002
 mysteycm                        // (c) 2001
@@ -1856,6 +1860,7 @@ parislgtu                       // (c) 2002
 pcockmag                        // (c) 2002
 pcockmagu                       // (c) 2004
 pelipete                        // (c) 2004
+pelipetejc                      // (c) 2006
 pelipeteu                       // (c) 2005
 pennyar                         // (c) 2005
 pengpyce                        // (c) 2003
@@ -1899,6 +1904,7 @@ silkrda6                        // (c) 2006
 silgola6                        // (c) 2002
 skydnca6                        // (c) 2008
 spgcarn                         // (c) 1999
+spgcarnq                        // (c) 2001
 stardrft                        // (c) 2003
 stardrftu                       // (c) 2004
 starqst                         // (c) 2001
@@ -1926,6 +1932,7 @@ turtreas                        // (c) 2006
 venetian                        // (c) 2002
 venice                          // (c) 2004
 werewild                        // (c) 2009
+werewildq                       // (c) 2010
 whalecsh                        // (c) 2002
 whalecshu                       // (c) 2003
 whalecshua                      // (c) 2005
@@ -11326,6 +11333,7 @@ skullfnga                       // MCH (c) 1996 Data East Corporation (Asia)
 skullfngj                       // MCH (c) 1996 Data East Corporation (Japan)
 stadhr96                        // MCM (c) 1996 Data East Corporation (World)
 stadhr96j                       // MCM (c) 1996 Data East Corporation (Japan)
+stadhr96j2                      // MCM (c) 1996 Data East Corporation (Japan)
 stadhr96u                       // MCM (c) 1996 Data East Corporation (USA)
 
 @source:deco156.cpp
@@ -13089,6 +13097,7 @@ skylancre                       // (c) 1983 Orca + Esco Trading Co license
 @source:funkyjet.cpp
 funkyjet                        // MAT (c) 1992 Data East (Mitchell license) (World, Rev 1)
 funkyjeta                       // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified
+funkyjetb                       // bootleg
 funkyjetj                       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 sotsugyo                        // (c) 1995 Mitchell (Atlus license)
 
@@ -13187,6 +13196,7 @@ intrgmes                        // (c) 1991 Inter Games
 fw_a7_11                        // (c) 1985 Fun World
 fw_a7_11a                       // (c) 1985 Fun World
 fw_a0_1                         // (c) 1991 Fun World
+jokcrdep                        // (c) 1991 Fun World
 
 @source:funybubl.cpp
 funybubl                        // (c) 1999 In Chang Electronic Co
@@ -17569,6 +17579,7 @@ berlwall                        // (c) 1991 Kaneko
 berlwallk                       // (c) 1991 Kaneko (Korea, Inter license)
 berlwallt                       // (c) 1991 Kaneko
 blazeon                         // (c) 1992 Atlus
+blazeonj                        // (c) 1992 Atlus
 bloodwar                        // (c) 1994 Kaneko
 bonkadv                         // (c) 1994 Kaneko
 brapboys                        // (c) 1992 Kaneko
@@ -17773,7 +17784,6 @@ winspike                        // 1997.?? GX705 (Europe)
 winspikej                       // 1997.07 GX705 (Japan)
 
 @source:konamim2.cpp
-3do_m2                          //
 btltryst                        // GX636 (c) 1998
 evilngt                         // GX810 (c) 1998
 evilngte                        // GX810 (c) 1998
@@ -18491,6 +18501,7 @@ kengoa                          // (c) 1991 (Japan)
 loht                            // (c) 1989
 lohtb                           // (c) 1989 (bootleg)
 lohtb2                          // (c) 1989 (bootleg)
+lohtb3                          // (c) 1989 (bootleg)
 lohtj                           // (c) 1989 (Japan)
 ltswords                        // (c) 1991 (World)
 majtitle                        // (c) 1990 (World)
@@ -35875,6 +35886,7 @@ keithlcy                        // (c) 1993 Visco
 koikois2                        // (c) 1997 Visco
 meosism                         // (c) 1996?Sammy
 mslider                         // (c) 1997 Visco / Datt Japan
+pastelis                        // (c) 1993 Visco
 ryorioh                         // (c) 1998 Visco
 srmp4                           // (c) 1993 Seta
 srmp4o                          // (c) 1993 Seta
@@ -37153,6 +37165,7 @@ riot                            // (c) 1992 NMK
 
 @source:tecmosys.cpp
 deroon                          // (c) 1996 Tecmo
+deroon2                         // (c) 1996 Tecmo
 tkdensho                        // (c) 1996 Tecmo
 tkdenshoa                       // (c) 1996 Tecmo
 
@@ -38512,10 +38525,6 @@ vigilanto                       // (c) 1988 (US)
 @source:vii.cpp
 batmantv                        // The Batman, 2004
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
-vsmile                          //
-vsmileb                         //
-vsmilef                         //
-vsmileg                         //
 walle                           //
 wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
@@ -38526,6 +38535,12 @@ rad_skat                        //
 rad_skatp                       //
 rad_sktv                        //
 rad_crik                        //
+
+@source:vsmile.cpp
+vsmile                          //
+vsmileb                         //
+vsmilef                         //
+vsmileg                         //
 
 @source:vsmilepro.cpp
 vsmilpro
@@ -39666,6 +39681,10 @@ epo_efdx                        //
 rad_rh                          //
 has_wamg                        //
 ekara                           //
+ekaraj                          //
+ddrfammt                        //
+popira                          //
+taikodp                         //
 xavtenni                        //
 ttv_sw                          //
 ttv_lotr                        //

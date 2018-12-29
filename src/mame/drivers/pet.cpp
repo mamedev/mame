@@ -1731,8 +1731,7 @@ void pet_state::_32k(machine_config &config)
 
 void pet_state::base_pet_devices(machine_config &config, const char *default_drive)
 {
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	VIA6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpb_handler().set(FUNC(pet_state::via_pb_r));

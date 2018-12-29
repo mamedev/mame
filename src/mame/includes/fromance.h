@@ -28,10 +28,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_gga(*this, "gga"),
 		m_spr_old(*this, "vsystem_spr_old"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_sublatch(*this, "sublatch"),
 		m_msm(*this, "msm"),
@@ -50,10 +50,10 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	optional_shared_ptr<uint8_t> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<vsystem_gga_device> m_gga;
 	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE8_MEMBER(fromance_gfxreg_w);
 	DECLARE_READ8_MEMBER(fromance_videoram_r);

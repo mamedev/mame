@@ -449,9 +449,7 @@ void skykid_state::skykid(machine_config &config)
 	screen.screen_vblank().set(FUNC(skykid_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skykid);
-	PALETTE(config, m_palette, 64*4+128*4+64*8);
-	m_palette->set_indirect_entries(256);
-	m_palette->set_init(FUNC(skykid_state::palette_init_skykid));
+	PALETTE(config, m_palette, FUNC(skykid_state::skykid_palette), 64*4 + 128*4 + 64*8, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

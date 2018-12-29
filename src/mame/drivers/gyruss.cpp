@@ -504,13 +504,11 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(gyruss_state, screen_update_gyruss)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gyruss_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gyruss)
-	MCFG_PALETTE_ADD("palette", 16*4+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gyruss);
+	PALETTE(config, m_palette, FUNC(gyruss_state::gyruss_palette), 16*4+16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

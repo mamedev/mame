@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="gba" description="Nintendo Game Boy Advance cartridges">
 
@@ -3525,7 +3525,7 @@
 	</software>
 
 	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (a figurine)
-		contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
+	    contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
 	<software name="plustw">
 		<description>Bouken Yuuki Pluster World - Densetsu no Plust Gate (Jpn)</description>
 		<year>2003</year>
@@ -3548,7 +3548,7 @@
 	</software>
 
 	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (a figurine)
-		contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
+	    contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
 	<software name="plustwex">
 		<description>Bouken Yuuki Pluster World - Densetsu no Plust Gate EX (Jpn)</description>
 		<year>2003</year>
@@ -3568,7 +3568,7 @@
 	</software>
 
 	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (a figurine)
-		contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
+	    contains just press different switches on the cradle to be readed as a simple ID (the toys constains no electronics). -->
 	<software name="plustwgp">
 		<description>Bouken Yuuki Pluster World - Pluston GP (Jpn)</description>
 		<year>2003</year>
@@ -6302,7 +6302,7 @@
 	</software>
 
 	<!-- This games uses the GBA IR adapter (Nintendo P/N AGB-006) to connect to real Zoids toys.
-             Two toys supported: CDZ-01 (Diablotiger) and CDZ-02 (Cyclops). -->
+	         Two toys supported: CDZ-01 (Diablotiger) and CDZ-02 (Cyclops). -->
 	<software name="cybzoids">
 		<description>Cyberdrive Zoids - Kijuu no Senshi Hyuu (Jpn)</description>
 		<year>2003</year>
@@ -16534,7 +16534,7 @@
 	</software>
 
 	<!-- Telefang 2 is compatible with an accessory called "Power Antenna" (just like the GBC version). The "Power Antenna" is just a led light connected
-		to the GBA accessories port. -->
+	    to the GBA accessories port. -->
 	<software name="telfng2p">
 		<description>Keitai Denjuu Telefang 2 - Power (Jpn)</description>
 		<year>2002</year>
@@ -18181,7 +18181,7 @@
 	</software>
 
 	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (shaped like a crystal with a frozen monster inside)
-		contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
+	    contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
 	<software name="legendzs">
 		<description>Legendz - Sign of Nekuromu (Jpn)</description>
 		<year>2005</year>
@@ -18203,7 +18203,7 @@
 	</software>
 
 	<!-- This game supports interacting with real toys (using a cradle/reader connected to the GBA accessories port). Each toy (shaped like a crystal with a frozen monster inside)
-		contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
+	    contains a serial EEPROM (probably with an ID and some data the game can read and write). -->
 	<software name="legendzy">
 		<description>Legendz - Yomigaeru Shiren no Shima (Jpn)</description>
 		<year>2004</year>
@@ -27877,9 +27877,9 @@
 		</part>
 	</software>
 
-	<!-- Compatible with "Battle Chips" (using the "Battle Chip Gate" (バトルチップゲート) connected to the GBA accessories port). 
-		A Battle Chip looks like a memory card, but contains no memory, it's just an ID by shortcutting different pins on its edge connector.
-		https://megaman.fandom.com/wiki/List_of_Advanced_PET_Battle_Chips -->
+	<!-- Compatible with "Battle Chips" (using the "Battle Chip Gate" (バトルチップゲート) connected to the GBA accessories port).
+	    A Battle Chip looks like a memory card, but contains no memory, it's just an ID by shortcutting different pins on its edge connector.
+	    https://megaman.fandom.com/wiki/List_of_Advanced_PET_Battle_Chips -->
 	<software name="rockmx45">
 		<description>Rockman EXE 4.5 - Real Operation (Jpn)</description>
 		<year>2004</year>
@@ -29284,7 +29284,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="sboktai">
 		<description>Shin Bokura no Taiyou - Gyakushuu no Sabata (Jpn)</description>
@@ -30516,8 +30516,8 @@
 		</part>
 	</software>
 
-<!-- This comes from a proto cart: it is mostly similar to the final release, with single byte differences
-The cart also contained a non-empty SRAM save which we currently include in the set, even if we don't load it. -->
+	<!-- This comes from a proto cart: it is mostly similar to the final release, with single byte differences
+	The cart also contained a non-empty SRAM save which we currently include in the set, even if we don't load it. -->
 	<software name="sonicup" cloneof="sonic" supported="partial">
 		<description>Sonic Advance (USA, Prototype)</description>
 		<year>2002</year>
@@ -36256,7 +36256,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<!-- Game with rumble and gyroscope (AGB-019A).
-		Has a sub-board (AGB-MOG-01) with "U1 CG-L43" (miniature angular rate sensor: https://4donline.ihs.com/images/VipMasterIC/IC/TOKN/TOKND00194/TOKND00194-23.pdf) -->
+	    Has a sub-board (AGB-MOG-01) with "U1 CG-L43" (miniature angular rate sensor: https://4donline.ihs.com/images/VipMasterIC/IC/TOKN/TOKND00194/TOKND00194-23.pdf) -->
 	<software name="wariotws">
 		<description>WarioWare - Twisted! (USA)</description>
 		<year>2005</year>
@@ -39911,16 +39911,16 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 <!-- Misc Add-ons -->
 
 	<!-- "Tony Hawk's Motion" for Nintendo DS uses an accessory called "Motion Pack" (Activision Part No. 83493.133) in form of GBA cart.
-		It serves as motion sensor. Its inside PCB is labeled "DS-2011 R1.2" and contains:
-			* Kionix KXSC4 high-performance, low-power, analog output tri-axis accelerometer (http://kionixfs.kionix.com/en/datasheet/KXSC4-2050%20Specifications%20Rev%203.pdf).
-			* Atmel TINY13V high Performance, Low Power AVR 8-Bit RISC Microcontroller [ROM not dumped] (http://ww1.microchip.com/downloads/en/devicedoc/doc2535.pdf) -->
+	    It serves as motion sensor. Its inside PCB is labeled "DS-2011 R1.2" and contains:
+	        * Kionix KXSC4 high-performance, low-power, analog output tri-axis accelerometer (http://kionixfs.kionix.com/en/datasheet/KXSC4-2050%20Specifications%20Rev%203.pdf).
+	        * Atmel TINY13V high Performance, Low Power AVR 8-Bit RISC Microcontroller [ROM not dumped] (http://ww1.microchip.com/downloads/en/devicedoc/doc2535.pdf) -->
 
 	<!-- "Daigasso Band Brothers" (大合奏!バンドブラザーズ) for Nintendo DS uses a GBA cart (NTR-A-ZBBJ-JPN) called "Daigasso Request Selection" for adding new songs to the game.
-		Inside there is an standard "AGB-E01-41" GBA cart PCB with "U1=GPIO MASK ROM [R27V810F-064]". -->
+	    Inside there is an standard "AGB-E01-41" GBA cart PCB with "U1=GPIO MASK ROM [R27V810F-064]". -->
 
 	<!-- AM3 did a Nintendo officially lilcensed video player for GBA in form of a GBA cart with a SmartMedia slot.
-		There were lot of pre-recorded SmartMedia cards with videos (Pokémon, Detective Conan, etc.), but also kiosk machines to download new videos to an empty card.
-		Inside this GBA cart the PCB is labeled "YGP2-AM1-01". The ROM and the video processor are behind the SmartMedia slot, but the label "U3 AM3-ASIC" is visible. -->
+	    There were lot of pre-recorded SmartMedia cards with videos (Pokémon, Detective Conan, etc.), but also kiosk machines to download new videos to an empty card.
+	    Inside this GBA cart the PCB is labeled "YGP2-AM1-01". The ROM and the video processor are behind the SmartMedia slot, but the label "U3 AM3-ASIC" is visible. -->
 
 
 	<software name="gbapo" supported="no">
@@ -40011,18 +40011,18 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<!-- The video playback can be configured by placing a file named "play_yanmicro.ini" on the SD root folder, with the following content:
-			Property		Value
-			PLAY_YAN_Design 	0 (default, pictogram mode) or 1 (Mario mode).
-			PLAY_YAN_StartMode	0 (movie mode) or 1 (default, music mode).
-			PLAY_YAN_VolumeAdd	Integer from -19 to 9 (default is 0).
-			PLAY_YAN_AudioPlayMode	0 (default, ordered list without repeat), 1 (ordered list with repeat), 2 (random without repeat) or 3 (random with repeat).
-			PLAY_YAN_AudioBass      0 (default) or 1 (bass boost).
-			PLAY_YAN_AudioWide      Integer from 0 to 6 (being 0 no wide sound effect and 6 maximum wide sound efect).
-			PLAY_YAN_VideoPlayMode	0 (default, single video playback), 1 (repeat over the selection video list), 2 (play all the stored video clips) or 3 (play all the stored video clips, with repeat).
-			PLAY_YAN_VideoBright	Integer from 0 to 5 (being 0 the default brightness value, and 6 the maximum brightness).
-		The game came bundled (on the deluxe edition) with Panasonic Media Stage 4.2 to allow users to encode their own videos. 
-		There was a free upgrade tp version V4.2L311 (https://panasonic.jp/support/software/mediastage/download/v42_nintendo.html).
-		It supports SD cards up to 1GB (it won't recognize 2GB SD cards). -->
+	        Property        Value
+	        PLAY_YAN_Design     0 (default, pictogram mode) or 1 (Mario mode).
+	        PLAY_YAN_StartMode  0 (movie mode) or 1 (default, music mode).
+	        PLAY_YAN_VolumeAdd  Integer from -19 to 9 (default is 0).
+	        PLAY_YAN_AudioPlayMode  0 (default, ordered list without repeat), 1 (ordered list with repeat), 2 (random without repeat) or 3 (random with repeat).
+	        PLAY_YAN_AudioBass      0 (default) or 1 (bass boost).
+	        PLAY_YAN_AudioWide      Integer from 0 to 6 (being 0 no wide sound effect and 6 maximum wide sound efect).
+	        PLAY_YAN_VideoPlayMode  0 (default, single video playback), 1 (repeat over the selection video list), 2 (play all the stored video clips) or 3 (play all the stored video clips, with repeat).
+	        PLAY_YAN_VideoBright    Integer from 0 to 5 (being 0 the default brightness value, and 6 the maximum brightness).
+	    The game came bundled (on the deluxe edition) with Panasonic Media Stage 4.2 to allow users to encode their own videos.
+	    There was a free upgrade tp version V4.2L311 (https://panasonic.jp/support/software/mediastage/download/v42_nintendo.html).
+	    It supports SD cards up to 1GB (it won't recognize 2GB SD cards). -->
 	<software name="playyanm">
 		<description>Play-Yan Micro (Jpn)</description>
 		<year>2005</year>

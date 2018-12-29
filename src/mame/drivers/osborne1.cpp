@@ -298,7 +298,7 @@ void osborne1_state::osborne1(machine_config &config)
 	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_osborne1);
-	PALETTE(config, "palette", 3).set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);

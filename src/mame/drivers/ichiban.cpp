@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ichibanjyan)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1500,7 +1500,7 @@ void harddriv_state::driver_nomsp(machine_config &config)
 	rs232.rxd_handler().set("duartn68681", FUNC(mc68681_device::rx_a_w));
 
 	/* video hardware */
-	PALETTE(config, m_palette, 1024);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(HARDDRIV_GSP_CLOCK/12*4, 160*4, 0, 127*4, 417, 0, 384);
@@ -1523,7 +1523,7 @@ void harddriv_state::driver_msp(machine_config &config)
 	m_msp->set_pixel_clock(5000000);
 	m_msp->set_pixels_per_clock(2);
 	m_msp->output_int().set(FUNC(harddriv_state::hdmsp_irq_gen));
-    m_msp->set_screen("screen");
+	m_msp->set_screen("screen");
 
 	config.device_remove("slapstic");
 }
@@ -1550,18 +1550,18 @@ void harddriv_state::multisync_nomsp(machine_config &config)
 /* Multisync board with MSP (used by Hard Drivin' compact) */
 void harddriv_state::multisync_msp(machine_config &config)
 {
-    multisync_nomsp(config);
+	multisync_nomsp(config);
 
-    /* basic machine hardware */
-    TMS34010(config, m_msp, XTAL(50'000'000));
-    m_msp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_msp_map);
-    m_msp->set_halt_on_reset(true);
-    m_msp->set_pixel_clock(5000000);
-    m_msp->set_pixels_per_clock(2);
-    m_msp->output_int().set(FUNC(harddriv_state::hdmsp_irq_gen));
-    m_msp->set_screen("screen");
+	/* basic machine hardware */
+	TMS34010(config, m_msp, XTAL(50'000'000));
+	m_msp->set_addrmap(AS_PROGRAM, &harddriv_state::driver_msp_map);
+	m_msp->set_halt_on_reset(true);
+	m_msp->set_pixel_clock(5000000);
+	m_msp->set_pixels_per_clock(2);
+	m_msp->output_int().set(FUNC(harddriv_state::hdmsp_irq_gen));
+	m_msp->set_screen("screen");
 
-    config.device_remove("slapstic");
+	config.device_remove("slapstic");
 }
 
 

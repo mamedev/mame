@@ -538,8 +538,7 @@ void pgm_state::pgmbase(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pgm);
-	PALETTE(config, m_palette, 0x1200/2);
-	m_palette->set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
 
 	MCFG_VIDEO_START_OVERRIDE(pgm_state,pgm)
 

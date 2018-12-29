@@ -2594,11 +2594,10 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calomega)
-	MCFG_PALETTE_ADD("palette", 256) /* or 128? is the upper half of the PROMs really valid colors? */
-	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
+	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256); // or 128? is the upper half of the PROMs really valid colors?
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 6845 @ CPU clock */
 	crtc.set_screen("screen");

@@ -521,7 +521,7 @@ void n8080_state::spacefev(machine_config &config)
 	m_screen->set_screen_update(FUNC(n8080_state::screen_update_spacefev));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8).set_init(FUNC(n8080_state::palette_init_n8080));
+	PALETTE(config, m_palette, FUNC(n8080_state::n8080_palette), 8);
 
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,spacefev)
 
@@ -552,7 +552,7 @@ void n8080_state::sheriff(machine_config &config)
 	m_screen->set_screen_update(FUNC(n8080_state::screen_update_sheriff));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8).set_init(FUNC(n8080_state::palette_init_n8080));
+	PALETTE(config, m_palette, FUNC(n8080_state::n8080_palette), 8);
 
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,sheriff)
 
@@ -595,7 +595,7 @@ void n8080_state::helifire(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(n8080_state::screen_vblank_helifire));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8 + 0x400).set_init(FUNC(n8080_state::palette_init_helifire));
+	PALETTE(config, m_palette, FUNC(n8080_state::helifire_palette), 8 + 0x400);
 
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,helifire)
 

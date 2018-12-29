@@ -811,11 +811,10 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
@@ -900,11 +899,10 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
 
@@ -1000,11 +998,10 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninjabl)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
@@ -1074,11 +1071,10 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_edrandy)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
@@ -1164,14 +1160,13 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_robocop2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robocop2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
@@ -1264,8 +1259,7 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mutantf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)

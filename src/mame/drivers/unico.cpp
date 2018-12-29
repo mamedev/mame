@@ -576,11 +576,10 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT_CLASS(4, unico_state, unico_R6G6B6X)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &unico_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -621,11 +620,10 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT_CLASS(4, zeropnt_state, unico_R6G6B6X)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &zeropnt_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -669,11 +667,10 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT_CLASS(4, zeropnt2_state, unico_R6G6B6X)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &zeropnt2_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -134,7 +134,8 @@ const tiny_rom_entry *model1io2_device::device_rom_region() const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
+void model1io2_device::device_add_mconfig(machine_config &config)
+{
 	tmpz84c015_device &iocpu(TMPZ84C015(config, "iocpu", 19.6608_MHz_XTAL / 2)); // TMPZ84C015AF-12
 	iocpu.set_addrmap(AS_PROGRAM, &model1io2_device::mem_map);
 
@@ -182,10 +183,10 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	MB3773(config, m_watchdog, 0);
 
 	msm6253_device &adc(MSM6253(config, "adc", 32_MHz_XTAL / 16 / 4));
-	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r), this);
-	adc.set_input_cb<1>(FUNC(model1io2_device::analog1_r), this);
-	adc.set_input_cb<2>(FUNC(model1io2_device::analog2_r), this);
-	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r), this);
+	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r));
+	adc.set_input_cb<1>(FUNC(model1io2_device::analog1_r));
+	adc.set_input_cb<2>(FUNC(model1io2_device::analog2_r));
+	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r));
 
 	// diagnostic LCD display
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -196,13 +197,12 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	screen.set_screen_update("lcd", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(model1io2_device, lcd)
+	PALETTE(config, "palette", FUNC(model1io2_device::lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update), this);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************
@@ -274,7 +274,7 @@ void model1io2_device::device_reset()
 //  DIAGNOSTIC LCD
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( model1io2_device, lcd )
+void model1io2_device::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on

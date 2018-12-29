@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	crtc.out_vsync_callback().set(FUNC(hitpoker_state::hitpoker_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hitpoker);
-	PALETTE(config, m_palette, 0x800);
+	PALETTE(config, m_palette).set_entries(0x800);
 
 	SPEAKER(config, "mono").front_center();
 

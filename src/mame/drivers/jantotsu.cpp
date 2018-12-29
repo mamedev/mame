@@ -108,11 +108,12 @@ dumped by sayu
 class jantotsu_state : public driver_device
 {
 public:
-	jantotsu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jantotsu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm") ,
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette")
+	{ }
 
 	void jantotsu(machine_config &config);
 
@@ -141,7 +142,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jantotsu);
+	void jantotsu_palette(palette_device &palette) const;
 	uint32_t screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
 	required_device<cpu_device> m_maincpu;
@@ -218,26 +219,26 @@ WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 		logerror("I/O port $07 write trips %02x\n",data);
 }
 
-PALETTE_INIT_MEMBER(jantotsu_state, jantotsu)
+void jantotsu_state::jantotsu_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2, r, g, b;
-	int i;
 
-	for (i = 0; i < 0x20; ++i)
+	for (int i = 0; i < 0x20; ++i)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int bit0, bit1, bit2;
+
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[0], 3);
+		bit1 = BIT(color_prom[0], 4);
+		bit2 = BIT(color_prom[0], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[0], 6);
+		bit2 = BIT(color_prom[0], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
@@ -518,8 +519,7 @@ MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 	MCFG_SCREEN_UPDATE_DRIVER(jantotsu_state, screen_update_jantotsu)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(jantotsu_state, jantotsu)
+	PALETTE(config, m_palette, FUNC(jantotsu_state::jantotsu_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

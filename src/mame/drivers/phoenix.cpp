@@ -455,8 +455,7 @@ void phoenix_state::phoenix(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
-
-	PALETTE(config, m_palette, 256).set_init(FUNC(phoenix_state::palette_init_phoenix));
+	PALETTE(config, m_palette, FUNC(phoenix_state::phoenix_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
@@ -484,7 +483,7 @@ void phoenix_state::pleiads(machine_config &config)
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_pleiads);
 
-	m_palette->set_init(FUNC(phoenix_state::palette_init_pleiads));
+	m_palette->set_init(FUNC(phoenix_state::pleiads_palette));
 
 	/* sound hardware */
 	tms36xx_device &tms(TMS36XX(config.replace(), "tms", 247));
@@ -524,8 +523,7 @@ void phoenix_state::survival(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
-
-	PALETTE(config, m_palette, 256).set_init(FUNC(phoenix_state::palette_init_survival));
+	PALETTE(config, m_palette, FUNC(phoenix_state::survival_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 

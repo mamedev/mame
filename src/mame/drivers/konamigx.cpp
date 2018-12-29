@@ -1651,8 +1651,7 @@ void konamigx_state::konamigx(machine_config &config)
 	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
 	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx));
 
-	PALETTE(config, m_palette, 8192);
-	m_palette->set_format(PALETTE_FORMAT_XRGB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
@@ -1792,7 +1791,7 @@ void konamigx_state::opengolf(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type1_map);
 
-	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 }
 
@@ -1838,7 +1837,7 @@ void konamigx_state::gxtype3(machine_config &config)
 
 	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -132, -23);
 
-	PALETTE(config.replace(), m_palette, 16384);
+	PALETTE(config.replace(), m_palette).set_entries(16384);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
@@ -1876,7 +1875,7 @@ void konamigx_state::gxtype4(machine_config &config)
 	screen2.set_visarea(0, 384-1, 16, 32*8-1-16);
 	screen2.set_screen_update(FUNC(konamigx_state::screen_update_konamigx_right));
 
-	PALETTE(config.replace(), m_palette, 8192);
+	PALETTE(config.replace(), m_palette).set_entries(8192);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 

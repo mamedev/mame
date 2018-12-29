@@ -1301,16 +1301,15 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_discrete(*this, "discrete"),
 		m_ay8910(*this, "ay8910"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void goldnpkr_base(machine_config &config);
 	void wildcard(machine_config &config);
 	void wildcrdb(machine_config &config);
 	void witchcrd(machine_config &config);
@@ -1349,16 +1348,24 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 
-	DECLARE_PALETTE_INIT(witchcrd);
-
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	required_device<cpu_device> m_maincpu;
-	required_device_array<pia6821_device, 2> m_pia;
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+
+	void witchcrd_palette(palette_device &palette) const;
+
+	void goldnpkr_base(machine_config &config);
+
+	required_device<cpu_device> m_maincpu;
+	required_device_array<pia6821_device, 2> m_pia;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 private:
 	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
@@ -1375,10 +1382,9 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldnpkr);
+	void goldnpkr_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(wcrdxtnd);
-	DECLARE_PALETTE_INIT(wcrdxtnd);
+	void wcrdxtnd_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
 
@@ -1395,14 +1401,10 @@ private:
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	optional_device<discrete_device> m_discrete;
 	optional_device<ay8910_device> m_ay8910;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	output_finder<5> m_lamps;
 
 	tilemap_t *m_bg_tilemap;
@@ -1511,9 +1513,8 @@ uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
+void goldnpkr_state::goldnpkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1522,42 +1523,36 @@ PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
     ---- x---   intensity.
     xxxx ----   unused.
 */
-	int i;
 
-	/* 0000IBGR */
-	if (color_prom == nullptr) return;
+	// 0000IBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
+		constexpr int intenmin = 0xe0;
+//      constexpr int intenmin = 0xc2;    // 2.5 Volts (75.757575% of the whole range)
+		constexpr int intenmax = 0xff;    // 3.3 Volts (the whole range)
 
-		intenmin = 0xe0;
-//      intenmin = 0xc2;    /* 2.5 Volts (75.757575% of the whole range) */
-		intenmax = 0xff;    /* 3.3 Volts (the whole range) */
+		// intensity component
+		int const inten = BIT(color_prom[i], 3);
 
-		/* intensity component */
-		inten = (color_prom[i] >> 3) & 0x01;
+		// red component
+		int const r = BIT(color_prom[i], 0) * (inten ? intenmax : intenmin);
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * intenmin) + (inten * (bit0 * (intenmax - intenmin)));
+		// green component
+		int const g = BIT(color_prom[i], 1) * (inten ? intenmax : intenmin);
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
-
+		// blue component
+		int const b = BIT(color_prom[i], 2) * (inten ? intenmax : intenmin);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
+void goldnpkr_state::witchcrd_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1573,39 +1568,32 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
     ---- x---   blue killer.
     xxxx ----   unused.
 */
-	int i;
 
-	/* 0000KBGR */
+	// 0000KBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	if (color_prom == nullptr) return;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// blue killer (from schematics)
+		int const bk = BIT(color_prom[i], 3);
 
-		/* blue killer (from schematics) */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
+		// blue component
+		int const b = bk * BIT(color_prom[i], 2) * 0xff;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::wcrdxtnd_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.
@@ -1617,32 +1605,25 @@ PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
     ---- x---   intensity / blue killer.
     xxxx ----   unused.
 */
-	int i;
+	// 0000KBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	/* 0000KBGR */
-
-	if (color_prom == nullptr) return;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// blue killer (from schematics)
+		int const bk = BIT(color_prom[i], 3);
 
-		/* blue killer (from schematics) */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
-		//if ((b == 0) & (bk = 1))   --> needs better implementation
+		// blue component
+		int b = bk * BIT(color_prom[i], 2) * 0xff;
+		//if (!b & bk)   --> needs better implementation
 		//  b = 0x3f;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
@@ -4348,7 +4329,7 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldnpkr);
-	PALETTE(config, m_palette, 256).set_init(FUNC(goldnpkr_state::palette_init_goldnpkr));
+	PALETTE(config, m_palette, FUNC(goldnpkr_state::goldnpkr_palette), 256);
 }
 
 void goldnpkr_state::goldnpkr(machine_config &config)
@@ -4386,7 +4367,7 @@ void goldnpkr_state::witchcrd(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	m_palette->set_init(FUNC(goldnpkr_state::palette_init_witchcrd));
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4404,7 +4385,7 @@ void goldnpkr_state::wcfalcon(machine_config &config)
 	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w)); /* port A out, custom handler due to address + data are muxed */
 
 	/* video hardware */
-	m_palette->set_init(FUNC(goldnpkr_state::palette_init_witchcrd));
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4422,7 +4403,9 @@ void goldnpkr_state::wildcard(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	m_palette->set_init(FUNC(goldnpkr_state::palette_init_witchcrd));
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
+//  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4441,7 +4424,7 @@ void goldnpkr_state::wcrdxtnd(machine_config &config)
 
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_wcrdxtnd);
-	m_palette->set_init(FUNC(goldnpkr_state::palette_init_wcrdxtnd));
+	m_palette->set_init(FUNC(goldnpkr_state::wcrdxtnd_palette));
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
 
 	/* sound hardware */
@@ -4464,7 +4447,9 @@ void goldnpkr_state::wildcrdb(machine_config &config)
 	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w));
 
 	/* video hardware */
-	m_palette->set_init(FUNC(goldnpkr_state::palette_init_witchcrd));
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
+//  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4482,7 +4467,7 @@ void goldnpkr_state::genie(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	m_palette->set_init(FUNC(goldnpkr_state::palette_init_witchcrd));
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4500,7 +4485,7 @@ void goldnpkr_state::geniea(machine_config &config)
 //  m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	m_palette->set_init(FUNC(goldnpkr_state::palette_init_witchcrd));
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4698,7 +4683,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");
@@ -4706,9 +4691,8 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldnpkr);
+	PALETTE(config, m_palette, FUNC(blitz_state::witchcrd_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

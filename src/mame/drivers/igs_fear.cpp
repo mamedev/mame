@@ -96,8 +96,7 @@ void igs_fear_state::igs_fear(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(igs_fear_state, igs_fear)
 
-	PALETTE(config, m_palette, 0x200);
-
+	PALETTE(config, m_palette).set_entries(0x200);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igs_fear);
 
 	/* sound hardware */

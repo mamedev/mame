@@ -39,9 +39,14 @@ public:
 	{ }
 
 	void cdc721(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(cdc721);
+	void cdc721_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(lights_w);
@@ -60,9 +65,6 @@ private:
 	void block4_map(address_map &map);
 	void block8_map(address_map &map);
 	void blockc_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	u8 m_flashcnt;
 	u8 m_foreign_char_bank;
@@ -249,11 +251,11 @@ static GFXDECODE_START( gfx_cdc721 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cdc721_charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( cdc721_state, cdc721 )
+void cdc721_state::cdc721_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
-	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0, 0, 0 );     // Black
+	palette.set_pen_color(1, 0, 255, 0 );   // Full
+	palette.set_pen_color(2, 0, 128, 0 );   // Dimmed
 }
 
 uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -324,8 +326,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
+	PALETTE(config, "palette", FUNC(cdc721_state::cdc721_palette), 3);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
 
 	CRT5037(config, m_crtc, 12.936_MHz_XTAL / 8).set_char_width(8);

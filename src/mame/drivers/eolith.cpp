@@ -569,7 +569,7 @@ void eolith_state::eolith45(machine_config &config)
 	m_screen->set_screen_update(FUNC(eolith_state::screen_update_eolith));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 32768).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
