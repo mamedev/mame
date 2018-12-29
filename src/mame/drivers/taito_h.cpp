@@ -664,8 +664,7 @@ void taitoh_state::syvalion(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_h);
-	PALETTE(config, m_palette, 33*16);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);
@@ -718,8 +717,7 @@ void taitoh_state::recordbr(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_h);
-	PALETTE(config, m_palette, 33*16);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);
@@ -782,8 +780,7 @@ void taitoh_state::dleague(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_h);
-	PALETTE(config, m_palette, 33*16);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);
