@@ -317,7 +317,7 @@ class floppy_connector: public device_t,
 {
 public:
 	template <typename T>
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, const floppy_format_type *formats, bool fixed = false)
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, const floppy_format_type formats[], bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
@@ -326,7 +326,7 @@ public:
 		set_fixed(fixed);
 		set_formats(formats);
 	}
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, const device_type &devtype, bool is_default, const floppy_format_type *formats)
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, const device_type &devtype, bool is_default, const floppy_format_type formats[])
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
@@ -339,7 +339,7 @@ public:
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~floppy_connector();
 
-	void set_formats(const floppy_format_type *formats);
+	void set_formats(const floppy_format_type formats[]);
 	floppy_image_device *get_device();
 	void enable_sound(bool doit) { m_enable_sound = doit; }
 

@@ -44,8 +44,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(travrusa);
-	DECLARE_PALETTE_INIT(shtrider);
+	void travrusa_palette(palette_device &palette) const;
+	void shtrider_palette(palette_device &palette) const;
 	uint32_t screen_update_travrusa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_scroll();
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

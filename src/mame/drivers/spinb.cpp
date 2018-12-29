@@ -71,6 +71,10 @@ public:
 	void init_game1();
 	void init_game2();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p3_r);
@@ -99,7 +103,7 @@ private:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	DECLARE_PALETTE_INIT(spinb);
+	void spinb_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -130,14 +134,12 @@ private:
 	uint8_t *m_p_audio;
 	uint8_t *m_p_music;
 	uint8_t *m_p_dmdcpu;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	void update_sound_a();
 	void update_sound_m();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_musiccpu;
-	required_device<cpu_device> m_dmdcpu;
+	required_device<i8031_device> m_dmdcpu;
 	required_device<msm5205_device> m_msm_a;
 	required_device<msm5205_device> m_msm_m;
 	required_device<ttl7474_device> m_ic5a;
@@ -577,7 +579,7 @@ void spinb_state::init_game2()
 	m_game = 2;
 }
 
-PALETTE_INIT_MEMBER( spinb_state, spinb )
+void  spinb_state::spinb_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
@@ -586,8 +588,7 @@ PALETTE_INIT_MEMBER( spinb_state, spinb )
 
 uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,gfx,gfx1;
-	uint16_t sy=0,ma,x;
+	uint16_t sy=0,ma;
 	address_space &internal = m_dmdcpu->space(AS_DATA);
 	ma = internal.read_byte(0x05) << 8; // find where display memory is
 
@@ -596,13 +597,13 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		ma = ((ma - 0x200) & 0x1c00) + 0x200;
 		if (ma > 0x1c00) return 1; // not initialised yet
 
-		for(y=0; y<32; y++)
+		for (uint8_t y = 0; y < 32; y++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
-			for(x = 0; x < 16; x++)
+			for (uint16_t x = 0; x < 16; x++)
 			{
-				gfx = m_dmdram[ma+0x200];
-				gfx1 = m_dmdram[ma++];
+				uint8_t const gfx = m_dmdram[ma+0x200];
+				uint8_t const gfx1 = m_dmdram[ma++];
 
 				*p++ = BIT(gfx1, 0) ? 1 : BIT(gfx, 0) ? 2 : 0;
 				*p++ = BIT(gfx1, 1) ? 1 : BIT(gfx, 1) ? 2 : 0;
@@ -619,12 +620,12 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		ma &= 0x1e00;
 
-		for(y=0; y<32; y++)
+		for (uint8_t y = 0; y < 32; y++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
-			for(x = 0; x < 16; x++)
+			for (uint16_t x = 0; x < 16; x++)
 			{
-				gfx = m_dmdram[ma++];
+				uint8_t const gfx = m_dmdram[ma++];
 
 				*p++ = BIT(gfx, 0);
 				*p++ = BIT(gfx, 1);
@@ -640,47 +641,53 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-MACHINE_CONFIG_START(spinb_state::spinb)
+void spinb_state::spinb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(spinb_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(spinb_state, irq0_line_hold, 160) // NE556 adjustable (if faster, then jolypark has a stack problem)
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(spinb_audio_map)
-	MCFG_DEVICE_ADD("musiccpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(spinb_music_map)
-	MCFG_DEVICE_ADD("dmdcpu",I8031, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(dmd_mem)
-	MCFG_DEVICE_IO_MAP(dmd_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, spinb_state, p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, spinb_state, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, spinb_state, p3_w))
+	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spinb_state::spinb_map);
+	m_maincpu->set_periodic_int(FUNC(spinb_state::irq0_line_hold), attotime::from_hz(160)); // NE556 adjustable (if faster, then jolypark has a stack problem)
+
+	Z80(config, m_audiocpu, XTAL(5'000'000) / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spinb_state::spinb_audio_map);
+
+	Z80(config, m_musiccpu, XTAL(5'000'000) / 2);
+	m_musiccpu->set_addrmap(AS_PROGRAM, &spinb_state::spinb_music_map);
+
+	I8031(config, m_dmdcpu, XTAL(16'000'000));
+	m_dmdcpu->set_addrmap(AS_PROGRAM, &spinb_state::dmd_mem);
+	m_dmdcpu->set_addrmap(AS_IO, &spinb_state::dmd_io);
+	m_dmdcpu->port_out_cb<1>().set(FUNC(spinb_state::p1_w));
+	m_dmdcpu->port_in_cb<3>().set(FUNC(spinb_state::p3_r));
+	m_dmdcpu->port_out_cb<3>().set(FUNC(spinb_state::p3_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(spinb_state, screen_update)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 127, 0, 31)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD( "palette", 3 )
-	MCFG_PALETTE_INIT_OWNER(spinb_state, spinb)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(spinb_state::screen_update));
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 127, 0, 31);
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(spinb_state::spinb_palette), 3);
 
 	/* Sound */
 	genpin_audio(config);
+
 	SPEAKER(config, "msmavol").front_center();
-	MCFG_DEVICE_ADD("msm_a", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("ic5a", ttl7474_device, clock_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
+	MSM5205(config, m_msm_a, XTAL(384'000));
+	m_msm_a->vck_callback().set("ic5a", FUNC(ttl7474_device::clock_w));
+	m_msm_a->set_prescaler_selector(msm5205_device::S48_4B); /* 4KHz 4-bit */
+	m_msm_a->add_route(ALL_OUTPUTS, "msmavol", 1.0);
+
 	SPEAKER(config, "msmmvol").front_center();
-	MCFG_DEVICE_ADD("msm_m", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("ic5m", ttl7474_device, clock_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
+	MSM5205(config, m_msm_m, XTAL(384'000));
+	m_msm_m->vck_callback().set("ic5m", FUNC(ttl7474_device::clock_w));
+	m_msm_m->set_prescaler_selector(msm5205_device::S48_4B); /* 4KHz 4-bit */
+	m_msm_m->add_route(ALL_OUTPUTS, "msmmvol", 1.0);
 
 	/* Devices */
 	i8255_device &ppi60(I8255A(config, "ppi60"));
@@ -738,26 +745,28 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 
 	HC157(config, m_ic14m, 0); // actually IC15 on Jolly Park
 	m_ic14m->out_callback().set("msm_m", FUNC(msm5205_device::data_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(spinb_state::jolypark)
+void spinb_state::jolypark(machine_config &config)
+{
 	spinb(config);
-	MCFG_DEVICE_REPLACE("msm_a", MSM6585, XTAL(640'000))
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("ic5a", ttl7474_device, clock_w))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
-	MCFG_DEVICE_REPLACE("msm_m", MSM6585, XTAL(640'000))
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("ic5m", ttl7474_device, clock_w))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(spinb_state::vrnwrld)
+	MSM6585(config.replace(), m_msm_a, XTAL(640'000));
+	m_msm_a->vck_callback().set("ic5a", FUNC(ttl7474_device::clock_w));
+	m_msm_a->set_prescaler_selector(msm6585_device::S40);
+	m_msm_a->add_route(ALL_OUTPUTS, "msmavol", 1.0);
+
+	MSM6585(config.replace(), m_msm_m, XTAL(640'000));
+	m_msm_m->vck_callback().set("ic5m", FUNC(ttl7474_device::clock_w));
+	m_msm_m->set_prescaler_selector(msm6585_device::S40);
+	m_msm_m->add_route(ALL_OUTPUTS, "msmmvol", 1.0);
+}
+
+void spinb_state::vrnwrld(machine_config &config)
+{
 	jolypark(config);
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(vrnwrld_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &spinb_state::vrnwrld_map);
+}
 
 
 /*-------------------------------------------------------------------

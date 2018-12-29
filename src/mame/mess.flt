@@ -116,6 +116,7 @@ c900.cpp
 camplynx.cpp
 candela.cpp
 canon_s80.cpp
+cardinal.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
@@ -208,6 +209,7 @@ emate.cpp
 emma2.cpp
 enmirage.cpp
 ep64.cpp
+epic14e.cpp
 esprit.cpp
 esq1.cpp
 esq5505.cpp
@@ -244,6 +246,7 @@ force68k.cpp
 fp1100.cpp
 fp200.cpp
 fp6000.cpp
+fs3216.cpp
 ft68m.cpp
 galaxy.cpp
 galeb.cpp
@@ -290,10 +293,12 @@ hp16500.cpp
 hp2100.cpp
 hp2620.cpp
 hp2640.cpp
+hp3478a.cpp
 hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp95lx.cpp
 hp9825.cpp
 hp9845.cpp
 hp9k.cpp
@@ -316,6 +321,7 @@ icatel.cpp
 icebox.cpp
 ie15.cpp
 if800.cpp
+ikt5a.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -401,6 +407,7 @@ mc8020.cpp
 mc8030.cpp
 mcb216.cpp
 mccpm.cpp
+mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd2.cpp
@@ -444,6 +451,7 @@ mod8.cpp
 modellot.cpp
 modena.cpp
 molecular.cpp
+monon_color.cpp
 monty.cpp
 mpc3000.cpp
 mpf1.cpp
@@ -459,6 +467,7 @@ mt735.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
+mupid2.cpp
 mvme147.cpp
 mx2178.cpp
 myb3k.cpp
@@ -478,6 +487,7 @@ nascom1.cpp
 nc.cpp
 ncd17c.cpp
 ncdmips.cpp
+ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
@@ -660,6 +670,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+shine.cpp
 si5500.cpp
 sitcom.cpp
 sk1.cpp
@@ -814,6 +825,7 @@ votrpss.cpp
 votrtnt.cpp
 vp415.cpp
 vp60.cpp
+vsmile.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp
@@ -879,7 +891,6 @@ zx.cpp
 +jaguar
 +jaguarcd
 //konamim2.cpp
-+3do_m2
 //neogeo.cpp
 +aes
 //vectrex.cpp

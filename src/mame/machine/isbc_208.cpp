@@ -41,7 +41,7 @@ void isbc_208_device::device_add_mconfig(machine_config &config)
 	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_r));
 	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_w));
 
-	I8272A(config, m_fdc, true);
+	I8272A(config, m_fdc, 8_MHz_XTAL, true);
 	m_fdc->intrq_wr_callback().set(FUNC(isbc_208_device::irq_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats);

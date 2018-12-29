@@ -72,7 +72,7 @@ private:
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_PALETTE_INIT(irobot);
+	void irobot_palette(palette_device &palette) const;
 	uint32_t screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irvg_done_callback);

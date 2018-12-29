@@ -11,12 +11,6 @@
 #ifndef MAME_CPU_M6502_M6502_H
 #define MAME_CPU_M6502_M6502_H
 
-#define MCFG_M6502_DISABLE_CACHE() \
-	downcast<m6502_device *>(device)->disable_cache();
-
-#define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
-
 class m6502_device : public cpu_device {
 public:
 	enum {
@@ -31,7 +25,7 @@ public:
 	bool get_sync() const { return sync; }
 	void disable_cache() { cache_disabled = true; }
 
-	template<class Object> devcb_base &set_sync_callback(Object &&cb) { return sync_w.set_callback(std::forward<Object>(cb)); }
+	auto sync_cb() { return sync_w.bind(); }
 
 	devcb_write_line sync_w;
 

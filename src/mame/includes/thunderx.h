@@ -8,13 +8,13 @@
 #ifndef MAME_INCLUDES_THUNDERX_H
 #define MAME_INCLUDES_THUNDERX_H
 
-#pragma ocne
+#pragma once
 
-#include "cpu/m6809/konami.h"
+#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
-#include "video/k052109.h"
 #include "video/k051960.h"
+#include "video/k052109.h"
 #include "video/konami_helper.h"
 #include "emupal.h"
 
@@ -47,7 +47,7 @@ private:
 	};
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank5800;
 	optional_device<k007232_device> m_k007232;

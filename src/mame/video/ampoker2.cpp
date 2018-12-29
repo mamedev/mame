@@ -70,45 +70,50 @@
 
 
 #include "emu.h"
-#include "video/resnet.h"
 #include "includes/ampoker2.h"
 
+#include "video/resnet.h"
 
-PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
+
+void ampoker2_state::ampoker2_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-/*    - bits -
-      76543210
-      RRRGGGBB
-*/
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_r[3], weights_g[3], weights_b[2];
+	/*    - bits -
+	      76543210
+	      RRRGGGBB
+	*/
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
+	double weights_r[3], weights_g[3], weights_b[2];
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistances_rg, weights_r,  0,  0,
 			3,  resistances_rg, weights_g,  0,  0,
 			2,  resistances_b,  weights_b,  0,  0);
 
 
+	uint8_t const *const color_prom = memregion("proms")->base();
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		/* blue component */
-		int bit0 = (color_prom[i] >> 0) & 0x01;
-		int bit1 = (color_prom[i] >> 1) & 0x01;
-		int b = combine_2_weights(weights_b, bit0, bit1);
-		/* green component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
-		bit1 = (color_prom[i] >> 3) & 0x01;
-		int bit2 = (color_prom[i] >> 4) & 0x01;
-		int g = combine_3_weights(weights_g, bit0, bit1, bit2);
-		/* red component */
-		bit0 = (color_prom[i] >> 5) & 0x01;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		int r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int bit0, bit1, bit2;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		// blue component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
+
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		bit2 = BIT(color_prom[i], 4);
+		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
+
+		// red component
+		bit0 = BIT(color_prom[i], 5);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

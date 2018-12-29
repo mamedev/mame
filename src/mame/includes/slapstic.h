@@ -19,9 +19,6 @@
 
 DECLARE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device)
 
-#define MCFG_SLAPSTIC_NUM(_chipnum) \
-	downcast<atari_slapstic_device &>(*device).set_chipnum(_chipnum);
-
 /*************************************
  *
  *  Structure of slapstic params

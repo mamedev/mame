@@ -681,19 +681,18 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbisland)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbisland);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_gfxdecode_tag(m_gfxdecode);
+	m_pc090oj->set_palette_tag(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -704,9 +703,9 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 
@@ -731,18 +730,17 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jumping)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_YINVERT(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_yinvert(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -757,6 +755,7 @@ MACHINE_CONFIG_END
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
 MACHINE_CONFIG_START(rbisland_state::jumpingi)
 	jumping(config);
+
 	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)

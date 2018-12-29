@@ -2613,7 +2613,7 @@ MACHINE_CONFIG_START(nsub_state::nsub)
 	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
 
 	/* audio hardware */
-	MCFG_S97271P_ADD("s97271p")
+	S97271P(config, m_s97271p, 0);
 MACHINE_CONFIG_END
 
 

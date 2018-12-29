@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(gumbo_state::gumbo)
 	MCFG_DEVICE_PROGRAM_MAP(gumbo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gumbo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gumbo);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -253,8 +253,7 @@ MACHINE_CONFIG_START(gumbo_state::gumbo)
 	MCFG_SCREEN_UPDATE_DRIVER(gumbo_state, screen_update_gumbo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

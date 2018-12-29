@@ -113,8 +113,7 @@ void orion_state::orion128(machine_config &config)
 	m_screen->set_screen_update(FUNC(orion_state::screen_update_orion128));
 	m_screen->set_palette(m_palette);
 
-	auto &palette(PALETTE(config, m_palette, 18));
-	palette.set_init(palette_init_delegate(FUNC(orion_state::palette_init_orion128), this));
+	PALETTE(config, m_palette, FUNC(orion_state::orion128_palette), 18);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -184,8 +183,7 @@ void orion_z80_state::orionz80(machine_config &config)
 	m_screen->set_screen_update(FUNC(orion_z80_state::screen_update_orion128));
 	m_screen->set_palette(m_palette);
 
-	auto &palette(PALETTE(config, m_palette, 18));
-	palette.set_init(palette_init_delegate(FUNC(orion_z80_state::palette_init_orion128), this));
+	PALETTE(config, m_palette, FUNC(orion_z80_state::orion128_palette), 18);
 
 	MC146818(config, "rtc", 4.194304_MHz_XTAL);
 
@@ -260,9 +258,7 @@ void orion_pro_state::orionpro(machine_config &config)
 	m_screen->set_screen_update(FUNC(orion_pro_state::screen_update_orion128));
 	m_screen->set_palette(m_palette);
 
-	auto &palette(PALETTE(config, m_palette, 18));
-	palette.set_init(palette_init_delegate(FUNC(orion_pro_state::palette_init_orion128), this));
-
+	PALETTE(config, m_palette, FUNC(orion_pro_state::orion128_palette), 18);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);

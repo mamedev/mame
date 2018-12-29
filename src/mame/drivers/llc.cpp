@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 	config.set_default_layout(layout_llc1);
 
 	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
@@ -240,8 +240,8 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<1>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(llc_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(llc_state::kbd_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(llc_state::llc2)
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc2)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 
-	MCFG_K7659_KEYBOARD_ADD()
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

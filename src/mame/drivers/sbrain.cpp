@@ -40,6 +40,7 @@ To Do:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"

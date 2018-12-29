@@ -563,7 +563,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 		m_sp_palbase = new_sp_palbase;
 		m_bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
+		if (LOG_PALETTE && m_screen) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
 	}
 }
 
@@ -1542,15 +1542,16 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-MACHINE_CONFIG_START(segac2_state::segac)
-
+void segac2_state::segac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XL2_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	M68000(config, m_maincpu, XL2_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
@@ -1564,36 +1565,36 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	io.out_ph_callback().set(FUNC(segac2_state::io_porth_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, XL2_CLOCK, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_sndirqline_callback_c2));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv6irqline_callback_c2));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv4irqline_callback_c2));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(segac2_state::vdp_sndirqline_callback_c2));
+	m_vdp->lv6_irq().set(FUNC(segac2_state::vdp_lv6irqline_callback_c2));
+	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
+	m_vdp->set_alt_timing(1);
+	m_vdp->set_screen("megadriv");
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
-	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, segac2_state, screen_vblank_megadriv))
+	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(512, 262);
+	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(segac2_state::screen_update_segac2_new));
+	screen.screen_vblank().set(FUNC(segac2_state::screen_vblank_megadriv));
 
-	MCFG_PALETTE_ADD("palette", 2048*3)
+	PALETTE(config, m_palette).set_entries(2048*3);
 
 	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, XL2_CLOCK/7)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segac2_state, segac2_irq2_interrupt))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", XL2_CLOCK/7));
+	ymsnd.irq_handler().set(FUNC(segac2_state::segac2_irq2_interrupt));
+	ymsnd.add_route(0, "mono", 0.50);
 	/* right channel not connected */
-MACHINE_CONFIG_END
+}
 
 
 void segac2_state::segac2(machine_config &config)
@@ -1728,7 +1729,7 @@ ROM_START( borencha ) /* Borench  (c)1990 Sega */
 ROM_END
 
 
-ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-02 THUNDER FORCE (EMP5032 labeled 317-0172)  */
+ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-02 THUNDER FORCE AC (EMP5032 labeled 317-0172) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13675.ic32", 0x000000, 0x040000, CRC(95ecf202) SHA1(92b0f351f2bee7d59873a4991615f14f1afe4da7) )
 	ROM_LOAD16_BYTE( "epr-13674.ic31", 0x000001, 0x040000, CRC(e63d7f1a) SHA1(a40d0a5a96f379a467048dc8fddd8aaaeb94da1d) )
@@ -1741,7 +1742,7 @@ ROM_START( tfrceac ) /* Thunder Force AC  (c)1990 Technosoft / Sega - 834-7745-0
 ROM_END
 
 
-ROM_START( tfrceacj ) /* Thunder Force AC (Jpn)  (c)1990 Technosoft / Sega */
+ROM_START( tfrceacj ) /* Thunder Force AC (Japan)  (c)1990 Technosoft / Sega - 834-7745 THUNDER FORCE AC (EMP5032 labeled 317-0172)  */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13657.ic32", 0x000000, 0x040000, CRC(a0f38ffd) SHA1(da548e7f61aed0e82a460553a119941da8857bc4) )
 	ROM_LOAD16_BYTE( "epr-13656.ic31", 0x000001, 0x040000, CRC(b9438d1e) SHA1(598209c9fec3527fde720af09e5bebd7379f5b2b) )

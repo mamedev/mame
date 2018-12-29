@@ -29,15 +29,15 @@
 #include "emu.h"
 #include "video/newport.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_VC2			(1 << 1)
-#define LOG_CMAP0		(1 << 2)
-#define LOG_CMAP1		(1 << 3)
-#define LOG_XMAP0		(1 << 4)
-#define LOG_XMAP1		(1 << 5)
-#define LOG_REX3 		(1 << 6)
-#define LOG_COMMANDS	(1 << 7)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_VC2         (1 << 1)
+#define LOG_CMAP0       (1 << 2)
+#define LOG_CMAP1       (1 << 3)
+#define LOG_XMAP0       (1 << 4)
+#define LOG_XMAP1       (1 << 5)
+#define LOG_REX3        (1 << 6)
+#define LOG_COMMANDS    (1 << 7)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3)
 
 #define VERBOSE (0)
 #include "logmacro.h"

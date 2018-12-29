@@ -34,16 +34,6 @@ typedef device_delegate<void (int irq)> wswan_video_irq_cb_delegate;
 typedef device_delegate<void (void)> wswan_video_dmasnd_cb_delegate;
 #define WSWAN_VIDEO_DMASND_CB_MEMBER(_name)   void _name(void)
 
-#define MCFG_WSWAN_VIDEO_IRQ_CB(_class, _method) \
-	downcast<wswan_video_device &>(*device).set_irq_callback(wswan_video_irq_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_WSWAN_VIDEO_DMASND_CB(_class, _method) \
-	downcast<wswan_video_device &>(*device).set_dmasnd_callback(wswan_video_dmasnd_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_WSWAN_VIDEO_TYPE( _type) \
-	downcast<wswan_video_device &>(*device).set_vdp_type(_type);
-
-
 class wswan_video_device : public device_t
 {
 public:
@@ -51,8 +41,8 @@ public:
 	~wswan_video_device() {}
 
 	// static configuration
-	void set_irq_callback(wswan_video_irq_cb_delegate callback) { m_set_irq_cb = callback; }
-	void set_dmasnd_callback(wswan_video_dmasnd_cb_delegate callback) { m_snd_dma_cb = callback; }
+	template <typename... T> void set_irq_callback(T &&... args) { m_set_irq_cb = wswan_video_irq_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_dmasnd_callback(T &&... args) { m_snd_dma_cb = wswan_video_dmasnd_cb_delegate(std::forward<T>(args)...); }
 	void set_vdp_type(int type) { m_vdp_type = type; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

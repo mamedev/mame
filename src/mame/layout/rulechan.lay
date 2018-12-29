@@ -1,0 +1,459 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="DIGIT" defstate="0">
+		<led7seg><color red="0.0" green="0.45" blue="0.45" /></led7seg>
+	</element>
+	<element name="BALL0">
+		<disk state = "0">
+			<color red="0.0" green="0.3" blue="0" />
+		</disk>
+		<disk state = "1">
+			<color red="0" green="1" blue="0" />
+		</disk>
+	</element>
+	<element name="BALL">
+		<disk state = "0">
+			<color red="0.3" green="0" blue="0" />
+		</disk>
+		<disk state = "1">
+			<color red="1" green="0" blue="0" />
+		</disk>
+	</element>
+	<element name="BOT"><disk><color red="0" green="0.4" blue="0" /></disk></element>
+	<element name="BBET"><disk><color red="0" green="0.4" blue="0" /></disk><text string="Bet"><color red="0.0" green="0.2" blue="0.0" /></text></element>
+	<element name="B_UP"><disk><color red="0" green="0.4" blue="0" /></disk><text string="Up"><color red="0.0" green="0.2" blue="0.0" /></text></element>
+	<element name="BDWN"><disk><color red="0" green="0.4" blue="0" /></disk><text string="Down"><color red="0.0" green="0.2" blue="0.0" /></text></element>
+	<element name="BLEF"><disk><color red="0" green="0.4" blue="0" /></disk><text string="Left"><color red="0.0" green="0.2" blue="0.0" /></text></element>
+	<element name="BRIG"><disk><color red="0" green="0.4" blue="0" /></disk><text string="Right"><color red="0.0" green="0.2" blue="0.0" /></text></element>
+
+	<element name="L0" defstate="1">
+		<rect state="0">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<text state ="0" string="Operator Key">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<text state ="1" string="Operator Key">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="L00" defstate="1">
+		<rect state="0">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<text state ="0" string="Page Key">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<text state ="1" string="Page Key">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="LI1" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="IN 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LI2" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="IN 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LI3" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="IN 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LI4" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="IN 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LI5" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="IN 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LI6" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="IN 6">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LO1" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="OUT 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LO2" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="OUT 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LO3" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="OUT 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LO4" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="OUT 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LO5" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="OUT 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<element name="LO6" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="OUT 6">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+	<view name="Lamps">
+		<screen index="0">
+			<bounds left="100" top="0" right="832" bottom="1072" />
+		</screen>
+
+		<bezel name="lamp10" element="DIGIT"><bounds x="1140" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
+		<bezel name="lamp11" element="DIGIT"><bounds x="1160" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
+		<bezel name="lamp12" element="DIGIT"><bounds x="1180" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
+		<bezel name="lamp13" element="DIGIT"><bounds x="1200" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
+		<bezel name="lamp14" element="DIGIT"><bounds x="1220" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
+		<bezel name="lamp15" element="DIGIT"><bounds x="1240" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
+
+		<bezel element="BBET" inputtag="IN0" inputmask="0x04" >
+			<bounds x="270" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BDWN" inputtag="IN0" inputmask="0x08">
+			<bounds x="174" y="75" width="42" height="42" />
+		</bezel>
+		<bezel element="B_UP" inputtag="IN0" inputmask="0x10" >
+			<bounds x="174" y="25" width="42" height="42" />
+		</bezel>
+		<bezel element="BLEF" inputtag="IN0" inputmask="0x20">
+			<bounds x="126" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BRIG" inputtag="IN0" inputmask="0x40" >
+			<bounds x="222" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BBET" inputtag="IN1" inputmask="0x04" >
+			<bounds x="514" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BDWN" inputtag="IN1" inputmask="0x08">
+			<bounds x="418" y="75" width="42" height="42" />
+		</bezel>
+		<bezel element="B_UP" inputtag="IN1" inputmask="0x10" >
+			<bounds x="418" y="25" width="42" height="42" />
+		</bezel>
+		<bezel element="BLEF" inputtag="IN1" inputmask="0x20">
+			<bounds x="370" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BRIG" inputtag="IN1" inputmask="0x40" >
+			<bounds x="466" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BBET" inputtag="IN2" inputmask="0x04" >
+			<bounds x="758" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BDWN" inputtag="IN2" inputmask="0x08">
+			<bounds x="662" y="75" width="42" height="42" />
+		</bezel>
+		<bezel element="B_UP" inputtag="IN2" inputmask="0x10" >
+			<bounds x="662" y="25" width="42" height="42" />
+		</bezel>
+		<bezel element="BLEF" inputtag="IN2" inputmask="0x20">
+			<bounds x="614" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BRIG" inputtag="IN2" inputmask="0x40" >
+			<bounds x="710" y="50" width="42" height="42" />
+		</bezel>
+		<bezel element="BBET" inputtag="IN3" inputmask="0x04" >
+			<bounds x="758" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BDWN" inputtag="IN3" inputmask="0x08">
+			<bounds x="662" y="1025" width="42" height="42" />
+		</bezel>
+		<bezel element="B_UP" inputtag="IN3" inputmask="0x10" >
+			<bounds x="662" y="975" width="42" height="42" />
+		</bezel>
+		<bezel element="BLEF" inputtag="IN3" inputmask="0x20">
+			<bounds x="614" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BRIG" inputtag="IN3" inputmask="0x40" >
+			<bounds x="710" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BBET" inputtag="IN4" inputmask="0x04" >
+			<bounds x="514" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BDWN" inputtag="IN4" inputmask="0x08">
+			<bounds x="418" y="1025" width="42" height="42" />
+		</bezel>
+		<bezel element="B_UP" inputtag="IN4" inputmask="0x10" >
+			<bounds x="418" y="975" width="42" height="42" />
+		</bezel>
+		<bezel element="BLEF" inputtag="IN4" inputmask="0x20">
+			<bounds x="370" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BRIG" inputtag="IN4" inputmask="0x40" >
+			<bounds x="466" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BBET" inputtag="IN5" inputmask="0x04" >
+			<bounds x="270" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BDWN" inputtag="IN5" inputmask="0x08">
+			<bounds x="174" y="1025" width="42" height="42" />
+		</bezel>
+		<bezel element="B_UP" inputtag="IN5" inputmask="0x10" >
+			<bounds x="174" y="975" width="42" height="42" />
+		</bezel>
+		<bezel element="BLEF" inputtag="IN5" inputmask="0x20">
+			<bounds x="126" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel element="BRIG" inputtag="IN5" inputmask="0x40" >
+			<bounds x="222" y="1000" width="42" height="42" />
+		</bezel>
+		<bezel name="lamp60" element="L0" inputtag="AUX" inputmask="0x08" >
+			<bounds x="1000" y="870" width="200" height="45" />
+		</bezel>
+		<bezel name="lamp61" element="L00" inputtag="AUX" inputmask="0x80" >
+			<bounds x="1270" y="870" width="200" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LI1" inputtag="IN0" inputmask="0x01" >
+			<bounds x="1000" y="950" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LO1" inputtag="IN0" inputmask="0x02">
+			<bounds x="1000" y="1000" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LI2" inputtag="IN1" inputmask="0x01" >
+			<bounds x="1080" y="950" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LO2" inputtag="IN1" inputmask="0x02">
+			<bounds x="1080" y="1000" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LI3" inputtag="IN2" inputmask="0x01" >
+			<bounds x="1160" y="950" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LO3" inputtag="IN2" inputmask="0x02">
+			<bounds x="1160" y="1000" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LI4" inputtag="IN3" inputmask="0x01" >
+			<bounds x="1240" y="950" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LO4" inputtag="IN3" inputmask="0x02">
+			<bounds x="1240" y="1000" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LI5" inputtag="IN4" inputmask="0x01" >
+			<bounds x="1320" y="950" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LO5" inputtag="IN4" inputmask="0x02">
+			<bounds x="1320" y="1000" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LI6" inputtag="IN5" inputmask="0x01" >
+			<bounds x="1400" y="950" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp60" element="LO6" inputtag="IN5" inputmask="0x02">
+			<bounds x="1400" y="1000" width="70" height="45" />
+		</bezel>
+		<bezel name="lamp20" element="BALL0">
+			<bounds x="1321.5755279531" y="319.178830824334" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp56" element="BALL">
+			<bounds x="1332.56513467655" y="335.702636395822" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp55" element="BALL">
+			<bounds x="1340.60412921523" y="353.84601461785" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp54" element="BALL">
+			<bounds x="1345.46124433281" y="373.087013532536" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp53" element="BALL">
+			<bounds x="1346.9967496707" y="392.872104633103" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp52" element="BALL">
+			<bounds x="1345.16647153601" y="412.632106871213" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp51" element="BALL">
+			<bounds x="1340.0230636983" y="431.798560959421" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp50" element="BALL">
+			<bounds x="1331.71449263647" y="449.820082909883" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp49" element="BALL">
+			<bounds x="1320.4797808126" y="466.178226347788" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp48" element="BALL">
+			<bounds x="1306.64213043088" y="480.402397269624" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp47" element="BALL">
+			<bounds x="1290.59962549863" y="492.083392175853" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp46" element="BALL">
+			<bounds x="1272.81377967425" y="500.885170110556" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp45" element="BALL">
+			<bounds x="1253.7962593595" y="506.554519947908" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp44" element="BALL">
+			<bounds x="1234.09416398871" y="508.928344815248" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp43" element="BALL">
+			<bounds x="1214.27428697419" y="507.938354093155" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp42" element="BALL">
+			<bounds x="1194.90681009169" y="503.613028012232" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp41" element="BALL">
+			<bounds x="1176.54890038884" y="496.076798328726" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp40" element="BALL">
+			<bounds x="1159.72868150364" y="485.546468649452" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp39" element="BALL">
+			<bounds x="1144.93004050891" y="472.32497738676" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp38" element="BALL">
+			<bounds x="1132.57870736225" y="456.792682771969" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp37" element="BALL">
+			<bounds x="1123.03000743027" y="439.396420641569" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp36" element="BALL">
+			<bounds x="1116.55863942476" y="420.636649783757" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp35" element="BALL">
+			<bounds x="1113.35077282082" y="401.053054650283" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp34" element="BALL">
+			<bounds x="1113.49869210012" y="381.209019617376" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp33" element="BALL">
+			<bounds x="1116.99814189431" y="361.675421442988" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp32" element="BALL">
+			<bounds x="1123.74844940422" y="343.014206181865" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp31" element="BALL">
+			<bounds x="1133.55542057307" y="325.762223020679" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp30" element="BALL">
+			<bounds x="1146.13692669582" y="310.415780104371" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp29" element="BALL">
+			<bounds x="1161.13102074843" y="297.416366654444" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp28" element="BALL">
+			<bounds x="1178.10634994466" y="287.137952127882" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp27" element="BALL">
+			<bounds x="1196.57456497046" y="279.876227796751" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp26" element="BALL">
+			<bounds x="1216.00436890452" y="275.840100248669" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp25" element="BALL">
+			<bounds x="1235.83680166342" y="275.145681524636" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp24" element="BALL">
+			<bounds x="1255.5013202655" y="277.812948787016" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp23" element="BALL">
+			<bounds x="1274.43221231367" y="283.765169612954" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp22" element="BALL">
+			<bounds x="1292.08487051111" y="292.831109446467" width="16" height="16" />
+		</bezel>
+		<bezel name="lamp21" element="BALL">
+			<bounds x="1307.95146002158" y="304.749957704861" width="16" height="16" />
+		</bezel>
+
+	</view>
+</mamelayout>

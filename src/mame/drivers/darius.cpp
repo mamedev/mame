@@ -727,9 +727,8 @@ MACHINE_CONFIG_START(darius_state::darius)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darius)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darius);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	config.set_default_layout(layout_darius);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -738,7 +737,7 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_ADD("mscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -746,7 +745,7 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_middle)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -754,14 +753,14 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(-16, 8)
-	MCFG_PC080SN_YINVERT(0)
-	MCFG_PC080SN_DBLWIDTH(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_offsets(-16, 8);
+	m_pc080sn->set_yinvert(0);
+	m_pc080sn->set_dblwidth(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -819,9 +818,9 @@ MACHINE_CONFIG_START(darius_state::darius)
 	FILTER_VOLUME(config, "msm5205.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "msm5205.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 

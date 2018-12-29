@@ -351,10 +351,7 @@ void mb87030_device::step(bool timeout)
 		if (!m_tc || m_fifo.full())
 			break;
 
-		LOG("pushing read data: %02X\n", data);
-		m_fifo.enqueue(data);
-		m_tc--;
-
+		m_bus_data = data;
 		update_state(State::TransferSendAck, 10);
 		break;
 
@@ -362,7 +359,6 @@ void mb87030_device::step(bool timeout)
 		m_hdb = data;
 		m_hdb_loaded = true;
 		update_state(State::TransferRecvDataDMAResp, 10);
-		m_tc--;
 		m_dreq_handler(true);
 		break;
 
@@ -375,8 +371,7 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferSendData:
 		if (m_tc && !m_fifo.empty()) {
-			scsi_bus->data_w(scsi_refid, m_fifo.dequeue());
-			m_tc--;
+			scsi_bus->data_w(scsi_refid, m_fifo.peek());
 			update_state(State::TransferSendAck, 10);
 			break;
 		}
@@ -400,7 +395,6 @@ void mb87030_device::step(bool timeout)
 		m_hdb_loaded = false;
 		m_dreq_handler(false);
 		scsi_bus->data_w(scsi_refid, m_hdb);
-		m_tc--;
 		update_state(State::TransferSendAck, 10);
 		break;
 
@@ -408,9 +402,8 @@ void mb87030_device::step(bool timeout)
 		if (!(m_scmd & SCMD_TERM_MODE) && !(ctrl & S_INP))
 				m_temp = data;
 
-			scsi_set_ctrl(S_ACK, S_ACK);
-			scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
-
+		scsi_set_ctrl(S_ACK, S_ACK);
+		scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
 		update_state(State::TransferWaitDeassertREQ, 10);
 		break;
 
@@ -420,12 +413,21 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferDeassertACK:
+		m_tc--;
+		if (!m_dma_transfer) {
+			if (!(ctrl & S_INP)) {
+				m_fifo.dequeue();
+			} else {
+				LOG("pushing read data: %02X\n", m_bus_data);
+				m_fifo.enqueue(m_bus_data);
+			}
+		}
 		update_state(State::TransferWaitReq, 10);
 		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 		scsi_set_ctrl(0, S_ACK);
 		break;
 
-		}
+	}
 }
 
 void mb87030_device::device_start()
@@ -458,6 +460,7 @@ void mb87030_device::device_start()
 	save_item(NAME(m_scsi_phase));
 	save_item(NAME(m_scsi_ctrl));
 	save_item(NAME(m_dma_transfer));
+	save_item(NAME(m_bus_data));
 //  save_item(NAME(m_state));
 }
 

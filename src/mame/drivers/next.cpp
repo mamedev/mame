@@ -1021,10 +1021,10 @@ MACHINE_CONFIG_START(next_state::next_base)
 	SCC8530(config, scc, XTAL(25'000'000));
 	scc->intrq_callback().set(FUNC(next_state::scc_irq));
 
-	MCFG_DEVICE_ADD("keyboard", NEXTKBD, 0)
-	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(*this, next_state, keyboard_irq))
-	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(*this, next_state, power_irq))
-	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(*this, next_state, nmi_irq))
+	NEXTKBD(config, keyboard, 0);
+	keyboard->int_change_wr_callback().set(FUNC(next_state::keyboard_irq));
+	keyboard->int_power_wr_callback().set(FUNC(next_state::power_irq));
+	keyboard->int_nmi_wr_callback().set(FUNC(next_state::nmi_irq));
 
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
@@ -1042,9 +1042,9 @@ MACHINE_CONFIG_START(next_state::next_base)
 	net->tx_drq().set(FUNC(next_state::net_tx_drq));
 	net->rx_drq().set(FUNC(next_state::net_rx_drq));
 
-	MCFG_DEVICE_ADD("mo", NEXTMO, 0)
-	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(*this, next_state, mo_irq))
-	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(*this, next_state, mo_drq))
+	NEXTMO(config, mo, 0);
+	mo->irq_wr_callback().set(FUNC(next_state::mo_irq));
+	mo->drq_wr_callback().set(FUNC(next_state::mo_drq));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::next)

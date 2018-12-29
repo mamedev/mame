@@ -629,14 +629,15 @@ void lordgun_state::machine_start()
 	save_item(NAME(m_whitescreen));
 }
 
-MACHINE_CONFIG_START(lordgun_state::lordgun)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(lordgun_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
+void lordgun_state::lordgun(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(20'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lordgun_state::lordgun_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lordgun_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(soundmem_map)
-	MCFG_DEVICE_IO_MAP(lordgun_soundio_map)
+	Z80(config, m_soundcpu, XTAL(20'000'000) / 4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lordgun_state::soundmem_map);
+	m_soundcpu->set_addrmap(AS_IO, &lordgun_state::lordgun_soundio_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("DIP");
@@ -653,20 +654,20 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	ppi1.in_pc_callback().set_ioport("COIN");
 	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(0x200, 0x100);
+	m_screen->set_visarea(0,0x1c0-1, 0,0xe0-1);
+	m_screen->set_screen_update(FUNC(lordgun_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lordgun);
 
-	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	// 0x800 real colors, repeated per priority level
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x800 * 8);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -674,23 +675,23 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.irq_handler().set_inputline("soundcpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right!
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH);   // ? 5MHz can't be right!
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
+void lordgun_state::aliencha(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(20'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lordgun_state::aliencha_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lordgun_state::irq4_line_hold));
 
-MACHINE_CONFIG_START(lordgun_state::aliencha)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(aliencha_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(soundmem_map)
-	MCFG_DEVICE_IO_MAP(aliencha_soundio_map)
+	Z80(config, m_soundcpu, XTAL(20'000'000) / 4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lordgun_state::soundmem_map);
+	m_soundcpu->set_addrmap(AS_IO, &lordgun_state::aliencha_soundio_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set(FUNC(lordgun_state::aliencha_dip_r));
@@ -707,20 +708,20 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	ppi1.in_pc_callback().set_ioport("COIN");
 	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(0x200, 0x100);
+	m_screen->set_visarea(0,0x1c0-1, 0,0xe0-1);
+	m_screen->set_screen_update(FUNC(lordgun_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lordgun);
 
-	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	// 0x800 real colors, repeated per priority level
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x800 * 8);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -728,17 +729,16 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, XTAL(33'868'800))            // ? 33.8688MHz matches video (decrease for faster music tempo)
-	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
-	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ymf278b_device &ymf(YMF278B(config, "ymf", XTAL(33'868'800))); // ? 33.8688MHz matches video (decrease for faster music tempo)
+	ymf.set_addrmap(0, &lordgun_state::ymf278_map);
+	ymf.irq_handler().set_inputline("soundcpu", 0);
+	ymf.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH); // ? 5MHz can't be right
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)  // ? 5MHz can't be right
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki2", XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // ? 5MHz can't be right
+}
 
 
 /***************************************************************************

@@ -513,8 +513,7 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_ROM("audiocpu")
+	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -523,17 +522,17 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cabal);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -541,11 +540,9 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	SEIBU_ADPCM(config, m_adpcm1, 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
 
-	MCFG_DEVICE_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	SEIBU_ADPCM(config, m_adpcm2, 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cabal_state::cabalt)
@@ -564,7 +561,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cabal_state::cabalbl2)
 	cabal(config);
-	MCFG_DEVICE_REMOVE("sei80bu")
+	config.device_remove("sei80bu");
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(cabalbl2_sound_map)
@@ -606,11 +603,10 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cabal);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

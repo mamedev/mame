@@ -50,14 +50,13 @@
 #include "sound/dave.h"
 
 
+void ep64_expansion_bus_cards(device_slot_interface &device);
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define EP64_EXPANSION_BUS_TAG  "exp"
-
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -96,12 +95,20 @@ class ep64_expansion_bus_slot_device : public device_t,
 
 public:
 	// construction/destruction
+	ep64_expansion_bus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, char const *dflt)
+		: ep64_expansion_bus_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		ep64_expansion_bus_cards(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_dave_tag(const char* tag) { m_dave.set_tag(tag); }
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_wait_wr_callback(Object &&cb) { return m_write_wait.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_dave_tag(T &&dave_tag) { m_dave.set_tag(std::forward<T>(dave_tag)); }
+	auto irq_wr() { return m_write_irq.bind(); }
+	auto nmi_wr() { return m_write_nmi.bind(); }
+	auto wait_wr() { return m_write_wait.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
@@ -141,9 +148,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(EP64_EXPANSION_BUS_SLOT, ep64_expansion_bus_slot_device)
-
-
-void ep64_expansion_bus_cards(device_slot_interface &device);
-
 
 #endif // MAME_BUS_EP64_EXP_H

@@ -130,11 +130,11 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
 void a2bus_mouse_device::device_add_mconfig(machine_config &config)
 {
 	M68705P3(config, m_mcu, 2043600);
-	m_mcu->porta_r_cb().set(FUNC(a2bus_mouse_device::mcu_port_a_r));
-	m_mcu->portb_r_cb().set(FUNC(a2bus_mouse_device::mcu_port_b_r));
-	m_mcu->porta_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_a_w));
-	m_mcu->portb_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_b_w));
-	m_mcu->portc_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_c_w));
+	m_mcu->porta_r().set(FUNC(a2bus_mouse_device::mcu_port_a_r));
+	m_mcu->portb_r().set(FUNC(a2bus_mouse_device::mcu_port_b_r));
+	m_mcu->porta_w().set(FUNC(a2bus_mouse_device::mcu_port_a_w));
+	m_mcu->portb_w().set(FUNC(a2bus_mouse_device::mcu_port_b_w));
+	m_mcu->portc_w().set(FUNC(a2bus_mouse_device::mcu_port_c_w));
 
 	PIA6821(config, m_pia, 1021800);
 	m_pia->writepa_handler().set(FUNC(a2bus_mouse_device::pia_out_a));

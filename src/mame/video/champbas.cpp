@@ -28,14 +28,14 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(champbas_state,champbas)
+void champbas_state::champbas_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
 
 	/* compute the color output resistor weights */
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 0, 0,
 			3, &resistances_rg[0], gweights, 0, 0,
@@ -45,24 +45,23 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
 
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
 
 		/* blue component */
 		bit0 = (color_prom[i] >> 6) & 0x01;
 		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(bweights, bit0, bit1);
+		int const b = combine_2_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -71,13 +70,13 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 
 	for (int i = 0; i < 0x200; i++)
 	{
-		uint8_t ctabentry = (color_prom[i & 0xff] & 0x0f) | ((i & 0x100) >> 4);
+		uint8_t const ctabentry = (color_prom[i & 0xff] & 0x0f) | ((i & 0x100) >> 4);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 
-PALETTE_INIT_MEMBER(exctsccr_state,exctsccr)
+void exctsccr_state::exctsccr_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -85,25 +84,24 @@ PALETTE_INIT_MEMBER(exctsccr_state,exctsccr)
 	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -114,15 +112,15 @@ PALETTE_INIT_MEMBER(exctsccr_state,exctsccr)
 	/* characters / sprites (3bpp) */
 	for (int i = 0; i < 0x100; i++)
 	{
-		int swapped_i = bitswap<8>(i, 2, 7, 6, 5, 4, 3, 1, 0);
-		uint8_t ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
+		int const swapped_i = bitswap<8>(i, 2, 7, 6, 5, 4, 3, 1, 0);
+		uint8_t const ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites (4bpp) */
 	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = (color_prom[0x100 + i] & 0x0f) | 0x10;
+		uint8_t const ctabentry = (color_prom[0x100 + i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i + 0x100, ctabentry);
 	}
 }

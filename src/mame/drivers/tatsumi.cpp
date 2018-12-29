@@ -902,9 +902,8 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(apache3_state, screen_update_apache3)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apache3)
-	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apache3);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
 
 	/* apache 3 schematics state
 	bit 4:  250
@@ -955,11 +954,9 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(roundup5_state, screen_update_roundup5)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_roundup5)
-	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_roundup5);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024 + 4096); // 1024 real colours, and 4096 arranged as series of CLUTs
+	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
@@ -1038,9 +1035,8 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 272, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_cyclwarr)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
-	MCFG_PALETTE_ADD("palette", 8192 + 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclwarr);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192 + 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 

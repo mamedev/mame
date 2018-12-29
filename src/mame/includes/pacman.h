@@ -181,7 +181,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(jrpacman_scan_rows);
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
 	DECLARE_VIDEO_START(pacman);
-	DECLARE_PALETTE_INIT(pacman);
+	void pacman_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(birdiy);
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);

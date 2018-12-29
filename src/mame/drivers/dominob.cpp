@@ -72,16 +72,20 @@ Notes:
 class dominob_state : public driver_device
 {
 public:
-	dominob_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dominob_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void dominob(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -89,17 +93,18 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_bgram;
 
-	/* input-related */
-	//uint8_t m_paddle_select;
-	//uint8_t m_paddle_value;
-	DECLARE_WRITE8_MEMBER(dominob_d008_w);
-	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
-	virtual void video_start() override;
-	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	/* input-related */
+	//uint8_t m_paddle_select;
+	//uint8_t m_paddle_value;
+
+	DECLARE_WRITE8_MEMBER(dominob_d008_w);
+	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
+	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };
@@ -312,12 +317,10 @@ MACHINE_CONFIG_START(dominob_state::dominob)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dominob_state, screen_update_dominob)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dominob)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dominob);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

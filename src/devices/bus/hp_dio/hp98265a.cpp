@@ -204,7 +204,7 @@ READ16_MEMBER(dio16_98265a_device::io_r)
 		ret = m_spc->data_read();
 		break;
 	case 3:
-		ret = 0xe8; /* Flush/Configuration register */
+		ret = 0x88; /* Flush/Configuration register */
 		break;
 	}
 	LOG("io_r: offset=%02X ret=%02X\n",offset, ret);

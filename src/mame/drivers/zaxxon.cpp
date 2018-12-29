@@ -941,9 +941,8 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::bg_enable_w)); // BEN
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaxxon)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaxxon);
+	PALETTE(config, m_palette, FUNC(zaxxon_state::zaxxon_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
@@ -970,24 +969,25 @@ MACHINE_CONFIG_START(zaxxon_state::szaxxon)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(zaxxon_state::szaxxone)
+void zaxxon_state::szaxxone(machine_config &config)
+{
 	zaxxon(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
-MACHINE_CONFIG_END
+	sega_315_5013_device &maincpu(SEGA_315_5013(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::zaxxon_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
+}
 
 
 
 MACHINE_CONFIG_START(zaxxon_state::futspye)
 	root(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
-	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
+	sega_315_5061_device &maincpu(SEGA_315_5061(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::zaxxon_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
 
 
 	/* video hardware */
@@ -1005,13 +1005,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	root(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
-	MCFG_DEVICE_PROGRAM_MAP(ixion_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
+	sega_315_5098_device &maincpu(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::ixion_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
 
-	MCFG_DEVICE_REMOVE("ppi8255")
+	config.device_remove("ppi8255");
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,razmataz)
@@ -1020,19 +1020,20 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_SEGAUSBROM_ADD("usbsnd", "maincpu")
+	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(zaxxon_state::ixion)
+void zaxxon_state::ixion(machine_config &config)
+{
 	razmataze(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_DEVICE_PROGRAM_MAP(ixion_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
+	sega_315_5013_device &maincpu(SEGA_315_5013(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::ixion_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
 
 	m_mainlatch[0]->q_out_cb<6>().set_nop(); // flip screen not used
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(zaxxon_state::congo)
 	root(config);
@@ -1060,9 +1061,7 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(512)
-	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
+	m_palette->set_entries(512).set_init(FUNC(zaxxon_state::zaxxon_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
 	MCFG_SCREEN_MODIFY("screen")

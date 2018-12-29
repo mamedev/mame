@@ -275,9 +275,8 @@ MACHINE_CONFIG_START(kopunch_state::kopunch)
 	MCFG_SCREEN_UPDATE_DRIVER(kopunch_state, screen_update_kopunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kopunch)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(kopunch_state, kopunch)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_kopunch);
+	PALETTE(config, "palette", FUNC(kopunch_state::kopunch_palette), 8);
 
 	/* sound hardware */
 	// ...

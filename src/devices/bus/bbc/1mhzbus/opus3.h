@@ -11,6 +11,7 @@
 #define MAME_BUS_BBC_1MHZBUS_OPUS3_H
 
 #include "1mhzbus.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"

@@ -302,19 +302,20 @@ INPUT_PORTS_START( segasp )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(segasp_state::segasp)
+void segasp_state::segasp(machine_config &config)
+{
 	naomi_aw_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(segasp_map)
-	MCFG_DEVICE_IO_MAP(onchip_port)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segasp_state::segasp_map);
+	m_maincpu->set_addrmap(AS_IO, &segasp_state::onchip_port);
 
 	EEPROM_93C46_16BIT(config, "main_eeprom");
 	EEPROM_93C46_16BIT(config, "sp_eeprom");
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
 	X76F100(config, "naomibd_eeprom");  // actually not present
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", 0, "naomibd_eeprom", "pic_readout"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 void segasp_state::init_segasp()
 {
@@ -612,7 +613,7 @@ ROM_END
 GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 // These use ROMs
 GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main)", GAME_FLAGS ) // 28.05.2009
-GAME( 2009, bingogals,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
+GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )

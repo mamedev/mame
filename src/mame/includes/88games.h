@@ -10,10 +10,11 @@
 
 #pragma once
 
+#include "cpu/m6809/konami.h"
 #include "sound/upd7759.h"
-#include "video/k052109.h"
-#include "video/k051960.h"
 #include "video/k051316.h"
+#include "video/k051960.h"
+#include "video/k052109.h"
 #include "video/konami_helper.h"
 
 class _88games_state : public driver_device
@@ -42,7 +43,7 @@ private:
 	int          m_speech_chip;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;

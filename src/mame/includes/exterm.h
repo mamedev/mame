@@ -68,7 +68,7 @@ private:
 	DECLARE_READ8_MEMBER(sound_nmi_to_slave_r);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_WRITE8_MEMBER(ym2151_data_latch_w);
-	DECLARE_PALETTE_INIT(exterm);
+	void exterm_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_master);

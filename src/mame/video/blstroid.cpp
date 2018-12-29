@@ -95,7 +95,7 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 		case TIMER_IRQ_ON:
 			/* generate the interrupt */
-			scanline_int_gen(*m_maincpu);
+			scanline_int_write_line(1);
 			update_interrupts();
 			break;
 		default:

@@ -29,6 +29,7 @@ class tim100_state : public driver_device
 public:
 	tim100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_charmap(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
@@ -46,8 +47,9 @@ private:
 	void tim100_mem(address_map &map);
 
 	virtual void machine_start() override;
-	uint8_t *m_charmap;
+
 	uint16_t m_dma_adr;
+	required_region_ptr<uint8_t> m_charmap;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -93,8 +95,7 @@ static const rgb_t tim100_palette[3] = {
 
 void tim100_state::machine_start()
 {
-	m_charmap = memregion("chargen")->base();
-	m_palette->set_pen_colors(0, tim100_palette, ARRAY_LENGTH(tim100_palette));
+	m_palette->set_pen_colors(0, tim100_palette);
 }
 
 const gfx_layout tim100_charlayout =

@@ -7,24 +7,6 @@
 #include <tuple>
 
 
-#define MCFG_ESQ1X22_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, ESQ1X22, 60)
-
-#define MCFG_ESQ1x22_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_ESQ2X40_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, ESQ2X40, 60)
-
-#define MCFG_ESQ2X40_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_ESQ2X40_SQ1_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, ESQ2X40_SQ1, 60)
-
-#define MCFG_ESQ2X40_SQ1_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
 class esqvfd_device : public device_t {
 public:
 	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }

@@ -242,8 +242,8 @@ To Do:
 class subsino_state : public driver_device
 {
 public:
-	subsino_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	subsino_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_reel_scroll(*this, "reel_scroll.%u", 0U),
@@ -322,8 +322,8 @@ private:
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_stbsub_reel_tile_info);
 	DECLARE_VIDEO_START(subsino);
-	DECLARE_PALETTE_INIT(_2proms);
-	DECLARE_PALETTE_INIT(_3proms);
+	void _2proms_palette(palette_device &palette) const;
+	void _3proms_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(reels);
 	DECLARE_VIDEO_START(stbsub);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -534,55 +534,55 @@ uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap
 
 
 
-PALETTE_INIT_MEMBER(subsino_state, _2proms)
+void subsino_state::_2proms_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i,r,g,b,val;
-	int bit0,bit1,bit2;
-
-	for (i = 0; i < 256; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 256; i++)
 	{
-		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
+		int bit0, bit1, bit2;
+		int const val = color_prom[i | 0x100] | (color_prom[i | 0x000] << 4);
 
 		bit0 = 0;
-		bit1 = (val >> 6) & 0x01;
-		bit2 = (val >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 3) & 0x01;
-		bit1 = (val >> 4) & 0x01;
-		bit2 = (val >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 0) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(val, 6);
+		bit2 = BIT(val, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(val, 3);
+		bit1 = BIT(val, 4);
+		bit2 = BIT(val, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(val, 0);
+		bit1 = BIT(val, 1);
+		bit2 = BIT(val, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(subsino_state, _3proms)
+void subsino_state::_3proms_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i,r,g,b,val;
-	int bit0,bit1,bit2;
-
-	for (i = 0; i < 256; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 256; i++)
 	{
-		val = (color_prom[i+0x000]) | (color_prom[i+0x100]<<3) | (color_prom[i+0x200]<<6);
+		int bit0, bit1, bit2;
+		int const val = color_prom[i | 0x000] | (color_prom[i | 0x100] << 3) | (color_prom[i | 0x200] << 6);
 
 		bit0 = 0;
-		bit1 = (val >> 7) & 0x01;
-		bit2 = (val >> 6) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 5) & 0x01;
-		bit1 = (val >> 4) & 0x01;
-		bit2 = (val >> 3) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 2) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 0) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(val, 7);
+		bit2 = BIT(val, 6);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(val, 5);
+		bit1 = BIT(val, 4);
+		bit2 = BIT(val, 3);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(val, 2);
+		bit1 = BIT(val, 1);
+		bit2 = BIT(val, 0);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -2726,12 +2726,11 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth3)
+	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth3);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
+	PALETTE(config, m_palette, FUNC(subsino_state::_2proms_palette), 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2770,12 +2769,11 @@ MACHINE_CONFIG_START(subsino_state::crsbingo)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4)
+	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
+	PALETTE(config, m_palette, FUNC(subsino_state::_2proms_palette), 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2812,12 +2810,11 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4)
+	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
+	PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2865,12 +2862,11 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_reels)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4_reels)
+	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4_reels);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
+	PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state, reels)
 
@@ -2907,12 +2903,12 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stbsub_reels)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_stbsub)
+	GFXDECODE(config, m_gfxdecode, m_palette, subsino_stbsub);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	//MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
+	PALETTE(config, m_palette).set_entries(0x100);
+	//PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino_state::ramdac_map);

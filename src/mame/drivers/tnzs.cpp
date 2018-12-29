@@ -1529,123 +1529,121 @@ static GFXDECODE_START( gfx_insectx )
 	GFXDECODE_ENTRY( "gfx1", 0, insectx_charlayout, 0, 32 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
+void tnzs_base_state::tnzs_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tnzs_base_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tnzs_base_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tnzs_base_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,XTAL(12'000'000)/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
-	MCFG_DEVICE_PROGRAM_MAP(base_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tnzs_base_state,  irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(12'000'000)/2);        /* 6.0 MHz ??? - Main board Crystal is 12MHz, verified on insectx, kageki, tnzsb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &tnzs_base_state::base_sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(tnzs_base_state::irq0_line_hold));
 
 	tnzs_mainbank(config);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tnzs_base_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnzs_base_state, screen_vblank_tnzs))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(tnzs_base_state::screen_update_tnzs));
+	m_screen->screen_vblank().set(FUNC(tnzs_base_state::screen_vblank_tnzs));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnzs)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnzs);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tnzs_mcu_state::tnzs)
+void tnzs_mcu_state::tnzs(machine_config &config)
+{
 	tnzs_base(config);
-	MCFG_DEVICE_ADD("mcu", I8742, 12000000/2)  /* 400KHz ??? - Main board Crystal is 12MHz */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, tnzs_mcu_state, mcu_port1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, tnzs_mcu_state, mcu_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, tnzs_mcu_state, mcu_port2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COIN1"))
-	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COIN2"))
+	I8742(config, m_mcu, 12000000/2);  /* 400KHz ??? - Main board Crystal is 12MHz */
+	m_mcu->p1_in_cb().set(FUNC(tnzs_mcu_state::mcu_port1_r));
+	m_mcu->p2_in_cb().set(FUNC(tnzs_mcu_state::mcu_port2_r));
+	m_mcu->p2_out_cb().set(FUNC(tnzs_mcu_state::mcu_port2_w));
+	m_mcu->t0_in_cb().set_ioport("COIN1");
+	m_mcu->t1_in_cb().set_ioport("COIN2");
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(tnzs_sub_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &tnzs_mcu_state::tnzs_sub_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(59.15)   /* it should be the same as the newer pcb vsync */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	m_screen->set_refresh_hz(59.15);   /* it should be the same as the newer pcb vsync */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4));
 	ymsnd.port_a_read_callback().set_ioport("DSWA");
 	ymsnd.port_b_read_callback().set_ioport("DSWB");
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(extrmatn_state::extrmatn)
+void extrmatn_state::extrmatn(machine_config &config)
+{
 	tnzs(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(prompal_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &extrmatn_state::prompal_main_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(extrmatn_state::prompalette));
+}
 
 void extrmatn_state::plumppop(machine_config &config)
 {
 	extrmatn(config);
+
 	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("AN1");
 	m_upd4701->set_porty_tag("AN2");
 }
 
-MACHINE_CONFIG_START(arknoid2_state::arknoid2)
+void arknoid2_state::arknoid2(machine_config &config)
+{
 	plumppop(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arknoid2_state, mcu_interrupt)
+	m_maincpu->set_vblank_int("screen", FUNC(arknoid2_state::mcu_interrupt));
+	m_subcpu->set_addrmap(AS_PROGRAM, &arknoid2_state::arknoid2_sub_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(arknoid2_sub_map)
+	subdevice<cpu_device>("mcu")->set_disable();
+}
 
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(insectx_state::insectx)
+void insectx_state::insectx(machine_config &config)
+{
 	tnzs_base(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(insectx_sub_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::insectx_sub_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_insectx)
+	m_gfxdecode->set_info(gfx_insectx);
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
 	ymsnd.port_a_read_callback().set_ioport("DSWA");
 	ymsnd.port_b_read_callback().set_ioport("DSWB");
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(kageki_state::kageki)
+void kageki_state::kageki(machine_config &config)
+{
 	tnzs_base(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(kageki_sub_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &kageki_state::kageki_sub_map);
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
@@ -1656,28 +1654,26 @@ MACHINE_CONFIG_START(kageki_state::kageki)
 	ymsnd.add_route(2, "speaker", 0.15);
 	ymsnd.add_route(3, "speaker", 0.35);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(kageki_state, init_samples)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_start_callback(FUNC(kageki_state::init_samples));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(tnzsb_state::tnzsb)
+void tnzsb_state::tnzsb(machine_config &config)
+{
 	tnzs_base(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tnzsb_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tnzsb_state::tnzsb_main_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tnzsb_state::tnzsb_sub_map);
 
-	MCFG_DEVICE_MODIFY("sub") /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(tnzsb_sub_map)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(tnzsb_cpu2_map)
-	MCFG_DEVICE_IO_MAP(tnzsb_io_map)
+	Z80(config, m_audiocpu, XTAL(12'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tnzsb_state::tnzsb_cpu2_map);
+	m_audiocpu->set_addrmap(AS_IO, &tnzsb_state::tnzsb_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(59.15)   /* verified on pcb */
+	m_screen->set_refresh_hz(59.15);   /* verified on pcb */
 
 	/* sound hardware */
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -1688,52 +1684,47 @@ MACHINE_CONFIG_START(tnzsb_state::tnzsb)
 	ymsnd.add_route(1, "speaker", 1.0);
 	ymsnd.add_route(2, "speaker", 1.0);
 	ymsnd.add_route(3, "speaker", 2.0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(kabukiz_state::kabukiz)
+void kabukiz_state::kabukiz(machine_config &config)
+{
 	tnzsb(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(kabukiz_sub_map)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(kabukiz_cpu2_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &kabukiz_state::kabukiz_sub_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kabukiz_state::kabukiz_cpu2_map);
 
 	/* sound hardware */
 	ym2203_device &ymsnd(*subdevice<ym2203_device>("ymsnd"));
 	ymsnd.port_a_write_callback().set(FUNC(kabukiz_state::sound_bank_w));
 	ymsnd.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-
-MACHINE_CONFIG_START(jpopnics_state::jpopnics)
+void jpopnics_state::jpopnics(machine_config &config)
+{
 	tnzs_base(config);
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jpopnics_main_map)
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(jpopnics_sub_map)
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpopnics_state::jpopnics_main_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &jpopnics_state::jpopnics_sub_map);
 
 	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("AN1");
 	m_upd4701->set_porty_tag("AN2");
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(1024)
-	MCFG_PALETTE_FORMAT(GGGGBBBBRRRRxxxx) /* wrong, the other 4 bits seem to be used as well */
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	m_palette->set_format(palette_device::GBRx_444, 1024); // wrong, the other 4 bits seem to be used as well
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	YM2151(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Not verified - Main board Crystal is 12MHz */
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

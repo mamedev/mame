@@ -1701,8 +1701,7 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MB8421(config, m_dpram, 0);
 
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
-	MCFG_GFX_PALETTE("palette")
+	S24TILE(config, m_tiles, 0, 0x3fff).set_palette(m_palette);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
@@ -1710,8 +1709,7 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, model1_state, screen_vblank_model1))
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
 
 	SEGAM1AUDIO(config, m_m1audio, 0);
 	m_m1audio->rxd_handler().set(m_m1uart, FUNC(i8251_device::write_rxd));

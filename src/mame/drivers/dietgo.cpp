@@ -226,30 +226,29 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 1024);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dietgo)
 
-	MCFG_DEVICE_ADD("tilegen", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(dietgo_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(dietgo_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen, 0);
+	m_deco_tilegen->set_split(0);
+	m_deco_tilegen->set_pf1_size(DECO_64x32);
+	m_deco_tilegen->set_pf2_size(DECO_64x32);
+	m_deco_tilegen->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen->set_pf1_col_bank(0x00);
+	m_deco_tilegen->set_pf2_col_bank(0x10);
+	m_deco_tilegen->set_pf1_col_mask(0x0f);
+	m_deco_tilegen->set_pf2_col_mask(0x0f);
+	m_deco_tilegen->set_bank1_callback(FUNC(dietgo_state::bank_callback), this);
+	m_deco_tilegen->set_bank2_callback(FUNC(dietgo_state::bank_callback), this);
+	m_deco_tilegen->set_pf12_8x8_bank(0);
+	m_deco_tilegen->set_pf12_16x16_bank(1);
+	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");

@@ -106,6 +106,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -2195,9 +2196,9 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cmi_state, cmi_iix_vblank))
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("msm5832", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_msm5832, 32.768_kHz_XTAL);
 
 	I8214(config, m_i8214[0], 1000000); // cmi_8214_intf_1
 	m_i8214[0]->int_wr_callback().set(FUNC(cmi_state::i8214_1_int_w));
@@ -2300,30 +2301,30 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	SPEAKER(config, "mono").front_center();
 
 	// Channel cards
-	MCFG_DEVICE_ADD("cmi01a_0", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<0>))
-	MCFG_DEVICE_ADD("cmi01a_1", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<1>))
-	MCFG_DEVICE_ADD("cmi01a_2", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<2>))
-	MCFG_DEVICE_ADD("cmi01a_3", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<3>))
-	MCFG_DEVICE_ADD("cmi01a_4", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<4>))
-	MCFG_DEVICE_ADD("cmi01a_5", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<5>))
-	MCFG_DEVICE_ADD("cmi01a_6", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<6>))
-	MCFG_DEVICE_ADD("cmi01a_7", CMI01A_CHANNEL_CARD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<7>))
+	cmi01a_device &cmi01a_0(CMI01A_CHANNEL_CARD(config, "cmi01a_0", 0));
+	cmi01a_0.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_0.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_device &cmi01a_1(CMI01A_CHANNEL_CARD(config, "cmi01a_1", 0));
+	cmi01a_1.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_1.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_device &cmi01a_2(CMI01A_CHANNEL_CARD(config, "cmi01a_2", 0));
+	cmi01a_2.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_2.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_device &cmi01a_3(CMI01A_CHANNEL_CARD(config, "cmi01a_3", 0));
+	cmi01a_3.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_3.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_device &cmi01a_4(CMI01A_CHANNEL_CARD(config, "cmi01a_4", 0));
+	cmi01a_4.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_4.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_device &cmi01a_5(CMI01A_CHANNEL_CARD(config, "cmi01a_5", 0));
+	cmi01a_5.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_5.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_device &cmi01a_6(CMI01A_CHANNEL_CARD(config, "cmi01a_6", 0));
+	cmi01a_6.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_6.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
+	cmi01a_device &cmi01a_7(CMI01A_CHANNEL_CARD(config, "cmi01a_7", 0));
+	cmi01a_7.add_route(ALL_OUTPUTS, "mono", 0.25);
+	cmi01a_7.irq_callback().set(FUNC(cmi_state::channel_irq<0>));
 MACHINE_CONFIG_END
 
 ROM_START( cmi2x )

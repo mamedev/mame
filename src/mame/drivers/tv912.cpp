@@ -62,7 +62,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define CHAR_WIDTH 14
+#define TV912_CH_WIDTH 14
 #define CHARSET_TEST 0
 
 class tv912_state : public driver_device
@@ -306,7 +306,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					dots ^= 0xff;
 			}
 
-			for (int d = 0; d < CHAR_WIDTH / 2; d++)
+			for (int d = 0; d < TV912_CH_WIDTH / 2; d++)
 			{
 				if (x >= cliprect.left() && x <= cliprect.right())
 					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
@@ -891,11 +891,11 @@ void tv912_state::tv912(machine_config &config)
 	m_bankdev->set_stride(0x100);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(23.814_MHz_XTAL, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240);
+	screen.set_raw(23.814_MHz_XTAL, 105 * TV912_CH_WIDTH, 0, 80 * TV912_CH_WIDTH, 270, 0, 240);
 	screen.set_screen_update(FUNC(tv912_state::screen_update));
 
-	TMS9927(config, m_crtc, 23.814_MHz_XTAL / CHAR_WIDTH);
-	m_crtc->set_char_width(CHAR_WIDTH);
+	TMS9927(config, m_crtc, 23.814_MHz_XTAL / TV912_CH_WIDTH);
+	m_crtc->set_char_width(TV912_CH_WIDTH);
 	m_crtc->vsyn_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc->set_screen("screen");
 

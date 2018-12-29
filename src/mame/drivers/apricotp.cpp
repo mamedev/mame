@@ -27,6 +27,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/m6800/m6801.h"
 #include "formats/apridisk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/apricotkb.h"
 #include "machine/pic8259.h"

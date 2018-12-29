@@ -380,7 +380,7 @@ void k3_state::flagrall(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::flagrall_map);
 	m_maincpu->set_vblank_int("screen", FUNC(k3_state::irq4_line_hold));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_1945kiii);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1945kiii);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -388,9 +388,9 @@ void k3_state::flagrall(machine_config &config)
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(k3_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 0x200).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
 
 	SPEAKER(config, "mono").front_center();
 

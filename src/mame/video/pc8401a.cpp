@@ -7,7 +7,7 @@
 
 /* PC-8401A */
 
-PALETTE_INIT_MEMBER(pc8401a_state,pc8401a)
+void pc8401a_state::pc8401a_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(39, 108, 51));
 	palette.set_pen_color(1, rgb_t(16, 37, 84));
@@ -61,8 +61,7 @@ void pc8401a_state::pc8500_lcdc(address_map &map)
 MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
 //  config.set_default_layout(layout_pc8401a);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
+	PALETTE(config, "palette", FUNC(pc8401a_state::pc8401a_palette), 2);
 
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -80,8 +79,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	config.set_default_layout(layout_pc8500);
 
-	MCFG_PALETTE_ADD("palette", 2+8)
-	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
+	PALETTE(config, "palette", FUNC(pc8500_state::pc8401a_palette), 2 + 8);
 
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)

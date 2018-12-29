@@ -83,7 +83,7 @@ protected:
 	virtual void video_start() override;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_PALETTE_INIT(starpal_init);
+	void starpal_init(palette_device &palette) const;
 	void get_pens();
 	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);

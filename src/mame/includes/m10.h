@@ -119,7 +119,7 @@ private:
 	DECLARE_MACHINE_START(m10);
 	DECLARE_MACHINE_RESET(m10);
 	DECLARE_VIDEO_START(m10);
-	DECLARE_PALETTE_INIT(m10);
+	void m10_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(m15);
 	uint32_t screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

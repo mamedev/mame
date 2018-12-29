@@ -37,16 +37,16 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 {
 	switch (offset)
 	{
-		case 0:
-			m_bg_ctrl = data;
-			break;
+	case 0:
+		m_bg_ctrl = data;
+		break;
 
-		case 1:
-			m_soundlatch->write(space, 0, data);
-			break;
+	case 1:
+		m_soundlatch->write(space, 0, data);
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
@@ -239,11 +239,10 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16) // from $30*2 to $CC*2+8
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyfox)
-	MCFG_PALETTE_ADD("palette", 256+256) /* 256 static colors (+256 for the background??) */
-	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyfox);
+	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256+256); // 256 static colors (+256 for the background??)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

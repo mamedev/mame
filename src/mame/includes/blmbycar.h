@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emupal.h"
+#include "video/gaelco_wrally_sprites.h"
 
 class blmbycar_state : public driver_device
 {
@@ -16,6 +17,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_sprites(*this, "sprites"),
 		m_vram(*this, "vram_%u", 0U),
 		m_scroll(*this, "scroll_%u", 0U),
 		m_spriteram(*this, "spriteram"),
@@ -35,6 +37,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<gaelco_wrally_sprites_device> m_sprites;
 
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 2> m_vram;

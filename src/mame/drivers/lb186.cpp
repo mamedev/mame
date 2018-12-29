@@ -8,7 +8,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/nscsi_hd.h"
 #include "machine/ncr5380n.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 

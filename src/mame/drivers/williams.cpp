@@ -1510,8 +1510,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(williams_state,williams)
+	PALETTE(config, m_palette, FUNC(williams_state::williams_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1761,8 +1760,8 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_williams2)
+	PALETTE(config, m_palette).set_entries(1024);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_williams2);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)

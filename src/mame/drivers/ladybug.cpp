@@ -736,13 +736,10 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladybug)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ladybug);
+	PALETTE(config, "palette", FUNC(ladybug_state::ladybug_palette), 4*8 + 4*16, 32);
 
-	MCFG_DEVICE_ADD("video", LADYBUG_VIDEO, 4000000)
-	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
+	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag("gfxdecode");
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // L5 on video board or H3 on single board
 	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flipscreen_w)); // no other outputs used
@@ -750,11 +747,8 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("sn2", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dorodon_state::dorodon)
@@ -784,35 +778,22 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sraider_state, screen_update_sraider)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sraider_state, screen_vblank_sraider))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sraider)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16+32+2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+32+1)
-	MCFG_PALETTE_INIT_OWNER(sraider_state,sraider)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sraider);
+	PALETTE(config, m_palette, FUNC(sraider_state::sraider_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
 
-	MCFG_DEVICE_ADD("video", LADYBUG_VIDEO, 4000000)
-	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
-
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag(m_gfxdecode);
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("sn2", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("sn3", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("sn4", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("sn5", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

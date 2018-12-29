@@ -347,10 +347,11 @@ void gts80a_state::init_gts80a()
 }
 
 /* with Sound Board */
-MACHINE_CONFIG_START(gts80a_state::gts80a)
+void gts80a_state::gts80a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
-	MCFG_DEVICE_PROGRAM_MAP(gts80a_map)
+	M6502(config, m_maincpu, XTAL(3'579'545)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gts80a_state::gts80a_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
@@ -382,21 +383,21 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gts80a_state::gts80a_s)
+void gts80a_state::gts80a_s(machine_config &config)
+{
 	gts80a(config);
-	MCFG_DEVICE_ADD("r0sound", GOTTLIEB_SOUND_REV0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(gts80a_state::gts80a_ss)
+
+void gts80a_state::gts80a_ss(machine_config &config)
+{
 	gts80a(config);
-	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
-	//MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	//GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);  // votrax crashes
+}
 
 
 class caveman_state : public gts80a_state

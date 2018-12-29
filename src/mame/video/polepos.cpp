@@ -27,9 +27,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(polepos_state,polepos)
+void polepos_state::polepos_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	/*******************************************************
 	 * Color PROMs
@@ -52,28 +52,30 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 *******************************************************/
 	for (int i = 0; i < 128; i++)
 	{
-		/* Sheet 15B: 136014-0137 red component */
-		int bit0 = (color_prom[0x000 + i] >> 0) & 1;
-		int bit1 = (color_prom[0x000 + i] >> 1) & 1;
-		int bit2 = (color_prom[0x000 + i] >> 2) & 1;
-		int bit3 = (color_prom[0x000 + i] >> 3) & 1;
-		int r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int bit0, bit1, bit2, bit3;
 
-		/* Sheet 15B: 136014-0138 green component */
-		bit0 = (color_prom[0x100 + i] >> 0) & 1;
-		bit1 = (color_prom[0x100 + i] >> 1) & 1;
-		bit2 = (color_prom[0x100 + i] >> 2) & 1;
-		bit3 = (color_prom[0x100 + i] >> 3) & 1;
-		int g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// Sheet 15B: 136014-0137 red component
+		bit0 = BIT(color_prom[0x000 + i], 0);
+		bit1 = BIT(color_prom[0x000 + i], 1);
+		bit2 = BIT(color_prom[0x000 + i], 2);
+		bit3 = BIT(color_prom[0x000 + i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* Sheet 15B: 136014-0139 blue component */
-		bit0 = (color_prom[0x200 + i] >> 0) & 1;
-		bit1 = (color_prom[0x200 + i] >> 1) & 1;
-		bit2 = (color_prom[0x200 + i] >> 2) & 1;
-		bit3 = (color_prom[0x200 + i] >> 3) & 1;
-		int b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// Sheet 15B: 136014-0138 green component
+		bit0 = BIT(color_prom[0x100 + i], 0);
+		bit1 = BIT(color_prom[0x100 + i], 1);
+		bit2 = BIT(color_prom[0x100 + i], 2);
+		bit3 = BIT(color_prom[0x100 + i], 3);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		// Sheet 15B: 136014-0139 blue component
+		bit0 = BIT(color_prom[0x200 + i], 0);
+		bit1 = BIT(color_prom[0x200 + i], 1);
+		bit2 = BIT(color_prom[0x200 + i], 2);
+		bit3 = BIT(color_prom[0x200 + i], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/*******************************************************
@@ -83,7 +85,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 *******************************************************/
 	for (int i = 0; i < 64*4; i++)
 	{
-		int color = color_prom[0x300 + i];
+		int const color = color_prom[0x300 + i];
 		palette.set_pen_indirect(0x0000 + i, (color != 15) ? (0x020 + color) : 0x2f);
 		palette.set_pen_indirect(0x0100 + i, (color != 15) ? (0x060 + color) : 0x2f);
 	}
@@ -96,7 +98,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 *******************************************************/
 	for (int i = 0; i < 64*4; i++)
 	{
-		int color = color_prom[0x400 + i];
+		int const color = color_prom[0x400 + i];
 		palette.set_pen_indirect(0x0200 + i, 0x000 + color);
 	}
 
@@ -107,7 +109,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 *******************************************************/
 	for (int i = 0; i < 64*16; i++)
 	{
-		int color = color_prom[0xc00 + i];
+		int const color = color_prom[0xc00 + i];
 		palette.set_pen_indirect(0x0300 + i, (color != 15) ? (0x010 + color) : 0x1f);
 		palette.set_pen_indirect(0x0700 + i, (color != 15) ? (0x050 + color) : 0x1f);
 	}
@@ -120,14 +122,14 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 *******************************************************/
 	for (int i = 0; i < 64*16; i++)
 	{
-		int color = color_prom[0x800 + i];
+		int const color = color_prom[0x800 + i];
 		palette.set_pen_indirect(0x0b00 + i, 0x040 + color);
 	}
 
 	/* 136014-142, 136014-143, 136014-144 Vertical position modifiers */
 	for (int i = 0; i < 256; i++)
 	{
-		int j = color_prom[0x500 + i] + (color_prom[0x600 + i] << 4) + (color_prom[0x700 + i] << 8);
+		int const j = color_prom[0x500 + i] + (color_prom[0x600 + i] << 4) + (color_prom[0x700 + i] << 8);
 		m_vertical_position_modifier[i] = j;
 	}
 }

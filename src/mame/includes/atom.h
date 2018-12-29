@@ -8,7 +8,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
 #include "machine/i8255.h"

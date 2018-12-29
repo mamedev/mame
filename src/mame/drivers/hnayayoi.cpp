@@ -565,7 +565,7 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_SCREEN_RAW_PARAMS(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	hd6845_device &crtc(HD6845(config, "crtc", 20_MHz_XTAL / 8));
 	crtc.set_screen("screen");

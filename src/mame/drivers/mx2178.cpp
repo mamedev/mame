@@ -145,7 +145,7 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
 	mc6845_device &crtc(MC6845(config, "crtc", XTAL(18'869'600) / 8)); // clk unknown

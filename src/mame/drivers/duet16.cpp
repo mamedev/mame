@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
 #include "machine/pit8253.h"
@@ -406,7 +407,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_INPUT_MERGER_ANY_HIGH("tmint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir0_w)) // INT6
 
-	UPD765A(config, m_fdc, true, false);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w)); // INT4
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -419,7 +420,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
 
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")
+	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "chrpal", gfx_duet16)
 

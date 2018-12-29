@@ -127,7 +127,7 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7
 
-	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750_device &te7750(TE7750(config, "te7750"));
 	te7750.ios_cb().set_constant(3);
 	te7750.in_port1_cb().set_ioport("IN1");
 	te7750.in_port2_cb().set_ioport("IN2");
@@ -143,9 +143,9 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("soundcpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag("soundcpu");
 
 	SPEAKER(config, "mono").front_center();
 

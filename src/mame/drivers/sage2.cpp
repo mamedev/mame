@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	rs232b.rxd_handler().set(m_usart1, FUNC(i8251_device::write_rxd));
 	rs232b.dsr_handler().set(m_usart1, FUNC(i8251_device::write_dsr));
 
-	UPD765A(config, m_fdc, false, false);
+	UPD765A(config, m_fdc, 8'000'000, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(sage2_state::fdc_irq));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")

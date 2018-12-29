@@ -22,7 +22,7 @@
 #include "screen.h"
 
 // character matrix is supposed to be only 7x7, but 15 produces correct timings
-#define CHAR_WIDTH 15
+#define V100_CH_WIDTH 15
 
 class v100_state : public driver_device
 {
@@ -83,8 +83,8 @@ u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	unsigned row0 = cliprect.top() / 10;
 	unsigned x0 = cliprect.left();
-	unsigned px0 = x0 % CHAR_WIDTH;
-	unsigned columns = screen.visible_area().width() / CHAR_WIDTH;
+	unsigned px0 = x0 % V100_CH_WIDTH;
+	unsigned columns = screen.visible_area().width() / V100_CH_WIDTH;
 
 	u16 start = 0;
 	unsigned y = 0;
@@ -116,7 +116,7 @@ u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 					px++;
 					if ((px & 1) == 0)
 						gfxdata <<= 1;
-					if (px >= CHAR_WIDTH)
+					if (px >= V100_CH_WIDTH)
 					{
 						addr = (addr + 1) & 0xfff;
 						gfxdata = m_p_chargen[((m_videoram[addr] & 0x7f) << 4) | scan];
@@ -362,12 +362,12 @@ MACHINE_CONFIG_START(v100_state::v100)
 	brg2.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 260, 0, 240)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * CHAR_WIDTH, 0, 132 * CHAR_WIDTH, 312, 0, 240)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * V100_CH_WIDTH, 0, 80 * V100_CH_WIDTH, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * V100_CH_WIDTH, 0, 132 * V100_CH_WIDTH, 312, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
 
-	CRT5037(config, m_vtac, XTAL(47'736'000) / CHAR_WIDTH);
-	m_vtac->set_char_width(CHAR_WIDTH);
+	CRT5037(config, m_vtac, XTAL(47'736'000) / V100_CH_WIDTH);
+	m_vtac->set_char_width(V100_CH_WIDTH);
 	m_vtac->set_screen("screen");
 	m_vtac->hsyn_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
 	m_vtac->vsyn_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();

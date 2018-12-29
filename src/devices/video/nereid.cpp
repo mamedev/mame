@@ -39,7 +39,7 @@ void nereid_device::device_start()
 
 void nereid_device::device_reset()
 {
-	for(int i = 0; i < palette_entries(); i++)
+	for (int i = 0; i < palette_entries(); i++)
 		set_pen_color(i, rgb_t(0, 0, 0));
 	m_index = 0;
 	m_plane_mask = 0;

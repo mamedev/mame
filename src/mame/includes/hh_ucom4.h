@@ -31,7 +31,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<ucom4_cpu_device> m_maincpu;
 	optional_ioport_array<5> m_inp_matrix; // max 5
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;

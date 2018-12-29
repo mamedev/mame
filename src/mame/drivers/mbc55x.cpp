@@ -24,22 +24,23 @@ ToDo:
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/clock.h"
+#include "machine/i8087.h"
 #include "machine/input_merger.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
-const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
+static constexpr rgb_t mbc55x_pens[SCREEN_NO_COLOURS]
 {
-	/*normal brightness */
-	{ 0x00,0x00,0x00 }, /* black */
-	{ 0x00,0x00,0x80 }, /* blue */
-	{ 0x00,0x80,0x00 }, /* green */
-	{ 0x00,0x80,0x80 }, /* cyan */
-	{ 0x80,0x00,0x00 }, /* red */
-	{ 0x80,0x00,0x80 }, /* magenta */
-	{ 0x80,0x80,0x00 }, /* yellow */
-	{ 0x80,0x80,0x80 }, /* light grey */
+	// normal brightness
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0x00, 0x00, 0x80 }, // blue
+	{ 0x00, 0x80, 0x00 }, // green
+	{ 0x00, 0x80, 0x80 }, // cyan
+	{ 0x80, 0x00, 0x00 }, // red
+	{ 0x80, 0x00, 0x80 }, // magenta
+	{ 0x80, 0x80, 0x00 }, // yellow
+	{ 0x80, 0x80, 0x80 }  // light grey
 };
 
 
@@ -223,14 +224,11 @@ static INPUT_PORTS_START( mbc55x )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(mbc55x_state, mbc55x)
+void mbc55x_state::mbc55x_palette(palette_device &palette) const
 {
-	int colourno;
-
 	logerror("initializing palette\n");
 
-	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
-		palette.set_pen_color(colourno, mbc55x_palette[colourno][RED], mbc55x_palette[colourno][GREEN], mbc55x_palette[colourno][BLUE]);
+	palette.set_pen_colors(0, mbc55x_pens);
 }
 
 
@@ -258,6 +256,14 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbc55x_state::mbc55x_io);
 	m_maincpu->set_irq_acknowledge_callback(PIC8259_TAG, FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("coproc", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("coproc", FUNC(i8087_device::addr_w));
+
+	i8087_device &i8087(I8087(config, "coproc", 14.318181_MHz_XTAL / 4));
+	i8087.set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
+	i8087.set_data_width(8);
+	i8087.irq().set(m_pic, FUNC(pic8259_device::ir6_w));
+	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
 	ADDRESS_MAP_BANK(config, m_iodecode);
 	m_iodecode->endianness(ENDIANNESS_LITTLE);
@@ -272,8 +278,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	screen.set_raw(14.318181_MHz_XTAL, 896, 0, 640, 262, 0, 200);
 	screen.set_screen_update(VID_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS * 3)
-	MCFG_PALETTE_INIT_OWNER(mbc55x_state, mbc55x)
+	PALETTE(config, m_palette, FUNC(mbc55x_state::mbc55x_palette), SCREEN_NO_COLOURS * 3);
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("128K,192K,256K,320K,384K,448K,512K,576K,640K");
 
@@ -331,7 +336,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa", 14.318181_MHz_XTAL / 4));
 	isa.set_cputag(m_maincpu);
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
 	//isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI));

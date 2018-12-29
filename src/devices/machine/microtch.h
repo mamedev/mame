@@ -14,6 +14,7 @@ class microtouch_device :
 public:
 	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <class Object> devcb_base &set_stx_callback(Object &&cb) { return m_out_stx_func.set_callback(std::forward<Object>(cb)); }
+	auto stx() { return m_out_stx_func.bind(); }
 
 	virtual ioport_constructor device_input_ports() const override;
 	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }

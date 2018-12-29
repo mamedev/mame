@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "pc_kbdc.h"
 
 //**************************************************************************
@@ -58,7 +59,7 @@ protected:
 	void keytronic_pc3270_io(address_map &map);
 	void keytronic_pc3270_program(address_map &map);
 
-	required_device<cpu_device> m_cpu;
+	required_device<i8051_device> m_cpu;
 
 	uint8_t   m_p1;
 	uint8_t   m_p1_data;

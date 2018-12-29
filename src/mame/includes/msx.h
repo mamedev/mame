@@ -20,7 +20,6 @@
 #include "sound/ym2413.h"
 #include "video/v9938.h"
 #include "video/tms9928a.h"
-#include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "formats/fmsx_cas.h"
 #include "formats/msx_dsk.h"

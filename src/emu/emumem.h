@@ -164,8 +164,6 @@ template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<D, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
 template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
 
 template <typename D, typename T> using rw_device_class_t  = typename rw_device_class <D, T>::type;
 
@@ -1657,7 +1655,7 @@ public:
 	int entry() const { return m_curentry; }
 	bool anonymous() const { return m_anonymous; }
 	offs_t addrstart() const { return m_addrstart; }
-	void *base() const { return m_baseptr; }
+	void *base() const { return m_entries.empty() ? nullptr : m_entries[m_curentry]; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *name() const { return m_name.c_str(); }
 
@@ -1683,7 +1681,6 @@ public:
 private:
 	// internal state
 	running_machine &       m_machine;              // need the machine to free our memory
-	u8 *                    m_baseptr;              // pointer to our current base pointer
 	std::vector<u8 *>       m_entries;              // the entries
 	bool                    m_anonymous;            // are we anonymous or explicit?
 	offs_t                  m_addrstart;            // start offset

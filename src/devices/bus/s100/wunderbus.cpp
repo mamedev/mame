@@ -303,9 +303,9 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 {
 	uint8_t address = (m_7c->read() & 0x3e) << 2;
-	if ((offset & 0xf8) != address) return 0;
+	if ((offset & 0xf8) != address) return 0xff;
 
-	uint8_t data = 0;
+	uint8_t data = 0xff;
 
 	if ((offset & 0x07) < 7)
 	{

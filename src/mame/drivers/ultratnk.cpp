@@ -8,6 +8,7 @@ Atari Ultra Tank driver
 
 #include "emu.h"
 #include "includes/ultratnk.h"
+
 #include "audio/sprint4.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
@@ -309,12 +310,10 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ultratnk)
-	MCFG_PALETTE_ADD("palette", 10)
-	MCFG_PALETTE_INDIRECT_ENTRIES(4)
-	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_ultratnk)
+	PALETTE(config, m_palette, FUNC(ultratnk_state::ultratnk_palette), 10, 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

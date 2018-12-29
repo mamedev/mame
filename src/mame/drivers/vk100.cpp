@@ -1043,6 +1043,7 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
 	H46505(config, m_crtc, 45.6192_MHz_XTAL/3/12);
+	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);
 	m_crtc->set_update_row_callback(FUNC(vk100_state::crtc_update_row), this);

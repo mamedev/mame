@@ -59,7 +59,7 @@ protected:
 	required_device<generic_latch_16_device> m_soundlatch;
 	optional_device_array<dac_byte_interface, 8> m_dac;
 	optional_device<dac_word_interface> m_dac9;
-	optional_device_array<dac_byte_interface, 8> m_dacvol;
+	optional_device_array<dac_binary_weighted_8bit_device, 8> m_dacvol;
 	optional_device_array<pit8254_device, 3> m_pit;
 	optional_device<i80186_cpu_device> m_audiocpu;
 	optional_device<ym2151_device> m_ymsnd;

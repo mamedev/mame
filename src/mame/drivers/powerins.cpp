@@ -37,6 +37,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
+#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 #include "speaker.h"
@@ -304,11 +305,10 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, powerins_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerins)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -325,9 +325,9 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(powerins_state::powerinsa)
@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(powerins_state::powerinsa)
 
 	MCFG_DEVICE_REMOVE("oki2")
 	MCFG_DEVICE_REMOVE("ym2203")
-	MCFG_DEVICE_REMOVE("nmk112")
+	config.device_remove("nmk112");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(powerins_state::powerinsb)

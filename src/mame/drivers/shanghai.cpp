@@ -34,11 +34,11 @@ displayed.
 class shanghai_state : public driver_device
 {
 public:
-	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shanghai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this,"screen")
-		{ }
+	{ }
 
 	void shanghai(machine_config &config);
 	void shangha2(machine_config &config);
@@ -46,7 +46,7 @@ public:
 
 private:
 	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
-	DECLARE_PALETTE_INIT(shanghai);
+	void shanghai_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
 	void hd63484_map(address_map &map);
@@ -62,31 +62,31 @@ private:
 };
 
 
-PALETTE_INIT_MEMBER(shanghai_state,shanghai)
+void shanghai_state::shanghai_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (i >> 2) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 4) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (i >> 5) & 0x01;
-		bit1 = (i >> 6) & 0x01;
-		bit2 = (i >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(i, 2);
+		bit1 = BIT(i, 3);
+		bit2 = BIT(i, 4);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(i, 5);
+		bit1 = BIT(i, 6);
+		bit2 = BIT(i, 7);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
 		bit0 = 0;
-		bit1 = (i >> 0) & 0x01;
-		bit2 = (i >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(i, 0);
+		bit2 = BIT(i, 1);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -415,9 +415,7 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
+	PALETTE(config, "palette", FUNC(shanghai_state::shanghai_palette)).set_format(palette_device::xBGR_444, 256);
 
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
@@ -451,8 +449,7 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
@@ -491,8 +488,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 	MCFG_HD63484_EXTERNAL_SKEW(2)
@@ -507,14 +503,14 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2203_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2203_device, write))
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline("audiocpu", 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym2203_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 
-	MCFG_DEVICE_ADD("adpcm", SEIBU_ADPCM, 8000) // actually MSM5205
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SEIBU_ADPCM(config, "adpcm", 8000).add_route(ALL_OUTPUTS, "mono", 0.80); // actually MSM5205
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -89,7 +89,7 @@ class i2cmem_device :
 {
 public:
 	// construction/destruction
-	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
+	i2cmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	i2cmem_device & set_address(int address) { m_slave_address = address; return *this; }
 	i2cmem_device & set_page_size(int page_size) { m_page_size = page_size; return *this; }
@@ -109,6 +109,9 @@ public:
 	DECLARE_READ_LINE_MEMBER( read_sda );
 
 protected:
+	// construction/destruction
+	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -146,8 +149,15 @@ protected:
 	int m_page_offset;
 };
 
+class x2404p_device : public i2cmem_device
+{
+public:
+	// construction/destruction
+	x2404p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(I2CMEM, i2cmem_device)
+DECLARE_DEVICE_TYPE(X2404P, x2404p_device)
 
 #endif // MAME_MACHINE_I2CMEM_H

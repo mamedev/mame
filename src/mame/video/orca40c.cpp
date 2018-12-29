@@ -280,7 +280,5 @@ void orca_ovg_40c_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(DEVICE_SELF, FUNC(orca_ovg_40c_device::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, m_palette, 4*8+2*8+2*1);
-	m_palette->set_indirect_entries(48+1);
-	m_palette->set_init(DEVICE_SELF, FUNC(orca_ovg_40c_device::palette_init));
+	PALETTE(config, m_palette, FUNC(orca_ovg_40c_device::palette_init), 4*8+2*8+2*1, 48+1);
 }

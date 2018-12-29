@@ -1549,6 +1549,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2rb2",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2rb3",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2red",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2redp2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2v004",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2acc",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceblp",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
@@ -3123,6 +3124,13 @@ WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
 			memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
 		}
 	}
+}
+
+
+uint32_t cps2_state::screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	cps2_set_sprite_priorities();
+	return screen_update_cps1(screen, bitmap, cliprect);
 }
 
 void cps2_state::cps2_set_sprite_priorities()

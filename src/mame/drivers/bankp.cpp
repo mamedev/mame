@@ -306,12 +306,10 @@ MACHINE_CONFIG_START(bankp_state::bankp)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bankp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bankp)
-	MCFG_PALETTE_ADD("palette", 32*4+16*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(bankp_state, bankp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bankp);
+	PALETTE(config, m_palette, FUNC(bankp_state::bankp_palette), 32*4+16*8, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -29,32 +29,36 @@
 class poker72_state : public driver_device
 {
 public:
-	poker72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	poker72_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_pal(*this, "pal"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void poker72(machine_config &config);
 
 	void init_poker72();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_pal;
 	uint8_t m_tile_bank;
-	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(tile_bank_w);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(poker72);
-	uint32_t screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE8_MEMBER(tile_bank_w);
+	void poker72_palette(palette_device &palette) const;
+	uint32_t screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void poker72_map(address_map &map);
 };
 
@@ -91,12 +95,11 @@ uint32_t poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind1
 
 WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 {
-	int r,g,b;
 	m_pal[offset] = data;
 
-	r = m_pal[(offset & 0x3ff)+0x000] & 0x3f;
-	g = m_pal[(offset & 0x3ff)+0x400] & 0x3f;
-	b = m_pal[(offset & 0x3ff)+0x800] & 0x3f;
+	int const r = m_pal[(offset & 0x3ff) + 0x000] & 0x3f;
+	int const g = m_pal[(offset & 0x3ff) + 0x400] & 0x3f;
+	int const b = m_pal[(offset & 0x3ff) + 0x800] & 0x3f;
 
 	m_palette->set_pen_color( offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
@@ -352,16 +355,14 @@ static GFXDECODE_START( gfx_poker72 )
 GFXDECODE_END
 
 /* default 444 palette for debug purpose */
-PALETTE_INIT_MEMBER(poker72_state, poker72)
+void poker72_state::poker72_palette(palette_device &palette) const
 {
-	int x,r,g,b;
-
-	for(x=0;x<0x100;x++)
+	for (int x = 0; x < 0x100; x++)
 	{
-		r = (x & 0xf)*0x10;
-		g = ((x & 0x3c)>>2)*0x10;
-		b = ((x & 0xf0)>>4)*0x10;
-		palette.set_pen_color(x,rgb_t(r,g,b));
+		int const r = (x & 0x0f);
+		int const g = (x & 0x3c) >> 2;
+		int const b = (x & 0xf0) >> 4;
+		palette.set_pen_color(x, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
 	}
 }
 
@@ -371,13 +372,10 @@ void poker72_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(poker72_state::poker72)
-
-
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(poker72_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poker72_state,  irq0_line_hold)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -386,11 +384,10 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poker72)
-	MCFG_PALETTE_ADD("palette", 0xe00)
-	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poker72);
+	PALETTE(config, m_palette, FUNC(poker72_state::poker72_palette), 0xe00);
 
 	SPEAKER(config, "mono").front_center();
 

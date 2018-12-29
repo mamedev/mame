@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "tf20.h"
+#include "imagedev/floppy.h"
 
 #define XTAL_CR1    XTAL(8'000'000)
 #define XTAL_CR2    XTAL(4'915'200)
@@ -101,7 +102,7 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	m_mpsc->out_dtra_callback().set(FUNC(epson_tf20_device::dtra_w));
 
 	// floppy disk controller
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, XTAL_CR1, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	// floppy drives

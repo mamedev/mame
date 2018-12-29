@@ -89,10 +89,6 @@ enum
 #define SUPERFX_CFGR_MS0    0x20    // MS0
 
 
-#define MCFG_SUPERFX_OUT_IRQ(_devcb) \
-	downcast<superfx_device &>(*device).set_out_irq_func(DEVCB_##_devcb);
-
-
 class superfx_device :  public cpu_device, public superfx_disassembler::config
 {
 public:
@@ -100,7 +96,7 @@ public:
 	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_out_irq_func(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_out_irq_func.bind(); }
 
 	uint8_t mmio_read(uint32_t addr);
 	void mmio_write(uint32_t addr, uint8_t data);

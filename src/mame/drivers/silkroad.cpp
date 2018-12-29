@@ -294,12 +294,10 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(6*8+2, 64*8-1-(10*8)-2, 2*8, 32*8-1-(2*8))
 	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silkroad)
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_silkroad);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000).set_membits(16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

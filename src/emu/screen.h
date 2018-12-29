@@ -356,7 +356,7 @@ private:
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	devcb_write_line    m_screen_vblank;            // screen vblank line callback
-	devcb_write32		m_scanline_cb;				// screen scanline callback
+	devcb_write32       m_scanline_cb;              // screen scanline callback
 	optional_device<device_palette_interface> m_palette;      // our palette
 	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in

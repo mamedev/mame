@@ -808,7 +808,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 	screen.set_visarea(0*8, 60*8-1, 0*8, 30*8-1);
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &bmcpokr_state::ramdac_map);

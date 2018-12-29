@@ -330,13 +330,13 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 
 	config.set_default_layout(layout_vt100);
 
-	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, XTAL(24'073'400))
-	MCFG_VT_SET_SCREEN("screen")
-	MCFG_VT_CHARGEN("chargen")
-	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(*this, vt100_state, video_ram_r))
-	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE("rstbuf", rst_pos_buffer_device, rst4_w))
-	MCFG_VT_VIDEO_LBA3_LBA4_CALLBACK(WRITE8(*this, vt100_state, uart_clock_w))
-	MCFG_VT_VIDEO_LBA7_CALLBACK(WRITELINE("nvr", er1400_device, clock_w))
+	VT100_VIDEO(config, m_crtc, XTAL(24'073'400));
+	m_crtc->set_screen("screen");
+	m_crtc->set_chargen("chargen");
+	m_crtc->ram_rd_callback().set(FUNC(vt100_state::video_ram_r));
+	m_crtc->vert_freq_intr_wr_callback().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst4_w));
+	m_crtc->lba3_lba4_wr_callback().set(FUNC(vt100_state::uart_clock_w));
+	m_crtc->lba7_wr_callback().set(m_nvr, FUNC(er1400_device::clock_w));
 
 	I8251(config, m_pusart, XTAL(24'883'200) / 9);
 	m_pusart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));

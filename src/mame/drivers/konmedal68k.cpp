@@ -36,8 +36,8 @@
 class konmedal68k_state : public driver_device
 {
 public:
-	konmedal68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	konmedal68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k055555(*this, "k055555"),
@@ -309,16 +309,14 @@ MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	MCFG_SCREEN_UPDATE_DRIVER(konmedal68k_state, screen_update_konmedal68k)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 8192).enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal68k_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4dj, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
