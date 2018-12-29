@@ -1081,10 +1081,16 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 	uint32_t fszx = (fullscreenzoomx << 16) / 0x40;
 	uint32_t fszy = (fullscreenzoomy << 16) / 0x40;
 
-	m_renderbuffer_clip.set(
-		(cliprect.left() * fszx) >> 16, (((cliprect.right() + 1) * fszx + 0x8000) >> 16) - 1,
-		(cliprect.top() * fszy) >> 16, (((cliprect.bottom() + 1) * fszy + 0x8000) >> 16) - 1);
-
+	if (fullscreenzoomx == 0x40 && fullscreenzoomy == 0x40)
+	{
+		m_renderbuffer_clip = cliprect;
+	}
+	else
+	{
+		m_renderbuffer_clip.set(
+			(cliprect.left() * fszx) >> 16, (((cliprect.right() + 1) * fszx + 0x8000) >> 16) - 1,
+			(cliprect.top() * fszy) >> 16, (((cliprect.bottom() + 1) * fszy + 0x8000) >> 16) - 1);
+	}
 	m_renderbuffer_bitmap.fill(0, m_renderbuffer_clip);
 
 	/* Sprites */
@@ -1264,20 +1270,37 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	/* copy render bitmap with zoom */
-	uint32_t srcy = cliprect.top() * fszy;
-	for (uint32_t rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
+	if (fullscreenzoomx == 0x40 && fullscreenzoomy == 0x40)
 	{
-		uint32_t* dstbitmap = &bitmap.pix32(rendery);
-		uint32_t* srcbitmap = &m_renderbuffer_bitmap.pix32(srcy >> 16);
-		uint32_t srcx = cliprect.left() * fszx;
-
-		for (uint32_t renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
+		/* copy render bitmap without zoom */
+		for (uint32_t rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
 		{
-			dstbitmap[renderx] = m_mame_colours[srcbitmap[srcx >> 16] & 0x1ffff];
-			srcx += fszx;
+			uint32_t* dstbitmap = &bitmap.pix32(rendery);
+			uint32_t* srcbitmap = &m_renderbuffer_bitmap.pix32(rendery);
+
+			for (uint32_t renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
+			{
+				dstbitmap[renderx] = m_mame_colours[srcbitmap[renderx] & 0x1ffff];
+			}
 		}
-		srcy += fszy;
+	}
+	else
+	{
+		/* copy render bitmap with zoom */
+		uint32_t srcy = cliprect.top() * fszy;
+		for (uint32_t rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
+		{
+			uint32_t* dstbitmap = &bitmap.pix32(rendery);
+			uint32_t* srcbitmap = &m_renderbuffer_bitmap.pix32(srcy >> 16);
+			uint32_t srcx = cliprect.left() * fszx;
+
+			for (uint32_t renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
+			{
+				dstbitmap[renderx] = m_mame_colours[srcbitmap[srcx >> 16] & 0x1ffff];
+				srcx += fszx;
+			}
+			srcy += fszy;
+		}
 	}
 
 	draw_fg_layer(screen, bitmap, cliprect);
