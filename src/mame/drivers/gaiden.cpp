@@ -1325,9 +1325,9 @@ ROM_START( mastninj )
 	ROM_LOAD( "19.ic2",            0x0f0000, 0x10000, CRC(c12c367b) SHA1(9835292f335f1353f7b9bd0bb85124942822646f) )
 
 	ROM_REGION( 0x080000, "misc", 0 )
-	ROM_LOAD( "gal16v8.ic42.bad.dump",    0x000, 0x117, BAD_DUMP CRC(61d6a8d7) SHA1(d3a6331b1fccd374e4f080740094d3832ff98ad9) )
-	ROM_LOAD( "tibpal16l8.ic15.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "tibpal16l8.ic54.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "gal16v8.ic42",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "tibpal16l8.ic15", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8.ic54", 0x000, 0x104, NO_DUMP )
 ROM_END
 
 
