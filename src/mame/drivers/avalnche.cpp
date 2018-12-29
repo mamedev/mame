@@ -222,14 +222,14 @@ MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // 1 CREDIT LAMP
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, avalnche_state, video_invert_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 CREDIT LAMP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led2")) // START LAMP
+	F9334(config, m_latch); // F8
+	m_latch->q_out_cb<0>().set_output("led0"); // 1 CREDIT LAMP
+	m_latch->q_out_cb<2>().set(FUNC(avalnche_state::video_invert_w));
+	m_latch->q_out_cb<3>().set_output("led1"); // 2 CREDIT LAMP
+	m_latch->q_out_cb<7>().set_output("led2"); // START LAMP
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

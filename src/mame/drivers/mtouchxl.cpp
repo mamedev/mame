@@ -211,68 +211,65 @@ void mtxl_state::cdrom(device_t *device)
 }
 #endif
 
-MACHINE_CONFIG_START(mtxl_state::at486)
-	MCFG_DEVICE_ADD(m_maincpu, I486DX4, 33000000)
-	MCFG_DEVICE_PROGRAM_MAP(at32_map)
-	MCFG_DEVICE_IO_MAP(at32_io)
+void mtxl_state::at486(machine_config &config)
+{
+	I486DX4(config, m_maincpu, 33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtxl_state::at32_map);
+	m_maincpu->set_addrmap(AS_IO, &mtxl_state::at32_io);
 #ifndef REAL_PCI_CHIPSET
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	AT_MB(config, "mb", 0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true) // FIXME: determine ISA bus clock
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
 
-	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("cs4231", AD1848, 0)
-	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
-	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
+
+	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
+	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
 
 	subdevice<am9517a_device>("mb:dma8237_1")->out_iow_callback<1>().set("cs4231", FUNC(ad1848_device::dack_w));
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
-	MCFG_DEVICE_REMOVE("mb:keybc");
-	MCFG_DEVICE_REMOVE("mb:pc_kbdc");
-	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
-	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
-	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
-	MCFG_DEVICE_REMOVE("mb:rtc")
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	config.device_remove("mb:keybc");
+	config.device_remove("mb:pc_kbdc");
+	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
+	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
+
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 #endif
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")    // Early XL games had 8 MB RAM, 6000 and later require 32MB
+	RAM(config, RAM_TAG).set_default_size("32M"); // Early XL games had 8 MB RAM, 6000 and later require 32MB
 
 	/* bankdev for dxxxx */
-	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* Flash ROM */
-	MCFG_AMD_29F040_ADD("flash")
+	AMD_29F040(config, "flash");
 
 	/* Security key */
-	MCFG_DS1205_ADD("multikey")
+	DS1205(config, "multikey");
 
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
-	MCFG_PCI_ROOT_ADD(":pci")
-	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
+	PCI_ROOT(config, ":pci");
+	// FIXME: This MCFG fragment does not compile. -R
+	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
-MACHINE_CONFIG_END
+}
 
 #ifdef REAL_PCI_CHIPSET
 #define MOTHERBOARD_ROMS \

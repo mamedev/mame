@@ -50,7 +50,7 @@ private:
 	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
 	uint8_t m_irq_state;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(sm1800);
+	void sm1800_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
@@ -71,8 +71,7 @@ void sm1800_state::sm1800_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x3c, 0x3d).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
-	map(0x5c, 0x5c).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x5d, 0x5d).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x5c, 0x5d).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x6c, 0x6f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	//AM_RANGE( 0x74, 0x74 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	//AM_RANGE( 0x75, 0x75 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
@@ -134,7 +133,7 @@ READ8_MEMBER( sm1800_state::sm1800_8255_portc_r )
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(sm1800_state, sm1800)
+void sm1800_state::sm1800_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black()); // black
 	palette.set_pen_color(1, 0xa0, 0xa0, 0xa0); // white
@@ -176,17 +175,16 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
+	PALETTE(config, m_palette, FUNC(sm1800_state::sm1800_palette), 3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sm1800)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sm1800_state, sm1800_8255_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sm1800_state, sm1800_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, sm1800_state, sm1800_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sm1800_state, sm1800_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(sm1800_state::sm1800_8255_porta_r));
+	m_ppi->out_pb_callback().set(FUNC(sm1800_state::sm1800_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(sm1800_state::sm1800_8255_portc_w));
 
 	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
 	MCFG_I8275_CHARACTER_WIDTH(8)

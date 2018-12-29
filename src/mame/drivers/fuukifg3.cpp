@@ -221,10 +221,10 @@ void fuuki32_state::fuuki32_map(address_map &map)
 	map(0x600000, 0x601fff).ram().rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)); // Sprites
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // Palette
 
-	map(0x800000, 0x800003).portr("800000").nopw();                                         // Coin
-	map(0x810000, 0x810003).portr("810000").nopw();                                         // Player Inputs
-	map(0x880000, 0x880003).portr("880000");                                                     // Service + DIPS
-	map(0x890000, 0x890003).portr("890000");                                                     // More DIPS
+	map(0x800000, 0x800003).lr16("800000", [this]() { return uint16_t(m_system->read()); }).nopw();  // Coin
+	map(0x810000, 0x810003).lr16("810000", [this]() { return uint16_t(m_inputs->read()); }).nopw();  // Player Inputs
+	map(0x880000, 0x880003).lr16("880000", [this]() { return uint16_t(m_dsw1->read()); });           // Service + DIPS
+	map(0x890000, 0x890003).lr16("890000", [this]() { return uint16_t(m_dsw2->read()); });           // More DIPS
 
 	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
 	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen Related
@@ -270,22 +270,6 @@ void fuuki32_state::fuuki32_sound_io_map(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( asurabld )
-	PORT_START("800000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
-
-	PORT_START("810000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "INPUTS")
-
-	PORT_START("880000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW1")
-
-	PORT_START("890000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW2")
-
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -529,48 +513,45 @@ void fuuki32_state::machine_reset()
 	m_raster_interrupt_timer->adjust(m_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
-
-MACHINE_CONFIG_START(fuuki32_state::fuuki32)
-
+void fuuki32_state::fuuki32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
-	MCFG_DEVICE_PROGRAM_MAP(fuuki32_map)
+	M68EC020(config, m_maincpu, CPU_CLOCK); /* 20MHz verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki32_state::fuuki32_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
-	MCFG_DEVICE_PROGRAM_MAP(fuuki32_sound_map)
-	MCFG_DEVICE_IO_MAP(fuuki32_sound_io_map)
+	z80_device &soundcpu(Z80(config, "soundcpu", SOUND_CPU_CLOCK)); /* 6MHz verified */
+	soundcpu.set_addrmap(AS_PROGRAM, &fuuki32_state::fuuki32_sound_map);
+	soundcpu.set_addrmap(AS_IO, &fuuki32_state::fuuki32_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fuuki32_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(64 * 8, 32 * 8);
+	m_screen->set_visarea(0, 40 * 8 - 1, 0, 30 * 8 - 1);
+	m_screen->set_screen_update(FUNC(fuuki32_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(fuuki32_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki32)
-	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki32);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	MCFG_DEVICE_ADD("fuukivid", FUUKI_VIDEO, 0)
-	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
+	FUUKI_VIDEO(config, m_fuukivid, 0, m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
-	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(4, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(5, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(6, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(7, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK)); // 33.8688MHz
+	ymf.irq_handler().set_inputline("soundcpu", 0);
+	ymf.add_route(0, "lspeaker", 0.50);
+	ymf.add_route(1, "rspeaker", 0.50);
+	ymf.add_route(2, "lspeaker", 0.50);
+	ymf.add_route(3, "rspeaker", 0.50);
+	ymf.add_route(4, "lspeaker", 0.40);
+	ymf.add_route(5, "rspeaker", 0.40);
+	ymf.add_route(6, "lspeaker", 0.40);
+	ymf.add_route(7, "rspeaker", 0.40);
+}
 
 /***************************************************************************
 

@@ -576,7 +576,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, const char *tag,
 isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
-	m_crtc_ega(nullptr), m_vram(nullptr), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
+	m_crtc_ega(nullptr), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_video_mode(0),
 	m_palette(*this, "palette")
 {
@@ -618,17 +618,13 @@ void isa8_ega_device::device_start()
 		memcpy(memregion(subtag("user2").c_str())->base(), memregion(subtag("user1").c_str())->base(), 0x4000);
 
 	/* Install 256KB Video ram on our EGA card */
-	m_vram = machine().memory().region_alloc(subtag("vram").c_str(), 256 * 1024, 1, ENDIANNESS_LITTLE);
+	m_vram = make_unique_clear<uint8_t[]>(256 * 1024);
 
-	m_videoram = m_vram->base();
+	m_videoram = m_vram.get();
 	m_plane[0] = m_videoram + 0x00000;
-	memset(m_plane[0], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[1] = m_videoram + 0x10000;
-	memset(m_plane[1], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[2] = m_videoram + 0x20000;
-	memset(m_plane[2], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[3] = m_videoram + 0x30000;
-	memset(m_plane[3], 0, sizeof(uint8_t) * 0x10000);
 
 	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 

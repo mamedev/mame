@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+#ifndef MAME_INCLUDES_SKYKID_H
+#define MAME_INCLUDES_SKYKID_H
+
+#pragma once
+
 #include "cpu/m6800/m6801.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -32,7 +37,6 @@ private:
 	DECLARE_WRITE8_MEMBER(skykid_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(skykid_irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(skykid_irq_2_ctrl_w);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_READ8_MEMBER(skykid_videoram_r);
 	DECLARE_WRITE8_MEMBER(skykid_videoram_w);
 	DECLARE_READ8_MEMBER(skykid_textram_r);
@@ -43,12 +47,11 @@ private:
 	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	DECLARE_PALETTE_INIT(skykid);
+	void skykid_palette(palette_device &palette) const;
 	uint32_t screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 	void skykid_map(address_map &map);
 
 	virtual void machine_start() override;
@@ -72,3 +75,5 @@ private:
 	uint8_t m_main_irq_mask;
 	uint8_t m_mcu_irq_mask;
 };
+
+#endif // MAME_INCLUDES_SKYKID_H

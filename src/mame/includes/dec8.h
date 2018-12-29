@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "sound/msm5205.h"
@@ -64,7 +65,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	optional_device<input_merger_device> m_nmigate;
 	required_device<buffered_spriteram8_device> m_spriteram;
 	optional_device<msm5205_device> m_msm;

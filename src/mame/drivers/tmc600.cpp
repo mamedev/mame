@@ -296,8 +296,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_TMC600_EURO_BUS_SLOT_ADD(TMC600_EURO_BUS_TAG, tmc600_euro_bus_cards, nullptr)
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
+	RAM(config, RAM_TAG).set_default_size("8K");
 MACHINE_CONFIG_END
 
 /* ROMs */

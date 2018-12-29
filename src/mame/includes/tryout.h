@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
+#ifndef MAME_INCLUDES_TRYOUT_H
+#define MAME_INCLUDES_TRYOUT_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class tryout_state : public driver_device
 {
 public:
-	tryout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tryout_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -17,7 +21,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_gfx_control(*this, "gfx_control") { }
+		m_gfx_control(*this, "gfx_control")
+	{ }
 
 	void tryout(machine_config &config);
 
@@ -58,7 +63,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tryout);
+	void tryout_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -66,3 +71,5 @@ private:
 	void main_cpu(address_map &map);
 	void sound_cpu(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TRYOUT_H

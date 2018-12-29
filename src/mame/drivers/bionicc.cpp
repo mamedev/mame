@@ -405,10 +405,10 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bionicc_state, nmi_line_pulse, 4*60)
 
 	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(24'000'000) / 4)
-	MCFG_DEVICE_IO_MAP(mcu_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, bionicc_state, out1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, bionicc_state, out3_w))
+	I8751(config, m_mcu, XTAL(24'000'000) / 4);
+	m_mcu->set_addrmap(AS_IO, &bionicc_state::mcu_io);
+	m_mcu->port_out_cb<1>().set(FUNC(bionicc_state::out1_w));
+	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::out3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -416,24 +416,21 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 386, 0, 256, 260, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bionicc)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT_CLASS(2, bionicc_state, RRRRGGGGBBBBIIII)
+	PALETTE(config, m_palette).set_format(2, &bionicc_state::RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
 MACHINE_CONFIG_END
 
 

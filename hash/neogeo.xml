@@ -5318,7 +5318,7 @@
 	<software name="puzzledp">
 		<description>Puzzle De Pon!</description>
 		<year>1995</year>
-		<publisher>Taito (Visco license)</publisher>
+		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-202"/>
 		<info name="release" value="19951128"/>
 		<info name="alt_title" value="パズルdeポン！"/>
@@ -6734,7 +6734,7 @@
 	<software name="puzzldpr" cloneof="puzzledp">
 		<description>Puzzle De Pon! R!</description>
 		<year>1997</year>
-		<publisher>Taito (Visco license)</publisher>
+		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-2350?"/>
 		<info name="alt_title" value="パズル de ポン! R"/>
 		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->

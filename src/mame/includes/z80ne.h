@@ -17,8 +17,10 @@
 
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
+#include "machine/ram.h"
 #include "machine/wd_fdc.h"
 
 /***************************************************************************
@@ -71,6 +73,7 @@ public:
 		m_maincpu(*this, "z80ne"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
+		m_ram(*this, RAM_TAG),
 		m_region_z80ne(*this, "z80ne"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -144,6 +147,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+	required_device<ram_device> m_ram;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;

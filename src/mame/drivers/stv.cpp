@@ -951,10 +951,65 @@ void stv_state::init_ffreveng()
 	init_stv();
 }
 
+
+READ32_MEMBER(stv_state::decathlt_prot_r)
+{
+	// needs to be a way to indicate if device is enabled and fall through to cartridge data if not?
+	if (m_newprotection_element)
+	{
+		m_newprotection_element = false;
+		m_5838crypt->debug_helper(m_protbankval);
+	}
+
+	uint32 ret = 0;
+	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r(space, offset, mem_mask)<<16);
+	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r(space, offset, mem_mask);
+	return ret;
+}
+
+WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
+{
+	int offs = offset * 4;
+
+	m_protbankval = (offs & 0x1800000)>>23;
+	m_protbank->set_entry(m_protbankval); // if the protection device is accessed at this address data is fetched from 0x02000000
+	m_newprotection_element = true;
+
+	if ((offs & 0x7fffff) == 0x7FFFF0)
+	{
+		m_5838crypt->srcaddr_w(space, offset, data, mem_mask);
+	}
+	else if ((offs & 0x7fffff) == 0x7FFFF4)
+	{
+		m_5838crypt->data_w(space, offset, data, mem_mask);
+	}
+}
+
 void stv_state::init_decathlt()
 {
-	m_5838crypt->install_decathlt_protection();
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000000, 0x37fffff, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address, write data
+
+	// really needs installing over the whole range, with fallbacks to read rom if device is disabled or isn't accessed on given address
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27ffff8, 0x27ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); // read decompressed data
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fffff8, 0x2fffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37ffff8, 0x37ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
+
+	m_protbank->configure_entry(0, memregion("cart")->base() + 0x0000000);
+	m_protbank->configure_entry(1, memregion("cart")->base() + 0x0800000);
+	m_protbank->configure_entry(2, memregion("cart")->base() + 0x1000000);
+	//m_protbank->configure_entry(3, memregion("cart")->base() + 0x1800000);
+
+	m_protbank->set_entry(0);
+
+	m_newprotection_element = false;
+
 	init_stv();
+}
+
+void stv_state::init_decathlt_nokey()
+{
+	init_decathlt();
+	m_5838crypt->set_hack_mode(sega_315_5838_comp_device::HACK_MODE_NO_KEY);
 }
 
 void stv_state::init_nameclv3()
@@ -1010,6 +1065,11 @@ void stv_state::sound_mem(address_map &map)
 	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
 }
 
+void stv_state::scsp_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+}
+
 
 
 /********************************************
@@ -1062,106 +1122,100 @@ WRITE8_MEMBER( stv_state::pdr2_output_w )
 }
 
 
-MACHINE_CONFIG_START(stv_state::stv)
-
+void stv_state::stv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
-	MCFG_SH2_IS_SLAVE(0)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", stv_state, saturn_scanline, "screen", 0, 1)
+	SH2(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
+	m_maincpu->set_is_slave(0);
+	TIMER(config, "scantimer").configure_scanline(FUNC(stv_state::saturn_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
-	MCFG_SH2_IS_SLAVE(1)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", stv_state, saturn_slave_scanline, "screen", 0, 1)
+	SH2(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
+	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stv_mem);
+	m_slave->set_is_slave(1);
+	TIMER(config, "slave_scantimer").configure_scanline(FUNC(stv_state::saturn_slave_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
+	M68000(config, m_audiocpu, 11289600); //11.2896 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stv_state::sound_mem);
 
-	MCFG_SEGA_SCU_ADD("scu")
-	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
+	SEGA_SCU(config, m_scu, 0);
+	m_scu->set_hostcpu(m_maincpu);
 
-	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
-	MCFG_SMPC_HLE_SCREEN("screen")
-	downcast<smpc_hle_device &>(*device).set_region_code(0);
-	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(*this, stv_state, pdr1_input_r))
-	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(*this, stv_state, pdr2_input_r))
-	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(*this, stv_state, pdr1_output_w))
-	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(*this, stv_state, pdr2_output_w))
-	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(*this, saturn_state, master_sh2_reset_w))
-	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(*this, saturn_state, master_sh2_nmi_w))
-	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(*this, saturn_state, slave_sh2_reset_w))
-//  MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(*this, saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
-	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(*this, saturn_state, system_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(*this, saturn_state, system_halt_w))
-	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
+	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
+	m_smpc_hle->set_screen_tag("screen");
+	m_smpc_hle->set_region_code(0);
+	m_smpc_hle->pdr1_in_handler().set(FUNC(stv_state::pdr1_input_r));
+	m_smpc_hle->pdr2_in_handler().set(FUNC(stv_state::pdr2_input_r));
+	m_smpc_hle->pdr1_out_handler().set(FUNC(stv_state::pdr1_output_w));
+	m_smpc_hle->pdr2_out_handler().set(FUNC(stv_state::pdr2_output_w));
+	m_smpc_hle->master_reset_handler().set(FUNC(saturn_state::master_sh2_reset_w));
+	m_smpc_hle->master_nmi_handler().set(FUNC(saturn_state::master_sh2_nmi_w));
+	m_smpc_hle->slave_reset_handler().set(FUNC(saturn_state::slave_sh2_reset_w));
+//  m_smpc_hle->sound_reset_handler().set(FUNC(saturn_state::sound_68k_reset_w)); // ST-V games controls reset line via PDR2
+	m_smpc_hle->system_reset_handler().set(FUNC(saturn_state::system_reset_w));
+	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
+	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
+	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(sega_scu_device::smpc_irq_w));
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT) /* Actually AK93C45F */
+	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 352, 263, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(stv_state, screen_update_stv_vdp2)
-	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 352, 263, 0, 224);
+	m_screen->set_screen_update(FUNC(stv_state::screen_update_stv_vdp2));
+	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stv)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
 
 	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("scsp", SCSP)
-	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(stv_state::stv_5881)
-	stv(config);
-	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
-	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(stv_state::stvcd)
-	stv(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
-	MCFG_DEVICE_MODIFY("slave")
-	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
-
-	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
-	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_DEVICE_MODIFY("scsp")
-	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))
-MACHINE_CONFIG_END
-
-
-uint16_t stv_state::crypt_read_callback_ch1(uint32_t addr)
-{
-	return m_maincpu->space().read_word(0x02000000 + 0x1000000 + (addr * 2));
+	SCSP(config, m_scsp, 22579200); // TODO : Unknown clock, divider
+	m_scsp->set_addrmap(0, &stv_state::scsp_mem);
+	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
+	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
+	m_scsp->add_route(0, "lspeaker", 1.0);
+	m_scsp->add_route(1, "rspeaker", 1.0);
 }
 
-uint16_t stv_state::crypt_read_callback_ch2(uint32_t addr)
+void stv_state::stv_5881(machine_config &config)
 {
-	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
+	stv(config);
+	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	m_cryptdevice->set_read_cb(FUNC(stv_state::crypt_read_callback));
 }
 
-MACHINE_CONFIG_START(stv_state::stv_5838)
+void stv_state::stvcd(machine_config &config)
+{
 	stv(config);
-	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
-	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
-	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
+	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
+
+	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
+	stvcd.add_route(0, "scsp", 1.0, 0);
+	stvcd.add_route(1, "scsp", 1.0, 1);
+}
+
+
+void stv_state::sega5838_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).bankr("protbank");
+}
+
+void stv_state::stv_5838(machine_config &config)
+{
+	stv(config);
+
+	SEGA315_5838_COMP(config, m_5838crypt, 0);
+	m_5838crypt->set_addrmap(0, &stv_state::sega5838_map);
+}
 
 
 /*
@@ -1179,35 +1233,37 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 }
 
 
-MACHINE_CONFIG_START(stv_state::batmanfr)
+void stv_state::batmanfr(machine_config &config)
+{
 	stv(config);
-	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
-MACHINE_CONFIG_END
+	ACCLAIM_RAX(config, "rax", 0);
+}
 
+#define STV_CARTSLOT_ADD(_tag, _load) \
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "stv_cart")  \
+		.set_device_load(device_image_load_delegate(&stv_state::device_image_load_##_load, this));
 
-#define MCFG_STV_CARTSLOT_ADD(_tag, _load) \
-	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "stv_cart")  \
-	MCFG_GENERIC_LOAD(stv_state, _load)
+void stv_state::stv_cartslot(machine_config &config)
+{
+	STV_CARTSLOT_ADD("stv_slot1", stv_cart1);
+	STV_CARTSLOT_ADD("stv_slot2", stv_cart2);
+	STV_CARTSLOT_ADD("stv_slot3", stv_cart3);
+	STV_CARTSLOT_ADD("stv_slot4", stv_cart4);
 
-MACHINE_CONFIG_START(stv_state::stv_cartslot)
+	SOFTWARE_LIST(config, "cart_list").set_original("stv");
+}
 
-	MCFG_STV_CARTSLOT_ADD("stv_slot1", stv_cart1)
-	MCFG_STV_CARTSLOT_ADD("stv_slot2", stv_cart2)
-	MCFG_STV_CARTSLOT_ADD("stv_slot3", stv_cart3)
-	MCFG_STV_CARTSLOT_ADD("stv_slot4", stv_cart4)
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list","stv")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(stv_state::stv_slot)
+void stv_state::stv_slot(machine_config &config)
+{
 	stv(config);
 	stv_cartslot(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(stv_state::hopper)
+void stv_state::hopper(machine_config &config)
+{
 	stv(config);
-	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_CONFIG_END
+	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+}
 
 MACHINE_RESET_MEMBER(stv_state,stv)
 {
@@ -1284,8 +1340,6 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 
 MACHINE_START_MEMBER(stv_state, stv)
 {
-	m_scsp->set_ram_base(m_sound_ram);
-
 	// save states
 //  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
@@ -2709,6 +2763,7 @@ ROM_END
 
 ROM_START( znpwfvt )
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "tw" ) // only runs with Taiwanese BIOS ROMs
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr20408.13",    0x0000001, 0x0100000, CRC(1d62fcf6) SHA1(3651261aa755da27b11462f2705311b7c639a687) ) // good
@@ -3605,6 +3660,35 @@ ROM_START( sackids )
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 
+ROM_START( skychal )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(a12ccf64) SHA1(eb3ff0cdc10fa17e40af5bddedfa5f758c7a5623) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(9a929dcf) SHA1(892e491fa33cc30cbbd24feb4ea6a63f9a9e1a62) )
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(ed2183d3) SHA1(7c43171a57e070a295c191408bd1b8ffee053d9b) )
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(e7401d68) SHA1(02f77439075b6367b46dc9ef7f67023b32a68526) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(950f7a2f) SHA1(1b4fd7b08eeb2fdf2cdfae7f8aa3240e8dce3b9a) )
+	ROM_LOAD16_WORD_SWAP( "ic32.bin",     0x0c00000, 0x200000, CRC(a656212b) SHA1(b2bf325cb4cf67787c836a9ac1bb7231068ffd82) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "skychal.nv", 0x0000, 0x0080, CRC(a6515237) SHA1(5e50cc93eb60ed67cdca408b23b80d16a398df02) )
+ROM_END
+
+ROM_START( supgoal )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(a686f7a2) SHA1(f4f9b63046d184864cfffe6ef8268a33b73298da) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(56fbbeea) SHA1(2c622ccc20aed0df7c611a00986ce76b84c61d70) )
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(64701c2b) SHA1(e9a426ce1882660d533b963899a8b1b6f41f85d4) )
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(d9aebe8c) SHA1(cd19cf1227d151a015c4dc3aed14bc3b2f78ce07) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(26d4ade5) SHA1(6b958aa4db293c7af88a735323d19f6417d86048) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "supgoal.nv", 0x0000, 0x0080, CRC(63806aae) SHA1(b82f0995799e9259a1f071ea8b64a719f9e3c9e9) )
+ROM_END
+
 
 GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
 
@@ -3653,10 +3737,12 @@ GAME( 1998, sss,       stvbios, stv_5881, stv,      stv_state,   init_sss,      
 GAME( 1995, sandor,    stvbios, stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega",                         "Puzzle & Action: Sando-R (J 951114 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, thunt,     sandor,  stv,      stv,      stv_state,   init_thunt,      ROT0,   "Sega",                         "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, thuntk,    sandor,  stv,      stv,      stv_state,   init_sandor,     ROT0,   "Sega / Deniam",                "Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, skychal,   stvbios, hopper,   patocar,  stv_state,   init_hopper,     ROT0,   "Sega",                         "Sky Challenger (J 000406 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, smleague,  stvbios, stv,      stv,      stv_state,   init_smleague,   ROT0,   "Sega",                         "Super Major League (U 960108 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, finlarch,  smleague,stv,      stv,      stv_state,   init_finlarch,   ROT0,   "Sega",                         "Final Arch (J 950714 V1.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, sokyugrt,  stvbios, stv,      stv,      stv_state,   init_sokyugrt,   ROT0,   "Raizing / Eighting",           "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, suikoenb,  stvbios, stv,      stv6b,    stv_state,   init_suikoenb,   ROT0,   "Data East",                    "Suiko Enbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, supgoal,   stvbios, hopper,   patocar,  stv_state,   init_hopper,     ROT0,   "Sega",                         "Nerae! Super Goal (J 981218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, techbowl,  stvbios, hopper,   patocar,  stv_state,   init_hopper,     ROT0,   "Sega",                         "Technical Bowling (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, vfkids,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Virtua Fighter Kids (JUET 960319 V0.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, vmahjong,  stvbios, stv,      vmahjong, stv_state,   init_stvmp,      ROT0,   "Micronet",                     "Virtual Mahjong (J 961214 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -3697,16 +3783,16 @@ GAME( 1997, pclub2kc,  stvbios, stv,      stv,      stvpc_state, init_stv,      
 GAME( 1997, pclubyo2,  stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Atlus",                        "Print Club Yoshimoto V2 (J 970422 V1.100)", MACHINE_NOT_WORKING )
 
 
-GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
-GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pclove,    stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove (J 970421 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1997, pclove2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club LoveLove Ver 2 (J 970825 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1997, pcpooh2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 2 (J 971218 V1.000)", MACHINE_NOT_WORKING ) // ^
+GAME( 1998, pcpooh3,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Atlus",                        "Print Club Winnie-the-Pooh Vol. 3 (J 980406 V1.000)", MACHINE_NOT_WORKING ) // ^
 
 GAME( 1998, stress,    stvbios, stv,      stv,      stvpc_state, init_stv,        ROT0,   "Sega",                         "Stress Busters (J 981020 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
-GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
-GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
+GAME( 1996, nameclub,  stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club (J 960315 V1.000)", MACHINE_NOT_WORKING ) // uses the same type of protection as decathlete!!
+GAME( 1996, nclubv2,   stvbios, stv_5838, stv,      stvpc_state, init_decathlt_nokey,   ROT0,   "Sega",                         "Name Club Ver.2 (J 960315 V1.000)", MACHINE_NOT_WORKING ) // ^  (has the same datecode as nameclub, probably incorrect unless both were released today)
+GAME( 1997, nclubv3,   stvbios, stv,      stv,      stvpc_state, init_nameclv3,         ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // no protection
 
 
 

@@ -836,8 +836,7 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_DEVICE_IO_MAP(gstream_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -847,10 +846,9 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x1000 + 0x400 + 0x400 + 0x400); // sprites + 3 bg layers
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gstream)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gstream);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -869,7 +867,7 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 	MCFG_DEVICE_IO_MAP(x2222_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
-//  MCFG_NVRAM_ADD_1FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -879,9 +877,9 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_565);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x2222)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x2222);
 
 	// unknown sound hw (no sound roms dumped)
 

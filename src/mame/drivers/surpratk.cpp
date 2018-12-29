@@ -14,7 +14,6 @@
 #include "includes/surpratk.h"
 #include "includes/konamipt.h"
 
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -31,9 +30,9 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 	if (data & 0xf8)
 		logerror("%s: videobank = %02x\n", machine().describe_context(), data);
 
-	/* bit 0 = select 053245 at 0000-07ff */
-	/* bit 1 = select palette at 0000-07ff */
-	/* bit 2 = select palette bank 0 or 1 */
+	// bit 0 = select 053245 at 0000-07ff
+	// bit 1 = select palette at 0000-07ff
+	// bit 2 = select palette bank 0 or 1
 	if (BIT(data, 1))
 		m_bank0000->set_bank(2 + BIT(data, 2));
 	else
@@ -45,14 +44,14 @@ WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
 
-	/* bit 0/1 = coin counters */
+	// bit 0/1 = coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
-	/* bit 3 = enable char ROM reading through the video RAM */
+	// bit 3 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* other bits unknown */
+	// other bits unknown
 }
 
 
@@ -168,56 +167,51 @@ WRITE8_MEMBER( surpratk_state::banking_callback )
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-MACHINE_CONFIG_START(surpratk_state::surpratk)
-
+void surpratk_state::surpratk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
-	MCFG_DEVICE_PROGRAM_MAP(surpratk_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, surpratk_state, banking_callback))
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &surpratk_state::surpratk_map);
+	m_maincpu->set_vblank_int("screen", FUNC(surpratk_state::surpratk_interrupt));
+	m_maincpu->line().set(FUNC(surpratk_state::banking_callback));
 
-	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
+	ADDRESS_MAP_BANK(config, "bank0000").set_map(&surpratk_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(surpratk_state, screen_update_surpratk)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(surpratk_state::screen_update_surpratk));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(surpratk_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(surpratk_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(surpratk_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette(m_palette);
+	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.irq_handler().set_inputline(m_maincpu, KONAMI_FIRQ_LINE);
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
+}
+
+
 
 /***************************************************************************
 

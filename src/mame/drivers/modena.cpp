@@ -145,10 +145,10 @@ MACHINE_CONFIG_START(mephisto_modena_state::modena)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(4'194'304) / (1 << 13)) - attotime::from_usec(975))  // active for 975us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
+	MEPHISTO_BUTTONS_BOARD(config, m_board, 0);
+	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_modena);
 
 	/* sound hardware */

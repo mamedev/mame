@@ -67,10 +67,11 @@
 #include "emu.h"
 #include "includes/malzak.h"
 
-#include "cpu/s2650/s2650.h"
 #include "machine/nvram.h"
 #include "sound/sn76477.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)
@@ -262,11 +263,9 @@ static GFXDECODE_START( gfx_malzak )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(malzak_state, malzak)
+void malzak_state::malzak_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 8 * 8; i++)
+	for (int i = 0; i < 8 * 8; i++)
 	{
 		palette.set_pen_color(i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
 		palette.set_pen_color(i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
@@ -291,90 +290,88 @@ void malzak_state::machine_start()
 
 void malzak_state::machine_reset()
 {
-	memset(m_playfield_code, 0, 256 * sizeof(int));
+	std::fill(std::begin(m_playfield_code), std::end(m_playfield_code), 0);
 
 	m_malzak_x = 0;
 	m_malzak_y = 0;
 }
 
-MACHINE_CONFIG_START(malzak_state::malzak)
-
+void malzak_state::malzak(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, S2650, 3800000/4)
-	MCFG_DEVICE_PROGRAM_MAP(malzak_map)
-	MCFG_DEVICE_IO_MAP(malzak_io_map)
-	MCFG_DEVICE_DATA_MAP(malzak_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE(m_screen, screen_device, vblank))
+	S2650(config, m_maincpu, 3800000/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &malzak_state::malzak_map);
+	m_maincpu->set_addrmap(AS_IO, &malzak_state::malzak_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &malzak_state::malzak_data_map);
+	m_maincpu->sense_handler().set(m_screen, FUNC(screen_device::vblank));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(480, 512)  /* vert size is a guess */
-	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(malzak_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(480, 512);  /* vert size is a guess */
+	m_screen->set_visarea(0, 479, 0, 479);
+	m_screen->set_screen_update(FUNC(malzak_state::screen_update));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_malzak)
-	MCFG_PALETTE_ADD(m_palette, 128)
-	MCFG_PALETTE_INIT_OWNER(malzak_state, malzak)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_malzak);
+	PALETTE(config, m_palette, FUNC(malzak_state::malzak_palette), 128);
 
-	MCFG_DEVICE_ADD(m_s2636[0], S2636, 0)
-	MCFG_S2636_OFFSETS(0, -16)  // -8, -16
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(0, -16);  // -8, -16
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(m_s2636[1], S2636, 0)
-	MCFG_S2636_OFFSETS(0, -16)  // -9, -16
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[1], 0);
+	m_s2636[1]->set_offsets(0, -16);  // -9, -16
+	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(m_trom, SAA5050, 6000000)
-	MCFG_SAA5050_D_CALLBACK(READ8(*this, malzak_state, videoram_r))
-	MCFG_SAA5050_SCREEN_SIZE(42, 24, 64)
+	SAA5050(config, m_trom, 6000000);
+	m_trom->d_cb().set(FUNC(malzak_state::videoram_r));
+	m_trom->set_screen_size(42, 24, 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(1, 1, 1)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	sn76477_device &sn1(SN76477(config, "sn1"));
+	sn1.set_noise_params(0, 0, 0);
+	sn1.set_decay_res(0);
+	sn1.set_attack_params(0, RES_K(100));
+	sn1.set_amp_res(RES_K(56));
+	sn1.set_feedback_res(RES_K(10));
+	sn1.set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	sn1.set_pitch_voltage(5.0);
+	sn1.set_slf_params(CAP_U(1.0), RES_K(120));
+	sn1.set_oneshot_params(0, 0);
+	sn1.set_vco_mode(0);
+	sn1.set_mixer_params(1, 1, 1);
+	sn1.set_envelope_params(1, 1);
+	sn1.set_enable(1);
+	sn1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("sn2", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(1, 1, 1)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 1)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	sn76477_device &sn2(SN76477(config, "sn2"));
+	sn2.set_noise_params(0, 0, 0);
+	sn2.set_decay_res(0);
+	sn2.set_attack_params(0, RES_K(100));
+	sn2.set_amp_res(RES_K(56));
+	sn2.set_feedback_res(RES_K(10));
+	sn2.set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	sn2.set_pitch_voltage(5.0);
+	sn2.set_slf_params(CAP_U(1.0), RES_K(120));
+	sn2.set_oneshot_params(0, 0);
+	sn2.set_vco_mode(0);
+	sn2.set_mixer_params(1, 1, 1);
+	sn2.set_envelope_params(1, 1);
+	sn2.set_enable(1);
+	sn2.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(malzak_state::malzak2)
+void malzak_state::malzak2(machine_config &config)
+{
 	malzak(config);
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(malzak2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &malzak_state::malzak2_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 ROM_START( malzak )
 	ROM_REGION( 0x8000, "maincpu", 0 )

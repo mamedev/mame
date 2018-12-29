@@ -51,8 +51,8 @@ To do:
 class astrocorp_state : public driver_device
 {
 public:
-	astrocorp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	astrocorp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -73,6 +73,10 @@ public:
 	void init_showhanc();
 	void init_showhand();
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -90,6 +94,9 @@ private:
 	bitmap_ind16 m_bitmap;
 	uint16_t     m_screen_enable;
 	uint16_t     m_draw_sprites;
+
+	output_finder<7> m_lamps;
+
 	DECLARE_WRITE16_MEMBER(astrocorp_draw_sprites_w);
 	DECLARE_WRITE16_MEMBER(astrocorp_eeprom_w);
 	DECLARE_WRITE16_MEMBER(showhand_outputs_w);
@@ -98,7 +105,6 @@ private:
 	DECLARE_READ16_MEMBER(astrocorp_unk_r);
 	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
-	DECLARE_VIDEO_START(astrocorp);
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -107,17 +113,13 @@ private:
 	void showhand_map(address_map &map);
 	void skilldrp_map(address_map &map);
 	void speeddrp_map(address_map &map);
-
-	virtual void machine_start() override;
-
-	output_finder<7> m_lamps;
 };
 
 /***************************************************************************
                                 Video
 ***************************************************************************/
 
-VIDEO_START_MEMBER(astrocorp_state,astrocorp)
+void astrocorp_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -530,9 +532,9 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_DEVICE_PROGRAM_MAP(showhand_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_DATA(showhand_default_eeprom, sizeof(showhand_default_eeprom))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	EEPROM_93C46_16BIT(config, "eeprom").default_data(showhand_default_eeprom, sizeof(showhand_default_eeprom));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -542,13 +544,10 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_RAW_PARAMS(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,320,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrocorp);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -583,8 +582,8 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_DEVICE_PROGRAM_MAP(skilldrp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
@@ -597,13 +596,10 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0xf0-1)
 	MCFG_SCREEN_RAW_PARAMS(ASTROCORP_PIXEL_CLOCK,ASTROCORP_HTOTAL,ASTROCORP_HBEND,512,ASTROCORP_VTOTAL,ASTROCORP_VBEND,ASTROCORP_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrocorp);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

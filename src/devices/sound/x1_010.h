@@ -10,14 +10,11 @@ class x1_010_device : public device_t, public device_sound_interface, public dev
 public:
 	x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configuration
-	void set_address_xor(int addr) { m_xor = addr; }
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER ( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	DECLARE_READ16_MEMBER ( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
+	u16 word_r(offs_t offset);
+	void word_w(offs_t offset, u16 data);
 
 	void enable_w(int data);
 
@@ -39,7 +36,6 @@ private:
 
 	/* Variables only used here */
 	int m_rate;                              // Output sampling rate (Hz)
-	int m_xor;                               // address XOR
 	sound_stream *  m_stream;                // Stream handle
 	int m_sound_enable;                      // sound output enable/disable
 	std::unique_ptr<uint8_t[]>   m_reg;                 // X1-010 Register & wave form area
@@ -51,8 +47,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(X1_010, x1_010_device)
-
-#define MCFG_X1_010_ADDRESS_XOR(_addr) \
-	downcast<x1_010_device &>(*device).set_address_xor(_addr);
 
 #endif // MAME_SOUND_X1_010_H

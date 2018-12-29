@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(bking_state::bking)
 	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bking_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -415,28 +415,24 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bking_state, screen_vblank_bking))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bking)
-	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
-	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bking);
+	PALETTE(config, m_palette, FUNC(bking_state::bking_palette), 4*8 + 4*4 + 4*2 + 4*2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bking_state, port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(6'000'000)/4));
+	ay2.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ay2.port_b_write_callback().set(FUNC(bking_state::port_b_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

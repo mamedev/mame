@@ -11,6 +11,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -39,6 +40,7 @@ public:
 		, m_ctc_0(*this, "z80ctc_0")
 		, m_ctc_1(*this, "z80ctc_1")
 		, m_fdc(*this, "upd765")
+		, m_floppy(*this, "upd765:0")
 		, m_key_t(*this, "keyboard_timer")
 		, m_ram(*this, RAM_TAG)
 		, m_region_maincpu(*this, "maincpu")
@@ -52,29 +54,32 @@ public:
 
 	void nanos(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
-	DECLARE_WRITE8_MEMBER( nanos_tc_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	DECLARE_WRITE8_MEMBER(tc_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
-	DECLARE_READ8_MEMBER(nanos_port_a_r);
-	DECLARE_READ8_MEMBER(nanos_port_b_r);
-	DECLARE_WRITE8_MEMBER(nanos_port_b_w);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_READ8_MEMBER(port_a_r);
+	DECLARE_READ8_MEMBER(port_b_r);
+	DECLARE_WRITE8_MEMBER(port_b_w);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void nanos_io(address_map &map);
-	void nanos_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t m_key_command;
 	uint8_t m_last_code;
 	uint8_t m_key_pressed;
 	uint8_t row_number(uint8_t code);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	required_device<cpu_device> m_maincpu;
+
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<z80pio_device> m_pio_0;
 	required_device<z80pio_device> m_pio_1;
@@ -83,6 +88,7 @@ private:
 	required_device<z80ctc_device> m_ctc_0;
 	required_device<z80ctc_device> m_ctc_1;
 	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
 	required_device<timer_device> m_key_t;
 	required_device<ram_device> m_ram;
 	required_memory_region m_region_maincpu;
@@ -96,13 +102,13 @@ private:
 
 
 
-void nanos_state::nanos_mem(address_map &map)
+void nanos_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr("bank1").bankw("bank3");
-	map(0x1000, 0xffff).bankrw("bank2");
+	map(0x0000, 0x0fff).bankr(m_bank1).bankw(m_bank3);
+	map(0x1000, 0xffff).bankrw(m_bank2);
 }
 
-WRITE8_MEMBER(nanos_state::nanos_tc_w)
+WRITE8_MEMBER(nanos_state::tc_w)
 {
 	m_fdc->tc_w(BIT(data,1));
 }
@@ -110,15 +116,15 @@ WRITE8_MEMBER(nanos_state::nanos_tc_w)
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( nanos_state::ctc_z0_w )
+WRITE_LINE_MEMBER(nanos_state::ctc_z0_w)
 {
 }
 
-WRITE_LINE_MEMBER( nanos_state::ctc_z1_w )
+WRITE_LINE_MEMBER(nanos_state::ctc_z1_w)
 {
 }
 
-WRITE_LINE_MEMBER( nanos_state::ctc_z2_w )
+WRITE_LINE_MEMBER(nanos_state::ctc_z2_w)
 {
 }
 
@@ -143,7 +149,7 @@ static const z80_daisy_config nanos_daisy_chain[] =
 	{ nullptr }
 };
 
-void nanos_state::nanos_io(address_map &map)
+void nanos_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -157,7 +163,7 @@ void nanos_state::nanos_io(address_map &map)
 	map(0x8C, 0x8F).rw(m_ctc_0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	/* FDC card */
-	map(0x92, 0x92).w(FUNC(nanos_state::nanos_tc_w));
+	map(0x92, 0x92).w(FUNC(nanos_state::tc_w));
 	map(0x94, 0x95).m(m_fdc, FUNC(upd765a_device::map));
 	/* V24+IFSS card */
 	map(0xA0, 0xA3).rw(m_sio_0, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
@@ -257,14 +263,14 @@ INPUT_PORTS_END
 uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  static uint8_t framecnt=0;
-	uint8_t y,ra,chr,gfx;
+	uint8_t gfx;
 	uint16_t sy=0,ma=0,x;
 
 //  framecnt++;
 
-	for (y = 0; y < 25; y++)
+	for (uint8_t y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
 
@@ -272,7 +278,7 @@ uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				if (ra < 8)
 				{
-					chr = m_ram->pointer()[0xf800+ x];
+					uint8_t chr = m_ram->pointer()[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
 					gfx = m_p_chargen[(chr<<3) | ra ];
@@ -296,25 +302,24 @@ uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-READ8_MEMBER(nanos_state::nanos_port_a_r)
+READ8_MEMBER(nanos_state::port_a_r)
 {
-	uint8_t retVal;
 	if (m_key_command==0)  {
 		return m_key_pressed;
 	} else {
-		retVal = m_last_code;
+		uint8_t retVal = m_last_code;
 		m_last_code = 0;
 		return retVal;
 	}
 }
 
-READ8_MEMBER(nanos_state::nanos_port_b_r)
+READ8_MEMBER(nanos_state::port_b_r)
 {
 	return 0xff;
 }
 
 
-WRITE8_MEMBER(nanos_state::nanos_port_b_w)
+WRITE8_MEMBER(nanos_state::port_b_w)
 {
 	m_key_command = BIT(data,1);
 	if (BIT(data,7)) {
@@ -339,15 +344,13 @@ uint8_t nanos_state::row_number(uint8_t code)
 
 TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 {
-	int i;
-	uint8_t code;
 	uint8_t key_code = 0;
 	uint8_t shift = m_linec->read() & 0x02 ? 1 : 0;
 	uint8_t ctrl =  m_linec->read() & 0x01 ? 1 : 0;
 	m_key_pressed = 0xff;
-	for(i = 0; i < 7; i++)
+	for(int i = 0; i < 7; i++)
 	{
-		code = m_lines[i]->read();
+		uint8_t code = m_lines[i]->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -433,7 +436,7 @@ void nanos_state::machine_reset()
 	m_bank2->set_base(m_ram->pointer() + 0x1000);
 	m_bank3->set_base(m_ram->pointer());
 
-	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(false);
+	m_floppy->get_device()->mon_w(false);
 }
 
 FLOPPY_FORMATS_MEMBER( nanos_state::floppy_formats )
@@ -465,10 +468,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nanos_state::nanos)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(nanos_mem)
-	MCFG_DEVICE_IO_MAP(nanos_io)
-	MCFG_Z80_DAISY_CHAIN(nanos_daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &nanos_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &nanos_state::io_map);
+	m_maincpu->set_daisy_config(nanos_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -480,45 +483,44 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nanos)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
+	Z80CTC(config, m_ctc_0, XTAL(4'000'000));
+	m_ctc_0->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_0->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc_0->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc_0->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
+	Z80CTC(config, m_ctc_1, XTAL(4'000'000));
+	m_ctc_1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_1->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc_1->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc_1->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio_0, XTAL(4'000'000));
+	m_pio_0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio_1, XTAL(4'000'000));
+	m_pio_1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("z80sio_0", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, nanos_state, z80daisy_interrupt))
+	Z80SIO(config, m_sio_0, XTAL(4'000'000));
+	m_sio_0->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
 
-	MCFG_DEVICE_ADD("z80sio_1", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, nanos_state, z80daisy_interrupt))
+	Z80SIO(config, m_sio_1, XTAL(4'000'000));
+	m_sio_1->out_int_callback().set(FUNC(nanos_state::z80daisy_interrupt));
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, nanos_state, nanos_port_a_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, nanos_state, nanos_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, nanos_state, nanos_port_b_w))
+	Z80PIO(config, m_pio, XTAL(4'000'000));
+	m_pio->in_pa_callback().set(FUNC(nanos_state::port_a_r));
+	m_pio->in_pb_callback().set(FUNC(nanos_state::port_b_r));
+	m_pio->out_pb_callback().set(FUNC(nanos_state::port_b_w));
 
 	/* UPD765 */
-	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", nanos_floppies, "525hd", nanos_state::floppy_formats)
+	UPD765A(config, m_fdc, 8'000'000, false, true);
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", nanos_state, keyboard_callback, attotime::from_hz(24000))
 MACHINE_CONFIG_END

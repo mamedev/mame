@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -644,21 +644,14 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galpani2)
-	MCFG_PALETTE_ADD("palette", 0x4000)    // sprites
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_galpani2);
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000); // sprites
+	PALETTE(config, m_bg8palette).set_format(palette_device::xGRB_555, 0x200 / 2); // bg8
+	PALETTE(config, m_bg15palette, palette_device::GRB_555); // 32768 static colors for the bg
 
-	MCFG_PALETTE_ADD("bg8palette", 0x200/2) // bg8
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-
-	MCFG_PALETTE_ADD("bgpalette", 32768) /* 32768 static colors for the bg */
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	MCFG_PALETTE_INIT_OWNER(galpani2_state,galpani2)
-
-	MCFG_DEVICE_ADD_KC002_SPRITES
-	MCFG_KANEKO16_SPRITE_OFFSETS(0x10000 - 0x16c0 + 0xc00, 0)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
-
+	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_offsets(0x10000 - 0x16c0 + 0xc00, 0);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

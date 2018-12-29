@@ -70,7 +70,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(flyball);
+	void flyball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -405,11 +405,11 @@ static GFXDECODE_START( gfx_flyball )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(flyball_state, flyball)
+void flyball_state::flyball_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x3F, 0x3F, 0x3F));  /* tiles, ball */
-	palette.set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(2, rgb_t(0xFF ,0xFF, 0xFF));  /* sprites */
+	palette.set_pen_color(0, rgb_t(0x3f, 0x3f, 0x3f));  // tiles, ball
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(2, rgb_t(0xff ,0xff, 0xff));  // sprites
 	palette.set_pen_color(3, rgb_t(0x00, 0x00, 0x00));
 }
 
@@ -465,13 +465,13 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MCFG_DEVICE_PROGRAM_MAP(flyball_map)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F7
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, flyball_state, lamp_w)) // 1 player lamp
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // crowd very loud
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // footstep off-on
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // crowd off-on
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // crowd soft-loud
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // bat hit
+	F9334(config, m_outlatch); // F7
+	m_outlatch->q_out_cb<2>().set_nop(); // bat hit
+	m_outlatch->q_out_cb<3>().set_nop(); // crowd soft-loud
+	m_outlatch->q_out_cb<4>().set_nop(); // crowd off-on
+	m_outlatch->q_out_cb<5>().set_nop(); // footstep off-on
+	m_outlatch->q_out_cb<6>().set_nop(); // crowd very loud
+	m_outlatch->q_out_cb<7>().set(FUNC(flyball_state::lamp_w)); // 1 player lamp
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -479,12 +479,11 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(flyball_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flyball)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(flyball_state, flyball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_flyball)
+	PALETTE(config, m_palette, FUNC(flyball_state::flyball_palette), 4);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

@@ -183,13 +183,13 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
-	m_upd7759->reset_w(data >> 7);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 
 WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -466,8 +466,8 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -478,24 +478,23 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SCREEN_SIZE(304, 224)
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rpunch)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rpunch);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2); // verified from rpunch schematics
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
+	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -517,8 +516,8 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -529,14 +528,13 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_SCREEN_SIZE(304, 224)
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_svolleybl)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_svolleybl);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2);
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
@@ -544,10 +542,10 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
+	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

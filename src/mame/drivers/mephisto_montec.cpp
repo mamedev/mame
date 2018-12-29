@@ -464,13 +464,13 @@ MACHINE_CONFIG_START(mephisto_montec_state::montec)
 	MCFG_DEVICE_PROGRAM_MAP( montec_mem )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
+	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
 	config.set_default_layout(layout_mephisto_montec);
 MACHINE_CONFIG_END
@@ -488,9 +488,8 @@ MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
 	MCFG_DEVICE_PROGRAM_MAP(megaiv_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
-	MCFG_DEVICE_REMOVE("board")
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_BOARD_DISABLE_LEDS(true)
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_megaiv);
 MACHINE_CONFIG_END
 

@@ -74,7 +74,7 @@ Games on this system include....
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (client)                | Sega / Hitmaker                     | GDROM | GDT-0017       | 317-0403-JPN | 253-5508-0403J|
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev A)        | Sega / Hitmaker                     | GDROM | GDT-0017A      | 317-0403-JPN | 253-5508-0403J|
 |*| 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev B)        | Sega / Hitmaker                     | GDROM | GDT-0017B      | 317-0403-JPN | 253-5508-0403J|
-| | 2004 | F-Zero AX - Monster Ride Cycraft Edition                        | Sega / Amusement Vision / Nintendo  | GDROM |                |              |               |
+|*| 2003 | F-Zero AX - Monster Ride Cycraft Edition                        | Sega / Amusement Vision / Nintendo  | Cart  | 837-14343-4S1  | 317-0373-COM | 253-5508-0373 |
 |*| 2005 | Mario Kart Arcade GP (Japan, MKA1 Ver.A1)                       | Namco / Nintendo                    | Cart  | 837-14343-4T1  | 317-5109-COM | 253-5509-5109 |
 | | 2005 | The Key Of Avalon 2.5: War of the Key (server)                  | Sega / Hitmaker                     | GDROM | GDT-0018       | 317-0403-JPN | 253-5508-0403J|
 |*| 2005 | The Key Of Avalon 2.5: War of the Key (server) (Rev A)          | Sega / Hitmaker                     | GDROM | GDT-0018A      | 317-0403-JPN | 253-5508-0403J|
@@ -591,10 +591,12 @@ MACHINE_CONFIG_START(triforce_state::triforce_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(triforce_state::triforcegd)
+void triforce_state::triforcegd(machine_config &config)
+{
 	triforce_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
-MACHINE_CONFIG_END
+	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, ":gdrom", "pic"));
+	rom_board.irq_callback().set_nop();
+}
 
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -1116,6 +1118,34 @@ ROM_START( mkartag2a )
 	ROM_LOAD("317-5128-com.pic", 0x00, 0x4000, CRC(0231b10c) SHA1(e060d74753a39081364e3175ac12e724ad585c33) )
 ROM_END
 
+/*
+
+F-ZERO AX MONSTER RIDE
+Cart: 842-06CN4000
+ROM PCB: 837-14343-4S1
+Actel ProAsic: 315-6362
+Key Chip (PIC): 253-5508-0373
+IC1-IC4 Samsung K9K1G08UOA
+IC9     MX 29LV400TTC
+
+*/
+
+ROM_START( fzeroaxm )
+	TRIFORCE_BIOS
+
+	ROM_REGION(0x21200000, "rom_board", 0)
+	// DES encrypted
+	ROM_LOAD16_BYTE( "ic1.bin",     0x00000000, 0x8400000, CRC(50d1363d) SHA1(d673ef4e5f6c9dfb7a3b9c3bd453a9d7b86077a2) )
+	ROM_LOAD16_BYTE( "ic2.bin",     0x00000001, 0x8400000, CRC(ce749357) SHA1(ecbd318fa6d183ba9428170b61699d8808356df8) )
+	ROM_LOAD16_BYTE( "ic3s.bin",    0x10800000, 0x8400000, CRC(0f7bd95a) SHA1(33fa62685e2039266be3448bec386c774174952b) )
+	ROM_LOAD16_BYTE( "ic4s.bin",    0x10800001, 0x8400000, CRC(9f10994f) SHA1(987b8b3051a17f3085fe7fbad595c56c1d05f605) )
+	// below contain rom board NAND block list/map (16bit words), the "block" is 2 * 32 NAND pages (512 data bytes +16 ECC?)
+	ROM_LOAD16_BYTE( "ic9.bin",     0x21000000, 0x0080000, CRC(bf461723) SHA1(4c18a4c3fabde7e63e36a7fcda19cd6acfe45f84) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-0373-com.pic", 0x00, 0x4000, CRC(0e48f645) SHA1(ec057b0f536c3e9ce5353c02676cf17e96bb3239) )
+ROM_END
+
 /* Main board */
 /*Triforce*/GAME( 2002, triforce, 0,        triforce_base, triforce, triforce_state, empty_init, ROT0, "Sega",                               "Triforce Bios", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT )
 
@@ -1188,6 +1218,7 @@ ROM_END
 /* 0022A */ GAME( 2006, tcfboxa,  triforce, triforcegd,    triforce, triforce_state, empty_init, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (4.01) (GDT-0022A)", MACHINE_IS_SKELETON )
 
 // 837-xxxxx (Sega cart games)
+/* 14343-4S1  */ GAME( 2003, fzeroaxm, triforce, triforce_base, triforce, triforce_state, empty_init, ROT0, "Sega / Amusement Vision / Nintendo", "F-Zero AX Monster Ride", MACHINE_IS_SKELETON ) // 2003/09/04
 /* 14343-4T1  */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, triforce_state, empty_init, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP (Japan, MKA1 Ver.A1)", MACHINE_IS_SKELETON )
 /* 14343-R4S0 */ GAME( 2007, mkartag2, triforce, triforce_base, triforce, triforce_state, empty_init, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP 2 (Japan, MK21 Ver.A)", MACHINE_IS_SKELETON )
 /* 14343-R4S0 */ GAME( 2007, mkartag2a,mkartag2, triforce_base, triforce, triforce_state, empty_init, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP 2 (Japan, MK21 Ver.A, alt dump)", MACHINE_IS_SKELETON )

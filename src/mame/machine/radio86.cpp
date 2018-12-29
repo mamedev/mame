@@ -40,7 +40,7 @@ void radio86_state::init_radioram()
 	memset(m_radio_ram_disk.get(),0,0x20000);
 }
 
-READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
+uint8_t radio86_state::radio86_8255_portb_r2()
 {
 	uint8_t key = 0xff;
 	for (int i = 0; i < 8; i++)
@@ -52,7 +52,7 @@ READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
 	return key;
 }
 
-READ8_MEMBER(radio86_state::kr03_8255_portb_r2)
+uint8_t radio86_state::kr03_8255_portb_r2()
 {
 	uint8_t key = 0xff;
 	uint16_t data;
@@ -70,7 +70,7 @@ READ8_MEMBER(radio86_state::kr03_8255_portb_r2)
 	return key;
 }
 
-READ8_MEMBER(radio86_state::radio86_8255_portc_r2)
+uint8_t radio86_state::radio86_8255_portc_r2()
 {
 	double level = m_cassette->input();
 	uint8_t dat = m_io_line[8]->read();
@@ -80,18 +80,18 @@ READ8_MEMBER(radio86_state::radio86_8255_portc_r2)
 	return dat;
 }
 
-WRITE8_MEMBER(radio86_state::radio86_8255_porta_w2)
+void radio86_state::radio86_8255_porta_w2(uint8_t data)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_MEMBER(radio86_state::radio86_8255_portc_w2)
+void radio86_state::radio86_8255_portc_w2(uint8_t data)
 {
 	m_cassette->output(data & 0x01 ? 1 : -1);
 }
 
 
-READ8_MEMBER(radio86_state::rk7007_8255_portc_r)
+uint8_t radio86_state::rk7007_8255_portc_r()
 {
 	double level = m_cassette->input();
 	uint8_t key = 0xff;
@@ -108,7 +108,7 @@ READ8_MEMBER(radio86_state::rk7007_8255_portc_r)
 	return key;
 }
 
-WRITE_LINE_MEMBER(radio86_state::hrq_w)
+void radio86_state::hrq_w(int state)
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -117,13 +117,13 @@ WRITE_LINE_MEMBER(radio86_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(radio86_state::memory_read_byte)
+uint8_t radio86_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(radio86_state::memory_write_byte)
+void radio86_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
@@ -142,23 +142,23 @@ void radio86_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-READ8_MEMBER(radio86_state::radio_cpu_state_r)
+uint8_t radio86_state::radio_cpu_state_r()
 {
 	// FIXME: the driver should handler the status callback rather than accessing this through the state interface
 	return m_maincpu->state_int(i8080_cpu_device::I8085_STATUS);
 }
 
-READ8_MEMBER(radio86_state::radio_io_r)
+uint8_t radio86_state::radio_io_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte((offset << 8) + offset);
 }
 
-WRITE8_MEMBER(radio86_state::radio_io_w)
+void radio86_state::radio_io_w(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte((offset << 8) + offset,data);
 }
 
-MACHINE_RESET_MEMBER(radio86_state,radio86)
+void radio86_state::machine_reset()
 {
 	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
@@ -168,7 +168,7 @@ MACHINE_RESET_MEMBER(radio86_state,radio86)
 }
 
 
-WRITE8_MEMBER(radio86_state::radio86_pagesel)
+void radio86_state::radio86_pagesel(uint8_t data)
 {
 	m_disk_sel = data;
 }
@@ -182,7 +182,7 @@ READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
 		return 0xff;
 }
 
-READ8_MEMBER(radio86_state::radio86ram_romdisk_porta_r)
+uint8_t radio86_state::radio86ram_romdisk_porta_r()
 {
 	uint8_t *romdisk = m_region_maincpu->base() + 0x10000;
 	if ((m_disk_sel & 0x0f) ==0) {
@@ -196,53 +196,45 @@ READ8_MEMBER(radio86_state::radio86ram_romdisk_porta_r)
 	}
 }
 
-WRITE8_MEMBER(radio86_state::radio86_romdisk_portb_w)
+void radio86_state::radio86_romdisk_portb_w(uint8_t data)
 {
 	m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER(radio86_state::radio86_romdisk_portc_w)
+void radio86_state::radio86_romdisk_portc_w(uint8_t data)
 {
 	m_romdisk_msb = data;
 }
 
-WRITE8_MEMBER(radio86_state::mikrosha_8255_font_page_w)
+void radio86_state::mikrosha_8255_font_page_w(uint8_t data)
 {
 	m_mikrosha_font_page = (data  > 7) & 1;
 }
 
 I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const uint8_t *charmap = m_charmap;
-	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp) {
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t pixels = m_charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if (vsp)
 		pixels = 0;
-	}
-	if (lten) {
+
+	if (lten)
 		pixels = 0xff;
-	}
-	if (rvv) {
+
+	if (rvv)
 		pixels ^= 0xff;
-	}
-	for(i=0;i<6;i++) {
+
+	for (int i = 0; i < 6; i++)
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
-	}
 }
 
-static const rgb_t radio86_palette[3] = {
-	rgb_t(0x00, 0x00, 0x00), // black
-	rgb_t(0xa0, 0xa0, 0xa0), // white
-	rgb_t(0xff, 0xff, 0xff)  // highlight
+static constexpr rgb_t radio86_pens[3] = {
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0xa0, 0xa0, 0xa0 }, // white
+	{ 0xff, 0xff, 0xff }  // highlight
 };
 
-PALETTE_INIT_MEMBER(radio86_state,radio86)
+void radio86_state::radio86_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, radio86_palette, ARRAY_LENGTH(radio86_palette));
-}
-
-void radio86_state::video_start()
-{
-	m_charmap = memregion("gfx1")->base();
+	palette.set_pen_colors(0, radio86_pens);
 }

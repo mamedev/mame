@@ -86,7 +86,7 @@ private:
 
 	void sym1_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<rs232_port_device> m_crt;
@@ -327,56 +327,53 @@ void sym1_state::sym1_map(address_map &map)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(sym1_state::sym1)
+void sym1_state::sym1(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M6502, SYM1_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sym1_map)
+	M6502(config, m_maincpu, SYM1_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sym1_state::sym1_map);
 
 	config.set_default_layout(layout_sym1);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// devices
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, SYM1_CLOCK)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, sym1_state, riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, sym1_state, riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, sym1_state, riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, sym1_state, riot_b_w))
+	mos6532_new_device &riot(MOS6532_NEW(config, "riot", SYM1_CLOCK));
+	riot.pa_rd_callback().set(FUNC(sym1_state::riot_a_r));
+	riot.pa_wr_callback().set(FUNC(sym1_state::riot_a_w));
+	riot.pb_rd_callback().set(FUNC(sym1_state::riot_b_r));
+	riot.pb_wr_callback().set(FUNC(sym1_state::riot_b_w));
 
-	MCFG_DEVICE_ADD("ttl74145", TTL74145, 0)
-	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(*this, sym1_state, sym1_74145_output_0_w))
-	MCFG_TTL74145_OUTPUT_LINE_1_CB(WRITELINE(*this, sym1_state, sym1_74145_output_1_w))
-	MCFG_TTL74145_OUTPUT_LINE_2_CB(WRITELINE(*this, sym1_state, sym1_74145_output_2_w))
-	MCFG_TTL74145_OUTPUT_LINE_3_CB(WRITELINE(*this, sym1_state, sym1_74145_output_3_w))
-	MCFG_TTL74145_OUTPUT_LINE_4_CB(WRITELINE(*this, sym1_state, sym1_74145_output_4_w))
-	MCFG_TTL74145_OUTPUT_LINE_5_CB(WRITELINE(*this, sym1_state, sym1_74145_output_5_w))
-	MCFG_TTL74145_OUTPUT_LINE_6_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	TTL74145(config, m_ttl74145, 0);
+	m_ttl74145->output_line_callback<0>().set(FUNC(sym1_state::sym1_74145_output_0_w));
+	m_ttl74145->output_line_callback<1>().set(FUNC(sym1_state::sym1_74145_output_1_w));
+	m_ttl74145->output_line_callback<2>().set(FUNC(sym1_state::sym1_74145_output_2_w));
+	m_ttl74145->output_line_callback<3>().set(FUNC(sym1_state::sym1_74145_output_3_w));
+	m_ttl74145->output_line_callback<4>().set(FUNC(sym1_state::sym1_74145_output_4_w));
+	m_ttl74145->output_line_callback<5>().set(FUNC(sym1_state::sym1_74145_output_5_w));
+	m_ttl74145->output_line_callback<6>().set("speaker", FUNC(speaker_sound_device::level_w));
 	// lines 7-9 not connected
 
-	MCFG_DEVICE_ADD("via1", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	VIA6522(config, "via1", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	VIA6522(config, "via2", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("via2", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	via6522_device &via3(VIA6522(config, "via3", SYM1_CLOCK));
+	via3.writepa_handler().set(FUNC(sym1_state::via3_a_w));
+	via3.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_DEVICE_ADD("via3", VIA6522, SYM1_CLOCK)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, sym1_state, via3_a_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
+	input_merger_device &merger(INPUT_MERGER_ANY_HIGH(config, "mainirq", 0)); // wire-or connection
+	merger.output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq") // wire-or connection
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
-
-	MCFG_DEVICE_ADD("crt", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_DEVICE_ADD("tty", RS232_PORT, default_rs232_devices, nullptr) // actually a 20 mA current loop; 110 bps assumed
+	RS232_PORT(config, "crt", default_rs232_devices, nullptr);
+	RS232_PORT(config, "tty", default_rs232_devices, nullptr); // actually a 20 mA current loop; 110 bps assumed
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("4K");
+	m_ram->set_extra_options("1K,2K,3K");
+}
 
 
 //**************************************************************************

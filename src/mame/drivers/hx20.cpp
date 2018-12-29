@@ -75,15 +75,9 @@ WRITE8_MEMBER( hx20_state::ksc_w )
 READ8_MEMBER( hx20_state::krtn07_r )
 {
 	uint8_t data = 0xff;
-
-	if (!BIT(m_ksc, 0)) data &= m_ksc0->read();
-	if (!BIT(m_ksc, 1)) data &= m_ksc1->read();
-	if (!BIT(m_ksc, 2)) data &= m_ksc2->read();
-	if (!BIT(m_ksc, 3)) data &= m_ksc3->read();
-	if (!BIT(m_ksc, 4)) data &= m_ksc4->read();
-	if (!BIT(m_ksc, 5)) data &= m_ksc5->read();
-	if (!BIT(m_ksc, 6)) data &= m_ksc6->read();
-	if (!BIT(m_ksc, 7)) data &= m_ksc7->read();
+	for (int b = 0; 8 > b; ++b)
+		if (!BIT(m_ksc, b))
+			data &= m_ksc_io[b]->read();
 
 	return data;
 }
@@ -111,15 +105,9 @@ READ8_MEMBER( hx20_state::krtn89_r )
 	*/
 
 	uint8_t data = 0xff;
-
-	if (!BIT(m_ksc, 0)) data &= m_ksc0->read() >> 8;
-	if (!BIT(m_ksc, 1)) data &= m_ksc1->read() >> 8;
-	if (!BIT(m_ksc, 2)) data &= m_ksc2->read() >> 8;
-	if (!BIT(m_ksc, 3)) data &= m_ksc3->read() >> 8;
-	if (!BIT(m_ksc, 4)) data &= m_ksc4->read() >> 8;
-	if (!BIT(m_ksc, 5)) data &= m_ksc5->read() >> 8;
-	if (!BIT(m_ksc, 6)) data &= m_ksc6->read() >> 8;
-	if (!BIT(m_ksc, 7)) data &= m_ksc7->read() >> 8;
+	for (int b = 0; 8 > b; ++b)
+		if (!BIT(m_ksc, b))
+			data &= m_ksc_io[b]->read() >> 8;
 
 	return data;
 }
@@ -149,31 +137,15 @@ WRITE8_MEMBER( hx20_state::lcd_cs_w )
 	logerror("LCD CS %02x\n", data);
 
 	// LCD
-	m_lcdc0->cs_w(1);
-	m_lcdc1->cs_w(1);
-	m_lcdc2->cs_w(1);
-	m_lcdc3->cs_w(1);
-	m_lcdc4->cs_w(1);
-	m_lcdc5->cs_w(1);
+	for (auto &lcdc : m_lcdc)
+		lcdc->cs_w(1);
 
-	switch (data & 0x07)
-	{
-	case 1: m_lcdc0->cs_w(0); break;
-	case 2: m_lcdc1->cs_w(0); break;
-	case 3: m_lcdc2->cs_w(0); break;
-	case 4: m_lcdc3->cs_w(0); break;
-	case 5: m_lcdc4->cs_w(0); break;
-	case 6: m_lcdc5->cs_w(0); break;
-	}
+	if (data & 0x07)
+		m_lcdc[(data & 0x07) - 1]->cs_w(0);
 
-	int cd = BIT(data, 3);
-
-	m_lcdc0->cd_w(cd);
-	m_lcdc1->cd_w(cd);
-	m_lcdc2->cd_w(cd);
-	m_lcdc3->cd_w(cd);
-	m_lcdc4->cd_w(cd);
-	m_lcdc5->cd_w(cd);
+	int const cd = BIT(data, 3);
+	for (auto &lcdc : m_lcdc)
+		lcdc->cd_w(cd);
 
 	// serial
 	m_sio->pout_w(BIT(data, 5));
@@ -566,19 +538,6 @@ void hx20_state::hx20_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( hx20_io )
-//-------------------------------------------------
-
-void hx20_state::hx20_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::main_p1_r), FUNC(hx20_state::main_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::main_p2_r), FUNC(hx20_state::main_p2_w));
-	map(M6801_PORT3, M6801_PORT3).noprw(); // A0-A7, D0-D7
-	map(M6801_PORT4, M6801_PORT4).noprw(); // A8-A15
-}
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( hx20_sub_mem )
 //-------------------------------------------------
 
@@ -587,19 +546,6 @@ void hx20_state::hx20_sub_mem(address_map &map)
 	map(0x0000, 0x001f).rw(m_subcpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
 	map(0x0080, 0x00ff).ram();
 	map(0xf000, 0xffff).rom().region(HD6301V1_SLAVE_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( hx20_sub_io )
-//-------------------------------------------------
-
-void hx20_state::hx20_sub_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::slave_p1_r), FUNC(hx20_state::slave_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::slave_p2_r), FUNC(hx20_state::slave_p2_w));
-	map(M6801_PORT3, M6801_PORT3).rw(FUNC(hx20_state::slave_p3_r), FUNC(hx20_state::slave_p3_w));
-	map(M6801_PORT4, M6801_PORT4).rw(FUNC(hx20_state::slave_p4_r), FUNC(hx20_state::slave_p4_w));
 }
 
 
@@ -812,7 +758,7 @@ WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
 //  VIDEO
 //**************************************************************************
 
-PALETTE_INIT_MEMBER(hx20_state, hx20)
+void hx20_state::hx20_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
@@ -825,12 +771,8 @@ PALETTE_INIT_MEMBER(hx20_state, hx20)
 
 uint32_t hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_lcdc0->screen_update(screen, bitmap, cliprect);
-	m_lcdc1->screen_update(screen, bitmap, cliprect);
-	m_lcdc2->screen_update(screen, bitmap, cliprect);
-	m_lcdc3->screen_update(screen, bitmap, cliprect);
-	m_lcdc4->screen_update(screen, bitmap, cliprect);
-	m_lcdc5->screen_update(screen, bitmap, cliprect);
+	for (auto &lcdc : m_lcdc)
+		lcdc->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -896,13 +838,25 @@ void hx20_state::machine_start()
 
 MACHINE_CONFIG_START(hx20_state::hx20)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(hx20_mem)
-	MCFG_DEVICE_IO_MAP(hx20_io)
+	HD63701(config, m_maincpu, XTAL(2'457'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_mem);
+	m_maincpu->in_p1_cb().set(FUNC(hx20_state::main_p1_r));
+	m_maincpu->out_p1_cb().set(FUNC(hx20_state::main_p1_w));
+	m_maincpu->in_p2_cb().set(FUNC(hx20_state::main_p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(hx20_state::main_p2_w));
+	// Port 3 = A0-A7, D0-D7
+	// Port 4 = A8-A15
 
-	MCFG_DEVICE_ADD(HD6301V1_SLAVE_TAG, HD63701, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(hx20_sub_mem)
-	MCFG_DEVICE_IO_MAP(hx20_sub_io)
+	HD63701(config, m_subcpu, XTAL(2'457'600));
+	m_subcpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_sub_mem);
+	m_subcpu->in_p1_cb().set(FUNC(hx20_state::slave_p1_r));
+	m_subcpu->out_p1_cb().set(FUNC(hx20_state::slave_p1_w));
+	m_subcpu->in_p2_cb().set(FUNC(hx20_state::slave_p2_r));
+	m_subcpu->out_p2_cb().set(FUNC(hx20_state::slave_p2_w));
+	m_subcpu->in_p3_cb().set(FUNC(hx20_state::slave_p3_r));
+	m_subcpu->out_p3_cb().set(FUNC(hx20_state::slave_p3_w));
+	m_subcpu->in_p4_cb().set(FUNC(hx20_state::slave_p4_r));
+	m_subcpu->out_p4_cb().set(FUNC(hx20_state::slave_p4_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -913,34 +867,28 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_SCREEN_UPDATE_DRIVER(hx20_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hx20_state, hx20)
+	PALETTE(config, "palette", FUNC(hx20_state::hx20_palette), 2);
 
-	MCFG_UPD7227_ADD(UPD7227_0_TAG, 0, 0)
-	MCFG_UPD7227_ADD(UPD7227_1_TAG, 40, 0)
-	MCFG_UPD7227_ADD(UPD7227_2_TAG, 80, 0)
-	MCFG_UPD7227_ADD(UPD7227_3_TAG, 0, 16)
-	MCFG_UPD7227_ADD(UPD7227_4_TAG, 40, 16)
-	MCFG_UPD7227_ADD(UPD7227_5_TAG, 80, 16)
+	for (int y = 0, i = 0; 2 > y; ++y)
+		for (int x = 0; 3 > x; ++x)
+			UPD7227(config, m_lcdc[i++], x * 40, y * 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 4.194304_MHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, hx20_state, rtc_irq_w))
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
+	m_rtc->irq().set(FUNC(hx20_state::rtc_irq_w));
+
+	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
 	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
 	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// optional rom
 	MCFG_GENERIC_SOCKET_ADD("optrom", generic_plain_slot, "opt_rom")
@@ -960,9 +908,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hx20_state::cm6000)
 	hx20(config);
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(HD6301V1_MAIN_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(cm6000_mem)
-	MCFG_DEVICE_IO_MAP(hx20_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6000_mem);
 
 	// optional rom
 	MCFG_DEVICE_REMOVE("optrom")

@@ -26,7 +26,7 @@
     TODO:
     The entire lispcpu half (more like 3/4) of the machine
     Framebuffer 1152x864? 1150x900? (lives on the i/o card)
-    I8274 MPSC (z80dart.cpp) x2
+    I8274 MPSC (z80sio.cpp) x2
     1024x4bit SRAM AM2148-50 x6 @F22-F27
     2048x8bit SRAM @F7 and @G7
     keyboard/mouse (a 68k based console dedicated to this machine; talks through one of the MPSC chips)

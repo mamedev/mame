@@ -489,72 +489,65 @@ void lethal_state::machine_reset()
 	m_bank4000->set_bank(0);
 }
 
-MACHINE_CONFIG_START(lethal_state::lethalen)
-
+void lethal_state::lethalen(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(le_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lethal_state,  lethalen_interrupt)
+	HD6309(config, m_maincpu, MAIN_CLOCK/2);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::le_main);
+	m_maincpu->set_vblank_int("screen", FUNC(lethal_state::lethalen_interrupt));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(le_sound)
+	Z80(config, m_soundcpu, MAIN_CLOCK/4);  /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lethal_state::le_sound);
 
-	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(216, 504-1, 16, 240-1);
+	screen.set_screen_update(FUNC(lethal_state::screen_update_lethalen));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(lethal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8LE, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8LE, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_BPP(6)
-	MCFG_K05324X_OFFSETS(95, 0)
-	MCFG_K05324X_CB(lethal_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette(m_palette);
+	m_k053244->set_bpp(6);
+	m_k053244->set_offsets(95, 0);
+	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback), this);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set_inputline("soundcpu", INPUT_LINE_NMI);
+	k054539.add_route(0, "rspeaker", 1.0);
+	k054539.add_route(1, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(lethal_state::lethalej)
+void lethal_state::lethalej(machine_config &config)
+{
 	lethalen(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
+	subdevice<screen_device>("screen")->set_visarea(224, 512-1, 16, 240-1);
 
-	MCFG_DEVICE_MODIFY("k053244")
-	MCFG_K05324X_OFFSETS(-105, 0)
-MACHINE_CONFIG_END
+	m_k053244->set_offsets(-105, 0);
+}
 
 ROM_START( lethalen )   // US version UAE
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */

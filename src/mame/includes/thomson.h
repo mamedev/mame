@@ -152,6 +152,7 @@ public:
 	}
 
 	void to9(machine_config &config);
+	void to7_base(machine_config &config);
 	void to7(machine_config &config);
 	void mo5e(machine_config &config);
 	void to770a(machine_config &config);
@@ -364,8 +365,8 @@ private:
 	WRITE_LINE_MEMBER( fdc_index_2_w );
 	WRITE_LINE_MEMBER( fdc_index_3_w );
 	void thomson_index_callback(int index, int state);
-	DECLARE_PALETTE_INIT(thom);
-	DECLARE_PALETTE_INIT(mo5);
+	void thom_palette(palette_device &palette);
+	void mo5_palette(palette_device &palette);
 
 	optional_device<mc6854_device> m_mc6854;
 
@@ -374,7 +375,7 @@ private:
 	int m_centronics_busy;
 	int m_centronics_perror;
 
-	MC6854_OUT_FRAME_CB(to7_network_got_frame);
+	void to7_network_got_frame(uint8_t *data, int length);
 
 	void mo5(address_map &map);
 	void mo5nr(address_map &map);
@@ -644,7 +645,7 @@ private:
 	void to9_floppy_reset();
 };
 
-/*----------- defined in video/thomson.c -----------*/
+/*----------- defined in video/thomson.cpp -----------*/
 
 /*
    TO7 video:
@@ -725,8 +726,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device)
-
-#define MCFG_TO7_IO_LINE_ADD(_tag)  \
-	MCFG_DEVICE_ADD((_tag), TO7_IO_LINE, 0)
 
 #endif // MAME_INCLUDES_THOMSON_H

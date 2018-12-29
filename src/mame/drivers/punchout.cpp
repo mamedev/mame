@@ -632,17 +632,17 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_DEVICE_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(punchout_sound_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, punchout_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // watchdog reset, seldom used because 08 clears the watchdog as well
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("vlm", vlm5030_device, rst))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("vlm", vlm5030_device, st))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("vlm", vlm5030_device, vcu))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // enable NVRAM?
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2B
+	mainlatch.q_out_cb<0>().set(FUNC(punchout_state::nmi_mask_w));
+	mainlatch.q_out_cb<1>().set_nop(); // watchdog reset, seldom used because 08 clears the watchdog as well
+	mainlatch.q_out_cb<2>().set_nop(); // ?
+	mainlatch.q_out_cb<3>().set_inputline("audiocpu", INPUT_LINE_RESET);
+	mainlatch.q_out_cb<4>().set("vlm", FUNC(vlm5030_device::rst));
+	mainlatch.q_out_cb<5>().set("vlm", FUNC(vlm5030_device::st));
+	mainlatch.q_out_cb<6>().set("vlm", FUNC(vlm5030_device::vcu));
+	mainlatch.q_out_cb<7>().set_nop(); // enable NVRAM?
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_punchout)
@@ -672,8 +672,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "mono").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
 	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)
@@ -688,9 +688,9 @@ MACHINE_CONFIG_START(punchout_state::spnchout)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(spnchout_io_map)
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, 0) // OSCIN -> Vcc
-	MCFG_RP5C01_REMOVE_BATTERY()
-	MCFG_RP5H01_ADD("rp5h01")
+	RP5C01(config, m_rtc, 0); // OSCIN -> Vcc
+	m_rtc->remove_battery();
+	RP5H01(config, m_rp5h01, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
 MACHINE_CONFIG_END

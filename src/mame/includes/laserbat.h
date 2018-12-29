@@ -5,8 +5,14 @@
     Laser Battle / Lazarian - Cat and Mouse
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LASERBAT_H
+#define MAME_INCLUDES_LASERBAT_H
+
+#pragma once
 
 #include "audio/zaccaria.h"
+
+#include "cpu/s2650/s2650.h"
 
 #include "machine/6821pia.h"
 #include "machine/pla.h"
@@ -23,7 +29,6 @@
 class laserbat_state_base : public driver_device
 {
 public:
-
 	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_mux_ports(*this, {"ROW0", "ROW1", "SW1", "SW2"})
@@ -33,9 +38,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_gfxmix(*this, "gfxmix")
-		, m_pvi1(*this, "pvi1")
-		, m_pvi2(*this, "pvi2")
-		, m_pvi3(*this, "pvi3")
+		, m_pvi(*this, "pvi%u", 1U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_scanline_timer(nullptr)
 		, m_gfx1(nullptr)
@@ -104,16 +107,14 @@ protected:
 	required_ioport m_row2;
 
 	// main CPU device
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 
 	// video devices
-	required_device<screen_device>      m_screen;
-	required_device<palette_device>     m_palette;
-	required_device<pla_device>         m_gfxmix;
-	required_device<s2636_device>       m_pvi1;
-	required_device<s2636_device>       m_pvi2;
-	required_device<s2636_device>       m_pvi3;
-	required_device<gfxdecode_device>   m_gfxdecode;
+	required_device<screen_device>         m_screen;
+	required_device<palette_device>        m_palette;
+	required_device<pla_device>            m_gfxmix;
+	required_device_array<s2636_device, 3> m_pvi;
+	required_device<gfxdecode_device>      m_gfxdecode;
 
 	// stuff for rendering video
 	emu_timer       *m_scanline_timer;
@@ -168,12 +169,11 @@ public:
 	void laserbat(machine_config &config);
 
 protected:
-
 	// initialisation/startup
 	virtual void machine_start() override;
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
+	void laserbat_palette(palette_device &palette) const;
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
@@ -202,7 +202,7 @@ public:
 protected:
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(catnmous);
+	void catnmous_palette(palette_device &palette) const;
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
@@ -210,3 +210,5 @@ protected:
 
 	required_device<zac1b11107_audio_device>    m_audiopcb;
 };
+
+#endif // MAME_INCLUDES_LASERBAT_H

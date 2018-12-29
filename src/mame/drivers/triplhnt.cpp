@@ -258,27 +258,27 @@ static GFXDECODE_START( gfx_triplhnt )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(triplhnt_state, triplhnt)
+void triplhnt_state::triplhnt_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xAF, 0xAF, 0xAF));  /* sprites */
+	palette.set_pen_color(0, rgb_t(0xaf, 0xaf, 0xaf));  // sprites
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(2, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(2, rgb_t(0xff, 0xff, 0xff));
 	palette.set_pen_color(3, rgb_t(0x50, 0x50, 0x50));
-	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));  /* tiles */
-	palette.set_pen_color(5, rgb_t(0x3F, 0x3F, 0x3F));
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));  // tiles
+	palette.set_pen_color(5, rgb_t(0x3f, 0x3f, 0x3f));
 	palette.set_pen_color(6, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(7, rgb_t(0x3F, 0x3F, 0x3F));
+	palette.set_pen_color(7, rgb_t(0x3f, 0x3f, 0x3f));
 }
 
 
-MACHINE_CONFIG_START(triplhnt_state::triplhnt)
+void triplhnt_state::triplhnt(machine_config &config)
+{
+	/* basic machine hardware */
+	M6800(config, m_maincpu, 800000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &triplhnt_state::triplhnt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(triplhnt_state::irq0_line_hold));
 
-/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 800000)
-	MCFG_DEVICE_PROGRAM_MAP(triplhnt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
-
-	MCFG_NVRAM_ADD_0FILL("nvram") // battery-backed 74C89 at J5
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery-backed 74C89 at J5
 
 	F9334(config, m_latch); // J7
 	m_latch->q_out_cb<0>().set_nop(); // unused
@@ -292,31 +292,30 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	m_latch->q_out_cb<7>().set([this] (int state) { m_sprite_bank = state; });
 	m_latch->q_out_cb<7>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_BEAR_EN>)); // bear
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(256, 262);
+	screen.set_visarea(0, 255, 0, 239);
+	screen.set_screen_update(FUNC(triplhnt_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_triplhnt);
+	PALETTE(config, m_palette, FUNC(triplhnt_state::triplhnt_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(2)  /* 2 channels */
-	MCFG_SAMPLES_NAMES(triplhnt_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);  /* 2 channels */
+	m_samples->set_samples_names(triplhnt_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, triplhnt_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, triplhnt_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
 
 ROM_START( triplhnt )

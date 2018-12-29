@@ -57,7 +57,7 @@ private:
 	bool m_endram;
 	void set_banks();
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
@@ -263,53 +263,55 @@ void ts816_state::init_ts816()
 	membank("bank2")->configure_entry(1, &rams[0x1e000]);
 }
 
-MACHINE_CONFIG_START(ts816_state::ts816)
+void ts816_state::ts816(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ts816_mem)
-	MCFG_DEVICE_IO_MAP(ts816_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ts816_state::ts816_mem);
+	m_maincpu->set_addrmap(AS_IO, &ts816_state::ts816_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts816_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(ts816_state::kbd_put));
 
-	//MCFG_DEVICE_ADD("sio0", Z80SIO, XTAL(16'000'000) / 4)
-	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio3", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio4", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio5", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio6", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio7", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio8", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("sio9", Z80SIO, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	//z80sio_device& sio0(Z80SIO(config, "sio0", XTAL(16'000'000) / 4));
+	//sio0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(16'000'000) / 4));
+	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio2(Z80SIO(config, "sio2", XTAL(16'000'000) / 4));
+	sio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio3(Z80SIO(config, "sio3", XTAL(16'000'000) / 4));
+	sio3.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio4(Z80SIO(config, "sio4", XTAL(16'000'000) / 4));
+	sio4.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio5(Z80SIO(config, "sio5", XTAL(16'000'000) / 4));
+	sio5.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio6(Z80SIO(config, "sio6", XTAL(16'000'000) / 4));
+	sio6.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio7(Z80SIO(config, "sio7", XTAL(16'000'000) / 4));
+	sio7.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio8(Z80SIO(config, "sio8", XTAL(16'000'000) / 4));
+	sio8.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	z80sio_device& sio9(Z80SIO(config, "sio9", XTAL(16'000'000) / 4));
+	sio9.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_Z80PIO_IN_PA_CB(READ8(*this, ts816_state, porta_r))
-	//MCFG_Z80PIO_IN_PB_CB(READ8(*this, ts816_state, portb_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, ts816_state, portb_w))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(16'000'000) / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//pio.in_pa_callback().set(FUNC(ts816_state::porta_r));
+	//pio.in_pb_callback().set(FUNC(ts816_state::portb_r));
+	//pio.out_pb_callback().set(FUNC(ts816_state::portb_w));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc1(Z80CTC(config, "ctc1", XTAL(16'000'000) / 4));
+	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
-	//MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, ts816_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	z80ctc_device& ctc2(Z80CTC(config, "ctc2", XTAL(16'000'000) / 4));
+	ctc2.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	z80dma_device& dma(Z80DMA(config, "dma", XTAL(16'000'000) / 4));
+	//dma.out_busreq_callback().set(FUNC(ts816_state::busreq_w));
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+}
 
 /* ROM definition */
 ROM_START( ts816 )

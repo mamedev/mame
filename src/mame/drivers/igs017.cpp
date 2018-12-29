@@ -86,13 +86,13 @@ class igs_bitswap_device : public device_t
 public:
 	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_pc_callback(Object &&cb)  { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
+	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
+	auto in_pc_callback()  { return m_in_pc_cb.bind(); }
 
-	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_pc_callback() { return m_out_pc_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -161,43 +161,6 @@ void igs_bitswap_device::set_val_xor(uint16_t val_xor)
 	printf("igs_bitswap: INIT val_xor = %04x\n", m_val_xor);
 #endif
 }
-
-#define MCFG_IGS_BITSWAP_IN_PORTA_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_IN_PORTB_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_IN_PORTC_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTA_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTB_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_IGS_BITSWAP_OUT_PORTC_CB(_devcb) \
-	downcast<igs_bitswap_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
-
-// note: b3 seems fixed to ~15, it may go away in the future
-#define MCFG_IGS_BITSWAP_M3_0_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(0, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_1_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(1, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_2_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(2, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_M3_3_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_m3_bits(3, _b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_MF_BITS(_b0, _b1, _b2, _b3) \
-	downcast<igs_bitswap_device &>(*device).set_mf_bits(_b0, _b1, _b2, _b3);
-
-#define MCFG_IGS_BITSWAP_VAL_XOR(_val_xor) \
-	downcast<igs_bitswap_device &>(*device).set_val_xor(_val_xor);
 
 DEFINE_DEVICE_TYPE(IGS_BITSWAP, igs_bitswap_device, "igs_bitswap", "IGS Bitswap Protection")
 
@@ -490,8 +453,8 @@ void igs_incdec_device::device_reset()
 class igs017_state : public driver_device
 {
 public:
-	igs017_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	igs017_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_remap_addr(-1),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
@@ -577,10 +540,10 @@ private:
 	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
 	DECLARE_READ16_MEMBER(mgcs_magic_r);
 
-	uint16_t mgcs_palette_bitswap(uint16_t bgr);
-	uint16_t lhzb2a_palette_bitswap(uint16_t bgr);
-	uint16_t tjsb_palette_bitswap(uint16_t bgr);
-	uint16_t slqz2_palette_bitswap(uint16_t bgr);
+	uint16_t mgcs_palette_bitswap(uint16_t bgr) const;
+	uint16_t lhzb2a_palette_bitswap(uint16_t bgr) const;
+	uint16_t tjsb_palette_bitswap(uint16_t bgr) const;
+	uint16_t slqz2_palette_bitswap(uint16_t bgr) const;
 
 	DECLARE_READ8_MEMBER(sdmg2_keys_r);
 	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
@@ -666,26 +629,26 @@ uint32_t igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 
 }
 
 // palette bitswap callbacks
-uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr) const
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
 	return bitswap<16>(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
-uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr) const
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 	return bitswap<16>(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
-uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr) const
 {
 	// bitswap
 	return bitswap<16>(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
-uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr)
+uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr) const
 {
 	return bitswap<16>(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
@@ -3562,25 +3525,25 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
+	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// protection
-	MCFG_DEVICE_ADD("igs_bitswap", IGS_BITSWAP, 0)
-	MCFG_IGS_BITSWAP_IN_PORTA_CB(IOPORT("PLAYER1"))
-	MCFG_IGS_BITSWAP_IN_PORTB_CB(IOPORT("PLAYER2"))
-	MCFG_IGS_BITSWAP_IN_PORTC_CB(IOPORT("COINS"))
-	MCFG_IGS_BITSWAP_OUT_PORTA_CB(WRITE8(*this, igs017_state, iqblocka_keyin_w))
-	MCFG_IGS_BITSWAP_VAL_XOR(0x15d6)
-	MCFG_IGS_BITSWAP_MF_BITS(3, 5, 9, 11)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~5, 8,  ~10, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS( 3, ~8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS( 2, ~6, ~11, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS( 0, ~1,  ~3, ~15)
+	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	m_igs_bitswap->in_pa_callback().set_ioport("PLAYER1");
+	m_igs_bitswap->in_pb_callback().set_ioport("PLAYER2");
+	m_igs_bitswap->in_pc_callback().set_ioport("COINS");
+	m_igs_bitswap->out_pa_callback().set(FUNC(igs017_state::iqblocka_keyin_w));
+	m_igs_bitswap->set_val_xor(0x15d6);
+	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
+	m_igs_bitswap->set_m3_bits(0, ~5,  8, ~10, ~15);
+	m_igs_bitswap->set_m3_bits(1,  3, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(2,  2, ~6, ~11, ~15);
+	m_igs_bitswap->set_m3_bits(3,  0, ~1, ~3,  ~15);
 
-	MCFG_DEVICE_ADD("igs_incdec", IGS_INCDEC, 0)
+	IGS_INCDEC(config, m_igs_incdec, 0);
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3589,13 +3552,12 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3606,22 +3568,24 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(igs017_state::iqblockf)
+void igs017_state::iqblockf(machine_config &config)
+{
 	iqblocka(config);
-	MCFG_DEVICE_MODIFY("igs_bitswap") // tweaked protection bitswap
-	MCFG_IGS_BITSWAP_OUT_PORTB_CB(WRITE8(*this, igs017_state, iqblockf_keyout_w))
-	MCFG_IGS_BITSWAP_MF_BITS(0, 5, 9, 13)
-MACHINE_CONFIG_END
+	// tweaked protection bitswap
+	m_igs_bitswap->out_pb_callback().set(FUNC(igs017_state::iqblockf_keyout_w));
+	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
+}
 
-MACHINE_CONFIG_START(igs017_state::genius6)
+void igs017_state::genius6(machine_config &config)
+{
 	iqblockf(config);
-	MCFG_DEVICE_MODIFY("igs_bitswap") // tweaked protection bitswap
-	MCFG_IGS_BITSWAP_MF_BITS(2, 7, 9, 13)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~5,  6,  ~7, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS( 1, ~6,  ~9, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS( 4, ~8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS( 3, ~5,  ~6, ~15)
-MACHINE_CONFIG_END
+	// tweaked protection bitswap
+	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
+	m_igs_bitswap->set_m3_bits(0, ~5,  6,  ~7, ~15);
+	m_igs_bitswap->set_m3_bits(1,  1, ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits(2,  4, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(3,  3, ~5,  ~6, ~15);
+}
 
 MACHINE_CONFIG_START(igs017_state::starzan)
 	iqblocka(config);
@@ -3659,9 +3623,9 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, igs017_state, mgcs_keys_r))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("COINS");
+	ppi.in_pb_callback().set(FUNC(igs017_state::mgcs_keys_r));
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
@@ -3672,14 +3636,13 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, mgcs_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3698,16 +3661,16 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("COINS");
+	ppi.in_pb_callback().set_ioport("DSW1");
+	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3716,14 +3679,13 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3748,18 +3710,18 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,lhzb2a)
 
 	// i/o
-//  MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+//  I8255A(config, "ppi8255", 0);
 
 	// protection
-	MCFG_DEVICE_ADD("igs_bitswap", IGS_BITSWAP, 0)
-	MCFG_IGS_BITSWAP_VAL_XOR(0x289a)
-	MCFG_IGS_BITSWAP_MF_BITS(4, 7,  10, 13)
-	MCFG_IGS_BITSWAP_M3_0_BITS(~3,   8, ~12, ~15)
-	MCFG_IGS_BITSWAP_M3_1_BITS(~3,  ~6,  ~9, ~15)
-	MCFG_IGS_BITSWAP_M3_2_BITS(~3,   4,  ~5, ~15)
-	MCFG_IGS_BITSWAP_M3_3_BITS(~9, ~11,  12, ~15)
+	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	m_igs_bitswap->set_val_xor(0x289a);
+	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
+	m_igs_bitswap->set_m3_bits(0, ~3,   8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits(1, ~3,  ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits(2, ~3,   4,  ~5, ~15);
+	m_igs_bitswap->set_m3_bits(3, ~9, ~11,  12, ~15);
 
-	MCFG_DEVICE_ADD("igs_incdec", IGS_INCDEC, 0)
+	IGS_INCDEC(config, m_igs_incdec, 0);
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3768,14 +3730,13 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, lhzb2a_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3794,16 +3755,16 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("COINS");
+	ppi.in_pb_callback().set_ioport("DSW1");
+	ppi.in_pc_callback().set_ioport("DSW2");
 
 	// protection
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( igs017_state, igs025_to_igs022_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
 
-	MCFG_DEVICE_ADD("igs022", IGS022, 0)
+	IGS022(config, m_igs022, 0);
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3812,14 +3773,13 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, slqz2_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3838,9 +3798,9 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3849,13 +3809,12 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3885,8 +3844,8 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3895,13 +3854,12 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3921,10 +3879,10 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
+	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3933,14 +3891,13 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_PALETTE_SCRAMBLE_CB( igs017_state, tjsb_palette_bitswap )
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap), this);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -3963,10 +3920,10 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("DSW1");
+	ppi.in_pb_callback().set_ioport("DSW2");
+	ppi.in_pc_callback().set_ioport("DSW3");
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3975,13 +3932,12 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x100*2);
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_palette("palette");
 
 	// sound
 	SPEAKER(config, "mono").front_center();

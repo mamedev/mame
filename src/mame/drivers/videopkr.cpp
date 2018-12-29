@@ -313,7 +313,7 @@ public:
 		, m_aysnd(*this, "aysnd")
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
-		{ }
+	{ }
 
 	void babypkr(machine_config &config);
 	void videodad(machine_config &config);
@@ -340,10 +340,10 @@ private:
 	DECLARE_READ8_MEMBER(baby_sound_p1_r);
 	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(videopkr);
+	void videopkr_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(vidadcba);
-	DECLARE_PALETTE_INIT(babypkr);
-	DECLARE_PALETTE_INIT(fortune1);
+	void babypkr_palette(palette_device &palette) const;
+	void fortune1_palette(palette_device &palette) const;
 	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
 	void count_7dig(unsigned long data, uint8_t index);
@@ -436,97 +436,80 @@ void videopkr_state::count_7dig(unsigned long data, uint8_t index)
 	sprintf(strn,"%7lu",data);
 
 	for (i = 0; i < 7; i++)
-	{
 		m_digits[index+i] = dec_7seg((strn[6 - i] | 0x10) - 0x30);
-	}
 }
 
-PALETTE_INIT_MEMBER(videopkr_state, videopkr)
+void videopkr_state::videopkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int j;
-
-	for (j = 0; j < palette.entries(); j++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int r, g, b, tr, tg, tb, i;
+		int const i = BIT(color_prom[j], 3);
 
-		i = (color_prom[j] >> 3) & 0x01;
+		// red component
+		int const tr = 0xf0 - (0xf0 * BIT(color_prom[j], 0));
+		int const r = tr - (i * (tr / 5));
 
-		/* red component */
-		tr = 0xf0 - (0xf0 * ((color_prom[j] >> 0) & 0x01));
-		r = tr - (i * (tr / 5));
+		// green component
+		int const tg = 0xf0 - (0xf0 * BIT(color_prom[j], 1));
+		int const g = tg - (i * (tg / 5));
 
-		/* green component */
-		tg = 0xf0 - (0xf0 * ((color_prom[j] >> 1) & 0x01));
-		g = tg - (i * (tg / 5));
-
-		/* blue component */
-		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
-		b = tb - (i * (tb / 5));
+		// blue component
+		int const tb = 0xf0 - (0xf0 * BIT(color_prom[j], 2));
+		int const b = tb - (i * (tb / 5));
 
 		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(videopkr_state,babypkr)
+void videopkr_state::babypkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int j;
-
-	for (j = 0; j < palette.entries(); j++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int r, g, b, tr, tg, tb, i, top;
+		// intensity component
+		int const i = 0x2f * BIT(color_prom[j], 3);
+		int const top = 0xff - i;
 
-		top = 0xff;
+		// red component
+		int const tr = 0xdf * BIT(color_prom[j], 0);
+		int const r = top - ((tr * top) / 0x100 );
 
-		/* intense component */
-		i = 0x2f * ((color_prom[j] >> 3) & 0x01);
-		top = top - i;
+		// green component
+		int const tg = 0xdf * BIT(color_prom[j], 1);
+		int const g = top - ((tg * top) / 0x100 );
 
-		/* red component */
-		tr =  0xdf * ((color_prom[j] >> 0) & 0x01);
-		r = top - ((tr * top) / 0x100 );
-
-		/* green component */
-		tg =  0xdf * ((color_prom[j] >> 1) & 0x01);
-		g = top - ((tg * top) / 0x100 );
-
-		/* blue component */
-		tb =  0xdf * ((color_prom[j] >> 2) & 0x01);
-		b = top - ((tb * top) / 0x100);
+		// blue component
+		int const tb = 0xdf * BIT(color_prom[j], 2);
+		int const b = top - ((tb * top) / 0x100);
 
 		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(videopkr_state,fortune1)
+void videopkr_state::fortune1_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int j;
-
-	for (j = 0; j < palette.entries(); j++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int r, g, b, tr, tg, tb, i, c;
+		int const i = BIT(color_prom[j], 3);
 
-		i = (color_prom[j] >> 3) & 0x01;
+		// red component
+		int const tr = 0xf0 - (0xf0 * BIT(color_prom[j], 0));
+		int const r = tr - (i * (tr / 5));
 
-		/* red component */
-		tr = 0xf0 - (0xf0 * ((color_prom[j] >> 0) & 0x01));
-		r = tr - (i * (tr / 5));
+		// green component
+		int const tg = 0xf0 - (0xf0 * BIT(color_prom[j], 1));
+		int const g = tg - (i * (tg / 5));
 
-		/* green component */
-		tg = 0xf0 - (0xf0 * ((color_prom[j] >> 1) & 0x01));
-		g = tg - (i * (tg / 5));
+		// blue component
+		int const tb = 0xf0 - (0xf0 * BIT(color_prom[j], 2));
+		int const b = tb - (i * (tb / 5));
 
-		/* blue component */
-		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
-		b = tb - (i * (tb / 5));
-
-		c = j;
-
-		// Swap Position of Inner-most Colors on Each 4 Color Palette
+		// Swap position of Inner-most colors on each 4 color palette
+		int c = j;
 		if ((c % 4) == 1 || (c % 4) == 2)
-			c = ((int)(c / 4) * 4) + (3 - (c % 4));
+			c = (int(c / 4) * 4) + (3 - (c % 4));
 
 		palette.set_pen_color(c, rgb_t(r, g, b));
 	}
@@ -1240,43 +1223,39 @@ void videopkr_state::machine_start()
 MACHINE_CONFIG_START(videopkr_state::videopkr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8039, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
-	MCFG_DEVICE_IO_MAP(i8039_io_port)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, videopkr_state, videopkr_p1_data_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, videopkr_state, videopkr_p1_data_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, videopkr_p2_data_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, videopkr_p2_data_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, videopkr_state, prog_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, videopkr_state, videopkr_t0_latch))
+	i8039_device &maincpu(I8039(config, m_maincpu, CPU_CLOCK));
+	maincpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8039_map);
+	maincpu.set_addrmap(AS_IO, &videopkr_state::i8039_io_port);
+	maincpu.p1_in_cb().set(FUNC(videopkr_state::videopkr_p1_data_r));
+	maincpu.p1_out_cb().set(FUNC(videopkr_state::videopkr_p1_data_w));
+	maincpu.p2_in_cb().set(FUNC(videopkr_state::videopkr_p2_data_r));
+	maincpu.p2_out_cb().set(FUNC(videopkr_state::videopkr_p2_data_w));
+	maincpu.prog_out_cb().set(FUNC(videopkr_state::prog_w));
+	maincpu.t0_in_cb().set(FUNC(videopkr_state::videopkr_t0_latch));
+	maincpu.set_vblank_int("screen", FUNC(videopkr_state::irq0_line_assert));
 
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", videopkr_state,  irq0_line_assert)
+	i8039_device &soundcpu(I8039(config, m_soundcpu, SOUND_CLOCK));
+	soundcpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8039_sound_mem);
+	soundcpu.set_addrmap(AS_IO, &videopkr_state::i8039_sound_port);
+	soundcpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	soundcpu.p2_in_cb().set(FUNC(videopkr_state::sound_p2_r));
+	soundcpu.p2_out_cb().set(FUNC(videopkr_state::sound_p2_w));
 
-	MCFG_DEVICE_ADD("soundcpu", I8039, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(i8039_sound_mem)
-	MCFG_DEVICE_IO_MAP(i8039_sound_port)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(5*8, 31*8-1, 3*8, 29*8-1)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(2080)
 	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopkr)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(videopkr_state, videopkr)
+	PALETTE(config, "palette", FUNC(videopkr_state::videopkr_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1302,8 +1281,7 @@ MACHINE_CONFIG_START(videopkr_state::videodad)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
+	m_maincpu->set_clock(CPU_CLOCK_ALT);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1319,57 +1297,53 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
+	m_maincpu->set_clock(CPU_CLOCK_ALT);
+
 	/* most likely romless or eprom */
-	MCFG_DEVICE_REPLACE("soundcpu", I8031, CPU_CLOCK )
-	MCFG_DEVICE_PROGRAM_MAP(i8051_sound_mem)
-	MCFG_DEVICE_IO_MAP(i8051_sound_port)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, videopkr_state, baby_sound_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, videopkr_state, baby_sound_p1_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p3_w))
+	i8031_device &soundcpu(I8031(config.replace(), m_soundcpu, CPU_CLOCK));
+	soundcpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8051_sound_mem);
+	soundcpu.set_addrmap(AS_IO, &videopkr_state::i8051_sound_port);
+	soundcpu.port_in_cb<0>().set(FUNC(videopkr_state::baby_sound_p0_r));
+	soundcpu.port_out_cb<0>().set(FUNC(videopkr_state::baby_sound_p0_w));
+	soundcpu.port_in_cb<1>().set(FUNC(videopkr_state::baby_sound_p1_r));
+	soundcpu.port_out_cb<2>().set("dac", FUNC(dac_byte_interface::data_w));
+	soundcpu.port_out_cb<3>().set(FUNC(videopkr_state::baby_sound_p3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(5*16, 31*16-1, 3*8, 29*8-1)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(videopkr_state,babypkr)
+	subdevice<palette_device>("palette")->set_init(FUNC(videopkr_state::babypkr_palette));
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_aysnd, CPU_CLOCK / 6).add_route(ALL_OUTPUTS, "speaker", 0.3); /* no ports used */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(videopkr_state::fortune1)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
+	m_maincpu->set_clock(CPU_CLOCK_ALT);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
+	subdevice<palette_device>("palette")->set_init(FUNC(videopkr_state::fortune1_palette));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(videopkr_state::bpoker)
 	babypkr(config);
-	MCFG_DEVICE_REPLACE("maincpu", I8751, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(i8751_map)
-	MCFG_DEVICE_IO_MAP(i8751_io_port)
-	MCFG_MCS51_PORT_P0_IN_CB(CONSTANT(0)) // ???
-	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
-	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???
+	i8751_device &maincpu(I8751(config.replace(), m_maincpu, XTAL(6'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &videopkr_state::i8751_map);
+	maincpu.set_addrmap(AS_IO, &videopkr_state::i8751_io_port);
+	maincpu.port_in_cb<0>().set_constant(0); // ???
+	maincpu.port_in_cb<1>().set_constant(0); // ???
+	maincpu.port_out_cb<1>().set_nop(); // ???
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	//MCFG_I8255_OUT_PORTA_CB()
-	//MCFG_I8255_IN_PORTB_CB()
-	//MCFG_I8255_OUT_PORTC_CB()
-	//MCFG_I8255_IN_PORTC_CB()
+	I8255A(config, "ppi");
+	//ppi.out_pa_callback()
+	//ppi.in_pb_callback()
+	//ppi.out_pc_callback()
+	//ppi.in_pc_callback()
 MACHINE_CONFIG_END
 
 

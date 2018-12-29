@@ -6,31 +6,31 @@
 
     (reg) prefix ops (e8 to ef subtable)
 
-	(reg) implies one of the follow registers
+    (reg) implies one of the follow registers
 
     (8-bit mode operations)
-	E8  A
-	E9  W
-	EA  C
-	EB  B
-	EC  E
-	ED  D
-	EE  L
-	EF  H
+    E8  A
+    E9  W
+    EA  C
+    EB  B
+    EC  E
+    ED  D
+    EE  L
+    EF  H
 
-	(16-bit mode operations)
-    E8  invalid
-	E9  invalid
-	EA  invalid
-	EB  invalid
-	EC  WA
-	ED  BC
-	EE  DE
-	EF  HL
+    (16-bit mode operations)
+    E8  WA
+    E9  BC
+    EA  DE
+    EB  HL
+    EC  WA
+    ED  BC
+    EE  DE
+    EF  HL
 
-	(RETN operation - special)
-	E8  RETN
-	E9-EF invalid
+    (RETN operation - special)
+    E8  RETN
+    E9-EF invalid
 
 *************************************************************************************************************/
 
@@ -145,9 +145,9 @@ void tlcs870_device::do_RETN(const uint8_t opbyte0, const uint8_t opbyte1)
 	if (opbyte0 == 0xe8)
 	{
 		/*
-			Return from non-maskable interrupt service (how does this differ from RETI?)
-			OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-			RETN              1110 1000           0000 0100                        *  *  *  *    7
+		    Return from non-maskable interrupt service (how does this differ from RETI?)
+		    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
+		    RETN              1110 1000           0000 0100                        *  *  *  *    7
 		*/
 		m_cycles = 7;
 
@@ -169,7 +169,7 @@ void tlcs870_device::do_SWAP_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		SWAP g            1110 1ggg           0000 0001                        1  -  -  -    4
+	    SWAP g            1110 1ggg           0000 0001                        1  -  -  -    4
 	*/
 	m_cycles = 4;
 
@@ -181,7 +181,7 @@ void tlcs870_device::do_DAA_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		DAS g             1110 1ggg           0000 1010                        C  Z  C  H    3
+	    DAS g             1110 1ggg           0000 1010                        C  Z  C  H    3
 	*/
 	m_cycles = 3;
 
@@ -197,7 +197,7 @@ void tlcs870_device::do_DAS_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		DAS g             1110 1ggg           0000 1011                        C  Z  C  H    3
+	    DAS g             1110 1ggg           0000 1011                        C  Z  C  H    3
 	*/
 	m_cycles = 3;
 
@@ -212,9 +212,9 @@ void tlcs870_device::do_DAS_g(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_SHLC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
-		Logical Shift Left with Carry Flag
+	    Logical Shift Left with Carry Flag
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		SHLC g            1110 1ggg           0001 1100                        C  Z  *  -    2
+	    SHLC g            1110 1ggg           0001 1100                        C  Z  *  -    2
 	*/
 	m_cycles = 2;
 
@@ -228,9 +228,9 @@ void tlcs870_device::do_SHLC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_SHRC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
-		Logical Shift Right with Carry Flag
+	    Logical Shift Right with Carry Flag
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		SHRC g            1110 1ggg           0001 1101                        C  Z  *  -    2
+	    SHRC g            1110 1ggg           0001 1101                        C  Z  *  -    2
 	*/
 	m_cycles = 2;
 
@@ -244,9 +244,9 @@ void tlcs870_device::do_SHRC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_ROLC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
-		Rotate Left through Carry flag
+	    Rotate Left through Carry flag
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		ROLC g            1110 1ggg           0001 1110                        C  Z  *  -    2
+	    ROLC g            1110 1ggg           0001 1110                        C  Z  *  -    2
 	*/
 	m_cycles = 2;
 
@@ -261,9 +261,9 @@ void tlcs870_device::do_ROLC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 void tlcs870_device::do_RORC_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
-		Rotate Right through Carry flag
+	    Rotate Right through Carry flag
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		RORC g            1110 1ggg           0001 1111                        C  Z  *  -    2
+	    RORC g            1110 1ggg           0001 1111                        C  Z  *  -    2
 	*/
 	m_cycles = 2;
 
@@ -279,7 +279,7 @@ void tlcs870_device::do_LD_r_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD r, g           1110 1ggg           0101 1rrr                        1  Z  -  -    2
+	    LD r, g           1110 1ggg           0101 1rrr                        1  Z  -  -    2
 	*/
 	m_cycles = 2;
 
@@ -296,7 +296,7 @@ void tlcs870_device::do_XCH_r_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		XCG r, g          1110 1ggg           1010 1rrr                        1  Z  -  -    3
+	    XCG r, g          1110 1ggg           1010 1rrr                        1  Z  -  -    3
 	*/
 	m_cycles = 3;
 
@@ -320,14 +320,14 @@ void tlcs870_device::do_ALUOP_A_g(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		ADDC A, g         1110 1ggg           0110 0000                        C  Z  C  H    2
-		ADD A, g          1110 1ggg           0110 0001                        C  Z  C  H    2
-		SUBB A, g         1110 1ggg           0110 0010                        C  Z  C  H    2
-		SUB A, g          1110 1ggg           0110 0011                        C  Z  C  H    2
-		AND A, g          1110 1ggg           0110 0100                        Z  Z  -  -    2
-		XOR A, g          1110 1ggg           0110 0101                        Z  Z  -  -    2
-		OR A, g           1110 1ggg           0110 0110                        Z  Z  -  -    2
-		CMP A, g          1110 1ggg           0110 0111                        Z  Z  C  H    2
+	    ADDC A, g         1110 1ggg           0110 0000                        C  Z  C  H    2
+	    ADD A, g          1110 1ggg           0110 0001                        C  Z  C  H    2
+	    SUBB A, g         1110 1ggg           0110 0010                        C  Z  C  H    2
+	    SUB A, g          1110 1ggg           0110 0011                        C  Z  C  H    2
+	    AND A, g          1110 1ggg           0110 0100                        Z  Z  -  -    2
+	    XOR A, g          1110 1ggg           0110 0101                        Z  Z  -  -    2
+	    OR A, g           1110 1ggg           0110 0110                        Z  Z  -  -    2
+	    CMP A, g          1110 1ggg           0110 0111                        Z  Z  C  H    2
 	*/
 	m_cycles = 2;
 
@@ -345,14 +345,14 @@ void tlcs870_device::do_ALUOP_g_A(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		ADDC g, A         1110 1ggg           0110 1000                        C  Z  C  H    3
-		ADD g, A          1110 1ggg           0110 1001                        C  Z  C  H    3
-		SUBB g, A         1110 1ggg           0110 1010                        C  Z  C  H    3
-		SUB g, A          1110 1ggg           0110 1011                        C  Z  C  H    3
-		AND g, A          1110 1ggg           0110 1100                        Z  Z  -  -    3
-		XOR g, A          1110 1ggg           0110 1101                        Z  Z  -  -    3
-		OR g, A           1110 1ggg           0110 1110                        Z  Z  -  -    3
-		CMP g, A          1110 1ggg           0110 1111                        Z  Z  C  H    3
+	    ADDC g, A         1110 1ggg           0110 1000                        C  Z  C  H    3
+	    ADD g, A          1110 1ggg           0110 1001                        C  Z  C  H    3
+	    SUBB g, A         1110 1ggg           0110 1010                        C  Z  C  H    3
+	    SUB g, A          1110 1ggg           0110 1011                        C  Z  C  H    3
+	    AND g, A          1110 1ggg           0110 1100                        Z  Z  -  -    3
+	    XOR g, A          1110 1ggg           0110 1101                        Z  Z  -  -    3
+	    OR g, A           1110 1ggg           0110 1110                        Z  Z  -  -    3
+	    CMP g, A          1110 1ggg           0110 1111                        Z  Z  C  H    3
 	*/
 	m_cycles = 3;
 
@@ -369,14 +369,14 @@ void tlcs870_device::do_ALUOP_g_n(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		ADDC g, n         1110 1ggg           0111 0000 nnnn nnnn              C  Z  C  H    3
-		ADD g, n          1110 1ggg           0111 0001 nnnn nnnn              C  Z  C  H    3
-		SUBB g, n         1110 1ggg           0111 0010 nnnn nnnn              C  Z  C  H    3
-		SUB g, n          1110 1ggg           0111 0011 nnnn nnnn              C  Z  C  H    3
-		AND g, n          1110 1ggg           0111 0100 nnnn nnnn              Z  Z  -  -    3
-		XOR g, n          1110 1ggg           0111 0101 nnnn nnnn              Z  Z  -  -    3
-		OR g, n           1110 1ggg           0111 0110 nnnn nnnn              Z  Z  -  -    3
-		CMP g, n          1110 1ggg           0111 0111 nnnn nnnn              Z  Z  C  H    3
+	    ADDC g, n         1110 1ggg           0111 0000 nnnn nnnn              C  Z  C  H    3
+	    ADD g, n          1110 1ggg           0111 0001 nnnn nnnn              C  Z  C  H    3
+	    SUBB g, n         1110 1ggg           0111 0010 nnnn nnnn              C  Z  C  H    3
+	    SUB g, n          1110 1ggg           0111 0011 nnnn nnnn              C  Z  C  H    3
+	    AND g, n          1110 1ggg           0111 0100 nnnn nnnn              Z  Z  -  -    3
+	    XOR g, n          1110 1ggg           0111 0101 nnnn nnnn              Z  Z  -  -    3
+	    OR g, n           1110 1ggg           0111 0110 nnnn nnnn              Z  Z  -  -    3
+	    CMP g, n          1110 1ggg           0111 0111 nnnn nnnn              Z  Z  C  H    3
 	*/
 	m_cycles = 3;
 
@@ -400,14 +400,14 @@ void tlcs870_device::do_ALUOP_WA_gg(const uint8_t opbyte0, const uint8_t opbyte1
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		ADDC WA, gg       1110 10gg           0011 0000                        C  Z  C  U    4
-		ADD WA, gg        1110 10gg           0011 0001                        C  Z  C  U    4
-		SUBB WA, gg       1110 10gg           0011 0010                        C  Z  C  U    4
-		SUB WA, gg        1110 10gg           0011 0011                        C  Z  C  U    4
-		AND WA, gg        1110 10gg           0011 0100                        Z  Z  -  -    4
-		XOR WA, gg        1110 10gg           0011 0101                        Z  Z  -  -    4
-		OR WA, gg         1110 10gg           0011 0110                        Z  Z  -  -    4
-		CMP WA, gg        1110 10gg           0011 0111                        Z  Z  C  U    4
+	    ADDC WA, gg       1110 10gg           0011 0000                        C  Z  C  U    4
+	    ADD WA, gg        1110 10gg           0011 0001                        C  Z  C  U    4
+	    SUBB WA, gg       1110 10gg           0011 0010                        C  Z  C  U    4
+	    SUB WA, gg        1110 10gg           0011 0011                        C  Z  C  U    4
+	    AND WA, gg        1110 10gg           0011 0100                        Z  Z  -  -    4
+	    XOR WA, gg        1110 10gg           0011 0101                        Z  Z  -  -    4
+	    OR WA, gg         1110 10gg           0011 0110                        Z  Z  -  -    4
+	    CMP WA, gg        1110 10gg           0011 0111                        Z  Z  C  U    4
 	*/
 	m_cycles = 4;
 
@@ -426,14 +426,14 @@ void tlcs870_device::do_ALUOP_gg_mn(const uint8_t opbyte0, const uint8_t opbyte1
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		ADDC gg, mn       1110 10gg           0011 1000 nnnn nnnn mmmm mmmm    C  Z  C  U    4
-		ADD gg, mn        1110 10gg           0011 1001 nnnn nnnn mmmm mmmm    C  Z  C  U    4
-		SUBB gg, mn       1110 10gg           0011 1010 nnnn nnnn mmmm mmmm    C  Z  C  U    4
-		SUB gg, mn        1110 10gg           0011 1011 nnnn nnnn mmmm mmmm    C  Z  C  U    4
-		AND gg, mn        1110 10gg           0011 1100 nnnn nnnn mmmm mmmm    Z  Z  -  -    4
-		XOR gg, mn        1110 10gg           0011 1101 nnnn nnnn mmmm mmmm    Z  Z  -  -    4
-		OR gg, mn         1110 10gg           0011 1110 nnnn nnnn mmmm mmmm    Z  Z  -  -    4
-		CMP gg, mn        1110 10gg           0011 1111 nnnn nnnn mmmm mmmm    Z  Z  C  U    4
+	    ADDC gg, mn       1110 10gg           0011 1000 nnnn nnnn mmmm mmmm    C  Z  C  U    4
+	    ADD gg, mn        1110 10gg           0011 1001 nnnn nnnn mmmm mmmm    C  Z  C  U    4
+	    SUBB gg, mn       1110 10gg           0011 1010 nnnn nnnn mmmm mmmm    C  Z  C  U    4
+	    SUB gg, mn        1110 10gg           0011 1011 nnnn nnnn mmmm mmmm    C  Z  C  U    4
+	    AND gg, mn        1110 10gg           0011 1100 nnnn nnnn mmmm mmmm    Z  Z  -  -    4
+	    XOR gg, mn        1110 10gg           0011 1101 nnnn nnnn mmmm mmmm    Z  Z  -  -    4
+	    OR gg, mn         1110 10gg           0011 1110 nnnn nnnn mmmm mmmm    Z  Z  -  -    4
+	    CMP gg, mn        1110 10gg           0011 1111 nnnn nnnn mmmm mmmm    Z  Z  C  U    4
 	*/
 	m_cycles = 4;
 
@@ -459,8 +459,8 @@ void tlcs870_device::do_SET_inppbit(const uint8_t opbyte0, const uint8_t opbyte1
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		SET (DE).g        1110 1ggg           1000 0010                        Z  *  -  -    5
-		SET (HL).g        1110 1ggg           1000 0011                        Z  *  -  -    5
+	    SET (DE).g        1110 1ggg           1000 0010                        Z  *  -  -    5
+	    SET (HL).g        1110 1ggg           1000 0011                        Z  *  -  -    5
 	*/
 	m_cycles = 5;
 
@@ -489,14 +489,15 @@ void tlcs870_device::do_CLR_inppbit(const uint8_t opbyte0, const uint8_t opbyte1
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		CLR (DE).g        1110 1ggg           1000 1010                        Z  *  -  -    5
-		CLR (HL).g        1110 1ggg           1000 1011                        Z  *  -  -    5
+	    CLR (DE).g        1110 1ggg           1000 1010                        Z  *  -  -    5
+	    CLR (HL).g        1110 1ggg           1000 1011                        Z  *  -  -    5
 	*/
 	m_cycles = 5;
 
 	const uint8_t bitpos = get_reg8(opbyte0 & 7) & 0x7;
 	const uint8_t bitused = 1 << bitpos;
 	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(addr);
 
 	if (val & bitused) // Zero flag gets set based on original value of bit?
@@ -519,14 +520,15 @@ void tlcs870_device::do_CPL_inpp_indirectbit(const uint8_t opbyte0, const uint8_
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		CPL (DE).g        1110 1ggg           1001 0010                        Z  *  -  -    5
-		CPL (HL).g        1110 1ggg           1001 0011                        Z  *  -  -    5
+	    CPL (DE).g        1110 1ggg           1001 0010                        Z  *  -  -    5
+	    CPL (HL).g        1110 1ggg           1001 0011                        Z  *  -  -    5
 	*/
 	m_cycles = 5;
 
 	const uint8_t bitpos = get_reg8(opbyte0 & 7) & 0x7;
 	const uint8_t bitused = 1 << bitpos;
 	const uint16_t addr = get_reg16((opbyte1 & 1) + 2); // DE or HL
+	m_read_input_port = 0; // reads output latch, not actual ports if accessing memory mapped ports
 	uint8_t val = RM8(addr);
 
 	uint8_t bit = val & bitused;
@@ -553,8 +555,8 @@ void tlcs870_device::do_LD_inpp_indirectbit_CF(const uint8_t opbyte0, const uint
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD (DE).g, CF     1110 1ggg           1001 1010                        1  -  -  -    5
-		LD (HL).g, CF     1110 1ggg           1001 1011                        1  -  -  -    5
+	    LD (DE).g, CF     1110 1ggg           1001 1010                        1  -  -  -    5
+	    LD (HL).g, CF     1110 1ggg           1001 1011                        1  -  -  -    5
 	*/
 	m_cycles = 5;
 
@@ -583,10 +585,10 @@ void tlcs870_device::do_LD_CF_inpp_indirectbit(const uint8_t opbyte0, const uint
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD CF, (DE).g     1110 1ggg           1001 1110                        ~C -  *  -    4
-		LD CF, (HL).g     1110 1ggg           1001 1111                        ~C -  *  -    4
+	    LD CF, (DE).g     1110 1ggg           1001 1110                        ~C -  *  -    4
+	    LD CF, (HL).g     1110 1ggg           1001 1111                        ~C -  *  -    4
 
-		aka aka TEST (pp).g
+	    aka aka TEST (pp).g
 	*/
 	m_cycles = 4;
 
@@ -608,7 +610,7 @@ void tlcs870_device::do_SET_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		SET g.b           1110 1ggg           0100 0bbb                        Z  *  -  -    3
+	    SET g.b           1110 1ggg           0100 0bbb                        Z  *  -  -    3
 	*/
 	m_cycles = 3;
 
@@ -637,7 +639,7 @@ void tlcs870_device::do_CLR_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		CLR g.b           1110 1ggg           0100 1bbb                        Z  *  -  -    3
+	    CLR g.b           1110 1ggg           0100 1bbb                        Z  *  -  -    3
 	*/
 	m_cycles = 3;
 
@@ -666,7 +668,7 @@ void tlcs870_device::do_CPL_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		CPL g.b           1110 1ggg           1100 0bbb                        Z  *  -  -    3
+	    CPL g.b           1110 1ggg           1100 0bbb                        Z  *  -  -    3
 	*/
 	m_cycles = 3;
 
@@ -699,7 +701,7 @@ void tlcs870_device::do_LD_gbit_CF(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD g.b, CF        1110 1ggg           1100 1bbb                        1  -  -  -    2
+	    LD g.b, CF        1110 1ggg           1100 1bbb                        1  -  -  -    2
 	*/
 	m_cycles = 2;
 
@@ -728,7 +730,7 @@ void tlcs870_device::do_XOR_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		XOR CF, g.b       1110 1ggg           1101 0bbb                        ~C -  *  -    2
+	    XOR CF, g.b       1110 1ggg           1101 0bbb                        ~C -  *  -    2
 	*/
 	m_cycles = 2;
 
@@ -774,9 +776,9 @@ void tlcs870_device::do_LD_CF_gbit(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD CF, g.b        1110 1ggg           1101 1bbb                        ~C -  *  -    2
+	    LD CF, g.b        1110 1ggg           1101 1bbb                        ~C -  *  -    2
 
-		aka TEST g.b
+	    aka TEST g.b
 	*/
 	m_cycles = 2;
 
@@ -800,12 +802,12 @@ void tlcs870_device::do_MUL_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		MUL W, A          not listed (redundant encoding?)                     ?  ?  ?  ?    ?
-		MUL B, C          1110 1010           0000 0010                        Z  Z  -  -    8
-		MUL D, E          1110 1010           0000 0010                        Z  Z  -  -    8
-		MUL H, L          1110 1011           0000 0010                        Z  Z  -  -    8
+	    MUL W, A          not listed (redundant encoding?)                     ?  ?  ?  ?    ?
+	    MUL B, C          1110 1010           0000 0010                        Z  Z  -  -    8
+	    MUL D, E          1110 1010           0000 0010                        Z  Z  -  -    8
+	    MUL H, L          1110 1011           0000 0010                        Z  Z  -  -    8
 
-		aka MUL ggH, ggL (odd syntax, basically MUL gg)
+	    aka MUL ggH, ggL (odd syntax, basically MUL gg)
 	*/
 	m_cycles = 8;
 
@@ -817,10 +819,10 @@ void tlcs870_device::do_DIV_gg_C(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		DIV WA, C         not listed (redundant encoding?)                     ?  ?  ?  ?    ?
-		DIV BC, C         not listed (illegal?)                                ?  ?  ?  ?    ?
-		DIV DE, C         1110 1010           0000 0011                        Z  Z  C  -    8
-		DIV HL, C         1110 1011           0000 0011                        Z  Z  C  -    8
+	    DIV WA, C         not listed (redundant encoding?)                     ?  ?  ?  ?    ?
+	    DIV BC, C         not listed (illegal?)                                ?  ?  ?  ?    ?
+	    DIV DE, C         1110 1010           0000 0011                        Z  Z  C  -    8
+	    DIV HL, C         1110 1011           0000 0011                        Z  Z  C  -    8
 	*/
 	m_cycles = 8;
 
@@ -832,7 +834,7 @@ void tlcs870_device::do_POP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		POP gg            1110 10gg           0000 0110                        -  -  -  -    5
+	    POP gg            1110 10gg           0000 0110                        -  -  -  -    5
 	*/
 	m_cycles = 5;
 
@@ -846,7 +848,7 @@ void tlcs870_device::do_PUSH_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		PUSH gg           1110 10gg           0000 0111                        -  -  -  -    4
+	    PUSH gg           1110 10gg           0000 0111                        -  -  -  -    4
 	*/
 	m_cycles = 4;
 
@@ -861,7 +863,7 @@ void tlcs870_device::do_LD_SP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD SP, gg         1110 10gg           1111 1010                        1  -  -  -    3
+	    LD SP, gg         1110 10gg           1111 1010                        1  -  -  -    3
 	*/
 	m_cycles = 3;
 
@@ -873,7 +875,7 @@ void tlcs870_device::do_LD_gg_SP(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD gg, SP         1110 10gg           1111 1011                        1  -  -  -    3
+	    LD gg, SP         1110 10gg           1111 1011                        1  -  -  -    3
 	*/
 	m_cycles = 3;
 
@@ -885,7 +887,7 @@ void tlcs870_device::do_LD_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		LD rr, gg         1110 10gg           0001 00rr                        1  -  -  -    2
+	    LD rr, gg         1110 10gg           0001 00rr                        1  -  -  -    2
 	*/
 	m_cycles = 2;
 
@@ -900,7 +902,7 @@ void tlcs870_device::do_XCH_rr_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		XCH rr, gg        1110 10gg           0001 01rr                        1  -  -  -    3
+	    XCH rr, gg        1110 10gg           0001 01rr                        1  -  -  -    3
 	*/
 	m_cycles = 3;
 
@@ -918,7 +920,7 @@ void tlcs870_device::do_CALL_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		CALL gg           1110 10gg           1111 1100                        -  -  -  -    6
+	    CALL gg           1110 10gg           1111 1100                        -  -  -  -    6
 	*/
 	m_cycles = 6;
 
@@ -936,7 +938,7 @@ void tlcs870_device::do_JP_gg(const uint8_t opbyte0, const uint8_t opbyte1)
 {
 	/*
 	    OP                (opbyte0) (immval0) (opbyte1) (immval1) (immval2)    JF ZF CF HF   cycles
-		JP gg             1110 10gg           1111 1110                        1  -  -  -    3
+	    JP gg             1110 10gg           1111 1110                        1  -  -  -    3
 	*/
 	m_cycles = 3;
 

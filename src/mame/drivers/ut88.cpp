@@ -202,9 +202,9 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 28*8-1)
 	MCFG_VIDEO_START_OVERRIDE(ut88_state,ut88)
 	MCFG_SCREEN_UPDATE_DRIVER(ut88_state, screen_update_ut88)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ut88)
 
 	/* audio hardware */
@@ -216,10 +216,10 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ut88_state, ut88_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ut88_state, ut88_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ut88_state, ut88_8255_portc_r))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(ut88_state::ut88_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(ut88_state::ut88_8255_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(ut88_state::ut88_8255_portc_r));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rku_cassette_formats)

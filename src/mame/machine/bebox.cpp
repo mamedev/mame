@@ -183,7 +183,7 @@ READ64_MEMBER(bebox_state::bebox_crossproc_interrupts_r )
 	result = m_crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
-	if (&space != &m_ppc1->space(AS_PROGRAM))
+	if (&space != &m_ppc[0]->space(AS_PROGRAM))
 		result |= 0x02000000;
 	else
 		result &= ~0x02000000;
@@ -208,7 +208,6 @@ WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
 	};
 	int i, line;
 	uint32_t old_crossproc_interrupts = m_crossproc_interrupts;
-	cpu_device *cpus[] = { m_ppc1, m_ppc2 };
 
 	bebox_mbreg32_w(&m_crossproc_interrupts, data, mem_mask);
 
@@ -230,7 +229,7 @@ WRITE64_MEMBER(bebox_state::bebox_crossproc_interrupts_w )
                     */
 			}
 
-			cpus[crossproc_map[i].cpunum]->set_input_line(crossproc_map[i].inputline, line);
+			m_ppc[crossproc_map[i].cpunum]->set_input_line(crossproc_map[i].inputline, line);
 		}
 	}
 }
@@ -241,7 +240,7 @@ WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 
 	if (b & 0x20)
 	{
-		m_ppc2->set_input_line(INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		m_ppc[1]->set_input_line(INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -249,7 +248,6 @@ WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 void bebox_state::bebox_update_interrupts()
 {
 	uint32_t interrupt;
-	cpu_device *cpus[] = { m_ppc1, m_ppc2 };
 
 	for (int cpunum = 0; cpunum < 2; cpunum++)
 	{
@@ -261,7 +259,7 @@ void bebox_state::bebox_update_interrupts()
 				m_interrupts, m_cpu_imask[cpunum], interrupt ? "on" : "off");
 		}
 
-		cpus[cpunum]->set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		m_ppc[cpunum]->set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -311,8 +309,8 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != nullptr), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) m_ppc1->pc(),
-			(unsigned) m_ppc2->pc(),
+			(unsigned) m_ppc[0]->pc(),
+			(unsigned) m_ppc[1]->pc(),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
@@ -337,7 +335,7 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 WRITE_LINE_MEMBER( bebox_state::fdc_interrupt )
 {
 	bebox_set_irq_bit(13, state);
-	m_pic8259_1->ir6_w(state);
+	m_pic8259[0]->ir6_w(state);
 }
 
 /*************************************
@@ -349,7 +347,7 @@ WRITE_LINE_MEMBER( bebox_state::fdc_interrupt )
 READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 {
 	uint32_t result;
-	result = m_pic8259_1->acknowledge();
+	result = m_pic8259[0]->acknowledge();
 	bebox_set_irq_bit(5, 0);   /* HACK */
 	return ((uint64_t) result) << 56;
 }
@@ -368,12 +366,12 @@ WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_master_set_int_line)
 
 WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
 {
-	m_pic8259_1->ir2_w(state);
+	m_pic8259[0]->ir2_w(state);
 }
 
 READ8_MEMBER(bebox_state::get_slave_ack)
 {
-	return m_pic8259_2->acknowledge();
+	return m_pic8259[1]->acknowledge();
 }
 
 
@@ -386,7 +384,7 @@ READ8_MEMBER(bebox_state::get_slave_ack)
 WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
 {
 	bebox_set_irq_bit(7, state);
-	m_pic8259_1->ir6_w(state);
+	m_pic8259[0]->ir6_w(state);
 }
 
 
@@ -530,16 +528,16 @@ READ8_MEMBER(bebox_state::bebox_80000480_r)
 
 WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 {
-	m_ppc1->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_ppc[0]->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	m_dma8237_1->hack_w( state );
+	m_dma8237[0]->hack_w( state );
 }
 
 
 READ8_MEMBER(bebox_state::bebox_dma_read_byte )
 {
-	address_space& prog_space = m_ppc1->space(AS_PROGRAM); // get the right address space
+	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	return prog_space.read_byte(page_offset + offset);
@@ -548,7 +546,7 @@ READ8_MEMBER(bebox_state::bebox_dma_read_byte )
 
 WRITE8_MEMBER(bebox_state::bebox_dma_write_byte )
 {
-	address_space& prog_space = m_ppc1->space(AS_PROGRAM); // get the right address space
+	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x7FFF0000;
 	prog_space.write_byte(page_offset + offset, data);
@@ -588,7 +586,7 @@ WRITE_LINE_MEMBER(bebox_state::pc_dack3_w){ set_dma_channel(machine(), 3, state)
 
 WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
 {
-	m_pic8259_1->ir0_w(state);
+	m_pic8259[0]->ir0_w(state);
 }
 
 
@@ -732,7 +730,7 @@ void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, 
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
 					if (m_scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						address_space &space = m_ppc1->space(AS_PROGRAM);
+						address_space &space = m_ppc[0]->space(AS_PROGRAM);
 
 						addr = (m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						space.install_readwrite_handler(addr, addr + 0xFF, read64_delegate(FUNC(bebox_state::scsi53c810_r),this), write64_delegate(FUNC(bebox_state::scsi53c810_w),this));
@@ -767,8 +765,8 @@ void bebox_state::machine_reset()
 {
 	timer_set(attotime::zero, TIMER_GET_DEVICES);
 
-	m_ppc1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	m_ppc2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_ppc[0]->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_ppc[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Endianness? Bah!
 	memcpy(m_flash->base(),memregion("user1")->base(),0x200000);
@@ -780,8 +778,8 @@ void bebox_state::machine_start()
 
 void bebox_state::init_bebox()
 {
-	address_space &space_0 = m_ppc1->space(AS_PROGRAM);
-	address_space &space_1 = m_ppc2->space(AS_PROGRAM);
+	address_space &space_0 = m_ppc[0]->space(AS_PROGRAM);
+	address_space &space_1 = m_ppc[1]->space(AS_PROGRAM);
 
 	/* set up boot and flash ROM */
 	membank("bank2")->set_base(memregion("user2")->base());

@@ -483,12 +483,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(vigilant_state::vigilant)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(vigilant_map)
 	MCFG_DEVICE_IO_MAP(vigilant_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("soundcpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
@@ -511,18 +511,18 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579645)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "lspeaker", 0.55);
+	ymsnd.add_route(1, "rspeaker", 0.55);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -561,9 +561,9 @@ MACHINE_CONFIG_START(vigilant_state::buccanrs)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
@@ -598,12 +598,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vigilant_state::kikcubic)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(kikcubic_map)
 	MCFG_DEVICE_IO_MAP(kikcubic_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
+	MCFG_DEVICE_ADD("soundcpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
@@ -626,18 +626,18 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579645)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "lspeaker", 0.55);
+	ymsnd.add_route(1, "rspeaker", 0.55);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

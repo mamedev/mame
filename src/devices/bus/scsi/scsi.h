@@ -98,7 +98,7 @@ class scsi_port_device : public device_t
 
 public:
 	// construction/destruction
-	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_bsy_handler(Object &&cb) { return m_bsy_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_sel_handler(Object &&cb) { return m_sel_handler.set_callback(std::forward<Object>(cb)); }
@@ -148,6 +148,8 @@ public:
 		data7_handler().set(tag, FUNC(input_buffer_device::write_bit7));
 	}
 
+	void set_output_latch(output_latch_device &latch);
+
 	DECLARE_WRITE_LINE_MEMBER( write_bsy );
 	DECLARE_WRITE_LINE_MEMBER( write_sel );
 	DECLARE_WRITE_LINE_MEMBER( write_cd );
@@ -165,6 +167,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_data5 );
 	DECLARE_WRITE_LINE_MEMBER( write_data6 );
 	DECLARE_WRITE_LINE_MEMBER( write_data7 );
+
+	scsi_port_slot_device &slot(int index);
+	void set_slot_device(int index, const char *option, const device_type &type, const input_device_default *id);
 
 protected:
 	// device-level overrides
@@ -208,7 +213,7 @@ private:
 	devcb_write_line m_data6_handler;
 	devcb_write_line m_data7_handler;
 
-	scsi_port_slot_device *m_slot[7];
+	optional_device_array<scsi_port_slot_device, 7> m_slot;
 	int m_device_count;
 
 	int m_bsy_in;
@@ -258,7 +263,7 @@ class scsi_port_slot_device : public device_t,
 	friend class scsi_port_interface;
 
 public:
-	scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	scsi_port_interface *dev() { return m_dev; }
 	scsi_port_device *port() { return m_port; }

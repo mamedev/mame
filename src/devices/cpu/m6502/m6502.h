@@ -4,18 +4,12 @@
 
     m6502.h
 
-    Mostek 6502, original NMOS variant
+    MOS Technology 6502, original NMOS variant
 
 ***************************************************************************/
 
 #ifndef MAME_CPU_M6502_M6502_H
 #define MAME_CPU_M6502_M6502_H
-
-#define MCFG_M6502_DISABLE_CACHE() \
-	downcast<m6502_device *>(device)->disable_cache();
-
-#define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
 
 class m6502_device : public cpu_device {
 public:
@@ -31,7 +25,7 @@ public:
 	bool get_sync() const { return sync; }
 	void disable_cache() { cache_disabled = true; }
 
-	template<class Object> devcb_base &set_sync_callback(Object &&cb) { return sync_w.set_callback(std::forward<Object>(cb)); }
+	auto sync_cb() { return sync_w.bind(); }
 
 	devcb_write_line sync_w;
 
@@ -126,7 +120,7 @@ protected:
 
 	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
-	int icount;
+	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
 	bool irq_taken, sync, cache_disabled, inhibit_interrupts;
 
@@ -269,6 +263,18 @@ protected:
 	O(kil_non);
 
 #undef O
+};
+
+class m6502_mcu_device : public m6502_device {
+protected:
+	m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	void internal_update() { internal_update(total_cycles()); }
+	virtual void internal_update(uint64_t current_time) = 0;
+	void recompute_bcount(uint64_t event_time);
+	static void add_event(uint64_t &event_time, uint64_t new_event);
+
+	virtual void execute_run() override;
 };
 
 enum {

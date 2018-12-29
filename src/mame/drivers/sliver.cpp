@@ -111,7 +111,7 @@ private:
 	int m_tmp_counter;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8051_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -523,10 +523,10 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("obj_actel", sliver_state, obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
-	MCFG_DEVICE_ADD("audiocpu", I8051, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
-	MCFG_DEVICE_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sliver_state, oki_setbank))
+	I8051(config, m_audiocpu, 8000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sliver_state::soundmem_prg);
+	m_audiocpu->set_addrmap(AS_IO, &sliver_state::soundmem_io);
+	m_audiocpu->port_out_cb<1>().set(FUNC(sliver_state::oki_setbank));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -536,13 +536,13 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)

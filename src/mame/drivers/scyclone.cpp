@@ -607,68 +607,65 @@ INTERRUPT_GEN_MEMBER(scyclone_state::irq)
 }
 
 
-MACHINE_CONFIG_START(scyclone_state::scyclone)
-
+void scyclone_state::scyclone(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000/2) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference
-	MCFG_DEVICE_PROGRAM_MAP(scyclone_map)
-	MCFG_DEVICE_IO_MAP(scyclone_iomap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scyclone_state, irq)
+	Z80(config, m_maincpu, 5000000/2); // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference
+	m_maincpu->set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_map);
+	m_maincpu->set_addrmap(AS_IO, &scyclone_state::scyclone_iomap);
+	m_maincpu->set_vblank_int("screen", FUNC(scyclone_state::irq));
 
 	// sound ?
-	MCFG_DEVICE_ADD("subcpu", Z80, 5000000/2) // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
-	MCFG_DEVICE_PROGRAM_MAP(scyclone_sub_map)
-	MCFG_DEVICE_IO_MAP(scyclone_sub_iomap)
+	z80_device &subcpu(Z80(config, "subcpu", 5000000/2)); // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
+	subcpu.set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_sub_map);
+	subcpu.set_addrmap(AS_IO, &scyclone_state::scyclone_sub_iomap);
 	// no idea, but it does wait on an irq in places, irq0 increases a register checked in the wait loop so without it sound dies after a while
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(scyclone_state, irq0_line_hold, 400*60)
+	subcpu.set_periodic_int(FUNC(scyclone_state::irq0_line_hold), attotime::from_hz(400*60));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scyclone_state, screen_update_scyclone)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // due to hw collisions
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-32-1);
+	screen.set_screen_update(FUNC(scyclone_state::screen_update_scyclone));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE); // due to hw collisions
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scyclone)
-	MCFG_PALETTE_ADD("palette", 8 + 4*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scyclone);
+	PALETTE(config, m_palette).set_entries(8 + 4*4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("snsnd0", SN76477)
-	MCFG_SN76477_ENABLE(1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	sn76477_device &snsnd0(SN76477(config, "snsnd0"));
+	snsnd0.set_enable(1);
+	snsnd0.add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	MCFG_DEVICE_ADD("snsnd1", SN76477)
-	MCFG_SN76477_ENABLE(1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	sn76477_device &snsnd1(SN76477(config, "snsnd1"));
+	snsnd1.set_enable(1);
+	snsnd1.add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	// this is just taken from route16.cpp
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
-	MCFG_DEVICE_ADD("vref2", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-
-MACHINE_CONFIG_END
+	voltage_regulator_device &vref2(VOLTAGE_REGULATOR(config, "vref2", 0));
+	vref2.set_output(5.0);
+	vref2.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
+	vref2.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 ROM_START( scyclone )
 	ROM_REGION( 0x3000, "maincpu", 0 )

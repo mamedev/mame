@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -13,14 +13,14 @@
 
 namespace bx
 {
-	void xchg(void* _a, void* _b, size_t _numBytes)
+	void swap(void* _a, void* _b, size_t _numBytes)
 	{
 		uint8_t* lhs = (uint8_t*)_a;
 		uint8_t* rhs = (uint8_t*)_b;
 		const uint8_t* end = rhs + _numBytes;
 		while (rhs != end)
 		{
-			xchg(*lhs++, *rhs++);
+			swap(*lhs++, *rhs++);
 		}
 	}
 

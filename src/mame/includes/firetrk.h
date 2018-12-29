@@ -5,6 +5,10 @@
 Atari Fire Truck + Super Bug + Monte Carlo driver
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_FIRETRK_H
+#define MAME_INCLUDES_FIRETRK_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -60,7 +64,7 @@ public:
 		, m_bit_6(*this, "BIT_6")
 		, m_bit_7(*this, "BIT_7")
 		, m_dips(*this, {"DIP_0", "DIP_1"})
-		, m_steer(*this, {"STEER_1", "STEER_2"})
+		, m_steer(*this, "STEER_%u", 1U)
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -97,10 +101,10 @@ private:
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info2);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info2);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info2);
-	DECLARE_PALETTE_INIT(firetrk);
+	void firetrk_palette(palette_device &palette);
 	DECLARE_VIDEO_START(superbug);
 	DECLARE_VIDEO_START(montecar);
-	DECLARE_PALETTE_INIT(montecar);
+	void montecar_palette(palette_device &palette);
 	uint32_t screen_update_firetrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -173,3 +177,5 @@ private:
 DISCRETE_SOUND_EXTERN( firetrk_discrete );
 DISCRETE_SOUND_EXTERN( superbug_discrete );
 DISCRETE_SOUND_EXTERN( montecar_discrete );
+
+#endif // MAME_INCLUDES_FIRETRK_H

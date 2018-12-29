@@ -31,8 +31,8 @@ TODO:
 class horse_state : public driver_device
 {
 public:
-	horse_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	horse_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_inp_matrix(*this, "IN.%u", 0),
@@ -199,10 +199,10 @@ MACHINE_CONFIG_START(horse_state::horse)
 	MCFG_DEVICE_PROGRAM_MAP(horse_map)
 	MCFG_DEVICE_IO_MAP(horse_io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 4) // port A input, B output, C output but unused
-	MCFG_I8155_IN_PORTA_CB(READ8(*this, horse_state, input_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, horse_state, output_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("speaker", speaker_sound_device, level_w))
+	i8155_device &i8155(I8155(config, "i8155", XTAL(12'000'000) / 4)); // port A input, B output, C output but unused
+	i8155.in_pa_callback().set(FUNC(horse_state::input_r));
+	i8155.out_pb_callback().set(FUNC(horse_state::output_w));
+	i8155.out_to_callback().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(horse_state::horse)
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

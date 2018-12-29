@@ -1236,18 +1236,17 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mrokumei)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrokumei)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrokumei);
+	PALETTE(config, m_palette, FUNC(homedata_state::mrokumei_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1291,22 +1290,21 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_reikaids)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_reikaids);
+	PALETTE(config, m_palette, FUNC(homedata_state::reikaids_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
+	YM2203(config, m_ymsnd, 3000000);
+	m_ymsnd->port_a_read_callback().set_ioport("DSW1");
+	m_ymsnd->port_b_read_callback().set_ioport("DSW2");
+	m_ymsnd->add_route(0, "speaker", 0.25);
+	m_ymsnd->add_route(1, "speaker", 0.25);
+	m_ymsnd->add_route(2, "speaker", 0.25);
+	m_ymsnd->add_route(3, "speaker", 1.0);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1349,10 +1347,9 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pteacher)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pteacher);
+	PALETTE(config, m_palette, FUNC(homedata_state::pteacher_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
@@ -1516,22 +1513,21 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mirderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirderby)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirderby);
+	PALETTE(config, m_palette, FUNC(homedata_state::mirderby_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000)
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
+	YM2203(config, m_ymsnd, 2000000);
+	m_ymsnd->add_route(0, "speaker", 0.25);
+	m_ymsnd->add_route(1, "speaker", 0.25);
+	m_ymsnd->add_route(2, "speaker", 0.25);
+	m_ymsnd->add_route(3, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 /**************************************************************************/

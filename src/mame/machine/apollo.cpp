@@ -722,7 +722,7 @@ void apollo_sio::device_reset()
 	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( apollo_sio::read )
+uint8_t apollo_sio::read(offs_t offset)
 {
 	static int last_read8_offset[2] = { -1, -1 };
 	static int last_read8_value[2] = { -1, -1 };
@@ -732,7 +732,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = duart_base_device::read(space, offset/2, mem_mask);
+	int data = duart_base_device::read(offset/2);
 
 	switch (offset / 2)
 	{
@@ -766,7 +766,7 @@ READ8_MEMBER( apollo_sio::read )
 	return data;
 }
 
-WRITE8_MEMBER( apollo_sio::write )
+void apollo_sio::write(offs_t offset, uint8_t data)
 {
 	static const char * const duart68681_reg_write_names[0x10] = { "MRA",
 			"CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB",
@@ -788,7 +788,7 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	duart_base_device::write(space, offset/2, data, mem_mask);
+	duart_base_device::write(offset/2, data);
 }
 
 // device type definition
@@ -853,7 +853,8 @@ DEFINE_DEVICE_TYPE(APOLLO_NI, apollo_ni, "node_id", "Apollo Node ID")
 
 apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_NI, tag, owner, clock),
-	device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this),
+	m_wdc(*this, ":isa1:wdc")
 {
 }
 
@@ -1012,19 +1013,18 @@ void apollo_ni::call_unload()
 
 void apollo_ni::set_node_id_from_disk()
 {
-	omti8621_apollo_device *omti8621 = machine().device<omti8621_apollo_device>("isa1:wdc");
 	uint8_t db[0x50];
 
 	// check label of physical volume and get sector data of logical volume 1
 	// Note: sector data starts with 32 byte block header
 	// set node ID from UID of logical volume 1 of logical unit 0
-	if (omti8621
-			&& omti8621->get_sector(0, db, sizeof(db), 0) == sizeof(db)
+	if (m_wdc
+			&& m_wdc->get_sector(0, db, sizeof(db), 0) == sizeof(db)
 			&& memcmp(db + 0x22, "APOLLO", 6) == 0)
 	{
 		uint16_t sector1 = apollo_is_dn5500() ? 4 : 1;
 
-		if (omti8621->get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
+		if (m_wdc->get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
 		{
 			// set node_id from UID of logical volume 1 of logical unit 0
 			m_node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
@@ -1093,46 +1093,48 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_pic8259_slave->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_slave_set_int_line));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, apollo_state, apollo_ptm_irq_function))
+	PTM6840(config, m_ptm, 0);
+	m_ptm->set_external_clocks(250000, 125000, 62500);
+	m_ptm->irq_callback().set(FUNC(apollo_state::apollo_ptm_irq_function));
+
 	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
 
-	MCFG_DEVICE_ADD(APOLLO_RTC_TAG, MC146818, 32.768_kHz_XTAL)
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	// FIXME: is this interrupt really only connected on DN3000?
-	//MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
-	MCFG_MC146818_UTC(true)
-	MCFG_MC146818_BINARY(false)
-	MCFG_MC146818_24_12(false)
-	MCFG_MC146818_EPOCH(0)
+	//m_rtc->irq().set(FUNC(apollo_state::apollo_rtc_irq_function));
+	m_rtc->set_use_utc(true);
+	m_rtc->set_binary(false);
+	m_rtc->set_24hrs(false);
+	m_rtc->set_epoch(0);
 
-	MCFG_APOLLO_NI_ADD(APOLLO_NI_TAG, 0)
+	APOLLO_NI(config, m_node_id, 0);
 
-	MCFG_APOLLO_SIO_ADD(APOLLO_SIO2_TAG, 3.6864_MHz_XTAL)
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio2_irq_handler))
+	APOLLO_SIO(config, m_sio2, 3.6864_MHz_XTAL);
+	m_sio2->irq_cb().set(FUNC(apollo_state::sio2_irq_handler));
 
-	MCFG_DEVICE_ADD(APOLLO_ISA_TAG, ISA16, 0)
-	MCFG_ISA16_CPU(MAINCPU)
-	MCFG_ISA16_BUS_CUSTOM_SPACES()
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(APOLLO_PIC1_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_IRQ10_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ11_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ12_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ14_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ15_CB(WRITELINE(APOLLO_PIC2_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ0_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(APOLLO_DMA1_TAG, am9517a_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(WRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ6_CB(WRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ7_CB(WRITELINE(APOLLO_DMA2_TAG, am9517a_device, dreq3_w))
+	ISA16(config, m_isa, 0);
+	m_isa->set_cputag(MAINCPU);
+	m_isa->set_custom_spaces();
+	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
+	m_isa->irq3_callback().set(m_pic8259_master, FUNC(pic8259_device::ir3_w));
+	m_isa->irq4_callback().set(m_pic8259_master, FUNC(pic8259_device::ir4_w));
+	m_isa->irq5_callback().set(m_pic8259_master, FUNC(pic8259_device::ir5_w));
+	m_isa->irq6_callback().set(m_pic8259_master, FUNC(pic8259_device::ir6_w));
+	m_isa->irq7_callback().set(m_pic8259_master, FUNC(pic8259_device::ir7_w));
+	m_isa->irq10_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w));
+	m_isa->irq11_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir3_w));
+	m_isa->irq12_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir4_w));
+	m_isa->irq14_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir6_w));
+	m_isa->irq15_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir7_w));
+	m_isa->drq0_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq0_w));
+	m_isa->drq1_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq1_w));
+	m_isa->drq2_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq2_w));
+	m_isa->drq3_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq3_w));
+	m_isa->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
+	m_isa->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
+	m_isa->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
+
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false)
 	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false)
@@ -1145,17 +1147,18 @@ MACHINE_CONFIG_START(apollo_state::common)
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head
-MACHINE_CONFIG_START(apollo_state::apollo)
+void apollo_state::apollo(machine_config &config)
+{
 	common(config);
-	MCFG_APOLLO_SIO_ADD(APOLLO_SIO_TAG, 3.6864_MHz_XTAL)
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio_irq_handler))
-	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
-	MCFG_APOLLO_SIO_A_TX_CALLBACK(WRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
+	APOLLO_SIO(config, m_sio, 3.6864_MHz_XTAL);
+	m_sio->irq_cb().set(FUNC(apollo_state::sio_irq_handler));
+	m_sio->outport_cb().set(FUNC(apollo_state::sio_output));
+	m_sio->a_tx_cb().set(m_keyboard, FUNC(apollo_kbd_device::rx_w));
 
 #ifdef APOLLO_XXL
-	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE(APOLLO_STDIO_TAG, apollo_stdio_device, rx_w))
+	m_sio->b_tx_cb().set(APOLLO_STDIO_TAG, FUNC(apollo_stdio_device::rx_w));
 #endif
-MACHINE_CONFIG_END
+}
 
 static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
@@ -1167,18 +1170,18 @@ static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 // for headless machines using a serial console
-MACHINE_CONFIG_START(apollo_state::apollo_terminal)
+void apollo_state::apollo_terminal(machine_config &config)
+{
 	common(config);
-	MCFG_APOLLO_SIO_ADD(APOLLO_SIO_TAG, 3.6864_MHz_XTAL)
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio_irq_handler))
-	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
-	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	APOLLO_SIO(config, m_sio, 3.6864_MHz_XTAL);
+	m_sio->irq_cb().set(FUNC(apollo_state::sio_irq_handler));
+	m_sio->outport_cb().set(FUNC(apollo_state::sio_output));
+	m_sio->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
-
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_sio, FUNC(apollo_sio::rx_b_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(apollo_terminal));
+}
 
 void apollo_state::init_apollo()
 {

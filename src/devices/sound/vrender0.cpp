@@ -77,19 +77,18 @@ static const unsigned short ULawTo16[]=
 //  LIVE DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VRENDER0, vrender0_device, "vrender0", "VRender0")
+DEFINE_DEVICE_TYPE(SOUND_VRENDER0, vr0sound_device, "vr0sound", "MagicEyes VRender0 Sound Engine")
 
 //-------------------------------------------------
-//  vrender0_device - constructor
+//  vr0sound_device - constructor
 //-------------------------------------------------
 
-vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VRENDER0, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_TexBase(nullptr),
-		m_FBBase(nullptr),
-		m_stream(nullptr),
-		m_reg_base(0)
+vr0sound_device::vr0sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SOUND_VRENDER0, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_TexBase(nullptr),
+	m_FBBase(nullptr),
+	m_stream(nullptr)
 {
 }
 
@@ -98,11 +97,11 @@ vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void vrender0_device::device_start()
+void vr0sound_device::device_start()
 {
 	memset(m_SOUNDREGS,0,sizeof(m_SOUNDREGS));
 
-	m_stream = stream_alloc(0, 2, 44100);
+	m_stream = stream_alloc(0, 2, 44100); // TODO : Related to clock?
 
 	save_item(NAME(m_SOUNDREGS));
 }
@@ -113,20 +112,20 @@ void vrender0_device::device_start()
 //  for our sound stream
 //-------------------------------------------------
 
-void vrender0_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void vr0sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	VR0_RenderAudio(samples, outputs[0], outputs[1]);
 }
 
 
 
-READ32_MEMBER(vrender0_device::vr0_snd_read)
+READ32_MEMBER(vr0sound_device::vr0_snd_read)
 {
 	return m_SOUNDREGS[offset];
 }
 
 
-WRITE32_MEMBER(vrender0_device::vr0_snd_write)
+WRITE32_MEMBER(vr0sound_device::vr0_snd_write)
 {
 	if(offset==0x404/4)
 	{
@@ -150,14 +149,14 @@ WRITE32_MEMBER(vrender0_device::vr0_snd_write)
 }
 
 
-void vrender0_device::set_areas(uint32_t *texture, uint32_t *frame)
+void vr0sound_device::set_areas(uint32_t *texture, uint32_t *frame)
 {
 	m_TexBase=texture;
 	m_FBBase=frame;
 }
 
 
-void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
+void vr0sound_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
 {
 	int16_t *SAMPLES;
 	uint32_t st=STATUS;

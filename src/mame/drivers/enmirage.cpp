@@ -45,6 +45,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
@@ -220,36 +221,36 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_portb)
 	}
 }
 
-MACHINE_CONFIG_START(enmirage_state::mirage)
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
+void enmirage_state::mirage(machine_config &config)
+{
+	MC6809E(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &enmirage_state::mirage_map);
 
 	config.set_default_layout(layout_mirage);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_ES5503_ADD("es5503", 7000000)
-	MCFG_ES5503_OUTPUT_CHANNELS(2)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, enmirage_state, mirage_doc_irq))
-	MCFG_ES5503_ADC_FUNC(READ8(*this, enmirage_state, mirage_adc_read))
+	es5503_device &es5503(ES5503(config, "es5503", 7000000));
+	es5503.set_channels(2);
+	es5503.irq_func().set(FUNC(enmirage_state::mirage_doc_irq));
+	es5503.adc_func().set(FUNC(enmirage_state::mirage_adc_read));
+	es5503.add_route(0, "lspeaker", 1.0);
+	es5503.add_route(1, "rspeaker", 1.0);
 
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	VIA6522(config, m_via, 1000000);
+	m_via->writepa_handler().set(FUNC(enmirage_state::mirage_via_write_porta));
+	m_via->writepb_handler().set(FUNC(enmirage_state::mirage_via_write_portb));
+	m_via->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, enmirage_state, mirage_via_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, enmirage_state, mirage_via_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	acia6850_device &acia6850(ACIA6850(config, "acia6850", 0));
+	acia6850.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	WD1772(config, m_fdc, 8000000);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, 8000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
-
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", enmirage_state::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "wd1772:0", ensoniq_floppies, "35dd", enmirage_state::floppy_formats);
+}
 
 static INPUT_PORTS_START( mirage )
 INPUT_PORTS_END

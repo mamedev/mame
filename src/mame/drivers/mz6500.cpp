@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
 #include "emupal.h"
@@ -165,11 +166,11 @@ MACHINE_CONFIG_START(mz6500_state::mz6500)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz6500_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc, 8000000/6); // unk clock
+	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(mz6500_state::hgdc_display_pixels), this);
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, 8000000, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

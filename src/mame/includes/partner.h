@@ -13,6 +13,7 @@
 
 #include "includes/radio86.h"
 
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
@@ -28,13 +29,12 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(partner_floppy_r);
-	DECLARE_WRITE8_MEMBER(partner_floppy_w);
-	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
-	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
+	uint8_t partner_floppy_r(offs_t offset);
+	void partner_floppy_w(offs_t offset, uint8_t data);
+	void partner_win_memory_page_w(uint8_t data);
+	void partner_mem_page_w(uint8_t data);
 	void init_partner();
-	DECLARE_MACHINE_START(partner);
-	DECLARE_MACHINE_RESET(partner);
+
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -53,6 +53,8 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<fd1793_device> m_fdc;
 	required_memory_bank_array<13> m_bank;
+
+	virtual void machine_reset() override;
 };
 
 

@@ -33,10 +33,6 @@
 #define ARM7_MAX_FASTRAM       4
 #define ARM7_MAX_HOTSPOTS      16
 
-#define MCFG_ARM_HIGH_VECTORS() \
-	downcast<arm7_cpu_device &>(*device).set_high_vectors();
-
-
 /***************************************************************************
     COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
@@ -599,6 +595,12 @@ public:
 	arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class arm710a_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 class arm9_cpu_device : public arm7_cpu_device
 {
@@ -691,6 +693,7 @@ public:
 
 DECLARE_DEVICE_TYPE(ARM7,         arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device)
+DECLARE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device)
 DECLARE_DEVICE_TYPE(ARM9,         arm9_cpu_device)
 DECLARE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device)

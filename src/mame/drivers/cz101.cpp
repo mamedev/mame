@@ -45,7 +45,7 @@ public:
 
 	void cz101(machine_config &config);
 
-	DECLARE_PALETTE_INIT(cz101);
+	void cz101_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
@@ -250,7 +250,7 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( cz101_state, cz101 )
+void cz101_state::cz101_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on
@@ -325,7 +325,7 @@ READ8_MEMBER( cz101_state::keys_r )
 READ8_MEMBER( cz101_state::port_a_r )
 {
 	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 1))
-		return m_hd44780->read(space, BIT(m_port_c, 5));
+		return m_hd44780->read(BIT(m_port_c, 5));
 
 	return 0xff;
 }
@@ -333,7 +333,7 @@ READ8_MEMBER( cz101_state::port_a_r )
 WRITE8_MEMBER( cz101_state::port_a_w )
 {
 	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 0))
-		m_hd44780->write(space, BIT(m_port_c, 5), data);
+		m_hd44780->write(BIT(m_port_c, 5), data);
 }
 
 // 7-------  nmi output
@@ -400,8 +400,7 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(cz101_state, cz101)
+	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

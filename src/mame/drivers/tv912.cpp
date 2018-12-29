@@ -62,7 +62,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define CHAR_WIDTH 14
+#define TV912_CH_WIDTH 14
 #define CHARSET_TEST 0
 
 class tv912_state : public driver_device
@@ -255,7 +255,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			if (!BIT(sel, b))
 			{
 				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(XTAL(23'814'000) / 3.5 / divisor), !param);
+				m_baudgen_timer->adjust(attotime::from_hz(23.814_MHz_XTAL / 3.5 / divisor), !param);
 				break;
 			}
 		}
@@ -272,7 +272,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		return 0;
 	}
 
-	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	const u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
 
 	rectangle curs;
@@ -306,7 +306,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					dots ^= 0xff;
 			}
 
-			for (int d = 0; d < CHAR_WIDTH / 2; d++)
+			for (int d = 0; d < TV912_CH_WIDTH / 2; d++)
 			{
 				if (x >= cliprect.left() && x <= cliprect.right())
 					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
@@ -884,22 +884,22 @@ void tv912_state::tv912(machine_config &config)
 	maincpu.t1_in_cb().set(m_crtc, FUNC(tms9927_device::bl_r)).invert();
 	maincpu.prog_out_cb().set(m_uart, FUNC(ay51013_device::write_xr)).invert();
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(0, &tv912_state::bank_map);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(12);
 	m_bankdev->set_stride(0x100);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(23.814_MHz_XTAL, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240);
+	screen.set_raw(23.814_MHz_XTAL, 105 * TV912_CH_WIDTH, 0, 80 * TV912_CH_WIDTH, 270, 0, 240);
 	screen.set_screen_update(FUNC(tv912_state::screen_update));
 
-	TMS9927(config, m_crtc, 23.814_MHz_XTAL / CHAR_WIDTH);
-	m_crtc->set_char_width(CHAR_WIDTH);
-	m_crtc->vsyn_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	TMS9927(config, m_crtc, 23.814_MHz_XTAL / TV912_CH_WIDTH);
+	m_crtc->set_char_width(TV912_CH_WIDTH);
+	m_crtc->vsyn_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc->set_screen("screen");
 
-	AY51013(config, m_uart, 0);
+	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true);

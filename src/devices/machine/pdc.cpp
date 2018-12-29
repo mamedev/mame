@@ -157,9 +157,9 @@ void pdc_device::pdc_io(address_map &map)
 	map(0x3c, 0x3c).portr("SW2").mirror(0xFF00); /* FDC Dipswitch */
 	map(0x3d, 0x3d).portr("SW1").mirror(0xFF00); /* HDC Dipswitch */
 	map(0x40, 0x41).rw(HDC_TAG, FUNC(hdc9224_device::read), FUNC(hdc9224_device::write)).mirror(0xFF00);
-	map(0x42, 0x43).m(FDC_TAG, FUNC(upd765a_device::map)).mirror(0xFF00);
+	map(0x42, 0x43).m(m_fdc, FUNC(upd765a_device::map)).mirror(0xFF00);
 	map(0x50, 0x5f).w(FUNC(pdc_device::p50_5f_w)).mirror(0xFF00);
-	map(0x60, 0x6f).rw(FDCDMA_TAG, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).mirror(0xFF00);
+	map(0x60, 0x6f).rw(m_dma8237, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).mirror(0xFF00);
 }
 
 //-------------------------------------------------
@@ -255,20 +255,21 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
+void pdc_device::device_add_mconfig(machine_config &config)
+{
 	/* CPU - Zilog Z0840006PSC */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(pdc_mem)
-	MCFG_DEVICE_IO_MAP(pdc_io)
+	Z80(config, m_pdccpu, XTAL(10'000'000) / 2);
+	m_pdccpu->set_addrmap(AS_PROGRAM, &pdc_device::pdc_mem);
+	m_pdccpu->set_addrmap(AS_IO, &pdc_device::pdc_io);
 	//MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	/* Floppy Disk Controller - uPD765a - NEC D765AC-2 */
-	MCFG_UPD765A_ADD(FDC_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pdc_device, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(FDCDMA_TAG, am9517a_device, dreq0_w)) //MCFG_DEVCB_INVERT
+	UPD765A(config, m_fdc, 4'000'000, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pdc_device::fdc_irq));
+	m_fdc->drq_wr_callback().set(m_dma8237, FUNC(am9517a_device::dreq0_w)); //.invert();
 
 	// Floppy disk drive
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats);
 
 	/* DMA Controller - Intel P8237A-5 */
 	/* Channel 0: uPD765a Floppy Disk Controller */
@@ -284,9 +285,11 @@ MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	m_dma8237->out_iow_callback<1>().set(FUNC(pdc_device::m68k_dma_w));
 
 	/* Hard Disk Controller - HDC9224 */
-	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
-MACHINE_CONFIG_END
+	// TODO: connect the HDC lines
+	HDC9224(config, HDC_TAG, 0);
+	MFM_HD_CONNECTOR(config, "h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+
+}
 
 ioport_constructor pdc_device::device_input_ports() const
 {
@@ -319,6 +322,10 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
+	/* Resolve callbacks */
+	m_m68k_r_cb.resolve_safe(0);
+	m_m68k_w_cb.resolve_safe();
+
 	/* Save States */
 	save_item(NAME(reg_p0));
 	save_item(NAME(reg_p1));
@@ -331,6 +338,10 @@ void pdc_device::device_start()
 	save_item(NAME(reg_p21));
 	save_item(NAME(reg_p38));
 	save_item(NAME(fdd_68k_dma_address));
+
+	/* Resolve callbacks */
+	m_m68k_r_cb.resolve_safe(0);
+	m_m68k_w_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -346,10 +357,6 @@ void pdc_device::device_reset()
 
 	/* Reset CPU */
 	m_pdccpu->reset();
-
-	/* Resolve callbacks */
-	m_m68k_r_cb.resolve_safe(0);
-	m_m68k_w_cb.resolve_safe();
 
 	m_fdc->set_rate(500000) ;
 }

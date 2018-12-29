@@ -303,11 +303,10 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_scorpion)
 
-	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
+	BETA_DISK(config, m_beta, 0);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	m_ram->set_default_size("256K");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", scorpion_state, nmi_check_callback, attotime::from_hz(50))
 

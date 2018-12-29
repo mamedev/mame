@@ -171,17 +171,16 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(tx1_main)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(tx1_math)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,tx1)
+	PALETTE(config, "palette", FUNC(tx1_state::tx1_palette), 256);
 
 	config.set_default_layout(layout_triphsxs);
 
@@ -218,14 +217,14 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_main)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_triphsxs);
 
@@ -245,8 +244,7 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
+	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
 	MCFG_DEVICE_ADD("soundbrd", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
@@ -257,14 +255,14 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggybjr_main)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
@@ -272,8 +270,7 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
+	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
 	MCFG_DEVICE_ADD("soundbrd", BUGGYBOYJR_SOUND, BUGGYBOY_ZCLK)

@@ -15,15 +15,8 @@
 
 #pragma once
 
-
-
-#define MCFG_TMS32010_BIO_IN_CB(_devcb) \
-	downcast<tms32010_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
-
-
 #define TMS32010_INT_PENDING    0x80000000
 #define TMS32010_INT_NONE       0
-
 
 enum
 {
@@ -45,7 +38,7 @@ public:
 	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_bio_in_cb(Object &&cb) { return m_bio_in.set_callback(std::forward<Object>(cb)); }
+	auto bio() { return m_bio_in.bind(); }
 
 	void tms32010_ram(address_map &map);
 	void tms32015_ram(address_map &map);

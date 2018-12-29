@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Graves, R. Belmont
+// copyright-holders:David Graves, R. Belmont, David Haywood
 /***************************************************************************
 
 Excellent System's ES-9209B Hardware
@@ -26,8 +26,7 @@ TODO
  - Modernize ES-8712 and hook up to MSM6585 and HCT157
  - Figure out which customs use D80010-D80077 and merge implementation with Aquarium
  - Is SW3 actually used?
- - Missing row scroll (column scroll?)
-   Reference video showing effect: https://www.youtube.com/watch?v=zBGjncVsSf4
+ - Power Flipper reference video: https://www.youtube.com/watch?v=zBGjncVsSf4 (seems to have been recorded with 'flipscreen' dipswitch on, because it causes a jumping glitch before the raster effect, same in MAME)
 
 BGMs (controlled by OKI MSM6585 sound chip)
   MSM6585: is an upgraded MSM5205 voice synth IC.
@@ -76,7 +75,7 @@ Custom: EXCELLENT SYSTEM ES-9208 347102 (QFP160)
 
 * Denotes unpopulated components
 
-NOTE: Mask roms from Power Flipper Pinball Shooting have not been dumped, but assumed to
+NOTE: Mask ROMs from Power Flipper Pinball Shooting have not been dumped, but assumed to
       be the same data.
 
 ***************************************************************************/
@@ -93,26 +92,19 @@ NOTE: Mask roms from Power Flipper Pinball Shooting have not been dumped, but as
                       INTERRUPTS
 ***********************************************************/
 
-void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_DEVICE_CALLBACK_MEMBER(gcpinbal_state::scanline_cb)
 {
-	switch (id)
-	{
-	case TIMER_GCPINBAL_INTERRUPT1:
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in gcpinbal_state::device_timer");
-	}
+
+	if (param>=16)
+		m_screen->update_partial(m_screen->vpos()-1);
+
+	if (param==240)
+		m_maincpu->set_input_line(1, HOLD_LINE); // V-blank
+	else if ((param>=16) && (param<240))
+		m_maincpu->set_input_line(4, HOLD_LINE); // H-blank? (or programmable, used for raster effects)
+
+	// IRQ level 3 is sound related, hooked up to MSM6585
 }
-
-INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
-{
-	/* Unsure of actual sequence */
-
-	m_int1_timer->adjust(m_maincpu->cycles_to_attotime(500));
-	device.execute().set_input_line(4, HOLD_LINE);
-}
-
 
 /***********************************************************
                           IOC
@@ -338,8 +330,6 @@ GFXDECODE_END
 
 void gcpinbal_state::machine_start()
 {
-	m_int1_timer = timer_alloc(TIMER_GCPINBAL_INTERRUPT1);
-
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_bg0_gfxset));
@@ -367,9 +357,10 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gcpinbal_state, scanline_cb, "screen", 0, 1)
+
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
@@ -380,13 +371,12 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gcpinbal_state, screen_update_gcpinbal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gcpinbal)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gcpinbal);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)
+	EXCELLENT_SPRITE(config, m_sprgen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -394,15 +384,15 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_RESET_HANDLER(INPUTLINE("maincpu", 3))
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	ES8712(config, m_essnd, 0);
+	m_essnd->reset_handler().set_inputline("maincpu", 3);
+	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
+	m_essnd->set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL)
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL));
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm6585_device::S40); /* 16 kHz */
+	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -419,20 +409,20 @@ ROM_START( pwrflip ) /* Updated version of Grand Cross Pinball or semi-sequel? *
 	ROM_LOAD16_WORD_SWAP( "p.f.u46",       0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
 	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 mask ROMs */
 	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
 	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
 	ROM_LOAD16_WORD_SWAP( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
-	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
+	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B mask ROM */
 
 	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
-	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
+	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x000400, "plds", 0 ) /* 2x TIBPAL16L8-15CN */
 	ROM_LOAD( "a.u72", 0x000, 0x104, NO_DUMP )
@@ -447,20 +437,20 @@ ROM_START( gcpinbal )
 	ROM_LOAD16_WORD_SWAP( "4_excellent.u46",  0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
 	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 mask ROMs */
 	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
 	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
 	ROM_LOAD16_WORD_SWAP( "1_excellent.u10",   0x000000, 0x020000, CRC(79321550) SHA1(61f1b772ed8cf95bfee9df8394b0c3ff727e8702) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
-	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
+	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B mask ROM */
 
 	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
-	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
+	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x000400, "plds", 0 ) /* 2x TIBPAL16L8-15CN */
 	ROM_LOAD( "a.u72", 0x000, 0x104, NO_DUMP )

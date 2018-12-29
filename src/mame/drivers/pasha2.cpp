@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_DEVICE_ADD("audiocpu", AT89C52, 12000000)     /* clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -418,9 +418,9 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pasha2_state, screen_update_pasha2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

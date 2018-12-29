@@ -253,12 +253,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_DEVICE_ADD("maincpu", MC6809, 12.0576_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(poly_mem)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(poly_bank)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&poly_state::poly_bank).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
@@ -285,14 +280,12 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("64K");
 
 	/* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	//MCFG_MC6854_OUT_TXD_CB(WRITELINE(NETWORK_TAG, poly_network_device, data_w))
-	//MCFG_MC6854_OUT_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
+	MC6854(config, m_adlc);
+	//m_adlc->out_txd_cb().set(NETWORK_TAG, FUNC(poly_network_device::data_w));
+	//m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	//MCFG_POLY_NETWORK_ADD()
 	//MCFG_POLY_NETWORK_CLK_CB(WRITELINE(*this, poly_state, network_clk_w))
@@ -301,48 +294,48 @@ MACHINE_CONFIG_START(poly_state::poly)
 	//MCFG_POLY_NETWORK_SLOT_ADD("netdown", poly_network_devices, nullptr)
 
 	/* timer */
-	MCFG_DEVICE_ADD("ptm", PTM6840, 12.0576_MHz_XTAL / 3)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, poly_state, ptm_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(*this, poly_state, ptm_o3_callback))
-	//MCFG_PTM6840_IRQ_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
+	PTM6840(config, m_ptm, 12.0576_MHz_XTAL / 3);
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o2_callback().set(FUNC(poly_state::ptm_o2_callback));
+	m_ptm->o3_callback().set(FUNC(poly_state::ptm_o3_callback));
+	//m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* keyboard encoder */
-	//MCFG_DEVICE_ADD("kr2376", KR2376_12, 50000)
-	//MCFG_KR2376_MATRIX_X0(IOPORT("X0"))
-	//MCFG_KR2376_MATRIX_X1(IOPORT("X1"))
-	//MCFG_KR2376_MATRIX_X2(IOPORT("X2"))
-	//MCFG_KR2376_MATRIX_X3(IOPORT("X3"))
-	//MCFG_KR2376_MATRIX_X4(IOPORT("X4"))
-	//MCFG_KR2376_MATRIX_X5(IOPORT("X5"))
-	//MCFG_KR2376_MATRIX_X6(IOPORT("X6"))
-	//MCFG_KR2376_MATRIX_X7(IOPORT("X7"))
-	//MCFG_KR2376_SHIFT_CB(READLINE(*this, poly_state, kbd_shift_r))
-	//MCFG_KR2376_CONTROL_CB(READLINE(*this, poly_state, kbd_control_r))
-	//MCFG_KR2376_STROBE_CB(WRITELINE("pia1", pia6821_device, cb1_w))
+	//KR2376_12(config, m_kr2376, 50000);
+	//m_kr2376->x<0>().set_ioport("X0");
+	//m_kr2376->x<1>().set_ioport("X1");
+	//m_kr2376->x<2>().set_ioport("X2");
+	//m_kr2376->x<3>().set_ioport("X3");
+	//m_kr2376->x<4>().set_ioport("X4");
+	//m_kr2376->x<5>().set_ioport("X5");
+	//m_kr2376->x<6>().set_ioport("X6");
+	//m_kr2376->x<7>().set_ioport("X7");
+	//m_kr2376->shift().set(FUNC(poly_state::kbd_shift_r));
+	//m_kr2376->control().set(FUNC(poly_state::kbd_control_r));
+	//m_kr2376->strobe().set("pia1", FUNC(pia6821_device::cb1_w));
 
 	/* generic keyboard until ROM in KR2376-12 is known */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(poly_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(poly_state::kbd_put));
 
 	/* video control */
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, poly_state, pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, poly_state, pia0_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->writepa_handler().set(FUNC(poly_state::pia0_pa_w));
+	m_pia[0]->writepb_handler().set(FUNC(poly_state::pia0_pb_w));
+	m_pia[0]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
+	m_pia[0]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
 	/* keyboard PIA */
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, poly_state, pia1_b_in))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<4>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<5>))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpb_handler().set(FUNC(poly_state::pia1_b_in));
+	m_pia[1]->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
+	m_pia[1]->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
 	/* optional rs232 interface */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<6>))
+	ACIA6850(config, m_acia, 0);
+	//m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));
 
 	CLOCK(config, m_acia_clock, 153600);
 	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
@@ -357,8 +350,7 @@ MACHINE_CONFIG_START(poly_state::poly2)
 	poly(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "POLY2")
@@ -369,9 +361,9 @@ MACHINE_CONFIG_START(polydev_state::polydev)
 	poly(config);
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", FD1771, 12.0_MHz_XTAL / 12)
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, polydev_state, motor_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1771(config, m_fdc, 12.0_MHz_XTAL / 12);
+	m_fdc->hld_wr_callback().set(FUNC(polydev_state::motor_w));
+	m_fdc->set_force_ready(true);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poly_floppies, "525sd", polydev_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

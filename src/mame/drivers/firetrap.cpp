@@ -639,23 +639,22 @@ MACHINE_CONFIG_START(firetrap_state::firetrap)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_firetrap)
+	PALETTE(config, m_palette, FUNC(firetrap_state::firetrap_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, firetrap_state, firetrap_adpcm_int))
@@ -684,23 +683,22 @@ MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_firetrap)
+	PALETTE(config, m_palette, FUNC(firetrap_state::firetrap_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, firetrap_state, firetrap_adpcm_int))

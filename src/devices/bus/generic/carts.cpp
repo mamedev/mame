@@ -13,17 +13,20 @@
 #include "ram.h"
 
 
-void generic_plain_slot(device_slot_interface &device)
+device_slot_interface &generic_plain_slot(device_slot_interface &device)
 {
 	device.option_add_internal("rom", GENERIC_ROM_PLAIN);
+	return device;
 }
 
-void generic_linear_slot(device_slot_interface &device)
+device_slot_interface &generic_linear_slot(device_slot_interface &device)
 {
 	device.option_add_internal("rom", GENERIC_ROM_LINEAR);
+	return device;
 }
 
-void generic_romram_plain_slot(device_slot_interface &device)
+device_slot_interface &generic_romram_plain_slot(device_slot_interface &device)
 {
 	device.option_add_internal("rom", GENERIC_ROMRAM_PLAIN);
+	return device;
 }

@@ -494,11 +494,19 @@ private:
 class cobra_jvs : public jvs_device
 {
 public:
+	template <typename T>
+	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag, bool enable)
+		: cobra_jvs(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+		set_main_board(enable);
+	}
+
 	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	//DECLARE_WRITE_LINE_MEMBER(coin_1_w);
 	//DECLARE_WRITE_LINE_MEMBER(coin_2_w);
-	static void static_set_main_board(device_t &device, bool enable);
+	void set_main_board(bool enable) { is_main_board = enable; }
 	void increase_coin_counter(uint8_t which);
 
 protected:
@@ -522,12 +530,6 @@ cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *o
 {
 	m_coin_counter[0] = 0;
 	m_coin_counter[1] = 0;
-}
-
-void cobra_jvs::static_set_main_board(device_t &device, bool enable)
-{
-	cobra_jvs &jvsdev = downcast<cobra_jvs &>(device);
-	jvsdev.is_main_board = enable;
 }
 
 #if 0
@@ -3281,26 +3283,25 @@ void cobra_state::machine_reset()
 MACHINE_CONFIG_START(cobra_state::cobra)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC603, 100000000)      /* 603EV, 100? MHz */
-	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))  /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cobra_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cobra_state,  cobra_vblank)
+	PPC603(config, m_maincpu, 100000000);      /* 603EV, 100? MHz */
+	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cobra_state::cobra_vblank));
 
-	MCFG_DEVICE_ADD("subcpu", PPC403GA, 32000000)      /* 403GA, 33? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cobra_sub_map)
+	PPC403GA(config, m_subcpu, 32000000);      /* 403GA, 33? MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_sub_map);
 
-	MCFG_DEVICE_ADD("gfxcpu", PPC604, 100000000)       /* 604, 100? MHz */
-	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cobra_gfx_map)
+	PPC604(config, m_gfxcpu, 100000000);       /* 604, 100? MHz */
+	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
-
+	config.m_minimum_quantum = attotime::from_hz(15005);
 
 	MCFG_PCI_BUS_LEGACY_ADD(m_legacy_pci, 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, cobra_state, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, cobra_state, ide_interrupt))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(cobra_state::ide_interrupt));
 
 	/* video hardware */
 
@@ -3324,22 +3325,19 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_DEVICE_ADD(m_dmadac[1], DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
+	M48T58(config, "m48t58", 0);
 
-	MCFG_DEVICE_ADD("k001604", K001604, 0)     // on the LAN board in Racing Jam DX
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)  // correct?
-	MCFG_K001604_ROZ_OFFSET(0)  // correct?
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
+	m_k001604->set_layer_size(0);
+	m_k001604->set_roz_size(1);
+	m_k001604->set_txt_mem_offset(0);  // correct?
+	m_k001604->set_roz_mem_offset(0);  // correct?
+	m_k001604->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_jvs_host, COBRA_JVS_HOST, 4000000)
-	MCFG_JVS_DEVICE_ADD(m_jvs1, COBRA_JVS, "cobra_jvs_host")
-	cobra_jvs::static_set_main_board(*device, true);
-	MCFG_JVS_DEVICE_ADD(m_jvs2, COBRA_JVS, "cobra_jvs_host")
-	cobra_jvs::static_set_main_board(*device, true);
-	MCFG_JVS_DEVICE_ADD(m_jvs3, COBRA_JVS, "cobra_jvs_host")
-	cobra_jvs::static_set_main_board(*device, true);
+	COBRA_JVS_HOST(config, m_jvs_host, 4000000);
+	COBRA_JVS(config, m_jvs1, 0, m_jvs_host, true);
+	COBRA_JVS(config, m_jvs2, 0, m_jvs_host, true);
+	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

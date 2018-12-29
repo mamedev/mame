@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bnet#license-bsd-2-clause
  */
 
@@ -24,22 +24,21 @@ namespace bx
 	{
 		clear();
 
-		const char* start = _url.getPtr();
 		const char* term  = _url.getTerm();
-		const char* schemeEnd = strFind(StringView(start, term), "://");
-		const char* hostStart = NULL != schemeEnd ? schemeEnd+3 : start;
-		const char* pathStart = strFind(StringView(hostStart, term), '/');
+		StringView schemeEnd = strFind(_url, "://");
+		const char* hostStart = !schemeEnd.isEmpty() ? schemeEnd.getTerm() : _url.getPtr();
+		StringView path = strFind(StringView(hostStart, term), '/');
 
-		if (NULL == schemeEnd
-		&&  NULL == pathStart)
+		if (schemeEnd.isEmpty()
+		&&  path.isEmpty() )
 		{
 			return false;
 		}
 
-		if (NULL != schemeEnd
-		&& (NULL == pathStart || pathStart > schemeEnd) )
+		if (!schemeEnd.isEmpty()
+		&& (path.isEmpty() || path.getPtr() > schemeEnd.getPtr() ) )
 		{
-			StringView scheme(start, schemeEnd);
+			const StringView scheme(_url.getPtr(), schemeEnd.getPtr() );
 
 			if (!isAlpha(scheme) )
 			{
@@ -49,63 +48,64 @@ namespace bx
 			m_tokens[Scheme].set(scheme);
 		}
 
-		if (NULL != pathStart)
+		if (!path.isEmpty() )
 		{
-			const char* queryStart    = strFind(StringView(pathStart, term), '?');
-			const char* fragmentStart = strFind(StringView(pathStart, term), '#');
+			path.set(path.getPtr(), term);
+			const StringView query    = strFind(path, '?');
+			const StringView fragment = strFind(path, '#');
 
-			if (NULL != fragmentStart
-			&&  fragmentStart < queryStart)
+			if (!fragment.isEmpty()
+			&&   fragment.getPtr() < query.getPtr() )
 			{
 				return false;
 			}
 
-			m_tokens[Path].set(pathStart
-				, NULL != queryStart    ? queryStart
-				: NULL != fragmentStart ? fragmentStart
+			m_tokens[Path].set(path.getPtr()
+				, !query.isEmpty()    ? query.getPtr()
+				: !fragment.isEmpty() ? fragment.getPtr()
 				: term
 				);
 
-			if (NULL != queryStart)
+			if (!query.isEmpty() )
 			{
-				m_tokens[Query].set(queryStart+1
-					, NULL != fragmentStart ? fragmentStart
+				m_tokens[Query].set(query.getPtr()+1
+					, !fragment.isEmpty() ? fragment.getPtr()
 					: term
 					);
 			}
 
-			if (NULL != fragmentStart)
+			if (!fragment.isEmpty() )
 			{
-				m_tokens[Fragment].set(fragmentStart+1, term);
+				m_tokens[Fragment].set(fragment.getPtr()+1, term);
 			}
 
-			term = pathStart;
+			term = path.getPtr();
 		}
 
-		const char* userPassEnd   = strFind(StringView(hostStart, term), '@');
-		const char* userPassStart = NULL != userPassEnd ? hostStart : NULL;
-		hostStart = NULL != userPassEnd ? userPassEnd+1 : hostStart;
-		const char* portStart = strFind(StringView(hostStart, term), ':');
+		const StringView userPassEnd = strFind(StringView(hostStart, term), '@');
+		const char* userPassStart = !userPassEnd.isEmpty() ? hostStart : NULL;
+		hostStart = !userPassEnd.isEmpty() ? userPassEnd.getPtr()+1 : hostStart;
+		const StringView portStart = strFind(StringView(hostStart, term), ':');
 
-		m_tokens[Host].set(hostStart, NULL != portStart ? portStart : term);
+		m_tokens[Host].set(hostStart, !portStart.isEmpty() ? portStart.getPtr() : term);
 
-		if (NULL != portStart)
+		if (!portStart.isEmpty())
 		{
-			m_tokens[Port].set(portStart+1, term);
+			m_tokens[Port].set(portStart.getPtr()+1, term);
 		}
 
 		if (NULL != userPassStart)
 		{
-			const char* passStart = strFind(StringView(userPassStart, userPassEnd), ':');
+			StringView passStart = strFind(StringView(userPassStart, userPassEnd.getPtr() ), ':');
 
 			m_tokens[UserName].set(userPassStart
-				, NULL != passStart ? passStart
-				: userPassEnd
+				, !passStart.isEmpty() ? passStart.getPtr()
+				: userPassEnd.getPtr()
 				);
 
-			if (NULL != passStart)
+			if (!passStart.isEmpty() )
 			{
-				m_tokens[Password].set(passStart+1, userPassEnd);
+				m_tokens[Password].set(passStart.getPtr()+1, userPassEnd.getPtr() );
 			}
 		}
 

@@ -5,9 +5,10 @@
                             -= Kaneko 16 Bit Games =-
 
 ***************************************************************************/
-
 #ifndef MAME_INCLUDES_KANEKO16_H
 #define MAME_INCLUDES_KANEKO16_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -30,8 +31,8 @@
 class kaneko16_state : public driver_device
 {
 public:
-	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ym2149(*this, "ym2149_%u", 1),
@@ -147,8 +148,8 @@ public:
 class kaneko16_gtmr_state : public kaneko16_state
 {
 public:
-	kaneko16_gtmr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag)
+	kaneko16_gtmr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kaneko16_state(mconfig, type, tag)
 	{
 	}
 
@@ -175,13 +176,12 @@ public:
 class kaneko16_berlwall_state : public kaneko16_state
 {
 public:
-	kaneko16_berlwall_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
+	kaneko16_berlwall_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kaneko16_state(mconfig, type, tag),
 		m_bg15_select(*this, "bg15_select"),
 		m_bg15_scroll(*this, "bg15_scroll"),
 		m_bg15_bright(*this, "bg15_bright"),
 		m_bgpalette(*this, "bgpalette")
-
 	{
 	}
 
@@ -209,7 +209,6 @@ public:
 	void init_berlwallk();
 	void init_berlwallt();
 	void init_berlwall_common();
-	DECLARE_PALETTE_INIT(berlwall);
 	DECLARE_VIDEO_START(berlwall);
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -222,8 +221,8 @@ public:
 class kaneko16_shogwarr_state : public kaneko16_state
 {
 public:
-	kaneko16_shogwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
+	kaneko16_shogwarr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kaneko16_state(mconfig, type, tag),
 		m_calc3_prot(*this, "calc3_prot")
 	{
 	}

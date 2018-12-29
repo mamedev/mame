@@ -513,12 +513,12 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, chinsan_state, input_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, chinsan_state, input_p2_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, chinsan_state, input_p1_r))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(chinsan_state::input_select_w));
+	ppi.in_pb_callback().set(FUNC(chinsan_state::input_p2_r));
+	ppi.in_pc_callback().set(FUNC(chinsan_state::input_p1_r));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -530,18 +530,18 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinsan)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(10'000'000)/8));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinsan_state, adpcm_int_w))

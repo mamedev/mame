@@ -4,10 +4,17 @@
 /*
     Sega/Yamaha AICA emulation
 
+    Confirmed Part numbers:
+        SEGA 315-6232 G21003 (Later)
+        SEGA 315-6119 FQ1003 (Earlier)
+
     This is effectively a 64-voice SCSP, with the following differences:
     - No FM mode
     - A third sample format (ADPCM) has been added
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
+
+    TODO:
+    - Where are EXTS Connected?
 */
 
 #include "emu.h"
@@ -972,8 +979,8 @@ void aica_device::w16(address_space &space,unsigned int addr,unsigned short val)
 		}
 		else if(addr<0x45c0)
 			*((unsigned short *) (m_DSP.EFREG+(addr-0x4580)/4))=val;
-		else if(addr<0x45c8)
-			*((unsigned short *) (m_DSP.EXTS+(addr-0x45c0)/2))=val;
+		//else if(addr<0x45c8)
+		//  *((unsigned short *) (m_DSP.EXTS+(addr-0x45c0)/2))=val; // Read only
 	}
 }
 
@@ -1264,10 +1271,13 @@ int32_t aica_device::UpdateSlot(AICA_SLOT *slot)
 void aica_device::DoMasterSamples(int nsamples)
 {
 	stream_sample_t *bufr,*bufl;
+	stream_sample_t *exts[2];
 	int sl, s, i;
 
 	bufr=m_bufferr;
 	bufl=m_bufferl;
+	exts[0]=m_exts0;
+	exts[1]=m_exts1;
 
 	for(s=0;s<nsamples;++s)
 	{
@@ -1310,6 +1320,18 @@ void aica_device::DoMasterSamples(int nsamples)
 				unsigned int Enc=((EFPAN(i))<<0x8)|((EFSDL(i))<<0xd);
 				smpl+=(m_DSP.EFREG[i]*m_LPANTABLE[Enc])>>SHIFT;
 				smpr+=(m_DSP.EFREG[i]*m_RPANTABLE[Enc])>>SHIFT;
+			}
+		}
+
+		// mix EXTS output
+		for(i=0;i<2;++i)
+		{
+			if(EFSDL(i+16)) // 16,17 for EXTS
+			{
+				m_DSP.EXTS[i]=exts[i][s];
+				unsigned int Enc=((EFPAN(i+16))<<0x8)|((EFSDL(i+16))<<0xd);
+				smpl+=(m_DSP.EXTS[i]*m_LPANTABLE[Enc])>>SHIFT;
+				smpr+=(m_DSP.EXTS[i]*m_RPANTABLE[Enc])>>SHIFT;
 			}
 		}
 
@@ -1416,6 +1438,8 @@ void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 {
 	m_bufferl = outputs[0];
 	m_bufferr = outputs[1];
+	m_exts0 = inputs[0];
+	m_exts1 = inputs[1];
 	m_length = samples;
 	DoMasterSamples(samples);
 }
@@ -1433,7 +1457,7 @@ void aica_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, (int)m_rate);
+	m_stream = machine().sound().stream_alloc(*this, 2, 2, (int)m_rate);
 
 	// save state
 	save_item(NAME(m_IrqTimA));
@@ -1529,6 +1553,8 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_mcipd(0),
 		m_bufferl(nullptr),
 		m_bufferr(nullptr),
+		m_exts0(nullptr),
+		m_exts1(nullptr),
 		m_length(0),
 		m_RBUFDST(nullptr)
 

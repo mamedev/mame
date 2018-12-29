@@ -29,8 +29,8 @@
 class _8080bw_state : public mw8080bw_state
 {
 public:
-	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mw8080bw_state(mconfig, type, tag),
+	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),
 		m_speaker(*this, "speaker"),
@@ -177,8 +177,8 @@ private:
 	DECLARE_MACHINE_RESET(schaser_sh);
 	DECLARE_MACHINE_START(claybust);
 
-	DECLARE_PALETTE_INIT(rollingc);
-	DECLARE_PALETTE_INIT(sflush);
+	void rollingc_palette(palette_device &palette) const;
+	void sflush_palette(palette_device &palette) const;
 
 	uint32_t screen_update_invadpt2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

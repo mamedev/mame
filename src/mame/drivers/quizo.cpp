@@ -37,8 +37,9 @@ class quizo_state : public driver_device
 {
 public:
 	quizo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void quizo(machine_config &config);
 
@@ -55,7 +56,7 @@ private:
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 
-	DECLARE_PALETTE_INIT(quizo);
+	void quizo_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void memmap(address_map &map);
@@ -67,42 +68,39 @@ private:
 #define XTAL2   21477270
 
 
-static const uint8_t rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
+static constexpr uint8_t rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
-PALETTE_INIT_MEMBER(quizo_state, quizo)
+void quizo_state::quizo_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	for (i = 0;i < 16;i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 16; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
 		bit0 = 0;
-		bit1 = (*color_prom >> 0) & 0x01;
-		bit2 = (*color_prom >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 0);
+		bit2 = BIT(color_prom[i], 1);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = (*color_prom >> 2) & 0x01;
-		bit1 = (*color_prom >> 3) & 0x01;
-		bit2 = (*color_prom >> 4) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		bit2 = BIT(color_prom[i], 4);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = (*color_prom >> 5) & 0x01;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 5);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
-		color_prom++;
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 uint32_t quizo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	for(y=0;y<200;y++)
+	for(int y = 0; y < 200; y++)
 	{
-		for(x=0;x<80;x++)
+		for(int x = 0; x < 80; x++)
 		{
 			int data=m_videoram[y*80+x];
 			int data1=m_videoram[y*80+x+0x4000];
@@ -236,13 +234,11 @@ MACHINE_CONFIG_START(quizo_state::quizo)
 	MCFG_SCREEN_UPDATE_DRIVER(quizo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(quizo_state, quizo)
+	PALETTE(config, "palette", FUNC(quizo_state::quizo_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL2/16 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, "aysnd", XTAL2 / 16).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

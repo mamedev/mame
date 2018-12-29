@@ -275,38 +275,43 @@ static GFXDECODE_START( gfx_zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(zrt80_state::zrt80)
+void zrt80_state::zrt80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(2'457'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &zrt80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &zrt80_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zrt80)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 200);
+	screen.set_visarea(0, 640-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_zrt80);
+
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 800)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(zrt80_state, crtc_update_row)
+	MC6845(config, m_crtc, XTAL(20'000'000) / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8); /*?*/
+	m_crtc->set_update_row_callback(FUNC(zrt80_state::crtc_update_row), this);
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, 2457600 )
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(zrt80_state, kbd_put))
-MACHINE_CONFIG_END
+	INS8250(config, m_8250, 2457600);
+	m_8250->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(zrt80_state::kbd_put));
+}
 
 /* ROM definition */
 ROM_START( zrt80 )

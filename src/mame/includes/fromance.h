@@ -8,6 +8,10 @@
     and Bryan McPhail, Nicola Salmoria, Aaron Giles
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_FROMANCE_H
+#define MAME_INCLUDES_FROMANCE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
@@ -19,18 +23,18 @@
 class fromance_state : public driver_device
 {
 public:
-	fromance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fromance_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
 		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_gga(*this, "gga"),
-		m_videoram(*this, "videoram"),
 		m_spr_old(*this, "vsystem_spr_old"),
-		m_subcpu(*this, "sub"),
+		m_videoram(*this, "videoram"),
 		m_sublatch(*this, "sublatch"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen")
 	{ }
 
@@ -44,9 +48,12 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	optional_shared_ptr<uint8_t> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<vsystem_gga_device> m_gga;
+	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
 
 	DECLARE_WRITE8_MEMBER(fromance_gfxreg_w);
 	DECLARE_READ8_MEMBER(fromance_videoram_r);
@@ -73,7 +80,9 @@ private:
 	/* memory pointers (used by pipedrm) */
 	optional_shared_ptr<uint8_t> m_videoram;
 
-	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
+	optional_device<generic_latch_8_device> m_sublatch;
+	optional_device<msm5205_device> m_msm;
+	required_device<screen_device> m_screen;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -109,15 +118,10 @@ private:
 	DECLARE_VIDEO_START(nekkyoku);
 	DECLARE_VIDEO_START(fromance);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
-	inline void get_fromance_tile_info( tile_data &tileinfo, int tile_index, int layer );
-	inline void get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer );
+	inline void get_fromance_tile_info(tile_data &tileinfo, int tile_index, int layer);
+	inline void get_nekkyoku_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	void crtc_refresh();
 	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
-	required_device<cpu_device> m_subcpu;
-	optional_device<generic_latch_8_device> m_sublatch;
-	optional_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
 	void fromance_main_map(address_map &map);
 	void fromance_sub_io_map(address_map &map);
 	void fromance_sub_map(address_map &map);
@@ -126,3 +130,5 @@ private:
 	void nekkyoku_sub_io_map(address_map &map);
 	void nekkyoku_sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FROMANCE_H

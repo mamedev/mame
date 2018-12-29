@@ -35,7 +35,7 @@ class istellar_state : public driver_device
 public:
 	istellar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+		m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
@@ -289,22 +289,22 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	MCFG_DEVICE_PROGRAM_MAP(z80_2_mem)
 	MCFG_DEVICE_IO_MAP(z80_2_io)
 
-	MCFG_GENERIC_LATCH_8_ADD("latch1")
+	GENERIC_LATCH_8(config, "latch1");
 
-	MCFG_GENERIC_LATCH_8_ADD("latch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &latch2(GENERIC_LATCH_8(config, "latch2"));
+	latch2.data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	latch2.set_separate_acknowledge(true);
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, istellar_state, screen_update_istellar)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, istellar_state, vblank_irq))
 
 	// Daphne says "TODO: get the real interstellar resistor values"
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istellar)
 

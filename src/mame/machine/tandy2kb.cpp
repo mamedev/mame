@@ -51,13 +51,14 @@ const tiny_rom_entry *tandy2k_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tandy2k_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8048_TAG, I8048, 1000000) // ?
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, tandy2k_keyboard_device, kb_p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, tandy2k_keyboard_device, kb_p2_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, tandy2k_keyboard_device, kb_p1_r))
-	MCFG_DEVICE_DISABLE() // TODO
-MACHINE_CONFIG_END
+void tandy2k_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8048(config, m_maincpu, 1000000); // ?
+	m_maincpu->p1_out_cb().set(FUNC(tandy2k_keyboard_device::kb_p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(tandy2k_keyboard_device::kb_p2_w));
+	m_maincpu->bus_in_cb().set(FUNC(tandy2k_keyboard_device::kb_p1_r));
+	m_maincpu->set_disable(); // TODO
+}
 
 
 //-------------------------------------------------

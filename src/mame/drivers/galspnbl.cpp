@@ -233,24 +233,22 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galspnbl_state, screen_update_galspnbl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galspnbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_galspnbl)
 
-	MCFG_PALETTE_ADD("palette", 1024 + 32768)
-	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette, FUNC(galspnbl_state::galspnbl_palette)).set_format(palette_device::xBGR_444, 1024 + 32768);
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
-	MCFG_TECMO_SPRITE_GFX_REGION(1)
-	MCFG_TECMO_SPRITE_BOOTLEG(1)
+	TECMO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(1);
+	m_sprgen->set_bootleg(1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

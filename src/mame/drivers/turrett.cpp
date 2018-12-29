@@ -11,14 +11,6 @@
 #include "emu.h"
 #include "includes/turrett.h"
 
-#include "cpu/mips/r3000.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
-#include "emupal.h"
-#include "speaker.h"
-
-
-
 /*************************************
  *
  *  Definitions
@@ -253,7 +245,7 @@ uint32_t turrett_state::update_inputs(void)
 	}
 
 	// Update IRQ state
-	m_maincpu->set_input_line(R3000_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
 	return val;
 }
 
@@ -270,13 +262,13 @@ INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
 			if (newval == 0)
 			{
 				m_inputs_active |= p;
-				m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 		}
 		else
 		{
 			m_inputs_active |= p;
-			m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 	}
 }
@@ -297,7 +289,7 @@ INTERRUPT_GEN_MEMBER( turrett_state::vblank )
 		m_inputs_active |= 0x02000000;
 
 	m_frame ^= 1;
-	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 
@@ -309,7 +301,7 @@ INTERRUPT_GEN_MEMBER( turrett_state::adc )
 		m_inputs_active |= 0x00000002;
 
 	m_adc ^= 1;
-	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 /*************************************
@@ -356,15 +348,15 @@ void turrett_devices(device_slot_interface &device)
 MACHINE_CONFIG_START(turrett_state::turrett)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3041, R3041_CLOCK)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_R3000_BRCOND2_INPUT(READLINE(*this, turrett_state, sbrc2_r))
-	MCFG_R3000_BRCOND3_INPUT(READLINE(*this, turrett_state, sbrc3_r))
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
+	R3041(config, m_maincpu, R3041_CLOCK);
+	m_maincpu->set_endianness(ENDIANNESS_BIG);
+	m_maincpu->in_brcond<2>().set(FUNC(turrett_state::sbrc2_r));
+	m_maincpu->in_brcond<3>().set(FUNC(turrett_state::sbrc3_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &turrett_state::cpu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(turrett_state::vblank));
+	m_maincpu->set_periodic_int(FUNC(turrett_state::adc), attotime::from_hz(60));
 
-	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(turrett_devices, "hdd", nullptr, true);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -374,7 +366,7 @@ MACHINE_CONFIG_START(turrett_state::turrett)
 	MCFG_SCREEN_UPDATE_DRIVER(turrett_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -18,37 +18,6 @@
 
 #pragma once
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-// TODO: REMOVE THESE
-#define MCFG_VIA6522_READPA_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_readpa_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_READPB_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_readpb_handler(DEVCB_##_devcb);
-
-// TODO: CONVERT THESE TO WRITE LINE
-#define MCFG_VIA6522_WRITEPA_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_writepa_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_WRITEPB_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_writepb_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_CA2_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_ca2_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_CB1_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_cb1_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_CB2_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_cb2_handler(DEVCB_##_devcb);
-
-#define MCFG_VIA6522_IRQ_HANDLER(_devcb) \
-	downcast<via6522_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -83,21 +52,13 @@ public:
 	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// TODO: REMOVE THESE
-	template <class Object> devcb_base &set_readpa_handler(Object &&cb) { return m_in_a_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_readpb_handler(Object &&cb) { return m_in_b_handler.set_callback(std::forward<Object>(cb)); }
 	auto readpa_handler() { return m_in_a_handler.bind(); }
 	auto readpb_handler() { return m_in_b_handler.bind(); }
 
 	// TODO: CONVERT THESE TO WRITE LINE
-	template <class Object> devcb_base &set_writepa_handler(Object &&cb) { return m_out_a_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_writepb_handler(Object &&cb) { return m_out_b_handler.set_callback(std::forward<Object>(cb)); }
 	auto writepa_handler() { return m_out_a_handler.bind(); }
 	auto writepb_handler() { return m_out_b_handler.bind(); }
 
-	template <class Object> devcb_base &set_ca2_handler(Object &&cb) { return m_ca2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cb1_handler(Object &&cb) { return m_cb1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cb2_handler(Object &&cb) { return m_cb2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	auto ca2_handler() { return m_ca2_handler.bind(); }
 	auto cb1_handler() { return m_cb1_handler.bind(); }
 	auto cb2_handler() { return m_cb2_handler.bind(); }
@@ -105,8 +66,8 @@ public:
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { set_pa_line(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { set_pa_line(1, state); }
@@ -146,6 +107,7 @@ private:
 	static constexpr device_timer_id TIMER_SHIFT_IRQ = 4;
 
 	uint16_t get_counter1_value();
+	void counter2_decrement();
 
 	void set_int(int data);
 	void clear_int(int data);

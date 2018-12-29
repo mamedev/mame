@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -162,10 +162,10 @@ void simd_check_float(
 		, _0, _1, _2, _3
 		);
 
-	CHECK(bx::fequal(c.f[0], _0, 0.0001f) );
-	CHECK(bx::fequal(c.f[1], _1, 0.0001f) );
-	CHECK(bx::fequal(c.f[2], _2, 0.0001f) );
-	CHECK(bx::fequal(c.f[3], _3, 0.0001f) );
+	CHECK(bx::equal(c.f[0], _0, 0.0001f) );
+	CHECK(bx::equal(c.f[1], _1, 0.0001f) );
+	CHECK(bx::equal(c.f[2], _2, 0.0001f) );
+	CHECK(bx::equal(c.f[3], _3, 0.0001f) );
 }
 
 void simd_check_float(
@@ -189,14 +189,14 @@ void simd_check_float(
 		, _0, _1, _2, _3, _4, _5, _6, _7
 		);
 
-	CHECK(bx::fequal(c.f[0], _0, 0.0001f) );
-	CHECK(bx::fequal(c.f[1], _1, 0.0001f) );
-	CHECK(bx::fequal(c.f[2], _2, 0.0001f) );
-	CHECK(bx::fequal(c.f[3], _3, 0.0001f) );
-	CHECK(bx::fequal(c.f[4], _4, 0.0001f) );
-	CHECK(bx::fequal(c.f[5], _5, 0.0001f) );
-	CHECK(bx::fequal(c.f[6], _6, 0.0001f) );
-	CHECK(bx::fequal(c.f[7], _7, 0.0001f) );
+	CHECK(bx::equal(c.f[0], _0, 0.0001f) );
+	CHECK(bx::equal(c.f[1], _1, 0.0001f) );
+	CHECK(bx::equal(c.f[2], _2, 0.0001f) );
+	CHECK(bx::equal(c.f[3], _3, 0.0001f) );
+	CHECK(bx::equal(c.f[4], _4, 0.0001f) );
+	CHECK(bx::equal(c.f[5], _5, 0.0001f) );
+	CHECK(bx::equal(c.f[6], _6, 0.0001f) );
+	CHECK(bx::equal(c.f[7], _7, 0.0001f) );
 }
 
 void simd_check_string(const char* _str, bx::simd128_t _a)

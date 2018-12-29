@@ -301,8 +301,9 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 
 	// temporary until things are cleaned up
-	MCFG_DEVICE_ADD("tempcdc", LC89510_TEMP, 0) // cd controller
-	MCFG_SEGACD_HACK_SET_CDC_DO_DMA( sega_segacd_device, SegaCD_CDC_Do_DMA ) // hack
+	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
+	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA), this); // hack
+
 
 	MCFG_TIMER_ADD_NONE("sw_timer") //stopwatch timer
 	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, stamp_timer_callback)
@@ -316,7 +317,7 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
 	MCFG_DEVICE_ADDRESS_MAP(0, segacd_pcm_map)
 
-	MCFG_NVRAM_ADD_0FILL("backupram")
+	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
 MACHINE_CONFIG_END

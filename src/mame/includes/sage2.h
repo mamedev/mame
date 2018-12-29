@@ -6,6 +6,7 @@
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "bus/ieee488/ieee488.h"
+#include "imagedev/floppy.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"

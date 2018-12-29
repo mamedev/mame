@@ -374,8 +374,9 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 */
 
 #include "emu.h"
-#include "includes/xbox.h"
+#include "machine/pci.h"
 #include "includes/xbox_pci.h"
+#include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/idehd.h"
@@ -1860,28 +1861,40 @@ MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	MCFG_DEVICE_PROGRAM_MAP(chihiro_map)
 	MCFG_DEVICE_IO_MAP(chihiro_map_io)
 
-	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, nullptr, "bb", true)
+	//BUS_MASTER_IDE_CONTROLLER(config, "ide").options(ide_baseboard, nullptr, "bb", true);
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
 
-	MCFG_USB_PORT_ADD(":pci:02.0:port1", usb_baseboard, "an2131qc", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("an2131qc", an2131qc_configuration)
-	MCFG_USB_PORT_ADD(":pci:02.0:port2", usb_baseboard, "an2131sc", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("an2131sc", an2131sc_configuration)
-	MCFG_USB_PORT_ADD(":pci:02.0:port3", usb_baseboard, nullptr, false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_baseboard, nullptr, false)
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_baseboard, nullptr, false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_baseboard, nullptr, false);
 
 	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
-	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "jvs_master"));
+	sega837.set_port_tag<0>("TILT");
+	sega837.set_port_tag<1>("P1");
+	sega837.set_port_tag<2>("P2");
+	sega837.set_port_tag<3>("A0");
+	sega837.set_port_tag<4>("A1");
+	sega837.set_port_tag<5>("A2");
+	sega837.set_port_tag<6>("A3");
+	sega837.set_port_tag<7>("A4");
+	sega837.set_port_tag<8>("A5");
+	sega837.set_port_tag<9>("A6");
+	sega837.set_port_tag<10>("A7");
+	sega837.set_port_tag<11>("OUTPUT");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(chihiro_state::chihirogd)
+void chihiro_state::chihirogd(machine_config &config)
+{
 	chihiro_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
-	MCFG_DEVICE_ADD("network", SEGA_NETWORK_BOARD, 0)
-MACHINE_CONFIG_END
+	NAOMI_GDROM_BOARD(config, m_dimmboard, 0, ":gdrom", "pic");
+	m_dimmboard->irq_callback().set_nop();
+	SEGA_NETWORK_BOARD(config, "network", 0);
+}
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
@@ -2356,9 +2369,9 @@ ROM_START( qofd3 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "cdv-10026d", 0, SHA1(b079778f7837100a9b4fa2a536a4efc7817dd2d2) )  // DVD
 
-	// satellite Chihiro security PIC is missing
+	// satellite Chihiro security PIC, label is unknown
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, NO_DUMP )
+	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, CRC(bacf6f52) SHA1(72892aba23a540c02d3260be8c68d2b3fa45bdae) )
 
 	// "Quest of D Ver. 3.0"
 	// CD QOD3 VERSION UPDATE

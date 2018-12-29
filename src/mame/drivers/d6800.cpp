@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(25))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -410,14 +410,14 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, d6800_state, d6800_keyboard_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, d6800_state, d6800_cassette_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, d6800_state, d6800_keyboard_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, d6800_state, d6800_cassette_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, d6800_state, d6800_screen_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(d6800_state::d6800_keyboard_r));
+	m_pia->readpb_handler().set(FUNC(d6800_state::d6800_cassette_r));
+	m_pia->writepa_handler().set(FUNC(d6800_state::d6800_keyboard_w));
+	m_pia->writepb_handler().set(FUNC(d6800_state::d6800_cassette_w));
+	m_pia->cb2_handler().set(FUNC(d6800_state::d6800_screen_w));
+	m_pia->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

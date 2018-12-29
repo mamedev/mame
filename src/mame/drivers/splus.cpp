@@ -134,8 +134,8 @@ private:
 	required_ioport m_i20;
 	required_ioport m_i30;
 	required_ioport m_sensor;
-	required_device<cpu_device> m_maincpu;
-	required_device<i2cmem_device> m_i2cmem;
+	required_device<i80c32_device> m_maincpu;
+	required_device<x2404p_device> m_i2cmem;
 	output_finder<9> m_digits;
 	output_finder<5,8> m_leds;
 };
@@ -677,39 +677,57 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I80C32, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(splus_map)
-	MCFG_DEVICE_IO_MAP(splus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, splus_state, splus_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
+void splus_state::splus(machine_config &config) // basic machine hardware
+{
+	I80C32(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &splus_state::splus_map);
+	m_maincpu->set_addrmap(AS_IO, &splus_state::splus_iomap);
+	m_maincpu->port_out_cb<1>().set(FUNC(splus_state::splus_p1_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(splus_state::splus_p3_r));
 
 	// Fill NVRAM
-	MCFG_NVRAM_ADD_0FILL("cmosl")
-	MCFG_NVRAM_ADD_0FILL("cmosh")
+	NVRAM(config, "cmosl", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "cmosh", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware (ALL FAKE, NO VIDEO)
-	MCFG_PALETTE_ADD("palette", 16*16)
-	MCFG_SCREEN_ADD("scrn", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(splus_state, screen_update)
-	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	PALETTE(config, "palette").set_entries(16*16);
 
-	MCFG_X2404P_ADD("i2cmem")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(splus_state::screen_update));
+	screen.set_size((52+1)*8, (31+1)*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);
+	screen.set_palette("palette");
+
+	X2404P(config, m_i2cmem);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	AY8912(config, "aysnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 /*************************
 *        Rom Load        *
 *************************/
+
+ROM_START( spset005 ) /* Set Chip, not sure how it works but archive for future use */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set005.u52",   0x00000, 0x10000, CRC(43b70e2e) SHA1(30d610c988fc7e7e9fd54ff378c4a1fecfe5fffe) ) /* 09/24/93   @ IGT L93-1769 */
+	ROM_LOAD( "set017.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
+	ROM_LOAD( "set020.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
+ROM_END
+
+ROM_START( spset015 ) /* Set Chip, not sure how it works but archive for future use */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set015.u52",   0x00000, 0x10000, CRC(01641946) SHA1(81a0632ef96731907b28963293ab12db2073f4a6) )
+ROM_END
+
+ROM_START( spset026 ) /* Set Chip, not sure how it works but archive for future use */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set026.u52",   0x00000, 0x10000, CRC(01641946) SHA1(81a0632ef96731907b28963293ab12db2073f4a6) ) /* 11/06/96   @ IGT NV */
+ROM_END
 
 ROM_START( spss4240 ) /* Coral Reef (SS4240) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -724,4 +742,8 @@ ROM_END
 *************************/
 
 //     YEAR  NAME      PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
+GAMEL( 1993, spset005, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET005 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1993, spset015, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET015 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1996, spset026, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET026 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+
 GAMEL( 1994, spss4240, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

@@ -24,9 +24,9 @@ BMC Bowling (c) 1994.05 BMC, Ltd
         BET(B)+START(1) - other tests
         START(1) - next test
 
- press START(1)+HP(S) durning boot to see stats
+ press START(1)+HP(S) during boot to see stats
 
- press CONFIRM(N) durning boot, to enter    settings
+ press CONFIRM(N) during boot, to enter    settings
         BET(B) - change page
         STOP1(X)/STOP3(V) - modify
         START(1)/SMALL(F) - move
@@ -63,7 +63,7 @@ GREAT1 21.47727
 
 DIPS:
 Place for 4 8 switch dips
-dips 1 & 3 are all connected via resitors
+dips 1 & 3 are all connected via resistors
 dips 2 & 4 are standard 8 switch dips
 
 EEPROM       Label         Use
@@ -119,22 +119,24 @@ Main board:
 class bmcbowl_state : public driver_device
 {
 public:
-	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_stats_ram(*this, "nvram", 16),
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_input(*this, "IN%u", 1)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<uint8_t> m_stats_ram;
-	required_shared_ptr<uint16_t> m_vid1;
-	required_shared_ptr<uint16_t> m_vid2;
-	required_device<palette_device> m_palette;
-	int m_bmc_input;
-	DECLARE_READ16_MEMBER(bmc_random_read);
-	DECLARE_READ16_MEMBER(bmc_protection_r);
+	void bmcbowl(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_READ16_MEMBER(random_read);
+	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_READ8_MEMBER(via_b_in);
 	DECLARE_WRITE8_MEMBER(via_a_out);
@@ -142,24 +144,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
-	void init_bmcbowl();
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
-	void bmcbowl(machine_config &config);
-	void bmcbowl_mem(address_map &map);
+	void main_mem(address_map &map);
 	void ramdac_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_stats_ram;
+	required_shared_ptr<uint16_t> m_vid1;
+	required_shared_ptr<uint16_t> m_vid2;
+	required_device<palette_device> m_palette;
+
+	required_ioport_array<2> m_input;
+	uint8_t m_selected_input;
 };
 
 
-
-
-void bmcbowl_state::video_start()
-{
-}
-
-uint32_t bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
       280x230,4 bitmap layers, 8bpp,
@@ -208,12 +209,12 @@ uint32_t bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-READ16_MEMBER(bmcbowl_state::bmc_random_read)
+READ16_MEMBER(bmcbowl_state::random_read)
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(bmcbowl_state::bmc_protection_r)
+READ16_MEMBER(bmcbowl_state::protection_r)
 {
 	switch(m_maincpu->pcbase())
 	{
@@ -301,6 +302,11 @@ void bmcbowl_state::init_stats(const uint8_t *table, int table_len, int address)
 }
 #endif
 
+void bmcbowl_state::machine_start()
+{
+	save_item(NAME(m_selected_input));
+}
+
 void bmcbowl_state::machine_reset()
 {
 #ifdef NVRAM_HACK
@@ -313,7 +319,7 @@ void bmcbowl_state::machine_reset()
 #endif
 }
 
-void bmcbowl_state::bmcbowl_mem(address_map &map)
+void bmcbowl_state::main_mem(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
@@ -345,9 +351,9 @@ void bmcbowl_state::bmcbowl_mem(address_map &map)
 	map(0x30c040, 0x30c041).nopw();
 	map(0x30c080, 0x30c081).nopw();
 	map(0x30c0c0, 0x30c0c1).nopw();
-	map(0x30c100, 0x30c101).r(FUNC(bmcbowl_state::bmc_protection_r));
+	map(0x30c100, 0x30c101).r(FUNC(bmcbowl_state::protection_r));
 	map(0x30c140, 0x30c141).nopw();
-	map(0x30ca00, 0x30ca01).r(FUNC(bmcbowl_state::bmc_random_read)).nopw();
+	map(0x30ca00, 0x30ca01).r(FUNC(bmcbowl_state::random_read)).nopw();
 }
 
 
@@ -436,19 +442,19 @@ INPUT_PORTS_END
 
 READ8_MEMBER(bmcbowl_state::dips1_r)
 {
-	switch(m_bmc_input)
+	switch(m_selected_input)
 	{
-			case 0x00:  return  ioport("IN1")->read();
-			case 0x40:  return  ioport("IN2")->read();
+		case 0x00: return m_input[0]->read();
+		case 0x40: return m_input[1]->read();
 	}
-	logerror("%s:unknown input - %X\n",machine().describe_context(),m_bmc_input);
+	logerror("%s: unknown input - %X\n", machine().describe_context(), m_selected_input);
 	return 0xff;
 }
 
 
 WRITE8_MEMBER(bmcbowl_state::input_mux_w)
 {
-	m_bmc_input=data;
+	m_selected_input = data;
 }
 
 void bmcbowl_state::ramdac_map(address_map &map)
@@ -456,49 +462,51 @@ void bmcbowl_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(21'477'272) / 2 )
-	MCFG_DEVICE_PROGRAM_MAP(bmcbowl_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
+void bmcbowl_state::bmcbowl(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmcbowl_state::main_mem);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(35*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 0*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bmcbowl_state, screen_update_bmcbowl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(35*8, 30*8);
+	screen.set_visarea(0*8, 35*8-1, 0*8, 29*8-1);
+	screen.set_screen_update(FUNC(bmcbowl_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, m_palette).set_entries(256);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &bmcbowl_state::ramdac_map);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545) )  // guessed chip type, clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));  // guessed chip type, clock not verified
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545) / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, bmcbowl_state, dips1_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bmcbowl_state, input_mux_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(3'579'545) / 2));
+	aysnd.port_a_read_callback().set(FUNC(bmcbowl_state::dips1_r));
+	aysnd.port_b_write_callback().set(FUNC(bmcbowl_state::input_mux_w));
+	aysnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, bmcbowl_state,via_b_in))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, bmcbowl_state, via_a_out))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bmcbowl_state, via_b_out))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, bmcbowl_state, via_ca2_out))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_4))
-MACHINE_CONFIG_END
+	via6522_device &via(VIA6522(config, "via6522_0", 1000000));
+	via.readpb_handler().set(FUNC(bmcbowl_state::via_b_in));
+	via.writepa_handler().set(FUNC(bmcbowl_state::via_a_out));
+	via.writepb_handler().set(FUNC(bmcbowl_state::via_b_out));
+	via.ca2_handler().set(FUNC(bmcbowl_state::via_ca2_out));
+	via.irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
+}
 
 ROM_START( bmcbowl )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
@@ -518,9 +526,4 @@ ROM_START( bmcbowl )
 
 ROM_END
 
-void bmcbowl_state::init_bmcbowl()
-{
-	save_item(NAME(m_bmc_input));
-}
-
-GAME( 1994, bmcbowl, 0, bmcbowl, bmcbowl, bmcbowl_state, init_bmcbowl, ROT0, "BMC", "Konkyuu no Hoshi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1994, bmcbowl, 0, bmcbowl, bmcbowl, bmcbowl_state, empty_init, ROT0, "BMC", "Konkyuu no Hoshi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

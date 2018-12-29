@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+#ifndef MAME_INCLUDES_TWIN16_H
+#define MAME_INCLUDES_TWIN16_H
+
+#pragma once
+
 #include "video/bufsprite.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
@@ -9,8 +14,8 @@
 class twin16_state : public driver_device
 {
 public:
-	twin16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	twin16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
@@ -25,7 +30,8 @@ public:
 		m_videoram(*this, "videoram.%u", 0),
 		m_zipram(*this, "zipram"),
 		m_sprite_gfx_ram(*this, "sprite_gfx_ram"),
-		m_gfxrom(*this, "gfxrom") { }
+		m_gfxrom(*this, "gfxrom")
+	{ }
 
 	void devilw(machine_config &config);
 	void miaj(machine_config &config);
@@ -143,3 +149,5 @@ private:
 
 	uint16_t m_nvram[0x400 * 0x20 / 2];
 };
+
+#endif // MAME_INCLUDES_TWIN16_H

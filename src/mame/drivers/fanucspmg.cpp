@@ -531,6 +531,7 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
 #include "machine/i8087.h"
@@ -548,14 +549,6 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 
 #define MAINCPU_TAG "maincpu"
 #define SUBCPU_TAG  "subcpu"
-#define USART0_TAG  "usart0"
-#define USART1_TAG  "usart1"
-#define USART2_TAG  "usart2"
-#define USART3_TAG  "usart3"
-#define PIT0_TAG    "pit0"
-#define PIT1_TAG    "pit1"
-#define PIC0_TAG    "pic0"
-#define PIC1_TAG    "pic1"
 #define DMAC_TAG    "dmac"
 #define CRTC_TAG    "crtc"
 #define FDC_TAG     "fdc"
@@ -570,14 +563,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_subcpu(*this, SUBCPU_TAG)
-		, m_usart0(*this, USART0_TAG)
-		, m_usart1(*this, USART1_TAG)
-		, m_usart2(*this, USART2_TAG)
-		, m_usart3(*this, USART3_TAG)
-		, m_pit0(*this, PIT0_TAG)
-		, m_pit1(*this, PIT1_TAG)
-		, m_pic0(*this, PIC0_TAG)
-		, m_pic1(*this, PIC1_TAG)
+		, m_usart(*this, "usart%u", 0U)
+		, m_pit(*this, "pit%u", 0U)
+		, m_pic(*this, "pic%u", 0U)
 		, m_dmac(*this, DMAC_TAG)
 		, m_crtc(*this, CRTC_TAG)
 		, m_fdc(*this, FDC_TAG)
@@ -593,14 +581,9 @@ public:
 private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8085a_cpu_device> m_subcpu;
-	required_device<i8251_device> m_usart0;
-	required_device<i8251_device> m_usart1;
-	required_device<i8251_device> m_usart2;
-	required_device<i8251_device> m_usart3;
-	required_device<pit8253_device> m_pit0;
-	required_device<pit8253_device> m_pit1;
-	required_device<pic8259_device> m_pic0;
-	required_device<pic8259_device> m_pic1;
+	required_device_array<i8251_device, 4> m_usart;
+	required_device_array<pit8253_device, 2> m_pit;
+	required_device_array<pic8259_device, 2> m_pic;
 	required_device<i8257_device> m_dmac;
 	required_device<mc6845_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
@@ -676,7 +659,7 @@ WRITE8_MEMBER(fanucspmg_state::shared_w)
 READ8_MEMBER(fanucspmg_state::get_slave_ack)
 {
 	if(offset == 7)
-		return m_pic1->acknowledge();
+		return m_pic[1]->acknowledge();
 
 	return 0x00;
 }
@@ -725,22 +708,18 @@ void fanucspmg_state::maincpu_mem(address_map &map)
 	map(0x80000, 0x81fff).ram();   // believed to be shared RAM with a CPU inside the Program File
 	map(0x88000, 0x88001).noprw();   // Program File "ready" bit
 
-	map(0xf0000, 0xf0003).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0xf0000, 0xf0003).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0xf0004, 0xf0007).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0xf0008, 0xf000f).rw(m_pit0, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xf0010, 0xf0010).rw(m_usart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf0012, 0xf0012).rw(m_usart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf0014, 0xf0014).rw(m_usart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf0016, 0xf0016).rw(m_usart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf0018, 0xf0018).rw(m_usart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf001a, 0xf001a).rw(m_usart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf001c, 0xf001c).rw(m_usart3, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf001e, 0xf001e).rw(m_usart3, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf0008, 0xf000f).rw(m_pit[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf0010, 0xf0013).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0014, 0xf0017).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf0018, 0xf001b).rw(m_usart[2], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf001c, 0xf001f).rw(m_usart[3], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xf0020, 0xf0029).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0xf0042, 0xf0043).r(FUNC(fanucspmg_state::magic_r));
 	map(0xf0046, 0xf0046).w(FUNC(fanucspmg_state::dma_page_w));
-	map(0xf0048, 0xf004f).rw(m_pit1, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xf2000, 0xf2003).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0xf0048, 0xf004f).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf2000, 0xf2003).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 
 	map(0xf8000, 0xf9fff).rw(FUNC(fanucspmg_state::shared_r), FUNC(fanucspmg_state::shared_w));
 	map(0xfc000, 0xfffff).rom().region(MAINCPU_TAG, 0);
@@ -966,82 +945,81 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
+void fanucspmg_state::fanucspmg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, I8086, XTAL(15'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
-	MCFG_DEVICE_IO_MAP(maincpu_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
-	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
-	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
+	I8086(config, m_maincpu, XTAL(15'000'000)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fanucspmg_state::maincpu_mem);
+	m_maincpu->set_addrmap(AS_IO, &fanucspmg_state::maincpu_io);
+	m_maincpu->set_irq_acknowledge_callback("pic0", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
-	MCFG_DEVICE_ADD("i8087", I8087, XTAL(15'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
-	MCFG_I8087_DATA_WIDTH(16)
-	//MCFG_I8087_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))  // TODO: presumably this is connected to the pic
-	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
+	i8087_device &i8087(I8087(config, "i8087", XTAL(15'000'000)/3));
+	i8087.set_addrmap(AS_PROGRAM, &fanucspmg_state::maincpu_mem);
+	i8087.set_data_width(16);
+	//i8087.irq().set_inputline("maincpu", INPUT_LINE_NMI);  // TODO: presumably this is connected to the pic
+	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
-	MCFG_DEVICE_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
-	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
+	I8085A(config, m_subcpu, XTAL(16'000'000)/2/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &fanucspmg_state::subcpu_mem);
 
-	MCFG_DEVICE_ADD(USART0_TAG, I8251, 0)
-	MCFG_DEVICE_ADD(USART1_TAG, I8251, 0)
-	MCFG_DEVICE_ADD(USART2_TAG, I8251, 0)
-	MCFG_DEVICE_ADD(USART3_TAG, I8251, 0)
+	I8251(config, m_usart[0], 0);
+	I8251(config, m_usart[1], 0);
+	I8251(config, m_usart[2], 0);
+	I8251(config, m_usart[3], 0);
 
-	MCFG_DEVICE_ADD(PIT0_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12)
-	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12)
-	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
-	MCFG_DEVICE_ADD(PIT1_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12)
-	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12)
-	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12)
+	PIT8253(config, m_pit[0], 0);
+	m_pit[0]->set_clk<0>(XTAL(15'000'000)/12);
+	m_pit[0]->set_clk<1>(XTAL(15'000'000)/12);
+	m_pit[0]->set_clk<2>(XTAL(15'000'000)/12);
 
-	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL(15'000'000) / 5)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, fanucspmg_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, fanucspmg_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, fanucspmg_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fanucspmg_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(READ8(*this, fanucspmg_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, fanucspmg_state, fdcdma_w))
+	PIT8253(config, m_pit[1], 0);
+	m_pit[1]->set_clk<0>(XTAL(15'000'000)/12);
+	m_pit[1]->set_clk<1>(XTAL(15'000'000)/12);
+	m_pit[1]->set_clk<2>(XTAL(15'000'000)/12);
 
-	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, fanucspmg_state, get_slave_ack))
+	I8257(config, m_dmac, XTAL(15'000'000) / 5);
+	m_dmac->out_hrq_cb().set(FUNC(fanucspmg_state::hrq_w));
+	m_dmac->out_tc_cb().set(FUNC(fanucspmg_state::tc_w));
+	m_dmac->in_memr_cb().set(FUNC(fanucspmg_state::memory_read_byte));
+	m_dmac->out_memw_cb().set(FUNC(fanucspmg_state::memory_write_byte));
+	m_dmac->in_ior_cb<0>().set(FUNC(fanucspmg_state::fdcdma_r));
+	m_dmac->out_iow_cb<0>().set(FUNC(fanucspmg_state::fdcdma_w));
 
-	MCFG_DEVICE_ADD(PIC1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(PIC0_TAG, pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic[0], 0);
+	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic[0]->in_sp_callback().set_constant(1);
+	m_pic[0]->read_slave_ack_callback().set(FUNC(fanucspmg_state::get_slave_ack));
 
-	MCFG_UPD765A_ADD(FDC_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(PIC0_TAG, pic8259_device, ir3_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(DMAC_TAG, i8257_device, dreq0_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
+	PIC8259(config, m_pic[1], 0);
+	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir7_w));
+	m_pic[1]->in_sp_callback().set_constant(0);
 
-	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000), 640, 0, 512, 390, 0, 384 )
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	m_fdc->intrq_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);
+	screen.set_screen_update(CRTC_TAG, FUNC(mc6845_device::screen_update));
 
-MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
+	HD6845(config, m_crtc, XTAL(8'000'000)/2);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(fanucspmg_state::vsync_w));
+}
+
+void fanucspmg_state::fanucspmgm(machine_config &config)
+{
 	fanucspmg(config);
-	MCFG_DEVICE_REMOVE( CRTC_TAG )
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row_mono)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
-MACHINE_CONFIG_END
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row_mono), this);
+}
 
 /* ROM definition */
 ROM_START( fanucspg )

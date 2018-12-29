@@ -72,6 +72,8 @@ public:
 		, m_bank_e000_w(*this, "bank_e000_w")
 		, m_bank_f800_w(*this, "bank_f800_w")
 		, m_config(*this, "CONFIG")
+		, m_kbd_row(*this, "ROW%u", 0U)
+		, m_tape_timer(nullptr)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
@@ -82,18 +84,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(ext_irq_w);
 	DECLARE_WRITE8_MEMBER(psg_a_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_tape);
+	TIMER_CALLBACK_MEMBER(update_tape);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	void oric(machine_config &config);
+	void oric(machine_config &config, bool add_ext = true);
 	void prav8d(machine_config &config);
 	void oric_mem(address_map &map);
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_psg;
 	required_device<centronics_device> m_centronics;
@@ -109,7 +111,9 @@ protected:
 	optional_memory_bank m_bank_e000_w;
 	optional_memory_bank m_bank_f800_w;
 	required_ioport m_config;
-	ioport_port *m_kbd_row[8];
+	required_ioport_array<8> m_kbd_row;
+
+	emu_timer *m_tape_timer;
 
 	int m_blink_counter;
 	uint8_t m_pattr;
@@ -143,9 +147,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
 
 	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
@@ -189,6 +190,9 @@ protected:
 
 	virtual void update_irq() override;
 	void remap();
+	void port_314_w(u8 data);
+	u8 port_314_r();
+	u8 port_318_r();
 };
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
@@ -366,7 +370,7 @@ WRITE8_MEMBER(oric_state::psg_a_w)
 	update_keyboard();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(oric_state::update_tape)
+TIMER_CALLBACK_MEMBER(oric_state::update_tape)
 {
 	if(!m_config->read())
 		m_via->write_cb1(m_cassette->input() > 0.0038);
@@ -394,11 +398,8 @@ void oric_state::machine_start_common()
 	m_via_irq = false;
 	m_ext_irq = false;
 
-	for(int i=0; i<8; i++) {
-		char name[10];
-		sprintf(name, "ROW%d", i);
-		m_kbd_row[i] = machine().root_device().ioport(name);
-	}
+	if (!m_tape_timer)
+		m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(oric_state::update_tape), this));
 }
 
 void oric_state::machine_start()
@@ -476,7 +477,7 @@ WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
 	update_irq();
 }
 
-WRITE8_MEMBER(telestrat_state::port_314_w)
+void telestrat_state::port_314_w(u8 data)
 {
 	m_port_314 = data;
 	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
@@ -489,12 +490,12 @@ WRITE8_MEMBER(telestrat_state::port_314_w)
 	update_irq();
 }
 
-READ8_MEMBER(telestrat_state::port_314_r)
+u8 telestrat_state::port_314_r()
 {
 	return (m_fdc_irq && (m_port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(telestrat_state::port_318_r)
+u8 telestrat_state::port_318_r()
 {
 	return m_fdc_drq ? 0x7f : 0xff;
 }
@@ -776,56 +777,60 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(oric_state::oric)
+void oric_state::oric(machine_config &config, bool add_ext)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12_MHz_XTAL / 12)
-	MCFG_DEVICE_PROGRAM_MAP(oric_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6502(config, m_maincpu, 12_MHz_XTAL / 12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &oric_state::oric_mem);
+
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL / 2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
-	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, oric_state, vblank_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12_MHz_XTAL / 2, 64*6, 0, 40*6, 312, 0, 28*8); // 260 lines in 60 Hz mode
+	screen.set_screen_update(FUNC(oric_state::screen_update_oric));
+	screen.screen_vblank().set(FUNC(oric_state::vblank_w));
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("ay8912", AY8912, 12_MHz_XTAL / 12)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, oric_state, psg_a_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	AY8912(config, m_psg, 12_MHz_XTAL / 12);
+	m_psg->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_psg->set_resistors_load(4700, 4700, 4700);
+	m_psg->port_a_write_callback().set(FUNC(oric_state::psg_a_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(oric_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape_timer", oric_state, update_tape, attotime::from_hz(4800))
+	CASSETTE(config, m_cassette, 0);
+	m_cassette->set_formats(oric_cassette_formats);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED));
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522", VIA6522, 12_MHz_XTAL / 12)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, oric_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, oric_state, via_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, oric_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, oric_state, via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, oric_state, via_irq_w))
+	VIA6522(config, m_via, 12_MHz_XTAL / 12);
+	m_via->writepa_handler().set(FUNC(oric_state::via_a_w));
+	m_via->writepb_handler().set(FUNC(oric_state::via_b_w));
+	m_via->ca2_handler().set(FUNC(oric_state::via_ca2_w));
+	m_via->cb2_handler().set(FUNC(oric_state::via_cb2_w));
+	m_via->irq_handler().set(FUNC(oric_state::via_irq_w));
 
 	/* extension port */
-	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(*this, oric_state, ext_irq_w))
-MACHINE_CONFIG_END
+	ORICEXT_CONNECTOR(config, "ext", oricext_intf, nullptr, "maincpu").irq_callback().set(FUNC(oric_state::ext_irq_w));
+}
 
-MACHINE_CONFIG_START(oric_state::prav8d)
-	oric(config);
-MACHINE_CONFIG_END
+void oric_state::prav8d(machine_config &config)
+{
+	oric(config, true);
+}
 
 FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
@@ -836,40 +841,36 @@ static void telestrat_floppies(device_slot_interface &device)
 	device.option_add("3dsdd", FLOPPY_3_DSDD);
 }
 
-MACHINE_CONFIG_START(telestrat_state::telstrat)
-	oric(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(telestrat_mem)
+void telestrat_state::telstrat(machine_config &config)
+{
+	oric(config, false);
+	m_maincpu->set_addrmap(AS_PROGRAM, &telestrat_state::telestrat_mem);
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, telestrat_state, acia_irq_w))
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set(FUNC(telestrat_state::acia_irq_w));
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, 12_MHz_XTAL / 12)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, telestrat_state, via2_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, telestrat_state, via2_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, telestrat_state, via2_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, telestrat_state, via2_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, telestrat_state, via2_irq_w))
+	VIA6522(config, m_via2, 12_MHz_XTAL / 12);
+	m_via2->writepa_handler().set(FUNC(telestrat_state::via2_a_w));
+	m_via2->writepb_handler().set(FUNC(telestrat_state::via2_b_w));
+	m_via2->ca2_handler().set(FUNC(telestrat_state::via2_ca2_w));
+	m_via2->cb2_handler().set(FUNC(telestrat_state::via2_cb2_w));
+	m_via2->irq_handler().set(FUNC(telestrat_state::via2_irq_w));
 
 	/* microdisc */
-	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, telestrat_state, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, telestrat_state, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, telestrat_state, fdc_hld_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(telestrat_state::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(telestrat_state::fdc_drq_w));
+	m_fdc->hld_wr_callback().set(FUNC(telestrat_state::fdc_hld_w));
+	m_fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
-
-	// [RH] 30 August 2016: Based on the French Wikipedia page for the Oric, it does not appear
-	// that the Telestrat supported the same expansions as the Oric-1 and Atmos.
-	MCFG_DEVICE_REMOVE("ext")
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
+}
 
 
 ROM_START(oric1)

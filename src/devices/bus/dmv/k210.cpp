@@ -99,13 +99,13 @@ MACHINE_CONFIG_END
 void dmv_k210_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
 	if (ifsel == 0)
-		data = m_ppi->read(space, offset & 0x03);
+		data = m_ppi->read(offset & 0x03);
 }
 
 void dmv_k210_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
 	if (ifsel == 0)
-		m_ppi->write(space, offset & 0x03, data);
+		m_ppi->write(offset & 0x03, data);
 }
 
 READ8_MEMBER( dmv_k210_device::porta_r )

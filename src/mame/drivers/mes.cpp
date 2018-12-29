@@ -146,14 +146,14 @@ MACHINE_CONFIG_START(mes_state::mes)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
-	MCFG_DEVICE_ADD("sio", Z80SIO, 0)
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
+	Z80SIO(config, "sio", 0);
 
-	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(mes_state, kbd_put))
+	generic_keyboard_device &keybd(GENERIC_KEYBOARD(config, "keybd", 0));
+	keybd.set_keyboard_callback(FUNC(mes_state::kbd_put));
 MACHINE_CONFIG_END
 
 

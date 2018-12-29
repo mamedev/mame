@@ -460,7 +460,7 @@ uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  PALETTE_INIT( abc806 )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc806_state, abc806 )
+void abc806_state::abc806_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
@@ -478,17 +478,17 @@ PALETTE_INIT_MEMBER( abc806_state, abc806 )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc806_state::abc806_video)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
-	MCFG_MC6845_UPDATE_ROW_CB(abc806_state, abc806_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, abc806_state, hs_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, abc806_state, vs_w))
+	MC6845(config, m_crtc, ABC800_CCLK);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(ABC800_CHAR_WIDTH);
+	m_crtc->set_update_row_callback(FUNC(abc806_state::abc806_update_row), this);
+	m_crtc->out_hsync_callback().set(FUNC(abc806_state::hs_w));
+	m_crtc->out_vsync_callback().set(FUNC(abc806_state::vs_w));
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xfa)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(abc806_state, abc806)
+	PALETTE(config, m_palette, FUNC(abc806_state::abc806_palette), 8);
 MACHINE_CONFIG_END

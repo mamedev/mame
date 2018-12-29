@@ -400,7 +400,8 @@ void cidelsa_state::machine_reset()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(cidelsa_state::destryer)
+void cidelsa_state::destryer(machine_config &config)
+{
 	/* basic system hardware */
 	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DESTRYER_CHR1));
 	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::destryer_map);
@@ -409,13 +410,14 @@ MACHINE_CONFIG_START(cidelsa_state::destryer)
 	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
 	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound and video hardware */
 	destryer_video(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cidelsa_state::destryera)
+void cidelsa_state::destryera(machine_config &config)
+{
 	/* basic system hardware */
 	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DESTRYER_CHR1));
 	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::destryera_map);
@@ -424,13 +426,14 @@ MACHINE_CONFIG_START(cidelsa_state::destryera)
 	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
 	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound and video hardware */
 	destryer_video(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cidelsa_state::altair)
+void cidelsa_state::altair(machine_config &config)
+{
 	/* basic system hardware */
 	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, ALTAIR_CHR1));
 	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::altair_map);
@@ -440,7 +443,7 @@ MACHINE_CONFIG_START(cidelsa_state::altair)
 	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
 	cpu.tpb_cb().set("ic26", FUNC(cdp1852_device::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* input/output hardware */
 	cdp1852_device &ic23(CDP1852(config, "ic23")); // clock is really tied to CDP1869 CMSEL (pin 37)
@@ -461,9 +464,10 @@ MACHINE_CONFIG_START(cidelsa_state::altair)
 
 	/* sound and video hardware */
 	altair_video(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(draco_state::draco)
+void draco_state::draco(machine_config &config)
+{
 	/* basic system hardware */
 	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DRACO_CHR1));
 	cpu.set_addrmap(AS_PROGRAM, &draco_state::draco_map);
@@ -473,16 +477,16 @@ MACHINE_CONFIG_START(draco_state::draco)
 	cpu.q_cb().set(FUNC(draco_state::q_w));
 	cpu.tpb_cb().set("ic32", FUNC(cdp1852_device::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
-	MCFG_DEVICE_PROGRAM_MAP(draco_sound_map)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, draco_state, sound_bankswitch_w))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, draco_state, sound_g_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, draco_state, psg_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, draco_state, psg_w))
-	MCFG_COP400_READ_IN_CB(READ8(*this, draco_state, sound_in_r))
+	cop402_cpu_device &cop(COP402(config, COP402N_TAG, DRACO_SND_CHR1));
+	cop.set_addrmap(AS_PROGRAM, &draco_state::draco_sound_map);
+	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	cop.write_d().set(FUNC(draco_state::sound_bankswitch_w));
+	cop.write_g().set(FUNC(draco_state::sound_g_w));
+	cop.read_l().set(FUNC(draco_state::psg_r));
+	cop.write_l().set(FUNC(draco_state::psg_w));
+	cop.read_in().set(FUNC(draco_state::sound_in_r));
 
 	/* input/output hardware */
 	cdp1852_device &ic29(CDP1852(config, "ic29")); // clock is really tied to CDP1869 CMSEL (pin 37)
@@ -503,7 +507,7 @@ MACHINE_CONFIG_START(draco_state::draco)
 
 	/* sound and video hardware */
 	draco_video(config);
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/keyboard.h"
 #include "emupal.h"
@@ -160,18 +161,18 @@ MACHINE_CONFIG_START( olytext_state::olytext )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(olytext_state, screen_update)
 	//MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 8) // divisor guess
+	WD1772(config, "fdc", 16_MHz_XTAL / 8); // divisor guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", olytext_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(olytext_state, keyboard_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(olytext_state::keyboard_put));
 MACHINE_CONFIG_END
 
 

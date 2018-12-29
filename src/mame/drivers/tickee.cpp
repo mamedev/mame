@@ -761,15 +761,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tickee_state::tickee)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tickee_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::tickee_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::scanline_update));
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TICKET_DISPENSER_ADD("ticket1", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
@@ -786,15 +786,15 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2149, VIDEO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &ym1(YM2149(config, "ym1", VIDEO_CLOCK/8));
+	ym1.port_a_read_callback().set_ioport("DSW");
+	ym1.port_b_read_callback().set_ioport("IN1");
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM2149, VIDEO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &ym2(YM2149(config, "ym2", VIDEO_CLOCK/8));
+	ym2.port_a_read_callback().set_ioport("IN0");
+	ym2.port_b_read_callback().set_ioport("IN2");
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
@@ -810,19 +810,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(rapidfir_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, rapidfir_scanline_update)       /* scanline callback (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(tickee_state, rapidfir_to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(tickee_state, rapidfir_from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, XTAL(50'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::rapidfir_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::rapidfir_scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(tickee_state::rapidfir_to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(tickee_state::rapidfir_from_shiftreg));
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,rapidfir)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
@@ -844,15 +844,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tickee_state::mouseatk)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mouseatk_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tickee_state::mouseatk_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(tickee_state::scanline_update));
 
 	MCFG_MACHINE_RESET_OVERRIDE(tickee_state,tickee)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TICKET_DISPENSER_ADD("ticket1", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
@@ -867,10 +867,10 @@ MACHINE_CONFIG_START(tickee_state::mouseatk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM2149, OKI_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &ym(YM2149(config, "ym", OKI_CLOCK));
+	ym.port_a_read_callback().set_ioport("DSW");
+	ym.port_b_read_callback().set_ioport("IN1");
+	ym.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

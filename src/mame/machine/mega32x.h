@@ -31,7 +31,7 @@ public:
 	}
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
@@ -118,6 +118,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
@@ -138,12 +139,15 @@ protected:
 	TIMER_CALLBACK_MEMBER(handle_pwm_callback);
 	void calculate_pwm_timer();
 	uint16_t m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
-	uint16_t m_cur_lch[0x10],m_cur_rch[0x10];
+	static constexpr int PWM_FIFO_SIZE = 3;
+	uint16_t m_cur_lch[PWM_FIFO_SIZE],m_cur_rch[PWM_FIFO_SIZE];
 	uint16_t m_pwm_cycle_reg; //used for latching
 	uint8_t m_pwm_timer_tick;
-	uint8_t m_lch_index_r, m_rch_index_r, m_lch_index_w, m_rch_index_w;
+	uint8_t m_lch_size, m_rch_size;
 	uint16_t m_lch_fifo_state, m_rch_fifo_state;
 
+	void lch_pop();
+	void rch_pop();
 
 	uint16_t get_hposition(void);
 
@@ -243,8 +247,5 @@ protected:
 
 DECLARE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device)
 DECLARE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device)
-
-#define MCFG_SEGA_32X_PALETTE(_palette_tag) \
-	downcast<sega_32x_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_MACHINE_MEGA32X_H

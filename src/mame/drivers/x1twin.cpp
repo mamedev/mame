@@ -74,10 +74,6 @@ void x1twin_state::pce_mem(address_map &map)
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
 	map(0x1FE000, 0x1FE3FF).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
 	map(0x1FE400, 0x1FE7FF).rw(FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
-	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
-	map(0x1FEC00, 0x1FEFFF).rw(FUNC(x1twin_state::h6280_timer_r), FUNC(x1twin_state::h6280_timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(FUNC(x1twin_state::pce_joystick_r), FUNC(x1twin_state::pce_joystick_w));
-	map(0x1FF400, 0x1FF7FF).rw("maincpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
 void x1twin_state::pce_io(address_map &map)
@@ -416,41 +412,41 @@ static void x1_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
-	MCFG_DEVICE_IO_MAP(x1_io)
-	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+	Z80(config, m_maincpu, X1_MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1twin_state::x1_mem);
+	m_maincpu->set_addrmap(AS_IO, &x1twin_state::x1_io);
+	m_maincpu->set_daisy_config(x1_daisy);
 
-	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "iobank").set_map(&x1_state::x1_io_banks).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg2))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MAIN_CLOCK/4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("ctc", FUNC(z80ctc_device::trg3));
+	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
+	ppi.in_pb_callback().set(FUNC(x1_state::x1_portb_r));
+	ppi.in_pc_callback().set(FUNC(x1_state::x1_portc_r));
+	ppi.out_pa_callback().set(FUNC(x1_state::x1_porta_w));
+	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
+	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
-	MCFG_DEVICE_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
-	MCFG_DEVICE_IO_MAP(pce_io)
+	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, pce_mem);
+	m_maincpu->set_addrmap(AS_IO, pce_io);
+	m_maincpu->port_in_cb().set(FUNC(x1twin_state::pce_joystick_r));
+	m_maincpu->port_out_cb().set(FUNC(x1twin_state::pce_joystick_w));
+	m_maincpu->add_route(0, "pce_l", 0.5);
+	m_maincpu->add_route(1, "pce_r", 0.5);
+
 	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "pce_screen", 0, 1)
 	#endif
 
@@ -469,20 +465,20 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
+	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
-	MCFG_DEVICE_ADD("fdc", MB8877, MAIN_CLOCK / 16)
-	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
+	MB8877(config, m_fdc, MAIN_CLOCK / 16);
+	// TODO: guesswork, try to implicitly start the motor
+	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -503,13 +499,13 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 //  SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(0, "x1_l",  0.25)
-	MCFG_SOUND_ROUTE(0, "x1_r", 0.25)
-	MCFG_SOUND_ROUTE(1, "x1_l",  0.5)
-	MCFG_SOUND_ROUTE(2, "x1_r", 0.5)
+	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
+	ay.port_a_read_callback().set_ioport("P1");
+	ay.port_b_read_callback().set_ioport("P2");
+	ay.add_route(0, "x1_l", 0.25);
+	ay.add_route(0, "x1_r", 0.25);
+	ay.add_route(1, "x1_l", 0.5);
+	ay.add_route(2, "x1_r", 0.5);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -518,13 +514,6 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_CASSETTE_INTERFACE("x1_cass")
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
-
-#if 0
-	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_C6280_CPU("pce_cpu")
-	MCFG_SOUND_ROUTE(0, "pce_l", 0.5)
-	MCFG_SOUND_ROUTE(1, "pce_r", 0.5)
-#endif
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", x1twin_state, x1_keyboard_callback, attotime::from_hz(250))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1twin_state, x1_cmt_wind_timer, attotime::from_hz(16))

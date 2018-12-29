@@ -28,7 +28,7 @@
 #include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
 #include "formats/apridisk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/apricotkb.h"
 #include "machine/buffer.h"
 #include "machine/input_merger.h"
@@ -367,25 +367,25 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
 
-	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO, 2500000)
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
+	Z80SIO(config, m_sio, 2500000);
+	m_sio->out_int_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, f1_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, f1_state, ctc_z2_w))
+	Z80CTC(config, m_ctc, 2500000);
+	m_ctc->intr_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
+	m_ctc->zc_callback<1>().set(FUNC(f1_state::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(FUNC(f1_state::ctc_z2_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m_sio, z80sio_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// floppy
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 4_MHz_XTAL / 2 /* ? */)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_TEST))
+	WD2797(config, m_fdc, 4_MHz_XTAL / 2 /* ? */);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", f1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", f1_state::floppy_formats)

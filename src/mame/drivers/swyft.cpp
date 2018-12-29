@@ -327,7 +327,7 @@ public:
 	void swyft(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m68008_device> m_maincpu;
 	optional_device<centronics_device> m_ctx;
 	optional_device<output_latch_device> m_ctx_data_out;
 	required_device<acia6850_device> m_acia6850;
@@ -642,7 +642,7 @@ static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2
 READ8_MEMBER( swyft_state::swyft_via0_r )
 {
 	if (offset&0x000C3F) logerror("VIA0: read from invalid offset in 68k space: %06X!\n", offset);
-	uint8_t data = m_via[0]->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via[0]->read((offset>>6)&0xF);
 	LOGMASKED(LOG_VIA0, "VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	return data;
 }
@@ -651,13 +651,13 @@ WRITE8_MEMBER( swyft_state::swyft_via0_w )
 {
 	LOGMASKED(LOG_VIA0, "VIA0 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	if (offset&0x000C3F) logerror("VIA0: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via[1]->write(space, (offset>>6)&0xF, data);
+	m_via[1]->write((offset>>6)&0xF, data);
 }
 
 READ8_MEMBER( swyft_state::swyft_via1_r )
 {
 	if (offset&0x000C3F) logerror("VIA1: read from invalid offset in 68k space: %06X!\n", offset);
-	uint8_t data = m_via[1]->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via[1]->read((offset>>6)&0xF);
 	LOGMASKED(LOG_VIA1, "VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	return data;
 }
@@ -666,7 +666,7 @@ WRITE8_MEMBER( swyft_state::swyft_via1_w )
 {
 	LOGMASKED(LOG_VIA1, "VIA1 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 	if (offset&0x000C3F) logerror("VIA1: write to invalid offset in 68k space: %06X, data: %02X!\n", offset, data);
-	m_via[0]->write(space, (offset>>6)&0xF, data);
+	m_via[0]->write((offset>>6)&0xF, data);
 }
 
 // first via
@@ -751,49 +751,48 @@ WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
 	m_acia6850->write_rxc(state);
 }
 
-MACHINE_CONFIG_START(swyft_state::swyft)
-
+void swyft_state::swyft(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68008, XTAL(15'897'600)/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
-	MCFG_DEVICE_PROGRAM_MAP(swyft_mem)
+	M68008(config, m_maincpu, XTAL(15'897'600)/2); //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
+	m_maincpu->set_addrmap(AS_PROGRAM, &swyft_state::swyft_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(swyft_state,swyft)
 	MCFG_MACHINE_RESET_OVERRIDE(swyft_state,swyft)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(15.8976_MHz_XTAL / 2, 500, 0, 320, 265, 0, 242) // total guess
-	MCFG_SCREEN_UPDATE_DRIVER(swyft_state, screen_update_swyft)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
 	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(15.8976_MHz_XTAL / 2, 500, 0, 320, 265, 0, 242); // total guess
+	screen.set_screen_update(FUNC(swyft_state::screen_update_swyft));
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	ACIA6850(config, m_acia6850, 0);
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, (XTAL(15'897'600)/2)/5) // out e clock from 68008, ~ 10in clocks per out clock
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, swyft_state, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", (XTAL(15'897'600)/2)/5)); // out e clock from 68008, ~ 10in clocks per out clock
+	acia_clock.signal_handler().set(FUNC(swyft_state::write_acia_clock));
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, swyft_state, via0_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, swyft_state, via0_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, swyft_state, via0_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, swyft_state, via0_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, swyft_state, via0_cb1_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, swyft_state, via0_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, swyft_state, via0_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("viairq", input_merger_device, in_w<0>))
+	via6522_device &via0(VIA6522(config, "via6522_0", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via0.readpa_handler().set(FUNC(swyft_state::via0_pa_r));
+	via0.readpb_handler().set(FUNC(swyft_state::via0_pb_r));
+	via0.writepa_handler().set(FUNC(swyft_state::via0_pa_w));
+	via0.writepb_handler().set(FUNC(swyft_state::via0_pb_w));
+	via0.cb1_handler().set(FUNC(swyft_state::via0_cb1_w));
+	via0.ca2_handler().set(FUNC(swyft_state::via0_ca2_w));
+	via0.cb2_handler().set(FUNC(swyft_state::via0_cb2_w));
+	via0.irq_handler().set("viairq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, swyft_state, via1_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, swyft_state, via1_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, swyft_state, via1_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, swyft_state, via1_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, swyft_state, via1_cb1_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, swyft_state, via1_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, swyft_state, via1_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("viairq", input_merger_device, in_w<1>))
+	via6522_device &via1(VIA6522(config, "via6522_1", (XTAL(15'897'600)/2)/5)); // out e clock from 68008
+	via1.readpa_handler().set(FUNC(swyft_state::via1_pa_r));
+	via1.readpb_handler().set(FUNC(swyft_state::via1_pb_r));
+	via1.writepa_handler().set(FUNC(swyft_state::via1_pa_w));
+	via1.writepb_handler().set(FUNC(swyft_state::via1_pb_w));
+	via1.cb1_handler().set(FUNC(swyft_state::via1_cb1_w));
+	via1.ca2_handler().set(FUNC(swyft_state::via1_ca2_w));
+	via1.cb2_handler().set(FUNC(swyft_state::via1_cb2_w));
+	via1.irq_handler().set("viairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &viairq(INPUT_MERGER_ANY_HIGH(config, "viairq"));
 	viairq.output_handler().set_inputline("maincpu", M68K_IRQ_2);
@@ -807,7 +806,7 @@ MACHINE_CONFIG_START(swyft_state::swyft)
 	m_bitlatch->q_out_cb<5>().set(FUNC(swyft_state::bitlatch_q_w<5>));
 	m_bitlatch->q_out_cb<6>().set(FUNC(swyft_state::bitlatch_q_w<6>));
 	m_bitlatch->q_out_cb<7>().set(FUNC(swyft_state::bitlatch_q_w<7>));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( swyft )

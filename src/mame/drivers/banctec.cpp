@@ -154,15 +154,15 @@ MACHINE_CONFIG_START(banctec_state::banctec)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_banctec)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(2'000'000)) /* (?) */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(banctec_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(banctec_state, crtc_addr)
-
+	r6545_1_device &crtc(R6545_1(config, "crtc", XTAL(2'000'000))); /* (?) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(banctec_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(banctec_state::crtc_addr), this);
 MACHINE_CONFIG_END
 
 ROM_START(banctec)

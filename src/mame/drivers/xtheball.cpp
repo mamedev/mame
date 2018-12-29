@@ -294,33 +294,33 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(xtheball_state::xtheball)
 
-	MCFG_DEVICE_ADD("maincpu", TMS34010, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(10000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(xtheball_state, scanline_update)     /* scanline updater (rgb32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(xtheball_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
+	TMS34010(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xtheball_state::main_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(10000000);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(xtheball_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(xtheball_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(xtheball_state::from_shiftreg));
+	m_maincpu->set_periodic_int(FUNC(xtheball_state::irq1_line_hold), attotime::from_hz(15000));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("latch1", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("ticket", ticket_dispenser_device, motor_w))
+	hc259_device &latch1(HC259(config, "latch1"));
+	latch1.q_out_cb<7>().set("ticket", FUNC(ticket_dispenser_device::motor_w));
 	// Q4 = meter, Q6 = tickets, Q7 = tickets?
 
-	MCFG_DEVICE_ADD("latch2", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // start lamp
+	hc259_device &latch2(HC259(config, "latch2"));
+	latch2.q_out_cb<0>().set_output("led0"); // start lamp
 	// Q1-Q7 = more lamps?
 
-	MCFG_DEVICE_ADD("latch3", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, xtheball_state, foreground_mode_w))
+	hc259_device &latch3(HC259(config, "latch3"));
+	latch3.q_out_cb<3>().set(FUNC(xtheball_state::foreground_mode_w));
 	// Q3 = video foreground control?
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

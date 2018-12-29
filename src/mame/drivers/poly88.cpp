@@ -65,8 +65,7 @@ void poly88_state::poly88_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x04, 0x04).w(FUNC(poly88_state::poly88_baud_rate_w));
 	map(0x08, 0x08).w(FUNC(poly88_state::poly88_intr_w));
 	map(0xf8, 0xf8).r(FUNC(poly88_state::poly88_keyboard_r));
@@ -214,7 +213,7 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poly88)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* audio hardware */
@@ -227,9 +226,9 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, XTAL(16'588'800) / 9)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, poly88_state,write_cas_tx))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, poly88_state,poly88_usart_rxready))
+	I8251(config, m_uart, XTAL(16'588'800) / 9);
+	m_uart->txd_handler().set(FUNC(poly88_state::write_cas_tx));
+	m_uart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)

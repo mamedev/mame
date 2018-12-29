@@ -198,10 +198,6 @@ static INPUT_PORTS_START( concept )
 INPUT_PORTS_END
 
 
-
-/* init with simple, fixed, B/W palette */
-/* Is the palette black on white or white on black??? */
-
 void concept_a2_cards(device_slot_interface &device)
 {
 	device.option_add("fchdd", A2BUS_CORVUS);       // Corvus flat-cable HDD interface (see notes in a2corvus.c)
@@ -210,56 +206,56 @@ void concept_a2_cards(device_slot_interface &device)
 }
 
 
-
-MACHINE_CONFIG_START(concept_state::concept)
+void concept_state::concept(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 8182000)        /* 16.364 MHz / 2 */
-	MCFG_DEVICE_PROGRAM_MAP(concept_memmap)
+	M68000(config, m_maincpu, 8182000);        /* 16.364 MHz / 2 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &concept_state::concept_memmap);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)            /* 50 or 60, jumper-selectable */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(720, 560)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 560-1)
-	MCFG_SCREEN_UPDATE_DRIVER(concept_state, screen_update_concept)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);            /* 50 or 60, jumper-selectable */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(720, 560);
+	screen.set_visarea(0, 720-1, 0, 560-1);
+	screen.set_screen_update(FUNC(concept_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	/* Is the palette black on white or white on black??? */
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
-	MCFG_DEVICE_ADD("mm58274c", MM58274C, 0)
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	MM58274C(config, m_mm58274, 0);
+	m_mm58274->set_mode24(0); // 12 hour
+	m_mm58274->set_day1(1);   // monday
 
 	/* via */
-	MCFG_DEVICE_ADD(m_via0, VIA6522, 1022750)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, concept_state, via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, concept_state, via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, concept_state, via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, concept_state, via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, concept_state, via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, concept_state, via_irq_func))
+	VIA6522(config, m_via0, 1022750);
+	m_via0->readpa_handler().set(FUNC(concept_state::via_in_a));
+	m_via0->readpb_handler().set(FUNC(concept_state::via_in_b));
+	m_via0->writepa_handler().set(FUNC(concept_state::via_out_a));
+	m_via0->writepb_handler().set(FUNC(concept_state::via_out_b));
+	m_via0->cb2_handler().set(FUNC(concept_state::via_out_cb2));
+	m_via0->irq_handler().set(FUNC(concept_state::via_irq_func));
 
 	/* ACIAs */
-	MCFG_DEVICE_ADD(m_acia0, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MOS6551(config, m_acia0, 0);
+	m_acia0->set_xtal(XTAL(1'843'200));
+	m_acia0->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(m_acia1, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MOS6551(config, m_acia1, 0);
+	m_acia1->set_xtal(XTAL(1'843'200));
+	m_acia1->txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(m_kbdacia, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MOS6551(config, m_kbdacia, 0);
+	m_kbdacia->set_xtal(XTAL(1'843'200));
 
 	/* Apple II bus */
 	A2BUS(config, m_a2bus, 0).set_cputag(m_maincpu);
@@ -269,18 +265,18 @@ MACHINE_CONFIG_START(concept_state::concept)
 	A2BUS_SLOT(config, "sl4", m_a2bus, concept_a2_cards, "fdc01");
 
 	/* 2x RS232 ports */
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA_0_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA_0_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(ACIA_0_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA_0_TAG, mos6551_device, write_cts))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_acia0, FUNC(mos6551_device::write_rxd));
+	rs232a.dcd_handler().set(m_acia0, FUNC(mos6551_device::write_dcd));
+	rs232a.dsr_handler().set(m_acia0, FUNC(mos6551_device::write_dsr));
+	rs232a.cts_handler().set(m_acia0, FUNC(mos6551_device::write_cts));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA_1_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA_1_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(ACIA_1_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA_1_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_acia1, FUNC(mos6551_device::write_rxd));
+	rs232b.dcd_handler().set(m_acia1, FUNC(mos6551_device::write_dcd));
+	rs232b.dsr_handler().set(m_acia1, FUNC(mos6551_device::write_dsr));
+	rs232b.cts_handler().set(m_acia1, FUNC(mos6551_device::write_cts));
+}
 
 
 ROM_START( concept )

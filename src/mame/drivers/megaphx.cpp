@@ -93,7 +93,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_indersb(*this, "inder_sb"),
 		m_ppi(*this, "ppi8255_0"),
-		m_dsw_shifter{ {*this, "ttl166_1"}, {*this, "ttl166_2"} },
+		m_dsw_shifter(*this, "ttl166_%u", 1U),
 		m_dsw_data(0),
 		m_ppi_to_pic_command(0), m_ppi_to_pic_clock(0), m_ppi_to_pic_data(0),
 		m_pic_to_ppi_clock(0), m_pic_to_ppi_data(0)
@@ -104,6 +104,7 @@ public:
 	void init_megaphx();
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	required_device<inder_vid_device> m_indervid;
@@ -123,7 +124,7 @@ private:
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<inder_sb_device> m_indersb;
 	required_device<i8255_device> m_ppi;
-	required_device<ttl166_device> m_dsw_shifter[2];
+	required_device_array<ttl166_device, 2> m_dsw_shifter;
 
 	int m_dsw_data;
 	int m_ppi_to_pic_command;
@@ -143,6 +144,13 @@ public:
 protected:
 	virtual void machine_reset() override;
 };
+
+void megaphx_state::machine_start()
+{
+	uint16_t *src = (uint16_t*)memregion( "boot" )->base();
+	// copy vector table? - it must be writable because the game write the irq vector..
+	memcpy(m_mainram, src, 0x80);
+}
 
 void megaphx_state::machine_reset()
 {
@@ -376,44 +384,37 @@ WRITE_LINE_MEMBER( megaphx_state::dsw_w )
 	m_dsw_data = state;
 }
 
-MACHINE_CONFIG_START(megaphx_state::megaphx)
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(megaphx_68k_map)
-
-	MCFG_DEVICE_ADD("pic", PIC16C54, 6_MHz_XTAL) // correct?
-	MCFG_PIC16C5x_READ_A_CB(READ8(*this, megaphx_state, pic_porta_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, megaphx_state, pic_porta_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, megaphx_state, pic_portb_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, megaphx_state, pic_portb_w))
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-	MCFG_DEVICE_ADD("ttl166_1", TTL166)
-	MCFG_TTL166_DATA_CB(IOPORT("DSW1"))
-	MCFG_TTL166_QH_CB(WRITELINE("ttl166_2", ttl166_device, serial_w))
-
-	MCFG_DEVICE_ADD("ttl166_2", TTL166)
-	MCFG_TTL166_DATA_CB(IOPORT("DSW2"))
-	MCFG_TTL166_QH_CB(WRITELINE(*this, megaphx_state, dsw_w))
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, megaphx_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, megaphx_state, ppi_portc_w))
-
-	MCFG_INDER_VIDEO_ADD("inder_vid")
-
-	MCFG_INDER_AUDIO_ADD("inder_sb")
-MACHINE_CONFIG_END
-
-void megaphx_state::init_megaphx()
+void megaphx_state::megaphx(machine_config &config)
 {
-	uint16_t *src = (uint16_t*)memregion( "boot" )->base();
-	// copy vector table? - it must be writable because the game write the irq vector..
-	memcpy(m_mainram, src, 0x80);
-}
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megaphx_state::megaphx_68k_map);
 
+	pic16c54_device &pic(PIC16C54(config, "pic", 6_MHz_XTAL)); // correct?
+	pic.read_a().set(FUNC(megaphx_state::pic_porta_r));
+	pic.write_a().set(FUNC(megaphx_state::pic_porta_w));
+	pic.read_b().set(FUNC(megaphx_state::pic_portb_r));
+	pic.write_b().set(FUNC(megaphx_state::pic_portb_w));
+
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+
+	TTL166(config, m_dsw_shifter[0]);
+	m_dsw_shifter[0]->data_callback().set_ioport("DSW1");
+	m_dsw_shifter[0]->qh_callback().set(m_dsw_shifter[1], FUNC(ttl166_device::serial_w));
+
+	TTL166(config, m_dsw_shifter[1]);
+	m_dsw_shifter[1]->data_callback().set_ioport("DSW2");
+	m_dsw_shifter[1]->qh_callback().set(FUNC(megaphx_state::dsw_w));
+
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("P1");
+	m_ppi->in_pb_callback().set_ioport("P2");
+	m_ppi->in_pc_callback().set(FUNC(megaphx_state::ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
+
+	INDER_VIDEO(config, m_indervid, 0);
+
+	INDER_AUDIO(config, "inder_sb", 0);
+}
 
 ROM_START( megaphx )
 	ROM_REGION16_BE( 0x40000, "boot", 0 )  // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
@@ -471,5 +472,5 @@ ROM_START( hamboy )
 	ROM_FILL(0x2c, 1, 0x01) // patch timer length or its too slow (pic issue?)
 ROM_END
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, init_megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, hamboy,   0,        megaphx, hamboy,  hamboy_state,  init_megaphx, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, hamboy,   0,        megaphx, hamboy,  hamboy_state,  empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

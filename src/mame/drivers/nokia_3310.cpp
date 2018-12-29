@@ -715,20 +715,19 @@ MACHINE_CONFIG_START(noki3310_state::noki3310)
 	MCFG_SCREEN_UPDATE_DEVICE("pcd8544", pcd8544_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	MCFG_PCD8544_ADD("pcd8544")
 	MCFG_PCD8544_SCREEN_UPDATE_CALLBACK(noki3310_state, pcd8544_screen_update)
 
-	MCFG_INTEL_TE28F160_ADD("flash")
+	INTEL_TE28F160(config, "flash");
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(noki3310_state::noki3330)
 	noki3310(config);
 
-	MCFG_DEVICE_REMOVE("flash")
-	MCFG_INTEL_TE28F320_ADD("flash")
+	INTEL_TE28F320(config.replace(), "flash");
 
 MACHINE_CONFIG_END
 

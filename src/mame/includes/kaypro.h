@@ -9,6 +9,7 @@
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "bus/centronics/ctronics.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
@@ -59,7 +60,7 @@ public:
 	DECLARE_MACHINE_START(kayproii);
 	DECLARE_MACHINE_RESET(kaypro);
 	DECLARE_VIDEO_START(kaypro);
-	DECLARE_PALETTE_INIT(kaypro);
+	void kaypro_palette(palette_device &palette) const;
 	void init_kaypro();
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -96,7 +97,7 @@ private:
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;

@@ -468,22 +468,21 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
-	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
-	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
-	MCFG_TC0480SCP_COL_BASE(4096)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_offsets(30 + 3, 9);
+	m_tc0480scp->set_offsets_tx(-1, -1);
+	m_tc0480scp->set_offsets_flip(0, 2);
+	m_tc0480scp->set_col_base(4096);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_TC0360PRI_ADD("tc0360pri")
+	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -498,9 +497,9 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_maincpu);
+	m_tc0140syt->set_slave_tag("audiocpu");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapshot_state::opwolf3)
@@ -515,12 +514,12 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
-	MCFG_ADC0808_IN0_CB(IOPORT("GUN1X"))
-	MCFG_ADC0808_IN1_CB(IOPORT("GUN1Y"))
-	MCFG_ADC0808_IN2_CB(IOPORT("GUN2X"))
-	MCFG_ADC0808_IN3_CB(IOPORT("GUN2Y"))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 3);
+	adc.in_callback<0>().set_ioport("GUN1X");
+	adc.in_callback<1>().set_ioport("GUN1Y");
+	adc.in_callback<2>().set_ioport("GUN2X");
+	adc.in_callback<3>().set_ioport("GUN2Y");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
@@ -537,22 +536,21 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
-	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
-	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
-	MCFG_TC0480SCP_COL_BASE(4096)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_offsets(30 + 3, 9);
+	m_tc0480scp->set_offsets_tx(-1, -1);
+	m_tc0480scp->set_offsets_flip(0, 2);
+	m_tc0480scp->set_col_base(4096);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_TC0360PRI_ADD("tc0360pri")
+	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -567,9 +565,9 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_maincpu);
+	m_tc0140syt->set_slave_tag("audiocpu");
 MACHINE_CONFIG_END
 
 /***************************************************************************

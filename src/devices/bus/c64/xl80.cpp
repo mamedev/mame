@@ -131,12 +131,13 @@ MACHINE_CONFIG_START(c64_xl80_device::device_add_mconfig)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c64_xl80)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, MC6845_SCREEN_TAG, XTAL(14'318'181) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(c64_xl80_device, crtc_update_row)
+	H46505(config, m_crtc, XTAL(14'318'181) / 8);
+	m_crtc->set_screen(MC6845_SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(c64_xl80_device::crtc_update_row), this);
 MACHINE_CONFIG_END
 
 

@@ -26,6 +26,7 @@ TODO:
 - Super Stingray MCU irq controls timer speed, needs the MCU to be hooked up.
 - Super Champion Baseball "ball speed" protection
 - Fix sound CPU crashes properly on Alpha 68k II / V HW games (nested NMIs)
+- Sky Soldiers : BGM Fade out before boss battle isn't implemented
 
 General notes:
 
@@ -1906,14 +1907,14 @@ MACHINE_CONFIG_START(alpha68k_state::sstingry)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, nmi_line_pulse,  4000)
 
-	MCFG_DEVICE_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
-//  MCFG_DEVICE_PROGRAM_MAP(i8748_map)
-//  MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, alpha68k_state, saiyugoub1_mcu_command_r))
+	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
+//  mcu.set_addrmap(AS_PROGRAM, &alpha68k_state::i8748_map);
+//  mcu.bus_in_cb().set(FUNC(alpha68k_state::saiyugoub1_mcu_command_r));
 //  MCFG_MCS48_PORT_T0_CLK_CUSTOM(alpha68k_state, saiyugoub1_m5205_clk_w)     /* Drives the clock on the m5205 at 1/8 of this frequency */
-//  MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, alpha68k_state, saiyugoub1_m5205_irq_r))
-//  MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alpha68k_state, saiyugoub1_adpcm_rom_addr_w))
-//  MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alpha68k_state, saiyugoub1_adpcm_control_w))
-	MCFG_DEVICE_DISABLE()
+//  mcu.t1_in_cb().set(FUNC(alpha68k_state::saiyugoub1_m5205_irq_r));
+//  mcu.p1_out_cb().set(FUNC(alpha68k_state::saiyugoub1_adpcm_rom_addr_w));
+//  mcu.p2_out_cb().set(FUNC(alpha68k_state::saiyugoub1_adpcm_control_w));
+	mcu.set_disable();
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,common)
@@ -1926,18 +1927,16 @@ MACHINE_CONFIG_START(alpha68k_state::sstingry)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_sstingry)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sstingry)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sstingry)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::kyros_palette), 256 + 1, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
@@ -1978,18 +1977,16 @@ MACHINE_CONFIG_START(alpha68k_state::kyros)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kyros)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::kyros_palette), 256 + 1, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL / 12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
@@ -2029,22 +2026,20 @@ MACHINE_CONFIG_START(alpha68k_state::jongbou)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jongbou)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_jongbou)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::kyros_palette), 256 + 1, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.65);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
@@ -2068,19 +2063,17 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_I)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_I)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::paddlem_palette), 1024, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2121,9 +2114,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_II)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
@@ -2132,11 +2125,11 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
+	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
+	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.65);
 
 	MCFG_DEVICE_ADD("ym2", YM2413, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -2172,9 +2165,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 13C
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, alpha68k_state, video_control2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, alpha68k_state, video_control3_w))
+	LS259(config, m_outlatch); // 13C
+	m_outlatch->q_out_cb<2>().set(FUNC(alpha68k_state::video_control2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(alpha68k_state::video_control3_w));
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
@@ -2187,9 +2180,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_V)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
@@ -2198,11 +2191,11 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, ALPHA68K_PIXEL_CLOCK / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
+	ym2203_device &ym1(YM2203(config, "ym1", ALPHA68K_PIXEL_CLOCK / 2));
+	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.65);
 
 	MCFG_DEVICE_ADD("ym2", YM2413, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -2242,18 +2235,16 @@ MACHINE_CONFIG_START(alpha68k_state::tnextspc)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_I)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_I)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::paddlem_palette), 1024, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3155,7 +3146,7 @@ ROM_START( sbasebalj )
 	ROM_LOAD( "kcb-chr0.h16", 0x1e0000, 0x80000, CRC(b8a1a088) SHA1(cb21a04387431b1810130abd86a2ebf78cf09a3b) )
 ROM_END
 
-ROM_START( tnextspc ) /* MASKROM for gfx */
+ROM_START( tnextspc ) /* mask ROM for gfx */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) )
 	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) )
@@ -3177,7 +3168,7 @@ ROM_START( tnextspc ) /* MASKROM for gfx */
 	ROM_LOAD( "4.p4",        0x0700,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) /* Clut low nibble */
 ROM_END
 
-ROM_START( tnextspc2 ) /* EPROMs for gfx */
+ROM_START( tnextspc2 ) // two bootleg PCBs have been found with the same ROMs as this set, the only difference being ns_2.bin being double sized with 1st and 2nd half identical
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) /* b18.ic13 */
 	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) /* b17.ic11 */
@@ -3185,7 +3176,7 @@ ROM_START( tnextspc2 ) /* EPROMs for gfx */
 	ROM_REGION( 0x10000, "audiocpu", 0 )   /* Sound CPU */
 	ROM_LOAD( "ns_1.bin",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) /* b1.ic129 */
 
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* Graphics are odd/even interleaved */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* EPROMs, graphics are odd/even interleaved */
 	ROM_LOAD16_BYTE( "b3.ic49",  0x00001, 0x10000, CRC(2bddf94d) SHA1(e064f48d0e3bb089753c1b59c863bb46bfa2bcee) )
 	ROM_LOAD16_BYTE( "b7.ic53",  0x00000, 0x10000, CRC(a8b13a9a) SHA1(2f808c17e97a272be14099c53b287e665dd90b14) )
 	ROM_LOAD16_BYTE( "b4.ic50",  0x20001, 0x10000, CRC(80c6c841) SHA1(ab0aa4cad6dcadae62f849e53c3c5cd909f77971) )

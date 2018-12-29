@@ -82,6 +82,19 @@ public:
 
 	void set_character_width(int value) { m_hpixels_per_column = value; }
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = draw_character_delegate(std::forward<T>(args)...); }
+	void set_display_callback(draw_character_delegate callback) { m_display_cb = callback; }
+	template <class FunctionClass> void set_display_callback(const char *devname,
+		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t),
+		const char *name)
+	{
+		set_display_callback(draw_character_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_display_callback(
+		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t),
+		const char *name)
+	{
+		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return m_write_drq.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
@@ -102,6 +115,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -235,8 +250,16 @@ protected:
 	emu_timer *m_scanline_timer;
 };
 
+class i8276_device : public i8275_device
+{
+public:
+	// construction/destruction
+	i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8275, i8275_device)
+DECLARE_DEVICE_TYPE(I8276, i8276_device)
 
 #endif // MAME_VIDEO_I8275_H

@@ -537,38 +537,39 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(eolith_state::eolith45)
-	MCFG_DEVICE_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(eolith_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
+void eolith_state::eolith45(machine_config &config)
+{
+	E132N(config, m_maincpu, 45000000);         /* 45 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::eolith_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 
 	/* Sound CPU */
-	MCFG_DEVICE_ADD("soundcpu", I8032, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sound_prg_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, eolith_state, sound_p1_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
+	I8032(config, m_soundcpu, XTAL(12'000'000));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
+	m_soundcpu->set_addrmap(AS_IO, &eolith_state::sound_io_map);
+	m_soundcpu->port_out_cb<1>().set(FUNC(eolith_state::sound_p1_w));
+	m_soundcpu->serial_tx_cb().set(FUNC(eolith_state::soundcpu_to_qs1000)); // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))
+	EEPROM_93C66_8BIT(config, "eeprom")
+		.erase_time(attotime::from_usec(250))
+		.write_time(attotime::from_usec(250));
 
 //  for testing sound sync
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(eolith_state, screen_update_eolith)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(512, 262);
+	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_screen_update(FUNC(eolith_state::screen_update_eolith));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
@@ -576,34 +577,33 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", MCS51_INT0_LINE))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, MCS51_INT0_LINE);
 
-	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
-	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(*this, eolith_state, qs1000_p1_r))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, eolith_state, qs1000_p1_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	qs1000_device &qs1000(QS1000(config, "qs1000", XTAL(24'000'000)));
+	qs1000.set_external_rom(true);
+	qs1000.p1_in().set(FUNC(eolith_state::qs1000_p1_r));
+	qs1000.p1_out().set(FUNC(eolith_state::qs1000_p1_w));
+	qs1000.add_route(0, "lspeaker", 1.0);
+	qs1000.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(eolith_state::eolith50)
+void eolith_state::eolith50(machine_config &config)
+{
 	eolith45(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(50000000)         /* 50 MHz */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(50000000);         /* 50 MHz */
+}
 
-MACHINE_CONFIG_START(eolith_state::ironfort)
+void eolith_state::ironfort(machine_config &config)
+{
 	eolith45(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(44900000); /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+}
 
-MACHINE_CONFIG_START(eolith_state::hidctch3)
+void eolith_state::hidctch3(machine_config &config)
+{
 	eolith50(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hidctch3_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::hidctch3_map);
+}
 
 
 /*************************************

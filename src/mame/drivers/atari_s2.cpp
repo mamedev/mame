@@ -483,8 +483,8 @@ MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(4'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(atari_s2_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_WATCHDOG_ADD("watchdog")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* Sound */
 	genpin_audio(config);

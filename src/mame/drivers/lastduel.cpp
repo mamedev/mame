@@ -320,11 +320,11 @@ static INPUT_PORTS_START( madgear )
 	PORT_DIPSETTING(      0x0030, "Upright One Player" )
 	PORT_DIPSETTING(      0x0000, "Upright Two Players" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Cocktail ) )
-/*  PORT_DIPSETTING(      0x0020, "Upright One Player" ) */
+	PORT_DIPSETTING(      0x0020, "Upright One Player (duplicate)" )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Background Music" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Demo Music" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 	PORT_BIT( 0x7f00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( madgear )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 5C_3C ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, "1 Coin / 1 Credit (duplicate)" )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_3C ) )
@@ -394,6 +394,45 @@ static INPUT_PORTS_START( madgear )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
+
+// TODO, verify that there is no 'very difficult' in game code, this is based on test mode
+static INPUT_PORTS_START( leds2011 )
+	PORT_INCLUDE( madgear )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(      0x0000, "Normal (duplicate)" )
+INPUT_PORTS_END
+
+// A number of the dips are inverted
+// TODO: verify the difficulty dips, this is based on Test Mode
+static INPUT_PORTS_START( leds2011p )
+	PORT_INCLUDE( madgear )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	// This isn't a simple On / Off Flipscreen. The game code is buggy and it uses edge trigger logic rather than level based, so it always boots unflipped but changing it while running flips it
+	PORT_DIPNAME( 0x0002, 0x0002, "Flip Screen (Edge Trigger)" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, "Position 0 ('Off')" )
+	PORT_DIPSETTING(      0x0000, "Position 1 ('On')" )
+	PORT_DIPNAME( 0x000c, 0x0008, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x000c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, "Demo Music" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /******************************************************************************/
 
@@ -497,20 +536,19 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_lastduel)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT_CLASS(2, lastduel_state, lastduel_RRRRGGGGBBBBIIII)
+	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -543,20 +581,19 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_madgear)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT_CLASS(2, lastduel_state, lastduel_RRRRGGGGBBBBIIII)
+	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -932,6 +969,6 @@ GAME( 1989, madgear,   0,        madgear,  madgear,  lastduel_state, empty_init,
 GAME( 1989, madgearj,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, leds2011,  0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011u, leds2011, madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011p, leds2011, madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US, prototype 12)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011,  0,        madgear,  leds2011, lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011u, leds2011, madgear,  leds2011, lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011p, leds2011, madgear,  leds2011p,lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US, prototype 12)", MACHINE_SUPPORTS_SAVE )

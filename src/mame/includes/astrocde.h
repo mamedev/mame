@@ -5,7 +5,12 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_ASTROCDE_H
+#define MAME_INCLUDES_ASTROCDE_H
 
+#pragma once
+
+#include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/astrocde.h"
@@ -31,15 +36,15 @@ public:
 		TIMER_SCANLINE
 	};
 
-	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	astrocde_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_bank4000(*this, "bank4000"),
 		m_bank8000(*this, "bank8000"),
@@ -48,12 +53,12 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
 	optional_device<votrax_sc01_device> m_votrax;
 	optional_device<astrocade_io_device> m_astrocade_sound1;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<address_map_bank_device> m_bank4000;
 	optional_memory_bank m_bank8000;
@@ -135,9 +140,9 @@ public:
 	void init_gorf();
 	void init_astrocde();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(astrocde);
+	void astrocade_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(profpac);
-	DECLARE_PALETTE_INIT(profpac);
+	void profpac_palette(palette_device &palette) const;
 	uint32_t screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
@@ -182,9 +187,9 @@ protected:
 class seawolf2_state : public astrocde_state
 {
 public:
-	seawolf2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_samples(*this, "samples")
+	seawolf2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_samples(*this, "samples")
 	{ }
 
 	void seawolf2(machine_config &config);
@@ -204,9 +209,9 @@ private:
 class ebases_state : public astrocde_state
 {
 public:
-	ebases_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_trackball(*this, {"TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1"})
+	ebases_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_trackball(*this, {"TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1"})
 	{ }
 
 	void ebases(machine_config &config);
@@ -243,9 +248,10 @@ private:
 class tenpindx_state : public astrocde_state
 {
 public:
-	tenpindx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag)
-		, m_lamps(*this, "lamp%0", 0U)
+	tenpindx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		astrocde_state(mconfig, type, tag),
+		m_subcpu(*this, "sub"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void tenpindx(machine_config &config);
@@ -260,5 +266,8 @@ private:
 	void sub_io_map(address_map &map);
 	void sub_map(address_map &map);
 
+	required_device<z80_device> m_subcpu;
 	output_finder<19> m_lamps;
 };
+
+#endif // MAME_INCLUDES_ASTROCDE_H

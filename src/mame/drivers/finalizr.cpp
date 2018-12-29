@@ -17,7 +17,6 @@
 #include "includes/konamipt.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
@@ -77,10 +76,10 @@ WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(finalizr_state::i8039_T1_r)
+READ_LINE_MEMBER(finalizr_state::i8039_t1_r)
 {
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
-	    here (See the i8039_T0_w handler below).
+	    here (See the i8039_t0_w handler below).
 	    The frequency of this clock cannot be greater than I8039 CLKIN / 45
 	    Accounting for the I8039 input clock, and internal/external divisors
 	    the frequency here should be 192KHz (I8039 CLKIN / 48)
@@ -94,7 +93,7 @@ READ_LINE_MEMBER(finalizr_state::i8039_T1_r)
 	return (!(m_T1_line % 3) && (m_T1_line > 0));
 }
 
-WRITE8_MEMBER(finalizr_state::i8039_T0_w)
+WRITE8_MEMBER(finalizr_state::i8039_t0_w)
 {
 	/*  This becomes a clock output at a frequency of 3.072MHz (derived
 	    by internally dividing the main xtal clock input by a factor of 3).
@@ -270,15 +269,14 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("audiocpu", I8039,XTAL(18'432'000)/2) /* 9.216MHz clkin ?? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, finalizr_state, i8039_irqen_w))
-	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(finalizr_state, i8039_T0_w)
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, finalizr_state, i8039_T1_r))
+	I8039(config, m_audiocpu, XTAL(18'432'000)/2); /* 9.216MHz clkin ?? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &finalizr_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &finalizr_state::sound_io_map);
+	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::i8039_irqen_w));
+	m_audiocpu->t1_in_cb().set(FUNC(finalizr_state::i8039_t1_r));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -287,17 +285,15 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(finalizr_state, screen_update_finalizr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finalizr)
-	MCFG_PALETTE_ADD("palette", 2*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(finalizr_state, finalizr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_finalizr);
+	PALETTE(config, m_palette, FUNC(finalizr_state::finalizr_palette), 2*16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)

@@ -304,9 +304,9 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 	{
 		case 0x10/2:
 			if (mem_mask & 0xFF00)
-				m_sega_315_5641_pcm->port_w(space, 0, (data >> 8) & 0xFF);
+				m_sega_315_5641_pcm->port_w((data >> 8) & 0xFF);
 			if (mem_mask & 0x00FF)
-				m_sega_315_5641_pcm->port_w(space, 0, (data >> 0) & 0xFF);
+				m_sega_315_5641_pcm->port_w((data >> 0) & 0xFF);
 			break;
 		case 0x12/2: // guess
 			// Note about uPD7759 lines:
@@ -318,17 +318,17 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 				// value 8000 resets the FIFO? (always used with low reset line)
 				// value 0800 maps to the uPD7759's reset line (0 = reset, 1 = normal)
 				// value 4000 maps to the uPD7759's start line (0->1 = start)
-				m_sega_315_5641_pcm->reset_w((data >> 8) & 0x08);
-				m_sega_315_5641_pcm->start_w((data >> 8) & 0x40);
-				if (data & 0x4000)
+				m_sega_315_5641_pcm->reset_w(BIT(data, 11));
+				m_sega_315_5641_pcm->start_w(BIT(data, 14));
+				if (BIT(data, 14))
 				{
 					// Somewhere between "Reset Off" and the first sample data,
 					// we need to send a few commands to make the sample stream work.
 					// Doing that when rising the "start" line seems to work fine.
-					m_sega_315_5641_pcm->port_w(space, 0, 0xFF);    // "Last Sample" value (must be >= 0x10)
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Dummy 1
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr MSB
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr LSB
+					m_sega_315_5641_pcm->port_w(0xFF);    // "Last Sample" value (must be >= 0x10)
+					m_sega_315_5641_pcm->port_w(0x00);    // Dummy 1
+					m_sega_315_5641_pcm->port_w(0x00);    // Addr MSB
+					m_sega_315_5641_pcm->port_w(0x00);    // Addr LSB
 				}
 			}
 
@@ -392,47 +392,47 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_vdp->stop_timers();
 }
 
-MACHINE_CONFIG_START(pico_state::pico)
+void pico_state::pico(machine_config &config)
+{
 	md_ntsc(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	MCFG_DEVICE_REMOVE("genesis_snd_z80")
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("genesis_snd_z80");
+	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
+	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
-	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
-	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
-MACHINE_CONFIG_END
+	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
+	//m_sega_315_5641_pcm->drq().set(FUNC(pico_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+}
 
-MACHINE_CONFIG_START(pico_state::picopal)
+void pico_state::picopal(machine_config &config)
+{
 	md_pal(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	MCFG_DEVICE_REMOVE("genesis_snd_z80")
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("genesis_snd_z80");
+	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
+	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
-	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
-	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
-MACHINE_CONFIG_END
+	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
+	//m_sega_315_5641_pcm->drq().set(FUNC(pico_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+}
 
 
 
@@ -608,26 +608,26 @@ MACHINE_START_MEMBER(copera_state,copera)
 
 }
 
-MACHINE_CONFIG_START(copera_state::copera)
+void copera_state::copera(machine_config &config)
+{
 	md_ntsc(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(copera_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &copera_state::copera_mem);
 
-	MCFG_DEVICE_REMOVE("genesis_snd_z80")
-	MCFG_DEVICE_REMOVE("ymsnd")
+	config.device_remove("genesis_snd_z80");
+	config.device_remove("ymsnd");
 
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
+	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("copera");
 
-	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK)
-	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
-MACHINE_CONFIG_END
+	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);
+	//m_sega_315_5641_pcm->drq().set(FUNC(pico_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+}
 
 
 

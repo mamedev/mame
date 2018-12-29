@@ -117,8 +117,11 @@ Notes:
 
 TODO:
 -----
-
 - third CPU
+- docastle schematics say that maincpu(and cpu3) interrupt comes from the 6845
+  CURSOR pin. The cursor is configured at scanline 0, and causes the games to
+  update the next video frame during active display. What is the culprit here?
+  For now, it's simply hooked up to vsync.
 - dip switch reading bug. dorunrun and docastle are VERY timing sensitive, and
   dip switch reading will fail if timing is not completely accurate.
 - the dorunrun attract mode sequence is also very timing sensitive. The behaviour
@@ -165,7 +168,6 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 #include "speaker.h"
 
 
-
 /* Read/Write Handlers */
 WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 {
@@ -175,24 +177,6 @@ WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 		if (ma6 && !m_prev_ma6) // MA6 rising edge
 			m_slave->set_input_line(0, HOLD_LINE);
 		m_prev_ma6 = ma6;
-	}
-}
-
-WRITE_LINE_MEMBER(docastle_state::stx_on_w)
-{
-	if (state)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_cpu3->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-}
-
-WRITE_LINE_MEMBER(docastle_state::stx_off_w)
-{
-	if (!state)
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-		m_cpu3->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -623,46 +607,39 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	m_inp[1]->read_port5_callback().set_ioport("BUTTONS").rshift(4);
 	m_inp[1]->read_port7_callback().set_ioport("SYSTEM").rshift(4);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(9'828'000) / 16)
+	H46505(config, m_crtc, XTAL(9'828'000) / 16);
 	/*
 	The games program the CRTC for a width of 32 characters (256 pixels).
 	However, the DE output from the CRTC is first ANDed with the NAND of
 	MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
 	blanks the first 8 pixels and last 8 pixels of each line.
 	*/
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_VISAREA_ADJUST(8,-8,0,0)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, docastle_state, docastle_tint))
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, docastle_state, stx_on_w))
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, docastle_state, stx_off_w))
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_visarea_adjust(8,-8,0,0);
+	m_crtc->set_char_width(8);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_crtc->out_vsync_callback().append_inputline(m_cpu3, INPUT_LINE_NMI);
+	m_crtc->out_hsync_callback().set(FUNC(docastle_state::docastle_tint));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
+	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_docastle)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_docastle);
+	PALETTE(config, m_palette, FUNC(docastle_state::docastle_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("sn3", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("sn4", SN76489A, XTAL(4'000'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SN76489A(config, "sn1", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SN76489A(config, "sn2", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SN76489A(config, "sn3", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SN76489A(config, "sn4", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(docastle_state::dorunrun)
@@ -687,16 +664,15 @@ MACHINE_CONFIG_START(docastle_state::idsoccer)
 	MCFG_DEVICE_PROGRAM_MAP(idsoccer_map)
 
 	m_inp[0]->read_port4_callback().set_ioport("JOYS_RIGHT");
-
 	m_inp[1]->read_port4_callback().set_ioport("JOYS_RIGHT").rshift(4);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) // Crystal verified on American Soccer board.
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, docastle_state, idsoccer_adpcm_int)) // interrupt function
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)      // 6 kHz    ???
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 6 kHz ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

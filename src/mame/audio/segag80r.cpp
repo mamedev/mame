@@ -228,14 +228,14 @@ static const char *const astrob_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(segag80r_state::astrob_sound_board)
-
+void segag80r_state::astrob_sound_board(machine_config &config)
+{
 	/* sound hardware */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(11)
-	MCFG_SAMPLES_NAMES(astrob_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(11);
+	m_samples->set_samples_names(astrob_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
 
 /*************************************
@@ -415,22 +415,21 @@ static const char *const sega005_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(segag80r_state::sega005_sound_board)
-
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segag80r_state, sega005_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segag80r_state, sega005_sound_b_w))
+void segag80r_state::sega005_sound_board(machine_config &config)
+{
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(segag80r_state::sega005_sound_a_w));
+	ppi.out_pb_callback().set(FUNC(segag80r_state::sega005_sound_b_w));
 
 	/* sound hardware */
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(7)
-	MCFG_SAMPLES_NAMES(sega005_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(7);
+	m_samples->set_samples_names(sega005_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("005", SEGA005, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	SEGA005(config, "005", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
 
 /*************************************
@@ -577,15 +576,15 @@ static const char *const spaceod_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(segag80r_state::spaceod_sound_board)
-
+void segag80r_state::spaceod_sound_board(machine_config &config)
+{
 	/* sound hardware */
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(11)
-	MCFG_SAMPLES_NAMES(spaceod_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(11);
+	m_samples->set_samples_names(spaceod_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
 
 /*************************************
@@ -687,43 +686,6 @@ void monsterb_sound_device::device_start()
 	save_item(NAME(m_sound_addr));
 }
 
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-MACHINE_CONFIG_START(monsterb_sound_device::device_add_mconfig)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_audiocpu, N7751, 6000000)
-	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, monsterb_sound_device, n7751_command_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, monsterb_sound_device, n7751_rom_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monsterb_sound_device, n7751_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
-
-	MCFG_DEVICE_ADD(m_i8243, I8243, 0)
-	MCFG_I8243_READHANDLER(CONSTANT(0))
-	MCFG_I8243_WRITEHANDLER(WRITE8(*this, monsterb_sound_device, n7751_rom_control_w))
-
-	MCFG_DEVICE_ADD(m_samples, SAMPLES)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(monsterb_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-
-	MCFG_TMS36XX_ADD(m_music, 247)
-	MCFG_TMS36XX_TYPE(TMS3617)
-	MCFG_TMS36XX_DECAY_TIMES(0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 50K (R91-97)/100K (R98-106) ladder network
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-
-	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
-
 
 /*************************************
  *
@@ -791,37 +753,26 @@ WRITE8_MEMBER(monsterb_sound_device::n7751_command_w)
 }
 
 
-WRITE8_MEMBER(monsterb_sound_device::n7751_rom_control_w)
+template<int Shift>
+void monsterb_sound_device::n7751_rom_addr_w(uint8_t data)
 {
-	/* P4 - address lines 0-3 */
-	/* P5 - address lines 4-7 */
-	/* P6 - address lines 8-11 */
-	/* P7 - ROM selects */
-	switch (offset)
-	{
-		case 0:
-			m_sound_addr = (m_sound_addr & ~0x00f) | ((data & 0x0f) << 0);
-			break;
+	// P4 - address lines 0-3
+	// P5 - address lines 4-7
+	// P5 - address lines 8-11
+	m_sound_addr = (m_sound_addr & ~(0x00f << Shift)) | ((data & 0x0f) << Shift);
+}
 
-		case 1:
-			m_sound_addr = (m_sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
-			break;
 
-		case 2:
-			m_sound_addr = (m_sound_addr & ~0xf00) | ((data & 0x0f) << 8);
-			break;
+void monsterb_sound_device::n7751_rom_select_w(uint8_t data)
+{
+	// P7 - ROM selects
+	m_sound_addr &= 0xfff;
 
-		case 3:
-			m_sound_addr &= 0xfff;
-			{
-				int numroms = m_audiocpu_region->bytes() / 0x1000;
-				if (!(data & 0x01) && numroms >= 1) m_sound_addr |= 0x0000;
-				if (!(data & 0x02) && numroms >= 2) m_sound_addr |= 0x1000;
-				if (!(data & 0x04) && numroms >= 3) m_sound_addr |= 0x2000;
-				if (!(data & 0x08) && numroms >= 4) m_sound_addr |= 0x3000;
-			}
-			break;
-	}
+	int numroms = m_audiocpu_region->bytes() / 0x1000;
+	if (!(data & 0x01) && numroms >= 1) m_sound_addr |= 0x0000;
+	if (!(data & 0x02) && numroms >= 2) m_sound_addr |= 0x1000;
+	if (!(data & 0x04) && numroms >= 3) m_sound_addr |= 0x2000;
+	if (!(data & 0x08) && numroms >= 4) m_sound_addr |= 0x3000;
 }
 
 
@@ -843,9 +794,53 @@ READ8_MEMBER(monsterb_sound_device::n7751_command_r)
 WRITE8_MEMBER(monsterb_sound_device::n7751_p2_w)
 {
 	/* write to P2; low 4 bits go to 8243 */
-	m_i8243->p2_w(space, offset, data & 0x0f);
+	m_i8243->p2_w(data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 	m_n7751_busy = data >> 7;
+}
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+void monsterb_sound_device::device_add_mconfig(machine_config &config)
+{
+	/* basic machine hardware */
+	N7751(config, m_audiocpu, 6000000);
+	m_audiocpu->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
+	m_audiocpu->p2_in_cb().set(FUNC(monsterb_sound_device::n7751_command_r));
+	m_audiocpu->bus_in_cb().set(FUNC(monsterb_sound_device::n7751_rom_r));
+	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_audiocpu->p2_out_cb().set(FUNC(monsterb_sound_device::n7751_p2_w));
+	m_audiocpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<4>));
+	m_i8243->p6_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<8>));
+	m_i8243->p7_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_select_w));
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(monsterb_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	TMS36XX(config, m_music, 247);
+	m_music->set_subtype(tms36xx_device::subtype::TMS3617);
+	m_music->set_decays(0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
+	m_music->add_route(ALL_OUTPUTS, "speaker", 0.5);
+
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // 50K (R91-97)/100K (R98-106) ladder network
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+
+	SPEAKER(config, "speaker").front_center();
 }

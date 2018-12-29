@@ -3,6 +3,8 @@
 #ifndef MAME_INCLUDES_PGM_H
 #define MAME_INCLUDES_PGM_H
 
+#pragma once
+
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/igs028.h"

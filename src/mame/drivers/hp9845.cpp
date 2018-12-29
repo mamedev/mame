@@ -415,6 +415,7 @@ hp9845_base_state::hp9845_base_state(const machine_config &mconfig, device_type 
 	driver_device(mconfig, type, tag),
 	m_lpu(*this, "lpu"),
 	m_ppu(*this, "ppu"),
+	m_io_sys(*this , "io_sys"),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_gv_timer(*this, "gv_timer"),
@@ -465,17 +466,6 @@ void hp9845_base_state::machine_start()
 
 void hp9845_base_state::device_reset()
 {
-	// FLG & STS are to be reset before sub-devices,
-	// because the latter may set the former in their own reset functions
-	m_flg_status = 0;
-	m_sts_status = 0;
-}
-
-void hp9845_base_state::machine_reset()
-{
-	m_lpu->halt_w(1);
-	m_ppu->halt_w(0);
-
 	// First, unmap every r/w handler in 1..12 select codes
 	for (unsigned sc = IO_SLOT_FIRST_PA; sc < (IO_SLOT_LAST_PA + 1); sc++) {
 		m_ppu->space(AS_IO).unmap_readwrite(sc * 4 , sc * 4 + 3);
@@ -485,11 +475,19 @@ void hp9845_base_state::machine_reset()
 	int sc;
 	read16_delegate rhandler;
 	write16_delegate whandler;
-	for (unsigned i = 0; 4 > i; ++i)
+	for (unsigned i = 0; 4 > i; ++i) {
 		if ((sc = m_io_slot[i]->get_rw_handlers(rhandler , whandler)) >= 0) {
 			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
 			m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
 		}
+		m_slot_sc[ i ] = sc;
+	}
+}
+
+void hp9845_base_state::machine_reset()
+{
+	m_lpu->halt_w(1);
+	m_ppu->halt_w(0);
 
 	// Some sensible defaults
 	m_video_load_mar = false;
@@ -502,11 +500,7 @@ void hp9845_base_state::machine_reset()
 	m_gv_int_en = false;
 	m_gv_dma_en = false;
 
-	m_irl_pending = 0;
-	m_irh_pending = 0;
-	m_pa = 0;
-
-	set_sts(GVIDEO_PA , true);
+	m_io_sys->set_sts(GVIDEO_PA , true);
 
 	memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 	m_kb_scancode = 0x7f;
@@ -515,8 +509,6 @@ void hp9845_base_state::machine_reset()
 	m_beeper->set_state(0);
 
 	m_prt_irl = false;
-
-	logerror("STS=%04x FLG=%04x\n" , m_sts_status , m_flg_status);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::gv_timer)
@@ -539,90 +531,6 @@ attotime hp9845_base_state::time_to_gv_mem_availability() const
 				// TODO:
 				return attotime::zero;
 		}
-}
-
-IRQ_CALLBACK_MEMBER(hp9845_base_state::irq_callback)
-{
-		if (irqline == HPHYBRID_IRL) {
-			//logerror("irq ack L %02x\n" , m_irl_pending);
-				return m_irl_pending;
-		} else {
-			//logerror("irq ack H %02x\n" , m_irh_pending);
-				return m_irh_pending;
-		}
-}
-
-void hp9845_base_state::update_irq()
-{
-		m_ppu->set_input_line(HPHYBRID_IRL , m_irl_pending != 0);
-		m_ppu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
-}
-
-WRITE8_MEMBER(hp9845_base_state::irq_w)
-{
-	set_irq(uint8_t(offset) , data != 0);
-}
-
-void hp9845_base_state::set_irq(uint8_t sc , int state)
-{
-	unsigned bit_n = sc % 8;
-
-	if (sc < 8) {
-		if (state) {
-			BIT_SET(m_irl_pending, bit_n);
-		} else {
-			BIT_CLR(m_irl_pending, bit_n);
-		}
-	} else {
-		if (state) {
-			BIT_SET(m_irh_pending, bit_n);
-		} else {
-			BIT_CLR(m_irh_pending, bit_n);
-		}
-	}
-	update_irq();
-}
-
-void hp9845_base_state::update_flg_sts()
-{
-	bool sts = BIT(m_sts_status , m_pa);
-	bool flg = BIT(m_flg_status , m_pa);
-	m_ppu->status_w(sts);
-	m_ppu->flag_w(flg);
-}
-
-WRITE8_MEMBER(hp9845_base_state::sts_w)
-{
-	set_sts(uint8_t(offset) , data != 0);
-}
-
-void hp9845_base_state::set_sts(uint8_t sc , int state)
-{
-	if (state) {
-		BIT_SET(m_sts_status, sc);
-	} else {
-		BIT_CLR(m_sts_status, sc);
-	}
-	if (sc == m_pa) {
-		update_flg_sts();
-	}
-}
-
-WRITE8_MEMBER(hp9845_base_state::flg_w)
-{
-	set_flg(uint8_t(offset) , data != 0);
-}
-
-void hp9845_base_state::set_flg(uint8_t sc , int state)
-{
-	if (state) {
-		BIT_SET(m_flg_status, sc);
-	} else {
-		BIT_CLR(m_flg_status, sc);
-	}
-	if (sc == m_pa) {
-		update_flg_sts();
-	}
 }
 
 void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
@@ -697,7 +605,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 
 		if (max_seq_len) {
 			// Key pressed, store scancode & generate IRL
-			//logerror("idx=%u msl=%d\n" , max_seq_idx , max_seq_len);
 			m_kb_scancode = max_seq_idx;
 			BIT_SET(m_kb_status, 0);
 			update_kb_prt_irq();
@@ -737,7 +644,35 @@ WRITE16_MEMBER(hp9845_base_state::kb_irq_clear_w)
 void hp9845_base_state::update_kb_prt_irq()
 {
 	bool state = BIT(m_kb_status , 0) || m_prt_irl;
-	set_irq(0 , state);
+	m_io_sys->set_irq(0 , state);
+}
+
+void hp9845_base_state::set_irq_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_irq(uint8_t(sc) , state);
+}
+
+void hp9845_base_state::set_sts_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_sts(uint8_t(sc) , state);
+}
+
+void hp9845_base_state::set_flg_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_flg(uint8_t(sc) , state);
+}
+
+void hp9845_base_state::set_dmar_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_dmar(uint8_t(sc) , state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::beeper_off)
@@ -745,58 +680,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::beeper_off)
 	m_beeper->set_state(0);
 }
 
-WRITE8_MEMBER(hp9845_base_state::pa_w)
-{
-	if (data != m_pa) {
-		m_pa = data;
-		update_flg_sts();
-	}
-}
-
 WRITE_LINE_MEMBER(hp9845_base_state::prt_irl_w)
 {
 	m_prt_irl = state;
 	update_kb_prt_irq();
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::prt_flg_w)
-{
-	set_flg(PRINTER_PA , state);
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::prt_sts_w)
-{
-	set_sts(PRINTER_PA , state);
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::t14_irq_w)
-{
-	set_irq(T14_PA , state);
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::t14_flg_w)
-{
-	set_flg(T14_PA , state);
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::t14_sts_w)
-{
-	set_sts(T14_PA , state);
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::t15_irq_w)
-{
-	set_irq(T15_PA , state);
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::t15_flg_w)
-{
-	set_flg(T15_PA , state);
-}
-
-WRITE_LINE_MEMBER(hp9845_base_state::t15_sts_w)
-{
-	set_sts(T15_PA , state);
 }
 
 INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
@@ -1348,15 +1235,15 @@ void hp9845b_state::update_graphic_bits()
 			m_gv_fsm_state == GV_STAT_WAIT_DS_1 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_2;
 
-		set_flg(GVIDEO_PA , gv_ready);
+		m_io_sys->set_flg(GVIDEO_PA , gv_ready);
 
 		bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-		set_irq(GVIDEO_PA , irq);
+		m_io_sys->set_irq(GVIDEO_PA , irq);
 
 		bool dmar = gv_ready && m_gv_dma_en;
 
-		m_ppu->dmar_w(dmar);
+		m_io_sys->set_dmar(GVIDEO_PA , dmar);
 }
 
 // ***************
@@ -2775,15 +2662,15 @@ void hp9845c_state::update_graphic_bits()
 			m_gv_fsm_state == GV_STAT_WAIT_TRIG_1;
 	}
 
-	set_flg(GVIDEO_PA , gv_ready);
+	m_io_sys->set_flg(GVIDEO_PA , gv_ready);
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-	set_irq(GVIDEO_PA , irq);
+	m_io_sys->set_irq(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
 
-	m_ppu->dmar_w(dmar);
+	m_io_sys->set_dmar(GVIDEO_PA , dmar);
 }
 
 void hp9845c_state::update_gcursor()
@@ -3621,15 +3508,15 @@ void hp9845t_state::update_graphic_bits()
 	// Fix for this problem is in commit 27004d00
 	// My apologies to Tony Duell for doubting at one point the correctness
 	// of his 98780A schematics.. :)
-	set_flg(GVIDEO_PA , gv_ready);
+	m_io_sys->set_flg(GVIDEO_PA , gv_ready);
 
 	bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-	set_irq(GVIDEO_PA , irq);
+	m_io_sys->set_irq(GVIDEO_PA , irq);
 
 	bool dmar = gv_ready && m_gv_dma_en;
 
-	m_ppu->dmar_w(dmar);
+	m_io_sys->set_dmar(GVIDEO_PA , dmar);
 }
 
 void hp9845t_state::update_gcursor()
@@ -3730,22 +3617,33 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 	map(HP_MAKE_IOADDR(GVIDEO_PA, 0), HP_MAKE_IOADDR(GVIDEO_PA, 3)).rw(FUNC(hp9845_base_state::graphic_r), FUNC(hp9845_base_state::graphic_w));
 	// PA = 14, IC = 0..3
 	// Left-hand side tape drive (T14)
-	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw("t14", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
+	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw(m_t14, FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
 	// PA = 15, IC = 0..3
 	// Right-hand side tape drive (T15)
-	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw("t15", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
+	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw(m_t15, FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
 }
 
 MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
-	MCFG_DEVICE_ADD("lpu", HP_5061_3001, 5700000)
-	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
-	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_DEVICE_ADD("ppu", HP_5061_3001, 5700000)
-	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
-	MCFG_DEVICE_IO_MAP(ppu_io_map)
-	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp9845_base_state , irq_callback)
-	MCFG_HPHYBRID_PA_CHANGED(WRITE8(*this, hp9845_base_state , pa_w))
+	HP_5061_3001(config , m_lpu , 5700000);
+	m_lpu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
+	m_lpu->set_9845_boot_mode(true);
+	m_lpu->set_rw_cycles(6 , 6);
+	m_lpu->set_relative_mode(true);
+	HP_5061_3001(config , m_ppu , 5700000);
+	m_ppu->set_addrmap(AS_PROGRAM , &hp9845_base_state::global_mem_map);
+	m_ppu->set_addrmap(AS_IO , &hp9845_base_state::ppu_io_map);
+	m_ppu->set_9845_boot_mode(true);
+	m_ppu->set_rw_cycles(6 , 6);
+	m_ppu->set_relative_mode(true);
+	m_ppu->set_irq_acknowledge_callback("io_sys" , FUNC(hp98x5_io_sys_device::irq_callback));
+	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
+
+	HP98X5_IO_SYS(config , m_io_sys , 0);
+	m_io_sys->irl().set_inputline(m_ppu, HPHYBRID_IRL);
+	m_io_sys->irh().set_inputline(m_ppu, HPHYBRID_IRH);
+	m_io_sys->sts().set(m_ppu , FUNC(hp_5061_3001_cpu_device::status_w));
+	m_io_sys->flg().set(m_ppu , FUNC(hp_5061_3001_cpu_device::flag_w));
+	m_io_sys->dmar().set(m_ppu , FUNC(hp_5061_3001_cpu_device::dmar_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3762,15 +3660,15 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp9845_base_state , beeper_off);
 
-	// Tape controller
-	MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t15_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t15_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t15_sts_w))
-	MCFG_DEVICE_ADD("t14" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t14_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t14_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t14_sts_w))
+	// Tape drives
+	HP_TACO(config , m_t15 , 4000000);
+	m_t15->irq().set([this](int state) { m_io_sys->set_irq(T15_PA , state); });
+	m_t15->flg().set([this](int state) { m_io_sys->set_flg(T15_PA , state); });
+	m_t15->sts().set([this](int state) { m_io_sys->set_sts(T15_PA , state); });
+	HP_TACO(config , m_t14 , 4000000);
+	m_t14->irq().set([this](int state) { m_io_sys->set_irq(T14_PA , state); });
+	m_t14->flg().set([this](int state) { m_io_sys->set_flg(T14_PA , state); });
+	m_t14->sts().set([this](int state) { m_io_sys->set_sts(T14_PA , state); });
 
 	// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
 	// right-hand side and left-hand side drawers, respectively.
@@ -3794,33 +3692,23 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 
 	// I/O slots
-	MCFG_HP9845_IO_SLOT_ADD("slot0")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
-	MCFG_HP9845_IO_SLOT_ADD("slot1")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
-	MCFG_HP9845_IO_SLOT_ADD("slot2")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
-	MCFG_HP9845_IO_SLOT_ADD("slot3")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
+	for (unsigned slot = 0; slot < 4; slot++) {
+		auto& finder = m_io_slot[ slot ];
+		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder , 0) );
+		tmp.irq().set([this , slot](int state) { set_irq_slot(slot , state); });
+		tmp.sts().set([this , slot](int state) { set_sts_slot(slot , state); });
+		tmp.flg().set([this , slot](int state) { set_flg_slot(slot , state); });
+		tmp.dmar().set([this , slot](int state) { set_dmar_slot(slot , state); });
+	}
 
 	// LPU memory options
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("192K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 320K, 448K")
+	RAM(config, RAM_TAG).set_default_size("192K").set_extra_options("64K, 320K, 448K");
 
 	// Internal printer
-	MCFG_DEVICE_ADD("printer" , HP9845_PRINTER , 0)
-	MCFG_9845PRT_IRL_HANDLER(WRITELINE(*this, hp9845_base_state , prt_irl_w))
-	MCFG_9845PRT_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , prt_flg_w))
-	MCFG_9845PRT_STS_HANDLER(WRITELINE(*this, hp9845_base_state , prt_sts_w))
+	hp9845_printer_device& prt{ HP9845_PRINTER(config , "printer" , 0) };
+	prt.irq().set(FUNC(hp9845_base_state::prt_irl_w));
+	prt.flg().set([this](int state) { m_io_sys->set_flg(PRINTER_PA , state); });
+	prt.sts().set([this](int state) { m_io_sys->set_sts(PRINTER_PA , state); });
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845b_state::hp9845b)

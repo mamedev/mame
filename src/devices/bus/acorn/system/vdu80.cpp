@@ -94,7 +94,7 @@ MACHINE_CONFIG_START(acorn_vdu80_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acorn_vdu80)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	H46505(config, m_crtc, 2_MHz_XTAL);
 	m_crtc->set_screen("screen");

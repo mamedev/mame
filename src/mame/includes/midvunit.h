@@ -69,6 +69,8 @@ public:
 		m_dcs(*this, "dcs"),
 		m_generic_paletteram_32(*this, "paletteram"),
 		m_optional_drivers(*this, "lamp%u", 0U),
+		m_in1(*this, "IN1"),
+		m_dsw(*this, "DSW"),
 		m_motion(*this, "MOTION") { }
 
 	void midvcommon(machine_config &config);
@@ -173,18 +175,20 @@ private:
 	DECLARE_MACHINE_RESET(midvplus);
 	uint32_t screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
-	required_device<cpu_device> m_maincpu;
+	required_device<tms32031_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<palette_device> m_palette;
 	optional_device<adc0844_device> m_adc;
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
-	optional_device<ata_interface_device> m_ata; // TODO(RH): This is horrible and midvplus should be split into its own device_driver that derives from midvunit.
+	optional_device<ata_interface_device> m_ata;
 	required_device_array<timer_device, 2> m_timer;
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	output_finder<8> m_optional_drivers;
+	optional_ioport m_in1;
+	optional_ioport m_dsw;
 	optional_ioport m_motion;
 	void postload();
 

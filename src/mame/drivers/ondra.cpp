@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ondra_state, vblank_irq))
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	// sound hardware
@@ -152,9 +152,7 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ondra")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 /* ROM definition */

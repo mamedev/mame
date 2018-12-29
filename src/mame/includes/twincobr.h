@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "cpu/tms32010/tms32010.h"
+#include "machine/74259.h"
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
 #include "video/toaplan_scu.h"
@@ -28,7 +30,9 @@ public:
 		m_spritegen(*this, "scu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_mainlatch(*this, "mainlatch"),
+		m_coinlatch(*this, "coinlatch")
 	{ }
 
 	void twincobr(machine_config &config);
@@ -39,6 +43,8 @@ public:
 	void init_twincobr();
 
 protected:
+	virtual void video_start() override;
+
 	optional_shared_ptr<uint8_t> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
@@ -47,7 +53,7 @@ protected:
 	int32_t m_bg_ram_bank;
 	int m_intenable;
 	int m_dsp_on;
-	int m_dsp_BIO;
+	int m_dsp_bio;
 	int m_fsharkbt_8741;
 	int m_dsp_execute;
 	uint32_t m_dsp_addr_w;
@@ -81,7 +87,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_bio_w);
 	DECLARE_READ16_MEMBER(fsharkbt_dsp_r);
 	DECLARE_WRITE16_MEMBER(fsharkbt_dsp_w);
-	DECLARE_READ_LINE_MEMBER(twincobr_BIO_r);
+	DECLARE_READ_LINE_MEMBER(twincobr_bio_r);
 	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(dsp_int_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
@@ -118,7 +124,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_RESET(twincobr);
-	DECLARE_VIDEO_START(toaplan0);
 	uint32_t screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(twincobr_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
@@ -131,14 +136,16 @@ protected:
 	void twincobr_log_vram();
 	void twincobr_driver_savestate();
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
+	required_device<tms32010_device> m_dsp;
 	required_device<toaplan_scu_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
+	required_device<ls259_device> m_coinlatch;
 
-	void DSP_io_map(address_map &map);
-	void DSP_program_map(address_map &map);
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
 	void fsharkbt_i8741_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);

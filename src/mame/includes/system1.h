@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
+#ifndef MAME_INCLUDES_SYSTEM1_H
+#define MAME_INCLUDES_SYSTEM1_H
 
+#pragma once
+
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/gen_latch.h"
@@ -13,8 +18,8 @@
 class system1_state : public driver_device
 {
 public:
-	system1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	system1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_pio(*this, "pio"),
 		m_ram(*this, "ram"),
@@ -35,7 +40,7 @@ public:
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d"),
 		m_banked_decrypted_opcodes(nullptr)
-		{ }
+	{ }
 
 	void sys1ppix_315_5051(machine_config &config);
 	void sys1ppisx_315_5064(machine_config &config);
@@ -96,6 +101,7 @@ public:
 	void init_myherok();
 	void init_ufosensi();
 	void init_wbml();
+	void init_tokisens();
 	void init_bootsys2();
 	void init_bootsys2d();
 	void init_choplift();
@@ -161,6 +167,10 @@ private:
 	DECLARE_WRITE8_MEMBER(system1_paletteram_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 
+	void encrypted_sys1ppi_maps(machine_config &config);
+	void encrypted_sys1pio_maps(machine_config &config);
+	void encrypted_sys2_mc8123_maps(machine_config &config);
+
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -183,7 +193,7 @@ private:
 	void dakkochn_custom_w(uint8_t data, uint8_t prevdata);
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -206,3 +216,5 @@ private:
 	void system1_pio_io_map(address_map &map);
 	void system1_ppi_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SYSTEM1_H

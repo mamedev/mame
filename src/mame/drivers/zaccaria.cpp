@@ -339,20 +339,20 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3G on 1B1141 I/O (Z80) board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaccaria_state, flip_screen_x_w)) // VCMA
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaccaria_state, flip_screen_y_w)) // HCMA
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("audiopcb", zac1b11142_audio_device, ressound_w)) // RESSOUND
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaccaria_state, coin_w)) // COUNT
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaccaria_state, nmi_mask_w)) // INTST
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3G on 1B1141 I/O (Z80) board
+	mainlatch.q_out_cb<0>().set(FUNC(zaccaria_state::flip_screen_x_w)); // VCMA
+	mainlatch.q_out_cb<1>().set(FUNC(zaccaria_state::flip_screen_y_w)); // HCMA
+	mainlatch.q_out_cb<2>().set("audiopcb", FUNC(zac1b11142_audio_device::ressound_w)); // RESSOUND
+	mainlatch.q_out_cb<6>().set(FUNC(zaccaria_state::coin_w)); // COUNT
+	mainlatch.q_out_cb<7>().set(FUNC(zaccaria_state::nmi_mask_w)); // INTST
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaccaria_state, dsw_sel_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("SYSTEM");
+	ppi.out_pc_callback().set(FUNC(zaccaria_state::dsw_sel_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -361,18 +361,15 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zaccaria_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaccaria_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaccaria)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(512)
-	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaccaria);
+	PALETTE(config, m_palette, FUNC(zaccaria_state::zaccaria_palette), 32*8 + 32*8, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("audiopcb", ZACCARIA_1B11142)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	ZACCARIA_1B11142(config, "audiopcb").add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 

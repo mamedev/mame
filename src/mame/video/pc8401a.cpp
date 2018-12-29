@@ -7,7 +7,7 @@
 
 /* PC-8401A */
 
-PALETTE_INIT_MEMBER(pc8401a_state,pc8401a)
+void pc8401a_state::pc8401a_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(39, 108, 51));
 	palette.set_pen_color(1, rgb_t(16, 37, 84));
@@ -61,8 +61,7 @@ void pc8401a_state::pc8500_lcdc(address_map &map)
 MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
 //  config.set_default_layout(layout_pc8401a);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
+	PALETTE(config, "palette", FUNC(pc8401a_state::pc8401a_palette), 2);
 
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -72,14 +71,15 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8401a_lcdc)
+	SED1330(config, m_lcdc, 0);
+	m_lcdc->set_screen(SCREEN_TAG);
+	m_lcdc->set_addrmap(0, &pc8401a_state::pc8401a_lcdc);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	config.set_default_layout(layout_pc8500);
 
-	MCFG_PALETTE_ADD("palette", 2+8)
-	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
+	PALETTE(config, "palette", FUNC(pc8500_state::pc8401a_palette), 2 + 8);
 
 	/* LCD */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -89,7 +89,9 @@ MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8500_lcdc)
+	SED1330(config, m_lcdc, 0);
+	m_lcdc->set_screen(SCREEN_TAG);
+	m_lcdc->set_addrmap(0, &pc8500_state::pc8500_lcdc);
 
 	/* PC-8441A CRT */
 	MCFG_SCREEN_ADD(CRT_SCREEN_TAG, RASTER)
@@ -100,7 +102,8 @@ MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, CRT_SCREEN_TAG, 400000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
+	MC6845(config, m_crtc, 400000);
+	m_crtc->set_screen(CRT_SCREEN_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(6);
 MACHINE_CONFIG_END

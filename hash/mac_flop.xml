@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="mac_flop" description="Macintosh Disk images">
+<softwarelist name="mac_flop" description="Macintosh 400K/800K Disk images">
 
 	<software name="airborne">
 		<description>Airborne!</description>

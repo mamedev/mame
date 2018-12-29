@@ -612,14 +612,14 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
-	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
+	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the YM because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
@@ -650,14 +650,14 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0, m_maincpu, m_scan_timer)
-	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
+	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
@@ -688,14 +688,14 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0, m_maincpu, m_scan_timer)
-	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
+	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)

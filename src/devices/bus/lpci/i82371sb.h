@@ -24,8 +24,8 @@ public:
 	// construction/destruction
 	i82371sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_smi_callback(Object &&cb) { return m_smi_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_boot_state_hook(Object &&cb) { return m_boot_state_hook.set_callback(std::forward<Object>(cb)); }
+	auto smi() { return m_smi_callback.bind(); }
+	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
@@ -65,11 +65,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(I82371SB, i82371sb_device)
-
-#define MCFG_I82371SB_SMI_CB(_devcb) \
-	downcast<i82371sb_device &>(*device).set_smi_callback(DEVCB_##_devcb);
-
-#define MCFG_I82371SB_BOOT_STATE_HOOK(_devcb) \
-	downcast<i82371sb_device &>(*device).set_boot_state_hook(DEVCB_##_devcb);
 
 #endif // MAME_BUS_LPCI_I82371SB_H

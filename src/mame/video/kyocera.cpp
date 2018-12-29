@@ -6,13 +6,13 @@
 #include "screen.h"
 
 
-PALETTE_INIT_MEMBER(kc85_state,kc85)
+void kc85_state::kc85_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-PALETTE_INIT_MEMBER(tandy200_state,tandy200)
+void tandy200_state::tandy200_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -55,8 +55,7 @@ MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(kc85_state,kc85)
+	PALETTE(config, "palette", FUNC(kc85_state::kc85_palette), 2);
 
 	MCFG_HD44102_ADD(HD44102_0_TAG, SCREEN_TAG,   0,  0)
 	MCFG_HD44102_ADD(HD44102_1_TAG, SCREEN_TAG,  50,  0)
@@ -81,8 +80,7 @@ MACHINE_CONFIG_START(tandy200_state::tandy200_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)
+	PALETTE(config, "palette", FUNC(tandy200_state::tandy200_palette), 2);
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, tandy200_lcdc)

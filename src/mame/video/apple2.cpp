@@ -38,6 +38,7 @@ DEFINE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device, "a2video", "Apple II video")
 
 a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APPLE2_VIDEO, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
 {
 }
 
@@ -95,6 +96,9 @@ void a2_video_device::device_start()
 	{
 		m_dhires_artifact_map[i] = dhires_artifact_color_table[i];
 	}
+
+	// initialise for device_palette_interface
+	init_palette();
 
 	save_item(NAME(m_page2));
 	save_item(NAME(m_flash));
@@ -1068,10 +1072,15 @@ static const rgb_t apple2_palette[] =
 	rgb_t(0xFF, 0xFF, 0xFF)  /* White */
 };
 
-/* Initialize the palette */
-PALETTE_INIT_MEMBER(a2_video_device, apple2)
+void a2_video_device::init_palette()
 {
-	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
+	for (int i = 0; i < ARRAY_LENGTH(apple2_palette); i++)
+		set_pen_color(i, apple2_palette[i]);
+}
+
+uint32_t a2_video_device::palette_entries() const
+{
+	return ARRAY_LENGTH(apple2_palette);
 }
 
 uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

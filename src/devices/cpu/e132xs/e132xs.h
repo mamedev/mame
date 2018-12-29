@@ -135,6 +135,8 @@ public:
 	void e132_4k_iram_map(address_map &map);
 	void e132_8k_iram_map(address_map &map);
 
+	static uint32_t imm_length(uint16_t op);
+
 protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?
 	enum : u32
@@ -312,7 +314,8 @@ protected:
 	/* core state */
 	internal_hyperstone_state *m_core;
 
-	int32_t   m_instruction_length;
+	int32_t m_instruction_length;
+	bool m_instruction_length_valid;
 
 	emu_timer *m_timer;
 
@@ -332,6 +335,7 @@ private:
 	uint32_t get_global_register(uint8_t code);
 
 	uint32_t get_emu_code_addr(uint8_t num);
+	int32_t get_instruction_length(uint16_t op);
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
@@ -479,7 +483,7 @@ private:
 	void static_generate_interrupt_checks();
 	void generate_interrupt_checks_no_timer(drcuml_block &block, uml::code_label &labelnum);
 	void generate_interrupt_checks_with_timer(drcuml_block &block, uml::code_label &labelnum);
-	void generate_branch(drcuml_block &block, uml::parameter targetpc, bool update_cycles = true);
+	void generate_branch(drcuml_block &block, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles = true);
 	void generate_update_cycles(drcuml_block &block, bool check_interrupts = true);
 	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);

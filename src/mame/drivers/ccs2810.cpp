@@ -66,6 +66,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
+#include "imagedev/floppy.h"
 #include "machine/ins8250.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -915,8 +916,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2810)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2810_io)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	/* Devices */
 	INS8250(config, m_ins8250, 1.8432_MHz_XTAL);
@@ -939,8 +939,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2422_io)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	/* Devices */
 	INS8250(config, m_ins8250, 1.8432_MHz_XTAL);
@@ -956,7 +955,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	rs232.dsr_handler().set(m_ins8250, FUNC(ins8250_device::dsr_w));
 	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 16_MHz_XTAL / 8) // UB1793 or MB8877
+	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

@@ -1336,18 +1336,13 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
 
-	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(HP80_OPTROM_SIZE)
+	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp85_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
 
 	MCFG_SCREEN_ADD("screen" , RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
 	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp85_state, vblank_w))
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_TIMER_DRIVER_ADD("vm_timer", hp85_state, vm_timer)
 
 	// No idea at all about the actual keyboard scan frequency

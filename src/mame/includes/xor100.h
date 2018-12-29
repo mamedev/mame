@@ -7,6 +7,7 @@
 
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/com8116.h"
 #include "bus/centronics/ctronics.h"
@@ -54,8 +55,6 @@ private:
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
 	DECLARE_READ8_MEMBER( prom_disable_r );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_READ8_MEMBER( fdc_wait_r );
 	DECLARE_WRITE8_MEMBER( fdc_dcont_w );
 	DECLARE_WRITE8_MEMBER( fdc_dsel_w );

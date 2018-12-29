@@ -70,22 +70,20 @@
 #include "machine/terminal.h"
 #include "machine/rx01.h"
 
-#define TERMINAL_TAG "terminal"
 
 class vax11_state : public driver_device
 {
 public:
 	vax11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	void vax11(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( term_r );
 	DECLARE_READ16_MEMBER( term_tx_status_r );
@@ -142,18 +140,19 @@ void vax11_state::kbd_put(u8 data)
 	m_term_status = 0xffff;
 }
 
-MACHINE_CONFIG_START(vax11_state::vax11)
+void vax11_state::vax11(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
-	MCFG_T11_INITIAL_MODE(0 << 13)
-	MCFG_DEVICE_PROGRAM_MAP(vax11_mem)
+	T11(config, m_maincpu, XTAL(4'000'000)); // Need proper CPU here
+	m_maincpu->set_initial_mode(0 << 13);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vax11_state::vax11_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(vax11_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(vax11_state::kbd_put));
 
-	MCFG_RX01_ADD("rx01")
-MACHINE_CONFIG_END
+	RX01(config, "rx01", 0);
+}
 
 ROM_START( vax785 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )

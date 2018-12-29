@@ -14,6 +14,7 @@
 #include "machine/interpro_sga.h"
 #include "machine/interpro_arbga.h"
 
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/28fxxx.h"
 #include "machine/mc146818.h"
@@ -79,6 +80,7 @@ public:
 		, m_scsibus(*this, INTERPRO_SCSI_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
+		, m_softlist(*this, "softlist")
 		, m_diag_led(*this, "digit0")
 	{
 	}
@@ -95,6 +97,8 @@ public:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
+
+	required_device<software_list_device> m_softlist;
 
 	void init_common();
 
@@ -137,8 +141,7 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	void ioga(machine_config &config);
-	void interpro_scc1(machine_config &config);
-	void interpro_scc2(machine_config &config);
+	void interpro_serial(machine_config &config);
 	void interpro(machine_config &config);
 	static void interpro_scsi_adapter(device_t *device);
 	static void interpro_cdrom(device_t *device);
@@ -165,6 +168,7 @@ public:
 		, m_d_cammu(*this, INTERPRO_MMU_TAG "_d")
 		, m_i_cammu(*this, INTERPRO_MMU_TAG "_i")
 		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
+		, m_bus(*this, INTERPRO_SLOT_TAG)
 	{
 	}
 
@@ -204,6 +208,7 @@ public:
 	required_device<cammu_c3_device> m_d_cammu;
 	required_device<cammu_c3_device> m_i_cammu;
 	required_device<ncr53c90a_device> m_scsi;
+	required_device<srx_bus_device> m_bus;
 
 	void emerald(machine_config &config);
 	void ip6000(machine_config &config);
@@ -228,7 +233,10 @@ public:
 		: interpro_state(mconfig, type, tag)
 		, m_d_cammu(*this, INTERPRO_MMU_TAG "_d")
 		, m_i_cammu(*this, INTERPRO_MMU_TAG "_i")
+		, m_kbd_port(*this, INTERPRO_KEYBOARD_PORT_TAG)
+		, m_mse_port(*this, INTERPRO_MOUSE_PORT_TAG)
 		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
+		, m_bus(*this, INTERPRO_SLOT_TAG)
 	{
 	}
 
@@ -267,7 +275,10 @@ public:
 
 	required_device<cammu_c3_device> m_d_cammu;
 	required_device<cammu_c3_device> m_i_cammu;
+	required_device<interpro_keyboard_port_device> m_kbd_port;
+	required_device<interpro_mouse_port_device> m_mse_port;
 	required_device<ncr53c90a_device> m_scsi;
+	required_device<cbus_bus_device> m_bus;
 
 	void turquoise(machine_config &config);
 	void ip2000(machine_config &config);
@@ -335,13 +346,6 @@ public:
 	required_device<intel_28f010_device> m_flash_msb;
 
 	void sapphire(machine_config &config);
-	void ip2500(machine_config &config);
-	void ip2400(machine_config &config);
-	void ip2700(machine_config &config);
-	void ip2800(machine_config &config);
-	void ip6400(machine_config &config);
-	void ip6700(machine_config &config);
-	void ip6800(machine_config &config);
 
 	void interpro_82596_map(address_map &map);
 	void sapphire_base_map(address_map &map);
@@ -355,6 +359,49 @@ protected:
 private:
 	u16 m_ctrl1;
 	u16 m_ctrl2;
+};
+
+class cbus_sapphire_state : public sapphire_state
+{
+public:
+	cbus_sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sapphire_state(mconfig, type, tag)
+		, m_kbd_port(*this, INTERPRO_KEYBOARD_PORT_TAG)
+		, m_mse_port(*this, INTERPRO_MOUSE_PORT_TAG)
+		, m_bus(*this, INTERPRO_SLOT_TAG)
+	{
+	}
+
+	void cbus_sapphire(machine_config &config);
+
+	void ip2500(machine_config &config);
+	void ip2400(machine_config &config);
+	void ip2700(machine_config &config);
+	void ip2800(machine_config &config);
+
+protected:
+	required_device<interpro_keyboard_port_device> m_kbd_port;
+	required_device<interpro_mouse_port_device> m_mse_port;
+	required_device<cbus_bus_device> m_bus;
+};
+
+class srx_sapphire_state : public sapphire_state
+{
+public:
+	srx_sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sapphire_state(mconfig, type, tag)
+		, m_bus(*this, INTERPRO_SLOT_TAG)
+	{
+	}
+
+	void srx_sapphire(machine_config &config);
+
+	void ip6400(machine_config &config);
+	void ip6700(machine_config &config);
+	void ip6800(machine_config &config);
+
+protected:
+	required_device<srx_bus_device> m_bus;
 };
 
 #endif // MAME_INCLUDES_INTERPRO_H

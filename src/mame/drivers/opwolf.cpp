@@ -258,7 +258,10 @@ TODO
 
 There are a few unmapped writes for the sound Z80 in the log.
 
-Unknown writes to the MSM5205 control addresses
+Unknown writes to the MSM5205 control addresses (RUN/RES implementation is wrong)
+
+Sound volume filtering is imperfect. Notably the coin insert sound:
+MSM1 rings it at volume 0xa8, MSM2 echos it at volume 0x84 but should be more muffled.
 
 Raine source has standard Asuka/Mofflot sprite/tile priority:
 0x2000 in sprite_ctrl puts all sprites under top bg layer. But
@@ -274,91 +277,126 @@ register. So what is controlling priority.
 #define SOUND_CPU_CLOCK     (XTAL(8'000'000) / 2)     /* clock for Z80 sound CPU */
 
 #include "emu.h"
-#include "includes/opwolf.h"
-#include "audio/taitosnd.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
+#include "machine/timer.h"
+#include "machine/taitocchip.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
+#include "includes/taitoipt.h"
+#include "video/pc080sn.h"
+#include "video/pc090oj.h"
+#include "audio/taitosnd.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-READ16_MEMBER(opwolf_state::cchip_r)
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class opwolf_state : public driver_device
 {
-	return m_cchip_ram[offset];
-}
+public:
+	opwolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_cchip_ram(*this, "cchip_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_cchip(*this, "cchip"),
+		m_cchip_irq_clear(*this, "cchip_irq_clear"),
+		m_pc080sn(*this, "pc080sn"),
+		m_pc090oj(*this, "pc090oj"),
+		m_msm(*this, "msm%u", 0),
+		m_lspeaker(*this, "lspeaker"),
+		m_rspeaker(*this, "rspeaker")
+	{ }
 
-WRITE16_MEMBER(opwolf_state::cchip_w)
-{
-	m_cchip_ram[offset] = data &0xff;
-}
+	void opwolf(machine_config &config);
+	void opwolfb(machine_config &config);
+	void opwolfp(machine_config &config);
 
-/**********************************************************
-                GAME INPUTS
-**********************************************************/
+	void init_opwolf();
+	void init_opwolfb();
+	void init_opwolfp();
 
-#define P1X_PORT_TAG     "P1X"
-#define P1Y_PORT_TAG     "P1Y"
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
 
-READ16_MEMBER(opwolf_state::opwolf_in_r)
-{
-	static const char *const inname[2] = { "IN0", "IN1" };
-	return ioport(inname[offset])->read();
-}
+protected:
+	virtual void machine_start() override;
 
-READ16_MEMBER(opwolf_state::opwolf_dsw_r)
-{
-	static const char *const dswname[2] = { "DSWA", "DSWB" };
-	return ioport(dswname[offset])->read();
-}
+private:
+	DECLARE_READ16_MEMBER(cchip_r);
+	DECLARE_WRITE16_MEMBER(cchip_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_d_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_e_w);
+	DECLARE_WRITE16_MEMBER(opwolf_spritectrl_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
+	DECLARE_WRITE8_MEMBER(counters_w);
 
-READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
-{
-	static const char *const dswname[2] = { "IN2", "IN3" };
-	return ioport(dswname[offset])->read();
-}
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-READ8_MEMBER(opwolf_state::z80_input1_r)
-{
-	return ioport("IN0")->read();   /* irrelevant mirror ? */
-}
+	DECLARE_MACHINE_RESET(opwolf);
+	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void opwolf_msm5205_vck(msm5205_device *device, int chip);
+	template<int N> DECLARE_WRITE_LINE_MEMBER(msm5205_vck_w);
 
-READ8_MEMBER(opwolf_state::z80_input2_r)
-{
-	return ioport("IN0")->read();   /* needed for coins */
-}
+	void opwolf_map(address_map &map);
+	void opwolf_sound_z80_map(address_map &map);
+	void opwolfb_map(address_map &map);
+	void opwolfb_sub_z80_map(address_map &map);
+	void opwolfp_map(address_map &map);
+
+	/* memory pointers */
+	optional_shared_ptr<uint8_t> m_cchip_ram;
+
+	/* video-related */
+	uint16_t       m_sprite_ctrl;
+	uint16_t       m_sprites_flipscreen;
+
+	/* misc */
+	uint8_t        m_adpcm_b[0x08];
+	uint8_t        m_adpcm_c[0x08];
+	uint32_t       m_adpcm_pos[2];
+	uint32_t       m_adpcm_end[2];
+	int          m_adpcm_data[2];
+
+	int          m_opwolf_gun_xoffs;
+	int          m_opwolf_gun_yoffs;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<taito_cchip_device> m_cchip;
+	optional_device<timer_device> m_cchip_irq_clear;
+	required_device<pc080sn_device> m_pc080sn;
+	required_device<pc090oj_device> m_pc090oj;
+	required_device_array<msm5205_device, 2> m_msm;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
+};
 
 
-/******************************************************
-                SOUND
-******************************************************/
-
-WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
-{
-	membank("z80bank")->set_entry(data & 0x03);
-}
-
-/***********************************************************
-             MEMORY STRUCTURES
-***********************************************************/
-
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 void opwolf_state::opwolf_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0000, 0x0f07ff).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_data_r));
-	map(0x0f0802, 0x0f0803).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_status_r));
-	map(0x0ff000, 0x0ff7ff).w(FUNC(opwolf_state::opwolf_cchip_data_w));
-	map(0x0ff802, 0x0ff803).w(FUNC(opwolf_state::opwolf_cchip_status_w));
-	map(0x0ffc00, 0x0ffc01).w(FUNC(opwolf_state::opwolf_cchip_bank_w));
+	map(0x0f0000, 0x0f07ff).mirror(0xf000).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);
+	map(0x0f0800, 0x0f0fff).mirror(0xf000).rw(m_cchip, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic68_w)).umask16(0x00ff);
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380001).portr("DSWA");
+	map(0x380002, 0x380003).portr("DSWB");
 	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x3a0000, 0x3a0001).portr("IN2"); /* lightgun, read at $11e0/6 */
+	map(0x3a0002, 0x3a0003).portr("IN3");
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -371,17 +409,17 @@ void opwolf_state::opwolf_map(address_map &map)
 	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
 }
 
-
 void opwolf_state::opwolfb_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0f0008, 0x0f000b).r(FUNC(opwolf_state::opwolf_in_r));           /* coins and buttons */
-	map(0x0ff000, 0x0fffff).rw(FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
+	map(0x0f0000, 0x0f0fff).mirror(0xf000).rw(FUNC(opwolf_state::cchip_r), FUNC(opwolf_state::cchip_w));
 	map(0x100000, 0x107fff).ram();
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380001).portr("DSWA");
+	map(0x380002, 0x380003).portr("DSWB");
 	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 */
+	map(0x3a0000, 0x3a0001).portr("IN2"); /* lightgun, read at $11e0/6 */
+	map(0x3a0002, 0x3a0003).portr("IN3");
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -398,11 +436,12 @@ void opwolf_state::opwolfp_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x107fff).ram();
-
 	map(0x200000, 0x200fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x380003).r(FUNC(opwolf_state::opwolf_dsw_r));          /* dip switches */
+	map(0x380000, 0x380001).portr("DSWA");
+	map(0x380002, 0x380003).portr("DSWB");
 	map(0x380000, 0x380003).w(FUNC(opwolf_state::opwolf_spritectrl_w));  // usually 0x4, changes when you fire
-	map(0x3a0000, 0x3a0003).r(FUNC(opwolf_state::opwolf_lightgun_r));     /* lightgun, read at $11e0/6 (AND INPUTS) */
+	map(0x3a0000, 0x3a0001).portr("IN2"); /* lightgun, read at $11e0/6 (AND INPUTS) */
+	map(0x3a0002, 0x3a0003).portr("IN3");
 	map(0x3c0000, 0x3c0001).nopw();                    /* watchdog ?? */
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0000, 0x3e0000).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -413,148 +452,6 @@ void opwolf_state::opwolfp_map(address_map &map)
 	map(0xc40000, 0xc40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
 	map(0xc50000, 0xc50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
 	map(0xd00000, 0xd03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  /* sprite ram */
-}
-
-
-/***************************************************************************
-    This extra Z80 substitutes for the c-chip in the bootleg
- */
-
-void opwolf_state::opwolfb_sub_z80_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8800, 0x8800).r(FUNC(opwolf_state::z80_input1_r));  /* read at PC=$637: poked to $c004 */
-	map(0x9000, 0x9000).nopw();            /* unknown write, 0 then 1 each interrupt */
-	map(0x9800, 0x9800).r(FUNC(opwolf_state::z80_input2_r));  /* read at PC=$631: poked to $c005 */
-	map(0xa000, 0xa000).nopw();    /* IRQ acknowledge (unimplemented) */
-	map(0xc000, 0xc7ff).ram().share("cchip_ram");
-}
-
-
-/***************************************************************************/
-
-
-//static uint8_t adpcm_d[0x08];
-//0 - start ROM offset LSB
-//1 - start ROM offset MSB
-//2 - end ROM offset LSB
-//3 - end ROM offset MSB
-//start & end need to be multiplied by 16 to get a proper _byte_ address in adpcm ROM
-//4 - always zero write (start trigger ?)
-//5 - different values
-//6 - different values
-
-void opwolf_state::machine_start()
-{
-	m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
-
-	save_item(NAME(m_sprite_ctrl));
-	save_item(NAME(m_sprites_flipscreen));
-
-	save_item(NAME(m_adpcm_b));
-	save_item(NAME(m_adpcm_c));
-	save_item(NAME(m_adpcm_pos));
-	save_item(NAME(m_adpcm_end));
-}
-
-MACHINE_RESET_MEMBER(opwolf_state,opwolf)
-{
-	m_adpcm_b[0] = m_adpcm_b[1] = 0;
-	m_adpcm_c[0] = m_adpcm_c[1] = 0;
-	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
-	m_adpcm_end[0] = m_adpcm_end[1] = 0;
-	m_adpcm_data[0] = m_adpcm_data[1] = -1;
-
-	m_sprite_ctrl = 0;
-	m_sprites_flipscreen = 0;
-
-	m_msm1->reset_w(1);
-	m_msm2->reset_w(1);
-}
-
-void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
-{
-	if (m_adpcm_data[chip] != -1)
-	{
-		device->write_data(m_adpcm_data[chip] & 0x0f);
-		m_adpcm_data[chip] = -1;
-		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
-		{
-			device->reset_w(1);
-			//logerror("reset device %d\n", chip);
-		}
-	}
-	else
-	{
-		m_adpcm_data[chip] = memregion("adpcm")->base()[m_adpcm_pos[chip]];
-		m_adpcm_pos[chip] = (m_adpcm_pos[chip] + 1) & 0x7ffff;
-		device->write_data(m_adpcm_data[chip] >> 4);
-	}
-}
-WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
-{
-	opwolf_msm5205_vck(m_msm1, 0);
-}
-WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_2)
-{
-	opwolf_msm5205_vck(m_msm2, 1);
-}
-
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
-{
-	int start;
-	int end;
-
-	m_adpcm_b[offset] = data;
-
-	if (offset == 0x04) //trigger ?
-	{
-		start = m_adpcm_b[0] + m_adpcm_b[1] * 256;
-		end   = m_adpcm_b[2] + m_adpcm_b[3] * 256;
-		start *= 16;
-		end   *= 16;
-		m_adpcm_pos[0] = start;
-		m_adpcm_end[0] = end;
-		m_msm1->reset_w(0);
-		//logerror("TRIGGER MSM1\n");
-	}
-
-//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
-}
-
-
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
-{
-	int start;
-	int end;
-
-	m_adpcm_c[offset] = data;
-
-	if (offset == 0x04) //trigger ?
-	{
-		start = m_adpcm_c[0] + m_adpcm_c[1] * 256;
-		end   = m_adpcm_c[2] + m_adpcm_c[3] * 256;
-		start *= 16;
-		end   *= 16;
-		m_adpcm_pos[1] = start;
-		m_adpcm_end[1] = end;
-		m_msm2->reset_w(0);
-
-		//logerror("TRIGGER MSM2\n");
-	}
-
-//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
-}
-
-
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
-{
-//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
-}
-
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
-{
-//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
 }
 
 void opwolf_state::opwolf_sound_z80_map(address_map &map)
@@ -572,24 +469,24 @@ void opwolf_state::opwolf_sound_z80_map(address_map &map)
 	map(0xe000, 0xe000).w(FUNC(opwolf_state::opwolf_adpcm_e_w));
 }
 
-/***********************************************************
-             INPUT PORTS, DIPs
-***********************************************************/
-
-
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
+// this extra z80 substitutes for the c-chip in the bootleg
+void opwolf_state::opwolfb_sub_z80_map(address_map &map)
 {
-	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
-	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
-	return (scaled + 0x15 + m_opwolf_gun_xoffs);
-}
-
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
-{
-	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
+	map(0x0000, 0x7fff).rom();
+	map(0x8800, 0x8800).portr("IN1");  /* read at PC=$637: poked to $c004 */
+	map(0x9000, 0x9000).nopw();            /* unknown write, 0 then 1 each interrupt */
+	map(0x9800, 0x9800).portr("IN0");  /* read at PC=$631: poked to $c005 */
+	map(0xa000, 0xa000).nopw();    /* IRQ acknowledge (unimplemented) */
+	map(0xc000, 0xc7ff).ram().share("cchip_ram");
 }
 
 
+//**************************************************************************
+//  INPUT PORT DEFINITIONS
+//**************************************************************************
+
+#define P1X_PORT_TAG     "P1X"
+#define P1Y_PORT_TAG     "P1Y"
 
 static INPUT_PORTS_START( opwolf )
 	/* 0x380000 -> 0x0ff028 (-$fd8,A5) (C-chip) */
@@ -641,7 +538,6 @@ static INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-
 	PORT_START("IN2")
 	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, opwolf_state, opwolf_gun_x_r, nullptr)
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
@@ -655,23 +551,15 @@ static INPUT_PORTS_START( opwolf )
 
 	PORT_START(P1Y_PORT_TAG)  /* P1Y (span allows you to be slightly offscreen) */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
-
-
-
 INPUT_PORTS_END
-
-
 
 static INPUT_PORTS_START( opwolfp )
 	PORT_INCLUDE( opwolf )
-
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
-
-
 
 	PORT_MODIFY("IN2")
 	/* 0x0000 - 0x01ff is GUNX */
@@ -703,7 +591,6 @@ static INPUT_PORTS_START( opwolfp )
 	PORT_DIPSETTING(    0x00, "English (invalid)" ) // game hangs on course screen (confirmed on hardware where it watchdog resets)
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( opwolfu )
 	PORT_INCLUDE( opwolf )
 
@@ -719,9 +606,89 @@ static INPUT_PORTS_START( opwolfb )
 INPUT_PORTS_END
 
 
-/**************************************************************
-                GFX DECODING
-**************************************************************/
+//**************************************************************************
+//  INPUT PORT HANDLING
+//**************************************************************************
+
+WRITE8_MEMBER(opwolf_state::counters_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);
+}
+
+CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
+{
+	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
+	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
+	return (scaled + 0x15 + m_opwolf_gun_xoffs);
+}
+
+CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
+{
+	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
+}
+
+
+//**************************************************************************
+//  VIDEO
+//**************************************************************************
+
+WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
+{
+	// popmessage("opwolf_spritectrl_w ctrl = %4x", data);
+	if (offset == 0)
+	{
+		/* bit 0 -> MOTOR1 transistor */
+		/* bit 1 -> MOTOR2 transistor */
+		/* bit 2 -> Reset c-chip and coin custom PC050CM (active low) */
+		/* bit 3 -> Not connected */
+		/* bit 4 -> LATCH - used to signal light gun position can be latched to inputs on v-blank */
+		/* bits 5-7 are the sprite palette bank */
+
+		m_pc090oj->set_sprite_ctrl((data & 0xe0) >> 5);
+
+		/* If data & 3, the Piston Motor is activated via M-1/M-2 connector */
+		if (data & 3)
+		{
+			output().set_value("Player1_Recoil_Piston", 1);
+		}
+		else
+		{
+			output().set_value("Player1_Recoil_Piston", 0);
+		}
+	}
+}
+
+uint32_t opwolf_state::screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int layer[2];
+
+	m_pc080sn->tilemap_update();
+
+	layer[0] = 0;
+	layer[1] = 1;
+
+	screen.priority().fill(0, cliprect);
+
+	// Sprite/tilemap priority is hardwired by the PAL16L8 at location 19
+
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+
+	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 1);
+
+//  if (ioport("P1X")->read())
+//  popmessage("%d %d", machine(), "P1X"), ioport("P1Y")->read());
+
+	return 0;
+}
+
+
+//**************************************************************************
+//  DRAWGFX LAYOUTS
+//**************************************************************************
 
 static const gfx_layout charlayout =
 {
@@ -778,21 +745,210 @@ static GFXDECODE_START( gfx_opwolfb )
 GFXDECODE_END
 
 
-/***********************************************************
-                 MACHINE DRIVERS
-***********************************************************/
+//**************************************************************************
+//  SOUND
+//**************************************************************************
+
+WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
+{
+	membank("z80bank")->set_entry(data & 0x03);
+}
+
+//0 - start ROM offset LSB
+//1 - start ROM offset MSB
+//2 - end ROM offset LSB
+//3 - end ROM offset MSB
+//start & end need to be multiplied by 16 to get a proper _byte_ address in adpcm ROM
+//4 - RUN, always zero write (start trigger ?)
+//5 - VOL, sample volume
+//6 - RES
+//7 - N/C
+
+template<int N>
+WRITE_LINE_MEMBER(opwolf_state::msm5205_vck_w)
+{
+	if (m_adpcm_data[N] != -1)
+	{
+		m_msm[N]->write_data(m_adpcm_data[N] & 0x0f);
+		m_adpcm_data[N] = -1;
+		if (m_adpcm_pos[N] == m_adpcm_end[N])
+		{
+			m_msm[N]->reset_w(1);
+			//logerror("reset device %d\n", chip);
+		}
+	}
+	else
+	{
+		m_adpcm_data[N] = memregion("adpcm")->base()[m_adpcm_pos[N]];
+		m_adpcm_pos[N] = (m_adpcm_pos[N] + 1) & 0x7ffff;
+		m_msm[N]->write_data(m_adpcm_data[N] >> 4);
+	}
+}
+
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
+{
+	int start;
+	int end;
+
+	m_adpcm_b[offset] = data;
+
+	if (offset == 0x04) //trigger ?
+	{
+		start = m_adpcm_b[0] + m_adpcm_b[1] * 256;
+		end   = m_adpcm_b[2] + m_adpcm_b[3] * 256;
+		start *= 16;
+		end   *= 16;
+		m_adpcm_pos[0] = start;
+		m_adpcm_end[0] = end;
+		m_msm[0]->reset_w(0);
+		m_msm[0]->set_output_gain(0, m_adpcm_b[5] / 255.0);
+		//logerror("TRIGGER MSM1\n");
+	}
+
+//  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
+}
+
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
+{
+	int start;
+	int end;
+
+	m_adpcm_c[offset] = data;
+
+	if (offset == 0x04) //trigger ?
+	{
+		start = m_adpcm_c[0] + m_adpcm_c[1] * 256;
+		end   = m_adpcm_c[2] + m_adpcm_c[3] * 256;
+		start *= 16;
+		end   *= 16;
+		m_adpcm_pos[1] = start;
+		m_adpcm_end[1] = end;
+		m_msm[1]->reset_w(0);
+		m_msm[1]->set_output_gain(0, m_adpcm_c[5] / 255.0);
+		//logerror("TRIGGER MSM2\n");
+	}
+
+//  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
+}
+
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
+{
+	// total volume (speaker 1)
+	for (int i = 0; i <= 2; i++)
+		m_lspeaker->set_input_gain(i, data / 255.0);
+}
+
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
+{
+	// total volume (speaker 2)
+	for (int i = 0; i <= 2; i++)
+		m_rspeaker->set_input_gain(i, data / 255.0);
+}
+
+
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
+
+void opwolf_state::init_opwolf()
+{
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+
+	// World & US version have different gun offsets, presumably slightly different gun hardware
+	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
+	m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
+
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+}
+
+void opwolf_state::init_opwolfb()
+{
+	/* bootleg needs different range of raw gun coords */
+	m_opwolf_gun_xoffs = -2;
+	m_opwolf_gun_yoffs = 17;
+
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+}
+
+void opwolf_state::init_opwolfp()
+{
+	m_opwolf_gun_xoffs = 5;
+	m_opwolf_gun_yoffs = 30;
+
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+}
+
+void opwolf_state::machine_start()
+{
+	save_item(NAME(m_sprite_ctrl));
+	save_item(NAME(m_sprites_flipscreen));
+
+	save_item(NAME(m_adpcm_b));
+	save_item(NAME(m_adpcm_c));
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
+}
+
+MACHINE_RESET_MEMBER(opwolf_state,opwolf)
+{
+	m_adpcm_b[0] = m_adpcm_b[1] = 0;
+	m_adpcm_c[0] = m_adpcm_c[1] = 0;
+	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
+	m_adpcm_end[0] = m_adpcm_end[1] = 0;
+	m_adpcm_data[0] = m_adpcm_data[1] = -1;
+
+	m_sprite_ctrl = 0;
+	m_sprites_flipscreen = 0;
+
+	m_msm[0]->reset_w(1);
+	m_msm[1]->reset_w(1);
+}
+
+READ16_MEMBER(opwolf_state::cchip_r)
+{
+	return m_cchip_ram[offset];
+}
+
+WRITE16_MEMBER(opwolf_state::cchip_w)
+{
+	m_cchip_ram[offset] = data &0xff;
+}
+
+INTERRUPT_GEN_MEMBER(opwolf_state::interrupt)
+{
+	m_maincpu->set_input_line(5, HOLD_LINE);
+	if (m_cchip)
+		m_cchip->ext_interrupt(ASSERT_LINE);
+	if (m_cchip_irq_clear)
+		m_cchip_irq_clear->adjust(attotime::zero);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(opwolf_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
+
+//**************************************************************************
+//  MACHINE DEFINTIONS
+//**************************************************************************
 
 MACHINE_CONFIG_START(opwolf_state::opwolf)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(opwolf_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", opwolf_state,  irq5_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", opwolf_state, interrupt)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(opwolf_sound_z80_map)
 
 	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); /* 12MHz measured on pin 20 */
+	m_cchip->in_pb_callback().set_ioport("IN0");
+	m_cchip->in_pc_callback().set_ioport("IN1");
+	m_cchip->out_pb_callback().set(FUNC(opwolf_state::counters_w));
+
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", opwolf_state, cchip_irq_clear_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -807,45 +963,43 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)  /* 4 MHz */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));  /* 4 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
+
+	MCFG_DEVICE_ADD("msm0", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<0>))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<1>))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
-
 
 MACHINE_CONFIG_START(opwolf_state::opwolfp)
 	opwolf(config);
@@ -855,9 +1009,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolfp)
 	MCFG_DEVICE_PROGRAM_MAP(opwolfp_map)
 
 	MCFG_DEVICE_REMOVE("cchip")
+	MCFG_DEVICE_REMOVE("cchip_irq_clear")
 MACHINE_CONFIG_END
-
-
 
 MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
@@ -875,7 +1028,6 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -885,74 +1037,48 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolfb)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolfb);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
+
+	MCFG_DEVICE_ADD("msm0", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<0>))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<1>))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 
-/***************************************************************************
-                    DRIVERS
-***************************************************************************/
-
-/*
-
-Note about current c-chip eprom dump
-
-the current dump is bad because data with address bit 0x200 set is missing (always read out as 0xff)
-
-you can however locate some of the tables used by the current simulation code in the rom
-
-for example
-
-Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B
-00001128                 07 80 02 09 03 00 4C
-00001134  01 00 04 00 10 07 80 02 09 03 00 4C
-00001140  01 40 04 00 20
-
-is the following data from machine/opwolf.cpp
-
-static const uint16_t level_data_04[] = {
-  0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
-  0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
-
-however without the correct dump of the cchip eprom we can't run the actual cchip code
-
-*/
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 ROM_START( opwolf )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
@@ -965,7 +1091,7 @@ ROM_START( opwolf )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -993,7 +1119,7 @@ ROM_START( opwolfa )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1016,7 +1142,7 @@ ROM_START( opwolfj )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1039,7 +1165,7 @@ ROM_START( opwolfjsc )
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1062,7 +1188,7 @@ ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specif
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+	ROM_LOAD( "b20-18.73", 0x0000, 0x2000, CRC(5987b4e9) SHA1(d4b3d1c35a6eac86c86bd4ea49f1f157a2c05b2a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1099,7 +1225,6 @@ ROM_START( opwolfp )
 	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
-
 
 ROM_START( opwolfb )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
@@ -1146,51 +1271,13 @@ ROM_START( opwolfb )
 ROM_END
 
 
-void opwolf_state::init_opwolf()
-{
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-
-	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
-
-	opwolf_cchip_init();
-
-	// World & US version have different gun offsets, presumably slightly different gun hardware
-	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
-	m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
-
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
-}
-
-
-void opwolf_state::init_opwolfb()
-{
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-
-	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
-
-	/* bootleg needs different range of raw gun coords */
-	m_opwolf_gun_xoffs = -2;
-	m_opwolf_gun_yoffs = 17;
-
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
-}
-
-void opwolf_state::init_opwolfp()
-{
-	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
-
-	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
-
-	m_opwolf_gun_xoffs = 5;
-	m_opwolf_gun_yoffs = 30;
-
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
-}
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
 
 // Prototype rom set includes the string - 'T KATO 10/6/87'
 // Regular rom set includes the string '11 Sep 1987'
-
-// MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
+// C-Chip includes the string 'By_TAITO_Copration_On_OSAKA_BUNSHITU._01.Sep.1987_Toshiaki.Kato_Tsutomuawa_4
 
 //    year  rom       parent    machine   inp      state          init
 GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

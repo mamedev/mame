@@ -14,34 +14,6 @@
 /* usually 640000 for 8000 Hz sample rate or */
 /* usually 800000 for 10000 Hz sample rate.  */
 
-/* IRQ callback function, active low, i.e. state=0 */
-#define MCFG_TMS52XX_IRQ_HANDLER(_devcb) \
-	downcast<tms5220_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-/* Ready callback function, active low, i.e. state=0 */
-#define MCFG_TMS52XX_READYQ_HANDLER(_devcb) \
-	downcast<tms5220_device &>(*device).set_readyq_handler(DEVCB_##_devcb);
-
-/* old VSM handler, remove me! */
-#define MCFG_TMS52XX_SPEECHROM(_tag) \
-	downcast<tms5220_device &>(*device).set_speechrom_tag(_tag);
-
-/* new VSM handler */
-#define MCFG_TMS52XX_M0_CB(_devcb) \
-	downcast<tms5220_device &>(*device).set_m0_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS52XX_M1_CB(_devcb) \
-	downcast<tms5220_device &>(*device).set_m1_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS52XX_ADDR_CB(_devcb) \
-	downcast<tms5220_device &>(*device).set_addr_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS52XX_DATA_CB(_devcb) \
-	downcast<tms5220_device &>(*device).set_data_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS52XX_ROMCLK_CB(_devcb) \
-	downcast<tms5220_device &>(device).set_romclk_callback(DEVCB_##_devcb);
-
 class tms5220_device : public device_t, public device_sound_interface
 {
 public:
@@ -53,17 +25,21 @@ public:
 
 	tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_readyq_handler(Object &&cb) { return m_readyq_handler.set_callback(std::forward<Object>(cb)); }
+	// IRQ callback function, active low, i.e. state=0
+	auto irq_cb() { return m_irq_handler.bind(); }
+
+	// Ready callback function, active low, i.e. state=0
+	auto ready_cb() { return m_readyq_handler.bind(); }
+
 	// old VSM support, remove me!
 	void set_speechrom_tag(const char *_tag) { m_speechrom_tag = _tag; }
+
 	// new VSM support
-	template <class Object> devcb_base &set_m0_callback(Object &&cb) { return m_m0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_m1_callback(Object &&cb) { return m_m1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_addr_callback(Object &&cb) { return m_addr_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_data_callback(Object &&cb) { return m_data_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_romclk_callback(Object &&cb) { return m_romclk_cb.set_callback(std::forward<Object>(cb)); }
+	auto m0_cb() { return m_m0_cb.bind(); }
+	auto m1_cb() { return m_m1_cb.bind(); }
+	auto addr_cb() { return m_addr_cb.bind(); }
+	auto data_cb() { return m_data_cb.bind(); }
+	auto romclk_cb() { return m_romclk_cb.bind(); }
 
 	// Control lines - once written to will switch interface into * "true" timing behaviour.
 
@@ -81,11 +57,9 @@ public:
 	/RS is bit 1, /WS is bit 0
 	Note this is a hack and probably can be removed later, once the 'real'
 	line handlers above defer by at least 4 clock cycles before taking effect */
-	DECLARE_WRITE8_MEMBER( data_w ) { write_data(data); }
-	DECLARE_READ8_MEMBER( status_r ) { return read_status(); }
 
-	void write_data(uint8_t data);
-	uint8_t read_status();
+	void data_w(uint8_t data);
+	uint8_t status_r();
 
 	READ_LINE_MEMBER( readyq_r );
 	READ_LINE_MEMBER( intq_r );

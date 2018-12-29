@@ -383,9 +383,7 @@ Shark   Zame
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "sound/3812intf.h"
 #include "speaker.h"
 
@@ -413,8 +411,8 @@ void twincobr_state::main_program_map(address_map &map)
 	map(0x078004, 0x078005).portr("P1");
 	map(0x078006, 0x078007).portr("P2");
 	map(0x078008, 0x078009).portr("VBLANK");         /* V-Blank & FShark Coin/Start */
-	map(0x07800b, 0x07800b).w("coinlatch", FUNC(ls259_device::write_nibble_d0)); /* Flying Shark DSP Comms & coin stuff */
-	map(0x07800d, 0x07800d).w("mainlatch", FUNC(ls259_device::write_nibble_d0)); /* Twin Cobra DSP Comms & system control */
+	map(0x07800b, 0x07800b).w(m_coinlatch, FUNC(ls259_device::write_nibble_d0)); /* Flying Shark DSP Comms & coin stuff */
+	map(0x07800d, 0x07800d).w(m_mainlatch, FUNC(ls259_device::write_nibble_d0)); /* Twin Cobra DSP Comms & system control */
 	map(0x07a000, 0x07afff).rw(FUNC(twincobr_state::twincobr_sharedram_r), FUNC(twincobr_state::twincobr_sharedram_w));   /* 16-bit on 68000 side, 8-bit on Z80 side */
 	map(0x07e000, 0x07e001).rw(FUNC(twincobr_state::twincobr_txram_r), FUNC(twincobr_state::twincobr_txram_w));   /* data for text video RAM */
 	map(0x07e002, 0x07e003).rw(FUNC(twincobr_state::twincobr_bgram_r), FUNC(twincobr_state::twincobr_bgram_w));   /* data for bg video RAM */
@@ -435,7 +433,7 @@ void twincobr_state::sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x10, 0x10).portr("SYSTEM");         /* Twin Cobra - Coin/Start */
-	map(0x20, 0x20).w("coinlatch", FUNC(ls259_device::write_nibble_d0));      /* Twin Cobra coin count-lockout */
+	map(0x20, 0x20).w(m_coinlatch, FUNC(ls259_device::write_nibble_d0));      /* Twin Cobra coin count-lockout */
 	map(0x40, 0x40).portr("DSWA");
 	map(0x50, 0x50).portr("DSWB");
 }
@@ -443,14 +441,14 @@ void twincobr_state::sound_io_map(address_map &map)
 
 /***************************** TMS32010 Memory Map **************************/
 
-void twincobr_state::DSP_program_map(address_map &map)
+void twincobr_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-void twincobr_state::DSP_io_map(address_map &map)
+void twincobr_state::dsp_io_map(address_map &map)
 {
 	map(0, 0).w(FUNC(twincobr_state::twincobr_dsp_addrsel_w));
 	map(1, 1).rw(FUNC(twincobr_state::twincobr_dsp_r), FUNC(twincobr_state::twincobr_dsp_w));
@@ -661,38 +659,41 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(28'000'000)/2)         /* 14MHz CLKin */
-	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
+	TMS32010(config, m_dsp, XTAL(28'000'000)/2);         /* 14MHz CLKin */
+	m_dsp->set_addrmap(AS_PROGRAM, &twincobr_state::dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, twincobr_state, twincobr_BIO_r))
+	m_dsp->set_addrmap(AS_IO, &twincobr_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(twincobr_state::twincobr_bio_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, twincobr_state, int_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, twincobr_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, twincobr_state, bg_ram_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, twincobr_state, fg_rom_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, twincobr_state, dsp_int_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, twincobr_state, display_on_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<2>().set(FUNC(twincobr_state::int_enable_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(twincobr_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(twincobr_state::bg_ram_bank_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(twincobr_state::fg_rom_bank_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(twincobr_state::dsp_int_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(twincobr_state::display_on_w));
 
-	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, twincobr_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, twincobr_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, twincobr_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, twincobr_state, coin_lockout_2_w))
+	LS259(config, m_coinlatch);
+	m_coinlatch->q_out_cb<4>().set(FUNC(twincobr_state::coin_counter_1_w));
+	m_coinlatch->q_out_cb<5>().set(FUNC(twincobr_state::coin_counter_2_w));
+	m_coinlatch->q_out_cb<6>().set(FUNC(twincobr_state::coin_lockout_1_w));
+	m_coinlatch->q_out_cb<7>().set(FUNC(twincobr_state::coin_lockout_2_w));
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(28'000'000)/8) /* 3.5MHz measured on CLKin */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(2)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(28'000'000)/8)); /* 3.5MHz measured on CLKin */
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(31, 15);
 
-	MCFG_DEVICE_ADD("spriteram16", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram16);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -702,11 +703,8 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	m_screen->screen_vblank().append(FUNC(twincobr_state::twincobr_vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twincobr)
-	MCFG_PALETTE_ADD("palette", 1792)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(twincobr_state,toaplan0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twincobr);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1792);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -722,26 +720,23 @@ MACHINE_CONFIG_START(twincobr_state::twincobrw)
 	MCFG_DEVICE_CLOCK(XTAL(10'000'000)) /* The export versions have a dedicated OSC for the M68000 on the top right of the board */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(twincobr_state::fshark)
+void twincobr_state::fshark(machine_config &config)
+{
 	twincobr(config);
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
+	m_mainlatch->q_out_cb<6>().set_nop();
+	m_coinlatch->q_out_cb<0>().set(FUNC(twincobr_state::dsp_int_w));
 
-	MCFG_DEVICE_MODIFY("coinlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, twincobr_state, dsp_int_w))
-
-	MCFG_DEVICE_MODIFY("scu")
-	MCFG_TOAPLAN_SCU_SET_XOFFSETS(32, 14)
-MACHINE_CONFIG_END
+	m_spritegen->set_xoffsets(32, 14);
+}
 
 
-MACHINE_CONFIG_START(twincobr_state::fsharkbt)
+void twincobr_state::fsharkbt(machine_config &config)
+{
 	fshark(config);
 
-	MCFG_DEVICE_ADD("mcu", I8741, XTAL(28'000'000)/16)
+	I8741(config, "mcu", XTAL(28'000'000)/16).set_disable();  /* Internal program code is not dumped */
 	/* Program Map is internal to the CPU */
-	MCFG_DEVICE_DISABLE()       /* Internal program code is not dumped */
-MACHINE_CONFIG_END
+}
 
 
 

@@ -6,26 +6,7 @@
 #pragma once
 
 
-#define MCFG_SCN2672_INTR_CALLBACK(_intr) \
-	downcast<scn2672_device &>(*device).set_intr_callback(DEVCB_##_intr);
-
-#define MCFG_SCN2672_CHARACTER_WIDTH(_value) \
-	downcast<scn2672_device &>(*device).set_character_width(_value);
-
-#define MCFG_SCN2672_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	downcast<scn2672_device &>(*device).set_display_callback(scn2672_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
-
 #define SCN2672_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t attrcode, uint16_t address, bool cursor, bool dw, bool lg, bool ul, bool blink)
-
-
-#define MCFG_SCN2674_INTR_CALLBACK(_intr) \
-	downcast<scn2674_device &>(*device).set_intr_callback(DEVCB_##_intr);
-
-#define MCFG_SCN2674_CHARACTER_WIDTH(_value) \
-	downcast<scn2674_device &>(*device).set_character_width(_value);
-
-#define MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	downcast<scn2674_device &>(*device).set_display_callback(scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define SCN2674_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t attrcode, uint16_t address, bool cursor, bool dw, bool lg, bool ul, bool blink)
 
@@ -40,21 +21,36 @@ public:
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t attrcode, uint16_t address, bool cursor, bool dw, bool lg, bool ul, bool blink)> draw_character_delegate;
 
 	// static configuration
-	template <class Object> devcb_base &set_intr_callback(Object &&cb) { return m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	auto intr_callback() { return m_intr_cb.bind(); }
+	auto breq_callback() { return m_breq_cb.bind(); }
 	void set_character_width(int value) { m_hpixels_per_column = value; }
-	template <typename Object> void set_display_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( buffer_r ) { return m_char_buffer; }
-	DECLARE_WRITE8_MEMBER( buffer_w ) { m_char_buffer = data; }
-	DECLARE_READ8_MEMBER( attr_buffer_r ) { return m_attr_buffer; }
-	DECLARE_WRITE8_MEMBER( attr_buffer_w ) { m_attr_buffer = data; }
+	template <class FunctionClass>
+	void set_display_callback(void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint16_t, bool, bool, bool, bool, bool), const char *name)
+	{
+		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass>
+	void set_display_callback(const char *devname, void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint16_t, bool, bool, bool, bool, bool), const char *name)
+	{
+		set_display_callback(draw_character_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	void set_display_callback(draw_character_delegate callback)
+	{
+		m_display_cb = callback;
+	}
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t buffer_r() { return m_char_buffer; }
+	void buffer_w(offs_t offset, uint8_t data) { m_char_buffer = data; }
+	uint8_t attr_buffer_r() { return m_attr_buffer; }
+	void attr_buffer_w(offs_t offset, uint8_t data) { m_attr_buffer = data; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -65,6 +61,7 @@ protected:
 //protected:
 	bitmap_rgb32 m_bitmap;
 	devcb_write_line m_intr_cb;
+	devcb_write_line m_breq_cb;
 
 	uint8_t m_IR_pointer;
 	uint16_t m_screen1_address;

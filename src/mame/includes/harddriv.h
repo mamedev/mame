@@ -96,7 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 
-private:
+protected:
 
 	void init_video();
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
@@ -553,7 +553,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<ls259_device> m_latch;
 	required_device<dac_word_interface> m_dac;
-	required_device<cpu_device> m_sounddsp;
+	required_device<tms32010_device> m_sounddsp;
 	required_shared_ptr<uint16_t> m_sounddsp_ram;
 	required_region_ptr<uint8_t>  m_sound_rom;
 

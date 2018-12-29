@@ -1388,8 +1388,8 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmainj)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, djmain_state, ide_interrupt))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(djmain_state::ide_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1399,16 +1399,15 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	MCFG_SCREEN_VISIBLE_AREA(12, 512-12-1, 0, 384-1)
 	MCFG_SCREEN_UPDATE_DRIVER(djmain_state, screen_update_djmain)
 
-	MCFG_PALETTE_ADD("palette", 0x4440/4)
-	MCFG_PALETTE_FORMAT(XBGR)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djmain)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4440 / 4);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djmain);
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(djmain_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(djmain_state::tile_callback), this);
+	m_k056832->set_config("gfx2", K056832_BPP_4dj, 1, 1);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

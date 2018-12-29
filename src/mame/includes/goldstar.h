@@ -1,7 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
+#ifndef MAME_INCLUDES_GOLDSTAR_H
+#define MAME_INCLUDES_GOLDSTAR_H
+
+#pragma once
 
 #include "machine/ds2401.h"
+#include "machine/i8255.h"
 #include "machine/ticket.h"
 #include "emupal.h"
 
@@ -22,6 +27,7 @@ public:
 		m_reel2_scroll(*this, "reel2_scroll"),
 		m_reel3_scroll(*this, "reel3_scroll"),
 		m_maincpu(*this, "maincpu"),
+		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_lamps(*this, "lamp%u", 0U)
@@ -46,10 +52,10 @@ public:
 	void init_wcherry();
 	void init_super9();
 	DECLARE_VIDEO_START(goldstar);
-	DECLARE_PALETTE_INIT(cm);
+	void cm_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(cherrym);
-	DECLARE_PALETTE_INIT(cmast91);
-	DECLARE_PALETTE_INIT(lucky8);
+	void cmast91_palette(palette_device &palette) const;
+	void lucky8_palette(palette_device &palette) const;
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -120,6 +126,7 @@ protected:
 	uint8_t m_cm_girl_scroll;
 
 	required_device<cpu_device> m_maincpu;
+	optional_device_array<i8255_device, 3> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<16> m_lamps;
@@ -178,6 +185,7 @@ protected:
 	READ8_MEMBER(fixedval58_r) { return 0x58; }
 	READ8_MEMBER(fixedval68_r) { return 0x68; }
 	READ8_MEMBER(fixedval74_r) { return 0x74; }
+	READ8_MEMBER(fixedval7d_r) { return 0x7d; }
 	READ8_MEMBER(fixedval80_r) { return 0x80; }
 	READ8_MEMBER(fixedval82_r) { return 0x82; }
 	READ8_MEMBER(fixedval84_r) { return 0x84; }
@@ -214,10 +222,11 @@ public:
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
+	void init_luckylad();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
-	DECLARE_PALETTE_INIT(magodds);
+	void magodds_palette(palette_device &palette) const;
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -374,3 +383,5 @@ private:
 
 	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };
+
+#endif // MAME_INCLUDES_GOLDSTAR_H

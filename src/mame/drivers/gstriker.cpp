@@ -493,11 +493,7 @@ INPUT_PORTS_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-MACHINE_CONFIG_START(gstriker_state::gstriker)
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(gstriker_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
-
+MACHINE_CONFIG_START(gstriker_state::base)
 	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
@@ -513,11 +509,6 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("link", rs232_port_device, write_rts))
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -526,34 +517,32 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gstriker_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gstriker)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-
-	MCFG_DEVICE_ADD("zoomtilemap", MB60553, 0)
-	MCFG_MB60553_GFXDECODE("gfxdecode")
-	MCFG_MB60553_GFX_REGION(1)
-
-	MCFG_DEVICE_ADD("texttilemap", VS920A, 0)
-	MCFG_VS920A_GFXDECODE("gfxdecode")
-	MCFG_VS920A_GFX_REGION(0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gstriker);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 
 
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR_SET_PALMASK(0x1f)
-	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MB60553(config, m_bg, 0);
+	m_bg->set_gfxdecode_tag(m_gfxdecode);
+	m_bg->set_gfx_region(1);
+
+	VS920A(config, m_tx, 0);
+	m_tx->set_gfxdecode_tag(m_gfxdecode);
+	m_tx->set_gfx_region(0);
+
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_gfx_region(2);
+	m_spr->set_pal_mask(0x1f);
+	m_spr->set_transpen(0);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -563,23 +552,37 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gstriker_state::twc94)
-	gstriker(config);
-	MCFG_DEVICE_REPLACE("maincpu", M68000, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(twcup94_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
+void gstriker_state::gstriker(machine_config &config)
+{
+	base(config);
+
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gstriker_state::gstriker_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gstriker_state::irq1_line_hold));
+
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
+}
+
+void gstriker_state::twc94(machine_config &config)
+{
+	base(config);
+
+	M68000(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gstriker_state::twcup94_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gstriker_state::irq1_line_hold));
 
 	subdevice<vs9209_device>("io")->porth_output_cb().append(FUNC(gstriker_state::twcup94_prot_reg_w));
-
-	MCFG_DEVICE_REMOVE("acia")
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(gstriker_state::vgoal)
+void gstriker_state::vgoal(machine_config &config)
+{
 	twc94(config);
-	MCFG_DEVICE_MODIFY("vsystem_spr")
-	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0xf) // different vs. the other games, find register
-MACHINE_CONFIG_END
+	m_spr->set_transpen(0xf); // different vs. the other games, find register
+}
 
 
 

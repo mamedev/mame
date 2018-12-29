@@ -278,27 +278,26 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ksayakyu_state, screen_update_ksayakyu)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksayakyu)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ksayakyu);
+	PALETTE(config, m_palette, FUNC(ksayakyu_state::ksayakyu_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/16)); //unknown clock
+	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_b_write_callback().set(FUNC(ksayakyu_state::dummy1_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/16) //unknown clock
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/16)); //unknown clock
+	ay2.port_a_write_callback().set(FUNC(ksayakyu_state::dummy2_w));
+	ay2.port_b_write_callback().set(FUNC(ksayakyu_state::dummy3_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_DEVICE_PROGRAM_MAP(usgames_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -236,19 +236,18 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usgames)
-	MCFG_PALETTE_ADD("palette", 2*256)
-	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_usgames);
+	PALETTE(config, "palette", FUNC(usgames_state::usgames_palette), 2*256);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18_MHz_XTAL / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", 18_MHz_XTAL / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8912(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(usgames_state::usg185)

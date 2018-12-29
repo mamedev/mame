@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Joseba Epalza
+#ifndef MAME_INCLUDES_SPEEDBAL_H
+#define MAME_INCLUDES_SPEEDBAL_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -22,6 +26,10 @@ public:
 	void init_speedbal();
 	void init_musicbal();
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -36,9 +44,6 @@ private:
 	uint32_t m_leds_shiftreg;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(foreground_videoram_w);
@@ -59,3 +64,5 @@ private:
 	void sound_cpu_io_map(address_map &map);
 	void sound_cpu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SPEEDBAL_H

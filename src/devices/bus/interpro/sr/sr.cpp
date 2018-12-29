@@ -259,204 +259,98 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(CBUS, cbus_device, "cbus", "InterPro CBUS")
+DEFINE_DEVICE_TYPE(CBUS_BUS, cbus_bus_device, "cbus_bus", "InterPro CBUS bus")
 DEFINE_DEVICE_TYPE(CBUS_SLOT, cbus_slot_device, "cbus_slot", "InterPro CBUS slot")
 
-DEFINE_DEVICE_TYPE(SRX, srx_device, "srx", "InterPro SRX")
+DEFINE_DEVICE_TYPE(SRX_BUS, srx_bus_device, "srx_bus", "InterPro SRX bus")
 DEFINE_DEVICE_TYPE(SRX_SLOT, srx_slot_device, "srx_slot", "InterPro SRX slot")
 
-cbus_slot_device::cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, CBUS_SLOT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
-	, m_bus_tag(nullptr)
-	, m_slot_tag(nullptr)
+void interpro_bus_device::device_resolve_objects()
 {
-}
-
-void cbus_slot_device::set_tags(const char *bus_tag, const char *slot_tag)
-{
-	m_bus_tag = bus_tag;
-	m_slot_tag = slot_tag;
-}
-
-void cbus_slot_device::device_start()
-{
-	device_cbus_card_interface *dev = dynamic_cast<device_cbus_card_interface *>(get_card_device());
-
-	if (dev)
-		dev->set_tags(m_bus_tag, m_slot_tag);
-}
-
-cbus_device::cbus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, CBUS, tag, owner, clock)
-	, m_out_irq0_cb(*this)
-	, m_out_irq1_cb(*this)
-	, m_out_irq2_cb(*this)
-	, m_out_vblank_cb(*this)
-	, m_memory_tag(nullptr)
-{
-}
-
-void cbus_device::set_memory(const char *const tag, const int main_spacenum, const int io_spacenum)
-{
-	m_memory_tag = tag;
-	m_main_spacenum = main_spacenum;
-	m_io_spacenum = io_spacenum;
-}
-
-void cbus_device::device_start()
-{
-	assert_always(m_memory_tag != nullptr, "memory tag and address spaces must be configured");
-
-	// get the memory spaces
-	device_memory_interface *memory;
-	siblingdevice(m_memory_tag)->interface(memory);
-	m_main_space = &memory->space(m_main_spacenum);
-	m_io_space = &memory->space(m_io_spacenum);
+	m_main_space = &m_maincpu->space(0);
+	m_io_space = &m_maincpu->space(1);
 
 	// resolve callbacks
 	m_out_irq0_cb.resolve_safe();
 	m_out_irq1_cb.resolve_safe();
 	m_out_irq2_cb.resolve_safe();
-	m_out_vblank_cb.resolve_safe();
-
-	// FIXME: silence the slot address map
-	m_main_space->nop_read(CBUS_BASE, CBUS_BASE + (CBUS_STRIDE * (CBUS_COUNT - 1)) + (CBUS_SIZE - 1));
-	m_io_space->nop_read(CBUS_BASE, CBUS_BASE + (CBUS_STRIDE * (CBUS_COUNT - 1)) + (CBUS_SIZE - 1));
-
-	// empty the slots
-	m_slot_count = 0;
-	for (device_cbus_card_interface *&slot : m_slot)
-		slot = nullptr;
+	m_out_irq3_cb.resolve_safe();
 }
 
-void cbus_device::device_reset()
+cbus_bus_device::cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: interpro_bus_device(mconfig, CBUS_BUS, tag, owner, clock)
+	, m_slot_count(0)
+{
+	std::fill(std::begin(m_slot), std::end(m_slot), nullptr);
+}
+
+void cbus_bus_device::device_start()
 {
 }
 
-device_cbus_card_interface::device_cbus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
-	, m_bus(nullptr)
-	, m_bus_tag(nullptr)
-	, m_slot_tag(nullptr)
+cbus_slot_device::cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, CBUS_SLOT, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, m_bus(*this, finder_base::DUMMY_TAG)
 {
 }
 
-void device_cbus_card_interface::set_bus_device()
+void cbus_slot_device::device_resolve_objects()
 {
-	// get a reference to the bus
-	m_bus = dynamic_cast<cbus_device *>(device().machine().device(m_bus_tag));
+	device_cbus_card_interface *const card(dynamic_cast<device_cbus_card_interface *>(get_card_device()));
+
+	if (card)
+		card->set_bus_device(*m_bus);
+}
+
+void cbus_slot_device::device_start()
+{
+}
+
+void device_cbus_card_interface::set_bus_device(cbus_bus_device &bus_device)
+{
+	// keep a reference to the bus
+	m_bus = &bus_device;
 
 	// install the card in the next available slot
-	m_bus->install_card(*this, &device_cbus_card_interface::map);
+	m_bus->install_card(*this, device().memregion(m_idprom_region), &device_cbus_card_interface::map);
 }
 
-cbus_card_device_base::cbus_card_device_base(const machine_config &mconfig, device_t &device, const char *idprom_region)
-	: device_cbus_card_interface(mconfig, device)
-	, m_idprom_region(idprom_region)
+srx_bus_device::srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: interpro_bus_device(mconfig, SRX_BUS, tag, owner, clock)
+	, m_slot_count(1) // first slot is used by the system board
 {
+	std::fill(std::begin(m_slot), std::end(m_slot), nullptr);
 }
 
-void cbus_card_device_base::map(address_map &map)
+void srx_bus_device::device_start()
 {
-	// TODO: use lambda until device submaps support unit masks
-	map(0x00, 0x7f).lr32(m_idprom_region,
-		[this](address_space &space, offs_t offset, u32 mem_mask) { return device().memregion(m_idprom_region)->as_u32(offset); });
 }
 
 srx_slot_device::srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SRX_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
-	, m_bus_tag(nullptr)
-	, m_slot_tag(nullptr)
+	, m_bus(*this, finder_base::DUMMY_TAG)
 {
 }
 
-void srx_slot_device::set_tags(const char *bus_tag, const char *slot_tag)
+void srx_slot_device::device_resolve_objects()
 {
-	m_bus_tag = bus_tag;
-	m_slot_tag = slot_tag;
+	device_srx_card_interface *const card(dynamic_cast<device_srx_card_interface *>(get_card_device()));
+
+	if (card)
+		card->set_bus_device(*m_bus);
 }
 
 void srx_slot_device::device_start()
 {
-	device_srx_card_interface *dev = dynamic_cast<device_srx_card_interface *>(get_card_device());
-
-	if (dev)
-		dev->set_tags(m_bus_tag, m_slot_tag);
 }
 
-srx_device::srx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SRX, tag, owner, clock)
-	, m_out_irq0_cb(*this)
-	, m_out_irq1_cb(*this)
-	, m_out_irq2_cb(*this)
-	, m_out_vblank_cb(*this)
-	, m_memory_tag(nullptr)
+void device_srx_card_interface::set_bus_device(srx_bus_device &bus_device)
 {
-}
-
-void srx_device::set_memory(const char *const tag, const int main_spacenum, const int io_spacenum)
-{
-	m_memory_tag = tag;
-	m_main_spacenum = main_spacenum;
-	m_io_spacenum = io_spacenum;
-}
-
-void srx_device::device_start()
-{
-	assert_always(m_memory_tag != nullptr, "memory tag and address spaces must be configured");
-
-	// get the memory spaces
-	device_memory_interface *memory;
-	siblingdevice(m_memory_tag)->interface(memory);
-	m_main_space = &memory->space(m_main_spacenum);
-	m_io_space = &memory->space(m_io_spacenum);
-
-	// resolve callbacks
-	m_out_irq0_cb.resolve_safe();
-	m_out_irq1_cb.resolve_safe();
-	m_out_irq2_cb.resolve_safe();
-	m_out_vblank_cb.resolve_safe();
-
-	// empty the slots
-	for (device_srx_card_interface *&slot : m_slot)
-		slot = nullptr;
-
-	// first slot is used by the system board
-	m_slot_count = 1;
-}
-
-void srx_device::device_reset()
-{
-}
-
-device_srx_card_interface::device_srx_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
-	, m_bus(nullptr)
-	, m_bus_tag(nullptr)
-	, m_slot_tag(nullptr)
-{
-}
-
-void device_srx_card_interface::set_bus_device()
-{
-	// get a reference to the bus
-	m_bus = dynamic_cast<srx_device *>(device().machine().device(m_bus_tag));
+	// keep a reference to the bus
+	m_bus = &bus_device;
 
 	// install the card in the next available slot
-	m_bus->install_card(*this, &device_srx_card_interface::map);
-}
-
-srx_card_device_base::srx_card_device_base(const machine_config &mconfig, device_t &device, const char *idprom_region)
-	: device_srx_card_interface(mconfig, device)
-	, m_idprom_region(idprom_region)
-{
-}
-
-void srx_card_device_base::map(address_map &map)
-{
-	// TODO: use lambda until device submaps support unit masks
-	map(0x7f80, 0x7fff).lr32(m_idprom_region,
-		[this](address_space &space, offs_t offset, u32 mem_mask) { return device().memregion(m_idprom_region)->as_u32(offset); });
+	m_bus->install_card(*this, device().memregion(m_idprom_region), &device_srx_card_interface::map);
 }

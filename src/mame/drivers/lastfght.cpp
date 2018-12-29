@@ -37,8 +37,8 @@ PCB Layout
 
 Notes:
       H8/3044 - Subsino re-badged Hitachi H8/3044 HD6433044A22F Microcontroller (QFP100)
-                The H8/3044 is a H8/3002 with 24bit address bus and has 32k MASKROM and 2k RAM, clock input is 16.000MHz [32/2]
-                MD0,MD1 & MD2 are configured to MODE 6 16M-Byte Expanded Mode with the on-chip 32k MASKROM enabled.
+                The H8/3044 is a H8/3002 with 24bit address bus and has 32k mask ROM and 2k RAM, clock input is 16.000MHz [32/2]
+                MD0,MD1 & MD2 are configured to MODE 6 16M-Byte Expanded Mode with the on-chip 32k mask ROM enabled.
       EPM7032 - Altera EPM7032LC44-15T CPLD (PLCC44)
      CXK58257 - Sony CXK58257 32k x8 SRAM (SOP28)
     KM428C256 - Samsung Semiconductor KM428C256 256k x8 Dual Port DRAM (SOJ40)
@@ -52,7 +52,7 @@ Notes:
           SW1 - Push Button Test Switch
         HSync - 15.75kHz
         VSync - 60Hz
-    ROM BOARD - Small Daughterboard containing positions for 8x 16MBit SOP44 MASKROMs. Only positions 1-4 are populated.
+    ROM BOARD - Small Daughterboard containing positions for 8x 16MBit SOP44 mask ROMs. Only positions 1-4 are populated.
    Custom ICs -
                 U19     - SUBSINO 9623EX008 (QFP208)
                 H8/3044 - SUBSINO SS9689 6433044A22F, rebadged Hitachi H8/3044 MCU (QFP100)
@@ -560,13 +560,13 @@ MACHINE_CONFIG_START(lastfght_state::lastfght)
 	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &lastfght_state::ramdac_map);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 512, 256 )

@@ -15,8 +15,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/printer.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/abc80kb.h"
@@ -95,7 +93,7 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<sn76477_device> m_csg;
 	required_device<cassette_image_device> m_cassette;

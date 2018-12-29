@@ -45,8 +45,8 @@ Notes:
 class go2000_state : public driver_device
 {
 public:
-	go2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	go2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_maincpu(*this, "maincpu"),
@@ -54,7 +54,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void go2000(machine_config &config);
 
@@ -354,7 +355,7 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	MCFG_DEVICE_IO_MAP(go2000_sound_io)
 
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_go2000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_go2000);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -362,13 +363,12 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(go2000_state, screen_update_go2000)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.25) // unknown DAC

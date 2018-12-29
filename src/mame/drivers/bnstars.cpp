@@ -104,21 +104,22 @@ class bnstars_state : public ms32_state
 {
 public:
 	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ms32_state(mconfig, type, tag),
-			m_ms32_tx0_ram(*this, "tx0_ram"),
-			m_ms32_tx1_ram(*this, "tx1_ram"),
-			m_ms32_bg0_ram(*this, "bg0_ram"),
-			m_ms32_bg1_ram(*this, "bg1_ram"),
-			m_ms32_roz0_ram(*this, "roz0_ram"),
-			m_ms32_roz1_ram(*this, "roz1_ram"),
-			m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0),
-			m_ms32_spram(*this, "spram"),
-			m_ms32_tx0_scroll(*this, "tx0_scroll"),
-			m_ms32_bg0_scroll(*this, "bg0_scroll"),
-			m_ms32_tx1_scroll(*this, "tx1_scroll"),
-			m_ms32_bg1_scroll(*this, "bg1_scroll"),
-			m_p1_keys(*this, "P1KEY.%u", 0),
-			m_p2_keys(*this, "P2KEY.%u", 0) { }
+		: ms32_state(mconfig, type, tag)
+		, m_ms32_tx0_ram(*this, "tx0_ram")
+		, m_ms32_tx1_ram(*this, "tx1_ram")
+		, m_ms32_bg0_ram(*this, "bg0_ram")
+		, m_ms32_bg1_ram(*this, "bg1_ram")
+		, m_ms32_roz0_ram(*this, "roz0_ram")
+		, m_ms32_roz1_ram(*this, "roz1_ram")
+		, m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0)
+		, m_ms32_spram(*this, "spram")
+		, m_ms32_tx0_scroll(*this, "tx0_scroll")
+		, m_ms32_bg0_scroll(*this, "bg0_scroll")
+		, m_ms32_tx1_scroll(*this, "tx1_scroll")
+		, m_ms32_bg1_scroll(*this, "bg1_scroll")
+		, m_p1_keys(*this, "P1KEY.%u", 0)
+		, m_p2_keys(*this, "P2KEY.%u", 0)
+	{ }
 
 	void bnstars(machine_config &config);
 
@@ -824,13 +825,13 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bnstars)
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_FORMAT(XBRG)
-	MCFG_PALETTE_MEMBITS(16)
+	auto &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::xBRG_888, 0x8000);
+	palette.set_membits(16);
 
-	MCFG_PALETTE_ADD("palette2", 0x8000)
-	MCFG_PALETTE_FORMAT(XBRG)
-	MCFG_PALETTE_MEMBITS(16)
+	auto &palette2(PALETTE(config, "palette2"));
+	palette2.set_format(palette_device::xBRG_888, 0x8000);
+	palette2.set_membits(16);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -855,8 +856,8 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymf1", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

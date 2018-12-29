@@ -37,11 +37,12 @@ Other outs:
 class headonb_state : public driver_device
 {
 public:
-	headonb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	headonb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_video_ram(*this, "video_ram") { }
+		m_video_ram(*this, "video_ram")
+	{ }
 
 	void headonb(machine_config &config);
 
@@ -183,7 +184,7 @@ MACHINE_CONFIG_START(headonb_state::headonb)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_headonb)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	// TODO

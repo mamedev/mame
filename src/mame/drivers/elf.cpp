@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "includes/elf.h"
 #include "elf2.lh"
+#include "screen.h"
 
 #define RUN \
 	BIT(m_special->read(), 0)
@@ -237,25 +238,25 @@ QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 
 MACHINE_CONFIG_START(elf2_state::elf2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'579'545)/2)
-	MCFG_DEVICE_PROGRAM_MAP(elf2_mem)
-	MCFG_DEVICE_IO_MAP(elf2_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, elf2_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, elf2_state, clear_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, elf2_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, elf2_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, elf2_state, dma_r))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(CDP1861_TAG, cdp1861_device, dma_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, elf2_state, sc_w))
+	CDP1802(config, m_maincpu, XTAL(3'579'545)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elf2_state::elf2_mem);
+	m_maincpu->set_addrmap(AS_IO, &elf2_state::elf2_io);
+	m_maincpu->wait_cb().set(FUNC(elf2_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(elf2_state::clear_r));
+	m_maincpu->ef4_cb().set(FUNC(elf2_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(elf2_state::q_w));
+	m_maincpu->dma_rd_cb().set(FUNC(elf2_state::dma_r));
+	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
+	m_maincpu->sc_cb().set(FUNC(elf2_state::sc_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_elf2);
 
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL(3'579'545)/2)
-	MCFG_CDP1861_IRQ_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT))
-	MCFG_CDP1861_DMA_OUT_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT))
-	MCFG_CDP1861_EFX_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
-	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL(3'579'545)/2)
+	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(SCREEN_TAG);
+	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_vdc->dma_out_cb().set_inputline(m_maincpu,  COSMAC_INPUT_LINE_DMAOUT);
+	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	/* devices */
 	MCFG_DEVICE_ADD(MM74C923_TAG, MM74C923, 0)
@@ -278,8 +279,7 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	MCFG_QUICKLOAD_ADD("quickload", elf2_state, elf, "bin", 0)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
+	RAM(config, RAM_TAG).set_default_size("256");
 MACHINE_CONFIG_END
 
 /* ROMs */

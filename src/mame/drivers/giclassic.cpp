@@ -57,8 +57,8 @@
 class giclassic_state : public driver_device
 {
 public:
-	giclassic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	giclassic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_palette(*this, "palette")
@@ -70,8 +70,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
-
-	DECLARE_PALETTE_INIT(giclassic);
 
 	INTERRUPT_GEN_MEMBER(giclassic_interrupt);
 
@@ -311,16 +309,15 @@ MACHINE_CONFIG_START(giclassic_state::giclassic)
 	MCFG_SCREEN_SIZE(600, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(giclassic_state, screen_update_giclassic)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(giclassic_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(giclassic_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 1, 0);
+	m_k056832->set_palette(m_palette);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
@@ -337,27 +334,23 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 	MCFG_SCREEN_SIZE(600, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(giclassicsvr_state, screen_update_giclassicsvr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 16384);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(giclassicsvr_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(giclassicsvr_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 0, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(giclassicsvr_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_PS, -60, 24);
+	m_k055673->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k053252a", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
-
-	MCFG_DEVICE_ADD("k053252b", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
+	K053252(config, "k053252a", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
+	K053252(config, "k053252b", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
 MACHINE_CONFIG_END
 
 ROM_START( giclasex )

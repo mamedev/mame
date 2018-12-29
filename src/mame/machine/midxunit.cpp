@@ -14,24 +14,13 @@
 #include "includes/midxunit.h"
 #include "midwayic.h"
 
+#define LOG_IO      (1 << 0)
+#define LOG_UART    (1 << 1)
+#define LOG_UNKNOWN (1 << 2)
+#define LOG_SOUND   (1 << 3)
 
-/*************************************
- *
- *  State saving
- *
- *************************************/
-
-void midxunit_state::register_state_saving()
-{
-	save_item(NAME(m_cmos_write_enable));
-	save_item(NAME(m_iodata));
-	save_item(NAME(m_ioshuffle));
-	save_item(NAME(m_uart));
-	save_item(NAME(m_security_bits));
-	save_item(NAME(m_adc_int));
-}
-
-
+#define VERBOSE     (0)
+#include "logmacro.h"
 
 /*************************************
  *
@@ -74,8 +63,8 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 
 		default:
 			/* Gun Outputs for RevX */
-			/* Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3 */
-			/* Perhaps an Input is hooked up wrong??? */
+			/* Note: The Gun for the Coin slot you use is supposed to rumble when you insert coins, and it doesn't for P3. */
+			/* Perhaps an Input is hooked up wrong. */
 			output().set_value("Player1_Gun_Recoil", data & 0x1 );
 			output().set_value("Player2_Gun_Recoil", (data & 0x2) >> 1 );
 			output().set_value("Player3_Gun_Recoil", (data & 0x4) >> 2 );
@@ -83,8 +72,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 			output().set_value("Player2_Gun_LED", (~data & 0x20) >> 5 );
 			output().set_value("Player3_Gun_LED", (~data & 0x40) >> 6 );
 
-			logerror("%08X:I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
-//          logerror("%08X:Unknown I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
+			LOGMASKED(LOG_IO, "%s: I/O write to %d = %04X\n", machine().describe_context(), offset, data);
 			break;
 	}
 	m_iodata[offset] = newword;
@@ -99,7 +87,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
 		m_dcs->reset_w(data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
-		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", m_maincpu->pc(), offs, data & 0xff);
+		LOGMASKED(LOG_UNKNOWN, "%s: midxunit_unknown_w @ %d = %02X\n", machine().describe_context(), offs, data & 0xff);
 }
 
 
@@ -202,7 +190,7 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 			break;
 	}
 
-/*  logerror("%08X:UART R @ %X = %02X\n", m_maincpu->pc(), offset, result);*/
+	LOGMASKED(LOG_UART, "%s: UART R @ %X = %02X\n", machine().describe_context(), offset, result);
 	return result;
 }
 
@@ -238,7 +226,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 			break;
 	}
 
-/*  logerror("%08X:UART W @ %X = %02X\n", m_maincpu->pc(), offset, data);*/
+	LOGMASKED(LOG_UART, "%s: UART W @ %X = %02X\n", machine().describe_context(), offset, data);
 }
 
 
@@ -253,28 +241,30 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 
 /********************** Revolution X **********************/
 
-void midxunit_state::init_revx()
-{
-	/* register for state saving */
-	register_state_saving();
-}
-
 /*************************************
  *
  *  Machine init
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midxunit_state,midxunit)
+void midxunit_state::machine_start()
 {
-	int i;
+	save_item(NAME(m_cmos_write_enable));
+	save_item(NAME(m_iodata));
+	save_item(NAME(m_ioshuffle));
+	save_item(NAME(m_uart));
+	save_item(NAME(m_security_bits));
+	save_item(NAME(m_adc_int));
+}
 
+void midxunit_state::machine_reset()
+{
 	/* reset sound */
 	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
 
 	/* reset I/O shuffling */
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_ioshuffle[i] = i % 8;
 
 	m_dcs->set_io_callbacks(write_line_delegate(FUNC(midxunit_state::midxunit_dcs_output_full),this), write_line_delegate());
@@ -316,7 +306,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
 
 READ16_MEMBER(midxunit_state::midxunit_sound_r)
 {
-	logerror("%08X:Sound read\n", m_maincpu->pc());
+	LOGMASKED(LOG_SOUND, "%08X:Sound read\n", m_maincpu->pc());
 
 	return m_dcs->data_r() & 0xff;
 }
@@ -333,14 +323,14 @@ WRITE16_MEMBER(midxunit_state::midxunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", m_maincpu->pc(), data);
+		LOGMASKED(LOG_SOUND | LOG_UNKNOWN, "%s: Unexpected write to sound (hi) = %04X\n", machine().describe_context(), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
+		LOGMASKED(LOG_SOUND, "%s: Sound write = %04X\n", machine().describe_context(), data);
 		m_dcs->data_w(data & 0xff);
 	}
 }

@@ -60,6 +60,7 @@ public:
 		, m_audiocpu1(*this, "audiocpu1")
 		, m_audiocpu2(*this, "audiocpu2")
 		, m_videocpu(*this, "videocpu")
+		, m_selectlatch(*this, "selectlatch")
 		, m_io_dsw0(*this, "DSW0")
 		, m_io_dsw1(*this, "DSW1")
 		, m_io_x0(*this, "X0")
@@ -71,8 +72,12 @@ public:
 
 	void init_mrgame();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_PALETTE_INIT(mrgame);
+	void mrgame_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(ack1_w);
 	DECLARE_WRITE8_MEMBER(ack2_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -104,9 +109,6 @@ private:
 	void video_map(address_map &map);
 	void wcup90_video_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -129,6 +131,7 @@ private:
 	required_device<z80_device> m_audiocpu1;
 	required_device<z80_device> m_audiocpu2;
 	required_device<z80_device> m_videocpu;
+	required_device<ls259_device> m_selectlatch;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
 	required_ioport m_io_x0;
@@ -156,7 +159,7 @@ void mrgame_state::video_map(address_map &map)
 	map(0x4000, 0x47ff).ram();
 	map(0x4800, 0x4bff).mirror(0x0400).ram().share("videoram");
 	map(0x5000, 0x50ff).mirror(0x0700).ram().share("objectram");
-	map(0x6800, 0x6807).mirror(0x07f8).w("selectlatch", FUNC(ls259_device::write_d0));
+	map(0x6800, 0x6807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0x7000, 0x7000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -167,7 +170,7 @@ void mrgame_state::wcup90_video_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8bff).mirror(0x0400).ram().share("videoram");
 	map(0x9000, 0x90ff).mirror(0x0700).ram().share("objectram");
-	map(0xa800, 0xa807).mirror(0x07f8).w("selectlatch", FUNC(ls259_device::write_d0));
+	map(0xa800, 0xa807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0xb000, 0xb000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0xc000, 0xc003).mirror(0x3ffc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -444,41 +447,42 @@ static GFXDECODE_START(gfx_mrgame)
 	GFXDECODE_ENTRY("chargen", 0, spritelayout, 0, 16)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(mrgame_state, mrgame)
+void mrgame_state::mrgame_palette(palette_device &palette) const
 {
-	static const int resistances[3] = { 1000, 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
-	uint8_t i, bit0, bit1, bit2, r, g, b;
-	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
+	static constexpr int resistances[3] = { 1000, 470, 220 };
+	uint8_t const *const color_prom = machine().root_device().memregion("proms")->base();
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances[0], rweights, 0, 0,
 			3, &resistances[0], gweights, 0, 0,
 			2, &resistances[1], bweights, 0, 0);
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 32; i++)
+	// create a lookup table for the palette
+	for (uint8_t i = 0; i < 32; i++)
 	{
-		/* red component */
+		uint8_t bit0, bit1, bit2;
+
+		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		uint8_t const r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		/* green component */
+		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		uint8_t const g = combine_3_weights(gweights, bit0, bit1, bit2);
 
-		/* blue component */
+		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		b = combine_2_weights(bweights, bit0, bit1);
+		uint8_t const b = combine_2_weights(bweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		palette.set_pen_color(i+32, rgb_t(r, g, b));
+		palette.set_pen_color(i + 32, rgb_t(r, g, b));
 	}
 }
 
@@ -533,83 +537,88 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-MACHINE_CONFIG_START(mrgame_state::mrgame)
+void mrgame_state::mrgame(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 6_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
+	M68000(config, m_maincpu, 6_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mrgame_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(mrgame_state::irq1_line_hold), attotime::from_hz(183));
 
-	MCFG_DEVICE_ADD("videocpu", Z80, 18.432_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(video_map)
+	Z80(config, m_videocpu, 18.432_MHz_XTAL / 6);
+	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::video_map);
 
-	MCFG_DEVICE_ADD("audiocpu1", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(audio1_map)
-	MCFG_DEVICE_IO_MAP(audio1_io)
+	Z80(config, m_audiocpu1, 4_MHz_XTAL);
+	m_audiocpu1->set_addrmap(AS_PROGRAM, &mrgame_state::audio1_map);
+	m_audiocpu1->set_addrmap(AS_IO, &mrgame_state::audio1_io);
 
-	MCFG_DEVICE_ADD("audiocpu2", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(audio2_map)
-	MCFG_DEVICE_IO_MAP(audio2_io)
+	Z80(config, m_audiocpu2, 4_MHz_XTAL);
+	m_audiocpu2->set_addrmap(AS_PROGRAM, &mrgame_state::audio2_map);
+	m_audiocpu2->set_addrmap(AS_IO, &mrgame_state::audio2_io);
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5564 (x2) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5564 (x2) + battery
 
-	ls259_device &select(LS259(config, "selectlatch")); // 5B
-	select.q_out_cb<0>().set(FUNC(mrgame_state::video_a11_w));
-	select.q_out_cb<1>().set(FUNC(mrgame_state::nmi_intst_w));
-	select.q_out_cb<3>().set(FUNC(mrgame_state::video_a12_w));
-	select.q_out_cb<4>().set(FUNC(mrgame_state::video_a13_w));
-	select.q_out_cb<6>().set(FUNC(mrgame_state::flip_w));
+	LS259(config, m_selectlatch); // 5B
+	m_selectlatch->q_out_cb<0>().set(FUNC(mrgame_state::video_a11_w));
+	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::nmi_intst_w));
+	m_selectlatch->q_out_cb<3>().set(FUNC(mrgame_state::video_a12_w));
+	m_selectlatch->q_out_cb<4>().set(FUNC(mrgame_state::video_a13_w));
+	m_selectlatch->q_out_cb<6>().set(FUNC(mrgame_state::flip_w));
 
 	//watchdog_timer_device &watchdog(WATCHDOG_TIMER(config, "watchdog")); // LS393 at 5D (video board) driven by VBLANK
 	//watchdog.set_vblank_count("screen", 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 8, 248) // If you align with X on test screen some info is chopped off
-	MCFG_SCREEN_UPDATE_DRIVER(mrgame_state, screen_update_mrgame)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mrgame_state, vblank_nmi_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 8, 248); // If you align with X on test screen some info is chopped off
+	screen.set_screen_update(FUNC(mrgame_state::screen_update_mrgame));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mrgame_state::vblank_nmi_w));
 
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(mrgame_state, mrgame)
+	PALETTE(config, m_palette, FUNC(mrgame_state::mrgame_palette), 64);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrgame)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrgame);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
-	MCFG_DEVICE_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
-	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	dac_8bit_r2r_device &dacvol(DAC_8BIT_R2R(config, "dacvol", 0)); // unknown DAC
+	dacvol.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	dacvol.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	dacvol.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	dacvol.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT);
+
+	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
+	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT);
+	tms.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	tms.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	/* Devices */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //ugh
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mrgame_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mrgame_state, portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mrgame_state, portc_r))
-MACHINE_CONFIG_END
+	TIMER(config, "irq_timer").configure_periodic(FUNC(mrgame_state::irq_timer), attotime::from_hz(16000)); //ugh
 
-MACHINE_CONFIG_START(mrgame_state::wcup90)
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set(FUNC(mrgame_state::porta_r));
+	ppi.out_pb_callback().set(FUNC(mrgame_state::portb_w));
+	ppi.in_pc_callback().set(FUNC(mrgame_state::portc_r));
+}
+
+void mrgame_state::wcup90(machine_config &config)
+{
 	mrgame(config);
 
-	MCFG_DEVICE_MODIFY("videocpu")
-	MCFG_DEVICE_PROGRAM_MAP(wcup90_video_map)
+	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::wcup90_video_map);
 
-	MCFG_DEVICE_MODIFY("selectlatch") // U48
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mrgame_state, intst_w))
+	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::intst_w)); // U48
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mrgame_state, vblank_int_w))
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(mrgame_state::vblank_int_w));
+}
 
 /*-------------------------------------------------------------------
 / Dakar (06/1988)

@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	mainlatch.q_out_cb<6>().set_nop(); // probably flip screen
 	mainlatch.q_out_cb<7>().set_nop(); // probably flip screen
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -253,23 +253,21 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_timelimt)
-	MCFG_PALETTE_ADD("palette", 64+32)
-	MCFG_PALETTE_INIT_OWNER(timelimt_state, timelimt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_timelimt);
+	PALETTE(config, m_palette, FUNC(timelimt_state::timelimt_palette), 64+32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", 18432000/12));
+	ay2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /***************************************************************************

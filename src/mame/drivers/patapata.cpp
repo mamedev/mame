@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_patapata)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_patapata)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -302,8 +302,7 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_SCREEN_UPDATE_DRIVER(patapata_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x600/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x600/2);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -313,9 +312,9 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 ROM_START( patapata )

@@ -149,6 +149,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/hphybrid/hphybrid.h"
+#include "imagedev/floppy.h"
 #include "machine/74123.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
@@ -369,8 +370,8 @@ void hp64k_state::cpu_io_map(address_map &map)
 	map(HP_MAKE_IOADDR(12, 0), HP_MAKE_IOADDR(12, 3)).w(FUNC(hp64k_state::hp64k_irl_mask_w));
 }
 
-hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig , type , tag),
+hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig , type , tag),
 	m_cpu(*this , "cpu"),
 	m_crtc(*this , "crtc"),
 	m_palette(*this , "palette"),
@@ -712,7 +713,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 		case 0:
 				// DMA transfer, not at TC
 				if (m_floppy_if_state == HP64K_FLPST_DMAWR1) {
-						m_fdc->write_data(~m_floppy_in_latch_msb);
+						m_fdc->data_w(~m_floppy_in_latch_msb);
 						m_floppy_if_state = HP64K_FLPST_DMAWR2;
 				} else {
 						logerror("write to IC=0 with floppy state %d\n" , m_floppy_if_state);
@@ -738,7 +739,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 						// Write (to either FDC or drive control)
 						if (BIT(m_floppy_if_ctrl , 2)) {
 								// FDC
-								m_fdc->gen_w(~m_floppy_if_ctrl & 3 , ~m_floppy_in_latch_lsb);
+								m_fdc->write(~m_floppy_if_ctrl & 3 , ~m_floppy_in_latch_lsb);
 						} else {
 								// Drive control
 								m_floppy_drv_ctrl = m_floppy_in_latch_lsb;
@@ -748,7 +749,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 						// Read
 						if (BIT(m_floppy_if_ctrl , 2)) {
 								// FDC
-								m_floppy_out_latch_lsb = ~m_fdc->gen_r(~m_floppy_if_ctrl & 3);
+								m_floppy_out_latch_lsb = ~m_fdc->read(~m_floppy_if_ctrl & 3);
 						} else {
 								// Drive control
 								m_floppy_out_latch_lsb = m_floppy_drv_ctrl;
@@ -763,7 +764,7 @@ WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
 		case 2:
 				// DMA transfer, at TC
 				if (m_floppy_if_state == HP64K_FLPST_DMAWR1) {
-						m_fdc->write_data(~m_floppy_in_latch_msb);
+						m_fdc->data_w(~m_floppy_in_latch_msb);
 						m_floppy_if_state = HP64K_FLPST_DMAWR2;
 						m_floppy_dmaen = false;
 						m_floppy_dmai = true;
@@ -802,18 +803,18 @@ void hp64k_state::hp64k_update_floppy_dma(void)
 								m_floppy_if_state = HP64K_FLPST_DMAWR1;
 						} else {
 								// DMA reads
-								m_floppy_out_latch_msb = ~m_fdc->read_data();
+								m_floppy_out_latch_msb = ~m_fdc->data_r();
 								m_floppy_if_state = HP64K_FLPST_DMARD1;
 						}
 						break;
 
 				case HP64K_FLPST_DMAWR2:
-						m_fdc->write_data(~m_floppy_in_latch_lsb);
+						m_fdc->data_w(~m_floppy_in_latch_lsb);
 						m_floppy_if_state = HP64K_FLPST_IDLE;
 						break;
 
 				case HP64K_FLPST_DMARD1:
-						m_floppy_out_latch_lsb = ~m_fdc->read_data();
+						m_floppy_out_latch_lsb = ~m_fdc->data_r();
 						m_cpu->dmar_w(1);
 						m_floppy_if_state = HP64K_FLPST_DMARD2;
 						break;
@@ -961,13 +962,7 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 
 READ16_MEMBER(hp64k_state::hp64k_usart_r)
 {
-		uint16_t tmp;
-
-		if ((offset & 1) == 0) {
-				tmp = m_uart->status_r(space , 0);
-		} else {
-				tmp = m_uart->data_r(space , 0);
-		}
+		uint16_t tmp = m_uart->read(~offset & 1);
 
 		// bit 8 == bit 7 rear panel switches (modem/terminal) ???
 
@@ -982,11 +977,7 @@ READ16_MEMBER(hp64k_state::hp64k_usart_r)
 
 WRITE16_MEMBER(hp64k_state::hp64k_usart_w)
 {
-		if ((offset & 1) == 0) {
-				m_uart->control_w(space , 0 , (uint8_t)(data & 0xff));
-		} else {
-				m_uart->data_w(space , 0 , (uint8_t)(data & 0xff));
-		}
+		m_uart->write(~offset & 1, data & 0xff);
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_rxrdy_w)
@@ -1385,63 +1376,64 @@ static void hp64k_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(hp64k_state::hp64k)
-	MCFG_DEVICE_ADD("cpu" , HP_5061_3011 , 6250000)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
-	MCFG_DEVICE_IO_MAP(cpu_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp64k_state , hp64k_irq_callback)
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	HP_5061_3011(config , m_cpu , 6250000);
+	m_cpu->set_rw_cycles(6 , 6);
+	m_cpu->set_relative_mode(true);
+	m_cpu->set_addrmap(AS_PROGRAM , &hp64k_state::cpu_mem_map);
+	m_cpu->set_addrmap(AS_IO , &hp64k_state::cpu_io_map);
+	m_cpu->set_irq_acknowledge_callback(FUNC(hp64k_state::hp64k_irq_callback));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp64k_state , hp64k_kb_scan , attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", hp64k_state, hp64k_kb_scan, attotime::from_hz(100))
 
 	// Line sync timer. A line frequency of 50 Hz is assumed.
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("linesync_timer" , hp64k_state , hp64k_line_sync , attotime::from_hz(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("linesync_timer", hp64k_state, hp64k_line_sync, attotime::from_hz(50))
 
 	// Clock = 25 MHz / 9 * (112/114)
-	MCFG_DEVICE_ADD("crtc" , I8275 , 2729045)
+	MCFG_DEVICE_ADD("crtc", I8275, 2729045)
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_I8275_CHARACTER_WIDTH(9)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(hp64k_state , crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, hp64k_state , hp64k_crtc_drq_w))
-	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, hp64k_state , hp64k_crtc_vrtc_w))
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(hp64k_state, crtc_display_pixels)
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_crtc_drq_w))
+	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_crtc_vrtc_w))
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DEVICE("crtc" , i8275_device , screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(720 , 390)
+	MCFG_SCREEN_SIZE(720, 390)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 390-1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_FORCE_READY
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp64k_state , hp64k_flp_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, hp64k_state , hp64k_flp_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0" , hp64k_floppies , "525dd" , floppy_image_device::default_floppy_formats)
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
+	m_fdc->intrq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_flp_drq_w));
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1" , hp64k_floppies , "525dd" , floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_DEVICE_ADD("fdc_rdy0" , TTL74123 , 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(68.1))
+	TTL74123(config, m_ss0, 0);
+	m_ss0->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ss0->set_resistor_value(RES_K(68.1));
 	// Warning! Duration formula is not correct for LS123, actual capacitor is 10 uF
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hp64k_state , hp64k_floppy0_rdy));
+	m_ss0->set_capacitor_value(CAP_U(16));
+	m_ss0->set_b_pin_value(1);
+	m_ss0->set_clear_pin_value(1);
+	m_ss0->out_cb().set(FUNC(hp64k_state::hp64k_floppy0_rdy));
 
-	MCFG_DEVICE_ADD("fdc_rdy1" , TTL74123 , 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(68.1))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hp64k_state , hp64k_floppy1_rdy));
+	TTL74123(config, m_ss1, 0);
+	m_ss1->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ss1->set_resistor_value(RES_K(68.1));
+	m_ss1->set_capacitor_value(CAP_U(16));
+	m_ss1->set_b_pin_value(1);
+	m_ss1->set_clear_pin_value(1);
+	m_ss1->out_cb().set(FUNC(hp64k_state::hp64k_floppy1_rdy));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2500).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp64k_state , hp64k_beeper_off);
+	MCFG_TIMER_DRIVER_ADD("beep_timer", hp64k_state, hp64k_beeper_off);
 
 	COM8116(config, m_baud_rate, 5.0688_MHz_XTAL);
 	m_baud_rate->fr_handler().set(FUNC(hp64k_state::hp64k_baud_clk_w));
@@ -1458,29 +1450,31 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	m_rs232->dcd_handler().set(FUNC(hp64k_state::hp64k_rs232_dcd_w));
 	m_rs232->cts_handler().set(FUNC(hp64k_state::hp64k_rs232_cts_w));
 
-	MCFG_DEVICE_ADD("phi" , PHI , 0)
-	MCFG_PHI_INT_WRITE_CB(WRITELINE(*this, hp64k_state , hp64k_phi_int_w))
-	MCFG_PHI_DMARQ_WRITE_CB(WRITELINE("cpu" , hp_5061_3011_cpu_device , halt_w))
-	MCFG_PHI_SYS_CNTRL_READ_CB(READLINE(*this, hp64k_state , hp64k_phi_sys_ctrl_r))
-	MCFG_PHI_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , host_dio_w))
-	MCFG_PHI_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_eoi_w))
-	MCFG_PHI_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_dav_w))
-	MCFG_PHI_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_nrfd_w))
-	MCFG_PHI_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ndac_w))
-	MCFG_PHI_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ifc_w))
-	MCFG_PHI_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_srq_w))
-	MCFG_PHI_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_atn_w))
-	MCFG_PHI_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ren_w))
+	PHI(config, m_phi, 0);
+	m_phi->int_write_cb().set(FUNC(hp64k_state::hp64k_phi_int_w));
+	m_phi->dmarq_write_cb().set(m_cpu, FUNC(hp_5061_3011_cpu_device::halt_w));
+	m_phi->sys_cntrl_read_cb().set(FUNC(hp64k_state::hp64k_phi_sys_ctrl_r));
+	m_phi->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	m_phi->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_EOI>().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_DAV>().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_NRFD>().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_NDAC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_IFC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_SRQ>().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_ATN>().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_REN>().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
+
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("phi" , phi_device , eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("phi" , phi_device , dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE("phi" , phi_device , nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE("phi" , phi_device , ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE("phi" , phi_device , ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE("phi" , phi_device , srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE("phi" , phi_device , atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE("phi" , phi_device , ren_w))
-	MCFG_IEEE488_DIO_CALLBACK(WRITE8("phi" , phi_device , bus_dio_w))
+	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(m_phi, phi_device, eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(WRITELINE(m_phi, phi_device, dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(m_phi, phi_device, nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(m_phi, phi_device, ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(m_phi, phi_device, ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_phi, phi_device, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_phi, phi_device, atn_w))
+	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_phi, phi_device, ren_w))
+	MCFG_IEEE488_DIO_CALLBACK(WRITE8(m_phi, phi_device , bus_dio_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 MACHINE_CONFIG_END
 

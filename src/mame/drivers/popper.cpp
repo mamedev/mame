@@ -54,8 +54,8 @@
 class popper_state : public driver_device
 {
 public:
-	popper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	popper_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_screen(*this, "screen"),
@@ -99,7 +99,7 @@ private:
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 
-	DECLARE_PALETTE_INIT(popper);
+	void popper_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
@@ -259,9 +259,9 @@ static const res_net_decode_info popper_decode_info =
 	0,
 	63,
 	//   R     G     B
-	{    0,    0,    0, }, // offsets
-	{    0,    3,    6, }, // shifts
-	{ 0x07, 0x07, 0x03, }  // masks
+	{    0,    0,    0 }, // offsets
+	{    0,    3,    6 }, // shifts
+	{ 0x07, 0x07, 0x03 }  // masks
 };
 
 static const res_net_info popper_net_info =
@@ -274,7 +274,7 @@ static const res_net_info popper_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER( popper_state, popper )
+void popper_state::popper_palette(palette_device &palette) const
 {
 	const uint8_t *prom = memregion("colors")->base();
 	std::vector<rgb_t> rgb;
@@ -549,19 +549,16 @@ MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popper)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_popper);
 
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
+	PALETTE(config, "palette", FUNC(popper_state::popper_palette), 64);
 
 	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay[0], XTAL(18'432'000)/3/2/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay[1], XTAL(18'432'000)/3/2/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 

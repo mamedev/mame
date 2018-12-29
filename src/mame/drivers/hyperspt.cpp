@@ -301,18 +301,18 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_DEVICE_ADD(m_audiocpu, Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(hyperspt_sound_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // F2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, hyperspt_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(m_soundbrd, trackfld_audio_device, sh_irqtrigger_w)) // SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // END
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, hyperspt_state, coin_counter_1_w)) // COIN 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hyperspt_state, coin_counter_2_w)) // COIN 2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // SA
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, hyperspt_state, irq_mask_w)) // INT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // F2
+	mainlatch.q_out_cb<0>().set(FUNC(hyperspt_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(m_soundbrd, FUNC(trackfld_audio_device::sh_irqtrigger_w)); // SOUND ON
+	mainlatch.q_out_cb<2>().set_nop(); // END
+	mainlatch.q_out_cb<3>().set(FUNC(hyperspt_state::coin_counter_1_w)); // COIN 1
+	mainlatch.q_out_cb<4>().set(FUNC(hyperspt_state::coin_counter_2_w)); // COIN 2
+	mainlatch.q_out_cb<5>().set_nop(); // SA
+	mainlatch.q_out_cb<7>().set(FUNC(hyperspt_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -324,15 +324,13 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_hyperspt)
-	MCFG_PALETTE_ADD(m_palette, 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hyperspt);
+	PALETTE(config, m_palette, FUNC(hyperspt_state::hyperspt_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
@@ -380,7 +378,7 @@ MACHINE_CONFIG_START(hyperspt_state::hypersptb)
 	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 

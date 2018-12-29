@@ -69,39 +69,35 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #endif
 #endif
 
-static const unsigned char intv_colors[] =
+static constexpr rgb_t intv_colors[] =
 {
-	0x00, 0x00, 0x00, /* BLACK */
-	0x00, 0x2D, 0xFF, /* BLUE */
-	0xFF, 0x3D, 0x10, /* RED */
-	0xC9, 0xCF, 0xAB, /* TAN */
-	0x38, 0x6B, 0x3F, /* DARK GREEN */
-	0x00, 0xA7, 0x56, /* GREEN */
-	0xFA, 0xEA, 0x50, /* YELLOW */
-	0xFF, 0xFC, 0xFF, /* WHITE */
-	0xBD, 0xAC, 0xC8, /* GRAY */
-	0x24, 0xB8, 0xFF, /* CYAN */
-	0xFF, 0xB4, 0x1F, /* ORANGE */
-	0x54, 0x6E, 0x00, /* BROWN */
-	0xFF, 0x4E, 0x57, /* PINK */
-	0xA4, 0x96, 0xFF, /* LIGHT BLUE */
-	0x75, 0xCC, 0x80, /* YELLOW GREEN */
-	0xB5, 0x1A, 0x58  /* PURPLE */
+	{ 0x00, 0x00, 0x00 }, // BLACK
+	{ 0x00, 0x2d, 0xff }, // BLUE
+	{ 0xff, 0x3d, 0x10 }, // RED
+	{ 0xc9, 0xcf, 0xab }, // TAN
+	{ 0x38, 0x6b, 0x3f }, // DARK GREEN
+	{ 0x00, 0xa7, 0x56 }, // GREEN
+	{ 0xfa, 0xea, 0x50 }, // YELLOW
+	{ 0xff, 0xfc, 0xff }, // WHITE
+	{ 0xbd, 0xac, 0xc8 }, // GRAY
+	{ 0x24, 0xb8, 0xff }, // CYAN
+	{ 0xff, 0xb4, 0x1f }, // ORANGE
+	{ 0x54, 0x6e, 0x00 }, // BROWN
+	{ 0xff, 0x4e, 0x57 }, // PINK
+	{ 0xa4, 0x96, 0xff }, // LIGHT BLUE
+	{ 0x75, 0xcc, 0x80 }, // YELLOW GREEN
+	{ 0xb5, 0x1a, 0x58 }  // PURPLE
 };
 
-PALETTE_INIT_MEMBER(intv_state, intv)
+void intv_state::intv_palette(palette_device &palette) const
 {
 	int k = 0;
-	uint8_t r, g, b;
-	/* Two copies of everything (why?) */
+	// Two copies of everything (why?)
 
 	for (int i = 0; i < 16; i++)
 	{
-		r = intv_colors[i * 3 + 0];
-		g = intv_colors[i * 3 + 1];
-		b = intv_colors[i * 3 + 2];
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-		palette.set_indirect_color(i + 16, rgb_t(r, g, b));
+		palette.set_indirect_color(i, intv_colors[i]);
+		palette.set_indirect_color(i + 16, intv_colors[i]);
 	}
 
 	for (int i = 0; i < 16; i++)
@@ -478,21 +474,19 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intv)
 	MCFG_SCREEN_SIZE(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE)
 	MCFG_SCREEN_VISIBLE_AREA(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
+	PALETTE(config, m_palette, FUNC(intv_state::intv_palette), 0x400, 32);
 
 	MCFG_INTV_CONTROL_PORT_ADD("iopt_right_ctrl", intv_control_port_devices, "handctrl")
 	MCFG_INTV_CONTROL_PORT_ADD("iopt_left_ctrl", intv_control_port_devices, "handctrl")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	AY8914(config, m_sound, XTAL(3'579'545)/2);
+	m_sound->port_a_read_callback().set("iopt_right_ctrl", FUNC(intv_control_port_device::ctrl_r));
+	m_sound->port_b_read_callback().set("iopt_left_ctrl", FUNC(intv_control_port_device::ctrl_r));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	/* cartridge */
 	MCFG_INTV_CARTRIDGE_ADD("cartslot", intv_cart, nullptr)
@@ -551,15 +545,16 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_intvkbd)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_intvkbd)
 
 	/* crt controller */
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(7'159'090)/8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_OVERSCAN(stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE, stic_device::OVERSCAN_RIGHT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
-						  stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE, stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE)
+	TMS9927(config, m_crtc, XTAL(7'159'090)/8);
+	m_crtc->set_char_width(8);
+	m_crtc->set_overscan(
+		stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
+		stic_device::OVERSCAN_RIGHT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE,
+		stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE,
+		stic_device::OVERSCAN_BOTTOM_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intvkbd)

@@ -142,7 +142,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "screen.h"
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
-static const game_offset game_offsets[] =
+static const seta_state::game_offset game_offsets[] =
 {
 	// x offsets
 	// "game",    {spr, spr_flip}, {tmap, tmap_flip}
@@ -227,7 +227,7 @@ static const game_offset game_offsets[] =
         ---- ---0     Coin #0 Counter     */
 
 // some games haven't the coin lockout device (blandia, eightfrc, extdwnhl, gundhara, kamenrid, magspeed, sokonuke, zingzip, zombraid)
-WRITE8_MEMBER(seta_state::seta_coin_counter_w)
+void seta_state::seta_coin_counter_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -236,9 +236,9 @@ WRITE8_MEMBER(seta_state::seta_coin_counter_w)
 		m_x1->enable_w(BIT(data, 6));
 }
 
-WRITE8_MEMBER(seta_state::seta_coin_lockout_w)
+void seta_state::seta_coin_lockout_w(u8 data)
 {
-	seta_coin_counter_w(space, 0, data);
+	seta_coin_counter_w(data);
 
 	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2));
 	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
@@ -493,13 +493,11 @@ VIDEO_START_MEMBER(seta_state,kyustrkr_no_layers)
    The game can select to repeat every 16 colors to fill the 64 colors for the 6bpp gfx
    or to use the first 64 colors of the palette regardless of the color code!
 */
-PALETTE_INIT_MEMBER(seta_state,blandia)
+void seta_state::blandia_palette(palette_device &palette) const
 {
-	int color, pen;
-
-	for (color = 0; color < 0x20; color++)
+	for (int color = 0; color < 0x20; color++)
 	{
-		for (pen = 0; pen < 0x40; pen++)
+		for (int pen = 0; pen < 0x40; pen++)
 		{
 			// layer 2-3
 			palette.set_pen_indirect(0x0200 + ((color << 6) | pen), 0x200 + ((color << 4) | (pen & 0x0f)));
@@ -513,22 +511,19 @@ PALETTE_INIT_MEMBER(seta_state,blandia)
 
 	// setup the colortable for the effect palette.
 	// what are used for palette from 0x800 to 0xBFF?
-	for(int i = 0; i < 0x2200; i++)
-	{
+	for (int i = 0; i < 0x2200; i++)
 		palette.set_pen_indirect(0x2200 + i, 0x600 + (i & 0x1ff));
-	}
 }
 
 
 
 /* layers have 6 bits per pixel, but the color code has a 16 colors granularity,
    even if the low 2 bits are ignored (so there are only 4 different palettes) */
-PALETTE_INIT_MEMBER(seta_state,gundhara)
+void seta_state::gundhara_palette(palette_device &palette) const
 {
-	int color, pen;
-
-	for (color = 0; color < 0x20; color++)
-		for (pen = 0; pen < 0x40; pen++)
+	for (int color = 0; color < 0x20; color++)
+	{
+		for (int pen = 0; pen < 0x40; pen++)
 		{
 			palette.set_pen_indirect(0x0200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			palette.set_pen_indirect(0x1200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
@@ -536,17 +531,17 @@ PALETTE_INIT_MEMBER(seta_state,gundhara)
 			palette.set_pen_indirect(0x0a00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			palette.set_pen_indirect(0x1a00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
+	}
 }
 
 
 
 /* layers have 6 bits per pixel, but the color code has a 16 colors granularity */
-PALETTE_INIT_MEMBER(seta_state,jjsquawk)
+void seta_state::jjsquawk_palette(palette_device &palette) const
 {
-	int color, pen;
-
-	for (color = 0; color < 0x20; color++)
-		for (pen = 0; pen < 0x40; pen++)
+	for (int color = 0; color < 0x20; color++)
+	{
+		for (int pen = 0; pen < 0x40; pen++)
 		{
 			palette.set_pen_indirect(0x0200 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff)); // used by madshark
 			palette.set_pen_indirect(0x1200 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff));
@@ -554,54 +549,51 @@ PALETTE_INIT_MEMBER(seta_state,jjsquawk)
 			palette.set_pen_indirect(0x0a00 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff)); // used by madshark
 			palette.set_pen_indirect(0x1a00 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff));
 		}
+	}
 }
 
 
-/* layer 0 is 6 bit per pixel, but the color code has a 16 colors granularity */
-PALETTE_INIT_MEMBER(seta_state,zingzip)
+// layer 0 is 6 bit per pixel, but the color code has a 16 colors granularity
+void seta_state::zingzip_palette(palette_device &palette) const
 {
-	int color, pen;
-
-	for (color = 0; color < 0x20; color++)
-		for (pen = 0; pen < 0x40; pen++)
+	for (int color = 0; color < 0x20; color++)
+	{
+		for (int pen = 0; pen < 0x40; pen++)
 		{
 			palette.set_pen_indirect(0x400 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			palette.set_pen_indirect(0xc00 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
-}
-
-// color prom
-PALETTE_INIT_MEMBER(seta_state,palette_init_RRRRRGGGGGBBBBB_proms)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-	int x;
-	for (x = 0; x < 0x200 ; x++)
-	{
-		int data = (color_prom[x*2] <<8) | color_prom[x*2+1];
-		palette.set_pen_color(x, pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 	}
 }
 
-PALETTE_INIT_MEMBER(setaroul_state,setaroul)
+// color prom
+void seta_state::palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int x = 0; x < 0x200 ; x++)
+	{
+		int const data = (color_prom[x*2] << 8) | color_prom[x*2 + 1];
+		palette.set_pen_color(x, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	}
+}
+
+void setaroul_state::setaroul_palette(palette_device &palette) const
 {
 	m_gfxdecode->gfx(0)->set_granularity(16);
 	m_gfxdecode->gfx(1)->set_granularity(16);
 
-	PALETTE_INIT_NAME(palette_init_RRRRRGGGGGBBBBB_proms)(palette);
+	palette_init_RRRRRGGGGGBBBBB_proms(palette);
 }
 
-PALETTE_INIT_MEMBER(seta_state,usclssic)
+void usclssic_state::usclssic_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int color, pen;
-	int x;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* DECODE PROM */
-	for (x = 0; x < 0x200 ; x++)
+	// decode PROM
+	for (int x = 0; x < 0x200; x++)
 	{
-		uint16_t data = (color_prom[x*2] <<8) | color_prom[x*2+1];
-
-		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		uint16_t const data = (color_prom[x*2] << 8) | color_prom[x*2 + 1];
+		rgb_t const color(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 		if (x >= 0x100)
 			palette.set_indirect_color(x + 0x000, color);
@@ -609,12 +601,14 @@ PALETTE_INIT_MEMBER(seta_state,usclssic)
 			palette.set_indirect_color(x + 0x300, color);
 	}
 
-	for (color = 0; color < 0x20; color++)
-		for (pen = 0; pen < 0x40; pen++)
+	for (int color = 0; color < 0x20; color++)
+	{
+		for (int pen = 0; pen < 0x40; pen++)
 		{
 			palette.set_pen_indirect(0x200 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			palette.set_pen_indirect(0xa00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
+	}
 }
 
 
@@ -651,7 +645,7 @@ void seta_state::set_pens()
 }
 
 
-void seta_state::usclssic_set_pens()
+void usclssic_state::usclssic_set_pens()
 {
 	offs_t i;
 
@@ -734,13 +728,13 @@ uint32_t seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_
 	set_pens();
 	bitmap.fill(0x1f0, cliprect);
 
-	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000, 1);
+	m_seta001->draw_sprites(screen, bitmap,cliprect,0x1000);
 	return 0;
 }
 
 
 /* For games with 1 or 2 tilemaps */
-void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
+void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size )
 {
 	const rectangle &visarea = screen.visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
@@ -833,7 +827,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 
 			if (order & 4)
 			{
@@ -851,7 +845,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 		}
 	}
 	else
@@ -860,7 +854,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size);
 
 			if ((order & 4) && m_paletteram[1] != nullptr)
 			{
@@ -898,7 +892,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 			}
 
-			if (layers_ctrl & 8) m_seta001->draw_sprites(screen,bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8) m_seta001->draw_sprites(screen,bitmap,cliprect,sprite_bank_size);
 		}
 	}
 
@@ -906,7 +900,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint32_t seta_state::screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	seta_layers_update(screen, bitmap, cliprect, 0x1000, 1 );
+	seta_layers_update(screen, bitmap, cliprect, 0x1000 );
 	return 0;
 }
 
@@ -916,7 +910,7 @@ uint32_t setaroul_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(0x0, cliprect);
 
 	if (m_led & 0x80)
-		seta_layers_update(screen, bitmap, cliprect, 0x800, 1 );
+		seta_layers_update(screen, bitmap, cliprect, 0x800 );
 
 	return 0;
 }
@@ -937,7 +931,7 @@ uint32_t seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-uint32_t seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t usclssic_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	usclssic_set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);

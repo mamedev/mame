@@ -70,14 +70,14 @@ void interpro_sga_device::map(address_map &map)
 DEFINE_DEVICE_TYPE(INTERPRO_SGA, interpro_sga_device, "sga", "SRX Gate Array")
 
 interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, INTERPRO_SGA, tag, owner, clock),
-	out_berr_func(*this)
+	: device_t(mconfig, INTERPRO_SGA, tag, owner, clock)
+	, m_berr_func(*this)
 {
 }
 
 void interpro_sga_device::device_start()
 {
-	out_berr_func.resolve();
+	m_berr_func.resolve();
 
 	save_item(NAME(m_gcsr));
 	save_item(NAME(m_ipoll));
@@ -152,9 +152,9 @@ WRITE32_MEMBER(interpro_sga_device::ddtc1_w)
 		// error cycle - bit 0x10 indicates source address error (dspad1)
 		// now expecting 0x5463?
 		if ((m_dspad1 & 0xfffff000) == 0x40000000)
-			out_berr_func(space, 0x5433, m_dspad1); // BINFO_SNAPOK | BINFO_BERR | BINFO_BG_ICAMMU | 0x30 | CT(3)
+			m_berr_func(space, 0x5433, m_dspad1); // BINFO_SNAPOK | BINFO_BERR | BINFO_BG_ICAMMU | 0x30 | CT(3)
 		else
-			out_berr_func(space, 0x5423, m_ddpad1); // BINFO_SNAPOK | BINFO_BERR | BINFO_BG_ICAMMU | 0x20 | CT(3)
+			m_berr_func(space, 0x5423, m_ddpad1); // BINFO_SNAPOK | BINFO_BERR | BINFO_BG_ICAMMU | 0x20 | CT(3)
 
 		// 0x5423 = BERR|SNAPOK | BG(ICAMMU)? | CT(23)
 		// 0x5433 = BERR|SNAPOK | BG(ICAMMU)? | CT(33)

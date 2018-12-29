@@ -121,9 +121,9 @@ ROMs -
        1.U23 - Main Program, ST 27C4002 EPROM (DIP40)
        2.U22 /
 
-       The remaining ROMs are surface mounted TSOP48 Type II MASKROMs,
+       The remaining ROMs are surface mounted TSOP48 Type II mask ROMs,
        either OKI MSM27C3252 (32MBit) or OKI MSM27C1652 (16MBit).
-       These MASKROMs are non-standard and require a custom adapter
+       These mask ROMs are non-standard and require a custom adapter
        to read them. Not all positions are populated for each game. See
        the source below for specifics.
 
@@ -136,39 +136,32 @@ ROMs -
 #include "speaker.h"
 
 
+template<int Screen>
+uint32_t psikyo4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0x800, cliprect);
+	m_gfxdecode->gfx(0)->set_palette(*m_palette[Screen]);
+	draw_sprites(screen, bitmap, cliprect, Screen << 13);
+	return 0;
+}
+
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 16*16*8 )
 
 static GFXDECODE_START( gfx_ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE32_MEMBER(psikyo4_state::ps4_eeprom_w)
+WRITE8_MEMBER(psikyo4_state::eeprom_w)
 {
-	if (ACCESSING_BITS_16_31)
-	{
-		m_eeprom->di_write((data & 0x00200000) ? 1 : 0);
-		m_eeprom->cs_write((data & 0x00800000) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->clk_write((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x20) ? 1 : 0);
+	m_eeprom->cs_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
-		return;
-	}
-
-	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
+	if (data & ~0xe0)
+		logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-READ32_MEMBER(psikyo4_state::ps4_eeprom_r)
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		return ioport("JP4")->read();
-	}
-
-//  logerror("Unk EEPROM read mask %x\n", mem_mask);
-
-	return 0x00;
-}
-
-INTERRUPT_GEN_MEMBER(psikyo4_state::psikyosh_interrupt)
+INTERRUPT_GEN_MEMBER(psikyo4_state::interrupt)
 {
 	device.execute().set_input_line(4, HOLD_LINE);
 }
@@ -186,139 +179,89 @@ CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 	return ret;
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)
+WRITE32_MEMBER(psikyo4_state::paletteram_w)
 {
-	int r, g, b;
 	COMBINE_DATA(&m_paletteram[offset]);
 
-	b = ((m_paletteram[offset] & 0x0000ff00) >> 8);
-	g = ((m_paletteram[offset] & 0x00ff0000) >> 16);
-	r = ((m_paletteram[offset] & 0xff000000) >> 24);
+	uint8_t const b = ((m_paletteram[offset] & 0x0000ff00) >> 8);
+	uint8_t const g = ((m_paletteram[offset] & 0x00ff0000) >> 16);
+	uint8_t const r = ((m_paletteram[offset] & 0xff000000) >> 24);
 
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
-	m_palette2->set_pen_color(offset, rgb_t(r, g, b)); // For screen 2
+	m_palette[0]->set_pen_color(offset, rgb_t(r, g, b));
+	m_palette[1]->set_pen_color(offset, rgb_t(r, g, b)); // For screen 2
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
+template<int Screen>
+WRITE32_MEMBER(psikyo4_state::bgpen_w)
 {
-	int r, g, b;
-	COMBINE_DATA(&m_bgpen_1[0]);
+	COMBINE_DATA(&m_bgpen[Screen][0]);
 
-	b = ((m_bgpen_1[0] & 0x0000ff00) >>8);
-	g = ((m_bgpen_1[0] & 0x00ff0000) >>16);
-	r = ((m_bgpen_1[0] & 0xff000000) >>24);
+	uint8_t const b = ((m_bgpen[Screen][0] & 0x0000ff00) >> 8);
+	uint8_t const g = ((m_bgpen[Screen][0] & 0x00ff0000) >> 16);
+	uint8_t const r = ((m_bgpen[Screen][0] & 0xff000000) >> 24);
 
-	m_palette->set_pen_color(0x800, rgb_t(r, g, b)); // Clear colour for screen 1
+	m_palette[Screen]->set_pen_color(0x800, rgb_t(r, g, b)); // Clear colour for screen
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
+template<int Screen>
+WRITE8_MEMBER(psikyo4_state::screen_brt_w)
 {
-	int r, g, b;
-	COMBINE_DATA(&m_bgpen_2[0]);
+	/* Need separate brightness for both screens if displaying together */
+	double brt = data & 0xff;
 
-	b = ((m_bgpen_2[0] & 0x0000ff00) >>8);
-	g = ((m_bgpen_2[0] & 0x00ff0000) >>16);
-	r = ((m_bgpen_2[0] & 0xff000000) >>24);
+	if (brt > 0x7f)
+		brt = 0x7f; /* I reckon values must be clamped to 0x7f */
 
-	m_palette2->set_pen_color(0x800, rgb_t(r, g, b)); // Clear colour for screen 2
-}
-
-WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
-{
-	if (ACCESSING_BITS_0_7)
+	brt = (0x7f - brt) / 127.0;
+	if (m_oldbrt[Screen] != brt)
 	{
-		/* Need separate brightness for both screens if displaying together */
-		double brt1 = data & 0xff;
+		int i;
 
-		if (brt1 > 0x7f)
-			brt1 = 0x7f; /* I reckon values must be clamped to 0x7f */
+		for (i = 0; i < 0x800; i++)
+			m_palette[Screen]->set_pen_contrast(i, brt);
 
-		brt1 = (0x7f - brt1) / 127.0;
-		if (m_oldbrt1 != brt1)
-		{
-			int i;
-
-			for (i = 0; i < 0x800; i++)
-				m_palette->set_pen_contrast(i, brt1);
-
-			m_oldbrt1 = brt1;
-		}
+		m_oldbrt[Screen] = brt;
 	}
-	else
-	{
-		/* I believe this to be separate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
-		if((data & mem_mask) != 0)
-			logerror("Unk Scr 1 rgb? brt write %08x mask %08x\n", data, mem_mask);
-	}
+	/* I believe this to be separate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_screen2_brt_w)
+WRITE32_MEMBER(psikyo4_state::vidregs_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		/* Need separate brightness for both screens if displaying together */
-		double brt2 = data & 0xff;
-
-		if (brt2 > 0x7f)
-			brt2 = 0x7f; /* I reckon values must be clamped to 0x7f */
-
-		brt2 = (0x7f - brt2) / 127.0;
-
-		if (m_oldbrt2 != brt2)
-		{
-			int i;
-
-			for (i = 0x000; i < 0x800; i++)
-				m_palette2->set_pen_contrast(i, brt2);
-
-			m_oldbrt2 = brt2;
-		}
-	}
-	else
-	{
-		/* I believe this to be separate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
-		if((data & mem_mask) != 0)
-			logerror("Unk Scr 2 rgb? brt write %08x mask %08x\n", data, mem_mask);
-	}
-}
-
-WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
-{
-	COMBINE_DATA(&m_vidregs[offset]);
+	uint32_t const old = m_vidregs[offset];
+	data = COMBINE_DATA(&m_vidregs[offset]);
 
 	if (offset == 2) /* Configure bank for gfx test */
 	{
-		if (ACCESSING_BITS_0_15)    // Bank
-			membank("gfxbank")->set_base(memregion("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
+		if ((old ^ data) & 0x1fff)    // Bank
+		{
+			if ((data & 0x1fff) < m_gfx_max_bank)
+				m_gfxbank->set_entry(data & 0x1fff); /* Bank comes from vidregs */
+		}
 	}
 }
 
-WRITE32_MEMBER(psikyo4_state::io_select_w)
+WRITE16_MEMBER(psikyo4_state::ymf_bank_w)
 {
 	// YMF banking
-	if (ACCESSING_BITS_16_31)
+	uint16_t bankdata = data;
+	uint16_t bankmask = mem_mask;
+	for (auto & elem : m_ymf_bank)
 	{
-		uint32_t bankdata = data >> 16;
-		uint32_t bankmask = mem_mask >> 16;
-		for (auto & elem : m_ymf_bank)
+		if (bankmask & 0x0f)
 		{
-			if (bankmask & 0x0f)
-			{
-				int banknum = bankdata & 0x0f;
-				if (banknum < m_ymf_max_bank)
-					elem->set_entry(banknum);
-			}
-			bankdata >>= 4;
-			bankmask >>= 4;
+			int banknum = bankdata & 0x0f;
+			if (banknum < m_ymf_max_bank)
+				elem->set_entry(banknum);
 		}
+		bankdata >>= 4;
+		bankmask >>= 4;
 	}
+}
 
+WRITE8_MEMBER(psikyo4_state::io_select_w)
+{
 	// mahjong input multiplexing
-	if (ACCESSING_BITS_8_15)
-		m_io_select = data >> 8;
-
-	if (ACCESSING_BITS_0_7)
-		logerror("Unk ioselect write %x mask %x\n", data, mem_mask);
+	m_io_select = data;
 }
 
 void psikyo4_state::ps4_map(address_map &map)
@@ -326,20 +269,22 @@ void psikyo4_state::ps4_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom();     // program ROM (1 meg)
 	map(0x02000000, 0x021fffff).rom().region("maincpu", 0x100000); // data ROM
 	map(0x03000000, 0x030037ff).ram().share("spriteram");
-	map(0x03003fe0, 0x03003fe3).rw(FUNC(psikyo4_state::ps4_eeprom_r), FUNC(psikyo4_state::ps4_eeprom_w));
-	map(0x03003fe4, 0x03003fef).ram().w(FUNC(psikyo4_state::ps4_vidregs_w)).share("vidregs"); // vid regs?
+	map(0x03003fe0, 0x03003fe3).portr("JP4");
+	map(0x03003fe1, 0x03003fe1).w(FUNC(psikyo4_state::eeprom_w));
+	map(0x03003fe4, 0x03003fef).ram().w(FUNC(psikyo4_state::vidregs_w)).share("vidregs"); // vid regs?
 	map(0x03003fe4, 0x03003fe7).nopr(); // also writes to this address - might be vblank?
-//  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
-	map(0x03003ff0, 0x03003ff3).w(FUNC(psikyo4_state::ps4_screen1_brt_w)); // screen 1 brightness
-	map(0x03003ff4, 0x03003ff7).w(FUNC(psikyo4_state::ps4_bgpen_1_dword_w)).share("bgpen_1"); // screen 1 clear colour
-	map(0x03003ff8, 0x03003ffb).w(FUNC(psikyo4_state::ps4_screen2_brt_w)); // screen 2 brightness
-	map(0x03003ffc, 0x03003fff).w(FUNC(psikyo4_state::ps4_bgpen_2_dword_w)).share("bgpen_2"); // screen 2 clear colour
-	map(0x03004000, 0x03005fff).ram().w(FUNC(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)).share("paletteram"); // palette
+//  map(0x03003fe4, 0x03003fe7).nopw(); // might be vblank?
+	map(0x03003ff3, 0x03003ff3).w(FUNC(psikyo4_state::screen_brt_w<0>)); // screen 1 brightness
+	map(0x03003ff4, 0x03003ff7).w(FUNC(psikyo4_state::bgpen_w<0>)).share("bgpen_1"); // screen 1 clear colour
+	map(0x03003ffb, 0x03003ffb).w(FUNC(psikyo4_state::screen_brt_w<1>)); // screen 2 brightness
+	map(0x03003ffc, 0x03003fff).w(FUNC(psikyo4_state::bgpen_w<1>)).share("bgpen_2"); // screen 2 clear colour
+	map(0x03004000, 0x03005fff).ram().w(FUNC(psikyo4_state::paletteram_w)).share("paletteram"); // palette
 	map(0x03006000, 0x03007fff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 	map(0x05800000, 0x05800003).portr("P1_P2");
 	map(0x05800004, 0x05800007).portr("P3_P4");
-	map(0x05800008, 0x0580000b).w(FUNC(psikyo4_state::io_select_w)); // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
+	map(0x05800008, 0x05800009).w(FUNC(psikyo4_state::ymf_bank_w));
+	map(0x0580000a, 0x0580000a).w(FUNC(psikyo4_state::io_select_w)); // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
 
 	map(0x06000000, 0x060fffff).ram().share("ram"); // main RAM (1 meg)
 }
@@ -353,16 +298,21 @@ void psikyo4_state::ps4_ymf_map(address_map &map)
 }
 
 
+CUSTOM_INPUT_MEMBER(psikyo4_state::system_r)
+{
+	return m_system->read();
+}
+
 static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)0)
 
 	PORT_START("P3_P4")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, system_r, nullptr)
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)4)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state, mahjong_ctrl_r, (void *)4)
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
@@ -626,6 +576,9 @@ INPUT_PORTS_END
 
 void psikyo4_state::machine_start()
 {
+	m_gfx_max_bank = memregion("gfx1")->bytes() / 0x2000;
+	m_gfxbank->configure_entries(0, m_gfx_max_bank, memregion("gfx1")->base(), 0x2000);
+
 	// configure YMF ROM banks
 	memory_region *YMFROM = memregion("ymf");
 	m_ymf_max_bank = YMFROM->bytes() / 0x100000;
@@ -641,74 +594,69 @@ void psikyo4_state::machine_start()
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, memshare("ram")->ptr());
 
 	save_item(NAME(m_io_select));
-	save_item(NAME(m_oldbrt1));
-	save_item(NAME(m_oldbrt2));
+	save_item(NAME(m_oldbrt));
 }
 
 void psikyo4_state::machine_reset()
 {
-	m_oldbrt1 = -1;
-	m_oldbrt2 = -1;
+	m_oldbrt[0] = -1;
+	m_oldbrt[1] = -1;
 }
 
-MACHINE_CONFIG_START(psikyo4_state::ps4big)
-
+void psikyo4_state::ps4big(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(ps4_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
+	SH2(config, m_maincpu, 57272700/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo4_state::ps4_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(psikyo4_state::interrupt));
 
-
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	EEPROM_93C56_8BIT(config, m_eeprom).default_value(0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)
-	MCFG_PALETTE_ADD("lpalette", (0x2000/4) + 1) /* palette + clear colour */
-	MCFG_PALETTE_ADD("rpalette", (0x2000/4) + 1)
+	GFXDECODE(config, m_gfxdecode, m_palette[0], gfx_ps4);
+	PALETTE(config, m_palette[0]).set_entries((0x2000/4) + 1); /* palette + clear colour */
+	PALETTE(config, m_palette[1]).set_entries((0x2000/4) + 1);
 
 	config.set_default_layout(layout_dualhsxs);
 
+	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	m_lscreen->set_refresh_hz(60);
+	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_lscreen->set_size(40*8, 32*8);
+	m_lscreen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_lscreen->set_screen_update(FUNC(psikyo4_state::screen_update<0>));
+	m_lscreen->set_palette(m_palette[0]);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo4_state, screen_update_psikyo4_left)
-	MCFG_SCREEN_PALETTE("lpalette")
-
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo4_state, screen_update_psikyo4_right)
-	MCFG_SCREEN_PALETTE("rpalette")
-
+	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	m_rscreen->set_refresh_hz(60);
+	m_rscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_rscreen->set_size(40*8, 32*8);
+	m_rscreen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_rscreen->set_screen_update(FUNC(psikyo4_state::screen_update<1>));
+	m_rscreen->set_palette(m_palette[1]);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MCFG_DEVICE_ADDRESS_MAP(0, ps4_ymf_map)
-	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymf278b_device &ymf(YMF278B(config, "ymf", 57272700/2));
+	ymf.set_addrmap(0, &psikyo4_state::ps4_ymf_map);
+	ymf.irq_handler().set_inputline("maincpu", 12);
+	ymf.add_route(0, "rspeaker", 1.0); // Output for each screen
+	ymf.add_route(1, "lspeaker", 1.0);
+	ymf.add_route(2, "rspeaker", 1.0);
+	ymf.add_route(3, "lspeaker", 1.0);
+	ymf.add_route(4, "rspeaker", 1.0);
+	ymf.add_route(5, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(psikyo4_state::ps4small)
+void psikyo4_state::ps4small(machine_config &config)
+{
 	ps4big(config);
 
-	/* basic machine hardware */
-
-	MCFG_SCREEN_MODIFY("lscreen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-
-	MCFG_SCREEN_MODIFY("rscreen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-MACHINE_CONFIG_END
+	m_lscreen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_rscreen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+}
 
 
 

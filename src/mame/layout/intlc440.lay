@@ -220,20 +220,20 @@ Intel INTELLEC® 4/MOD 40 layout
 		<cpanel element="label_reset_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
 
 		<repeat count="3">
-			<param name="labelnum" start="11" increment="-4" />
+			<param name="groupnum" start="11" increment="-4" />
 			<param name="ledpos" start="81" increment="156" />
 			<param name="nybble" start="3" increment="-1" />
 			<param name="switchpos" start="74" increment="156" />
-			<param name="mask" start="0x0800" rshift="4" />
+			<param name="groupmask" start="0x0800" rshift="4" />
 			<cpanel element="label_a~nybble~">
 				<bounds x="~ledpos~" y="63" width="104" height="7" />
 			</cpanel>
 			<repeat count="4">
-				<param name="labelnum" start="~labelnum~" increment="-1" />
+				<param name="labelnum" start="~groupnum~" increment="-1" />
 				<param name="ledpos" start="~ledpos~" increment="31" />
 				<param name="switchpos" start="~switchpos~" increment="31" />
 				<param name="bit" start="3" increment="-1" />
-				<param name="mask" start="~mask~" rshift="1" />
+				<param name="bitmask" start="~groupmask~" rshift="1" />
 				<cpanel element="label_~labelnum~">
 					<bounds x="~ledpos~" y="71" width="11" height="7" />
 				</cpanel>
@@ -243,7 +243,7 @@ Intel INTELLEC® 4/MOD 40 layout
 				<cpanel name="led_address_a~nybble~_~bit~" element="led">
 					<bounds x="~ledpos~" y="79" width="11" height="7" />
 				</cpanel>
-				<cpanel element="switch" inputtag="ADDRDAT" inputmask="~mask~">
+				<cpanel element="switch" inputtag="ADDRDAT" inputmask="~bitmask~">
 					<bounds x="~switchpos~" y="240" width="25" height="46" />
 				</cpanel>
 			</repeat>
@@ -283,19 +283,19 @@ Intel INTELLEC® 4/MOD 40 layout
 		</cpanel>
 
 		<repeat count="2">
-			<param name="xpos" start="81" increment="156" />
+			<param name="groupx" start="81" increment="156" />
 			<param name="mnybble" start="1" increment="1" />
 			<param name="xnybble" start="2" increment="1" />
-			<param name="mbit" start="7" increment="-4" />
+			<param name="groupbit" start="7" increment="-4" />
 			<cpanel element="label_m~mnybble~">
-				<bounds x="~xpos~" y="112" width="104" height="7" />
+				<bounds x="~groupx~" y="112" width="104" height="7" />
 			</cpanel>
 			<cpanel element="label_x~xnybble~">
-				<bounds x="~xpos~" y="161" width="104" height="7" />
+				<bounds x="~groupx~" y="161" width="104" height="7" />
 			</cpanel>
 			<repeat count="4">
-				<param name="xpos" start="~xpos~" increment="31" />
-				<param name="mbit" start="~mbit~" increment="-1" />
+				<param name="xpos" start="~groupx~" increment="31" />
+				<param name="mbit" start="~groupbit~" increment="-1" />
 				<param name="bit" start="3" increment="-1" />
 				<cpanel element="label_~mbit~">
 					<bounds x="~xpos~" y="120" width="11" height="7" />
@@ -313,13 +313,13 @@ Intel INTELLEC® 4/MOD 40 layout
 		</repeat>
 
 		<repeat count="2">
-			<param name="xpos" start="393" increment="156" />
+			<param name="groupx" start="393" increment="156" />
 			<param name="nybble" start="2" increment="1" />
 			<cpanel element="label_x~nybble~">
-				<bounds x="~xpos~" y="161" width="104" height="7" />
+				<bounds x="~groupx~" y="161" width="104" height="7" />
 			</cpanel>
 			<repeat count="4">
-				<param name="xpos" start="~xpos~" increment="31" />
+				<param name="xpos" start="~groupx~" increment="31" />
 				<param name="bit" start="3" increment="-1" />
 				<cpanel element="label_~bit~">
 					<bounds x="~xpos~" y="169" width="11" height="7" />

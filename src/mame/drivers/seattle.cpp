@@ -223,6 +223,10 @@
 
 #define SYSTEM_CLOCK            50000000
 
+#define PCI_ID_GALILEO  ":pci:00.0"
+#define PCI_ID_VIDEO    ":pci:08.0"
+#define PCI_ID_IDE      ":pci:09.0"
+
 /* various board configurations */
 #define PHOENIX_CONFIG          (0)
 #define SEATTLE_CONFIG          (1)
@@ -276,6 +280,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
+		m_galileo(*this, PCI_ID_GALILEO),
+		m_voodoo(*this, PCI_ID_VIDEO),
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
 		m_screen(*this, "screen"),
@@ -331,6 +337,8 @@ public:
 private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
+	required_device<gt64010_device> m_galileo;
+	required_device<voodoo_1_pci_device> m_voodoo;
 	optional_device<atari_cage_seattle_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;
 	required_device<screen_device> m_screen;
@@ -1883,281 +1891,287 @@ INPUT_PORTS_END
  *  Machine drivers
  *
  *************************************/
-#define PCI_ID_GALILEO  ":pci:00.0"
-#define PCI_ID_VIDEO    ":pci:08.0"
-#define PCI_ID_IDE      ":pci:09.0"
-
-MACHINE_CONFIG_START(seattle_state::seattle_common)
+void seattle_state::seattle_common(machine_config &config)
+{
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
+	R5000LE(config, m_maincpu, SYSTEM_CLOCK * 3);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
+	PCI_ROOT(config, ":pci", 0);
 
-	MCFG_GT64010_ADD(PCI_ID_GALILEO, ":maincpu", SYSTEM_CLOCK, GALILEO_IRQ_NUM)
-	MCFG_GT64XXX_SET_CS(0, seattle_state::seattle_cs0_map)
-	MCFG_GT64XXX_SET_CS(1, seattle_state::seattle_cs1_map)
-	MCFG_GT64XXX_SET_CS(2, seattle_state::seattle_cs2_map)
-	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
-	MCFG_GT64XX_SET_SIMM0(0x00800000)
+	GT64010(config, m_galileo, SYSTEM_CLOCK, m_maincpu, GALILEO_IRQ_NUM);
+	m_galileo->set_map(0, address_map_constructor(&seattle_state::seattle_cs0_map, "seattle_cs0_map", this), this);
+	m_galileo->set_map(1, address_map_constructor(&seattle_state::seattle_cs1_map, "seattle_cs1_map", this), this);
+	m_galileo->set_map(2, address_map_constructor(&seattle_state::seattle_cs2_map, "seattle_cs2_map", this), this);
+	m_galileo->set_map(3, address_map_constructor(&seattle_state::seattle_cs3_map, "seattle_cs3_map", this), this);
+	m_galileo->set_simm0_size(0x00800000);
 
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
 	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
 	ide.set_legacy_top(0x0a0);
 
-	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, m_screen)
-	MCFG_VOODOO_PCI_FBMEM(2)
-	MCFG_VOODOO_PCI_TMUMEM(4, 0)
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, seattle_state, vblank_assert))
-	MCFG_VOODOO_STALL_CB(WRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
-
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
-	/* sound hardware */
-MACHINE_CONFIG_END
+	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 0);
+
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(seattle_state::vblank_assert));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	/* screen */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// Screeen size and timing is re-calculated later in voodoo card
+	m_screen->set_refresh_hz(57);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
+	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
+}
 
 
-MACHINE_CONFIG_START(seattle_state::phoenixsa)
+void seattle_state::phoenixsa(machine_config &config)
+{
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE(m_maincpu, R4700LE, SYSTEM_CLOCK*2)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
+	R4700LE(config.replace(), m_maincpu, SYSTEM_CLOCK * 2);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
-	MCFG_DEVICE_MODIFY(PCI_ID_GALILEO)
-	MCFG_GT64XX_SET_SIMM0(0x00200000)
-	MCFG_GT64XX_SET_SIMM1(0x00200000)
-MACHINE_CONFIG_END
+	m_galileo->set_simm0_size(0x00200000);
+	m_galileo->set_simm1_size(0x00200000);
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle150)
+void seattle_state::seattle150(machine_config &config)
+{
 	seattle_common(config);
-	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*3)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
-MACHINE_CONFIG_END
+	R5000LE(config.replace(), m_maincpu, SYSTEM_CLOCK * 3);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle150_widget)
+void seattle_state::seattle150_widget(machine_config &config)
+{
 	seattle150(config);
-	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
-MACHINE_CONFIG_END
+	SMC91C94(config, m_ethernet, 0);
+	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle200)
-	seattle_common(config);
-	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
-MACHINE_CONFIG_END
+void seattle_state::seattle200(machine_config &config)
+{
+	seattle150(config);
+	m_maincpu->set_clock(SYSTEM_CLOCK * 4);
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle200_widget)
+void seattle_state::seattle200_widget(machine_config &config)
+{
 	seattle200(config);
-	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
-MACHINE_CONFIG_END
+	SMC91C94(config, m_ethernet, 0);
+	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
+}
 
-MACHINE_CONFIG_START(seattle_state::flagstaff)
-	seattle_common(config);
-	MCFG_DEVICE_REPLACE(m_maincpu, R5000LE, SYSTEM_CLOCK*4)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
+void seattle_state::flagstaff(machine_config &config)
+{
+	seattle150(config);
+	m_maincpu->set_clock(SYSTEM_CLOCK * 4);
 
-	MCFG_DEVICE_MODIFY(PCI_ID_GALILEO)
-	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_flagstaff_cs3_map)
+	m_galileo->set_map(3, address_map_constructor(&seattle_state::seattle_flagstaff_cs3_map, "seattle_flagstaff_cs3_map", this), this);
 
-	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
+	SMC91C94(config, m_ethernet, 0);
+	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO)
-	MCFG_VOODOO_PCI_FBMEM(2)
-	MCFG_VOODOO_PCI_TMUMEM(4, 4)
-MACHINE_CONFIG_END
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 4);
+}
 
 // Per game configurations
 
-MACHINE_CONFIG_START(seattle_state::wg3dh)
+void seattle_state::wg3dh(machine_config &config)
+{
 	phoenixsa(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x3839);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(310/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(310/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
 
-MACHINE_CONFIG_START(seattle_state::mace)
+void seattle_state::mace(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x3839);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
-	MCFG_MIDWAY_IOASIC_UPPER(319/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
+	m_ioasic->set_upper(319/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrush)
+void seattle_state::sfrush(machine_config &config)
+{
 	flagstaff(config);
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x5236)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
+	cage.set_speedup(0x5236);
+	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(315/* no alternates */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, seattle_state, wheel_board_w))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(315/* no alternates */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrushrk)
+void seattle_state::sfrushrk(machine_config &config)
+{
 	flagstaff(config);
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x5329)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
+	cage.set_speedup(0x5329);
+	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
-	MCFG_MIDWAY_IOASIC_UPPER(331/* unknown */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, seattle_state, wheel_board_w))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
+	m_ioasic->set_upper(331/* unknown */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrushrkw)
+void seattle_state::sfrushrkw(machine_config &config)
+{
 	sfrushrk(config);
-	MCFG_DEVICE_MODIFY("ioasic")
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-MACHINE_CONFIG_END
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+}
 
-MACHINE_CONFIG_START(seattle_state::calspeed)
+void seattle_state::calspeed(machine_config &config)
+{
 	seattle150_widget(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c0)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x39c0);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
-	MCFG_MIDWAY_IOASIC_UPPER(328/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
+	m_ioasic->set_upper(328/* others? */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
+}
 
-MACHINE_CONFIG_START(seattle_state::vaportrx)
+void seattle_state::vaportrx(machine_config &config)
+{
 	seattle200_widget(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x39c2);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_VAPORTRX)
-	MCFG_MIDWAY_IOASIC_UPPER(324/* 334? unknown */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
+	m_ioasic->set_upper(324/* 334? unknown */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::biofreak)
+void seattle_state::biofreak(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3835)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x3835);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(231/* no alternates */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(231/* no alternates */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz)
+void seattle_state::blitz(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x39c2);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
-	MCFG_MIDWAY_IOASIC_UPPER(444/* or 528 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->set_upper(444/* or 528 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz99)
+void seattle_state::blitz99(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0afb);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
-	MCFG_MIDWAY_IOASIC_UPPER(481/* or 484 or 520 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->set_upper(481/* or 484 or 520 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz2k)
+void seattle_state::blitz2k(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
-	MCFG_MIDWAY_IOASIC_UPPER(494/* or 498 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->set_upper(494/* or 498 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::carnevil)
+void seattle_state::carnevil(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0af7);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
-	MCFG_MIDWAY_IOASIC_UPPER(469/* 469 or 486 or 528 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
+	m_ioasic->set_upper(469/* 469 or 486 or 528 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::hyprdriv)
+void seattle_state::hyprdriv(machine_config &config)
+{
 	seattle200_widget(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0af7);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_HYPRDRIV)
-	MCFG_MIDWAY_IOASIC_UPPER(469/* unknown */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
+	m_ioasic->set_upper(469/* unknown */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
 /*************************************
  *

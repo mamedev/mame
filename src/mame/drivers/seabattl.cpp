@@ -64,6 +64,11 @@ public:
 
 	void seabattl(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
@@ -81,16 +86,12 @@ private:
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
-	DECLARE_PALETTE_INIT(seabattl);
+	void seabattl_palette(palette_device &palette) const;
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void seabattl_data_map(address_map &map);
 	void seabattl_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_objram;
@@ -116,7 +117,7 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(seabattl_state, seabattl)
+void seabattl_state::seabattl_palette(palette_device &palette) const
 {
 	// sprites (m.obj) + s2636
 	for (int i = 0; i < 8; i++)
@@ -482,48 +483,41 @@ GFXDECODE_END
 MACHINE_CONFIG_START(seabattl_state::seabattl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, 14318180/4/2)
-	MCFG_DEVICE_PROGRAM_MAP(seabattl_map)
-	MCFG_DEVICE_DATA_MAP(seabattl_data_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	S2650(config, m_maincpu, 14318180/4/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &seabattl_state::seabattl_map);
+	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seabattl_state::seabattl_interrupt));
+	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 
-	MCFG_DEVICE_ADD("s2636", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -29)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	S2636(config, m_s2636, 0);
+	m_s2636->set_offsets(-13, -29);
+	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("sc_thousand", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<0>))
-	MCFG_DEVICE_ADD("sc_hundred", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<1>))
-	MCFG_DEVICE_ADD("sc_half", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<2>))
-	MCFG_DEVICE_ADD("sc_unity", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<3>))
-	MCFG_DEVICE_ADD("tm_half", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<4>))
-	MCFG_DEVICE_ADD("tm_unity", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, seabattl_state, digit_w<5>))
+	DM9368(config, m_digits[0], 0).update_cb().set(FUNC(seabattl_state::digit_w<0>));
+	DM9368(config, m_digits[1], 0).update_cb().set(FUNC(seabattl_state::digit_w<1>));
+	DM9368(config, m_digits[2], 0).update_cb().set(FUNC(seabattl_state::digit_w<2>));
+	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(seabattl_state::digit_w<3>));
+	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(seabattl_state::digit_w<4>));
+	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(seabattl_state::digit_w<5>));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(1*8, 29*8-1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(seabattl_state::screen_update_seabattl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seabattl)
-	MCFG_PALETTE_ADD("palette", 26)
-	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seabattl);
+	PALETTE(config, m_palette, FUNC(seabattl_state::seabattl_palette), 26);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* discrete sound */
-MACHINE_CONFIG_END
+}
 
 
 

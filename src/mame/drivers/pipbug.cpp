@@ -59,8 +59,8 @@ public:
 private:
 	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
 	required_device<rs232_port_device> m_rs232;
-	required_device<cpu_device> m_maincpu;
-	DECLARE_QUICKLOAD_LOAD_MEMBER( pipbug );
+	required_device<s2650_device> m_maincpu;
+	DECLARE_QUICKLOAD_LOAD_MEMBER(pipbug);
 	void pipbug_data(address_map &map);
 	void pipbug_mem(address_map &map);
 };
@@ -160,21 +160,23 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	return result;
 }
 
-MACHINE_CONFIG_START(pipbug_state::pipbug)
+void pipbug_state::pipbug(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(pipbug_mem)
-	MCFG_DEVICE_DATA_MAP(pipbug_data)
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE("rs232", rs232_port_device, write_txd))
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipbug_state::pipbug_mem);
+	m_maincpu->set_addrmap(AS_DATA, &pipbug_state::pipbug_data);
+	m_maincpu->flag_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", S2650_SENSE_LINE))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set_inputline(m_maincpu, S2650_SENSE_LINE);
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)
-MACHINE_CONFIG_END
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pipbug_state, pipbug), this), "pgm", 1);
+}
 
 
 /* ROM definition */

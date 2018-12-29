@@ -141,7 +141,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 	DECLARE_WRITE_LINE_MEMBER( wake_w );
 
-	DECLARE_PALETTE_INIT(portfolio);
+	void portfolio_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
@@ -926,7 +926,7 @@ WRITE8_MEMBER( portfolio_state::contrast_w )
 //  PALETTE_INIT( portfolio )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER(portfolio_state, portfolio)
+void portfolio_state::portfolio_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(142, 193, 172));
 	palette.set_pen_color(1, rgb_t(67, 71, 151));
@@ -939,8 +939,7 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 
 READ8_MEMBER( portfolio_state::hd61830_rd_r )
 {
-	// TODO with real ROM: offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
-	uint16_t address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
+	offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
 	uint8_t data = m_char_rom[address];
 
 	return data;
@@ -1030,10 +1029,9 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
+	PALETTE(config, "palette", FUNC(portfolio_state::portfolio_palette), 2);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portfolio)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_portfolio);
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)
@@ -1063,10 +1061,9 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pofo")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 MACHINE_CONFIG_END
 
 
@@ -1082,11 +1079,11 @@ MACHINE_CONFIG_END
 ROM_START( pofo )
 	ROM_REGION( 0x40000, M80C88A_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "dip1072", "DIP DOS 1.072" )
-	ROMX_LOAD( "rom b.u4", 0x00000, 0x20000, BAD_DUMP CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(0) ) // dumped with debug.com
-	ROMX_LOAD( "rom a.u3", 0x20000, 0x20000, BAD_DUMP CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(0) ) // dumped with debug.com
+	ROMX_LOAD( "c101782-007.u4", 0x00000, 0x20000, CRC(c9852766) SHA1(c74430281bc717bd36fd9b5baec1cc0f4489fe82), ROM_BIOS(0) )
+	ROMX_LOAD( "c101781-007.u3", 0x20000, 0x20000, CRC(b8fb730d) SHA1(1b9d82b824cab830256d34912a643a7d048cd401), ROM_BIOS(0) )
 
 	ROM_REGION( 0x8000, HD61830_TAG, 0 )
-	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual
+	ROM_LOAD( "c101783-001a-01.u3", 0x0000, 0x8000, CRC(61fdaff1) SHA1(5eb99e7a19af7b8d77ea8a2f1f554e6e3d382fa2) )
 ROM_END
 
 

@@ -19,17 +19,6 @@ TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)
 
 void pecom_state::machine_start()
 {
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15", "LINE16",
-		"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25"
-	};
-
-	for ( int i = 0; i < 26; i++ )
-	{
-		m_io_ports[i] = ioport(keynames[i]);
-	}
-
 	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pecom_state::reset_tick),this));
 }
 

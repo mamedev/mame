@@ -242,18 +242,17 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(pokechmp_state::screen_update_pokechmp));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append(FUNC(pokechmp_state::sound_irq));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pokechmp)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

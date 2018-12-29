@@ -114,18 +114,21 @@ ioport_constructor a2091_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dmac_hdc_device::device_add_mconfig)
-	MCFG_DMAC_ADD("dmac", 0)
-	MCFG_DMAC_SCSI_READ_HANDLER(READ8(*this, dmac_hdc_device, dmac_scsi_r))
-	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(*this, dmac_hdc_device, dmac_scsi_w))
-	MCFG_DMAC_INT_HANDLER(WRITELINE(*this, dmac_hdc_device, dmac_int_w))
-	MCFG_DMAC_CFGOUT_HANDLER(WRITELINE(*this, dmac_hdc_device, dmac_cfgout_w))
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, dmac_hdc_device, scsi_irq_w))
-MACHINE_CONFIG_END
+void dmac_hdc_device::device_add_mconfig(machine_config &config)
+{
+	amiga_dmac_device &dmac(AMIGA_DMAC(config, "dmac", 0));
+	dmac.scsi_read_handler().set(FUNC(dmac_hdc_device::dmac_scsi_r));
+	dmac.scsi_write_handler().set(FUNC(dmac_hdc_device::dmac_scsi_w));
+	dmac.int_handler().set(FUNC(dmac_hdc_device::dmac_int_w));
+	dmac.cfgout_handler().set(FUNC(dmac_hdc_device::dmac_cfgout_w));
+
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+
+	wd33c93_device &scsi_ctrl(WD33C93(config, "wd33c93"));
+	scsi_ctrl.set_scsi_port("scsi");
+	scsi_ctrl.irq_cb().set(FUNC(dmac_hdc_device::scsi_irq_w));
+}
 
 
 //-------------------------------------------------

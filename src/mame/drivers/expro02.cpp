@@ -222,8 +222,8 @@ TODO:
 class expro02_state : public driver_device
 {
 public:
-	expro02_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	expro02_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -262,7 +262,7 @@ private:
 	DECLARE_WRITE8_MEMBER(expro02_6295_bankswitch_w);
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(expro02);
+	void expro02_palette(palette_device &palette) const;
 
 	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -291,33 +291,28 @@ void expro02_state::machine_start()
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-PALETTE_INIT_MEMBER(expro02_state, expro02)
+void expro02_state::expro02_palette(palette_device &palette) const
 {
-	int i;
+	// first 2048 colors are dynamic
 
-	/* first 2048 colors are dynamic */
-
-	/* initialize 555 RGB lookup */
-	for (i = 0; i < 32768; i++)
-		palette.set_pen_color(2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+	// initialize 555 RGB lookup
+	for (int i = 0; i < 32768; i++)
+		palette.set_pen_color(2048 + i, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
 uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  kaneko16_fill_bitmap(machine(),bitmap,cliprect);
-	int y,x;
 	int count;
 
-
 	count = 0;
-	for (y=0;y<256;y++)
+	for (int y = 0; y < 256; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-
-		for (x=0;x<256;x++)
+		uint16_t *const dest = &bitmap.pix16(y);
+		for (int x = 0; x < 256; x++)
 		{
 			uint16_t dat = (m_bg_rgb555_pixram[count] & 0xfffe)>>1;
-			dat+=2048;
+			dat += 2048;
 
 			// never seen to test
 			//if (!(m_bg_rgb555_pixram[count] & 0x0001))
@@ -336,24 +331,18 @@ uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_
 	}
 
 	count = 0;
-	for (y=0;y<256;y++)
+	for (int y = 0; y < 256; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-
-		for (x=0;x<256;x++)
+		uint16_t *const dest = &bitmap.pix16(y);
+		for (int x = 0; x < 256; x++)
 		{
-			uint16_t dat = (m_fg_ind8_pixram[count]);
-			dat &=0x7ff;
-			if (!(m_paletteram[(dat&0x7ff)] & 0x0001))
+			uint16_t const dat = m_fg_ind8_pixram[count] & 0x7ff;
+			if (!(m_paletteram[dat] & 0x0001))
 				dest[x] = dat;
 
 			count++;
 		}
 	}
-
-
-
-	int i;
 
 	screen.priority().fill(0, cliprect);
 
@@ -361,11 +350,10 @@ uint32_t expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_
 	{
 		m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
-		for (i = 0; i < 8; i++)
-		{
+		for (int i = 0; i < 8; i++)
 			m_view2_0->render_tilemap_chip(screen, bitmap, cliprect, i);
-		}
 	}
+
 	return 0;
 }
 
@@ -927,31 +915,25 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_expro02)
-	MCFG_PALETTE_ADD("palette", 2048 + 32768)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_expro02);
+	PALETTE(config, m_palette, FUNC(expro02_state::expro02_palette)).set_format(palette_device::GRBx_555, 2048 + 32768);
 
-	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(1)
-	MCFG_KANEKO_TMAP_OFFSET(0x5b, 0x8, 256, 224)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2_0);
+	m_view2_0->set_gfx_region(1);
+	m_view2_0->set_offset(0x5b, 0x8, 256, 224);
+	m_view2_0->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD_VU002_SPRITES
-	MCFG_KANEKO16_SPRITE_PRIORITIES(8,8,8,8) // above all (not verified)
-	MCFG_KANEKO16_SPRITE_OFFSETS(0, -0x40)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)
+	m_kaneko_spr->set_offsets(0, -0x40);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
-
-
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -969,20 +951,18 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(fantasia_map)
 
-	MCFG_DEVICE_REMOVE("calc1_mcu")
+	config.device_remove("calc1_mcu");
 
-	MCFG_DEVICE_MODIFY("view2_0")
 	// these values might not be correct, behavior differs from original boards
-	MCFG_KANEKO_TMAP_INVERT_FLIP(1)
-	MCFG_KANEKO_TMAP_OFFSET(-256, -216, 256, 224)
+	m_view2_0->set_invert_flip(1);
+	m_view2_0->set_offset(-256, -216, 256, 224);
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::comad_noview2)
 	comad(config);
-	MCFG_DEVICE_REMOVE("view2_0")
+	config.device_remove("view2_0");
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_expro02_noview2)
 MACHINE_CONFIG_END

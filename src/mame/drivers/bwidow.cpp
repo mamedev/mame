@@ -780,8 +780,8 @@ MACHINE_CONFIG_START(bwidow_state::bwidow)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	/* sound hardware */
 	bwidow_audio(config);
@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(bwidow_state::bwidowp)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bwidowp_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bwidow_state::gravitar)

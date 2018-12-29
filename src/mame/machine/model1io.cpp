@@ -133,7 +133,7 @@ void  model1io_device::device_add_mconfig(machine_config &config)
 	z80_device &iocpu(Z80(config, "iocpu", 32_MHz_XTAL/8));
 	iocpu.set_addrmap(AS_PROGRAM, &model1io_device::mem_map);
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom); // 93C45
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
 	sega_315_5338a_device &io(SEGA_315_5338A(config, "io", 32_MHz_XTAL));
 	io.read_callback().set(FUNC(model1io_device::io_r));
@@ -148,10 +148,10 @@ void  model1io_device::device_add_mconfig(machine_config &config)
 	io.in_pg_callback().set(FUNC(model1io_device::io_pg_r));
 
 	msm6253_device &adc(MSM6253(config, "adc", 0));
-	adc.set_input_cb<0>(FUNC(model1io_device::analog0_r), this);
-	adc.set_input_cb<1>(FUNC(model1io_device::analog1_r), this);
-	adc.set_input_cb<2>(FUNC(model1io_device::analog2_r), this);
-	adc.set_input_cb<3>(FUNC(model1io_device::analog3_r), this);
+	adc.set_input_cb<0>(FUNC(model1io_device::analog0_r));
+	adc.set_input_cb<1>(FUNC(model1io_device::analog1_r));
+	adc.set_input_cb<2>(FUNC(model1io_device::analog2_r));
+	adc.set_input_cb<3>(FUNC(model1io_device::analog3_r));
 }
 
 

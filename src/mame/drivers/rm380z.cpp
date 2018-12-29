@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -260,18 +260,17 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* RAM configurations */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("56K")
+	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	MCFG_DEVICE_ADD("wd1771", FD1771, 1_MHz_XTAL)
+	FD1771(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rm380z_state::rm480z)
@@ -293,8 +292,8 @@ MACHINE_CONFIG_START(rm380z_state::rm480z)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard */
-//  MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-//  MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
+//  generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+//  keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 MACHINE_CONFIG_END
 
 

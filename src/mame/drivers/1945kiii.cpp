@@ -64,7 +64,8 @@ public:
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
 	{ }
 
 	void flagrall(machine_config &config);
@@ -78,7 +79,6 @@ private:
 	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
 	virtual void video_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -99,6 +99,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 
@@ -163,8 +164,8 @@ WRITE16_MEMBER(k3_state::scrolly_w)
 
 WRITE16_MEMBER(k3_state::k3_soundbanks_w)
 {
-	m_oki[1]->set_rom_bank((data & 4) >> 2);
-	m_oki[0]->set_rom_bank((data & 2) >> 1);
+	m_oki[1]->set_rom_bank(BIT(data, 2));
+	m_oki[0]->set_rom_bank(BIT(data, 1));
 }
 
 WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
@@ -186,7 +187,6 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 		popmessage("unk control %04x", data & 0xfcc9);
 
 	m_oki[0]->set_rom_bank((data & 0x6) >> 1);
-
 }
 
 
@@ -199,9 +199,9 @@ void k3_state::k3_base_map(address_map &map)
 	map(0x000000, 0x0fffff).rom(); // ROM
 	map(0x100000, 0x10ffff).ram(); // Main Ram
 	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x240000, 0x240fff).ram().share("spritera1");
-	map(0x280000, 0x280fff).ram().share("spritera2");
-	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::bgram_w)).share("bgram");
+	map(0x240000, 0x240fff).ram().share(m_spriteram[0]);
+	map(0x280000, 0x280fff).ram().share(m_spriteram[1]);
+	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::bgram_w)).share(m_bgram);
 	map(0x2c0800, 0x2c0fff).ram(); // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
 	map(0x340000, 0x340001).w(FUNC(k3_state::scrollx_w));
 	map(0x380000, 0x380001).w(FUNC(k3_state::scrolly_w));
@@ -374,48 +374,42 @@ static GFXDECODE_START( gfx_1945kiii )
 GFXDECODE_END
 
 
-void k3_state::machine_start()
+void k3_state::flagrall(machine_config &config)
 {
-}
+	M68000(config, m_maincpu, MASTER_CLOCK); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::flagrall_map);
+	m_maincpu->set_vblank_int("screen", FUNC(k3_state::irq4_line_hold));
 
-MACHINE_CONFIG_START(k3_state::flagrall)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1945kiii);
 
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
-	MCFG_DEVICE_PROGRAM_MAP(flagrall_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(k3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1945kiii)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(k3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(k3_state::k3)
+void k3_state::k3(machine_config &config)
+{
 	flagrall(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(k3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::k3_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[1], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+}
 
 
 

@@ -56,6 +56,7 @@ void sprint8_state::machine_start()
 	save_item(NAME(m_collision_reset));
 	save_item(NAME(m_collision_index));
 	save_item(NAME(m_dial));
+	save_item(NAME(m_team));
 }
 
 void sprint8_state::machine_reset()
@@ -471,12 +472,10 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint8_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint8)
-	MCFG_PALETTE_ADD("palette", 36)
-	MCFG_PALETTE_INDIRECT_ENTRIES(18)
-	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sprint8)
+	PALETTE(config, m_palette, FUNC(sprint8_state::sprint8_palette), 36, 18);
 
 	sprint8_audio(config);
 MACHINE_CONFIG_END

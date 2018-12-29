@@ -21,7 +21,7 @@
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/rp5c15.h"
@@ -53,8 +53,8 @@
 class mz2000_state : public driver_device
 {
 public:
-	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mz2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cass(*this, "cassette"),
 		m_floppy(nullptr),
 		m_maincpu(*this, "maincpu"),
@@ -73,7 +73,8 @@ public:
 		m_region_wram(*this, "wram"),
 		m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"}),
 		m_io_config(*this, "CONFIG"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void mz2000(machine_config &config);
 	void mz80b(machine_config &config);
@@ -352,7 +353,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 READ8_MEMBER(mz2000_state::fdc_r)
 {
 	if(m_has_fdc)
-		return m_mb8877a->read(space, offset) ^ 0xff;
+		return m_mb8877a->read(offset) ^ 0xff;
 
 	return 0xff;
 }
@@ -360,7 +361,7 @@ READ8_MEMBER(mz2000_state::fdc_r)
 WRITE8_MEMBER(mz2000_state::fdc_w)
 {
 	if(m_has_fdc)
-		m_mb8877a->write(space, offset, data ^ 0xff);
+		m_mb8877a->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER(mz2000_state::floppy_select_w)
@@ -881,26 +882,26 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_DEVICE_PROGRAM_MAP(mz2000_map)
 	MCFG_DEVICE_IO_MAP(mz2000_io)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2000_state, mz2000_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2000_state, mz2000_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2000_state, mz2000_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2000_state, mz2000_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2000_state, mz2000_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2000_state, mz2000_portc_w))
+	i8255_device &ppi(I8255(config, "i8255_0"));
+	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
+	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));;
+	ppi.in_pb_callback().set(FUNC(mz2000_state::mz2000_portb_r));
+	ppi.out_pb_callback().set(FUNC(mz2000_state::mz2000_portb_w));
+	ppi.in_pc_callback().set(FUNC(mz2000_state::mz2000_portc_r));
+	ppi.out_pc_callback().set(FUNC(mz2000_state::mz2000_portc_w));
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2000_state, mz2000_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2000_state, mz2000_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2000_state, mz2000_pio1_portb_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio_1", MASTER_CLOCK));
+	pio.in_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_r));
+	pio.out_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_w));
+	pio.in_pb_callback().set(FUNC(mz2000_state::mz2000_pio1_portb_r));
 
 	/* TODO: clocks aren't known */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(31250)
-	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
-	MCFG_PIT8253_CLK2(31250)
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(31250);
+	m_pit8253->set_clk<1>(31250); /* needed by "Art Magic" to boot */
+	m_pit8253->set_clk<2>(31250);
 
-	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
+	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)
@@ -923,10 +924,10 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2000)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 

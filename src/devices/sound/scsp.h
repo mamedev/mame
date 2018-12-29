@@ -15,43 +15,33 @@
 				// driver code indicates should be 4, but sounds distorted then
 
 
-#define MCFG_SCSP_ROFFSET(_offs) \
-	downcast<scsp_device &>(*device).set_roffset(_offs);
-
-#define MCFG_SCSP_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCSP_EXTS_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
-
-
 class scsp_device : public device_t,
-					public device_sound_interface
+	public device_sound_interface,
+	public device_rom_interface
 {
 public:
-	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44'100);
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP incorrections, etc
 
-	void set_roffset(int roffset) { m_roffset = roffset; }
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_exts_callback(Object &&cb) { return m_exts_cb.set_callback(std::forward<Object>(cb)); }
+	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 22'579'200);
+
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto main_irq_cb() { return m_main_irq_cb.bind(); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
 	// MIDI I/O access (used for comms on Model 2/3)
-	DECLARE_WRITE16_MEMBER( midi_in );
+	void midi_in(u8 data);
 	DECLARE_READ16_MEMBER( midi_out_r );
-
-	void set_ram_base(void *base);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
+
+	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -93,7 +83,6 @@ private:
 
 		uint8_t Backwards;    //the wave is playing backwards
 		uint8_t active;   //this slot is currently playing
-		uint8_t *base;        //samples base address
 		uint32_t cur_addr;    //current play address (24.8)
 		uint32_t nxt_addr;    //next play address
 		uint32_t step;        //pitch step (24.8)
@@ -104,10 +93,8 @@ private:
 		int16_t Prev;  //Previous sample (for interpolation)
 	};
 
-	int m_roffset;                /* offset in the region */
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
-	devcb_read16       m_exts_cb;
 
 	union
 	{
@@ -122,13 +109,8 @@ private:
 	int16_t m_DELAYBUF[SCSP_FM_DELAY];
 	uint8_t m_DELAYPTR;
 #endif
-	uint8_t *m_SCSPRAM;
-	uint32_t m_SCSPRAM_LENGTH;
 	char m_Master;
 	sound_stream * m_stream;
-
-	std::unique_ptr<int32_t[]> m_buffertmpl;
-	std::unique_ptr<int32_t[]> m_buffertmpr;
 
 	uint32_t m_IrqTimA;
 	uint32_t m_IrqTimBC;
@@ -168,6 +150,8 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
+	stream_sample_t *m_exts0;
+	stream_sample_t *m_exts1;
 
 	int m_length;
 
@@ -179,7 +163,7 @@ private:
 	int m_PSCALES[8][256];
 	int m_ASCALES[8][256];
 
-	void exec_dma(address_space &space);       /*state DMA transfer function*/
+	void exec_dma();       /*state DMA transfer function*/
 	uint8_t DecodeSCI(uint8_t irq);
 	void CheckPendingIRQ();
 	void MainCheckPendingIRQ(uint16_t irq_type);
@@ -189,7 +173,6 @@ private:
 	TIMER_CALLBACK_MEMBER( timerC_cb );
 	int Get_AR(int base, int R);
 	int Get_DR(int base, int R);
-	int Get_RR(int base, int R);
 	void Compute_EG(SCSP_SLOT *slot);
 	int EG_Update(SCSP_SLOT *slot);
 	uint32_t Step(SCSP_SLOT *slot);
@@ -198,11 +181,11 @@ private:
 	void StopSlot(SCSP_SLOT *slot, int keyoff);
 	void init();
 	void UpdateSlotReg(int s, int r);
-	void UpdateReg(address_space &space, int reg);
+	void UpdateReg(int reg);
 	void UpdateSlotRegR(int slot, int reg);
-	void UpdateRegR(address_space &space, int reg);
-	void w16(address_space &space, uint32_t addr, uint16_t val);
-	uint16_t r16(address_space &space, uint32_t addr);
+	void UpdateRegR(int reg);
+	void w16(uint32_t addr, uint16_t val);
+	uint16_t r16(uint32_t addr);
 	inline int32_t UpdateSlot(SCSP_SLOT *slot);
 	void DoMasterSamples(int nsamples);
 

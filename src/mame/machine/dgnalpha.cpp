@@ -69,7 +69,6 @@ keeping track of it in a variable in the driver.
 #include "emu.h"
 #include "includes/dgnalpha.h"
 #include "sound/ay8910.h"
-#include "imagedev/flopdrv.h"
 
 //-------------------------------------------------
 //  device_start
@@ -147,19 +146,19 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 			break;
 
 		case 12:
-			result = m_fdc->data_r(space, 0);
+			result = m_fdc->data_r();
 			break;
 
 		case 13:
-			result = m_fdc->sector_r(space, 0);
+			result = m_fdc->sector_r();
 			break;
 
 		case 14:
-			result = m_fdc->track_r(space, 0);
+			result = m_fdc->track_r();
 			break;
 
 		case 15:
-			result = m_fdc->status_r(space, 0);
+			result = m_fdc->status_r();
 			break;
 	}
 
@@ -189,16 +188,16 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			break;
 
 		case 12:
-			m_fdc->data_w(space, 0, data);
+			m_fdc->data_w(data);
 			break;
 		case 13:
-			m_fdc->sector_w(space, 0, data);
+			m_fdc->sector_w(data);
 			break;
 		case 14:
-			m_fdc->track_w(space, 0, data);
+			m_fdc->track_w(data);
 			break;
 		case 15:
-			m_fdc->cmd_w(space, 0, data);
+			m_fdc->cmd_w(data);
 			break;
 	}
 }

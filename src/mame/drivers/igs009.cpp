@@ -834,17 +834,17 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	MCFG_DEVICE_PROGRAM_MAP(jingbell_map)
 	MCFG_DEVICE_IO_MAP(jingbell_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, igs009_state, nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.out_pa_callback().set(FUNC(igs009_state::nmi_and_coins_w));
+	ppi0.in_pb_callback().set_ioport("SERVICE");
+	ppi0.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, igs009_state, video_and_leds_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, igs009_state, leds_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("BUTTONS1");
+	ppi1.out_pb_callback().set(FUNC(igs009_state::video_and_leds_w));
+	ppi1.out_pc_callback().set(FUNC(igs009_state::leds_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -853,12 +853,11 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs009_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs009_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jingbell)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_jingbell)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

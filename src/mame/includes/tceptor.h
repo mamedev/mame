@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:BUT
+#ifndef MAME_INCLUDES_TCEPTOR_H
+#define MAME_INCLUDES_TCEPTOR_H
+
+#pragma once
+
+#include "cpu/m6502/m65c02.h"
 #include "sound/namco.h"
 #include "video/c45.h"
 #include "emupal.h"
@@ -11,6 +17,7 @@ public:
 	tceptor_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu%u", 1U),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
@@ -33,6 +40,7 @@ private:
 	uint8_t m_m68k_irq_enable;
 	uint8_t m_mcu_irq_enable;
 	required_device<cpu_device> m_maincpu;
+	required_device_array<m65c02_device, 2> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
@@ -84,7 +92,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tceptor);
+	void tceptor_palette(palette_device &palette);
 	uint32_t screen_update_tceptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tceptor);
 	INTERRUPT_GEN_MEMBER(m6809_vb_interrupt);
@@ -106,3 +114,5 @@ private:
 	void mcu_io_map(address_map &map);
 	void mcu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TCEPTOR_H

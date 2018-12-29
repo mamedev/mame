@@ -155,19 +155,17 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
 	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ssrj_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssrj)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_INIT_OWNER(ssrj_state, ssrj)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssrj);
+	PALETTE(config, m_palette, FUNC(ssrj_state::ssrj_palette), 128);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/5)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 8000000/5));
+	aysnd.port_b_read_callback().set_ioport("IN3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 /***************************************************************************

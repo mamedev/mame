@@ -92,6 +92,9 @@ public:
 	void init_srallyc();
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_bufferram;
 	std::unique_ptr<uint16_t[]> m_fbvramA;
@@ -185,6 +188,10 @@ protected:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
 	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	DECLARE_READ32_MEMBER(doa_prot_r);
+	DECLARE_READ32_MEMBER(doa_unk_r);
+	void sega_0229_map(address_map &map);
+	int m_prot_a;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
@@ -206,8 +213,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
 	void push_geo_data(uint32_t data);
 	DECLARE_VIDEO_START(model2);
-	DECLARE_MACHINE_RESET(model2_common);
-	DECLARE_MACHINE_RESET(model2_scsp);
+	void reset_model2_scsp();
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
@@ -230,7 +236,9 @@ protected:
 	void geo_sharc_map(address_map &map);
 	void model2_base_mem(address_map &map);
 	void model2_5881_mem(address_map &map);
+	void model2_0229_mem(address_map &map);
 	void model2_snd(address_map &map);
+	void scsp_map(address_map &map);
 
 	void debug_init();
 	void debug_commands( int ref, const std::vector<std::string> &params );
@@ -319,9 +327,10 @@ public:
 		  m_copro_tgp_bank(*this, "copro_tgp_bank")
 	{}
 
-	DECLARE_MACHINE_START(model2_tgp);
-
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<mb86234_device> m_copro_tgp;
 	required_shared_ptr<uint32_t> m_copro_tgp_program;
 	required_region_ptr<uint32_t> m_copro_tgp_tables;
@@ -356,8 +365,6 @@ protected:
 	DECLARE_WRITE32_MEMBER(copro_atan_w);
 	DECLARE_READ32_MEMBER(copro_atan_r);
 
-	DECLARE_MACHINE_RESET(model2_tgp);
-
 	void model2_tgp_mem(address_map &map);
 
 	void copro_tgp_prog_map(address_map &map);
@@ -382,8 +389,6 @@ public:
 	model2o_state(const machine_config &mconfig, device_type type, const char *tag)
 		: model2_tgp_state(mconfig, type, tag)
 	{}
-
-	DECLARE_MACHINE_RESET(model2o);
 
 	void model2o(machine_config &config);
 	void daytona(machine_config &config);
@@ -454,8 +459,6 @@ public:
 		: model2_tgp_state(mconfig, type, tag)
 	{}
 
-	DECLARE_MACHINE_RESET(model2a);
-
 	void manxtt(machine_config &config);
 	void manxttdx(machine_config &config);
 	void model2a(machine_config &config);
@@ -467,8 +470,11 @@ public:
 	void zeroguna(machine_config &config);
 
 protected:
+	virtual void machine_reset() override;
+
 	void model2a_crx_mem(address_map &map);
 	void model2a_5881_mem(address_map &map);
+	void model2a_0229_mem(address_map &map);
 };
 
 /*****************************
@@ -485,9 +491,6 @@ public:
 		  m_copro_adsp(*this, "copro_adsp")
 	{}
 
-	DECLARE_MACHINE_RESET(model2b);
-	DECLARE_MACHINE_START(model2b);
-
 	void model2b(machine_config &config);
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
@@ -498,6 +501,9 @@ public:
 	void zerogun(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<adsp21062_device> m_copro_adsp;
 
 	DECLARE_WRITE32_MEMBER(copro_function_port_w);
@@ -509,6 +515,7 @@ protected:
 
 	void model2b_crx_mem(address_map &map);
 	void model2b_5881_mem(address_map &map);
+	void model2b_0229_mem(address_map &map);
 	// TODO: split into own class
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);
@@ -534,9 +541,6 @@ public:
 		  m_copro_tgpx4_program(*this, "copro_tgpx4_program")
 	{}
 
-	DECLARE_MACHINE_RESET(model2c);
-	DECLARE_MACHINE_START(model2c);
-
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
 	void skisuprg(machine_config &config);
@@ -549,6 +553,9 @@ public:
 	void topskatr(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<mb86235_device> m_copro_tgpx4;
 	required_shared_ptr<uint64_t> m_copro_tgpx4_program;
 

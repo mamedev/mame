@@ -49,8 +49,8 @@
 class galaxi_state : public driver_device
 {
 public:
-	galaxi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galaxi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg1_ram(*this, "bg1_ram"),
 		m_bg2_ram(*this, "bg2_ram"),
 		m_bg3_ram(*this, "bg3_ram"),
@@ -124,7 +124,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void show_out(  );
+	void show_out();
 
 	void galaxi_map(address_map &map);
 	void lastfour_map(address_map &map);
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 	MCFG_DEVICE_PROGRAM_MAP(galaxi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -479,11 +479,10 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16*5, 512-16*2-1, 16*1, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxi_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxi)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxi);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

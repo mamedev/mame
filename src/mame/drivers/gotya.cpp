@@ -209,37 +209,35 @@ void gotya_state::machine_reset()
 	m_theme_playing = 0;
 }
 
-MACHINE_CONFIG_START(gotya_state::gotya)
-
+void gotya_state::gotya(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(gotya_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 18432000/6); /* 3.072 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gotya_state::gotya_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gotya_state::irq0_line_hold));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(36*8, 32*8);
+	screen.set_visarea(0, 36*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gotya_state::screen_update_gotya));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotya)
-	MCFG_PALETTE_ADD("palette", 16*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gotya);
+	PALETTE(config, m_palette, FUNC(gotya_state::gotya_palette), 16*4, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

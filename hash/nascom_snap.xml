@@ -1,0 +1,896 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="nascom_snap" description="Nascom snapshot images">
+
+	<!-- Games -->
+
+	<software name="3dlabyr">
+		<description>3D Labyrinth</description>
+		<year>1983</year>
+		<publisher>80-Bus Journal</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="10083">
+				<rom name="3dlabyrinth.nas" size="10083" crc="78fd2aa7" sha1="4305701c851160c7aed702a817d021015951f08c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dmaze">
+		<description>3D Maze</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="14563">
+				<rom name="3dmaze.nas" size="14563" crc="4aaa531e" sha1="1a1e234f35b793aa50fd1a5240219e8d56c3cbb7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advquest">
+		<description>Adventure Quest</description>
+		<year>1982</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="143363">
+				<rom name="advquest.nas" size="143363" crc="5cfb6c97" sha1="f4c1f45f8e18818d17bd0bb6a2c2c0245ddec45d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroid">
+		<description>Asteroids</description>
+		<year>1982</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="35843">
+				<rom name="asteroids.nas" size="35843" crc="de6e8d32" sha1="5a305c56fb87b816f694a6fbc0e3090ba07cf217" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout">
+		<description>Breakout</description>
+		<year>1980</year>
+		<publisher>Blue Label Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="6723">
+				<rom name="breakout.nas" size="6723" crc="c1976ebc" sha1="b04133f547d4e3c142537fe2ca46d5c980047628" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrace">
+		<description>Car Race</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="15193">
+				<rom name="car_race.nas" size="15193" crc="cf1ff446" sha1="cef499536b667822f96123f300702fe00fbcb8b4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colossal">
+		<description>Colossal Adventure</description>
+		<year>1982</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap1" interface="nascom_snap">
+			<feature name="part_id" value="32K"/>
+			<dataarea name="snap" size="143363">
+				<rom name="cave_32k.nas" size="143363" crc="f6ddd1eb" sha1="8a5fe36b072e162c73e7fb03b6ace2b45fd23e7a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="snap2" interface="nascom_snap">
+			<feature name="part_id" value="16K"/>
+			<dataarea name="snap" size="71683">
+				<rom name="cave_16k.nas" size="71683" crc="4c13ee90" sha1="94c5bf72c66f6e855cd20df25ec57720f5464a39" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chaser">
+		<description>Chaser</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="17925">
+				<rom name="chaser.nas" size="17925" crc="a80a22a2" sha1="392d291a8200af45ffe8192034b1789ab823f96d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungeon">
+		<description>Dungeon Adventure</description>
+		<year>1982</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="125443">
+				<rom name="dungeon.nas" size="125443" crc="efe8d499" sha1="e684251aafa6c822e551e64ac938bd401206e734" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eliza">
+		<description>Eliza</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="28318">
+				<rom name="eliza.nas" size="28318" crc="b3cd521e" sha1="cf5f4b86ac9f938b98afd7ca7d263cf8b5daebc2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitm">
+		<description>Fruit Machine</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E4400 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="17923">
+				<rom name="bandid.nas" size="17923" crc="40196603" sha1="a93ff46ddf31bc724801267511eb7622adf54980" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitmg">
+		<description>Fruit Machine Game</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter ED00 to start" />
+		<sharedfeat name="compatibility" value="NASCOM1"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="3951">
+				<rom name="fruit.nas" size="3951" crc="e2bddbd1" sha1="757a269262a4e7955a767e23392eb5c00739d437" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian">
+		<description>Galaxian Attack</description>
+		<year>198?</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="17923">
+				<rom name="galaxian.nas" size="17923" crc="116fb86e" sha1="5846adebb87fca9ee0668ef637e98efa20b52039" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxy">
+		<description>Galaxy Attack</description>
+		<year>1981</year>
+		<publisher>South East London Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="25763">
+				<rom name="galaxy_attack.nas" size="25763" crc="7e83e746" sha1="4228f27bee2daccc23c608545f0aaa663e9a66a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galinv">
+		<description>Galactic Invaders</description>
+		<year>198?</year>
+		<publisher>South East London Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="13443">
+				<rom name="galactic_invaders.nas" size="13443" crc="032745ca" sha1="efe04c1318940e23f1fe966c44b044971c457cfe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gold">
+		<description>Eldorado Gold</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter EC80 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="57683">
+				<rom name="eldorado_gold.nas" size="57683" crc="258dfe4e" sha1="4b99dce367e37c17fc85671aae8faf09695708c6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman">
+		<description>Hangman</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter EC70 to start" />
+		<sharedfeat name="compatibility" value="NASCOM1"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="3778">
+				<rom name="hangman.nas" size="3778" crc="ac6b8c8b" sha1="e9c946213c37de7b15cfa5aa2f2f2263824eaf0f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holewall">
+		<description>The Hole in the Wall</description>
+		<year>1982</year>
+		<publisher>ZRL</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="11063">
+				<rom name="hole.nas" size="11063" crc="a0480895" sha1="89cbcd6d30a7e9650e448611324b753554afd373" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invearth">
+		<description>Invasion Earth</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="17923">
+				<rom name="invasion_earth.nas" size="17923" crc="82ed85b5" sha1="57c72690e400fc71b966768a44fee04d057e16b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invasion">
+		<description>Invasion</description>
+		<year>1980</year>
+		<publisher>Nascom Journal</publisher>
+		<info name="usage" value="Enter EF24 to start" />
+		<sharedfeat name="compatibility" value="NASCOM1"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="4063">
+				<rom name="invasion.nas" size="4063" crc="51d5d453" sha1="52024b8e8615c67569b8e388c12e4954a11b30e9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jailbrk">
+		<description>Jailbreak in Space</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E20EA to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="71685">
+				<rom name="jailbreak.nas" size="71685" crc="09aa8067" sha1="2459c490e0fc9b6e50edf6dca986b454c8f20432" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="life">
+		<description>Life</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="3363">
+				<rom name="life.nas" size="3363" crc="21fa02cd" sha1="011f6bb4990ed8c296040a7325123473cd8d49a7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lollypop">
+		<description>Lollypop Lady Trainer</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter E1000 (Nas-Sys 3 only) to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="3363">
+				<rom name="lollypop.nas" size="3363" crc="91abcb15" sha1="9c1b07cd6ddd0bd7de448518ccf61259f19f1d2b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordtime">
+		<description>Lords of Time</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="143363">
+				<rom name="lordtime.nas" size="143363" crc="54369479" sha1="6db894d3b8f9e23db5c868c2e5a95bc83c00438d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lumberja">
+		<description>Lumberjack</description>
+		<year>1980</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="35843">
+				<rom name="lumberjack.nas" size="35843" crc="ddafd1a7" sha1="e9c36401c8c5ff9d73a526b51c5a6a29613f7f23" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llander">
+		<description>Lunar Lander</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1E6A to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="4203">
+				<rom name="lunarlander.nas" size="4203" crc="faf86258" sha1="2e095c98d56040997b8291695e7f952033d81aa0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logichess">
+		<description>Logichess</description>
+		<year>1980</year>
+		<publisher>Blue Label Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="71683">
+				<rom name="logichess.nas" size="71683" crc="75475343" sha1="50181fc505b06ae6ef064f4c9943066cf89cfe32" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masterm">
+		<description>Double Mastermind</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter ED22 to start" />
+		<sharedfeat name="compatibility" value="NASCOM1"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="3468">
+				<rom name="masterm.nas" size="3468" crc="14fc1396" sha1="7275aa008a97ff93b1d6cd3b65b230977097dc74" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monster">
+		<description>Monster</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="36963">
+				<rom name="monster.nas" size="36963" crc="72470f5b" sha1="bf3f622c344b3fe29f99f37c41189f6981942fbe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonraid">
+		<description>Moon Raider</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM1,NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="22963">
+				<rom name="moon_raider.nas" size="22963" crc="acbed714" sha1="762d912b54239e70e3c2af028b03ce3ed7f9b07b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello">
+		<description>Othello</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter ED00 to start" />
+		<sharedfeat name="compatibility" value="NASCOM1"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="4028">
+				<rom name="othello.nas" size="4028" crc="66ebad30" sha1="02429c3df4d0c6668f2f762a385ca77a6e3a55d8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pac Man</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="26883">
+				<rom name="pacman.nas" size="26883" crc="7dd26ed7" sha1="c067f11ed660416a9ae462dd2b78e2e41f745735" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="packmann">
+		<description>Päck-Männ</description>
+		<year>1983</year>
+		<publisher>80-Bus Journal</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="38083">
+				<rom name="packman.nas" size="38083" crc="5fcce477" sha1="33ae83fce36bdd6c323ff808301be995059e2f70" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piranha">
+		<description>Piranha</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="10083">
+				<rom name="piranha.nas" size="10083" crc="e89ba8f2" sha1="c0934665d504ab86ecddcc89ece7b2e6c4755593" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="react">
+		<description>React</description>
+		<year>1979</year>
+		<publisher>INMC Software Library</publisher>
+		<info name="usage" value="Enter EC50 to start" />
+		<sharedfeat name="compatibility" value="NASCOM1"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="3812">
+				<rom name="react.nas" size="3812" crc="7629fb0c" sha1="d3364671deee9fd43e55bd65f120b0a5915cb02f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retneden">
+		<description>Return to Eden</description>
+		<year>1984</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="125443">
+				<rom name="eden.nas" size="125443" crc="0b8fa1f9" sha1="4d5ba95cf130f3810645d3566b861cc0e99c095f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revdros">
+		<description>Revenge of the Drosphila</description>
+		<year>1984</year>
+		<publisher>Garry Rowland</publisher>
+		<info name="usage" value="Enter E3123 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="52643">
+				<rom name="bananflu.nas" size="52643" crc="a3cc72b5" sha1="0f7fa89a72ca370671db55f78d7b8652adc35b3e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi">
+		<description>Reversi</description>
+		<year>198?</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="7843">
+				<rom name="reversi.nas" size="7843" crc="1da17911" sha1="97babdd368426847ec4557b0437cd9f55bd0bfeb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rubic">
+		<description>Rubic</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter EFD0 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="12883">
+				<rom name="rubic.nas" size="12883" crc="07ea546a" sha1="eec26e9e59c7b6563121c7aa8674e36676acd5ed" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon12">
+		<description>Sargon Chess v1.2</description>
+		<year>1981</year>
+		<publisher>Bits &amp; PC's</publisher>
+		<info name="usage" value="Enter E2FB8 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="53763">
+				<rom name="sargon12.nas" size="53763" crc="d6ed0e79" sha1="d37f18f4f74c4ddf512735e2bb4f874d2e3d777e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon13">
+		<description>Sargon Chess v1.3</description>
+		<year>1981</year>
+		<publisher>Bits &amp; PC's</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="32483">
+				<rom name="sargon13.nas" size="32483" crc="bb205022" sha1="f98a242035daf7d245d07832875bf5dd28c3a9ed" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="char" interface="nascom_char">
+			<dataarea name="char" size="17924">
+				<rom name="cgsargon.nas" size="17924" crc="5906fd29" sha1="4a1d6e96c62185e7424e2d87947c2b8137737c88" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serpent">
+		<description>Serpent</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="35878">
+				<rom name="serpent.nas" size="35878" crc="e0435228" sha1="4066624fe4eaf76f48e4029c6aee081cb6e0514e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snowball">
+		<description>Snowball</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="125443">
+				<rom name="snowball.nas" size="125443" crc="f2f79f58" sha1="c05e17c09ad992fa2dd5d2e45a3cdd3419f161d9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv">
+		<description>Space Invaders</description>
+		<year>1983</year>
+		<publisher>80-Bus Journal</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="14563">
+				<rom name="space_invaders.nas" size="14563" crc="136d9d92" sha1="a38f4b93fd5277d1c0254efdb0ef4b3e99f06349" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacewar">
+		<description>Spacewar</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 (Nas-Sys 3 only) to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="22403">
+				<rom name="spacewar.nas" size="22403" crc="4181f39f" sha1="ea9787a96add70024d4c23054bf746ef641cce46" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacezap">
+		<description>Space Zap</description>
+		<year>198?</year>
+		<publisher>Blue Label Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="71683">
+				<rom name="spacezap.nas" size="71683" crc="5e9c43eb" sha1="6d82d44338e0b13f1299283854cd8367fa929022" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcinvs">
+		<description>Space Invasion</description>
+		<year>1981</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="20163">
+				<rom name="space_invasion.nas" size="20163" crc="a9c6dffa" sha1="69ea785d8d672f4d851075bd64a20c66de81704c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfight" supported="no">
+		<description>Starfighters</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="14913">
+				<rom name="starfighters.nas" size="14913" crc="3abb6851" sha1="dcbe71b101667fc546919b164fbd2baa47b983ed" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surround">
+		<description>Level 9 Surround</description>
+		<year>1981</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="12323">
+				<rom name="surround.nas" size="12323" crc="e174054a" sha1="6dd76657b4aeb2b1ea0c995f47bf63dedc95e0ea" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tictacto">
+		<description>Tic-Tac-Toe</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="4483">
+				<rom name="tictactoe.nas" size="4483" crc="40de01af" sha1="864e898680ebaec6f4ccd73da850e8129e230c74" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Languages -->
+
+	<software name="blspascal">
+		<description>BLS Pascal V1.2</description>
+		<year>1981</year>
+		<publisher>Blue Label Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="53763">
+				<rom name="bls_pascal12.nas" size="53763" crc="f50f0293" sha1="3fa05599f322b5a54921012f26682279228ab9b3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphpac">
+		<description>Nas-Graphpac 1.0</description>
+		<year>1982</year>
+		<publisher>CCsoft</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="14563">
+				<rom name="graphpac.nas" size="14563" crc="b539c523" sha1="9f1a27ba8814a8958c3e8134a8bc4e20645aff43" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphedt">
+		<description>Graphics ROM Editor</description>
+		<year>1983</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="6933">
+				<rom name="graphedt.nas" size="6933" crc="90298c74" sha1="8eeae107d2493c1304c7ca5715c72a6b396b7bca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hforth">
+		<description>HullForth</description>
+		<year>1981</year>
+		<publisher>AFT Winfield &amp; PS Cain</publisher>
+		<info name="usage" value="Enter E1400 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="35843">
+				<rom name="hullforth.nas" size="35843" crc="e18777f4" sha1="c7cb30468c571dcc54506166c8e4fc0862bb6460" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpascal10">
+		<description>Hisoft Pascal 4 V1.0</description>
+		<year>1982</year>
+		<publisher>Hisoft</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="91843">
+				<rom name="hisoft_pascal10.nas" size="91843" crc="bb0c2b28" sha1="4edc53c12628aa7b7b5cd1df3852a96521c01a56" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpascal15">
+		<description>Hisoft Pascal 4 V1.5</description>
+		<year>1983</year>
+		<publisher>Hisoft</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="92333">
+				<rom name="hisoft_pascal15.nas" size="92333" crc="7b384508" sha1="d5c7db305a31e9a2f5d64ff62403f94776bd53e8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpascal20">
+		<description>Hisoft Pascal 4 V2.0</description>
+		<year>1983</year>
+		<publisher>Hisoft</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="94083">
+				<rom name="hisoft_pascal20.nas" size="94083" crc="8c2bf9f2" sha1="b6a46f2986dae3577e03bb71c4f59db87a87a369" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l9extbas">
+		<description>Extension Basic</description>
+		<year>1981</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="35843">
+				<rom name="l9extbasic.nas" size="35843" crc="c2f13fbe" sha1="a532be4b784f42884a5dfb872d9435ddab870197" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nforth">
+		<description>NAS-Forth V1.11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="41443">
+				<rom name="nasforth.nas" size="41443" crc="fe20d501" sha1="f4578ac51d808b45780304d14a48fca6762e4e7d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbasic">
+		<description>Nascom Extended Basic</description>
+		<year>1982</year>
+		<publisher>Crystal Electronics</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="59363">
+				<rom name="xbasic.nas" size="59363" crc="e82f4937" sha1="d69f6412fa6a8477b1b9f899faa947f2c70588ed" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xtal">
+		<description>Xtal Basic 2.2</description>
+		<year>1980</year>
+		<publisher>Crystal Electronics</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="37523">
+				<rom name="xtal.nas" size="37523" crc="00a63143" sha1="f868ea38eee708272041e09a3c172b9eaf431c88" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Assemblers -->
+
+	<software name="gener80">
+		<description>Gener-80</description>
+		<year>1983</year>
+		<publisher>Seven Stars Publishing</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="30243">
+				<rom name="gener80.nas" size="30243" crc="2147b550" sha1="1c0aac814eb91391c8d5c43c1781747b5a62ca47" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vtasm">
+		<description>V &amp; T Assembler</description>
+		<year>1980</year>
+		<publisher>V &amp; T Electronics</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="21913">
+				<rom name="vtasm.nas" size="21913" crc="3bab84a0" sha1="e3714ef515a031fcfe6bf0c5c2da68bbb79c539f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeap20">
+		<description>ZEAP 2.0</description>
+		<year>1980</year>
+		<publisher>Sigma Software</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="17923">
+				<rom name="zeap20.nas" size="17923" crc="6a22a1be" sha1="f0980af219d6ed9d03d54649ab8984bffc486d1f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Text Processors -->
+
+	<software name="nascalc">
+		<description>NAS-Calc</description>
+		<year>198?</year>
+		<publisher>Lucas Logic</publisher>
+		<info name="usage" value="Enter E5000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="8963">
+				<rom name="nascalc.nas" size="8963" crc="fece96a9" sha1="7e58c195e47ecc7ad5e7fb448a4574b295b3c532" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="naspen2">
+		<description>NAS-Pen 2.0</description>
+		<year>1982</year>
+		<publisher>Lucas Logic</publisher>
+		<info name="usage" value="Enter E8000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="17923">
+				<rom name="naspen2.nas" size="17923" crc="649c2d18" sha1="416c7e69fb1943463cc67fdbbd8aa84183e92bae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retrievr">
+		<description>Retriever 2</description>
+		<year>1981</year>
+		<publisher>AJ Bentley</publisher>
+		<info name="usage" value="Enter E1000 to start" />
+		<sharedfeat name="compatibility" value="NASCOM2"/>
+		<part name="snap" interface="nascom_snap">
+			<dataarea name="snap" size="17993">
+				<rom name="retriever2.nas" size="17993" crc="342185fe" sha1="72a7068b0b262b4570ccde23f25805bf269c3b69" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1023,44 +1023,43 @@ void psikyo_state::machine_reset()
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(psikyo_state::sngkace)
-
+void psikyo_state::sngkace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sngkace_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	M68EC020(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::sngkace_map);
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sngkace_sound_map)
-	MCFG_DEVICE_IO_MAP(sngkace_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/8); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::sngkace_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::sngkace_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.3)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.3);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,sngkace)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(32'000'000)/4) /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4)); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
+}
 
 
 
@@ -1069,81 +1068,79 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(psikyo_state::gunbird)
-
+void psikyo_state::gunbird(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(gunbird_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	M68EC020(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_map);
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ! LZ8420M (Z80 core) ! */
-	MCFG_DEVICE_PROGRAM_MAP(gunbird_sound_map)
-	MCFG_DEVICE_IO_MAP(gunbird_sound_io_map)
+	Z80(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::gunbird_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.3)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.3);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono",  1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
+}
 
-MACHINE_CONFIG_START(psikyo_state::s1945jn)
+void psikyo_state::s1945jn(machine_config &config)
+{
 	gunbird(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(s1945jn_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945jn_map);
+}
 
-MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
-
+void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(psikyo_bootleg_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	M68EC020(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::psikyo_bootleg_map);
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.3)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo_bootleg)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.3);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo_bootleg));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // ?? clock
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW); // ?? clock
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &psikyo_state::s1945bl_oki_map);
+}
 
 
 
@@ -1151,48 +1148,45 @@ MACHINE_CONFIG_END
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-
-MACHINE_CONFIG_START(psikyo_state::s1945)
-
+void psikyo_state::s1945(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(s1945_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	M68EC020(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ! LZ8420M (Z80 core) ! */
-	MCFG_DEVICE_PROGRAM_MAP(gunbird_sound_map)
-	MCFG_DEVICE_IO_MAP(s1945_sound_io_map)
+	Z80(config, m_audiocpu, 4000000);  /* ! LZ8420M (Z80 core) ! */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &psikyo_state::s1945_sound_io_map);
 
-	MCFG_DEVICE_ADD("mcu", PIC16C57, 4000000)  /* 4 MHz? */
-	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
+	PIC16C57(config, "mcu", 4000000).set_disable();  /* 4 MHz? */ /* Internal ROM is't dumped */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.90)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.90);    /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK));
+	ymf.irq_handler().set_inputline("audiocpu", 0);
+	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
+}
 
 
 /***************************************************************************
@@ -1610,11 +1604,11 @@ Notes:
       HA1388   - Hitachi HA1388 Sound Amp
       2058D    - JRC 2058 Op Amp
       U61, U34,\
-      U20, U21,- 16M MASKROM (SOP44)
+      U20, U21,- 16M mask ROM (SOP44)
       U22, U23 /
-      U1       - 4M MASKROM (SOP44)
+      U1       - 4M mask ROM (SOP44)
       VOL      - Master Volume Potentiometer
-      *        - Unpopulated position for 16M SOP44 MASKROM
+      *        - Unpopulated position for 16M SOP44 mask ROM
 
 
 CPU:    MC68EC020FG16

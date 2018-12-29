@@ -45,16 +45,17 @@ static void drives(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mufdc_device::device_add_mconfig)
-	MCFG_MCS3201_ADD("fdc")
-	MCFG_MCS3201_INPUT_HANDLER(READ8(*this, mufdc_device, fdc_input_r))
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, mufdc_device, fdc_irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, mufdc_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", drives, "35hd", mufdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", drives, "35hd", mufdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", drives, nullptr, mufdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", drives, nullptr, mufdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void mufdc_device::device_add_mconfig(machine_config &config)
+{
+	mcs3201_device &mcs3201(MCS3201(config, m_fdc, 24_MHz_XTAL));
+	mcs3201.input_handler().set(FUNC(mufdc_device::fdc_input_r));
+	mcs3201.intrq_wr_callback().set(FUNC(mufdc_device::fdc_irq_w));
+	mcs3201.drq_wr_callback().set(FUNC(mufdc_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", drives, "35hd", mufdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", drives, "35hd", mufdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", drives, nullptr, mufdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", drives, nullptr, mufdc_device::floppy_formats);
+}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

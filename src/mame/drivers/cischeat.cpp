@@ -1979,29 +1979,28 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigrun)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x4000/2);
+	m_palette->enable_shadows();
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x0e00/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 0x1600/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x3600/2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x0e00/2);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 0x1600/2);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x3600/2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
+	GENERIC_LATCH_16(config, m_soundlatch);
+	GENERIC_LATCH_16(config, m_soundlatch2);
 
 	// TODO: all sound frequencies unverified (assume same as Mega System 1)
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 7000000/2)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, cischeat_state,sound_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 7000000/2));
+	ymsnd.irq_handler().set(FUNC(cischeat_state::sound_irq));
+	ymsnd.add_route(0, "lspeaker", 0.50);
+	ymsnd.add_route(1, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
@@ -2035,19 +2034,16 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cischeat)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 
-	MCFG_DEVICE_MODIFY("scroll0")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x1c00/2)
-	MCFG_MEGASYS1_TILEMAP_BITS_PER_COLOR_CODE(5)
-	MCFG_DEVICE_MODIFY("scroll1")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x2c00/2)
-	MCFG_MEGASYS1_TILEMAP_BITS_PER_COLOR_CODE(5)
-	MCFG_DEVICE_MODIFY("scroll2")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x6c00/2)
-	MCFG_MEGASYS1_TILEMAP_BITS_PER_COLOR_CODE(5)
+	m_tmap[0]->set_colorbase(0x1c00/2);
+	m_tmap[0]->set_bits_per_color_code(5);
+
+	m_tmap[1]->set_colorbase(0x2c00/2);
+	m_tmap[1]->set_bits_per_color_code(5);
+
+	m_tmap[2]->set_colorbase(0x6c00/2);
+	m_tmap[2]->set_bits_per_color_code(5);
 MACHINE_CONFIG_END
 
 
@@ -2072,16 +2068,13 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gpstar)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 
-	MCFG_DEVICE_MODIFY("scroll0")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x1e00/2)
-	MCFG_DEVICE_MODIFY("scroll1")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x2e00/2)
-	MCFG_DEVICE_MODIFY("scroll2")
-	MCFG_MEGASYS1_TILEMAP_COLORBASE(0x6e00/2)
+	m_tmap[0]->set_colorbase(0x1e00/2);
+
+	m_tmap[1]->set_colorbase(0x2e00/2);
+
+	m_tmap[2]->set_colorbase(0x6e00/2);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_f1gpstar)
@@ -2142,7 +2135,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2152,15 +2145,14 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
+	m_palette->enable_shadows();
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x1e00/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x1e00/2);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2233,8 +2225,8 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	WATCHDOG_TIMER(config, m_watchdog);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2247,12 +2239,11 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
+	m_palette->enable_shadows();
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 0x1e00/2)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x1e00/2);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
 	MCFG_TIMER_ADD_NONE("motor_left")
@@ -2700,6 +2691,90 @@ GFX & Misc       - GS90015-02 (100 pin PQFP),  uses ROM 90015-31-R56
 
 ROM_START( f1gpstar )
 	ROM_REGION( 0x100000, "cpu1", 0 )
+	ROM_LOAD16_BYTE( "gp9188a27ver4.0.bin", 0x000000, 0x040000, CRC(47224c65) SHA1(1b09fe93b1896cf0706d4914ef956480c1ca231f) )
+	ROM_LOAD16_BYTE( "gp9188a22ver4.0.bin", 0x000001, 0x040000, CRC(05ca6410) SHA1(3b8bfd1702c43c398bffda6931e5575110cc5962) )
+
+	ROM_REGION( 0x80000, "cpu2", 0 )
+	/* Should Use ROMs: 90015-01.W06, 90015-02.W07, 90015-03.W08, 90015-04.W09 */
+	ROM_LOAD16_BYTE( "9188a-16.v10",  0x000000, 0x020000, CRC(ef0f7ca9) SHA1(98ad687fdab67dd9f54b50cf21fd10ac34b61e7a) )
+	ROM_LOAD16_BYTE( "9188a-11.v10",  0x000001, 0x020000, CRC(de292ea3) SHA1(04ed19045edb4edfff2b8fedac37c4a3352dfa76) )
+
+	ROM_REGION( 0x80000, "cpu3", 0 )
+	/* Should Use ROMs: 90015-01.W06, 90015-02.W07, 90015-03.W08, 90015-04.W09 */
+	ROM_LOAD16_BYTE( "9188a-6.v10",  0x000000, 0x020000, CRC(18ba0340) SHA1(e46e10a350f18cf3a46c0d3a0cb08fc369fced6d) )
+	ROM_LOAD16_BYTE( "9188a-1.v10",  0x000001, 0x020000, CRC(109d2913) SHA1(e117556481e801d51b8526a143bc202dda222f7f) )
+
+	ROM_REGION( 0x40000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "9190a-2.v11", 0x000000, 0x020000, CRC(acb2fd80) SHA1(bbed505ce745490ae11df8efdd3633181cfd4dec) )
+	ROM_LOAD16_BYTE( "9190a-1.v11", 0x000001, 0x020000, CRC(7cccadaf) SHA1(d1b79fbd0e27e8d479ef533fa00b18d1f2982dda) )
+
+	ROM_REGION16_BE( 0x80000, "user1", 0 )  /* second halves of program ROMs */
+	ROM_LOAD16_BYTE( "9188a-26.v10", 0x000000, 0x040000, CRC(0b76673f) SHA1(cf29333ffb51250ae2d5363d612260f536cd15af) ) // cpu #1
+	ROM_LOAD16_BYTE( "9188a-21.v10", 0x000001, 0x040000, CRC(3e098d77) SHA1(0bf7e8ca36086a7ae3d44a10b4ca43f869403eb0) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 )
+	ROM_LOAD( "90015-31.r56",  0x000000, 0x080000, CRC(0c8f0e2b) SHA1(6b0917a632c6beaca018146b6be66a3561b863b3) ) // scroll 0
+
+	ROM_REGION( 0x080000, "scroll1", 0 )
+	ROM_LOAD( "90015-32.r57",  0x000000, 0x080000, CRC(9c921cfb) SHA1(006d4af6dbbc34bee05f3620ba0a947a568a2400) ) // scroll 1
+
+	ROM_REGION( 0x020000, "scroll2", 0 )
+	ROM_LOAD( "9188a-30.v10",  0x000000, 0x020000, CRC(0ef1fbf1) SHA1(28fa0b677e70833954a5fc2fdce233d0dec4f43c) ) // scroll 2
+
+	ROM_REGION( 0x500000, "sprites", 0 )   /* sprites */
+	ROM_LOAD16_BYTE( "90015-21.r46",  0x000000, 0x080000, CRC(6f30211f) SHA1(aedba39fc6aab7847a3a2314e152bc00615cbd72) )
+	ROM_LOAD16_BYTE( "90015-22.r47",  0x000001, 0x080000, CRC(05a9a5da) SHA1(807c43c3ee76bce8e4874fa51d2453917b1e4f3b) )
+	ROM_LOAD16_BYTE( "90015-23.r48",  0x100000, 0x080000, CRC(58e9c6d2) SHA1(b81208819dbc5887183855001c72d0d91d32fc4b) )
+	ROM_LOAD16_BYTE( "90015-24.r49",  0x100001, 0x080000, CRC(abd6c91d) SHA1(ccbf47a37008a0ec64d7058225e6ba991b559a39) )
+	ROM_LOAD16_BYTE( "90015-25.r50",  0x200000, 0x080000, CRC(7ded911f) SHA1(d0083c17266f03f70f2d4b2953237fed0cb0696c) )
+	ROM_LOAD16_BYTE( "90015-26.r51",  0x200001, 0x080000, CRC(18a6c663) SHA1(b39cbb4b6d09150c7d1a8cf2cd3a96b61c265d83) )
+	ROM_LOAD16_BYTE( "90015-27.r52",  0x300000, 0x080000, CRC(7378c82f) SHA1(3e65064a36393b5d6ecb118a560f3fccc5b3c3c2) )
+	ROM_LOAD16_BYTE( "90015-28.r53",  0x300001, 0x080000, CRC(9944dacd) SHA1(722a0c152ef97830d5ab6251d5447293d951261f) )
+	ROM_LOAD16_BYTE( "90015-29.r54",  0x400000, 0x080000, CRC(2cdec370) SHA1(9fd8e8d6783a6c820d1f580a8872b5cc59641aa9) )
+	ROM_LOAD16_BYTE( "90015-30.r55",  0x400001, 0x080000, CRC(47e37604) SHA1(114eb01d3258bf481c01a8378f5f08b2bdeffbba) )
+
+	ROM_REGION( 0x200000, "road0", 0 )
+	ROM_LOAD( "90015-05.w10",  0x000000, 0x080000, CRC(8eb48a23) SHA1(e394eb013dd1fdc1c30616ce356bebd187453d08) ) // Road 0
+	ROM_LOAD( "90015-06.w11",  0x080000, 0x080000, CRC(32063a68) SHA1(587d35edec2755df11f4d63ff7bfd134a0f9fb36) )
+	ROM_LOAD( "90015-07.w12",  0x100000, 0x080000, CRC(0d0d54f3) SHA1(8040945ea8f9487f0527140c90d6a66965c27ff4) )
+	ROM_LOAD( "90015-08.w14",  0x180000, 0x080000, CRC(f48a42c5) SHA1(5caf50fbde682d7d1e4ec0cceacf0db7682b72a9) )
+
+	ROM_REGION( 0x100000, "road1", 0 )
+	ROM_LOAD( "90015-09.w13",  0x000000, 0x080000, CRC(55f49315) SHA1(ad338cb53149ccea2dbe5ad890433c9f09a8211c) ) // Road 1
+	ROM_LOAD( "90015-10.w15",  0x080000, 0x080000, CRC(678be0cb) SHA1(3857b549170b62b29644cf5ebdd4aac1afa9e420) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )    /* samples */
+	ROM_LOAD( "90015-34.w32", 0x000000, 0x080000, CRC(2ca9b062) SHA1(c01b8020b409d826c0ae69c153fdc5d89241771e) ) // 2 x 0x40000
+
+	ROM_REGION( 0x80000, "oki2", 0 )    /* samples */
+	ROM_LOAD( "90015-33.w31", 0x000000, 0x080000, CRC(6121d247) SHA1(213c7c45bc3d57c09778b1d58dbb5fe26d0b2477) ) // 2 x 0x40000
+
+	ROM_REGION( 0x80000, "user2", 0 )       /* ? Unused ROMs ? */
+// "I know that one of the ROM images in the archive looks bad (90015-04.W09)
+//  however, it is good as far as I can tell. There were two of those ROMs
+// (soldered) onto the board and I checked them both against each other. "
+
+	ROM_LOAD( "90015-04.w09",  0x000000, 0x080000, CRC(5b324c81) SHA1(ce61f2ea29086a74bdcf9f4df8e2edb749e41da5) )   // x 2 xxxxxxxxx0xxxxxxxxx = 0x00
+	ROM_LOAD( "90015-03.w08",  0x000000, 0x080000, CRC(ccf5b158) SHA1(06250762646e0da1fb71fd7b638492eaab3f5b7f) )   // x 2 FIXED BITS (000x000x)
+	ROM_LOAD( "90015-02.w07",  0x000000, 0x080000, CRC(fcbecc9b) SHA1(0670c276730ee282ef8c9599c00571b8d97725ab) )   // x 2
+	ROM_LOAD( "90015-01.w06",  0x000000, 0x080000, CRC(ce4bfe6e) SHA1(d428eb3d5da3bd080957c585c5b72b94a7849fca) )   // x 2 FIXED BITS (000x000x)
+
+	ROM_LOAD( "90015-20.r45",  0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) ) // x 2
+
+	ROM_LOAD( "ch9072-4",  0x000000, 0x001000, CRC(5bc23535) SHA1(2fd1b7184175c416b19e6570de7ecb0d897deb9a) )   // FIXED BITS (0000000x)
+	ROM_LOAD( "ch9072-5",  0x000000, 0x001000, CRC(0efac5b4) SHA1(a3e945aaf142bb62e0e791b8ca49a34891f31077) )   // FIXED BITS (xxxx0xxx)
+	ROM_LOAD( "ch9072-6",  0x000000, 0x001000, CRC(76ff63c5) SHA1(652754533cc14773f4d7590a65183349eed9eb62) )
+	ROM_LOAD( "ch9072-8",  0x000000, 0x001000, CRC(ca04bace) SHA1(3771ef4bf7983e97e3346309fcb0271e17a6d359) )   // FIXED BITS (0xxx0xxx)
+
+	ROM_LOAD( "pr88004q",  0x000000, 0x000200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) )   // FIXED BITS (1xxxxxxx1111x1xx)
+	ROM_LOAD( "pr88004w",  0x000000, 0x000100, CRC(3d648467) SHA1(bf8dbaa2176c801f7370313425c87f0eefe8a3a4) )   // FIXED BITS (00xxxxxx)
+
+	ROM_LOAD( "pr90015a",  0x000000, 0x000800, CRC(777583db) SHA1(8fd060a68fbb6156feb55afcfc5afd95999a8a62) )   // FIXED BITS (00000xxx0000xxxx)
+	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
+ROM_END
+
+ROM_START( f1gpstar3 )
+	ROM_REGION( 0x100000, "cpu1", 0 )
 	ROM_LOAD16_BYTE( "gp9188a27ver3.0.ic125", 0x000000, 0x040000, CRC(e3ab0085) SHA1(c2de842f427d5e982a42467ca7354b728f63bf88) )
 	ROM_LOAD16_BYTE( "gp9188a22ver3.0.ic92",  0x000001, 0x040000, CRC(7022061b) SHA1(241261f79072f09dbc325185e8e5b039c592a491) )
 
@@ -2782,7 +2857,7 @@ ROM_START( f1gpstar )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-ROM_START( f1gpstaro )
+ROM_START( f1gpstar2 )
 	ROM_REGION( 0x100000, "cpu1", 0 )
 	ROM_LOAD16_BYTE( "9188a-27.v20", 0x000000, 0x040000, CRC(0a9d3896) SHA1(5e3332a1b779dead1e4f9ef274a2f168721db0ed) )
 	ROM_LOAD16_BYTE( "9188a-22.v20", 0x000001, 0x040000, CRC(de15c9ca) SHA1(f356b02ca66b7e8ab0293e6e28fcd3f7996c80c8) )
@@ -3424,10 +3499,10 @@ Notes:
       ROMs -
             PR88004Q_8.IC102      - 82S147 PROM
             AC91106_VER1.2_7.IC99 - 27C010 EPROM
-            MR91042007-R66_6.IC95 - 4M MASKROM
+            MR91042007-R66_6.IC95 - 4M mask ROM
             AC91106_VER1.7_4.IC63 - 27C010 EPROM
             AC91106_VER1.7_3.IC62 - 27C010 EPROM
-            MR91042-08_2.IC57     - 4M MASKROM
+            MR91042-08_2.IC57     - 4M mask ROM
             AC91106_VER1.2_1.IC56 - 27C4001 EPROM
             PR91042_5.IC91        - 82S129 PROM
 
@@ -3483,18 +3558,63 @@ Notes:
             CH9072-5_11.IC33      - Atmel AT27HC642R
             CH9072-6_12.IC35      - Atmel AT27HC642R
             CH9072-8_15.IC59      - Atmel AT27HC642R
-            MR90015-35-W33_14.IC54- 4M MASKROM  \
-            MR90015-35-W33_17.IC67- 4M MASKROM  / Contain same data
-            MR91042-01-R60_1.IC1  - 4M MASKROM
-            MR91042-02-R61_2.IC2  - 4M MASKROM
-            MR91042-03-R62_3.IC5  - 4M MASKROM
-            MR91042-04-R63_4.IC6  - 4M MASKROM
-            MR91042-05-R64_5.IC11 - 4M MASKROM
-            MR91042-06-R65_6.IC12 - 4M MASKROM
+            MR90015-35-W33_14.IC54- 4M mask ROM  \
+            MR90015-35-W33_17.IC67- 4M mask ROM  / Contain same data
+            MR91042-01-R60_1.IC1  - 4M mask ROM
+            MR91042-02-R61_2.IC2  - 4M mask ROM
+            MR91042-03-R62_3.IC5  - 4M mask ROM
+            MR91042-04-R63_4.IC6  - 4M mask ROM
+            MR91042-05-R64_5.IC11 - 4M mask ROM
+            MR91042-06-R65_6.IC12 - 4M mask ROM
 
 ***************************************************************************/
 
 ROM_START( armchmp2 )
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD16_BYTE( "4_ver_2.7.ic63", 0x000000, 0x020000, CRC(e0cec032) SHA1(743b022b6de3efb045c4f1cca49caed0259ccfff) ) // same rom contents as ver 2.6, it appears to be correct;
+	ROM_LOAD16_BYTE( "3_ver_2.7.ic62", 0x000001, 0x020000, CRC(44186a37) SHA1(d21fbba11e9c82f48de2a699011ca7f3b90061ba) ) // modifications are in data area, where upper bytes are 00
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "mr91042-07-r66_6.ic95",  0x000000, 0x080000, CRC(d1be8699) SHA1(67563761f95892b08c7113ab1c52ab5aa7118fb8) )
+
+//  ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+//  UNUSED
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "ac91106_ver1.2_7.ic99", 0x000000, 0x020000, CRC(09755aef) SHA1(39c901fb9408a0ba488f0112d7f48b929b092e3b) )
+
+	ROM_REGION( 0x300000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "mr91042-01-r60_1.ic1",  0x000000, 0x080000, CRC(fdfe6951) SHA1(ba6c5cd5d16fdca6f131302b19e621f8abe8136a) )
+	ROM_LOAD16_BYTE( "mr91042-02-r61_2.ic2",  0x000001, 0x080000, CRC(2e6c8b30) SHA1(70503fec251606b37fea2c7f91e682aece252035) )
+	ROM_LOAD16_BYTE( "mr91042-03-r62_3.ic5",  0x100000, 0x080000, CRC(07ba6d3a) SHA1(9c58e3a1931b593448c53a59e7f5b9aaac40ff88) )
+	ROM_LOAD16_BYTE( "mr91042-04-r63_4.ic6",  0x100001, 0x080000, CRC(f37cb12c) SHA1(282ebbd795284d7efa335b797ca1eedc1110e9da) )
+	ROM_LOAD16_BYTE( "mr91042-05-r64_5.ic11", 0x200000, 0x080000, CRC(7a3bb52d) SHA1(7f9d1dad4c89e6b55415b082363bc261115e9f96) )
+	ROM_LOAD16_BYTE( "mr91042-06-r65_6.ic12", 0x200001, 0x080000, CRC(5312a4f2) SHA1(4dcd2839bb5acccecf1eb6c0e19e877a0cff6875) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )       /* Samples (4x40000) */
+	ROM_LOAD( "mr91042-08_2.ic57",     0x000000, 0x080000, CRC(dc015f6c) SHA1(9d0677c50a25be1d11d43e54dbf3005f18b79b66) )
+	ROM_RELOAD(                        0x080000, 0x080000 )
+
+	ROM_REGION( 0x100000, "oki2", 0 )       /* Samples (4x40000) */
+	ROM_LOAD( "ac-91106v2.0_1.ic56", 0x000000, 0x080000, CRC(0ff5cbcf) SHA1(25ef8d67749ca78afc4c13a31b3f7a87284947c1) )
+	ROM_RELOAD(                        0x080000, 0x080000 )
+
+	ROM_REGION( 0x80000, "user2", 0 )       /* ? Unused ROMs ? */
+	ROM_LOAD( "ch9072-4_13.ic39", 0x000000, 0x002000, CRC(b45b4dc0) SHA1(b9fae0c9ac2d40f0a202c538d866d5f2941ba8dd) )
+	ROM_LOAD( "ch9072-5_11.ic33", 0x000000, 0x002000, CRC(e122916b) SHA1(86d5ecc7ecc6f175ecb28459697ef33e1ee06860) )
+	ROM_LOAD( "ch9072-6_12.ic35", 0x000000, 0x002000, CRC(05d95bf7) SHA1(78181cf71f22c090a1e62823a43757353a9ef6ab) )
+	ROM_LOAD( "ch9072-8_15.ic59", 0x000000, 0x002000, CRC(6bf52596) SHA1(bf4e7e7df3daae4aa6a441b58b15a435aa45630e) )
+
+	ROM_LOAD( "mr90015-35-w33_17.ic67", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
+	ROM_LOAD( "mr90015-35-w33_14.ic54", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
+
+	ROM_LOAD( "pr88004q_8.ic102", 0x000000, 0x000200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) )
+	ROM_LOAD( "pr88004w_16.ic66", 0x000000, 0x000100, CRC(3d648467) SHA1(bf8dbaa2176c801f7370313425c87f0eefe8a3a4) )
+
+	ROM_LOAD( "pr91042_5.ic91", 0x000000, 0x000100, CRC(e71de4aa) SHA1(d06e5a35ad2127df2d6328cce153073380ee7819) )
+ROM_END
+
+ROM_START( armchmp2o2 )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* Main CPU Code */
 	ROM_LOAD16_BYTE( "ac-91106v2.6_4.ic63", 0x000000, 0x020000, CRC(e0cec032) SHA1(743b022b6de3efb045c4f1cca49caed0259ccfff) )
 	ROM_LOAD16_BYTE( "ac-91106v2.6_3.ic62", 0x000001, 0x020000, CRC(5de6da19) SHA1(1f46056596924789394ad2d99ec2d7fcb7845d3c) )
@@ -3654,12 +3774,14 @@ void cischeat_state::init_captflag()
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)",  MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_NODEVICE_LAN, layout_cischeat ) // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
-GAMEL( 1991, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstaro, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1992, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 4.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar3, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 3.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstar2, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (ver 2.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.7)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o2,armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 2.6)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II (ver 1.7)",       MACHINE_IMPERFECT_GRAPHICS )
 GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,  init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
 GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 GAME(  1993, captflag,  0,        captflag, captflag, cischeat_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )

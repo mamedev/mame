@@ -47,7 +47,6 @@ To do:
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs51/mcs51.h"
 #include "machine/deco222.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
@@ -1959,9 +1958,9 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -1973,15 +1972,14 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2007,13 +2005,13 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_DEVICE_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, shackled_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // needs heavy sync, otherwise one of the two CPUs will miss an irq and makes the game to hang
@@ -2024,9 +2022,9 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2038,15 +2036,14 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2069,20 +2066,20 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_DEVICE_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(58);
@@ -2098,15 +2095,14 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2129,20 +2125,20 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_DEVICE_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(58);
@@ -2158,15 +2154,14 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2189,24 +2184,24 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, 3000000*4)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, 3000000*4);
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(dec8_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::gondo_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(58);
@@ -2220,13 +2215,15 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	screen.set_palette("palette");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ghostb)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2263,9 +2260,9 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
+	m_spritegen_krn->set_gfx_region(1);
+	m_spritegen_krn->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2278,15 +2275,14 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2324,13 +2320,13 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_MXC06(config, m_spritegen_mxc, 0);
+	m_spritegen_mxc->set_gfx_region(1);
+	m_spritegen_mxc->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2342,16 +2338,15 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oscar)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::NMI_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2374,11 +2369,11 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* unknown frequency */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, srdarwin_mcu_to_main_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+	I8751(config, m_mcu, XTAL(8'000'000)); /* unknown frequency */
+	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
+	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::srdarwin_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 
@@ -2396,15 +2391,14 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srdarwin)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(144)
+	DECO_RMC3(config, m_palette, 0, 144); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2430,17 +2424,17 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(3, 3, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(3, 3, 0);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
+	DECO_MXC06(config, m_spritegen_mxc, 0);
+	m_spritegen_mxc->set_gfx_region(1);
+	m_spritegen_mxc->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2453,15 +2447,14 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cobracom)
-	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_DECO_RMC3_SET_PALETTE_SIZE(256)
+	DECO_RMC3(config, m_palette, 0, 256); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.53)
@@ -3173,7 +3166,7 @@ There is a small piggyback attached under CPUs PCB full of 74Sxx
 
 This boards looks like a legit PCB from Data East, even if a Data East logo is not present.
 
-ALL MEMORIES ARE MASKROMS!
+ALL MEMORIES ARE MASK ROMS!
 
 */
 ROM_START( meikyuha )

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Phil Stroffolino, Bryan McPhail
+#ifndef MAME_INCLUDES_SHOOTOUT_H
+#define MAME_INCLUDES_SHOOTOUT_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class shootout_state : public driver_device
 {
 public:
-	shootout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shootout_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -16,7 +20,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
-		m_videoram(*this, "videoram")  { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void shootouj(machine_config &config);
 	void shootouk(machine_config &config);
@@ -53,7 +58,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(shootout);
+	void shootout_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -66,3 +71,5 @@ private:
 	void shootout_map(address_map &map);
 	void shootout_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SHOOTOUT_H

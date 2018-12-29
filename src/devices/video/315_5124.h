@@ -54,11 +54,14 @@ public:
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
-	void set_signal_type(bool is_pal) { m_is_pal = is_pal; }
+	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
 	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_csync_callback(Object &&cb) { return m_csync_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pause_callback(Object &&cb) { return m_pause_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_int_cb.bind(); }
+	auto csync() { return m_csync_cb.bind(); }
+	auto pause() { return m_pause_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( data_read );
 	DECLARE_WRITE8_MEMBER( data_write );
@@ -66,8 +69,6 @@ public:
 	DECLARE_WRITE8_MEMBER( control_write );
 	DECLARE_READ8_MEMBER( vcount_read );
 	DECLARE_READ8_MEMBER( hcount_read );
-
-	DECLARE_PALETTE_INIT( sega315_5124 );
 
 	void hcount_latch() { hcount_latch_at_hpos(screen().hpos()); };
 	void hcount_latch_at_hpos(int hpos);
@@ -80,7 +81,6 @@ public:
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) { }
 
-	void sega315_5124(address_map &map);
 protected:
 	static constexpr unsigned SEGA315_5377_CRAM_SIZE        = 0x40; /* 32 colors x 2 bytes per color = 64 bytes */
 	static constexpr unsigned SEGA315_5124_CRAM_SIZE        = 0x20; /* 32 colors x 1 bytes per color = 32 bytes */
@@ -93,6 +93,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual space_config_vector memory_space_config() const override;
+
+	void sega315_5124_palette(palette_device &palette) const;
+
+	void sega315_5124(address_map &map);
 
 	void set_display_settings();
 	void set_frame_timing();
@@ -107,11 +111,10 @@ protected:
 	virtual void sprite_count_overflow(int line, int sprite_index);
 	virtual void draw_scanline(int pixel_offset_x, int pixel_plot_y, int line);
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line);
-	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line);
+	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line);
 	virtual uint16_t name_table_row_mode4(int row);
 	virtual uint16_t sprite_attributes_addr_mode4(uint16_t base);
 	virtual uint8_t sprite_tile_mask_mode4(uint8_t tile_number);
-	virtual int select_sprite_tile_mode4(int sprite_index, int sprite_line);
 	void process_line_timer();
 	void draw_scanline_mode4(int *line_buffer, int *priority_selected, int line);
 	void draw_sprites_mode4(int *line_buffer, int *priority_selected, int line);
@@ -124,42 +127,42 @@ protected:
 
 	void vdp_postload();
 
-	uint8_t            m_reg[16];                  /* All the registers */
-	uint8_t            m_status;                   /* Status register */
-	uint8_t            m_pending_status;           /* Pending status flags */
-	uint8_t            m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
-	uint8_t            m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
-	uint8_t            m_addrmode;                 /* Type of VDP action */
-	uint16_t           m_addr;                     /* Contents of internal VDP address register */
-	const uint8_t      m_cram_size;                /* CRAM size */
-	uint8_t            m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
-	bool               m_cram_dirty;               /* Have there been any changes to the CRAM area */
-	bool               m_hint_occurred;
-	bool               m_pending_hint;
-	bool               m_pending_control_write;
-	int                m_pending_sprcol_x;
-	uint8_t            m_buffer;
-	uint8_t            m_control_write_data_latch;
+	uint8_t          m_reg[16];                  /* All the registers */
+	uint8_t          m_status;                   /* Status register */
+	uint8_t          m_pending_status;           /* Pending status flags */
+	uint8_t          m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
+	uint8_t          m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
+	uint8_t          m_addrmode;                 /* Type of VDP action */
+	uint16_t         m_addr;                     /* Contents of internal VDP address register */
+	const uint8_t    m_cram_size;                /* CRAM size */
+	uint8_t          m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
+	bool             m_cram_dirty;               /* Have there been any changes to the CRAM area */
+	bool             m_hint_occurred;
+	bool             m_pending_hint;
+	bool             m_pending_control_write;
+	int              m_pending_sprcol_x;
+	uint8_t          m_buffer;
+	uint8_t          m_control_write_data_latch;
 	bool             m_sega315_5124_compatibility_mode;    /* when true, GG VDP behaves as SMS VDP */
 	int              m_irq_state;                /* The status of the IRQ line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	int              m_draw_time;
-	uint8_t            m_line_counter;
-	uint8_t            m_hcounter;
-	uint8_t            m_CRAM[SEGA315_5377_CRAM_SIZE];  /* CRAM */
-	const uint8_t      *m_frame_timing;
-	const uint8_t      *m_line_timing;
+	uint8_t          m_line_counter;
+	uint8_t          m_hcounter;
+	uint8_t          m_CRAM[SEGA315_5377_CRAM_SIZE];  /* CRAM */
+	const uint8_t    *m_frame_timing;
+	const uint8_t    *m_line_timing;
 	bitmap_rgb32     m_tmpbitmap;
 	bitmap_ind8      m_y1_bitmap;
-	const uint8_t      m_palette_offset;
-	const uint8_t      m_reg_num_mask;
+	const uint8_t    m_palette_offset;
+	const uint8_t    m_reg_num_mask;
 	bool             m_display_disabled;
-	uint16_t           m_sprite_base;
-	uint16_t           m_sprite_pattern_line[8];
+	uint16_t         m_sprite_base;
+	uint16_t         m_sprite_pattern_line[8];
 	int              m_sprite_tile_selected[8];
 	int              m_sprite_x[8];
-	uint8_t            m_sprite_flags[8];
+	uint8_t          m_sprite_flags[8];
 	int              m_sprite_count;
 	int              m_sprite_height;
 	int              m_sprite_zoom_scale;
@@ -223,10 +226,10 @@ protected:
 
 	virtual void update_palette() override;
 	virtual void cram_write(uint8_t data) override;
-	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line ) override;
+	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line) override;
 
 private:
-	DECLARE_PALETTE_INIT( sega315_5377 );
+	void sega315_5377_palette(palette_device &palette) const;
 };
 
 
@@ -246,7 +249,7 @@ protected:
 	virtual void sprite_count_overflow(int line, int sprite_index) override;
 	virtual void select_display_mode() override;
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
-	virtual void draw_column0_x_scroll_mode4(int *line_buffer, int *priority_selected, int x_scroll_fine_adjust, int palette_selected, int tile_line) override;
+	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line) override;
 };
 
 
@@ -257,7 +260,7 @@ protected:
 #define MCFG_SEGA315_5124_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_SEGA315_5124_IS_PAL(_bool) \
-	downcast<sega315_5124_device &>(*device).set_signal_type(_bool);
+	downcast<sega315_5124_device &>(*device).set_is_pal(_bool);
 
 #define MCFG_SEGA315_5124_INT_CB(_devcb) \
 	downcast<sega315_5124_device &>(*device).set_int_callback(DEVCB_##_devcb);
@@ -272,7 +275,7 @@ protected:
 #define MCFG_SEGA315_5246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_SEGA315_5246_IS_PAL(_bool) \
-	downcast<sega315_5246_device &>(*device).set_signal_type(_bool);
+	downcast<sega315_5246_device &>(*device).set_is_pal(_bool);
 
 #define MCFG_SEGA315_5246_INT_CB(_devcb) \
 	downcast<sega315_5246_device &>(*device).set_int_callback(DEVCB_##_devcb);
@@ -287,7 +290,7 @@ protected:
 #define MCFG_SEGA315_5377_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_SEGA315_5377_IS_PAL(_bool) \
-	downcast<sega315_5377_device &>(*device).set_signal_type(_bool);
+	downcast<sega315_5377_device &>(*device).set_is_pal(_bool);
 
 #define MCFG_SEGA315_5377_INT_CB(_devcb) \
 	downcast<sega315_5377_device &>(*device).set_int_callback(DEVCB_##_devcb);

@@ -892,90 +892,86 @@ static const char *const zektor_sample_names[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(segag80v_state::g80v_base)
-
+void segag80v_state::g80v_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, VIDEO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_OPCODES_MAP(opcodes_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80v_state,  irq0_line_hold)
-
+	Z80(config, m_maincpu, VIDEO_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segag80v_state::main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segag80v_state::opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &segag80v_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
 
 	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_refresh_hz(40);
+	m_screen->set_size(400, 300);
+	m_screen->set_visarea(512, 1536, 640-32, 1408+32);
+	m_screen->set_screen_update(FUNC(segag80v_state::screen_update_segag80v));
 
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
-	MCFG_SCREEN_UPDATE_DRIVER(segag80v_state, screen_update_segag80v)
-
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, m_vector);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segag80v_state::elim2)
+void segag80v_state::elim2(machine_config &config)
+{
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(elim_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(elim_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(segag80v_state::spacfury)
+void segag80v_state::spacfury(machine_config &config)
+{
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(spacfury_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(spacfury_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	/* speech board */
 	sega_speech_board(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segag80v_state::zektor)
+void segag80v_state::zektor(machine_config &config)
+{
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(zektor_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(zektor_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, VIDEO_CLOCK/4/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
+	AY8912(config, m_aysnd, VIDEO_CLOCK/4/2).add_route(ALL_OUTPUTS, "speaker", 0.33);
 
 	/* speech board */
 	sega_speech_board(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(segag80v_state::tacscan)
+void segag80v_state::tacscan(machine_config &config)
+{
 	g80v_base(config);
 
 	/* universal sound board */
-	MCFG_SEGAUSB_ADD("usbsnd", "maincpu")
-MACHINE_CONFIG_END
+	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(segag80v_state::startrek)
-	g80v_base(config);
+void segag80v_state::startrek(machine_config &config)
+{
+	tacscan(config);
 
 	/* speech board */
 	sega_speech_board(config);
-
-	/* universal sound board */
-	MCFG_SEGAUSB_ADD("usbsnd", "maincpu")
-MACHINE_CONFIG_END
+}
 
 
 

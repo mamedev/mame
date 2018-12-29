@@ -54,49 +54,51 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
+void electron_m2105_device::device_add_mconfig(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, electron_m2105_device, intrq_w))
+	INPUT_MERGER_ANY_HIGH(config, m_irqs);
+	m_irqs->output_handler().set(FUNC(electron_m2105_device::intrq_w));
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	/*MCFG_VIA6522_READPA_HANDLER(READ8(*this, electron_m2105_device, m2105_via_system_read_porta))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, electron_m2105_device, m2105_via_system_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, electron_m2105_device, m2105_via_system_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, electron_m2105_device, m2105_via_system_write_portb))*/
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	VIA6522(config, m_via6522_0, 1000000);
+	/*m_via6522_0->readpa_handler().set(FUNC(electron_m2105_device::m2105_via_system_read_porta));
+	m_via6522_0->readpb_handler().set(FUNC(electron_m2105_device::m2105_via_system_read_portb));
+	m_via6522_0->writepa_handler().set(FUNC(electron_m2105_device::m2105_via_system_write_porta));
+	m_via6522_0->writepb_handler().set(FUNC(electron_m2105_device::m2105_via_system_write_portb));*/
+	m_via6522_0->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
-	//MCFG_VIA6522_READPB_HANDLER(READ8(*this, electron_m2105_device, m2105_via_user_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, bus_w))
-	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, electron_m2105_device, m2105_via_user_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_centronics, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
+	VIA6522(config, m_via6522_1, 1000000);
+	//m_via6522_1->readpb_handler().set(FUNC(electron_m2105_device::m2105_via_user_read_portb));
+	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	//m_via6522_1->writepb_handler().set(FUNC(electron_m2105_device::m2105_via_user_write_portb));
+	m_via6522_1->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
+	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	/* duart */
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("irqs", input_merger_device, in_w<2>))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, electron_m2105_device, sio_out_w))
+	SCN2681(config, m_duart, XTAL(3'686'400));
+	m_duart->irq_cb().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	m_duart->a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
+	//m_duart->outport_cb().set(FUNC(electron_m2105_device::sio_out_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* speech hardware */
-	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
-	MCFG_DEVICE_ADD("tms5220", TMS5220, 640000)
-	MCFG_TMS52XX_SPEECHROM("vsm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEECHROM(config, "vsm", 0);
+	TMS5220(config, m_tms, 640000);
+	m_tms->set_speechrom_tag("vsm");
+	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 {
@@ -168,15 +170,15 @@ uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uin
 	}
 	else if (offset >= 0xfc40 && offset < 0xfc60)
 	{
-		data = m_via6522_1->read(space, offset);
+		data = m_via6522_1->read(offset);
 	}
 	else if (offset >= 0xfc60 && offset < 0xfc70)
 	{
-		data = m_duart->read(space, offset & 0x0f);
+		data = m_duart->read(offset & 0x0f);
 	}
 	else if (offset >= 0xfc70 && offset < 0xfc90)
 	{
-		data = m_via6522_0->read(space, offset);
+		data = m_via6522_0->read(offset);
 	}
 
 	return data;
@@ -194,15 +196,15 @@ void electron_m2105_device::expbus_w(address_space &space, offs_t offset, uint8_
 	}
 	else if (offset >= 0xfc40 && offset < 0xfc60)
 	{
-		m_via6522_1->write(space, offset, data);
+		m_via6522_1->write(offset, data);
 	}
 	else if (offset >= 0xfc60 && offset < 0xfc70)
 	{
-		m_duart->write(space, offset & 0x0f, data);
+		m_duart->write(offset & 0x0f, data);
 	}
 	else if (offset >= 0xfc70 && offset < 0xfc90)
 	{
-		m_via6522_0->write(space, offset, data);
+		m_via6522_0->write(offset, data);
 	}
 	else if (offset == 0xfe05)
 	{

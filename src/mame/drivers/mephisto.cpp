@@ -305,14 +305,14 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 	MCFG_DEVICE_PROGRAM_MAP(mephisto_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("outlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led100"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led101"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led102"))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led103"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led104"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led105"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mephisto_state, write_led7))
+	HC259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set_output("led100");
+	m_outlatch->q_out_cb<1>().set_output("led101");
+	m_outlatch->q_out_cb<2>().set_output("led102");
+	m_outlatch->q_out_cb<3>().set_output("led103");
+	m_outlatch->q_out_cb<4>().set_output("led104");
+	m_outlatch->q_out_cb<5>().set_output("led105");
+	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	config.set_default_layout(layout_mephisto);
 MACHINE_CONFIG_END
 

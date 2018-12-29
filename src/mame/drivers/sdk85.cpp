@@ -154,26 +154,26 @@ MACHINE_CONFIG_START(sdk85_state::sdk85)
 	MCFG_DEVICE_PROGRAM_MAP(sdk85_mem)
 	MCFG_DEVICE_IO_MAP(sdk85_io)
 
-	MCFG_DEVICE_ADD("romio", I8355, 6.144_MHz_XTAL / 2) // Monitor ROM (A14)
+	I8355(config, "romio", 6.144_MHz_XTAL / 2); // Monitor ROM (A14)
 
-	MCFG_DEVICE_ADD("expromio", I8355, 6.144_MHz_XTAL / 2) // Expansion ROM (A15)
+	I8355(config, "expromio", 6.144_MHz_XTAL / 2); // Expansion ROM (A15)
 
-	MCFG_DEVICE_ADD("ramio", I8155, 6.144_MHz_XTAL / 2) // Basic RAM (A16)
-	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_TRAP_LINE))
+	i8155_device &i8155(I8155(config, "ramio", 6.144_MHz_XTAL / 2)); // Basic RAM (A16)
+	i8155.out_to_callback().set_inputline(m_maincpu, I8085_TRAP_LINE);
 
-	MCFG_DEVICE_ADD("expramio", I8155, 6.144_MHz_XTAL / 2) // Expansion RAM (A17)
+	I8155(config, "expramio", 6.144_MHz_XTAL / 2); // Expansion RAM (A17)
 
 	/* video hardware */
 	config.set_default_layout(layout_sdk85);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2)               // Keyboard/Display Controller (A13)
-	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk85_state, scanlines_w))   // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk85_state, digit_w))     // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, sdk85_state, kbd_r))           // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                             // Shift key
-	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
+	i8279_device &kdc(I8279(config, "kdc", 6.144_MHz_XTAL / 2));        // Keyboard/Display Controller (A13)
+	kdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE);  // irq
+	kdc.out_sl_callback().set(FUNC(sdk85_state::scanlines_w));          // scan SL lines
+	kdc.out_disp_callback().set(FUNC(sdk85_state::digit_w));            // display A&B
+	kdc.in_rl_callback().set(FUNC(sdk85_state::kbd_r));                 // kbd RL lines
+	kdc.in_shift_callback().set_constant(1);                            // Shift key
+	kdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 
 /* ROM definition */

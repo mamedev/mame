@@ -209,19 +209,18 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_DEVICE_ADD("maincpu", M68010, MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, toobin_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", toobin_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, toobin_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update)
@@ -233,11 +232,12 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(*this, toobin_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:tms")
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(toobin_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("FF9000").bit(12);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+	config.device_remove("jsa:tms");
 MACHINE_CONFIG_END
 
 

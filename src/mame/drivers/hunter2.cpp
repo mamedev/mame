@@ -54,6 +54,9 @@ public:
 
 	void init_hunter2();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(serial_dsr_r);
@@ -67,7 +70,7 @@ private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(irqctrl_w);
 	DECLARE_WRITE8_MEMBER(memmap_w);
-	DECLARE_PALETTE_INIT(hunter2);
+	void hunter2_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 	DECLARE_WRITE_LINE_MEMBER(timer1_out);
@@ -80,7 +83,6 @@ private:
 
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<rs232_port_device> m_rs232;
@@ -343,7 +345,7 @@ void hunter2_state::init_hunter2()
 	m_nvram->set_base(ram,m_ram->bytes());
 }
 
-PALETTE_INIT_MEMBER(hunter2_state, hunter2)
+void hunter2_state::hunter2_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -390,8 +392,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
+	PALETTE(config, "palette", FUNC(hunter2_state::hunter2_palette), 2);
 	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL(4'915'200)/2/2) // unknown clock
 	MCFG_VIDEO_SET_SCREEN("screen")
 
@@ -414,30 +415,16 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(*this, hunter2_state,timer0_out))
 	MCFG_NSC810_TIMER1_OUT(WRITELINE(*this, hunter2_state,timer1_out))
 
-	MCFG_DEVICE_ADD("serial",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, hunter2_state,cts_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, hunter2_state,rxd_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->cts_handler().set(FUNC(hunter2_state::cts_w));
+	m_rs232->rxd_handler().set(FUNC(hunter2_state::rxd_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank2").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank3").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank4").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
 MACHINE_CONFIG_END
 
 /* ROM definition */

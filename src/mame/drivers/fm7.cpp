@@ -52,7 +52,6 @@
 #include "bus/centronics/dsjoy.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 
 #include "formats/fm7_cas.h"
 
@@ -445,13 +444,13 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 	switch(offset)
 	{
 		case 0:
-			return m_fdc->status_r(space, offset);
+			return m_fdc->status_r();
 		case 1:
-			return m_fdc->track_r(space, offset);
+			return m_fdc->track_r();
 		case 2:
-			return m_fdc->sector_r(space, offset);
+			return m_fdc->sector_r();
 		case 3:
-			return m_fdc->data_r(space, offset);
+			return m_fdc->data_r();
 		case 4:
 			return m_fdc_side | 0xfe;
 		case 5:
@@ -476,16 +475,16 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 	switch(offset)
 	{
 		case 0:
-			m_fdc->cmd_w(space, offset,data);
+			m_fdc->cmd_w(data);
 			break;
 		case 1:
-			m_fdc->track_w(space, offset,data);
+			m_fdc->track_w(data);
 			break;
 		case 2:
-			m_fdc->sector_w(space, offset,data);
+			m_fdc->sector_w(data);
 			break;
 		case 3:
-			m_fdc->data_w(space, offset,data);
+			m_fdc->data_w(data);
 			break;
 		case 4:
 			m_fdc_side = data & 0x01;
@@ -1514,22 +1513,10 @@ void fm7_state::fm7_sub_mem(address_map &map)
 
 void fm7_state::fm11_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rw("av_bank1", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x1000, 0x1fff).rw("av_bank2", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x2000, 0x2fff).rw("av_bank3", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x3000, 0x3fff).rw("av_bank4", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x4fff).rw("av_bank5", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x5000, 0x5fff).rw("av_bank6", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x6000, 0x6fff).rw("av_bank7", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x7000, 0x7fff).rw("av_bank8", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x8000, 0x8fff).rw("av_bank9", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x9000, 0x9fff).rw("av_bank10", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xa000, 0xafff).rw("av_bank11", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xb000, 0xbfff).rw("av_bank12", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xc000, 0xcfff).rw("av_bank13", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xd000, 0xdfff).rw("av_bank14", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xe000, 0xefff).rw("av_bank15", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf000, 0xfbff).rw("av_bank16", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	for (int bank = 0; bank < 16; bank++)
+	{
+		map(bank << 12, (bank << 12) | 0x0fff).rw(m_avbank[bank], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	}
 	map(0xfc00, 0xfc7f).ram();
 	map(0xfc80, 0xfcff).rw(FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
 	// I/O space (FD00-FDFF)
@@ -1634,22 +1621,10 @@ void fm7_state::fm16_sub_mem(address_map &map)
 
 void fm7_state::fm77av_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rw("av_bank1", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x1000, 0x1fff).rw("av_bank2", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x2000, 0x2fff).rw("av_bank3", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x3000, 0x3fff).rw("av_bank4", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x4fff).rw("av_bank5", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x5000, 0x5fff).rw("av_bank6", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x6000, 0x6fff).rw("av_bank7", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x7000, 0x7fff).rw("av_bank8", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x8000, 0x8fff).rw("av_bank9", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x9000, 0x9fff).rw("av_bank10", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xa000, 0xafff).rw("av_bank11", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xb000, 0xbfff).rw("av_bank12", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xc000, 0xcfff).rw("av_bank13", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xd000, 0xdfff).rw("av_bank14", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xe000, 0xefff).rw("av_bank15", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf000, 0xfbff).rw("av_bank16", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	for (int bank = 0; bank < 16; bank++)
+	{
+		map(bank << 12, (bank << 12) | 0x0fff).rw(m_avbank[bank], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	}
 	map(0xfc00, 0xfc7f).ram();
 	map(0xfc80, 0xfcff).rw(FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
 	// I/O space (FD00-FDFF)
@@ -2058,14 +2033,6 @@ static void fm7_floppies(device_slot_interface &device)
 }
 
 
-#define MCFG_ADDRESS_BANK(tag) \
-MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
-MCFG_DEVICE_PROGRAM_MAP(fm7_banked_mem) \
-MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
-MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
-MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
-
 MACHINE_CONFIG_START(fm7_state::fm7)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809, 16.128_MHz_XTAL / 2)
@@ -2079,8 +2046,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("psg", AY8910, 4.9152_MHz_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
+	AY8910(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -2091,7 +2057,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
@@ -2100,12 +2066,12 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 
@@ -2132,7 +2098,7 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
@@ -2142,19 +2108,19 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
@@ -2178,39 +2144,27 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ym", YM2203, 4.9152_MHz_XTAL / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, fm7_state, fm77av_fmirq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, fm7_state, fm77av_joy_1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, fm7_state, fm77av_joy_2_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	YM2203(config, m_ym, 4.9152_MHz_XTAL / 4);
+	m_ym->irq_handler().set(FUNC(fm7_state::fm77av_fmirq));
+	m_ym->port_a_read_callback().set(FUNC(fm7_state::fm77av_joy_1_r));
+	m_ym->port_b_read_callback().set(FUNC(fm7_state::fm77av_joy_2_r));
+	m_ym->add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
-	MCFG_ADDRESS_BANK("av_bank1")
-	MCFG_ADDRESS_BANK("av_bank2")
-	MCFG_ADDRESS_BANK("av_bank3")
-	MCFG_ADDRESS_BANK("av_bank4")
-	MCFG_ADDRESS_BANK("av_bank5")
-	MCFG_ADDRESS_BANK("av_bank6")
-	MCFG_ADDRESS_BANK("av_bank7")
-	MCFG_ADDRESS_BANK("av_bank8")
-	MCFG_ADDRESS_BANK("av_bank9")
-	MCFG_ADDRESS_BANK("av_bank10")
-	MCFG_ADDRESS_BANK("av_bank11")
-	MCFG_ADDRESS_BANK("av_bank12")
-	MCFG_ADDRESS_BANK("av_bank13")
-	MCFG_ADDRESS_BANK("av_bank14")
-	MCFG_ADDRESS_BANK("av_bank15")
-	MCFG_ADDRESS_BANK("av_bank16")
+	for (int bank = 0; bank < 16; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_avbank[bank]).set_map(&fm7_state::fm7_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x1000);
+	}
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	MCFG_PALETTE_ADD("av_palette", 4096)
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -2220,12 +2174,12 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("av_flop_list", "fm77av")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list", "fm7_disk")
@@ -2256,46 +2210,34 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_DEVICE_IO_MAP(fm11_x86_io)
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
-	MCFG_ADDRESS_BANK("av_bank1")
-	MCFG_ADDRESS_BANK("av_bank2")
-	MCFG_ADDRESS_BANK("av_bank3")
-	MCFG_ADDRESS_BANK("av_bank4")
-	MCFG_ADDRESS_BANK("av_bank5")
-	MCFG_ADDRESS_BANK("av_bank6")
-	MCFG_ADDRESS_BANK("av_bank7")
-	MCFG_ADDRESS_BANK("av_bank8")
-	MCFG_ADDRESS_BANK("av_bank9")
-	MCFG_ADDRESS_BANK("av_bank10")
-	MCFG_ADDRESS_BANK("av_bank11")
-	MCFG_ADDRESS_BANK("av_bank12")
-	MCFG_ADDRESS_BANK("av_bank13")
-	MCFG_ADDRESS_BANK("av_bank14")
-	MCFG_ADDRESS_BANK("av_bank15")
-	MCFG_ADDRESS_BANK("av_bank16")
+	for (int bank = 0; bank < 16; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_avbank[bank]).set_map(&fm7_state::fm7_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x1000);
+	}
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
@@ -2319,7 +2261,7 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
@@ -2329,19 +2271,19 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))

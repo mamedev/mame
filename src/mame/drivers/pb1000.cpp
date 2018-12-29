@@ -37,14 +37,14 @@
 class pb1000_state : public driver_device
 {
 public:
-	pb1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_beeper(*this, "beeper"),
-			m_hd44352(*this, "hd44352"),
-			m_card1(*this, "cardslot1"),
-			m_card2(*this, "cardslot2")
-		{ }
+	pb1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper"),
+		m_hd44352(*this, "hd44352"),
+		m_card1(*this, "cardslot1"),
+		m_card2(*this, "cardslot2")
+	{ }
 
 	void pb2000c(machine_config &config);
 	void pb1000(machine_config &config);
@@ -76,7 +76,7 @@ private:
 	DECLARE_READ8_MEMBER( pb2000c_port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
 	uint16_t read_touchscreen(uint8_t line);
-	DECLARE_PALETTE_INIT(pb1000);
+	void pb1000_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
 	void pb1000_mem(address_map &map);
 	void pb2000c_mem(address_map &map);
@@ -308,7 +308,7 @@ static INPUT_PORTS_START( pb2000c )
 		PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pb1000_state, pb1000)
+void pb1000_state::pb1000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -482,57 +482,57 @@ void pb1000_state::machine_start()
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 
-MACHINE_CONFIG_START(pb1000_state::pb1000)
+void pb1000_state::pb1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD61700, 910000)
-	MCFG_DEVICE_PROGRAM_MAP(pb1000_mem)
-	MCFG_HD61700_LCD_CTRL_CB(WRITE8(*this, pb1000_state, lcd_control))
-	MCFG_HD61700_LCD_READ_CB(READ8(*this, pb1000_state, lcd_data_r))
-	MCFG_HD61700_LCD_WRITE_CB(WRITE8(*this, pb1000_state, lcd_data_w))
-	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb1000_kb_r))
-	MCFG_HD61700_KB_WRITE_CB(WRITE8(*this, pb1000_state, kb_matrix_w))
-	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb1000_port_r))
-	MCFG_HD61700_PORT_WRITE_CB(WRITE8(*this, pb1000_state, port_w))
+	HD61700(config, m_maincpu, 910000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pb1000_state::pb1000_mem);
+	m_maincpu->lcd_ctrl().set(FUNC(pb1000_state::lcd_control));
+	m_maincpu->lcd_read().set(FUNC(pb1000_state::lcd_data_r));
+	m_maincpu->lcd_write().set(FUNC(pb1000_state::lcd_data_w));
+	m_maincpu->kb_read().set(FUNC(pb1000_state::pb1000_kb_r));
+	m_maincpu->kb_write().set(FUNC(pb1000_state::kb_matrix_w));
+	m_maincpu->port_read().set(FUNC(pb1000_state::pb1000_port_r));
+	m_maincpu->port_write().set(FUNC(pb1000_state::port_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44352", hd44352_device, screen_update)
-	MCFG_SCREEN_SIZE(192, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44352", FUNC(hd44352_device::screen_update));
+	screen.set_size(192, 32);
+	screen.set_visarea(0, 192-1, 0, 32-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pb1000)
+	PALETTE(config, "palette", FUNC(pb1000_state::pb1000_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pb1000);
 
-	MCFG_DEVICE_ADD("hd44352", HD44352, 910000)
-	MCFG_HD44352_ON_CB(INPUTLINE("maincpu", HD61700_ON_INT))
+	HD44352(config, m_hd44352, 910000);
+	m_hd44352->on_cb().set_inputline("maincpu", HD61700_ON_INT);
 
-	MCFG_NVRAM_ADD_0FILL("nvram1")
-	MCFG_NVRAM_ADD_0FILL("nvram2")
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-MACHINE_CONFIG_START(pb1000_state::pb2000c)
+void pb1000_state::pb2000c(machine_config &config)
+{
 	pb1000(config);
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pb2000c_mem)
-	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb2000c_kb_r))
-	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb2000c_port_r))
 
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot1", generic_plain_slot, "pb2000c_card")
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot2", generic_plain_slot, "pb2000c_card")
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pb1000_state::pb2000c_mem);
+	m_maincpu->kb_read().set(FUNC(pb1000_state::pb2000c_kb_r));
+	m_maincpu->port_read().set(FUNC(pb1000_state::pb2000c_port_r));
+
+	GENERIC_CARTSLOT(config, m_card1, generic_plain_slot, "pb2000c_card");
+	GENERIC_CARTSLOT(config, m_card2, generic_plain_slot, "pb2000c_card");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("card_list", "pb2000c")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "card_list").set_original("pb2000c");
+}
 
 /* ROM definition */
 

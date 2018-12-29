@@ -1860,73 +1860,74 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-MACHINE_CONFIG_START(seibuspi_state::spi)
-
+void seibuspi_state::spi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 50_MHz_XTAL / 2) // AMD or Intel 386DX, 25MHz
-	MCFG_DEVICE_PROGRAM_MAP(spi_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
+	I386(config, m_maincpu, 50_MHz_XTAL / 2); // AMD or Intel 386DX, 25MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 28.636363_MHz_XTAL / 4) // Z84C0008PEC, 7.159MHz
-	MCFG_DEVICE_PROGRAM_MAP(spi_soundmap)
+	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Z84C0008PEC, 7.159MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_soundmap);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
-	MCFG_DEVICE_ADD("ds2404", DS2404, 32.768_kHz_XTAL)
-	MCFG_DS2404_REF_YEAR(1995)
-	MCFG_DS2404_REF_MONTH(1)
-	MCFG_DS2404_REF_DAY(1)
+	ds2404_device &rtc(DS2404(config, "ds2404", 32.768_kHz_XTAL));
+	rtc.ref_year(1995);
+	rtc.ref_month(1);
+	rtc.ref_day(1);
 
-	MCFG_INTEL_E28F008SA_ADD("soundflash1") // Sharp LH28F008 on newer mainboard revision
-	MCFG_INTEL_E28F008SA_ADD("soundflash2") // "
+	INTEL_E28F008SA(config, "soundflash1"); // Sharp LH28F008 on newer mainboard revision
+	INTEL_E28F008SA(config, "soundflash2"); // "
 
-	MCFG_FIFO7200_ADD("soundfifo1", 0x200) // LH5496D, but on single board hw it's one CY7C421
-	MCFG_FIFO7200_ADD("soundfifo2", 0x200) // "
+	FIFO7200(config, m_soundfifo[0], 0x200); // LH5496D, but on single board hw it's one CY7C421
+	FIFO7200(config, m_soundfifo[1], 0x200); // "
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
+	screen.set_screen_update(FUNC(seibuspi_state::screen_update_spi));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+	PALETTE(config, m_palette, palette_device::BLACK, 6144);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(*this, seibuspi_state, tile_decrypt_key_w))
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seibuspi_state, spi_layer_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seibuspi_state, spi_layer_bank_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
+	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
+	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
+	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymf", YMF271, 16.9344_MHz_XTAL)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
-	MCFG_DEVICE_ADDRESS_MAP(0, spi_ymf271_map)
+	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
+	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.set_addrmap(0, &seibuspi_state::spi_ymf271_map);
 
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymf.add_route(0, "lspeaker", 1.0);
+	ymf.add_route(1, "rspeaker", 1.0);
+//  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf.add_route(3, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(seibuspi_state::ejanhs)
+void seibuspi_state::ejanhs(machine_config &config)
+{
 	spi(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seibuspi_state::rdft2)
+void seibuspi_state::rdft2(machine_config &config)
+{
 	spi(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rdft2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::rdft2_map);
+}
 
 
 /* single boards */
@@ -1938,104 +1939,99 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-MACHINE_CONFIG_START(seibuspi_state::sxx2e)
+void seibuspi_state::sxx2e(machine_config &config)
+{
 	spi(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxx2e_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2e_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxx2e_soundmap)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2e_soundmap);
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, sxx2e)
 
-	MCFG_DEVICE_REMOVE("soundflash1")
-	MCFG_DEVICE_REMOVE("soundflash2")
+	config.device_remove("soundflash1");
+	config.device_remove("soundflash2");
 
-	MCFG_DEVICE_REMOVE("soundfifo2")
+	config.device_remove("soundfifo2");
 
 	/* sound hardware */
 	 // Single PCBs only output mono sound, SXX2E : unverified
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.9344_MHz_XTAL)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
+	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.9344_MHz_XTAL));
+	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(seibuspi_state::sxx2f)
+void seibuspi_state::sxx2f(machine_config &config)
+{
 	sxx2e(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sxx2f_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2f_map);
 
-	MCFG_DEVICE_REMOVE("ds2404")
+	config.device_remove("ds2404");
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seibuspi_state::sxx2g) // clocks differ, but otherwise same hw as sxx2f
+void seibuspi_state::sxx2g(machine_config &config) // clocks differ, but otherwise same hw as sxx2f
+{
 	sxx2f(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
-	MCFG_DEVICE_CLOCK(28.636363_MHz_XTAL)
-
-	MCFG_DEVICE_MODIFY("audiocpu") // Z84C0004PCS, 4.9152MHz
-	MCFG_DEVICE_CLOCK(4.9512_MHz_XTAL)
+	m_maincpu->set_clock(28.636363_MHz_XTAL); // AMD AM386DX/DX-40, 28.63636MHz
+	m_audiocpu->set_clock(4.9512_MHz_XTAL); // Z84C0004PCS, 4.9152MHz
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ymf", YMF271, 16.384_MHz_XTAL) // 16.384MHz(!)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.384_MHz_XTAL)); // 16.384MHz(!)
+	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /* SYS386I */
 
-MACHINE_CONFIG_START(seibuspi_state::sys386i)
-
+void seibuspi_state::sys386i(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, 40_MHz_XTAL) // AMD 386DX, 40MHz
-	MCFG_DEVICE_PROGRAM_MAP(sys386i_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
+	I386(config, m_maincpu, 40_MHz_XTAL); // AMD 386DX, 40MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sys386i_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
+	screen.set_screen_update(FUNC(seibuspi_state::screen_update_spi));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+	PALETTE(config, m_palette, palette_device::BLACK, 6144);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(*this, seibuspi_state, tile_decrypt_key_w))
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seibuspi_state, spi_layer_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seibuspi_state, spi_layer_bank_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
+	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
+	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
+	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki[0], 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 28.636363_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /* SYS386F */
@@ -2058,27 +2054,27 @@ void seibuspi_state::init_sys386f()
 	}
 }
 
-MACHINE_CONFIG_START(seibuspi_state::sys386f)
-
+void seibuspi_state::sys386f(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I386, XTAL(50'000'000)/2) // Intel i386DX, 25MHz
-	MCFG_DEVICE_PROGRAM_MAP(sys386f_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
+	I386(config, m_maincpu, XTAL(50'000'000)/2); // Intel i386DX, 25MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sys386f_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(seibuspi_state::screen_update_sys386f));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys386f)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys386f);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
+	PALETTE(config, m_palette, palette_device::BLACK, 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 
@@ -2086,9 +2082,8 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 	 // Single PCBs only output mono sound
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'384'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, "ymz", XTAL(16'384'000)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*****************************************************************************/

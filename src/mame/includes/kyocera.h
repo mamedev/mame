@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
@@ -100,7 +99,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 	optional_device<im6402_device> m_uart;
 	required_device<hd44102_device> m_lcdc0;
@@ -149,7 +148,7 @@ protected:
 	int m_centronics_busy;
 	int m_centronics_select;
 
-	DECLARE_PALETTE_INIT(kc85);
+	void kc85_palette(palette_device &palette) const;
 	void kc85_io(address_map &map);
 	void kc85_mem(address_map &map);
 	void trsm100_io(address_map &map);
@@ -158,8 +157,9 @@ protected:
 class trsm100_state : public kc85_state
 {
 public:
-	trsm100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kc85_state(mconfig, type, tag) { }
+	trsm100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kc85_state(mconfig, type, tag)
+	{ }
 
 	virtual void machine_start() override;
 	void trsm100(machine_config &config);
@@ -169,9 +169,9 @@ public:
 class pc8201_state : public kc85_state
 {
 public:
-	pc8201_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kc85_state(mconfig, type, tag),
-			m_cas_cart(*this, "cas_cartslot")
+	pc8201_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kc85_state(mconfig, type, tag),
+		m_cas_cart(*this, "cas_cartslot")
 	{ }
 
 	virtual void machine_start() override;
@@ -219,7 +219,7 @@ public:
 		m_y(*this, "Y%u", 0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
 	required_device<hd61830_device> m_lcdc;
 	required_device<centronics_device> m_centronics;
@@ -250,7 +250,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
-	DECLARE_PALETTE_INIT(tandy200);
+	void tandy200_palette(palette_device &palette) const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tandy200_tp_tick);
 

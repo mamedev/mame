@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_DEVICE_PROGRAM_MAP(nova2001_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -661,27 +661,25 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_nova2001)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nova2001)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nova2001);
+	PALETTE(config, m_palette, FUNC(nova2001_state::nova2001_palette)).set_format(1, &nova2001_state::BBGGRRII, 512);
 
-	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/6)); // 2 MHz verified on schematics
+	ay1.port_a_write_callback().set(FUNC(nova2001_state::nova2001_scroll_x_w));
+	ay1.port_b_write_callback().set(FUNC(nova2001_state::nova2001_scroll_y_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/6)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/6));
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::ninjakun)
@@ -706,26 +704,25 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_ninjakun)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakun)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjakun);
+	PALETTE(config, m_palette).set_format(1, &nova2001_state::BBGGRRII, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/4)); // 3 MHz
+	ay1.port_a_read_callback().set_ioport("DSW1");
+	ay1.port_b_read_callback().set_ioport("DSW2");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/4) // 3 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/4)); // 3 MHz
+	ay2.port_a_write_callback().set(FUNC(nova2001_state::nova2001_scroll_x_w));
+	ay2.port_b_write_callback().set(FUNC(nova2001_state::nova2001_scroll_y_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.20);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::pkunwar)
@@ -742,27 +739,25 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_pkunwar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkunwar)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkunwar);
+	PALETTE(config, m_palette, FUNC(nova2001_state::nova2001_palette)).set_format(1, &nova2001_state::BBGGRRII, 512);
 
-	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/8)); // 1.5MHz (correct?)
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/8));
+	ay2.port_a_read_callback().set_ioport("IN2");
+	ay2.port_b_read_callback().set_ioport("DSW1");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::raiders5)
@@ -785,26 +780,25 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_raiders5)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiders5)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiders5);
+	PALETTE(config, m_palette).set_format(1, &nova2001_state::BBGGRRII, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/8)); // 1.5MHz
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/8));
+	ay2.port_a_read_callback().set_ioport("IN2");
+	ay2.port_b_read_callback().set_ioport("DSW1");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 

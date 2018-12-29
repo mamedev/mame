@@ -52,13 +52,16 @@ public:
 		m_pg{ {*this, "upd934g_c"}, {*this, "upd934g_b"} },
 		m_samples{ {*this, "samples_a"}, {*this, "samples_b"} },
 		m_keys(*this, "kc%u", 0),
+		m_led_song(*this, "led_song"),
+		m_led_pattern(*this, "led_pattern"),
+		m_led_startstop(*this, "led_startstop"),
 		m_port_a(0),
 		m_port_b(0xff)
 	{ }
 
 	void rz1(machine_config &config);
 
-	DECLARE_PALETTE_INIT(rz1);
+	void rz1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
@@ -71,6 +74,10 @@ private:
 	required_device<upd934g_device> m_pg[2];
 	required_memory_region m_samples[2];
 	required_ioport_array<8> m_keys;
+
+	output_finder<> m_led_song;
+	output_finder<> m_led_pattern;
+	output_finder<> m_led_startstop;
 
 	void map(address_map &map);
 
@@ -238,7 +245,7 @@ READ8_MEMBER( rz1_state::port_a_r )
 	if ((BIT(m_port_b, 7) == 0) && (BIT(m_port_b, 6) == 1))
 	{
 		// Not clear why, but code expects to read busy flag from PA5 rather than PA7
-		return bitswap<8>(m_hd44780->read(space, BIT(m_port_b, 5)), 5, 6, 7, 4, 3, 2, 1, 0);
+		return bitswap<8>(m_hd44780->read(BIT(m_port_b, 5)), 5, 6, 7, 4, 3, 2, 1, 0);
 	}
 
 	logerror("port_a_r (PB = %02x)\n", m_port_b);
@@ -250,7 +257,7 @@ WRITE8_MEMBER( rz1_state::port_a_w )
 	m_port_a = data;
 
 	if ((BIT(m_port_b, 7) == 0) && (BIT(m_port_b, 6) == 0))
-		m_hd44780->write(space, BIT(m_port_b, 5), data);
+		m_hd44780->write(BIT(m_port_b, 5), data);
 }
 
 // 7-------  lcd e
@@ -307,13 +314,18 @@ READ8_MEMBER( rz1_state::key_r )
 
 WRITE8_MEMBER( rz1_state::leds_w )
 {
-	output().set_value("led_song",      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0);
-	output().set_value("led_pattern",   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0);
-	output().set_value("led_startstop", BIT(data, 4) == 0 ? 1 : 0);
+	m_led_song =      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0;
+	m_led_pattern =   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0;
+	m_led_startstop = BIT(data, 4) == 0 ? 1 : 0;
 }
 
 void rz1_state::machine_start()
 {
+	// resolve output finders
+	m_led_song.resolve();
+	m_led_pattern.resolve();
+	m_led_startstop.resolve();
+
 	// register for save states
 	save_item(NAME(m_port_a));
 	save_item(NAME(m_port_b));
@@ -323,7 +335,7 @@ void rz1_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(rz1_state, rz1)
+void rz1_state::rz1_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t(92, 83, 88));    // lcd pixel on
@@ -334,7 +346,8 @@ PALETTE_INIT_MEMBER(rz1_state, rz1)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START( rz1_state::rz1 )
+void rz1_state::rz1(machine_config &config)
+{
 	UPD7811(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rz1_state::map);
 	m_maincpu->pa_in_cb().set(FUNC(rz1_state::port_a_r));
@@ -352,8 +365,7 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(rz1_state, rz1)
+	PALETTE(config, "palette", FUNC(rz1_state::rz1_palette), 3);
 
 	HD44780(config, m_hd44780, 0);
 	m_hd44780->set_lcd_size(1, 16);
@@ -368,7 +380,7 @@ MACHINE_CONFIG_START( rz1_state::rz1 )
 	UPD934G(config, m_pg[1], 1280000);
 	m_pg[1]->data_callback().set(FUNC(rz1_state::upd934g_b_data_r));
 	m_pg[1]->add_route(ALL_OUTPUTS, "speaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

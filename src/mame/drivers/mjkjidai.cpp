@@ -303,18 +303,18 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 	MCFG_DEVICE_PROGRAM_MAP(mjkjidai_map)
 	MCFG_DEVICE_IO_MAP(mjkjidai_io_map)
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("KEYBOARD"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mjkjidai_state, keyboard_select_lo_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mjkjidai_state, keyboard_select_hi_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set_ioport("KEYBOARD");
+	ppi1.out_pb_callback().set(FUNC(mjkjidai_state::keyboard_select_lo_w));
+	ppi1.out_pc_callback().set(FUNC(mjkjidai_state::keyboard_select_hi_w));
+	ppi1.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mjkjidai_state, mjkjidai_ctrl_w))  // rom bank, coin counter, flip screen etc
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
+	i8255_device &ppi2(I8255A(config, "ppi2"));
+	ppi2.out_pa_callback().set(FUNC(mjkjidai_state::mjkjidai_ctrl_w));  // rom bank, coin counter, flip screen etc
+	ppi2.in_pb_callback().set_ioport("DSW1");
+	ppi2.in_pc_callback().set_ioport("DSW2");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mjkjidai_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mjkjidai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

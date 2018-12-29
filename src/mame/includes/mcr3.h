@@ -5,6 +5,10 @@
     Midway MCR-3 system
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MCR3_H
+#define MAME_INCLUDES_MCR3_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/adc0844.h"
@@ -57,7 +61,7 @@ public:
 	void init_spyhunt();
 	void init_sarge();
 	DECLARE_VIDEO_START(spyhunt);
-	DECLARE_PALETTE_INIT(spyhunt);
+	void spyhunt_palette(palette_device &palette) const;
 
 	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -101,3 +105,5 @@ private:
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 	void mcr_common_init();
 };
+
+#endif // MAME_INCLUDES_MCR3_H

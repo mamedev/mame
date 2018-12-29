@@ -36,7 +36,7 @@ Notes: (all IC's shown. Only 16 ICs are used)
             Early PCB revisions used a PLCC68 chip in a socket. Later revisions used a
             PGA68 chip soldered directly into the motherboard
      4164 - 4164 64k x4-bit DRAM (4 chips for 32kbytes total)
-      ROM - Hitachi HN613256 32k x8-bit MASK ROM containing OS & BASIC
+      ROM - Hitachi HN613256 32k x8-bit mask ROM containing OS & BASIC
     LM324 - Texas Instruments LM324 Operational Amplifier
       MOD - UHF TV modulator UM1233-E36
      CVBS - Composite color video output socket
@@ -83,9 +83,9 @@ static const rgb_t electron_palette[8]=
 	rgb_t(0x000,0x000,0x000)
 };
 
-PALETTE_INIT_MEMBER(electron_state, electron)
+void electron_state::electron_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
+	palette.set_pen_colors(0, electron_palette);
 }
 
 void electron_state::electron_mem(address_map &map)
@@ -113,7 +113,6 @@ INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 }
 
 static INPUT_PORTS_START( electron )
-
 	PORT_START("LINE.0")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x92 | \\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR('|') PORT_CHAR('\\') // on the real keyboard, this would be on the 1st row, the 3rd key after 0
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("COPY") PORT_CODE(KEYCODE_END)  PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR('[') PORT_CHAR(']')
@@ -213,30 +212,27 @@ static INPUT_PORTS_START( electron64 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(electron_state::electron)
-	MCFG_DEVICE_ADD( "maincpu", M6502, 16_MHz_XTAL/8 )
-	MCFG_DEVICE_PROGRAM_MAP( electron_mem )
+	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
-	//MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 264, 264 + 640, 312, 31, 31 + 256)
-	MCFG_SCREEN_UPDATE_DRIVER(electron_state, screen_update_electron)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
+	//m_screen->set_raw(16_MHz_XTAL, 1024, 264, 264 + 640, 312, 31, 31 + 256)
+	m_screen->set_screen_update(FUNC(electron_state::screen_update_electron));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD( "palette", 16 )
-	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
+	PALETTE(config, "palette", FUNC(electron_state::electron_colours), 16);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 300 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	RAM(config, m_ram).set_default_size("32K");
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("electron_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(bbc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_interface("electron_cass");
 
 	/* expansion port */
 	MCFG_ELECTRON_EXPANSION_SLOT_ADD("exp", electron_expansion_devices, "plus3", false)
@@ -244,43 +240,53 @@ MACHINE_CONFIG_START(electron_state::electron)
 	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "electron_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "electron_cart")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "electron_flop")
-	MCFG_SOFTWARE_LIST_ADD("rom_list",  "electron_rom")
+	SOFTWARE_LIST(config, "cass_list").set_original("electron_cass");
+	SOFTWARE_LIST(config, "cart_list").set_original("electron_cart");
+	SOFTWARE_LIST(config, "flop_list").set_original("electron_flop");
+	SOFTWARE_LIST(config, "rom_list").set_original("electron_rom");
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(electron_state::btm2105)
 	electron(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_COLOR(rgb_t::amber())
+
+	m_screen->set_color(rgb_t::amber());
 
 	/* expansion port */
 	MCFG_DEVICE_MODIFY("exp")
 	MCFG_DEVICE_SLOT_INTERFACE(electron_expansion_devices, "m2105", true)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_list")
+	config.device_remove("cass_list");
+	config.device_remove("cart_list");
+	config.device_remove("flop_list");
+	config.device_remove("rom_list");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(electron_state::electron64)
+void electron_state::electron64(machine_config &config)
+{
 	electron(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(electron_mem)
-	MCFG_DEVICE_OPCODES_MAP(electron64_opcodes)
+	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &electron_state::electron64_opcodes);
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("64K");
+}
 
 
 /* Electron Rom Load */
 ROM_START(electron)
 	ROM_REGION( 0x4000, "mos", 0 )
 	ROM_LOAD( "b02_acornos-1.rom", 0x0000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+ROM_END
+
+ROM_START(electront)
+	ROM_REGION( 0x4000, "mos",  0 )
+	/* Serial 06-ALA01-0000087 from Centre for Computing History */
+	ROM_LOAD( "elk_036.rom", 0x0000, 0x4000, CRC(dd1a99c3) SHA1(87ee1b14895e476909dd002d5ca2346a3a5f3f57) )
 	ROM_REGION( 0x4000, "basic", 0 )
 	ROM_LOAD( "basic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
 ROM_END
@@ -297,5 +303,6 @@ ROM_END
 
 /*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                             FULLNAME                                 FLAGS */
 COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, empty_init, "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1983, electront,  electron, 0,      electron,   electron,   electron_state, empty_init, "Acorn",                            "Acorn Electron (Trial)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, empty_init, "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
 COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, empty_init, "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

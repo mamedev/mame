@@ -15,7 +15,6 @@
 #include "sound/tms5220.h"
 #include "cpu/mcs51/mcs51.h"
 
-#define TERMINAL_TAG "terminal"
 
 class pes_state : public driver_device
 {
@@ -23,7 +22,7 @@ public:
 	pes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
+		m_terminal(*this, "terminal"),
 		m_speech(*this, "tms5220")
 	{
 	}

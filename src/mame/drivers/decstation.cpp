@@ -4,10 +4,10 @@
 
     decstation.cpp: MIPS-based DECstation family
 
-    WANTED: all boot ROM dumps except 5000/133, all TURBOchannel card ROM dumps
+    WANTED: boot ROM dumps for KN02CA/KN04CA (MAXine) systems.
 
-    NOTE: after all the spew of failing tests (it really wants a VT102 terminal),
-    press 'q' at the MORE prompt and wait a few seconds for the PROM monitor to appear.
+    NOTE: after all the spew of failing tests, press 'q' at the MORE prompt and
+    wait a few seconds for the PROM monitor to appear.
     Type 'ls' for a list of commands (this is a very UNIX-flavored PROM monitor).
 
     Machine types:
@@ -19,9 +19,9 @@
             Ethernet: AMD7990 "LANCE" controller
             Monochrome or color video on-board
         PMIN/KN01:
-            Cheaper PMAX, 12.5 MHz R2000, same as PMAX
+            Cheaper PMAX, 12.5 MHz R2000, othersame as PMAX
 
-        Personal DECstation 5000/xx (MAXine/KN02BA):
+        Personal DECstation 5000/xx (MAXine/KN02CA for R3000, KN04CA? for R4000)
             20, 25, or 33 MHz R3000 or 100 MHz R4000
             40 MiB max RAM
             Serial: DEC "DZ" quad-UART for keyboard/mouse, SCC8530 for modem/printer
@@ -31,7 +31,7 @@
             Color 1024x768 8bpp video on-board
             2 TURBOchannel slots
 
-        DECstation 5000/1xx: (3MIN/KN02DA):
+        DECstation 5000/1xx: (3MIN/KN02BA, KN04BA? for R4000):
             20, 25, or 33 MHz R3000 or 100 MHz R4000
             128 MiB max RAM
             Serial: 2x SCC8530
@@ -47,7 +47,7 @@
             SCSI: NCR53C94
             Ethernet: AMD7990 "LANCE" controllor
 
-        DECstation 5000/240, 5000/261 (3MAX+/KN03)
+        DECstation 5000/240 (3MAX+/KN03AA), 5000/260 (3MAX+/KN05)
             40 MHz R3400, or 120 MHz R4400.
             480 MiB max RAM
             Serial: 2x SCC8530
@@ -57,7 +57,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
+#include "cpu/mips/mips3.h"
 #include "machine/decioga.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
@@ -65,7 +66,11 @@
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
+#include "machine/dec_lk201.h"
+#include "machine/am79c90.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
+#include "video/bt459.h"
 
 class decstation_state : public driver_device
 {
@@ -73,87 +78,166 @@ public:
 	decstation_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_lk201(*this, "lk201"),
 		m_ioga(*this, "ioga"),
 		m_rtc(*this, "rtc"),
 		m_scc0(*this, "scc0"),
 		m_scc1(*this, "scc1"),
-		m_asc(*this, "scsibus:7:asc")
+		m_asc(*this, "scsibus:7:asc"),
+		m_vrom(*this, "gfx"),
+		m_bt459(*this, "bt459"),
+		m_lance(*this, "am79c90"),
+		m_kn01vram(*this, "vram")
 		{ }
 
-	void kn02da(machine_config &config);
+	void kn01(machine_config &config);
+	void kn02ba(machine_config &config);
 
 	void init_decstation();
 
 protected:
 	DECLARE_READ_LINE_MEMBER(brcond0_r) { return ASSERT_LINE; }
+	DECLARE_WRITE_LINE_MEMBER(ioga_irq_w);
 
 	DECLARE_READ32_MEMBER(cfb_r);
 	DECLARE_WRITE32_MEMBER(cfb_w);
+
+	DECLARE_READ32_MEMBER(kn01_status_r);
+	DECLARE_WRITE32_MEMBER(kn01_control_w);
+	DECLARE_READ32_MEMBER(bt478_palette_r);
+	DECLARE_WRITE32_MEMBER(bt478_palette_w);
+
+	DECLARE_READ32_MEMBER(dz_r);
 
 	void ncr5394(device_t *device);
 
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<dec_ioga_device> m_ioga;
+	uint32_t kn01_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<mips1core_device_base> m_maincpu;
+	required_device<screen_device> m_screen;
+	optional_device<lk201_device> m_lk201;
+	optional_device<dec_ioga_device> m_ioga;
 	required_device<mc146818_device> m_rtc;
-	required_device<z80scc_device> m_scc0, m_scc1;
-	required_device<ncr53c94_device> m_asc;
+	optional_device<z80scc_device> m_scc0, m_scc1;
+	optional_device<ncr53c94_device> m_asc;
+	optional_memory_region m_vrom;
+	optional_device<bt459_device> m_bt459;
+	required_device<am79c90_device> m_lance;
+	optional_shared_ptr<uint32_t> m_kn01vram;
 
-	void decstation_map(address_map &map);
+	void kn01_map(address_map &map);
+	void threemin_map(address_map &map);
+
+	u8 *m_vrom_ptr;
+	u32 m_vram[0x200000/4];
+	u32 m_sfb[0x80];
+	int m_copy_src;
+
+	u32 m_kn01_control, m_kn01_status;
+	u32 m_palette[256], m_overlay[256];
+	u8 m_r, m_g, m_b, m_entry, m_stage;
 };
 
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
 
+void decstation_state::video_start()
+{
+}
+
+uint32_t decstation_state::kn01_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint32_t *scanline;
+	int x, y;
+	uint8_t pixels;
+	uint8_t *vram = (uint8_t *)m_kn01vram.target();
+
+	for (y = 0; y < 864; y++)
+	{
+		scanline = &bitmap.pix32(y);
+		for (x = 0; x < 1024; x++)
+		{
+			pixels = vram[(y * 1024) + x];
+			*scanline++ = m_palette[pixels];
+		}
+	}
+
+	return 0;
+}
+
+uint32_t decstation_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_bt459->screen_update(screen, bitmap, cliprect, (uint8_t *)&m_vram[0]);
+	return 0;
+}
+
+/*
+    0x100000 copy register 0
+    0x100004 copy register 1
+    0x100008 copy register 2
+    0x10000C copy register 3
+    0x100010 copy register 4
+    0x100014 copy register 5
+    0x100018 copy register 6
+    0x10001C copy register 7
+    0x100020 foreground register
+    0x100024 background register
+    0x100028 plane mask
+    0x10002C pixel mask
+    0x100030 cxt mode
+    0x100034 boolean operation
+    0x100038 pixel shift
+    0x10003C line address
+    0x100040 bresh 1
+    0x100044 bresh 2
+    0x100048 bresh 3
+    0x10004C bresh continue
+    0x100050 deep register
+    0x100054 start register
+    0x100058 Clear Interrupt
+    0x10005C reserved 2
+    0x100060 refresh count
+    0x100064 video horiz
+    0x100068 video vertical
+    0x10006C refresh base
+    0x100070 video valid
+    0x100074 Interrupt Enable
+*/
+
+#define MODE_SIMPLE     0
+#define MODE_OPAQUESTIPPLE  1
+#define MODE_OPAQUELINE     2
+#define MODE_TRANSPARENTSTIPPLE 5
+#define MODE_TRANSPARENTLINE    6
+#define MODE_COPY       7
+
 READ32_MEMBER(decstation_state::cfb_r)
 {
-	static const char fwver[8]    = "V5.3a  ";
-	static const char fwvendor[8] = "DEC    ";
-	static const char fwmodule[8] = "PMAG-BA";
-	static const char fwtype[8]   = "TCF0   ";
-	static const char fwinfo[8]   = "CX - D8";
 	uint32_t addr = offset << 2;
 
-	logerror("cfb_r: reading at %x\n", addr);
+//  logerror("cfb_r: reading at %x\n", addr);
 
-	// attempt to fake the ROM ID bytes of a PMAG-BA
-	// color framebuffer card.  doesn't work for unknown reasons.
-	if ((addr >= 0x3c0400) && (addr < 0x3c0420))
+	if (addr < 0x800000)
 	{
-		return fwver[(addr>>2)&0x7];
-	}
-	if ((addr >= 0x3c0420) && (addr < 0x3c0440))
-	{
-		return fwvendor[(addr>>2)&0x7];
-	}
-	if ((addr >= 0x3c0440) && (addr < 0x3c0460))
-	{
-		return fwmodule[(addr>>2)&0x7];
-	}
-	if ((addr >= 0x3c0460) && (addr < 0x3c0480))
-	{
-		return fwtype[(addr>>2)&0x7];
-	}
-	if ((addr >= 0x3c0480) && (addr < 0x3c04a0))
-	{
-		return fwinfo[(addr>>2)&0x7];
+		return m_vrom_ptr[addr>>2] & 0xff;
 	}
 
-	switch (addr)
+	if ((addr >= 0x100000) && (addr < 0x100200))
 	{
-		case 0x3c03e0: return 1;    // ROM width
-		case 0x3c03e4: return 4;    // ROM stride
-		case 0x3c03e8: return 1;    // ROM size in 8 KiB units
-		case 0x3c03ec: return 1;    // card address space in 4 MiB units
-		case 0x3c03f0: return 0x55555555; // TURBOchannel ID bytes
-		case 0x3c03f4: return 0x00000000;
-		case 0x3c03f8: return 0xaaaaaaaa;
-		case 0x3c03fc: return 0xffffffff;
-		case 0x3c0470: return 0;    // does card support parity?
+		return m_sfb[offset-(0x100000/4)];
+	}
+
+	if ((addr >= 0x200000) && (addr < 0x400000))
+	{
+		return m_vram[offset-(0x200000/4)];
 	}
 
 	return 0xffffffff;
@@ -161,30 +245,273 @@ READ32_MEMBER(decstation_state::cfb_r)
 
 WRITE32_MEMBER(decstation_state::cfb_w)
 {
-	logerror("cfb: %08x (mask %08x) @ %x\n", data, mem_mask, offset);
+	uint32_t addr = offset << 2;
+
+	if ((addr >= 0x100000) && (addr < 0x100200))
+	{
+		//printf("SFB: %08x (mask %08x) @ %x\n", data, mem_mask, offset<<2);
+		COMBINE_DATA(&m_sfb[offset-(0x100000/4)]);
+
+		if ((addr == 0x100030) && (data = 7))
+		{
+			m_copy_src = 1;
+		}
+		return;
+	}
+
+	if ((addr >= 0x1c0000) && (addr < 0x200000))
+	{
+		//printf("Bt459: %08x (mask %08x) @ %x\n", data, mem_mask, offset<<2);
+		return;
+	}
+
+	if ((addr >= 0x200000) && (addr < 0x400000))
+	{
+		//printf("FB: %08x (mask %08x) @ %x\n", data, mem_mask, offset<<2);
+
+		switch (m_sfb[0x30/4])
+		{
+			case MODE_SIMPLE:   // simple
+				COMBINE_DATA(&m_vram[offset-(0x200000/4)]);
+				break;
+
+			case MODE_TRANSPARENTSTIPPLE:
+				{
+					uint8_t *pVRAM = (uint8_t *)&m_vram[offset-(0x200000/4)];
+					uint8_t fgs[4];
+
+					fgs[0] = m_sfb[0x20/4] >> 24;
+					fgs[1] = (m_sfb[0x20/4] >> 16) & 0xff;
+					fgs[2] = (m_sfb[0x20/4] >> 8) & 0xff;
+					fgs[3] = m_sfb[0x20/4] & 0xff;
+					for (int x = 0; x < 32; x++)
+					{
+						if (data & (1<<(31-x)))
+						{
+							pVRAM[x] = fgs[x & 3];
+						}
+					}
+				}
+				break;
+
+			case MODE_COPY:
+				{
+					uint8_t *pVRAM = (uint8_t *)&m_vram[offset-(0x200000/4)];
+					uint8_t *pBuffer = (uint8_t *)&m_sfb[0];    // first 8 32-bit regs are the copy buffer
+
+					if (m_copy_src)
+					{
+						m_copy_src = 0;
+
+						for (int x = 0; x < 32; x++)
+						{
+							if (data & (1<<(31-x)))
+							{
+								pBuffer[x] = pVRAM[x];
+							}
+						}
+					}
+					else
+					{
+						m_copy_src = 1;
+
+						for (int x = 0; x < 32; x++)
+						{
+							if (data & (1<<(31-x)))
+							{
+								pVRAM[x] = pBuffer[x];
+							}
+						}
+					}
+				}
+				break;
+
+			default:
+				logerror("SFB: Unsupported VRAM write %08x (mask %08x) at %08x in mode %x\n", data, mem_mask, offset<<2, m_sfb[0x30/4]);
+				break;
+		}
+		return;
+	}
+}
+
+READ32_MEMBER(decstation_state::bt478_palette_r)
+{
+	u8 rv = 0;
+
+	if (offset == 1)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_stage++;
+				rv = (m_palette[m_entry] >> 16) & 0xff;
+				break;
+
+			case 1:
+				m_stage++;
+				rv = (m_palette[m_entry] >> 8) & 0xff;
+				break;
+
+			case 2:
+				rv = m_palette[m_entry] & 0xff;
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+		}
+	}
+	else if (offset == 5)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_stage++;
+				rv = (m_overlay[m_entry] >> 16) & 0xff;
+				break;
+
+			case 1:
+				m_stage++;
+				rv = (m_overlay[m_entry] >> 8) & 0xff;
+				break;
+
+			case 2:
+				rv = m_overlay[m_entry] & 0xff;
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+		}
+	}
+
+	return rv;
+}
+
+WRITE32_MEMBER(decstation_state::bt478_palette_w)
+{
+	if ((offset == 0) || (offset == 3) || (offset == 4) || (offset == 7))
+	{
+		m_entry = data & 0xff;
+		//printf("VDAC: entry %d\n", m_entry);
+		m_stage = 0;
+		m_r = m_g = m_b = 0;
+	}
+	else if (offset == 1)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_r = data & 0xff;
+				m_stage++;
+				break;
+
+			case 1:
+				m_g = data & 0xff;
+				m_stage++;
+				break;
+
+			case 2:
+				m_b = data & 0xff;
+				m_palette[m_entry] = rgb_t(m_r, m_g, m_b);
+				//printf("palette[%d] = RGB(%02x, %02x, %02x)\n", m_entry, m_r, m_g, m_b);
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+				m_r = m_g = m_b = 0;
+				break;
+		}
+	}
+	else if (offset == 5)
+	{
+		switch (m_stage)
+		{
+			case 0:
+				m_r = data & 0xff;
+				m_stage++;
+				break;
+
+			case 1:
+				m_g = data & 0xff;
+				m_stage++;
+				break;
+
+			case 2:
+				m_b = data & 0xff;
+				m_overlay[m_entry] = rgb_t(m_r, m_g, m_b);
+				//printf("overlay[%d] = RGB(%02x, %02x, %02x)\n", m_entry, m_r, m_g, m_b);
+				m_entry++;
+				m_entry &= 0xff;
+				m_stage = 0;
+				m_r = m_g = m_b = 0;
+				break;
+		}
+	}
 }
 
 /***************************************************************************
     MACHINE FUNCTIONS
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(decstation_state::ioga_irq_w)
+{
+	// not sure this is correct
+	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
+}
+
 void decstation_state::machine_start()
 {
+	if (m_vrom)
+		m_vrom_ptr = m_vrom->base();
+	save_item(NAME(m_vram));
+	save_item(NAME(m_sfb));
+	save_item(NAME(m_copy_src));
 }
 
 void decstation_state::machine_reset()
 {
+	m_copy_src = 1;
+	m_entry = 0;
+	m_stage = 0;
+	m_r = m_g = m_b = 0;
+	m_kn01_status = 0;
+}
+
+READ32_MEMBER(decstation_state::kn01_status_r)
+{
+	m_kn01_status ^= 0x200; // fake vint for now
+	return m_kn01_status;
+}
+
+WRITE32_MEMBER(decstation_state::kn01_control_w)
+{
+	COMBINE_DATA(&m_kn01_control);
+}
+
+READ32_MEMBER(decstation_state::dz_r)
+{
+	return 0x8000;
 }
 
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
-void decstation_state::decstation_map(address_map &map)
+void decstation_state::kn01_map(address_map &map)
+{
+	map(0x00000000, 0x017fffff).ram();
+	map(0x0fc00000, 0x0fcfffff).ram().share("vram");
+	map(0x12000000, 0x1200001f).rw(FUNC(decstation_state::bt478_palette_r), FUNC(decstation_state::bt478_palette_w));
+	//map(0x18000000, 0x18000007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0x0000ffff);
+	map(0x1c000000, 0x1c000003).r(FUNC(decstation_state::dz_r));
+	map(0x1d000000, 0x1d0000ff).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct)).umask32(0x000000ff);
+	map(0x1e000000, 0x1effffff).rw(FUNC(decstation_state::kn01_status_r), FUNC(decstation_state::kn01_control_w));
+	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
+}
+
+void decstation_state::threemin_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).ram();  // full 128 MB
-	map(0x10000000, 0x103cffff).rw(FUNC(decstation_state::cfb_r), FUNC(decstation_state::cfb_w));
+	map(0x10000000, 0x13ffffff).rw(FUNC(decstation_state::cfb_r), FUNC(decstation_state::cfb_w));
+	map(0x101c0000, 0x101c000f).m("bt459", FUNC(bt459_device::map)).umask32(0x000000ff);
 	map(0x1c000000, 0x1c07ffff).m(m_ioga, FUNC(dec_ioga_device::map));
+	map(0x1c0c0000, 0x1c0c0007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0x0000ffff);
 	map(0x1c100000, 0x1c100003).rw(m_scc0, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w)).umask32(0x0000ff00);
 	map(0x1c100004, 0x1c100007).rw(m_scc0, FUNC(z80scc_device::da_r), FUNC(z80scc_device::da_w)).umask32(0x0000ff00);
 	map(0x1c100008, 0x1c10000b).rw(m_scc0, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w)).umask32(0x0000ff00);
@@ -216,35 +543,67 @@ static void dec_scsi_devices(device_slot_interface &device)
 	device.option_add_internal("asc", NCR53C94);
 }
 
-MACHINE_CONFIG_START(decstation_state::kn02da)
-	MCFG_DEVICE_ADD( "maincpu", R3041, 33000000 ) // FIXME: Should be R3000A
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_R3000_BRCOND0_INPUT(READLINE(*this, decstation_state, brcond0_r))
-	MCFG_DEVICE_PROGRAM_MAP( decstation_map )
+MACHINE_CONFIG_START(decstation_state::kn01)
+	R2000(config, m_maincpu, 16.67_MHz_XTAL, 65536, 131072);
+	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
+	m_maincpu->set_fpurev(0x340);
+	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::kn01_map);
 
-	MCFG_DEVICE_ADD("ioga", DECSTATION_IOGA, XTAL(12'500'000))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(69169800, 1280, 0, 1024, 901, 0, 864);
+	m_screen->set_screen_update(FUNC(decstation_state::kn01_screen_update));
 
-	MCFG_DEVICE_ADD("rtc", MC146818, XTAL(32'768))
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("ioga", dec_ioga_device, rtc_irq_w))
-	MCFG_MC146818_BINARY(true)
+	AM79C90(config, m_lance, XTAL(12'500'000));
 
-	MCFG_DEVICE_ADD("scc0", SCC85C30, XTAL(14'745'600)/2)
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE("ioga", dec_ioga_device, scc0_irq_w))
+	MC146818(config, m_rtc, XTAL(32'768));
+	m_rtc->set_binary(true);
+MACHINE_CONFIG_END
 
-	MCFG_DEVICE_ADD("scc1", SCC85C30, XTAL(14'745'600)/2)
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE("ioga", dec_ioga_device, scc1_irq_w))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
+MACHINE_CONFIG_START(decstation_state::kn02ba)
+	R3000A(config, m_maincpu, 33.333_MHz_XTAL, 65536, 131072);
+	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
+	m_maincpu->set_fpurev(0x340); // should be R3010A v4.0
+	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::threemin_map);
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc1", z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc1", z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc1", z80scc_device, ctsa_w))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(130000000, 1704, 32, (1280+32), 1064, 3, (1024+3));
+	m_screen->set_screen_update(FUNC(decstation_state::screen_update));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc1", z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc1", z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc1", z80scc_device, ctsb_w))
+	BT459(config, m_bt459, 83'020'800);
+
+	AM79C90(config, m_lance, XTAL(12'500'000));
+	m_lance->intr_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
+
+	DECSTATION_IOGA(config, m_ioga, XTAL(12'500'000));
+	m_ioga->irq_out().set(FUNC(decstation_state::ioga_irq_w));
+
+	MC146818(config, m_rtc, XTAL(32'768));
+	m_rtc->irq().set("ioga", FUNC(dec_ioga_device::rtc_irq_w));
+	m_rtc->set_binary(true);
+
+	SCC85C30(config, m_scc0, XTAL(14'745'600)/2);
+	m_scc0->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc0_irq_w));
+	m_scc0->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_scc0->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+
+	SCC85C30(config, m_scc1, XTAL(14'745'600)/2);
+	m_scc1->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc1_irq_w));
+	m_scc1->out_txdb_callback().set(m_lk201, FUNC(lk201_device::rx_w));
+
+	LK201(config, m_lk201, 0);
+	m_lk201->tx_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
+
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc0, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc0, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc0, FUNC(z80scc_device::ctsa_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc0, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc0, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc0, FUNC(z80scc_device::ctsb_w));
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", dec_scsi_devices, "harddisk", false)
@@ -273,10 +632,20 @@ void decstation_state::init_decstation()
 
 ***************************************************************************/
 
+ROM_START( ds3100 )
+	ROM_REGION32_LE( 0x40000, "user1", 0 )
+	ROM_LOAD( "kn01-aa.v7.01.img", 0x000000, 0x040000, CRC(e2478aa7) SHA1(e789387c52df3e0d83fde97cb48314627ea90b93) )
+ROM_END
+
 ROM_START( ds5k133 )
 	ROM_REGION32_LE( 0x40000, "user1", 0 )
+	// 5.7j                                                                                                                                                                                                                                 sx
 	ROM_LOAD( "ds5000-133_005eb.bin", 0x000000, 0x040000, CRC(76a91d29) SHA1(140fcdb4fd2327daf764a35006d05fabfbee8da6) )
+
+	ROM_REGION32_LE( 0x20000, "gfx", 0 )
+	ROM_LOAD( "pmagb-ba-rom.img", 0x000000, 0x020000, CRC(91f40ab0) SHA1(a39ce6ed52697a513f0fb2300a1a6cf9e2eabe33) )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME                FLAGS
-COMP( 1992, ds5k133, 0,      0,      kn02da, decstation, decstation_state, init_decstation, "Digital Equipment Corporation", "DECstation 5000/133", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, ds3100,  0,      0,      kn01,   decstation, decstation_state, init_decstation, "Digital Equipment Corporation", "DECstation 3100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, ds5k133, 0,      0,      kn02ba, decstation, decstation_state, init_decstation, "Digital Equipment Corporation", "DECstation 5000/133", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

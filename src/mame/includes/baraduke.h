@@ -1,13 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+#ifndef MAME_INCLUDES_BARADUKE_H
+#define MAME_INCLUDES_BARADUKE_H
+
+#pragma once
+
+#include "cpu/m6800/m6801.h"
 #include "sound/namco.h"
 #include "emupal.h"
 
 class baraduke_state : public driver_device
 {
 public:
-	baraduke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	baraduke_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
@@ -24,7 +30,6 @@ public:
 	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);
 	DECLARE_WRITE8_MEMBER(baraduke_irq_ack_w);
 	DECLARE_READ8_MEMBER(soundkludge_r);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_READ8_MEMBER(baraduke_videoram_r);
 	DECLARE_WRITE8_MEMBER(baraduke_videoram_w);
 	DECLARE_READ8_MEMBER(baraduke_textram_r);
@@ -39,7 +44,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(baraduke);
+	void baraduke_palette(palette_device &palette) const;
 	uint32_t screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_baraduke);
 	void scroll_w(address_space &space, int layer, int offset, int data);
@@ -48,7 +53,6 @@ public:
 	void baraduke(machine_config &config);
 	void baraduke_map(address_map &map);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -59,7 +63,7 @@ protected:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_textram;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<hd63701_cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -70,3 +74,5 @@ protected:
 	int m_copy_sprites;
 	output_finder<2> m_lamps;
 };
+
+#endif // MAME_INCLUDES_BARADUKE_H

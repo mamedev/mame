@@ -278,67 +278,63 @@ void gradius3_state::machine_reset()
 
 }
 
-MACHINE_CONFIG_START(gradius3_state::gradius3)
-
+void gradius3_state::gradius3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(gradius3_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gradius3_state,  cpuA_interrupt)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gradius3_state::cpuA_interrupt));
 
-	MCFG_DEVICE_ADD("sub", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(gradius3_map2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gradius3_state, gradius3_sub_scanline, "screen", 0, 1)
-																				/* 4 is triggered by cpu A, the others are unknown but */
-																				/* required for the game to run. */
+	M68000(config, m_subcpu, XTAL(10'000'000));
+	m_subcpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_map2);
+	TIMER(config, "scantimer").configure_scanline(FUNC(gradius3_state::gradius3_sub_scanline), "screen", 0, 1);
+	/* 4 is triggered by cpu A, the others are unknown but */
+	/* required for the game to run. */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(gradius3_s_map)
+	Z80(config, m_audiocpu, 3579545);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_s_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(gradius3_state, screen_update_gradius3)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gradius3_state::screen_update_gradius3));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048).enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(gradius3_state, tile_callback)
-	MCFG_K052109_CHARRAM(true)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(gradius3_state::tile_callback), this);
+	m_k052109->set_char_ram(true);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(gradius3_state, sprite_callback)
-	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_GRADIUS3)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(gradius3_state::sprite_callback), this);
+	m_k051960->set_plane_order(K051960_PLANEORDER_GRADIUS3);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, gradius3_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(gradius3_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.20);
+	m_k007232->add_route(0, "rspeaker", 0.20);
+	m_k007232->add_route(1, "lspeaker", 0.20);
+	m_k007232->add_route(1, "rspeaker", 0.20);
+}
 
 
 

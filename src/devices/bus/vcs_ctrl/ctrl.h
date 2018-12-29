@@ -67,10 +67,20 @@ class vcs_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
+		: vcs_control_port_device(mconfig, tag, owner)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_trigger_wr_callback(Object &&cb) { return m_write_trigger.set_callback(std::forward<Object>(cb)); }
+	auto trigger_wr_callback() { return m_write_trigger.bind(); }
 
 	// computer interface
 

@@ -157,7 +157,7 @@ private:
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	DECLARE_PALETTE_INIT(mazerbla);
+	void mazerbla_palette(palette_device &palette);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
@@ -225,12 +225,12 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mazerbla_state, mazerbla)
+void mazerbla_state::mazerbla_palette(palette_device &palette)
 {
-	static const int resistances_r[2]  = { 4700, 2200 };
-	static const int resistances_gb[3] = { 10000, 4700, 2200 };
+	static constexpr int resistances_r[2]  = { 4700, 2200 };
+	static constexpr int resistances_gb[3] = { 10000, 4700, 2200 };
 
-	/* just to calculate coefficients for later use */
+	// just to calculate coefficients for later use
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistances_gb, m_weights_g,    3600,   0,
 			3,  resistances_gb, m_weights_b,    3600,   0,
@@ -1000,7 +1000,7 @@ MACHINE_CONFIG_START(mazerbla_state::mazerbla)
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1011,8 +1011,7 @@ MACHINE_CONFIG_START(mazerbla_state::mazerbla)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mazerbla_state, screen_vblank))
 
-	MCFG_PALETTE_ADD("palette", 256+1)
-	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
+	PALETTE(config, "palette", FUNC(mazerbla_state::mazerbla_palette), 256+1);
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -1043,7 +1042,7 @@ MACHINE_CONFIG_START(mazerbla_state::greatgun)
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1054,23 +1053,22 @@ MACHINE_CONFIG_START(mazerbla_state::greatgun)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mazerbla_state, screen_vblank))
 
-	MCFG_PALETTE_ADD("palette", 256+1)
-	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
+	PALETTE(config, "palette", FUNC(mazerbla_state::mazerbla_palette), 246+1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK / 8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay1(AY8910(config, "ay1", SOUND_CLOCK / 8));
+	ay1.port_b_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, SOUND_CLOCK / 8)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, mazerbla_state, gg_led_ctrl_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &ay2(AY8910(config, "ay2", SOUND_CLOCK / 8));
+	ay2.port_b_write_callback().set(FUNC(mazerbla_state::gg_led_ctrl_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 /*************************************

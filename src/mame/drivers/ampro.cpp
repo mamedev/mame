@@ -24,11 +24,11 @@ ToDo:
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
-#include "machine/clock.h"
 #include "machine/timer.h"
 #include "softlist.h"
 
@@ -48,8 +48,10 @@ public:
 
 	void init_ampro();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_MACHINE_RESET(ampro);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
@@ -58,7 +60,7 @@ private:
 	void ampro_io(address_map &map);
 	void ampro_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
 	required_device<wd1772_device> m_fdc;
@@ -137,7 +139,7 @@ static void ampro_floppies(device_slot_interface &device)
 static INPUT_PORTS_START( ampro )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( ampro_state, ampro )
+void ampro_state::machine_reset()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -152,39 +154,36 @@ void ampro_state::init_ampro()
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-MACHINE_CONFIG_START(ampro_state::ampro)
+void ampro_state::ampro(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ampro_mem)
-	MCFG_DEVICE_IO_MAP(ampro_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
-	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
-
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 16_MHz_XTAL / 8)); // 2MHz
-	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ampro_state::ampro_mem);
+	m_maincpu->set_addrmap(AS_IO, &ampro_state::ampro_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* Devices */
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->zc_callback<0>().set("dart", FUNC(z80dart_device::txca_w));    // Z80DART Ch A, SIO Ch A
-	m_ctc->zc_callback<0>().append("dart", FUNC(z80dart_device::rxca_w));
-	m_ctc->zc_callback<1>().set("dart", FUNC(z80dart_device::rxtxcb_w));   // SIO Ch B
+	m_ctc->set_clk<0>(16_MHz_XTAL / 8); // 2MHz
+	m_ctc->set_clk<1>(16_MHz_XTAL / 8); // 2MHz
+	m_ctc->zc_callback<0>().set(m_dart, FUNC(z80dart_device::txca_w));    // Z80DART Ch A, SIO Ch A
+	m_ctc->zc_callback<0>().append(m_dart, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));   // SIO Ch B
 
-	MCFG_DEVICE_ADD("dart", Z80DART, 16_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80DART(config, m_dart, 16_MHz_XTAL / 4);
+	m_dart->out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ampro")
-MACHINE_CONFIG_END
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	FLOPPY_CONNECTOR(config, "fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	SOFTWARE_LIST(config, "flop_list").set_original("ampro");
+}
 
 /* ROM definition */
 ROM_START( ampro )

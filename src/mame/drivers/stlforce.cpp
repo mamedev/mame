@@ -72,10 +72,6 @@ TO DO :
 #include "emu.h"
 #include "includes/stlforce.h"
 
-#include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "screen.h"
-#include "speaker.h"
 
 WRITE8_MEMBER(stlforce_state::eeprom_w)
 {
@@ -95,10 +91,10 @@ WRITE8_MEMBER(stlforce_state::oki_bank_w)
 void stlforce_state::stlforce_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x1007ff).ram().w(FUNC(stlforce_state::bg_videoram_w)).share("bg_videoram");
-	map(0x100800, 0x100fff).ram().w(FUNC(stlforce_state::mlow_videoram_w)).share("mlow_videoram");
-	map(0x101000, 0x1017ff).ram().w(FUNC(stlforce_state::mhigh_videoram_w)).share("mhigh_videoram");
-	map(0x101800, 0x1027ff).ram().w(FUNC(stlforce_state::tx_videoram_w)).share("tx_videoram");
+	map(0x100000, 0x1007ff).ram().w(m_video, FUNC(edevices_device::bg_videoram_w)).share("bg_videoram");
+	map(0x100800, 0x100fff).ram().w(m_video, FUNC(edevices_device::mlow_videoram_w)).share("mlow_videoram");
+	map(0x101000, 0x1017ff).ram().w(m_video, FUNC(edevices_device::mhigh_videoram_w)).share("mhigh_videoram");
+	map(0x101800, 0x1027ff).ram().w(m_video, FUNC(edevices_device::tx_videoram_w)).share("tx_videoram");
 	map(0x102800, 0x102fff).ram(); /* unknown / ram */
 	map(0x103000, 0x1033ff).ram().share("bg_scrollram");
 	map(0x103400, 0x1037ff).ram().share("mlow_scrollram");
@@ -106,13 +102,14 @@ void stlforce_state::stlforce_map(address_map &map)
 	map(0x103c00, 0x103fff).ram().share("vidattrram");
 	map(0x104000, 0x104fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x105000, 0x107fff).ram(); /* unknown / ram */
-	map(0x108000, 0x108fff).ram().share("spriteram");
+	map(0x108000, 0x1087ff).ram().share("spriteram");
+	map(0x108800, 0x108fff).ram();
 	map(0x109000, 0x11ffff).ram();
 	map(0x400000, 0x400001).portr("INPUT");
 	map(0x400002, 0x400003).portr("SYSTEM");
 	map(0x400011, 0x400011).w(FUNC(stlforce_state::eeprom_w));
 	map(0x400012, 0x400012).w(FUNC(stlforce_state::oki_bank_w));
-	map(0x40001e, 0x40001f).nopw(); // sprites buffer commands
+	map(0x40001e, 0x40001f).w(m_video, FUNC(edevices_device::sprites_commands_w));
 	map(0x410001, 0x410001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -156,7 +153,7 @@ INPUT_PORTS_END
 static const gfx_layout stlforce_bglayout =
 {
 	16,16,
-	RGN_FRAC(1,1),
+	RGN_FRAC(1,4),
 	4,
 	{0,1,2,3},
 	{12,8,4,0,28,24,20,16,16*32+12,16*32+8,16*32+4,16*32+0,16*32+28,16*32+24,16*32+20,16*32+16},
@@ -167,7 +164,7 @@ static const gfx_layout stlforce_bglayout =
 static const gfx_layout stlforce_txlayout =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	RGN_FRAC(1,4),
 	4,
 	{0,1,2,3},
 	{12,8,4,0,28,24,20,16},
@@ -187,11 +184,17 @@ static const gfx_layout stlforce_splayout =
 };
 
 static GFXDECODE_START( gfx_stlforce )
-	GFXDECODE_ENTRY( "gfx1", 0, stlforce_bglayout, 0, 256  )
-	GFXDECODE_ENTRY( "gfx1", 0, stlforce_txlayout, 0, 256  )
-	GFXDECODE_ENTRY( "gfx2", 0, stlforce_splayout, 0, 256  )
+	GFXDECODE_ENTRY( "gfx2", 0, stlforce_splayout, 1024, 16  )
+	GFXDECODE_ENTRY( "gfx1", 0x180000, stlforce_txlayout, 384, 8  )
+	GFXDECODE_ENTRY( "gfx1", 0x100000, stlforce_bglayout, 256, 8  )
+	GFXDECODE_ENTRY( "gfx1", 0x080000, stlforce_bglayout, 128, 8  )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, stlforce_bglayout, 0, 8  )
 GFXDECODE_END
 
+uint32_t stlforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return m_video->draw(screen, bitmap, cliprect);
+}
 
 MACHINE_CONFIG_START(stlforce_state::stlforce)
 
@@ -200,20 +203,32 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_DEVICE_PROGRAM_MAP(stlforce_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stlforce_state, irq4_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(8, 48*8-1-8-2, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stlforce)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
+
+	EDEVICES_SFORCE_VID(config, m_video, 0);
+	m_video->set_bg_videoram_tag("bg_videoram");
+	m_video->set_mlow_videoram_tag("mlow_videoram");
+	m_video->set_mhigh_videoram_tag("mhigh_videoram");
+	m_video->set_tx_videoram_tag("tx_videoram");
+	m_video->set_bg_scrollram_tag("bg_scrollram");
+	m_video->set_mlow_scrollram_tag("mlow_scrollram");
+	m_video->set_mhigh_scrollram_tag("mhigh_scrollram");
+	m_video->set_vidattrram_tag("vidattrram");
+	m_video->set_spriteram_tag("spriteram");
+	m_video->set_gfxdecode_tag("gfxdecode");
+	m_video->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -230,7 +245,10 @@ MACHINE_CONFIG_START(stlforce_state::twinbrat)
 	MCFG_DEVICE_CLOCK(XTAL(14'745'600))
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(3*8, 44*8-1, 0*8, 30*8-1)
+
+	/* modify m_video */
+	m_video->set_spritexoffset(10);
 
 	MCFG_DEVICE_MODIFY("oki")
 	MCFG_DEVICE_CLOCK(XTAL(30'000'000) / 32) // verified on 2 PCBs
@@ -374,21 +392,15 @@ ROM_START( twinbratb )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
 ROM_END
 
-void stlforce_state::init_stlforce()
-{
-	m_sprxoffs = 0;
-}
-
 void stlforce_state::init_twinbrat()
 {
-	m_sprxoffs = 9;
-
 	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
 	m_okibank->set_entry(0);
 }
 
 
-GAME( 1994, stlforce,  0,        stlforce, stlforce, stlforce_state, init_stlforce, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stlforce,  0,        stlforce, stlforce, stlforce_state, empty_init,    ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1995, twinbrat,  0,        twinbrat, stlforce, stlforce_state, init_twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, twinbrata, twinbrat, twinbrat, stlforce, stlforce_state, init_twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, twinbratb, twinbrat, twinbrat, stlforce, stlforce_state, init_twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 3)", MACHINE_SUPPORTS_SAVE )

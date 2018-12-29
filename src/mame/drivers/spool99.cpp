@@ -103,20 +103,24 @@ Note
 class spool99_state : public driver_device
 {
 public:
-	spool99_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spool99_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_main(*this, "mainram"),
 		m_vram(*this, "vram"),
-		m_cram(*this, "cram") { }
+		m_cram(*this, "cram")
+	{ }
 
 	void vcarn(machine_config &config);
 	void spool99(machine_config &config);
 
 	void init_spool99();
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -137,8 +141,6 @@ private:
 	DECLARE_WRITE8_MEMBER(eeprom_resetline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
-
-	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -371,7 +373,7 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_DEVICE_PROGRAM_MAP(spool99_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spool99)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_spool99);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -381,10 +383,9 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_SCREEN_UPDATE_DRIVER(spool99_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x200);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 
 	SPEAKER(config, "lspeaker").front_left();

@@ -374,7 +374,7 @@ WRITE8_MEMBER( gts80b_state::port3b_w )
 	if (m_r0_sound)
 		m_r0_sound->write(space, offset, sndcmd);
 	if (m_r1_sound)
-		m_r1_sound->write(space, offset, sndcmd);
+		m_r1_sound->write(sndcmd);
 }
 
 void gts80b_state::machine_reset()
@@ -388,81 +388,88 @@ void gts80b_state::init_gts80b()
 }
 
 /* with Sound Board */
-MACHINE_CONFIG_START(gts80b_state::gts80b)
+void gts80b_state::gts80b(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
-	MCFG_DEVICE_PROGRAM_MAP(gts80b_map)
+	M6502(config, m_maincpu, XTAL(3'579'545)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gts80b_state::gts80b_map);
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
 	config.set_default_layout(layout_gts80b);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80b_state, port1a_r)) // sw_r
-	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80b_state, port1a_w))
-	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80b_state, port1b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80b_state, port1b_w)) // sw_w
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80b_state, port2a_r)) // pa7 - slam tilt
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80b_state, port2a_w)) // digit select
-	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80b_state, port2b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80b_state, port2b_w)) // seg
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL(3'579'545)/4)
-	//MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80b_state, port3a_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80b_state, port3a_w)) // sol, snd
-	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80b_state, port3b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80b_state, port3b_w)) // lamps
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	riot6532_device &riot1(RIOT6532(config, "riot1", XTAL(3'579'545)/4));
+	riot1.in_pa_callback().set(FUNC(gts80b_state::port1a_r)); // sw_r
+	//riot1.out_pa_callback().set(FUNC(gts80b_state::port1a_w));
+	//riot1.in_pb_callback().set(FUNC(gts80b_state::port1b_r));
+	riot1.out_pb_callback().set(FUNC(gts80b_state::port1b_w)); // sw_w
+	riot1.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+
+	riot6532_device &riot2(RIOT6532(config, "riot2", XTAL(3'579'545)/4));
+	riot2.in_pa_callback().set(FUNC(gts80b_state::port2a_r)); // pa7 - slam tilt
+	riot2.out_pa_callback().set(FUNC(gts80b_state::port2a_w)); // digit select
+	//riot2.in_pb_callback().set(FUNC(gts80b_state::port2b_r));
+	riot2.out_pb_callback().set(FUNC(gts80b_state::port2b_w)); // seg
+	riot2.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+
+	riot6532_device &riot3(RIOT6532(config, "riot3", XTAL(3'579'545)/4));
+	//riot3.in_pa_callback().set(FUNC(gts80b_state::port3a_r));
+	riot3.out_pa_callback().set(FUNC(gts80b_state::port3a_w)); // sol, snd
+	//riot3.in_pb_callback().set(FUNC(gts80b_state::port3b_r));
+	riot3.out_pb_callback().set(FUNC(gts80b_state::port3b_w)); // lamps
+	riot3.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gts80b_state::gts80b_s)
+void gts80b_state::gts80b_s(machine_config &config)
+{
 	gts80b(config);
-	MCFG_DEVICE_ADD("r0sound", GOTTLIEB_SOUND_REV0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-//static MACHINE_CONFIG_START( gts80b_ss )
-//static    gts80b(config);
-//  MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
-//  //MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX0)  // votrax crashes
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-//MACHINE_CONFIG_END
+//void gts80b_state::gts80b_ss(machine_config &config)
+//{
+//  gts80b(config);
+//  GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  //GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);  // votrax crashes
+//}
 
-MACHINE_CONFIG_START(gts80b_state::gts80b_s1)
-	gts80b(config);
-
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b1)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(gts80b_state::gts80b_s2)
+void gts80b_state::gts80b_s1(machine_config &config)
+{
 	gts80b(config);
 
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b2)
-MACHINE_CONFIG_END
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b1(config);
+}
 
-MACHINE_CONFIG_START(gts80b_state::gts80b_s3)
+void gts80b_state::gts80b_s2(machine_config &config)
+{
 	gts80b(config);
 
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b3)
-MACHINE_CONFIG_END
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b2(config);
+}
 
-MACHINE_CONFIG_START(gts80b_state::bonebstr)
+void gts80b_state::gts80b_s3(machine_config &config)
+{
 	gts80b(config);
 
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b3a)
-MACHINE_CONFIG_END
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b3(config);
+}
+
+void gts80b_state::bonebstr(machine_config &config)
+{
+	gts80b(config);
+
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b3a(config);
+}
 
 
 /*-------------------------------------------------------------------

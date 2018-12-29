@@ -66,7 +66,7 @@
 					<param name="colno" start="1" increment="1" />
 					<param name="colx" start="~digitx~" increment="111" /> <!-- horizontal distance between LEDs -->
 					<bezel name="Dot_~digitno~~rowno~~colno~" element="Pixel" state="0">
-						<bounds x="~colx~" y="~rowy~" width="100" height="100"/> <!-- size of each LED -->
+						<bounds x="~colx~" y="~rowy~" width="100" height="100" /> <!-- size of each LED -->
 					</bezel>
 				</repeat>
 			</repeat>

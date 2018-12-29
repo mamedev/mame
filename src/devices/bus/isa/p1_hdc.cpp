@@ -56,7 +56,8 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(p1_hdc_device::device_add_mconfig)
+void p1_hdc_device::device_add_mconfig(machine_config &config)
+{
 	WD2010(config, m_hdc, 5'000'000); // XXX clock?
 	m_hdc->in_drdy_callback().set_constant(1);
 	m_hdc->in_index_callback().set_constant(1);
@@ -64,9 +65,9 @@ MACHINE_CONFIG_START(p1_hdc_device::device_add_mconfig)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	MCFG_HARDDISK_ADD("hard0")
-	MCFG_HARDDISK_ADD("hard1")
-MACHINE_CONFIG_END
+	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hard1", 0);
+}
 
 
 //-------------------------------------------------

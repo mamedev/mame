@@ -29,20 +29,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MOS6581_POTX_CALLBACK(_read) \
-	downcast<mos6581_device &>(*device).set_potx_rd_callback(DEVCB_##_read);
-
-#define MCFG_MOS6581_POTY_CALLBACK(_read) \
-	downcast<mos6581_device &>(*device).set_poty_rd_callback(DEVCB_##_read);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -64,8 +50,8 @@ public:
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mos6581_device();
 
-	template <class Object> devcb_base &set_potx_rd_callback(Object &&cb) { return m_read_potx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_poty_rd_callback(Object &&cb) { return m_read_poty.set_callback(std::forward<Object>(cb)); }
+	auto potx() { return m_read_potx.bind(); }
+	auto poty() { return m_read_poty.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

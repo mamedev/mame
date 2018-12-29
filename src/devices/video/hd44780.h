@@ -39,19 +39,30 @@ public:
 	typedef device_delegate<void (bitmap_ind16 &bitmap, uint8_t line, uint8_t pos, uint8_t y, uint8_t x, int state)> pixel_update_delegate;
 
 	// construction/destruction
-	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
 	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
+	void set_pixel_update_cb(pixel_update_delegate callback) { m_pixel_update_cb = callback; }
+	template <class FunctionClass> void set_pixel_update_cb(const char *devname,
+		void (FunctionClass::*callback)(bitmap_ind16 &, uint8_t, uint8_t, uint8_t, uint8_t, int), const char *name)
+	{
+		set_pixel_update_cb(pixel_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_pixel_update_cb(
+		void (FunctionClass::*callback)(bitmap_ind16 &, uint8_t, uint8_t, uint8_t, uint8_t, int), const char *name)
+	{
+		set_pixel_update_cb(pixel_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// device interface
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(control_write);
-	virtual DECLARE_READ8_MEMBER(control_read);
-	virtual DECLARE_WRITE8_MEMBER(data_write);
-	virtual DECLARE_READ8_MEMBER(data_read);
+	virtual void write(offs_t offset, u8 data);
+	virtual u8 read(offs_t offset);
+	virtual void control_write(u8 data);
+	virtual u8 control_read();
+	virtual void data_write(u8 data);
+	virtual u8 data_read();
 
 	const uint8_t *render();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

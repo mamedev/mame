@@ -66,57 +66,6 @@
 #define SIO_CHANA_TAG   "cha"
 #define SIO_CHANB_TAG   "chb"
 
-/* Generic macros */
-#define MCFG_Z80SIO_OUT_INT_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_CPU(_cputag)                            \
-	downcast<z80sio_device &>(*device).set_cputag(_cputag);
-
-// Port A callbacks
-#define MCFG_Z80SIO_OUT_TXDA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txd_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_DTRA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_dtr_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RTSA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rts_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_WRDYA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_wrdy_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_SYNCA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_sync_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RXDRQA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rxdrq_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_TXDRQA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txdrq_callback<0>(DEVCB_##_devcb);
-
-// Port B callbacks
-#define MCFG_Z80SIO_OUT_TXDB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txd_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_DTRB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_dtr_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RTSB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rts_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_WRDYB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_wrdy_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_SYNCB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_sync_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RXDRQB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rxdrq_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_TXDRQB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txdrq_callback<1>(DEVCB_##_devcb);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -337,15 +286,6 @@ class z80sio_device :  public device_t,
 public:
 	// construction/destruction
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <unsigned N, class Object> devcb_base &set_out_txd_callback(Object &&cb) { return m_out_txd_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_dtr_callback(Object &&cb) { return m_out_dtr_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_rts_callback(Object &&cb) { return m_out_rts_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_wrdy_callback(Object &&cb) { return m_out_wrdy_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_sync_callback(Object &&cb) { return m_out_sync_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_rxdrq_callback(Object &&cb) { return m_out_rxdrq_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_txdrq_callback(Object &&cb) { return m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
 
 	auto out_txda_callback() { return m_out_txd_cb[0].bind(); }
 	auto out_txdb_callback() { return m_out_txd_cb[1].bind(); }

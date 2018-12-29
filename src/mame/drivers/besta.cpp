@@ -25,28 +25,26 @@
 		} \
 	} while (0)
 
-#define TERMINAL_TAG "terminal"
 
 class besta_state : public driver_device
 {
 public:
 	besta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit1 (*this, "pit1"),
-		m_pit2 (*this, "pit2"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_p_ram(*this, "p_ram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit1 (*this, "pit1")
+		, m_pit2 (*this, "pit2")
+		, m_terminal(*this, "terminal")
+		, m_p_ram(*this, "p_ram")
+	{ }
 
+	void besta(machine_config &config);
+
+protected:
+	void besta_mem(address_map &map);
 	DECLARE_READ8_MEMBER( mpcc_reg_r );
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
 	void kbd_put(u8 data);
-
-	void besta(machine_config &config);
-	void besta_mem(address_map &map);
-protected:
 	virtual void machine_reset() override;
 
 	uint8_t m_term_data;
@@ -136,18 +134,19 @@ void besta_state::machine_reset()
 }
 
 /* CP31 processor board */
-MACHINE_CONFIG_START(besta_state::besta)
+void besta_state::besta(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, 2*16670000)
-	MCFG_DEVICE_PROGRAM_MAP(besta_mem)
+	M68030(config, m_maincpu, 2*16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &besta_state::besta_mem);
 
-	MCFG_DEVICE_ADD ("pit1", PIT68230, 16670000 / 2)    // XXX verify clock
+	PIT68230(config, m_pit1, 16670000 / 2);    // XXX verify clock
 
-	MCFG_DEVICE_ADD ("pit2", PIT68230, 16670000 / 2)    // XXX verify clock
+	PIT68230(config, m_pit2, 16670000 / 2);    // XXX verify clock
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(besta_state, kbd_put))
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(besta_state::kbd_put));
+}
 
 /* ROM definition */
 

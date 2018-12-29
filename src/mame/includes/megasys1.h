@@ -7,6 +7,10 @@
                     driver by   Luca Elia (l.elia@tin.it)
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_MEGASYS1_H
+#define MAME_INCLUDES_MEGASYS1_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -19,8 +23,8 @@
 class megasys1_state : public driver_device
 {
 public:
-	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	megasys1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_objectram(*this, "objectram"),
 		m_tmap(*this, "scroll%u", 0),
 		m_ram(*this, "ram"),
@@ -41,7 +45,7 @@ public:
 		m_io_dsw(*this, "DSW"),
 		m_io_dsw1(*this, "DSW1"),
 		m_io_dsw2(*this, "DSW2")
-		{ }
+	{ }
 
 	void system_A_soldam(machine_config &config);
 	void system_B_monkelf(machine_config &config);
@@ -171,7 +175,7 @@ private:
 
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
-	DECLARE_PALETTE_INIT(megasys1);
+	void megasys1_palette(palette_device &palette);
 	DECLARE_MACHINE_RESET(megasys1_hachoo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -203,3 +207,5 @@ private:
 	void z80_sound_io_map(address_map &map);
 	void z80_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MEGASYS1_H

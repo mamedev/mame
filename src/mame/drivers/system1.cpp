@@ -222,7 +222,6 @@ seem to have access to.
 #include "emu.h"
 #include "includes/system1.h"
 
-#include "cpu/mcs51/mcs51.h"
 #include "machine/segacrpt_device.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -1952,9 +1951,9 @@ static INPUT_PORTS_START( tokisens )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("SWA")
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
@@ -1972,6 +1971,15 @@ static INPUT_PORTS_START( tokisens )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tokisensa )
+	PORT_INCLUDE( tokisens )
+
+	PORT_MODIFY("SWA")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wbml )
@@ -2152,422 +2160,437 @@ GFXDECODE_END
  *************************************/
 
 /* original board with 64kbit ROMs and an 8255 PPI for outputs */
-MACHINE_CONFIG_START(system1_state::sys1ppi)
-
+void system1_state::sys1ppi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)  /* not really, see notes above */
-	MCFG_DEVICE_PROGRAM_MAP(system1_map)
-	MCFG_DEVICE_IO_MAP(system1_ppi_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK);  /* not really, see notes above */
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("soundirq", system1_state, soundirq_gen, "screen", 32, 64)
+	Z80(config, m_soundcpu, SOUND_CLOCK/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &system1_state::sound_map);
+
+	TIMER(config, "soundirq", 0).configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, system1_state, soundport_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, system1_state, videomode_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, system1_state, sound_control_w))
+	I8255A(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(system1_state::soundport_w));
+	m_ppi8255->out_pb_callback().set(FUNC(system1_state::videomode_w));
+	m_ppi8255->out_pc_callback().set(FUNC(system1_state::sound_control_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)  /* needed for proper hardware collisions */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);  /* needed for proper hardware collisions */
+	m_screen->set_raw(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224);
+	m_screen->set_screen_update(FUNC(system1_state::screen_update_system1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_system1)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_system1);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, "sn1", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, SOUND_CLOCK/2)  /* selectable via jumper */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
-
+	/* 2nd SN's clock is selectable via jumper */
+	SN76489A(config, "sn2", SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /* reduced visible area for scrolling games */
-MACHINE_CONFIG_START(system1_state::sys1ppis)
+void system1_state::sys1ppis(machine_config &config)
+{
 	sys1ppi(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
-MACHINE_CONFIG_END
-
-
-
-
-
+	m_screen->set_visarea(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1);
+}
 
 /* revised board with 128kbit ROMs and a Z80 PIO for outputs */
-MACHINE_CONFIG_START(system1_state::sys1pio)
+void system1_state::sys1pio(machine_config &config)
+{
 	sys1ppi(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(system1_pio_io_map)
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_pio_io_map);
 
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("pio", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, system1_state, soundport_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, system1_state, videomode_w))
-MACHINE_CONFIG_END
+	config.device_remove("ppi8255");
 
-#define ENCRYPTED_SYS1PPI_MAPS \
-	MCFG_DEVICE_PROGRAM_MAP(system1_map) \
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map) \
-	MCFG_DEVICE_IO_MAP(system1_ppi_io_map) \
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	Z80PIO(config, m_pio, MASTER_CLOCK);
+	m_pio->out_pa_callback().set(FUNC(system1_state::soundport_w));
+	m_pio->out_ardy_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	m_pio->out_pb_callback().set(FUNC(system1_state::videomode_w));
+}
 
-#define ENCRYPTED_SYS1PIO_MAPS \
-	MCFG_DEVICE_PROGRAM_MAP(system1_map) \
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map) \
-	MCFG_DEVICE_IO_MAP(system1_pio_io_map) \
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+void system1_state::encrypted_sys1ppi_maps(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+}
 
-#define ENCRYPTED_SYS2_MC8123_MAPS \
-	MCFG_DEVICE_PROGRAM_MAP(system1_map) \
-	MCFG_DEVICE_OPCODES_MAP(banked_decrypted_opcodes_map) \
-	MCFG_DEVICE_IO_MAP(system1_ppi_io_map) \
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+void system1_state::encrypted_sys1pio_maps(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_pio_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+}
 
+void system1_state::encrypted_sys2_mc8123_maps(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+}
 
-MACHINE_CONFIG_START(system1_state::sys1pioxb)
+void system1_state::sys1pioxb(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", MC8123, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	encrypted_sys1pio_maps(config);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5178)
+void system1_state::sys1ppix_315_5178(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5178, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5178(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5179)
+void system1_state::sys1ppix_315_5179(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5179(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5051)
+void system1_state::sys1ppix_315_5051(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5048)
+void system1_state::sys1ppix_315_5048(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5048, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5048(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5033)
+void system1_state::sys1ppix_315_5033(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5033, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5033(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5065)
+void system1_state::sys1ppix_315_5065(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5098)
+void system1_state::sys1ppix_315_5098(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5177)
+void system1_state::sys1piox_315_5177(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5162)
+void system1_state::sys1piox_315_5162(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5162, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5162(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_317_0006)
+void system1_state::sys1piox_317_0006(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5135)
+void system1_state::sys1piox_315_5135(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5135, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5135(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5132)
+void system1_state::sys1piox_315_5132(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5132, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5132(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5155)
+void system1_state::sys1piox_315_5155(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5155, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5155(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5110)
+void system1_state::sys1piox_315_5110(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5110, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5110(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5051)
+void system1_state::sys1piox_315_5051(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5098)
+void system1_state::sys1piox_315_5098(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5102)
+void system1_state::sys1piox_315_5102(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5102, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5102(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5133)
+void system1_state::sys1piox_315_5133(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5133, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5133(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5093)
+void system1_state::sys1piox_315_5093(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5093, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5093(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5065)
+void system1_state::sys1piox_315_5065(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
 /* reduced visible area for scrolling games */
-MACHINE_CONFIG_START(system1_state::sys1pios)
+void system1_state::sys1pios(machine_config &config)
+{
 	sys1pio(config);
+	m_screen->set_visarea(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1);
+}
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
-MACHINE_CONFIG_END
+void system1_state::sys1piosx_315_5099(machine_config &config)
+{
+	sys1pio(config);
+	segacrpt_z80_device &z80(SEGA_315_5099(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piosx_315_5099)
+void system1_state::sys1piosx_315_spat(machine_config &config)
+{
 	sys1pios(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_SPAT(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piosx_315_spat)
-	sys1pios(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_SPAT, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5064)
+void system1_state::sys1ppisx_315_5064(machine_config &config)
+{
 	sys1ppis(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5064, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5064(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5041)
+void system1_state::sys1ppisx_315_5041(machine_config &config)
+{
 	sys1ppis(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5041, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
-
-
-
-
-
+	segacrpt_z80_device &z80(SEGA_315_5041(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
 /* this describes the additional 8751 MCU when present */
-MACHINE_CONFIG_START(system1_state::mcu)
-
+void system1_state::mcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_REMOVE()
+	m_maincpu->set_vblank_int(device_interrupt_delegate(), nullptr);
 
-	MCFG_DEVICE_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, system1_state, mcu_control_w))
+	I8751(config, m_mcu, SOUND_CLOCK);
+	m_mcu->set_addrmap(AS_IO, &system1_state::mcu_io_map);
+	m_mcu->port_out_cb<1>().set(FUNC(system1_state::mcu_control_w));
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", MCS51_INT0_LINE))
+	m_screen->screen_vblank().set_inputline("mcu", MCS51_INT0_LINE);
 	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
 	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
-MACHINE_CONFIG_END
-
-
+	TIMER(config, "mcu_t0", 0).configure_periodic(timer_device::expired_delegate(FUNC(system1_state::mcu_t0_callback), this), attotime::from_usec(2500));
+}
 
 /* alternate program map with RAM/collision swapped */
-MACHINE_CONFIG_START(system1_state::nob)
+void system1_state::nob(machine_config &config)
+{
 	sys1ppi(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nobo_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::nobo_map);
+}
 
-MACHINE_CONFIG_START(system1_state::nobm)
+void system1_state::nobm(machine_config &config)
+{
 	nob(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, system1_state, nob_mcu_latch_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, system1_state, nob_mcu_latch_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, system1_state, nob_mcu_status_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, system1_state, nob_mcu_control_p2_w))
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, SOUND_CLOCK);
+	m_mcu->port_in_cb<0>().set(FUNC(system1_state::nob_mcu_latch_r));
+	m_mcu->port_out_cb<0>().set(FUNC(system1_state::nob_mcu_latch_w));
+	m_mcu->port_out_cb<1>().set(FUNC(system1_state::nob_mcu_status_w));
+	m_mcu->port_out_cb<2>().set(FUNC(system1_state::nob_mcu_control_p2_w));
+}
 
 
 
 /* system2 video */
-MACHINE_CONFIG_START(system1_state::sys2)
+void system1_state::sys2(machine_config &config)
+{
 	sys1ppi(config);
 
 	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(system1_state,system2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(system1_state::screen_update_system2));
+}
 
-MACHINE_CONFIG_START(system1_state::sys2x)
+void system1_state::sys2x(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_315_5177)
+void system1_state::sys2_315_5177(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_315_5176)
+void system1_state::sys2_315_5176(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5176, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5176(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_317_0006)
+void system1_state::sys2_317_0006(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_317_0007)
+void system1_state::sys2_317_0007(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0007, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_317_0007(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys2xb)
+void system1_state::sys2xb(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_REPLACE("maincpu", MC8123, MASTER_CLOCK)
-	ENCRYPTED_SYS2_MC8123_MAPS
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	encrypted_sys2_mc8123_maps(config);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2xboot)
+void system1_state::sys2xboot(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(banked_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2m)
+void system1_state::sys2m(machine_config &config)
+{
 	sys2(config);
 	mcu(config);
-MACHINE_CONFIG_END
+}
 
 /* system2 with rowscroll */
-MACHINE_CONFIG_START(system1_state::sys2row)
+void system1_state::sys2row(machine_config &config)
+{
 	sys2(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2_rowscroll)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(system1_state::screen_update_system2_rowscroll));
+}
 
-MACHINE_CONFIG_START(system1_state::sys2rowxb)
+void system1_state::sys2rowxb(machine_config &config)
+{
 	sys2row(config);
-	MCFG_DEVICE_REPLACE("maincpu", MC8123, MASTER_CLOCK)
-	ENCRYPTED_SYS2_MC8123_MAPS
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	encrypted_sys2_mc8123_maps(config);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2rowxboot)
+void system1_state::sys2rowxboot(machine_config &config)
+{
 	sys2row(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(banked_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2rowm)
+void system1_state::sys2rowm(machine_config &config)
+{
 	sys2row(config);
 	mcu(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -4514,32 +4537,32 @@ ROM_START( wbdeluxe )
 ROM_END
 
 
-ROM_START( gardia )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr10255.1",   0x00000, 0x8000, CRC(89282a6b) SHA1(f19e345e5fae6a518276cc1bd09d1e2083672b25) ) /* encrypted */
-	ROM_LOAD( "epr10254.2",   0x10000, 0x8000, CRC(2826b6d8) SHA1(de1faf33cca031b72052bf5244fcb0bd79d85659) )
-	ROM_LOAD( "epr10253.3",   0x18000, 0x8000, CRC(7911260f) SHA1(44196f0a6c4c2b22a68609ddfc75be6a7877a69a) )
+ROM_START( gardia ) /* Factory conversion, Sega game ID# 834-6119-04 GARDIA (CVT) */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* These 3 EPROMs located on a Sega 834-5764 daughter card with a 315-5134 PAL? */
+	ROM_LOAD( "epr-10255.1",   0x00000, 0x8000, CRC(89282a6b) SHA1(f19e345e5fae6a518276cc1bd09d1e2083672b25) ) /* encrypted */
+	ROM_LOAD( "epr-10254.2",   0x10000, 0x8000, CRC(2826b6d8) SHA1(de1faf33cca031b72052bf5244fcb0bd79d85659) )
+	ROM_LOAD( "epr-10253.3",   0x18000, 0x8000, CRC(7911260f) SHA1(44196f0a6c4c2b22a68609ddfc75be6a7877a69a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
+	ROM_LOAD( "epr-10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr10249.61",  0x0000, 0x4000, CRC(4e0ad0f2) SHA1(b76c155b674f3ad8938278d5dbb0452351c716a5) )
-	ROM_LOAD( "epr10248.64",  0x4000, 0x4000, CRC(3515d124) SHA1(39b28a103d8bfe702a376ebd880d6060e3d1ab30) )
-	ROM_LOAD( "epr10247.66",  0x8000, 0x4000, CRC(541e1555) SHA1(6660204c74a9f7e63b3ba08d99fb854aa863710e) )
+	ROM_LOAD( "epr-10249.61",  0x0000, 0x4000, CRC(4e0ad0f2) SHA1(b76c155b674f3ad8938278d5dbb0452351c716a5) )
+	ROM_LOAD( "epr-10248.64",  0x4000, 0x4000, CRC(3515d124) SHA1(39b28a103d8bfe702a376ebd880d6060e3d1ab30) )
+	ROM_LOAD( "epr-10247.66",  0x8000, 0x4000, CRC(541e1555) SHA1(6660204c74a9f7e63b3ba08d99fb854aa863710e) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr10234.117", 0x00000, 0x8000, CRC(8a6aed33) SHA1(044836885ace8294124b1be9b3a4828f772bb9ee) )
-	ROM_LOAD( "epr10233.110", 0x08000, 0x8000, CRC(c52784d3) SHA1(b37d7f261be12616dbe11dfa375eaf6878e4a0f3) )
-	ROM_LOAD( "epr10236.04",  0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
-	ROM_LOAD( "epr10235.5",   0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
+	ROM_LOAD( "epr-10234.117", 0x00000, 0x8000, CRC(8a6aed33) SHA1(044836885ace8294124b1be9b3a4828f772bb9ee) )
+	ROM_LOAD( "epr-10233.110", 0x08000, 0x8000, CRC(c52784d3) SHA1(b37d7f261be12616dbe11dfa375eaf6878e4a0f3) )
+	ROM_LOAD( "epr-10236.04",  0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
+	ROM_LOAD( "epr-10235.5",   0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
 
-	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_REGION( 0x0300, "palette", 0 ) /* BPROMs located on a Sega 834-5755 daughter card */
 	ROM_LOAD( "bprom.3",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
 	ROM_LOAD( "bprom.2",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
 	ROM_LOAD( "bprom.1",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
-	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 ) /* BPROM located on a Sega 834-5755 daughter card */
 	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
@@ -4634,30 +4657,62 @@ ROM_START( brain )
 ROM_END
 
 
-ROM_START( tokisens ) /* Sega game ID#  834-6409 - should use a Sega MC-8123, 317-0040 */
+ROM_START( tokisens ) /* Sega game ID#  834-6409 - Sega MC-8123, 317-0040 */
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr-10961.90",  0x00000, 0x8000, CRC(1466b61d) SHA1(99f93813834d3a7c9f6228076d400f74d9b6dea9) ) /* Possible bootleg or hacked?  Should be MC-8123, 317-0040 encrypted */
-	ROM_LOAD( "epr-10962.91",  0x10000, 0x8000, CRC(a8479f91) SHA1(0700746fb481fd2bd22ae82c9881aa61222a6379) )
-	ROM_LOAD( "epr-10963.92",  0x18000, 0x8000, CRC(b7193b39) SHA1(d40fb8591b1ff83f3d56b955ac11a07496a0adbb) )
+	ROM_LOAD( "epr-10961.ic90",  0x00000, 0x8000, CRC(5c71c203) SHA1(65c3730d2255be5e09fda2f8eae1c7f3d245ce9b) )
+	ROM_LOAD( "epr-10962.ic91",  0x10000, 0x8000, CRC(db9080e3) SHA1(591b1bd4ab694f45d472bb50483dadb980cd2f86) )
+	ROM_LOAD( "epr-10963.ic92",  0x18000, 0x8000, CRC(d17ad93f) SHA1(870dbd3558a4c3a47f36d3d3c0c71c647baacf10) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0040.key",  0x0000, 0x2000, CRC(e2b67fd6) SHA1(4fcf457279dac317ccf700591cfaa9a4cff81b4a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr-10967.126", 0x0000, 0x8000, CRC(97966bf2) SHA1(b5a3d36afbb3d6e2e2e2c121609a30dc080ccf13) )
+	ROM_LOAD( "epr-10967.ic126", 0x0000, 0x8000, CRC(97966bf2) SHA1(b5a3d36afbb3d6e2e2e2c121609a30dc080ccf13) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr-10964.4",   0x00000, 0x8000, CRC(9013b85c) SHA1(c27322245052ffc9d840fe683ed35965c61bf9e8) )
-	ROM_LOAD( "epr-10965.5",   0x08000, 0x8000, CRC(e4755cc6) SHA1(33370d556a70e19edce5e0c7fa8b11453ccbe91b) )
-	ROM_LOAD( "epr-10966.6",   0x10000, 0x8000, CRC(5bbfbdcc) SHA1(e7e679da874a79dfdda0be58d1352c192635296d) )
+	ROM_LOAD( "epr-10964.ic4",   0x00000, 0x8000, CRC(25af5c93) SHA1(da6e6244b14c9ad51cee012bf46d591928d13050) )
+	ROM_LOAD( "epr-10965.ic5",   0x08000, 0x8000, CRC(cc8eb99a) SHA1(b66c2a786a3401021a05740f36103cf8e6129a85) )
+	ROM_LOAD( "epr-10966.ic6",   0x10000, 0x8000, CRC(7ecf2459) SHA1(2dc6c4295d0e6f18efd26f8e15e0f31cf0a6820e) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr-10958.87",  0x00000, 0x8000, CRC(fc2bcbd7) SHA1(6b9007f2057e4c860ecae4ba5db4e02b8aaae8fd) )
-	ROM_LOAD( "epr-10957.86",  0x08000, 0x8000, CRC(4ec56860) SHA1(9fd6ba8a68b4cb98183e8ac8643656c251f1c72d) )
-	ROM_LOAD( "epr-10960.89",  0x10000, 0x8000, CRC(880e0d44) SHA1(2b2dc144807d1d048ffe81bfd33a77ccf618dd3e) )
-	ROM_LOAD( "epr-10959.88",  0x18000, 0x8000, CRC(4deda48f) SHA1(12db2a69286f22cd8243be6faa9a075fafec1dfd) )
+	ROM_LOAD( "epr-10958.ic87",  0x00000, 0x8000, CRC(bb62dbc8) SHA1(f48aa1b38077d801521afe6cd43f1463a22b9431) )
+	ROM_LOAD( "epr-10957.ic86",  0x08000, 0x8000, CRC(4ec56860) SHA1(9fd6ba8a68b4cb98183e8ac8643656c251f1c72d) )
+	ROM_LOAD( "epr-10960.ic89",  0x10000, 0x8000, CRC(880e0d44) SHA1(2b2dc144807d1d048ffe81bfd33a77ccf618dd3e) )
+	ROM_LOAD( "epr-10959.ic88",  0x18000, 0x8000, CRC(4deda48f) SHA1(12db2a69286f22cd8243be6faa9a075fafec1dfd) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "pri10956.ic20", 0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* MMI 63S141AN - palette red component */
-	ROM_LOAD( "pri10955.ic14", 0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* MMI 63S141AN - palette green component */
-	ROM_LOAD( "pri10954.ic8",  0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* MMI 63S141AN - palette blue component */
+	ROM_LOAD( "pr10956.ic20", 0x0000, 0x0100, CRC(fd1bba8a) SHA1(4a38239d89f70291df71976b18be49fb24f071ca) ) /* MMI 63S141AN - palette red component */
+	ROM_LOAD( "pr10955.ic14", 0x0100, 0x0100, CRC(72b35df7) SHA1(ef782fb7012c359ed7ca8f4ab42734c4994e473a) ) /* MMI 63S141AN - palette green component */
+	ROM_LOAD( "pr10954.ic8",  0x0200, 0x0100, CRC(b7984867) SHA1(8a03cc98c33e4defe880d10a02a5d0108fa0c9da) ) /* MMI 63S141AN - palette blue component */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.ic28",      0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* BPROM type N82S129AN or compatible */
+ROM_END
+
+ROM_START( tokisensa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic90",  0x00000, 0x8000, CRC(1466b61d) SHA1(99f93813834d3a7c9f6228076d400f74d9b6dea9) )
+	ROM_LOAD( "ic91",  0x10000, 0x8000, CRC(a8479f91) SHA1(0700746fb481fd2bd22ae82c9881aa61222a6379) )
+	ROM_LOAD( "ic92",  0x18000, 0x8000, CRC(b7193b39) SHA1(d40fb8591b1ff83f3d56b955ac11a07496a0adbb) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-10967.ic126", 0x0000, 0x8000, CRC(97966bf2) SHA1(b5a3d36afbb3d6e2e2e2c121609a30dc080ccf13) )
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "ic4",   0x00000, 0x8000, CRC(9013b85c) SHA1(c27322245052ffc9d840fe683ed35965c61bf9e8) )
+	ROM_LOAD( "ic5",   0x08000, 0x8000, CRC(e4755cc6) SHA1(33370d556a70e19edce5e0c7fa8b11453ccbe91b) )
+	ROM_LOAD( "ic6",   0x10000, 0x8000, CRC(5bbfbdcc) SHA1(e7e679da874a79dfdda0be58d1352c192635296d) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD( "ic87",            0x00000, 0x8000, CRC(fc2bcbd7) SHA1(6b9007f2057e4c860ecae4ba5db4e02b8aaae8fd) )
+	ROM_LOAD( "epr-10957.ic86",  0x08000, 0x8000, CRC(4ec56860) SHA1(9fd6ba8a68b4cb98183e8ac8643656c251f1c72d) )
+	ROM_LOAD( "epr-10960.ic89",  0x10000, 0x8000, CRC(880e0d44) SHA1(2b2dc144807d1d048ffe81bfd33a77ccf618dd3e) )
+	ROM_LOAD( "epr-10959.ic88",  0x18000, 0x8000, CRC(4deda48f) SHA1(12db2a69286f22cd8243be6faa9a075fafec1dfd) )
+
+	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_LOAD( "ic20", 0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* MMI 63S141AN - palette red component */
+	ROM_LOAD( "ic14", 0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* MMI 63S141AN - palette green component */
+	ROM_LOAD( "ic8",  0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* MMI 63S141AN - palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.ic28",      0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
@@ -5370,7 +5425,6 @@ void system1_state::init_blockgal()
 }
 
 
-
 void system1_state::init_wbml()
 {
 	init_bank0c();
@@ -5378,11 +5432,12 @@ void system1_state::init_wbml()
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
-void system1_state::init_ufosensi()
+void system1_state::init_tokisens()
 {
-	init_bank0c();
-	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
-	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
+	// HACK otherwise player dies in attract mode and game gives a continue screen, probably the other Z80 timing kludges aren't quite accurate (or the encrypted CPU differs)
+	// could also be different screen refresh, or even just exactly when the first interrupt occurs
+	m_maincpu->set_clock_scale(1.07f);
+	init_wbml();
 }
 
 void system1_state::init_dakkochn()
@@ -5521,7 +5576,7 @@ GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, i
 GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "hack (Vision Electronics)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nob,        0,        nobm,              nob,       system1_state, init_nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, init_nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 
@@ -5530,9 +5585,9 @@ GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, i
 GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-xxxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-5xxx)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Sanrin San Chan (Japan, 315-xxxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Sanrin San Chan (Japan, 315-5xxx)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )
@@ -5577,7 +5632,8 @@ GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, i
 GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tokisens,   0,        sys2,              tokisens,  system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tokisens,   0,        sys2xb,            tokisens,  system1_state, init_tokisens,     ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (MC-8123, 317-0040)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tokisensa,  tokisens, sys2,              tokisensa, system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (prototype?)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -5590,5 +5646,5 @@ GAME( 1987, wbmld,      wbml,     sys2xboot,         wbml,      system1_state, i
 GAME( 1987, wbmljod,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, dakkochn,   0,        sys2xb,            dakkochn,  system1_state, init_dakkochn,     ROT0,   "White Board", "DakkoChan House (MC-8123B, 317-5014)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blockgalb,  blockgal, sys2x,             blockgal,  system1_state, init_bootleg,      ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, init_ufosensi,     ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, init_wbml,         ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ufosensib,  ufosensi, sys2rowxboot,      ufosensi,  system1_state, init_bootsys2,     ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )

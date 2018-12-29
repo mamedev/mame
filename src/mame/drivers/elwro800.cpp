@@ -277,7 +277,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		return m_i8255->read(space, (offset & 0x03) ^ 0x03);
+		return m_i8255->read((offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
@@ -294,14 +294,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		if (offset & 1)
-		{
-			return m_i8251->status_r(space, 0);
-		}
-		else
-		{
-			return m_i8251->data_r(space, 0);
-		}
+		return m_i8251->read(offset & 1);
 	}
 	else if (!BIT(cs,5))
 	{
@@ -332,7 +325,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		m_i8255->write(space, (offset & 0x03) ^ 0x03, data);
+		m_i8255->write((offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{
@@ -345,14 +338,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		if (offset & 1)
-		{
-			m_i8251->control_w(space, 0, data);
-		}
-		else
-		{
-			m_i8251->data_w(space, 0, data);
-		}
+		m_i8251->write(offset & 1, data);
 	}
 	else if (!BIT(cs,5))
 	{
@@ -571,7 +557,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 3500000)    /* 3.5 MHz */
+	MCFG_DEVICE_ADD("maincpu",Z80, 14_MHz_XTAL / 4)    /* 3.5 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(elwro800_mem)
 	MCFG_DEVICE_IO_MAP(elwro800_io)
 	MCFG_DEVICE_OPCODES_MAP(elwro800_m1)
@@ -581,21 +567,18 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50.08)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
+	MCFG_SCREEN_RAW_PARAMS(14_MHz_XTAL / 2, 448, 0, SPEC_SCREEN_WIDTH, 312, 0, SPEC_SCREEN_HEIGHT)
+	// Sync and interrupt timings determined by 2716 EPROM
 	MCFG_SCREEN_UPDATE_DRIVER(elwro800_state, screen_update_spectrum )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, elwro800_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
+	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_elwro800);
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum)
 
-	UPD765A(config, "upd765", true, true);
+	UPD765A(config, "upd765", 8_MHz_XTAL / 2, true, true);
 
 	I8255A(config, m_i8255, 0);
 	m_i8255->in_pa_callback().set_ioport("JOY");
@@ -612,7 +595,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251, 14_MHz_XTAL / 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -627,18 +610,10 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(elwro800_bank1)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
-
-	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(elwro800_bank2)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&elwro800_state::elwro800_bank1).set_data_width(8).set_stride(0x2000);
+	ADDRESS_MAP_BANK(config, "bank2").set_map(&elwro800_state::elwro800_bank2).set_data_width(8).set_stride(0x2000);
 MACHINE_CONFIG_END
 
 /*************************************
@@ -653,9 +628,10 @@ ROM_START( elwro800 )
 	ROM_LOAD( "bas14.epr", 0x2000, 0x2000, CRC(a743eb80) SHA1(3a300550838535b4adfe6d05c05fe0b39c47df16) )
 	ROM_LOAD( "bootv.epr", 0x4000, 0x2000, CRC(de5fa37d) SHA1(4f203efe53524d84f69459c54b1a0296faa83fd9) )
 
-	ROM_REGION(0x0400, "proms", 0 )
-	ROM_LOAD( "junior_io_prom.bin", 0x0000, 0x0200,  CRC(c6a777c4) SHA1(41debc1b4c3bd4eef7e0e572327c759e0399a49c))
-	ROM_LOAD( "junior_mem_prom.bin", 0x0200, 0x0200, CRC(0f745f42) SHA1(360ec23887fb6d7e19ee85d2bb30d9fa57f4936e))
+	ROM_REGION(0x0c00, "proms", 0 )
+	ROM_LOAD( "junior_io_prom.bin",  0x0000, 0x0200, CRC(c6a777c4) SHA1(41debc1b4c3bd4eef7e0e572327c759e0399a49c) )
+	ROM_LOAD( "junior_mem_prom.bin", 0x0200, 0x0200, CRC(0f745f42) SHA1(360ec23887fb6d7e19ee85d2bb30d9fa57f4936e) )
+	ROM_LOAD( "tv_2716.e11",         0x0400, 0x0800, CRC(6093e80e) SHA1(a4972f336490d15222f4f24369f1f3253cfb9516) )
 ROM_END
 
 /* Driver */

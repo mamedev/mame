@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_audio_map)
@@ -544,28 +544,28 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_gfxdecode_tag("gfxdecode");
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch1");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	ES8712(config, m_essnd, 0);
+	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
+	m_essnd->set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, It's actually MSM6585? */
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL)); /* Not verified, It's actually MSM6585? */
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm6585_device::S40); /* Not verified */
+	msm.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// A RTC-62421 is present on the Last Bank PCB. However, the code
 	// that tries to read from it is broken and nonfunctional. The RTC

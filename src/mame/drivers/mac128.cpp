@@ -142,8 +142,8 @@ enum mac128model_t
 class mac128_state : public driver_device
 {
 public:
-	mac128_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mac128_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via6522_0"),
 		m_ram(*this, RAM_TAG),
@@ -170,7 +170,7 @@ public:
 	void init_macplus();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<ram_device> m_ram;
 	optional_device<ncr5380_device> m_ncr5380;
@@ -219,6 +219,7 @@ private:
 	int count_x, count_y;
 	int m_last_was_x;
 	int m_screen_buffer;
+	emu_timer *m_scan_timer;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
@@ -244,13 +245,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
+	TIMER_CALLBACK_MEMBER(mac_scanline);
 	DECLARE_VIDEO_START(mac);
-	DECLARE_PALETTE_INIT(mac);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
 	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
+#else
+	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 #endif
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);
@@ -288,6 +290,9 @@ void mac128_state::machine_start()
 	m_ram_size = m_ram->size()>>1;
 	m_ram_mask = m_ram_size - 1;
 	m_rom_ptr = (u16*)memregion("bootrom")->base();
+
+	if (!m_scan_timer)
+		m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_scanline), this));
 }
 
 void mac128_state::machine_reset()
@@ -312,6 +317,9 @@ void mac128_state::machine_reset()
 	m_irq_count = 0;
 	m_ca1_data = 0;
 	m_ca2_data = 0;
+
+	const int next_vpos = m_screen->vpos() + 1;
+	m_scan_timer->adjust(m_screen->time_until_pos(next_vpos), next_vpos);
 }
 
 READ16_MEMBER(mac128_state::ram_r)
@@ -433,7 +441,7 @@ void mac128_state::update_volume()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mac128_state::mac_scanline)
+TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 {
 	int scanline = param;
 	uint16_t *mac_snd_buf_ptr;
@@ -458,6 +466,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mac128_state::mac_scanline)
 	}
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
 }
 
 WRITE_LINE_MEMBER(mac128_state::mac_scsi_irq)
@@ -673,7 +682,7 @@ READ16_MEMBER ( mac128_state::mac_via_r )
 
 	if (LOG_VIA)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
-	data = m_via->read(space, offset);
+	data = m_via->read(offset);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 
@@ -689,9 +698,9 @@ WRITE16_MEMBER ( mac128_state::mac_via_w )
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
 	if (ACCESSING_BITS_0_7)
-		m_via->write(space, offset, data & 0xff);
+		m_via->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_via->write(space, offset, (data >> 8) & 0xff);
+		m_via->write(offset, (data >> 8) & 0xff);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 }
@@ -943,8 +952,8 @@ WRITE_LINE_MEMBER(mac128_state::mac_kbd_clk_in)
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_out_cb2)
 {
-	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
-	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	printf("Sending %d to kbd (PC=%x)\n", state, m_maincpu->pc());
+	m_mackbd->data_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 #else   // keyboard HLE
@@ -1221,12 +1230,6 @@ void mac128_state::mac128_state_load()
 {
 }
 
-PALETTE_INIT_MEMBER(mac128_state,mac)
-{
-	palette.set_pen_color(0, 0xff, 0xff, 0xff);
-	palette.set_pen_color(1, 0x00, 0x00, 0x00);
-}
-
 VIDEO_START_MEMBER(mac128_state,mac)
 {
 }
@@ -1324,92 +1327,89 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-MACHINE_CONFIG_START(mac128_state::mac512ke)
+void mac128_state::mac512ke(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mac512ke_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS)
-	MCFG_SCREEN_UPDATE_DRIVER(mac128_state, screen_update_mac)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mac128_state,mac)
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	MCFG_VIDEO_START_OVERRIDE(mac128_state,mac)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac128_state, mac_scanline, "screen", 0, 1)
-
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD(DAC_TAG, DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
+	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
+	vreg.set_output(5.0);
+	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
+	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", 32.768_kHz_XTAL)
-	MCFG_IWM_ADD("fdc", mac_iwm_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
+	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
+	IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
+	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
 
-	MCFG_DEVICE_ADD("scc", SCC85C30, C7M)
-	MCFG_Z80SCC_OFFSETS(C3_7M, 0, C3_7M, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, mac128_state, set_scc_interrupt))
+	SCC85C30(config, m_scc, C7M);
+	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
+	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, mac128_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, mac128_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, mac128_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, mac128_state,mac_via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, mac128_state,mac_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, mac128_state,mac_via_irq))
+	VIA6522(config, m_via, 1000000);
+	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
+	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b));
+	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a));
+	m_via->writepb_handler().set(FUNC(mac128_state::mac_via_out_b));
+	m_via->cb2_handler().set(FUNC(mac128_state::mac_via_out_cb2));
+	m_via->irq_handler().set(FUNC(mac128_state::mac_via_irq));
 
-	MCFG_MACKBD_ADD(MACKBD_TAG)
 #ifdef MAC_USE_EMULATED_KBD
-	MCFG_MACKBD_DATAOUT_HANDLER(WRITELINE("via6522_0", via6522_device, write_cb2))
-	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(*this, mac128_state, mac_kbd_clk_in))
+	mackbd_device &mackbd(MACKBD(config, MACKBD_TAG, 0));
+	mackbd.dataout_handler().set(m_via, FUNC(via6522_device::write_cb2));
+	mackbd.clkout_handler().set(FUNC(mac128_state::mac_kbd_clk_in));
+#else
+	MACKBD(config, MACKBD_TAG, 0);
 #endif
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, m_ram);
+	m_ram->set_default_size("512K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "hdd_list").set_type("mac_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mac128_state::mac128k)
+void mac128_state::mac128k(machine_config &config)
+{
 	mac512ke(config);
+	m_ram->set_default_size("128K");
+}
+
+
+void mac128_state::macplus(machine_config &config)
+{
+	mac512ke(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macplus_map);
+
+	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
+	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+
+	NCR5380(config, m_ncr5380, C7M);
+	m_ncr5380->set_scsi_port("scsi");
+	m_ncr5380->irq_callback().set(FUNC(mac128_state::mac_scsi_irq));
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(mac128_state::macplus)
-	mac512ke(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(macplus_map)
-
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
-
-	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(*this, mac128_state, mac_scsi_irq))
-
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
-
-	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,2560K,4M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("4M");
+	m_ram->set_extra_options("1M,2M,2560K,4M");
+}
 
 static INPUT_PORTS_START( macplus )
 	PORT_START("MOUSE0") /* Mouse - button */

@@ -5,7 +5,7 @@
     Sega Model 1 I/O Board (Advanced)
 
     Used by:
-    - Wing War (R360) (837-10859)
+    - Wing War/Wing War R360 (837-10859)
     - NetMerc (837-11659)
     - Virtua Cop (837-11130 with 837-11131)
 
@@ -112,7 +112,7 @@ ioport_constructor model1io2_device::device_input_ports() const
 ROM_START( model1io2 )
 	ROM_REGION(0x10000, "iocpu", 0)
 
-	// Wing War (taken from R360 version, is it the same for the regular version?)
+	// Wing War/Wing War R360
 	ROM_SYSTEM_BIOS(0, "epr16891", "EPR-16891")
 	ROMX_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0), ROM_BIOS(0))
 
@@ -134,7 +134,8 @@ const tiny_rom_entry *model1io2_device::device_rom_region() const
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
+void model1io2_device::device_add_mconfig(machine_config &config)
+{
 	tmpz84c015_device &iocpu(TMPZ84C015(config, "iocpu", 19.6608_MHz_XTAL / 2)); // TMPZ84C015AF-12
 	iocpu.set_addrmap(AS_PROGRAM, &model1io2_device::mem_map);
 
@@ -177,15 +178,15 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	io.out_pf_callback().set(FUNC(model1io2_device::io_pf_w));
 	io.out_pg_callback().set(FUNC(model1io2_device::io_pg_w));
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom); // 93C45
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
 	MB3773(config, m_watchdog, 0);
 
 	msm6253_device &adc(MSM6253(config, "adc", 32_MHz_XTAL / 16 / 4));
-	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r), this);
-	adc.set_input_cb<1>(FUNC(model1io2_device::analog1_r), this);
-	adc.set_input_cb<2>(FUNC(model1io2_device::analog2_r), this);
-	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r), this);
+	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r));
+	adc.set_input_cb<1>(FUNC(model1io2_device::analog1_r));
+	adc.set_input_cb<2>(FUNC(model1io2_device::analog2_r));
+	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r));
 
 	// diagnostic LCD display
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -196,13 +197,12 @@ MACHINE_CONFIG_START( model1io2_device::device_add_mconfig )
 	screen.set_screen_update("lcd", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(model1io2_device, lcd)
+	PALETTE(config, "palette", FUNC(model1io2_device::lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update), this);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************
@@ -274,7 +274,7 @@ void model1io2_device::device_reset()
 //  DIAGNOSTIC LCD
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( model1io2_device, lcd )
+void model1io2_device::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on
@@ -355,7 +355,7 @@ WRITE8_MEMBER( model1io2_device::io_pf_w )
 	m_eeprom->cs_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (BIT(data, 3) == 0 && BIT(data, 2) == 1 && BIT(data, 1) == 0)
-		m_lcd->write(space, BIT(data, 0), m_lcd_data);
+		m_lcd->write(BIT(data, 0), m_lcd_data);
 }
 
 WRITE8_MEMBER( model1io2_device::io_pg_w )

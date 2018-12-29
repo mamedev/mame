@@ -211,8 +211,7 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
+	RAM(config, RAM_TAG).set_default_size("8K");
 
 	HC259(config, m_bitlatch); // U4
 	m_bitlatch->parallel_out_cb().set_membank(m_rombank1).mask(0x07).invert();
@@ -231,6 +230,7 @@ decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const 
 	, m_rombank2(*this, "dmdbank2")
 	, m_ram(*this, RAM_TAG)
 	, m_bitlatch(*this, "bitlatch")
+	, m_rom(*this, finder_base::DUMMY_TAG)
 {}
 
 void decodmd_type1_device::device_start()
@@ -240,16 +240,13 @@ void decodmd_type1_device::device_start()
 
 void decodmd_type1_device::device_reset()
 {
-	uint8_t* ROM;
 	uint8_t* RAM = m_ram->pointer();
-	m_rom = memregion(m_gfxtag);
 
 	memset(RAM,0,0x2000);
 	memset(m_pixels,0,0x200*sizeof(uint32_t));
 
-	ROM = m_rom->base();
-	m_rombank1->configure_entries(0, 8, &ROM[0x0000], 0x4000);
-	m_rombank2->configure_entry(0, &ROM[0x1c000]);
+	m_rombank1->configure_entries(0, 8, &m_rom[0x0000], 0x4000);
+	m_rombank2->configure_entry(0, &m_rom[0x1c000]);
 	m_rombank1->set_entry(0);
 	m_rombank2->set_entry(0);
 	m_status = 0;

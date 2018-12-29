@@ -187,7 +187,7 @@ void laser2001_state::lasr2001_map(address_map &map)
 
 INPUT_CHANGED_MEMBER( crvision_state::trigger_nmi )
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -734,137 +734,141 @@ static void crvision_cart(device_slot_interface &device)
 }
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( creativision )
+    creativision machine configuration
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_state::creativision)
+void crvision_state::creativision(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(2'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(crvision_map)
+	M6502(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &crvision_state::crvision_map);
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, crvision_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, crvision_state, pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, crvision_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(SN76489_TAG, sn76496_base_device, command_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
+	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
+	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
+	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::command_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_status_in", 0);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	OUTPUT_LATCH(config, "cent_ctrl_out").bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
-	MCFG_SN76496_READY_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, m_psg, XTAL(2'000'000));
+	m_psg->ready_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
+	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K") // MAIN RAM
-	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+	RAM(config, m_ram);
+	m_ram->set_default_size("1K"); // main RAM
+	m_ram->set_extra_options("15K"); // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "crvision")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( ntsc )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_state::ntsc)
+void crvision_state::ntsc(machine_config &config)
+{
 	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9918_device, screen_update )
-MACHINE_CONFIG_END
+	tms9918_device &vdp(TMS9918(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( pal )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_pal_state::pal)
+void crvision_pal_state::pal(machine_config &config)
+{
 	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929_device, screen_update )
-MACHINE_CONFIG_END
+	tms9929_device &vdp(TMS9929(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(laser2001_state::lasr2001)
+void laser2001_state::lasr2001(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(17'734'470)/9)
-	MCFG_DEVICE_PROGRAM_MAP(lasr2001_map)
+	M6502(config, m_maincpu, XTAL(17'734'470)/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &laser2001_state::lasr2001_map);
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, laser2001_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, laser2001_state, pia_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, laser2001_state, pia_ca1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, laser2001_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, laser2001_state, pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, laser2001_state, pia_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, laser2001_state, pia_cb2_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(laser2001_state::pia_pa_r));
+	m_pia->readpb_handler().set(FUNC(laser2001_state::pia_pb_r));
+	m_pia->readca1_handler().set(FUNC(laser2001_state::pia_ca1_r));
+	m_pia->writepa_handler().set(FUNC(laser2001_state::pia_pa_w));
+	m_pia->writepb_handler().set(FUNC(laser2001_state::pia_pb_w));
+	m_pia->ca2_handler().set(FUNC(laser2001_state::pia_ca2_w));
+	m_pia->cb2_handler().set(FUNC(laser2001_state::pia_cb2_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 
-	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, laser2001_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(laser2001_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, laser2001_state, write_psg_ready))
+	SN76489A(config, m_psg, XTAL(17'734'470)/9);
+	m_psg->ready_cb().set(FUNC(laser2001_state::write_psg_ready));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
+	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, m_ram);
+	m_ram->set_default_size("16K");
+	m_ram->set_extra_options("32K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
-	MCFG_SOFTWARE_LIST_ADD("cart_list2","laser2001_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
+	SOFTWARE_LIST(config, "cart_list2").set_original("laser2001_cart");
+}
 
 /***************************************************************************
     ROMS

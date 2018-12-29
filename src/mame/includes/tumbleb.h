@@ -1,16 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Bryan McPhail
+#ifndef MAME_INCLUDES_TUMBLEB_H
+#define MAME_INCLUDES_TUMBLEB_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
-#include "video/decospr.h"
 #include "sound/okim6295.h"
+#include "video/decospr.h"
 #include "emupal.h"
+#include "screen.h"
 
 class tumbleb_state : public driver_device
 {
 public:
-	tumbleb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tumbleb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_pf1_data(*this, "pf1_data"),
@@ -22,10 +27,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
+		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void tumblepb(machine_config &config);
+	void tumblepba(machine_config &config);
 	void bcstory(machine_config &config);
 	void pangpang(machine_config &config);
 	void semibase(machine_config &config);
@@ -33,6 +40,7 @@ public:
 	void cookbib(machine_config &config);
 	void metlsavr(machine_config &config);
 	void fncywld(machine_config &config);
+	void magipur(machine_config &config);
 	void suprtrio(machine_config &config);
 	void htchctch(machine_config &config);
 	void sdfight(machine_config &config);
@@ -52,6 +60,7 @@ public:
 	void init_tumbleb2();
 	void init_chokchok();
 	void init_fncywld();
+	void init_magipur();
 	void init_carket();
 
 private:
@@ -82,6 +91,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<decospr_device> m_sprgen;
+	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	uint8_t m_semicom_prot_offset;
@@ -154,7 +164,9 @@ private:
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();
 
+	void unico_base_map(address_map &map);
 	void fncywld_main_map(address_map &map);
+	void magipur_main_map(address_map &map);
 	void htchctch_main_map(address_map &map);
 	void jumpkids_main_map(address_map &map);
 	void jumpkids_sound_map(address_map &map);
@@ -163,4 +175,7 @@ private:
 	void suprtrio_main_map(address_map &map);
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
+	void tumblepopba_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TUMBLEB_H

@@ -78,16 +78,14 @@ static const uint32_t text_map[] =
 };
 
 
-PALETTE_INIT_MEMBER(apple3_state, apple3)
+void apple3_state::palette_init(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
-		m_palette->set_pen_color(i,
-			apple3_palette[(3*i)]*17,
-			apple3_palette[(3*i)+1]*17,
-			apple3_palette[(3*i)+2]*17);
+		palette.set_pen_color(i,
+				apple3_palette[(3*i)]*17,
+				apple3_palette[(3*i)+1]*17,
+				apple3_palette[(3*i)+2]*17);
 	}
 }
 
@@ -107,18 +105,18 @@ void apple3_state::apple3_write_charmem()
 		{
 			addr = 0x7f & space.read_byte(screen_hole_map[i] + 0x400 + j + 0);
 			val = space.read_byte(screen_hole_map[i] + j + 0);
-			m_char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x3ff] = val;
+			m_char_mem[((addr * 8) + ((i & 3) * 2) + 0) & 0x7ff] = val;
 
 			addr = 0x7f & space.read_byte(screen_hole_map[i] + 0x400 + j + 4);
 			val = space.read_byte(screen_hole_map[i] + j + 4);
-			m_char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x3ff] = val;
+			m_char_mem[((addr * 8) + ((i & 3) * 2) + 1) & 0x7ff] = val;
 		}
 	}
 }
 
 
 
-VIDEO_START_MEMBER(apple3_state,apple3)
+void apple3_state::video_start()
 {
 	int i, j;
 	uint32_t v;
@@ -486,7 +484,7 @@ void apple3_state::graphics_chires(bitmap_ind16 &bitmap, const rectangle &clipre
 
 
 
-uint32_t apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apple3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
 

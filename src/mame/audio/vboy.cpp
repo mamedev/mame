@@ -191,9 +191,6 @@ static inline void mputb(uint8_t *ptr, int8_t data) { *ptr = data; }
 //  LIVE DEVICE
 //**************************************************************************
 
-constexpr unsigned vboysnd_device::AUDIO_FREQ;
-
-
 //-------------------------------------------------
 //  vboysnd_device - constructor
 //-------------------------------------------------
@@ -210,25 +207,37 @@ vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, d
 
 void vboysnd_device::device_start()
 {
-	int i;
-
+	uint32_t rate = clock() / 120;
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, AUDIO_FREQ);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate);
 
-	for (i=0; i<2048; i++)
-		waveFreq2LenTbl[i] = AUDIO_FREQ / (5000000.0f/(float)((2048-i) * 32));
-	for (i=0; i<32; i++)
-		waveTimer2LenTbl[i] = ((0.00384f*(float)(i+1)) * (float)AUDIO_FREQ);
-	for (i=0; i<8; i++)
-		waveEnv2LenTbl[i] = ((0.01536f*(float)(i+1)) * (float)AUDIO_FREQ);
+	m_timer = timer_alloc(0, nullptr);
+	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
 
-	for (i = 0; i < 5; i++)
+	for (int i=0; i<2048; i++)
+		waveFreq2LenTbl[i] = ((2048 - i) * 32) / 120;
+	for (int i=0; i<32; i++)
+		waveTimer2LenTbl[i] = (i+1) * 120;
+	for (int i=0; i<8; i++)
+		waveEnv2LenTbl[i] = (i + 1) * 4 * 120;
+
+	for (int i = 0; i < 5; i++)
 		memset(&snd_channel[i], 0, sizeof(s_snd_channel));
 
 	memset(m_aram, 0, 0x600);
+}
 
-	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(AUDIO_FREQ/4));
+
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void vboysnd_device::device_clock_changed()
+{
+	uint32_t rate = clock() / 120;
+	m_stream->set_sample_rate(rate);
+
+	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
 }
 
 

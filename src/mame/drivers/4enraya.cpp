@@ -485,16 +485,15 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_4enraya_state, screen_update_4enraya)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4enraya)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
+	AY8910(config, m_ay, MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
 MACHINE_CONFIG_END
 
 
@@ -505,13 +504,13 @@ MACHINE_CONFIG_START(unk_gambl_state::unkpacg)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(unkpacg_main_map)
 	MCFG_DEVICE_IO_MAP(unkpacg_main_portmap)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 //  SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_REPLACE("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config.replace(), m_ay, MAIN_CLOCK/4); /* guess */
+	m_ay->port_a_read_callback().set_ioport("DSW2");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

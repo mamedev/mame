@@ -30,15 +30,12 @@ Other:  BMC B816140 (CPLD)
 class bmcpokr_state : public driver_device
 {
 public:
-	bmcpokr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bmcpokr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_hopper(*this,"hopper"),
-		m_videoram_1(*this, "videoram_1"),
-		m_videoram_2(*this, "videoram_2"),
-		m_scrollram_1(*this, "scrollram_1"),
-		m_scrollram_2(*this, "scrollram_2"),
-		m_scrollram_3(*this, "scrollram_3"),
+		m_videoram(*this, "videoram_%u", 1U),
+		m_scrollram(*this, "scrollram_%u", 1U),
 		m_pixram(*this, "pixram"),
 		m_priority(*this, "priority"),
 		m_layerctrl(*this, "layerctrl"),
@@ -46,14 +43,22 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+	void bmcpokr(machine_config &config);
+	void mjmaglmp(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+
+private:
+	virtual void machine_start() override;
+
 	// Devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
-	required_shared_ptr<uint16_t> m_videoram_1;
-	required_shared_ptr<uint16_t> m_videoram_2;
-	required_shared_ptr<uint16_t> m_scrollram_1;
-	required_shared_ptr<uint16_t> m_scrollram_2;
-	required_shared_ptr<uint16_t> m_scrollram_3;
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
+	required_shared_ptr_array<uint16_t, 3> m_scrollram;
 	required_shared_ptr<uint16_t> m_pixram;
 	required_shared_ptr<uint16_t> m_priority;
 	required_shared_ptr<uint16_t> m_layerctrl;
@@ -67,47 +72,33 @@ public:
 	DECLARE_READ16_MEMBER(unk_r);
 
 	// I/O
-	uint16_t m_mux;
-	DECLARE_WRITE16_MEMBER(mux_w);
+	uint8_t m_mux;
+	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ16_MEMBER(dsw_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 	DECLARE_READ16_MEMBER(mjmaglmp_dsw_r);
 	DECLARE_READ16_MEMBER(mjmaglmp_key_r);
 
 	// Interrrupts
-	uint16_t m_irq_enable;
-	DECLARE_WRITE16_MEMBER(irq_enable_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	uint8_t m_irq_enable;
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	// Video
-	tilemap_t *m_tilemap_1;
-	tilemap_t *m_tilemap_2;
-	TILE_GET_INFO_MEMBER(get_t1_tile_info);
-	TILE_GET_INFO_MEMBER(get_t2_tile_info);
-	DECLARE_WRITE16_MEMBER(videoram_1_w);
-	DECLARE_WRITE16_MEMBER(videoram_2_w);
+	tilemap_t *m_tilemap[2];
+	template<unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
+	template<unsigned N> DECLARE_WRITE16_MEMBER(videoram_w);
 
 	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
-	uint16_t m_pixpal;
+	uint8_t m_pixpal;
 	DECLARE_WRITE16_MEMBER(pixram_w);
-	DECLARE_WRITE16_MEMBER(pixpal_w);
+	DECLARE_WRITE8_MEMBER(pixpal_w);
 
 	virtual void video_start() override;
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
-	uint32_t screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void save_state()
-	{
-		save_item(NAME(m_prot_val));
-		save_item(NAME(m_mux));
-		save_item(NAME(m_irq_enable));
-		save_item(NAME(m_pixpal));
-		machine().save().register_postload(save_prepost_delegate(FUNC(bmcpokr_state::pixbitmap_redraw), this));
-	}
-	void bmcpokr(machine_config &config);
-	void mjmaglmp(machine_config &config);
 	void bmcpokr_mem(address_map &map);
 	void mjmaglmp_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -118,48 +109,35 @@ public:
 ***************************************************************************/
 
 // Tilemaps
-
-WRITE16_MEMBER(bmcpokr_state::videoram_1_w)
+template<unsigned N>
+WRITE16_MEMBER(bmcpokr_state::videoram_w)
 {
-	COMBINE_DATA(&m_videoram_1[offset]);
-	m_tilemap_1->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[N][offset]);
+	m_tilemap[N]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bmcpokr_state::videoram_2_w)
+template<unsigned N>
+TILE_GET_INFO_MEMBER(bmcpokr_state::get_tile_info)
 {
-	COMBINE_DATA(&m_videoram_2[offset]);
-	m_tilemap_2->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(bmcpokr_state::get_t1_tile_info)
-{
-	uint16_t data = m_videoram_1[tile_index];
-	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
-}
-
-TILE_GET_INFO_MEMBER(bmcpokr_state::get_t2_tile_info)
-{
-	uint16_t data = m_videoram_2[tile_index];
+	uint16_t data = m_videoram[N][tile_index];
 	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
 }
 
 void bmcpokr_state::video_start()
 {
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,128);
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,128);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,128,128);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bmcpokr_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,128,128);
 
-	m_tilemap_1->set_transparent_pen(0);
-	m_tilemap_2->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
 
-	m_tilemap_1->set_scroll_rows(1);
-	m_tilemap_2->set_scroll_rows(1);
+	m_tilemap[0]->set_scroll_rows(1);
+	m_tilemap[1]->set_scroll_rows(1);
 
-	m_tilemap_1->set_scroll_cols(1);
-	m_tilemap_2->set_scroll_cols(1);
+	m_tilemap[0]->set_scroll_cols(1);
+	m_tilemap[1]->set_scroll_cols(1);
 
 	m_pixbitmap  = std::make_unique<bitmap_ind16>(0x400, 0x200);
-
-	save_state();
 }
 
 // 1024 x 512 bitmap. 4 bits per pixel (every byte encodes 2 pixels) + palette register
@@ -171,7 +149,7 @@ WRITE16_MEMBER(bmcpokr_state::pixram_w)
 	int x = (offset & 0xff) << 2;
 	int y = (offset >> 8);
 
-	uint16_t pixpal = (m_pixpal & 0xf) * 0x10;
+	uint16_t pixpal = (m_pixpal & 0xf) << 4;
 
 	uint16_t pen;
 	if (ACCESSING_BITS_8_15)
@@ -188,7 +166,7 @@ WRITE16_MEMBER(bmcpokr_state::pixram_w)
 
 void bmcpokr_state::pixbitmap_redraw()
 {
-	uint16_t pixpal = (m_pixpal & 0xf) * 0x10;
+	uint16_t pixpal = (m_pixpal & 0xf) << 4;
 	int offset = 0;
 	for (int y = 0; y < 512; y++)
 	{
@@ -204,11 +182,16 @@ void bmcpokr_state::pixbitmap_redraw()
 	}
 }
 
-WRITE16_MEMBER(bmcpokr_state::pixpal_w)
+WRITE8_MEMBER(bmcpokr_state::pixpal_w)
 {
-	uint16_t old = m_pixpal;
+	uint8_t old = m_pixpal;
 	if (old != COMBINE_DATA(&m_pixpal))
 		pixbitmap_redraw();
+}
+
+void bmcpokr_state::device_post_load()
+{
+	pixbitmap_redraw();
 }
 
 // Screen update
@@ -221,9 +204,9 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	switch (layer)
 	{
-		case 1:     tmap = m_tilemap_1; scroll = m_scrollram_1; ctrl = (m_layerctrl[0] >> 8) & 0xff; break;
-		case 2:     tmap = m_tilemap_2; scroll = m_scrollram_2; ctrl = (m_layerctrl[0] >> 0) & 0xff; break;
-		default:    tmap = nullptr;           scroll = m_scrollram_3; ctrl = (m_layerctrl[1] >> 8) & 0xff; break;
+		case 1:     tmap = m_tilemap[0]; scroll = m_scrollram[0]; ctrl = (m_layerctrl[0] >> 8) & 0xff; break;
+		case 2:     tmap = m_tilemap[1]; scroll = m_scrollram[1]; ctrl = (m_layerctrl[0] >> 0) & 0xff; break;
+		default:    tmap = nullptr;      scroll = m_scrollram[2]; ctrl = (m_layerctrl[1] >> 8) & 0xff; break;
 	}
 
 	if (ctrl == 0x00)
@@ -263,7 +246,7 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
-uint32_t bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcpokr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -329,17 +312,14 @@ WRITE16_MEMBER(bmcpokr_state::prot_w)
                                 Memory Maps
 ***************************************************************************/
 
-WRITE16_MEMBER(bmcpokr_state::mux_w)
+WRITE8_MEMBER(bmcpokr_state::mux_w)
 {
 	COMBINE_DATA(&m_mux);
-	if (ACCESSING_BITS_0_7)
-	{
-		m_hopper->motor_w(BIT(data, 0)); // hopper motor
-		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));                // coin-in / key-in
-		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));                // pay-out
-		//                           data & 0x0060                  // DSW mux
-		//                           data & 0x0080                  // ? always on
-	}
+	m_hopper->motor_w(BIT(data, 0)); // hopper motor
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));                // coin-in / key-in
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));                // pay-out
+	//                           data & 0x60                  // DSW mux
+	//                           data & 0x80                  // ? always on
 
 //  popmessage("mux %04x", m_mux);
 }
@@ -359,23 +339,20 @@ CUSTOM_INPUT_MEMBER(bmcpokr_state::hopper_r)
 {
 	// motor off should clear the sense bit (I guess ticket.c should actually do this).
 	// Otherwise a hopper bit stuck low will prevent several keys from being registered.
-	return (m_mux & 0x0001) ? m_hopper->line_r() : 1;
+	return (m_mux & 0x01) ? m_hopper->line_r() : 1;
 }
 
-WRITE16_MEMBER(bmcpokr_state::irq_enable_w)
+WRITE8_MEMBER(bmcpokr_state::irq_enable_w)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
-WRITE16_MEMBER(bmcpokr_state::irq_ack_w)
+WRITE8_MEMBER(bmcpokr_state::irq_ack_w)
 {
-	if (ACCESSING_BITS_0_7)
+	for (int i = 1; i < 8; i++)
 	{
-		for (int i = 1; i < 8; i++)
+		if (BIT(data, i))
 		{
-			if (data & (1 << i))
-			{
-				m_maincpu->set_input_line(i, CLEAR_LINE);
-			}
+			m_maincpu->set_input_line(i, CLEAR_LINE);
 		}
 	}
 }
@@ -385,8 +362,8 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
-	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share("videoram_2");
 	map(0x290000, 0x297fff).ram();
 
 	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
@@ -402,10 +379,10 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 
 	map(0x340000, 0x340001).ram(); // 340001.b, rw
 	map(0x340002, 0x340003).ram(); // 340003.b, w(9d)
-	map(0x340006, 0x340007).w(FUNC(bmcpokr_state::irq_ack_w));
-	map(0x340008, 0x340009).w(FUNC(bmcpokr_state::irq_enable_w));
+	map(0x340007, 0x340007).w(FUNC(bmcpokr_state::irq_ack_w));
+	map(0x340009, 0x340009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x34000e, 0x34000f).ram().share("priority");    // 34000f.b, w (priority?)
-	map(0x340016, 0x340017).w(FUNC(bmcpokr_state::pixpal_w));
+	map(0x340017, 0x340017).w(FUNC(bmcpokr_state::pixpal_w));
 	map(0x340018, 0x340019).ram(); // 340019.b, w
 	map(0x34001a, 0x34001b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x34001c, 0x34001d).ram(); // 34001d.b, w(0)
@@ -418,7 +395,7 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 
 	map(0x370000, 0x370001).portr("INPUTS");
 
-	map(0x380000, 0x380001).w(FUNC(bmcpokr_state::mux_w));
+	map(0x380001, 0x380001).w(FUNC(bmcpokr_state::mux_w));
 
 	map(0x390000, 0x390003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x398001, 0x398001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -458,8 +435,8 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram().share("nvram");
 
-	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_1_w)).share("videoram_1");
-	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_2_w)).share("videoram_2");
+	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share("videoram_1");
+	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share("videoram_2");
 	map(0x290000, 0x297fff).ram();
 
 	map(0x2a0000, 0x2dffff).ram().w(FUNC(bmcpokr_state::pixram_w)).share("pixram");
@@ -471,7 +448,7 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 
 	map(0x320000, 0x320003).ram().share("layerctrl");
 
-	map(0x388000, 0x388001).w(FUNC(bmcpokr_state::mux_w));
+	map(0x388001, 0x388001).w(FUNC(bmcpokr_state::mux_w));
 
 	map(0x390000, 0x390001).r(FUNC(bmcpokr_state::mjmaglmp_dsw_r));
 
@@ -486,10 +463,10 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 
 	map(0x3ca000, 0x3ca001).ram(); // 3ca001.b, rw
 	map(0x3ca002, 0x3ca003).ram(); // 3ca003.b, w(9d)
-	map(0x3ca006, 0x3ca007).w(FUNC(bmcpokr_state::irq_ack_w));
-	map(0x3ca008, 0x3ca009).w(FUNC(bmcpokr_state::irq_enable_w));
+	map(0x3ca007, 0x3ca007).w(FUNC(bmcpokr_state::irq_ack_w));
+	map(0x3ca009, 0x3ca009).w(FUNC(bmcpokr_state::irq_enable_w));
 	map(0x3ca00e, 0x3ca00f).ram().share("priority");    // 3ca00f.b, w (priority?)
-	map(0x3ca016, 0x3ca017).w(FUNC(bmcpokr_state::pixpal_w));
+	map(0x3ca017, 0x3ca017).w(FUNC(bmcpokr_state::pixpal_w));
 	map(0x3ca018, 0x3ca019).ram(); // 3ca019.b, w
 	map(0x3ca01a, 0x3ca01b).r(FUNC(bmcpokr_state::unk_r)).nopw();
 	map(0x3ca01c, 0x3ca01d).ram(); // 3ca01d.b, w(0)
@@ -794,13 +771,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 	int scanline = param;
 
 	if (scanline == 240)
-		if (m_irq_enable & (1<<2)) m_maincpu->set_input_line(2, ASSERT_LINE);
+		if (BIT(m_irq_enable, 2)) m_maincpu->set_input_line(2, ASSERT_LINE);
 
 	if (scanline == 128)
-		if (m_irq_enable & (1<<3)) m_maincpu->set_input_line(3, ASSERT_LINE);
+		if (BIT(m_irq_enable, 3)) m_maincpu->set_input_line(3, ASSERT_LINE);
 
 	if (scanline == 64)
-		if (m_irq_enable & (1<<6)) m_maincpu->set_input_line(6, ASSERT_LINE);
+		if (BIT(m_irq_enable, 6)) m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
 void bmcpokr_state::ramdac_map(address_map &map)
@@ -808,45 +785,54 @@ void bmcpokr_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
-	MCFG_DEVICE_PROGRAM_MAP(bmcpokr_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bmcpokr_state, interrupt, "screen", 0, 1)
+void bmcpokr_state::machine_start()
+{
+	save_item(NAME(m_prot_val));
+	save_item(NAME(m_mux));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_pixpal));
+}
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.935)    // HSync - 15.440kHz, VSync - 58.935Hz
+void bmcpokr_state::bmcpokr(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(42'000'000) / 4); // 68000 @10.50MHz (42/4)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::bmcpokr_mem);
 
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(bmcpokr_state, screen_update_bmcpokr)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 60*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	TIMER(config, "scantimer", 0).configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmcpokr)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh(HZ_TO_ATTOSECONDS(58.935));    // HSync - 15.440kHz, VSync - 58.935Hz
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(bmcpokr_state::screen_update));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 60*8-1, 0*8, 30*8-1);
+	screen.set_palette(m_palette);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	PALETTE(config, m_palette).set_entries(256);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(10), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)    // hopper stuck low if too slow
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &bmcpokr_state::ramdac_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bmcpokr);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, m_hopper, 0);
+	m_hopper->set_period(attotime::from_msec(10));
+	m_hopper->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);    // hopper stuck low if too slow
 
-MACHINE_CONFIG_START(bmcpokr_state::mjmaglmp)
+	SPEAKER(config, "mono").front_center();
+
+	YM2413(config, "ymsnd", XTAL(42'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.00);    // UM3567 @3.50MHz (42/12)
+
+	OKIM6295(config, "oki", XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);   // M6295 @1.05MHz (42/40), pin 7 not verified
+}
+
+void bmcpokr_state::mjmaglmp(machine_config &config)
+{
 	bmcpokr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mjmaglmp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::mjmaglmp_map);
+}
 
 /***************************************************************************
                                 ROMs Loading

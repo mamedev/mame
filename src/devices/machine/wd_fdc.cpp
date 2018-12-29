@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "wd_fdc.h"
 
+#include "imagedev/floppy.h"
+
 #include "debugger.h"
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
@@ -1083,7 +1085,7 @@ void wd_fdc_device_base::do_cmd_w()
 	}
 }
 
-void wd_fdc_device_base::write_cmd(uint8_t val)
+void wd_fdc_device_base::cmd_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 	LOGCOMP("Initiating command %02x\n", val);
@@ -1113,7 +1115,7 @@ void wd_fdc_device_base::write_cmd(uint8_t val)
 	}
 }
 
-uint8_t wd_fdc_device_base::read_status()
+uint8_t wd_fdc_device_base::status_r()
 {
 	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
@@ -1162,7 +1164,7 @@ void wd_fdc_device_base::do_track_w()
 	track_buffer = -1;
 }
 
-void wd_fdc_device_base::write_track(uint8_t val)
+void wd_fdc_device_base::track_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1174,7 +1176,7 @@ void wd_fdc_device_base::write_track(uint8_t val)
 	delay_cycles(t_track, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
-uint8_t wd_fdc_device_base::read_track()
+uint8_t wd_fdc_device_base::track_r()
 {
 	uint8_t val = track;
 	if (inverted_bus) val ^= 0xff;
@@ -1188,7 +1190,7 @@ void wd_fdc_device_base::do_sector_w()
 	sector_buffer = -1;
 }
 
-void wd_fdc_device_base::write_sector(uint8_t val)
+void wd_fdc_device_base::sector_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1206,7 +1208,7 @@ void wd_fdc_device_base::write_sector(uint8_t val)
 		delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);
 }
 
-uint8_t wd_fdc_device_base::read_sector()
+uint8_t wd_fdc_device_base::sector_r()
 {
 	uint8_t val = sector;
 	if (inverted_bus) val ^= 0xff;
@@ -1214,7 +1216,7 @@ uint8_t wd_fdc_device_base::read_sector()
 	return val;
 }
 
-void wd_fdc_device_base::write_data(uint8_t val)
+void wd_fdc_device_base::data_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
 
@@ -1222,7 +1224,7 @@ void wd_fdc_device_base::write_data(uint8_t val)
 	drop_drq();
 }
 
-uint8_t wd_fdc_device_base::read_data()
+uint8_t wd_fdc_device_base::data_r()
 {
 	drop_drq();
 
@@ -1232,24 +1234,24 @@ uint8_t wd_fdc_device_base::read_data()
 	return val;
 }
 
-void wd_fdc_device_base::gen_w(int reg, uint8_t val)
+void wd_fdc_device_base::write(offs_t reg, uint8_t val)
 {
 	LOGFUNC("%s %02x: %02x\n", FUNCNAME, reg, val);
 	switch(reg) {
-	case 0: write_cmd(val); break;
-	case 1: write_track(val); break;
-	case 2: write_sector(val); break;
-	case 3: write_data(val); break;
+	case 0: cmd_w(val); break;
+	case 1: track_w(val); break;
+	case 2: sector_w(val); break;
+	case 3: data_w(val); break;
 	}
 }
 
-uint8_t wd_fdc_device_base::gen_r(int reg)
+uint8_t wd_fdc_device_base::read(offs_t reg)
 {
 	switch(reg) {
-	case 0: return read_status();
-	case 1: return read_track();
-	case 2: return read_sector();
-	case 3: return read_data();
+	case 0: return status_r();
+	case 1: return track_r();
+	case 2: return sector_r();
+	case 3: return data_r();
 	}
 	return 0xff;
 }

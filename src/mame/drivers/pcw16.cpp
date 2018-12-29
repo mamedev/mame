@@ -91,8 +91,8 @@ TODO:
 
 #include "emu.h"
 #include "includes/pcw16.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1007,7 +1007,7 @@ INPUT_PORTS_END
 
 static void pcw16_com(device_slot_interface &device)
 {
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 }
 
 MACHINE_CONFIG_START(pcw16_state::pcw16)
@@ -1017,29 +1017,30 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_DEVICE_IO_MAP(pcw16_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
+	ns16550_device &uart1(NS16550(config, "ns16550_1", XTAL(1'843'200)));     /* TODO: Verify uart model */
+	uart1.out_tx_callback().set("serport1", FUNC(rs232_port_device::write_txd));
+	uart1.out_dtr_callback().set("serport1", FUNC(rs232_port_device::write_dtr));
+	uart1.out_rts_callback().set("serport1", FUNC(rs232_port_device::write_rts));
+	uart1.out_int_callback().set(FUNC(pcw16_state::pcw16_com_interrupt_1));
 
-	MCFG_DEVICE_ADD( "ns16550_1", NS16550, XTAL(1'843'200) )     /* TODO: Verify uart model */
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport1", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport1", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport1", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, pcw16_state, pcw16_com_interrupt_1))
-	MCFG_DEVICE_ADD( "serport1", RS232_PORT, pcw16_com, "msystems_mouse" )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, cts_w))
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", pcw16_com, "msystems_mouse"));
+	serport1.rxd_handler().set(uart1, FUNC(ins8250_uart_device::rx_w));
+	serport1.dcd_handler().set(uart1, FUNC(ins8250_uart_device::dcd_w));
+	serport1.dsr_handler().set(uart1, FUNC(ins8250_uart_device::dsr_w));
+	serport1.ri_handler().set(uart1, FUNC(ins8250_uart_device::ri_w));
+	serport1.cts_handler().set(uart1, FUNC(ins8250_uart_device::cts_w));
 
-	MCFG_DEVICE_ADD( "ns16550_2", NS16550, XTAL(1'843'200) )     /* TODO: Verify uart model */
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport2", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport2", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport2", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, pcw16_state, pcw16_com_interrupt_2))
-	MCFG_DEVICE_ADD( "serport2", RS232_PORT, pcw16_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, cts_w))
+	NS16550(config, m_uart2, XTAL(1'843'200));     /* TODO: Verify uart model */
+	m_uart2->out_tx_callback().set("serport2", FUNC(rs232_port_device::write_txd));
+	m_uart2->out_dtr_callback().set("serport2", FUNC(rs232_port_device::write_dtr));
+	m_uart2->out_rts_callback().set("serport2", FUNC(rs232_port_device::write_rts));
+	m_uart2->out_int_callback().set(FUNC(pcw16_state::pcw16_com_interrupt_2));
+
+	rs232_port_device &serport2(RS232_PORT(config, "serport2", pcw16_com, nullptr));
+	serport2.rxd_handler().set(m_uart2, FUNC(ins8250_uart_device::rx_w));
+	serport2.dcd_handler().set(m_uart2, FUNC(ins8250_uart_device::dcd_w));
+	serport2.dsr_handler().set(m_uart2, FUNC(ins8250_uart_device::dsr_w));
+	serport2.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1050,30 +1051,28 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw16_state, screen_update_pcw16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", PCW16_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(pcw16_state, pcw16)
+	PALETTE(config, "palette", FUNC(pcw16_state::pcw16_colours), PCW16_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* printer */
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set_inputline(m_maincpu, 0);
 
-	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw16_state, fdc_interrupt))
+	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_INTEL_E28F008SA_ADD("flash0")
-	MCFG_INTEL_E28F008SA_ADD("flash1")
+	RAM(config, RAM_TAG).set_default_size("2M");
+
+	INTEL_E28F008SA(config, "flash0");
+	INTEL_E28F008SA(config, "flash1");
 
 	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
 

@@ -47,7 +47,6 @@
 #include "emu.h"
 #include "includes/arabian.h"
 
-#include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -355,50 +354,48 @@ void arabian_state::machine_reset()
 	m_video_control = 0;
 }
 
-MACHINE_CONFIG_START(arabian_state::arabian)
-
+void arabian_state::arabian(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_OSC/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arabian_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_OSC/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &arabian_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &arabian_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(arabian_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("mcu", MB8841, MAIN_OSC/3/2)
-	MCFG_MB88XX_READ_K_CB(READ8(*this, arabian_state, mcu_portk_r))
-	MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, arabian_state, mcu_port_o_w))
-	MCFG_MB88XX_WRITE_P_CB(WRITE8(*this, arabian_state, mcu_port_p_w))
-	MCFG_MB88XX_READ_R0_CB(READ8(*this, arabian_state, mcu_port_r0_r))
-	MCFG_MB88XX_WRITE_R0_CB(WRITE8(*this, arabian_state, mcu_port_r0_w))
-	MCFG_MB88XX_READ_R1_CB(READ8(*this, arabian_state, mcu_port_r1_r))
-	MCFG_MB88XX_WRITE_R1_CB(WRITE8(*this, arabian_state, mcu_port_r1_w))
-	MCFG_MB88XX_READ_R2_CB(READ8(*this, arabian_state, mcu_port_r2_r))
-	MCFG_MB88XX_WRITE_R2_CB(WRITE8(*this, arabian_state, mcu_port_r2_w))
-	MCFG_MB88XX_READ_R3_CB(READ8(*this, arabian_state, mcu_port_r3_r))
-	MCFG_MB88XX_WRITE_R3_CB(WRITE8(*this, arabian_state, mcu_port_r3_w))
+	MB8841(config, m_mcu, MAIN_OSC/3/2);
+	m_mcu->read_k().set(FUNC(arabian_state::mcu_portk_r));
+	m_mcu->write_o().set(FUNC(arabian_state::mcu_port_o_w));
+	m_mcu->write_p().set(FUNC(arabian_state::mcu_port_p_w));
+	m_mcu->read_r<0>().set(FUNC(arabian_state::mcu_port_r0_r));
+	m_mcu->write_r<0>().set(FUNC(arabian_state::mcu_port_r0_w));
+	m_mcu->read_r<1>().set(FUNC(arabian_state::mcu_port_r1_r));
+	m_mcu->write_r<1>().set(FUNC(arabian_state::mcu_port_r1_w));
+	m_mcu->read_r<2>().set(FUNC(arabian_state::mcu_port_r2_r));
+	m_mcu->write_r<2>().set(FUNC(arabian_state::mcu_port_r2_w));
+	m_mcu->read_r<3>().set(FUNC(arabian_state::mcu_port_r3_r));
+	m_mcu->write_r<3>().set(FUNC(arabian_state::mcu_port_r3_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 11, 244)
-	MCFG_SCREEN_UPDATE_DRIVER(arabian_state, screen_update_arabian)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 11, 244);
+	screen.set_screen_update(FUNC(arabian_state::screen_update_arabian));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 256*32)
-	MCFG_PALETTE_INIT_OWNER(arabian_state, arabian)
+	PALETTE(config, m_palette, FUNC(arabian_state::arabian_palette), 256 * 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_OSC/4/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, arabian_state, ay8910_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, arabian_state, ay8910_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", MAIN_OSC/4/2));
+	aysnd.port_a_write_callback().set(FUNC(arabian_state::ay8910_porta_w));
+	aysnd.port_b_write_callback().set(FUNC(arabian_state::ay8910_portb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

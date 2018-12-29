@@ -32,8 +32,8 @@ class fp200_state : public driver_device
 {
 public:
 	fp200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void fp200(machine_config &config);
@@ -42,7 +42,7 @@ public:
 
 private:
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	uint8_t m_io_type;
 	uint8_t *m_chargen;
 	uint8_t m_keyb_mux;
@@ -72,7 +72,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
-	DECLARE_PALETTE_INIT(fp200);
+	void fp200_palette(palette_device &palette) const;
 	void fp200_io(address_map &map);
 	void fp200_map(address_map &map);
 
@@ -572,7 +572,7 @@ void fp200_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(fp200_state, fp200)
+void fp200_state::fp200_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
@@ -588,39 +588,36 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
 
-MACHINE_CONFIG_START(fp200_state::fp200)
-
+void fp200_state::fp200(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(fp200_map)
-	MCFG_DEVICE_IO_MAP(fp200_io)
-	MCFG_I8085A_SID(READLINE(*this, fp200_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, fp200_state, sod_w))
+	I8085A(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp200_state::fp200_map);
+	m_maincpu->set_addrmap(AS_IO, &fp200_state::fp200_io);
+	m_maincpu->in_sid_func().set(FUNC(fp200_state::sid_r));
+	m_maincpu->out_sod_func().set(FUNC(fp200_state::sod_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(fp200_state, screen_update)
-	MCFG_SCREEN_SIZE(20*8, 8*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 8*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(fp200_state::screen_update));
+	screen.set_size(20*8, 8*8);
+	screen.set_visarea(0*8, 20*8-1, 0*8, 8*8-1);
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp200)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_fp200);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(fp200_state, fp200)
+	PALETTE(config, "palette", FUNC(fp200_state::fp200_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
 
-  Game driver(s)
+  ROM definition(s)
 
 ***************************************************************************/
 

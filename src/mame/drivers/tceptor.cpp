@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/tceptor.h"
 
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
@@ -198,14 +197,6 @@ void tceptor_state::mcu_map(address_map &map)
 }
 
 
-void tceptor_state::mcu_io_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(M6801_PORT1, M6801_PORT1).nopw();
-	map(M6801_PORT2, M6801_PORT2).nopw();
-}
-
-
 
 /*******************************************************************/
 
@@ -322,71 +313,71 @@ void tceptor_state::machine_reset()
 
 /*******************************************************************/
 
-MACHINE_CONFIG_START(tceptor_state::tceptor)
-
+void tceptor_state::tceptor(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, XTAL(49'152'000)/32)
-	MCFG_DEVICE_PROGRAM_MAP(m6809_map)
+	M6809(config, m_maincpu, XTAL(49'152'000)/32);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tceptor_state::m6809_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M65C02, XTAL(49'152'000)/24)
-	MCFG_DEVICE_PROGRAM_MAP(m6502_a_map)
+	M65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
+	m_audiocpu[0]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_a_map);
 
-	MCFG_DEVICE_ADD("audio2", M65C02, XTAL(49'152'000)/24)
-	MCFG_DEVICE_PROGRAM_MAP(m6502_b_map)
+	M65C02(config, m_audiocpu[1], XTAL(49'152'000)/24);
+	m_audiocpu[1]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_b_map);
 
-	MCFG_DEVICE_ADD("sub", M68000, XTAL(49'152'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(m68k_map)
+	M68000(config, m_subcpu, XTAL(49'152'000)/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tceptor_state::m68k_map);
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8); // or compatible 6808 with extra instructions
+	m_mcu->set_addrmap(AS_PROGRAM, &tceptor_state::mcu_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock (needs to >640khz or the wait loop is too fast)
-	MCFG_ADC0808_IN0_CB(CONSTANT(0)) // unknown
-	MCFG_ADC0808_IN1_CB(IOPORT("PEDAL"))
-	MCFG_ADC0808_IN2_CB(IOPORT("STICKX"))
-	MCFG_ADC0808_IN3_CB(IOPORT("STICKY"))
+	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
+	adc.in_callback<0>().set_constant(0); // unknown
+	adc.in_callback<1>().set_ioport("PEDAL");
+	adc.in_callback<2>().set_ioport("STICKX");
+	adc.in_callback<3>().set_ioport("STICKY");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tceptor)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INDIRECT_ENTRIES(1024)
-	MCFG_PALETTE_INIT_OWNER(tceptor_state, tceptor)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tceptor);
+	PALETTE(config, m_palette, FUNC(tceptor_state::tceptor_palette), 4096, 1024);
 
 	NAMCO_C45_ROAD(config, m_c45_road, 0);
 	m_c45_road->set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(38*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
-	MCFG_SCREEN_UPDATE_DRIVER(tceptor_state, screen_update_tceptor)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tceptor_state, screen_vblank_tceptor))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.606060);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(38*8, 32*8);
+	m_screen->set_visarea(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0);
+	m_screen->set_screen_update(FUNC(tceptor_state::screen_update_tceptor));
+	m_screen->screen_vblank().set(FUNC(tceptor_state::screen_vblank_tceptor));
+	m_screen->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_NAMCO_AUDIO_STEREO(1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
+	m_cus30->set_voices(8);
+	m_cus30->set_stereo(true);
+	m_cus30->add_route(0, "lspeaker", 0.40);
+	m_cus30->add_route(1, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.4) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.4);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.4);
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /***************************************************************************
@@ -399,10 +390,10 @@ ROM_START( tceptor )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc1-1.10f",  0x08000, 0x08000, CRC(4c6b063e) SHA1(d9701657186f8051391084f51a720037f9f418b1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            // RC65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audio2", 0 )          // RC65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12
@@ -455,10 +446,10 @@ ROM_START( tceptor2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc2-1.10f",  0x08000, 0x08000, CRC(f953f153) SHA1(f4cd0a133d23b4bf3c24c70c28c4ecf8ad4daf6f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            // RC65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audio2", 0 )          // RC65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12

@@ -397,16 +397,16 @@ WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }
 
-MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
-
+void _20pacgal_state::_20pacgal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(_20pacgal_map)
-	MCFG_DEVICE_IO_MAP(_20pacgal_io_map)
+	Z180(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
+	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	_20pacgal_video(config);
@@ -414,26 +414,27 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, NAMCO_AUDIO_CLOCK)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	namco_cus30_device &namco(NAMCO_CUS30(config, "namco", NAMCO_AUDIO_CLOCK));
+	namco.set_voices(3);
+	namco.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-
-MACHINE_CONFIG_START(_25pacman_state::_25pacman)
+void _25pacman_state::_25pacman(machine_config &config)
+{
 	_20pacgal(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(_25pacman_map)
-	MCFG_DEVICE_IO_MAP(_25pacman_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &_25pacman_state::_25pacman_map);
+	m_maincpu->set_addrmap(AS_IO, &_25pacman_state::_25pacman_io_map);
 
-	MCFG_AMD_29LV200T_ADD("flash")
-MACHINE_CONFIG_END
+	AMD_29LV200T(config, "flash");
+}
 
 
 

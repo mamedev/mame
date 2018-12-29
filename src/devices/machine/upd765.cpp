@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "upd765.h"
+#include "imagedev/floppy.h"
 #include "debugger.h"
 
 #define LOG_WARN    (1U << 1)   // Show warnings
@@ -45,7 +46,7 @@ DEFINE_DEVICE_TYPE(UPD72065,       upd72065_device,       "upd72065",       "NEC
 DEFINE_DEVICE_TYPE(I82072,         i82072_device,         "i82072",         "Intel 82072 FDC")
 DEFINE_DEVICE_TYPE(SMC37C78,       smc37c78_device,       "smc37c78",       "SMC FDC73C78 FDC")
 DEFINE_DEVICE_TYPE(N82077AA,       n82077aa_device,       "n82077aa",       "Intel N82077AA FDC")
-DEFINE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device, "pc_fdc_superio", "PC FDC SUPERIO")
+DEFINE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device, "pc_fdc_superio", "Winbond PC FDC Super I/O")
 DEFINE_DEVICE_TYPE(DP8473,         dp8473_device,         "dp8473",         "National Semiconductor DP8473 FDC")
 DEFINE_DEVICE_TYPE(PC8477A,        pc8477a_device,        "pc8477a",        "National Semiconductor PC8477A FDC")
 DEFINE_DEVICE_TYPE(WD37C65C,       wd37c65c_device,       "wd37c65c",       "Western Digital WD37C65C FDC")
@@ -72,7 +73,7 @@ void i8272a_device::map(address_map &map)
 
 void upd72065_device::map(address_map &map)
 {
-	map(0x0, 0x0).r(FUNC(upd72065_device::msr_r));
+	map(0x0, 0x0).rw(FUNC(upd72065_device::msr_r), FUNC(upd72065_device::auxcmd_w));
 	map(0x1, 0x1).rw(FUNC(upd72065_device::fifo_r), FUNC(upd72065_device::fifo_w));
 }
 
@@ -584,6 +585,14 @@ void upd765_family_device::disable_transfer()
 
 void upd765_family_device::fifo_push(uint8_t data, bool internal)
 {
+	// MZ: A bit speculative. These lines help to avoid some FIFO mess-up
+	// with the HX5102 that happens when WRITE DATA fails to find the sector
+	// but the host already starts pushing the sector data. Should not hurt.
+	if(fifo_expected == 0) {
+		LOGFIFO("Fifo not expecting data, discarding\n");
+		return;
+	}
+
 	if(fifo_pos == 16) {
 		if(internal) {
 			if(!(st1 & ST1_OR))
@@ -967,15 +976,13 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 
 		case SCAN_SECTOR_DATA_BYTE:
-			if(!scan_done) // TODO: handle stp, x68000 sets it to 0xff (as it would dtl)?
-			{
+			if(!scan_done) { // TODO: handle stp, x68000 sets it to 0xff (as it would dtl)?
 				int slot = (cur_live.bit_counter >> 4)-1;
 				uint8_t data = fifo_pop(true);
 				if(!slot)
 					st2 = (st2 & ~(ST2_SN)) | ST2_SH;
 
-				if(data != cur_live.data_reg)
-				{
+				if(data != cur_live.data_reg) {
 					st2 = (st2 & ~(ST2_SH)) | ST2_SN;
 					if((data < cur_live.data_reg) && ((command[0] & 0x1f) == 0x19)) // low
 						st2 &= ~ST2_SN;
@@ -983,14 +990,11 @@ void upd765_family_device::live_run(attotime limit)
 					if((data > cur_live.data_reg) && ((command[0] & 0x1f) == 0x1d)) // high
 						st2 &= ~ST2_SN;
 				}
-				if((slot == sector_size) && !(st2 & ST2_SN))
-				{
+				if((slot == sector_size) && !(st2 & ST2_SN)) {
 					scan_done = true;
 					tc_done = true;
 				}
-			}
-			else
-			{
+			} else {
 				if(fifo_pos)
 					fifo_pop(true);
 			}
@@ -2369,9 +2373,9 @@ std::string upd765_family_device::results() const
 {
 	std::ostringstream stream;
 	stream << "results=(";
-	if (!result_pos) stream << "none";
-	else
-	{
+	if(!result_pos)
+		stream << "none";
+	else {
 		stream << std::hex << std::setfill('0') << std::setw(2) << unsigned(result[0]);
 		for (int i=1; i < result_pos; i++)
 			stream << ',' << std::setw(2) << unsigned(result[i]);
@@ -2743,7 +2747,7 @@ void i82072_device::start_command(int cmd)
 		upd765_family_device::start_command(cmd);
 
 		// set motor off counter if command execution has completed
-		if (main_phase != PHASE_EXEC && motorcfg)
+		if(main_phase != PHASE_EXEC && motorcfg)
 			motor_off_counter = (2 + ((motorcfg & MOFF) >> 4)) << (motorcfg & HSDA ? 1 : 0);
 	} else
 		delayed_command = cmd;
@@ -2766,7 +2770,7 @@ void i82072_device::execute_command(int cmd)
 		LOGCOMMAND("command motor %s drive %d\n", motor_on ? "on" : "off", fi.id);
 
 		// if we are selecting a different drive, stop the motor on the previously selected drive
-		if (selected_drive != fi.id && flopi[selected_drive].dev && flopi[selected_drive].dev->mon_r() == 0)
+		if(selected_drive != fi.id && flopi[selected_drive].dev && flopi[selected_drive].dev->mon_r() == 0)
 			flopi[selected_drive].dev->mon_w(1);
 
 		// select the drive
@@ -2978,5 +2982,18 @@ WRITE8_MEMBER(tc8566af_device::cr1_w)
 	if(m_cr1 & 0x02) {
 		// Not sure if this inverted or not
 		tc_w((m_cr1 & 0x01) ? true : false);
+	}
+}
+
+WRITE8_MEMBER(upd72065_device::auxcmd_w)
+{
+	switch(data) {
+	case 0x36: // reset
+		soft_reset();
+		break;
+	case 0x35: // set standby
+		break;
+	case 0x34: // reset standby
+		break;
 	}
 }

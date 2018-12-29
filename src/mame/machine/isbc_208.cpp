@@ -31,7 +31,8 @@ static void isbc_208_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(isbc_208_device::device_add_mconfig)
+void isbc_208_device::device_add_mconfig(machine_config &config)
+{
 	AM9517A(config, m_dmac, 8_MHz_XTAL/4);
 	m_dmac->out_hreq_callback().set(FUNC(isbc_208_device::hreq_w));
 	m_dmac->out_eop_callback().set(FUNC(isbc_208_device::out_eop_w));
@@ -40,12 +41,12 @@ MACHINE_CONFIG_START(isbc_208_device::device_add_mconfig)
 	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_r));
 	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(i8272a_device::mdma_w));
 
-	MCFG_I8272A_ADD(m_fdc, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isbc_208_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dmac", am9517a_device, dreq0_w))
+	I8272A(config, m_fdc, 8_MHz_XTAL, true);
+	m_fdc->intrq_wr_callback().set(FUNC(isbc_208_device::irq_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats);
-MACHINE_CONFIG_END
+}
 
 void isbc_208_device::map(address_map &map)
 {

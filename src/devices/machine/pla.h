@@ -11,9 +11,6 @@
 
 #pragma once
 
-
-
-
 ///*************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
@@ -52,14 +49,7 @@
     GND  14 |_____________| 15  F3
 */
 #define MCFG_PLS100_ADD(tag) \
-	MCFG_PLA_ADD((tag), 16, 8, 48)
-
-// MOS 8721 PLA
-// TODO: actual number of terms is unknown
-#define MCFG_MOS8721_ADD(tag) \
-	MCFG_PLA_ADD((tag), 27, 18, 379)
-
-
+	MCFG_DEVICE_ADD((tag), PLS100)
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -78,6 +68,14 @@ public:
 
 	// construction/destruction
 	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pla_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t inputs, uint32_t outputs, uint32_t terms)
+		: pla_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_num_inputs(inputs);
+		set_num_outputs(outputs);
+		set_num_terms(terms);
+	}
 
 	// configuration helpers
 	void set_num_inputs(uint32_t i) { m_inputs = i; }
@@ -124,8 +122,20 @@ private:
 	} m_term[MAX_TERMS];
 };
 
+class pls100_device : public pla_device
+{
+public:
+	pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
 
-// device type definition
+class mos8721_device : public pla_device
+{
+public:
+	mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 DECLARE_DEVICE_TYPE(PLA, pla_device)
+DECLARE_DEVICE_TYPE(PLS100, pls100_device)
+DECLARE_DEVICE_TYPE(MOS8721, mos8721_device)
 
 #endif // MAME_MACHINE_PLA_H

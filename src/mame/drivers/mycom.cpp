@@ -51,6 +51,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/msm5832.h"
 #include "machine/timer.h"
@@ -513,20 +514,20 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_DEVICE_PROGRAM_MAP(mycom_map)
 	MCFG_DEVICE_IO_MAP(mycom_io)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mycom_state, mycom_04_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mycom_state, mycom_05_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mycom_state, mycom_06_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_06_w))
+	I8255(config, m_ppi0);
+	m_ppi0->out_pa_callback().set(FUNC(mycom_state::mycom_04_w));
+	m_ppi0->in_pb_callback().set(FUNC(mycom_state::mycom_05_r));
+	m_ppi0->in_pc_callback().set(FUNC(mycom_state::mycom_06_r));
+	m_ppi0->out_pc_callback().set(FUNC(mycom_state::mycom_06_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mycom_state, mycom_08_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_0a_w))
+	I8255(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(mycom_state::mycom_08_r));
+	m_ppi1->out_pc_callback().set(FUNC(mycom_state::mycom_0a_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8("rtc", msm5832_device, data_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("rtc", msm5832_device, data_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_rtc_w))
+	I8255(config, m_ppi2);
+	m_ppi2->in_pb_callback().set("rtc", FUNC(msm5832_device::data_r));
+	m_ppi2->out_pb_callback().set("rtc", FUNC(msm5832_device::data_w));
+	m_ppi2->out_pc_callback().set(FUNC(mycom_state::mycom_rtc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -535,15 +536,16 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mycom_state, crtc_update_row)
+	MC6845(config, m_crtc, 1008000);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -557,7 +559,7 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 
 	MCFG_CASSETTE_ADD("cassette")
 
-	MCFG_DEVICE_ADD("fdc", FD1771, 16_MHz_XTAL / 16)
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)

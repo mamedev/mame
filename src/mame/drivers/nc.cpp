@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /******************************************************************************
 
-        nc.c
+        nc.cpp
 
         NC100/NC150/NC200 Notepad computer
 
@@ -18,7 +18,7 @@
             NC100 I/O Specification by Cliff Lawson,
             NC100EM by Russell Marks
         NC200:
-            Dissassembly of the NC200 ROM + e-mail
+            Disassembly of the NC200 ROM + e-mail
             exchange with Russell Marks
 
 
@@ -26,7 +26,7 @@
 
         Hardware:
             - Z80 CPU, 6 MHz
-            - memory powered by lithium batterys!
+            - memory powered by lithium batteries!
             - 2 channel tone (programmable frequency beep's)
             - LCD screen
             - laptop/portable computer
@@ -99,6 +99,7 @@
 #include "includes/nc.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/mc146818.h"   // for NC200 real time clock
 #include "machine/rp5c01.h"     // for NC100 real time clock
 #include "formats/pc_dsk.h"     // for NC200 disk image
@@ -855,8 +856,7 @@ void nc100_state::nc100_io(address_map &map)
 	map(0x91, 0x9f).r(FUNC(nc100_state::nc_irq_status_r));
 	map(0xa0, 0xaf).r(FUNC(nc100_state::nc100_card_battery_status_r));
 	map(0xb0, 0xb9).r(FUNC(nc100_state::nc_key_data_in_r));
-	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 }
 
@@ -1259,10 +1259,9 @@ void nc200_state::nc200_io(address_map &map)
 	map(0x90, 0x90).rw(FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
 	map(0xa0, 0xa0).r(FUNC(nc200_state::nc200_card_battery_status_r));
 	map(0xb0, 0xb9).r(FUNC(nc200_state::nc_key_data_in_r));
-	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
-	map(0xe0, 0xe1).m("upd765", FUNC(upd765a_device::map));
+	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 }
 
 static INPUT_PORTS_START(nc200)
@@ -1389,8 +1388,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", NC_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(nc_state, nc)
+	PALETTE(config, "palette", FUNC(nc_state::nc_colours), NC_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1406,7 +1404,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, m_uart, 0);
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, nc_state, write_uart_clock))
@@ -1417,9 +1415,8 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_GENERIC_UNLOAD(nc_state, nc_pcmcia_card)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	RAM(config, m_ram).set_default_size("64K");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* dummy timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
@@ -1442,13 +1439,12 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc100_state, write_nc100_centronics_ack))
 
 	/* uart */
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, nc100_state, nc100_rxrdy_callback))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc100_state, nc100_txrdy_callback))
+	m_uart->rxrdy_handler().set(FUNC(nc100_state::nc100_rxrdy_callback));
+	m_uart->txrdy_handler().set(FUNC(nc100_state::nc100_txrdy_callback));
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", TC8521, 32.768_kHz_XTAL)
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, nc100_state, nc100_tc8521_alarm_callback))
+	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
 MACHINE_CONFIG_END
 
 static const floppy_format_type ibmpc_floppy_formats[] = {
@@ -1474,29 +1470,27 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	MCFG_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nc200_state, screen_update_nc200)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(NC200_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(nc200_state, nc)
+	palette_device &palette(*subdevice<palette_device>("palette"));
+	palette.set_entries(NC200_NUM_COLOURS);
+	palette.set_init(FUNC(nc200_state::nc_colours));
 
 	/* printer */
 	MCFG_DEVICE_MODIFY("centronics")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc200_state, write_nc200_centronics_ack))
 
 	/* uart */
-	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, nc200_state, nc200_rxrdy_callback))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc200_state, nc200_txrdy_callback))
+	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
+	m_uart->txrdy_handler().set(FUNC(nc200_state::nc200_txrdy_callback));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, nc200_state, nc200_fdc_interrupt))
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
 	MCFG_DEVICE_ADD("mc", MC146818, 4.194304_MHz_XTAL)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	m_ram->set_default_size("128K");
 MACHINE_CONFIG_END
 
 

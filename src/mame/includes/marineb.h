@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "emupal.h"
 
 class marineb_state : public driver_device
@@ -18,7 +19,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch")
 	{ }
 
 	void springer(machine_config &config);
@@ -47,6 +49,7 @@ private:
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_outlatch;
 
 	bool     m_irq_mask;
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
@@ -62,7 +65,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(marineb);
+	void marineb_palette(palette_device &palette) const;
 	uint32_t screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_changes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

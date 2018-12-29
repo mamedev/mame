@@ -102,8 +102,8 @@
 class amusco_state : public driver_device
 {
 public:
-	amusco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	amusco_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_pit(*this, "pit8253"),
@@ -120,6 +120,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;
+
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_READ8_MEMBER(mc6845_r);
@@ -133,10 +137,7 @@ private:
 	DECLARE_WRITE8_MEMBER(rtc_control_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_PALETTE_INIT(amusco);
-
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	void amusco_palette(palette_device &palette) const;
 
 	void amusco_mem_map(address_map &map);
 	void amusco_io_map(address_map &map);
@@ -483,13 +484,13 @@ MC6845_UPDATE_ROW(amusco_state::update_row)
 	m_bg_tilemap->draw(*m_screen, bitmap, rowrect, 0, 0);
 }
 
-PALETTE_INIT_MEMBER(amusco_state,amusco)
+void amusco_state::amusco_palette(palette_device &palette) const
 {
 	// add some templates first
 	for (int i = 0; i < 8; i++)
 	{
-		for(int j=0;j<8;j++)
-			palette.set_pen_color(i*8+j, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		for (int j = 0; j < 8; j++)
+			palette.set_pen_color((i * 8) + j, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 
 	// override colors
@@ -534,41 +535,41 @@ PALETTE_INIT_MEMBER(amusco_state,amusco)
 MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
-	MCFG_DEVICE_PROGRAM_MAP(amusco_mem_map)
-	MCFG_DEVICE_IO_MAP(amusco_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, CPU_CLOCK);        // 5 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::amusco_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &amusco_state::amusco_io_map);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIT_CLOCK0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(PIT_CLOCK1)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(PIT_CLOCK0);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(PIT_CLOCK1);
+	m_pit->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amusco_state, output_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, amusco_state, output_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amusco_state, output_c_w))
+	i8255_device &ppi_outputs(I8255(config, "ppi_outputs"));
+	ppi_outputs.out_pa_callback().set(FUNC(amusco_state::output_a_w));
+	ppi_outputs.out_pb_callback().set(FUNC(amusco_state::output_b_w));
+	ppi_outputs.out_pc_callback().set(FUNC(amusco_state::output_c_w));
 
-	MCFG_DEVICE_ADD("ppi_inputs", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi_inputs(I8255(config, "ppi_inputs"));
+	ppi_inputs.in_pa_callback().set_ioport("IN0");
+	ppi_inputs.in_pb_callback().set_ioport("IN1");
+	ppi_inputs.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("lpt_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, lpt_data_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(*this, amusco_state, lpt_status_r))
+	i8155_device &i8155a(I8155(config, "lpt_interface", 0));
+	i8155a.out_pa_callback().set(FUNC(amusco_state::lpt_data_w));
+	i8155a.in_pb_callback().set(FUNC(amusco_state::lpt_status_r));
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, rtc_control_w))
-	MCFG_I8155_IN_PORTC_CB(READ8("rtc", msm5832_device, data_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8("rtc", msm5832_device, data_w))
+	i8155_device &i8155b(I8155(config, "rtc_interface", 0));
+	i8155b.out_pa_callback().set(FUNC(amusco_state::rtc_control_w));
+	i8155b.in_pc_callback().set(m_rtc, FUNC(msm5832_device::data_r));
+	i8155b.out_pc_callback().set(m_rtc, FUNC(msm5832_device::data_w));
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
@@ -580,17 +581,17 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amusco)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_amusco);
+	PALETTE(config, "palette", FUNC(amusco_state::amusco_palette), 8*8);
 
-	MCFG_PALETTE_ADD("palette",8*8)
-	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
+	R6545_1(config, m_crtc, CRTC_CLOCK); /* guess */
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_on_update_addr_change_callback(FUNC(amusco_state::crtc_addr), this);
+	m_crtc->out_de_callback().set(m_pic, FUNC(pic8259_device::ir1_w)); // IRQ1 sets 0x918 bit 3
+	m_crtc->set_update_row_callback(FUNC(amusco_state::update_row), this);
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_ADDR_CHANGED_CB(amusco_state, crtc_addr)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("pic8259", pic8259_device, ir1_w)) // IRQ1 sets 0x918 bit 3
-	MCFG_MC6845_UPDATE_ROW_CB(amusco_state, update_row)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

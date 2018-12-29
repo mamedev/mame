@@ -19,7 +19,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
 #include "formats/apridisk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/74153.h"
@@ -357,45 +357,46 @@ void apricot_state::apricot_io(address_map &map)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(apricot_state::apricot)
+void apricot_state::apricot(machine_config &config)
+{
 	// main cpu
-	MCFG_DEVICE_ADD("ic91", I8086, 15_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(apricot_mem)
-	MCFG_DEVICE_IO_MAP(apricot_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ic31", pic8259_device, inta_cb)
-	MCFG_I8086_LOCK_HANDLER(WRITELINE(*this, apricot_state, i8086_lock_w))
+	I8086(config, m_cpu, 15_MHz_XTAL / 3);
+	m_cpu->set_addrmap(AS_PROGRAM, &apricot_state::apricot_mem);
+	m_cpu->set_addrmap(AS_IO, &apricot_state::apricot_io);
+	m_cpu->set_irq_acknowledge_callback("ic31", FUNC(pic8259_device::inta_cb));
+	m_cpu->lock_handler().set(FUNC(apricot_state::i8086_lock_w));
 
 	// i/o cpu
-	MCFG_DEVICE_ADD("ic71", I8089, 15_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(apricot_mem)
-	MCFG_DEVICE_IO_MAP(apricot_io)
-	MCFG_I8089_DATA_WIDTH(16)
-	MCFG_I8089_SINTR1(WRITELINE("ic31", pic8259_device, ir0_w))
-	MCFG_I8089_SINTR2(WRITELINE("ic31", pic8259_device, ir1_w))
+	I8089(config, m_iop, 15_MHz_XTAL / 3);
+	m_iop->set_addrmap(AS_PROGRAM, &apricot_state::apricot_mem);
+	m_iop->set_addrmap(AS_IO, &apricot_state::apricot_io);
+	m_iop->set_data_width(16);
+	m_iop->sintr1().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_iop->sintr2().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	// ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256k")
+	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_SIZE(800, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_UPDATE_DRIVER(apricot_state, screen_update_apricot)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_size(800, 400);
+	screen.set_visarea(0, 800-1, 0, 400-1);
+	screen.set_refresh_hz(72);
+	screen.set_screen_update(FUNC(apricot_state::screen_update_apricot));
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
-	MCFG_MC6845_ADD("ic30", HD6845, "screen", 15_MHz_XTAL / 10)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(10)
-	MCFG_MC6845_UPDATE_ROW_CB(apricot_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, apricot_state, apricot_hd6845_de))
+	HD6845(config, m_crtc, 15_MHz_XTAL / 10);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(10);
+	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(apricot_state::apricot_hd6845_de));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ic7", SN76489, 4_MHz_XTAL / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "ic7", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// devices
 	I8255A(config, m_ppi, 0);
@@ -410,7 +411,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(4_MHz_XTAL / 16);
-	m_pit->out_handler<0>().set("ic31", FUNC(pic8259_device::ir6_w));
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
 	m_pit->set_clk<1>(4_MHz_XTAL / 2);
 	m_pit->out_handler<1>().set("ic14", FUNC(ttl153_device::i0a_w));
 	m_pit->set_clk<2>(4_MHz_XTAL / 2);
@@ -418,9 +419,9 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2a_w));
 	m_pit->out_handler<2>().append("ic14", FUNC(ttl153_device::i2b_w));
 
-	MCFG_DEVICE_ADD("ic14", TTL153)
-	MCFG_TTL153_ZA_CB(WRITELINE("ic15", z80sio_device, rxca_w))
-	MCFG_TTL153_ZB_CB(WRITELINE("ic15", z80sio_device, txca_w))
+	ttl153_device &ttl74153(TTL153(config, "ic14"));
+	ttl74153.za_cb().set("ic15", FUNC(z80sio_device::rxca_w));
+	ttl74153.zb_cb().set("ic15", FUNC(z80sio_device::txca_w));
 
 	CLOCK(config, "ic15_rxtxcb", 4_MHz_XTAL / 16).signal_handler().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 
@@ -456,27 +457,29 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	//m_centronics->select_handler().set(); // schematic page 294 says this is connected to pc4, but that is an output to the printer
 
 	INPUT_BUFFER(config, "cent_data_in");
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	// floppy
-	MCFG_DEVICE_ADD("ic68", WD2797, 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, apricot_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("ic71", i8089_device, drq1_w))
-	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats)
+	WD2797(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(apricot_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(m_iop, FUNC(i8089_device::drq1_w));
+	FLOPPY_CONNECTOR(config, "ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "apricot_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
 	// expansion bus
-	MCFG_EXPANSION_ADD("exp", "ic91")
-	MCFG_EXPANSION_IOP_ADD("ic71")
-	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, nullptr)
-	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, nullptr)
-MACHINE_CONFIG_END
+	APRICOT_EXPANSION_BUS(config, "exp", m_cpu, m_iop);
+	APRICOT_EXPANSION_SLOT(config, "exp:1", apricot_expansion_cards, nullptr);
+	APRICOT_EXPANSION_SLOT(config, "exp:2", apricot_expansion_cards, nullptr);
+}
 
-MACHINE_CONFIG_START(apricot_state::apricotxi)
+void apricot_state::apricotxi(machine_config &config)
+{
 	apricot(config);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

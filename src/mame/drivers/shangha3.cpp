@@ -445,130 +445,119 @@ static GFXDECODE_START( gfx_shangha3 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(shangha3_state::shangha3)
-
+void shangha3_state::shangha3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
-	MCFG_DEVICE_PROGRAM_MAP(shangha3_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	M68000(config, m_maincpu, 48_MHz_XTAL/3); // TMP68HC000N-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangha3_state::shangha3_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(24*16, 16*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  m_screen->set_size(24*16, 16*16);
+//  m_screen->set_visarea(0*16, 24*16-1, 1*16, 15*16-1);
+	m_screen->set_raw(48_MHz_XTAL/6, 512, 0, 24*16, 263, 1*16, 15*16); /* refresh rate is unknown */
+	m_screen->set_screen_update(FUNC(shangha3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
-
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 48_MHz_XTAL/32) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 48_MHz_XTAL/32)); // 1.5MHz
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(shangha3_state::heberpop)
-
+void shangha3_state::heberpop(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16 like the others??
-	MCFG_DEVICE_PROGRAM_MAP(heberpop_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	M68000(config, m_maincpu, 48_MHz_XTAL/3); // TMP68HC000N-16 like the others??
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangha3_state::heberpop_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 48_MHz_XTAL/8)  /* 6 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_DEVICE_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
+	Z80(config, m_audiocpu, 48_MHz_XTAL/8);  /* 6 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &shangha3_state::heberpop_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &shangha3_state::heberpop_sound_io_map);  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(24*16, 16*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  m_screen->set_size(24*16, 16*16);
+//  m_screen->set_visarea(0*16, 24*16-1, 1*16, 15*16-1);
+	m_screen->set_raw(48_MHz_XTAL/6, 512, 0, 24*16, 263, 1*16, 15*16); /* refresh rate is unknown */
+	m_screen->set_screen_update(FUNC(shangha3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
-
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 48_MHz_XTAL/6)); /* 8 MHz? */
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(shangha3_state::blocken)
-
+void shangha3_state::blocken(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
-	MCFG_DEVICE_PROGRAM_MAP(blocken_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
+	M68000(config, m_maincpu, 48_MHz_XTAL/3); // TMP68HC000N-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &shangha3_state::blocken_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 48_MHz_XTAL/8)   /* 6 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(heberpop_sound_map)
-	MCFG_DEVICE_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
+	Z80(config, m_audiocpu, 48_MHz_XTAL/8);   /* 6 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &shangha3_state::heberpop_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &shangha3_state::heberpop_sound_io_map);  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(24*16, 16*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(60);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  m_screen->set_size(24*16, 16*16);
+//  m_screen->set_visarea(0*16, 24*16-1, 1*16, 15*16-1);
+	m_screen->set_raw(48_MHz_XTAL/6, 512, 0, 24*16, 263, 1*16, 15*16); /* refresh rate is unknown */
+	m_screen->set_screen_update(FUNC(shangha3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shangha3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
-
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048).enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 48_MHz_XTAL/6)); /* 8 MHz? */
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, blocken_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->set_addrmap(0, &shangha3_state::blocken_oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -614,7 +603,7 @@ Memory: M1 = TMM2018AP-45 (2K x 8 SRAM)
  Other: SW1 & SW2 - 8-position dipswitch
         VOL - Volume pot
 
-* = unpopulated 32 pin rom sockets silkscreened 27C040
+* = unpopulated 32 pin ROM sockets silkscreened 27C040
 
 NOTE: For the "World" set, it differs from the US set (besides the US set having the data repeated) by 2 bytes.
 
@@ -629,8 +618,8 @@ ROM_START( shangha3 ) /* PCB labeled SUN04C - Has two additional tiles sets to c
 	ROM_LOAD16_BYTE( "ic2",  0x0001, 0x40000, CRC(714bfdbc) SHA1(0ce611624e8a5e28cba5443b63b8872eed9f68fc) ) /* ST M27C2001 EPROM with no label */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin MASK ROM */
-	ROM_LOAD( "27c4000.ic44", 0x200000, 0x080000, CRC(6344ffb7) SHA1(06bc5bcf94973ec152e7abf9cc658ef319eb4b65) ) // korean fonts, vs mode how to play etc? (probably for Korean program roms we don't have, but was on World board)
+	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin mask ROM */
+	ROM_LOAD( "27c4000.ic44", 0x200000, 0x080000, CRC(6344ffb7) SHA1(06bc5bcf94973ec152e7abf9cc658ef319eb4b65) ) // korean fonts, vs mode how to play etc? (probably for Korean program ROMs we don't have, but was on World board)
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "s3j_v10.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) )
@@ -643,7 +632,7 @@ ROM_START( shangha3u ) /* PCB labeled SUN04C - Shows FBI "Winners Don't Use Drug
 	/* both program ROMs are double sized with the identical halves */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin MASK ROM */
+	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin mask ROM */
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "ic75.ic75", 0x0000, 0x80000, CRC(a8136d8c) SHA1(8028bda5642c2546c1ac8da78dbff4084829f03b) ) /* 27C4001 with 1st & 2nd halves == s3j_v10.ic75 */
@@ -654,7 +643,7 @@ ROM_START( shangha3up ) /* PCB labeled SUN04 with a sticker labeled PCB 001, a p
 	ROM_LOAD16_BYTE( "syan3u_evn_10-7.ic3",  0x0000, 0x40000, CRC(a1f5275a) SHA1(71a024205bd5e6385bd9d746c339f0327bd1c1d6) ) /* ST M27C2001 EPROM hand written label:  SYAN3U  EVN 10/7 */
 	ROM_LOAD16_BYTE( "syan3u_odd_10-7.ic2",  0x0001, 0x40000, CRC(fe3960bf) SHA1(545473260d959b8ed8145263d54f5f4523a844c4) ) /* ST M27C2001 EPROM hand written label:  SYAN3U  ODD 10/7 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* same data as the 42 pin MASK S3J CHAR-A1 */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* same data as the 42 pin mask S3J CHAR-A1 */
 	ROM_LOAD( "s3j_chr-a1_1_sum_53b1_93.9.20.ic80", 0x000000, 0x80000, CRC(fcaf795b) SHA1(312d85f39087564d67f12e0287f508b94b1493af) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #1  SUM: 53B1  93.9.20 */
 	ROM_LOAD( "s3j_chr-a1_2_sum_0e32_93.9.20.ic81", 0x080000, 0x80000, CRC(5a564f50) SHA1(34ca2ecd7101961e657034082802d89db5b4b7bd) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #2  SUM: 0E32  93.9.20 */
 	ROM_LOAD( "s3j_chr-a1_3_sum_0d9a_93.9.20.ic82", 0x100000, 0x80000, CRC(2b333c69) SHA1(6e720de5d222be25857ab18902636587e8c6afb8) ) /* HN27C4001 hand written label:  S3J-CHR-A1  #3  SUM: 0D9A  93.9.20 */
@@ -670,7 +659,7 @@ ROM_START( shangha3j ) /* PCB labeled SUN04C */
 	ROM_LOAD16_BYTE( "s3j_v11.ic2",  0x0001, 0x40000, CRC(09174620) SHA1(1d1639c07895f715facfe153fbdb6ae0f3cdd876) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin MASK ROM */
+	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin mask ROM */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "s3j_v10.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) )

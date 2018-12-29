@@ -18,8 +18,10 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
+#include "machine/i8251.h"
 #include "machine/mb3773.h"
-#include "machine/watchdog.h"
+#include "machine/mb8421.h"
 #include "video/resnet.h"
 #include "emupal.h"
 #include "screen.h"
@@ -53,8 +55,6 @@ public:
 
 	// game-specific main CPU read/write handlers
 	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
-	DECLARE_READ16_MEMBER(rascot_excs_r);
-	DECLARE_WRITE16_MEMBER(rascot_excs_w);
 	DECLARE_READ16_MEMBER(smgp_excs_r);
 	DECLARE_WRITE16_MEMBER(smgp_excs_w);
 
@@ -72,8 +72,6 @@ protected:
 
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
-	void rascot_z80_map(address_map &map);
-	void rascot_z80_portmap(address_map &map);
 	void smgp_airdrive_map(address_map &map);
 	void smgp_airdrive_portmap(address_map &map);
 	void smgp_comm_map(address_map &map);
@@ -111,10 +109,11 @@ protected:
 
 	// devices
 	required_device<m68000_device> m_subcpu;
-	required_device<z80_device> m_soundcpu;
+	optional_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_soundcpu2;
 	optional_device<i8751_device> m_mcu;
 	required_device<mb3773_device> m_watchdog;
+	required_device_array<cxd1095_device, 2> m_iochip;
 	required_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
@@ -233,6 +232,20 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
+	DECLARE_READ8_MEMBER(commram_r);
+	DECLARE_WRITE8_MEMBER(commram_w);
+	DECLARE_WRITE8_MEMBER(commram_bank_w);
+
+	void sub_map(address_map &map);
+	void comm_map(address_map &map);
+
+	required_device<mb8421_device> m_commram;
+	required_device<i8251_device> m_usart;
+
+	uint8_t m_commram_bank;
 };
 
 #endif // MAME_INCLUDES_SEGAXBD_H

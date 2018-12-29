@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	mainlatch.q_out_cb<2>().set(FUNC(wiping_state::flipscreen_w)); // INV
 	mainlatch.q_out_cb<3>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert(); // CP2RE
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -311,12 +311,10 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wiping_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wiping)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiping);
+	PALETTE(config, m_palette, FUNC(wiping_state::wiping_palette), 64*4+64*4, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
