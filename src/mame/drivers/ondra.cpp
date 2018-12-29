@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ondra_state, vblank_irq))
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	// sound hardware

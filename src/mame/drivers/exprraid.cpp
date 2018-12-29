@@ -511,10 +511,10 @@ MACHINE_CONFIG_START(exprraid_state::exprraid)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 262, 8, 256-8) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exprraid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

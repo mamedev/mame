@@ -10,6 +10,7 @@
 #pragma once
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/tms32010/tms32010.h"
 #include "sound/3812intf.h"
 #include "video/toaplan_scu.h"
 #include "emupal.h"
@@ -57,7 +58,7 @@ protected:
 
 	/* Demon world */
 	int m_dsp_on;
-	int m_dsp_BIO;
+	int m_dsp_bio;
 	int m_dsp_execute;
 	uint32_t m_dsp_addr_w;
 	uint32_t m_main_ram_seg;
@@ -108,7 +109,7 @@ protected:
 	DECLARE_READ16_MEMBER(demonwld_dsp_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_w);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_bio_w);
-	DECLARE_READ_LINE_MEMBER(demonwld_BIO_r);
+	DECLARE_READ_LINE_MEMBER(demonwld_bio_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_ctrl_w);
 	DECLARE_READ16_MEMBER(samesame_port_6_word_r);
 	DECLARE_READ16_MEMBER(toaplan1_shared_r);
@@ -179,13 +180,13 @@ protected:
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ym3812_device> m_ymsnd;
-	optional_device<cpu_device> m_dsp;
+	optional_device<tms32010_device> m_dsp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	void DSP_io_map(address_map &map);
-	void DSP_program_map(address_map &map);
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
 	void demonwld_main_map(address_map &map);
 	void demonwld_sound_io_map(address_map &map);
 	void hellfire_main_map(address_map &map);

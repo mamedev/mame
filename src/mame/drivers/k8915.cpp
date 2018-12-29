@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(k8915_state::k8915)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(4'915'200) / 2));
 	ctc.set_clk<2>(XTAL(4'915'200) / 2);

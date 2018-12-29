@@ -315,8 +315,8 @@ MACHINE_CONFIG_START(poly_state::poly)
 	//m_kr2376->strobe().set("pia1", FUNC(pia6821_device::cb1_w));
 
 	/* generic keyboard until ROM in KR2376-12 is known */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(poly_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(poly_state::kbd_put));
 
 	/* video control */
 	PIA6821(config, m_pia[0], 0);

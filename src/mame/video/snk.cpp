@@ -28,35 +28,34 @@
 
 /**************************************************************************************/
 
-PALETTE_INIT_MEMBER(snk_state,tnk3)
+void snk_state::tnk3_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	int num_colors = 0x400;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	constexpr int num_colors = 0x400;
 
-	for( i=0; i<num_colors; i++ )
+	for (int i = 0; i < num_colors; i++)
 	{
-		int bit0=0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		bit0 = (color_prom[i + 2*num_colors] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 2*num_colors], 3);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + 2*num_colors] >> 2) & 0x01;
-		bit1 = (color_prom[i + num_colors] >> 2) & 0x01;
-		bit2 = (color_prom[i + num_colors] >> 3) & 0x01;
-		bit3 = (color_prom[i] >> 0) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 2*num_colors], 2);
+		bit1 = BIT(color_prom[i + num_colors], 2);
+		bit2 = BIT(color_prom[i + num_colors], 3);
+		bit3 = BIT(color_prom[i], 0);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + 2*num_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*num_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + num_colors] >> 0) & 0x01;
-		bit3 = (color_prom[i + num_colors] >> 1) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 2*num_colors], 0);
+		bit1 = BIT(color_prom[i + 2*num_colors], 1);
+		bit2 = BIT(color_prom[i + num_colors], 0);
+		bit3 = BIT(color_prom[i + num_colors], 1);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

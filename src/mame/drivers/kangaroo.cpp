@@ -437,7 +437,7 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(kangaroo_state, screen_update_kangaroo)
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

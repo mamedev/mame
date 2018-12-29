@@ -3126,6 +3126,13 @@ WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
 	}
 }
 
+
+uint32_t cps2_state::screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	cps2_set_sprite_priorities();
+	return screen_update_cps1(screen, bitmap, cliprect);
+}
+
 void cps2_state::cps2_set_sprite_priorities()
 {
 	m_pri_ctrl = m_output[CPS2_OBJ_PRI /2];

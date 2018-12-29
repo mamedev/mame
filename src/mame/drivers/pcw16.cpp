@@ -1051,19 +1051,17 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw16_state, screen_update_pcw16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", PCW16_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(pcw16_state, pcw16)
+	PALETTE(config, "palette", FUNC(pcw16_state::pcw16_colours), PCW16_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* printer */
 	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
 	lpt.irq_handler().set_inputline(m_maincpu, 0);
 
-	PC_FDC_SUPERIO(config, m_fdc);
+	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)

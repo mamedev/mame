@@ -1081,7 +1081,7 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
 
-	MCFG_BFMBD1_ADD("vfd0",0)
+	BFM_BD1(config, m_vfd0, 60, 0);
 	SPEAKER(config, "mono").front_center();
 	GENERIC_LATCH_8(config, "soundlatch");
 	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);

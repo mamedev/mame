@@ -72,7 +72,7 @@ private:
 	DECLARE_MACHINE_START(gberet);
 	DECLARE_MACHINE_RESET(gberet);
 	DECLARE_VIDEO_START(gberet);
-	DECLARE_PALETTE_INIT(gberet);
+	void gberet_palette(palette_device &palette) const;
 	uint32_t screen_update_gberet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gberetb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gberet_interrupt_tick);

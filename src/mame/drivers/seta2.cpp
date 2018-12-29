@@ -82,7 +82,7 @@ grdians:
   has the shadow bit set, and has become invisible after implementing it.
 
 penbros/ablast:
-- Zooming is used briefly.
+- Zooming is used briefly (between scenes, stage exit, stage introduction)
 
 deerhunt,wschamp:
 - offset tilemap sprite during demo. In deerhunt intro, the hunter should zoom
@@ -94,18 +94,12 @@ wschampb:
   original release? Is that why the next bug fix release is v1.01? IE: such a
   a minor increase in the version number.
 
-trophyh:
-- mame hangs for around 15 seconds every now and then, at scene changes.
-  This is probably due to a couple of frames with an odd or corrupt sprites list,
-  taking a long time to render.
-
 funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
 
 reelquak:
 - Needs an x offset for tilemap sprites.
-- There are one frame glitches in the reels scroll.
 
 ***************************************************************************/
 
@@ -176,15 +170,12 @@ void seta2_state::x1_map(address_map &map)
                                 Guardians
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::grdians_lockout_w)
+WRITE8_MEMBER(seta2_state::grdians_lockout_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// initially 0, then either $25 (coin 1) or $2a (coin 2)
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);   // or 0x08
-	}
-//  popmessage("%04X", data & 0xffff);
+	// initially 0, then either $25 (coin 1) or $2a (coin 2)
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);   // or 0x08
+//  popmessage("%04X", data & 0xff);
 }
 
 void seta2_state::grdians_map(address_map &map)
@@ -198,12 +189,12 @@ void seta2_state::grdians_map(address_map &map)
 	map(0x700002, 0x700003).portr("P2");                 // P2
 	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
 	map(0x70000c, 0x70000d).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x800000, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
+	map(0x800001, 0x800001).w(FUNC(seta2_state::grdians_lockout_w));
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
+	map(0xc00000, 0xc3ffff).ram().w(FUNC(seta2_state::spriteram_w)).share("spriteram");    // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
@@ -242,7 +233,7 @@ void seta2_state::gundamex_map(address_map &map)
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
@@ -284,19 +275,13 @@ READ16_MEMBER(seta2_state::mj4simai_p2_r)
 	}
 }
 
-WRITE16_MEMBER(seta2_state::mj4simai_keyboard_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_keyboard_row = data & 0xff;
-}
-
 void seta2_state::mj4simai_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0x600000, 0x600001).r(FUNC(seta2_state::mj4simai_p1_r));             // P1
 	map(0x600002, 0x600003).r(FUNC(seta2_state::mj4simai_p2_r));             // P2
-	map(0x600004, 0x600005).w(FUNC(seta2_state::mj4simai_keyboard_w));      // select keyboard row to read
+	map(0x600005, 0x600005).lw8("keyboard_row_w", [this](u8 data){ m_keyboard_row = data; } );      // select keyboard row to read
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x600100, 0x600101).portr("SYSTEM");             //
 	map(0x600200, 0x600201).nopw();                        // Leds? Coins?
@@ -306,7 +291,7 @@ void seta2_state::mj4simai_map(address_map &map)
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");   // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -330,7 +315,7 @@ void seta2_state::myangel_map(address_map &map)
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -354,7 +339,7 @@ void seta2_state::myangel2_map(address_map &map)
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xd00000, 0xd3ffff).ram().share("spriteram");       // Sprites
 	map(0xd40000, 0xd4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xd60000, 0xd6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
+	map(0xd60000, 0xd6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");          // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -371,18 +356,15 @@ READ16_MEMBER(seta2_state::pzlbowl_protection_r)
 	return memregion("maincpu")->base()[address - 2];
 }
 
-READ16_MEMBER(seta2_state::pzlbowl_coins_r)
+READ8_MEMBER(seta2_state::pzlbowl_coins_r)
 {
 	return ioport("SYSTEM")->read() | (machine().rand() & 0x80 );
 }
 
-WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
+WRITE8_MEMBER(seta2_state::pzlbowl_coin_counter_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0,data & 0x10);
-		machine().bookkeeping().coin_counter_w(1,data & 0x20);
-	}
+	machine().bookkeeping().coin_counter_w(0,data & 0x10);
+	machine().bookkeeping().coin_counter_w(1,data & 0x20);
 }
 
 void seta2_state::pzlbowl_map(address_map &map)
@@ -394,12 +376,12 @@ void seta2_state::pzlbowl_map(address_map &map)
 	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);           // Samples Banks
 	map(0x500000, 0x500001).portr("P1");                     // P1
 	map(0x500002, 0x500003).portr("P2");                     // P2
-	map(0x500004, 0x500005).rw(FUNC(seta2_state::pzlbowl_coins_r), FUNC(seta2_state::pzlbowl_coin_counter_w));   // Coins + Protection?
+	map(0x500005, 0x500005).rw(FUNC(seta2_state::pzlbowl_coins_r), FUNC(seta2_state::pzlbowl_coin_counter_w));   // Coins + Protection?
 	map(0x500006, 0x500007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x700000, 0x700001).r(FUNC(seta2_state::pzlbowl_protection_r));          // Protection
 	map(0x800000, 0x83ffff).ram().share("spriteram");       // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
@@ -419,7 +401,7 @@ void seta2_state::penbros_base_map(address_map &map)
 	map(0x600000, 0x600001).portr("P1");
 	map(0x600002, 0x600003).portr("P2");
 	map(0x600004, 0x600005).portr("SYSTEM");
-	map(0x600004, 0x600005).w(FUNC(seta2_state::pzlbowl_coin_counter_w));
+	map(0x600005, 0x600005).w(FUNC(seta2_state::pzlbowl_coin_counter_w));
 	map(0x600006, 0x600007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0xa00000, 0xa03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));
 	map(0xb00000, 0xb3ffff).ram().share("spriteram");
@@ -433,7 +415,7 @@ void seta2_state::penbros_map(address_map &map)
 	map(0x500300, 0x500301).portr("DSW1");
 	map(0x500302, 0x500303).portr("DSW2");
 	map(0x500300, 0x50030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);
-	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
 }
 
@@ -454,13 +436,15 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_leds[0] = BIT(data, 0);  // start
-		m_leds[1] = BIT(data, 1);  // small
-		m_leds[2] = BIT(data, 2);  // bet
-		m_leds[3] = BIT(data, 3);  // big
-		m_leds[4] = BIT(data, 4);  // double up
-		m_leds[5] = BIT(data, 5);  // collect
-		m_leds[6] = BIT(data, 6);  // bet cancel
+		// bit 0 - start
+		// bit 1 - small
+		// bit 2 - bet
+		// bit 3 - big
+		// bit 4 - double up
+		// bit 5 - collect
+		// bit 6 - bet cancel
+		for (int i = 0; i <= 6; i++)
+			m_leds[i] = BIT(data, i);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -470,18 +454,15 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 //  popmessage("LED %04X", data);
 }
 
-WRITE16_MEMBER(seta2_state::reelquak_coin_w)
+WRITE8_MEMBER(seta2_state::reelquak_coin_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
-		machine().bookkeeping().coin_counter_w(2, data & 0x04);  // pay out
-		machine().bookkeeping().coin_counter_w(3, data & 0x08);  // key in
-		//                                data & 0x10); // Sound IRQ Ack.? 1->0
-		//                                data & 0x20); // Vblank IRQ.? 1
-	}
-//  popmessage("COIN %04X", data & 0xffff);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  // pay out
+	machine().bookkeeping().coin_counter_w(3, data & 0x08);  // key in
+	//                                data & 0x10); // Sound IRQ Ack.? 1->0
+	//                                data & 0x20); // Vblank IRQ.? 1
+//  popmessage("COIN %04X", data & 0xff);
 }
 
 void seta2_state::reelquak_map(address_map &map)
@@ -493,14 +474,14 @@ void seta2_state::reelquak_map(address_map &map)
 	map(0x400002, 0x400003).portr("TICKET");             // Tickets
 	map(0x400004, 0x400005).portr("SYSTEM");             // Coins
 	map(0x400006, 0x400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x400200, 0x400201).w(FUNC(seta2_state::reelquak_coin_w));          // Coin Counters / IRQ Ack
+	map(0x400201, 0x400201).w(FUNC(seta2_state::reelquak_coin_w));          // Coin Counters / IRQ Ack
 	map(0x400300, 0x400301).portr("DSW1");               // DSW 1
 	map(0x400302, 0x400303).portr("DSW2");               // DSW 2
 	map(0x400300, 0x40030f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);       // Samples Banks
 	map(0xb00000, 0xb03fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");              // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));      // TMP68301 Registers
 }
 
@@ -515,7 +496,7 @@ void seta2_state::namcostr_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
-	map(0xc60000, 0xc6003f).w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -524,16 +505,13 @@ void seta2_state::namcostr_map(address_map &map)
                             Sammy Outdoor Shooting
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::samshoot_coin_w)
+WRITE8_MEMBER(seta2_state::samshoot_coin_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x10);
-		machine().bookkeeping().coin_counter_w(1, data & 0x20);
-		// Are these connected? They are set in I/O test
-		machine().bookkeeping().coin_lockout_w(0,~data & 0x40);
-		machine().bookkeeping().coin_lockout_w(1,~data & 0x80);
-	}
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	// Are these connected? They are set in I/O test
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x40);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x80);
 //  popmessage("%04x",data);
 }
 
@@ -553,12 +531,13 @@ void seta2_state::samshoot_map(address_map &map)
 
 	map(0x700000, 0x700001).portr("TRIGGER");          // Trigger
 	map(0x700002, 0x700003).portr("PUMP");             // Pump
-	map(0x700004, 0x700005).portr("COIN").w(FUNC(seta2_state::samshoot_coin_w));  // Coins
+	map(0x700004, 0x700005).portr("COIN");  // Coins
+	map(0x700005, 0x700005).w(FUNC(seta2_state::samshoot_coin_w));  // Coins
 	map(0x700006, 0x700007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog?
 
 	map(0x800000, 0x83ffff).ram().share("spriteram"); // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
-	map(0x860000, 0x86003f).w(FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs");    // Video Registers
 
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 
@@ -577,41 +556,32 @@ void staraudi_state::staraudi_debug_outputs()
 //  popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
 }
 
-WRITE16_MEMBER(staraudi_state::staraudi_lamps1_w)
+WRITE8_MEMBER(staraudi_state::lamps1_w)
 {
 	COMBINE_DATA(&m_lamps1);
-	if (ACCESSING_BITS_0_7)
-	{
-		m_leds[0] = BIT(data, 0);  // Lamp 1 |
-		m_leds[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
-		m_leds[2] = BIT(data, 2);  // Lamp 3 |
-		//                        data & 0x0008 );  // Degauss
-	}
+	m_leds[0] = BIT(data, 0);  // Lamp 1 |
+	m_leds[1] = BIT(data, 1);  // Lamp 2 |- Camera Lamps
+	m_leds[2] = BIT(data, 2);  // Lamp 3 |
+	//                        data & 0x08 );  // Degauss
 	staraudi_debug_outputs();
 }
 
-WRITE16_MEMBER(staraudi_state::staraudi_lamps2_w)
+WRITE8_MEMBER(staraudi_state::lamps2_w)
 {
 	COMBINE_DATA(&m_lamps2);
-	if (ACCESSING_BITS_0_7)
-	{
-		//                        data & 0x0020 );  // ? Always On
-		m_leds[3] = BIT(data, 6);  // 2P Switch Lamp
-		m_leds[4] = BIT(data, 7);  // 1P Switch Lamp
-	}
+	//                        data & 0x20 );  // ? Always On
+	m_leds[3] = BIT(data, 6);  // 2P Switch Lamp
+	m_leds[4] = BIT(data, 7);  // 1P Switch Lamp
 	staraudi_debug_outputs();
 }
 
-WRITE16_MEMBER(staraudi_state::staraudi_camera_w)
+WRITE8_MEMBER(staraudi_state::camera_w)
 {
 	COMBINE_DATA(&m_cam);
-	if (ACCESSING_BITS_0_7)
-	{
-		//                        data & 0x0001 );  // ? Always On
-		//                        data & 0x0002 );  // ? Print Test
-		//                        data & 0x0008 );  // Camera On (Test Mode)
-		//                        data & 0x0020 );  // ?
-	}
+	//                        data & 0x01 );  // ? Always On
+	//                        data & 0x02 );  // ? Print Test
+	//                        data & 0x08 );  // Camera On (Test Mode)
+	//                        data & 0x20 );  // ?
 	staraudi_debug_outputs();
 }
 
@@ -620,12 +590,12 @@ WRITE16_MEMBER(staraudi_state::staraudi_camera_w)
 #define TILE0 (0x7c000)
 #define TILERAM(offset) ((uint16_t*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
 
-READ16_MEMBER(staraudi_state::staraudi_tileram_r)
+READ16_MEMBER(staraudi_state::tileram_r)
 {
 	return *TILERAM(offset);
 }
 
-WRITE16_MEMBER(staraudi_state::staraudi_tileram_w)
+WRITE16_MEMBER(staraudi_state::tileram_w)
 {
 	COMBINE_DATA(TILERAM(offset));
 	int tile = TILE0 + ((offset * 2) % 0x20000) / (8*2);
@@ -638,22 +608,22 @@ void staraudi_state::staraudi_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();                             // ROM
 	map(0x200000, 0x23ffff).ram();                             // RAM
 
-	map(0x400000, 0x45ffff).rw(FUNC(staraudi_state::staraudi_tileram_r), FUNC(staraudi_state::staraudi_tileram_w)).share("tileram"); // Tile RAM
+	map(0x400000, 0x45ffff).rw(FUNC(staraudi_state::tileram_r), FUNC(staraudi_state::tileram_w)).share("tileram"); // Tile RAM
 
 //  AM_RANGE(0x500000, 0x53ffff) AM_RAM                             // Camera RAM (r8g8)
 //  AM_RANGE(0x540000, 0x57ffff) AM_RAM                             // Camera RAM (00b8)
 	map(0x500000, 0x57ffff).ram().share("rgbram");
 
-	map(0x600000, 0x600001).w(FUNC(staraudi_state::staraudi_camera_w));        // Camera Outputs
+	map(0x600001, 0x600001).w(FUNC(staraudi_state::camera_w));        // Camera Outputs
 
 	map(0x700000, 0x700001).portr("P1");                 // P1
 	map(0x700002, 0x700003).portr("P2");                 // P2
 	map(0x700004, 0x700005).portr("SYSTEM");             // Coins
 	map(0x700006, 0x700007).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 
-	map(0x700100, 0x700101).w(FUNC(staraudi_state::staraudi_lamps1_w));        // Lamps 1
+	map(0x700101, 0x700101).w(FUNC(staraudi_state::lamps1_w));        // Lamps 1
 	map(0x700180, 0x70018f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
-	map(0x700200, 0x700201).w(FUNC(staraudi_state::staraudi_lamps2_w));        // Lamps 2
+	map(0x700201, 0x700201).w(FUNC(staraudi_state::lamps2_w));        // Lamps 2
 	map(0x700300, 0x700301).portr("DSW1");               // DSW 1
 	map(0x700302, 0x700303).portr("DSW2");               // DSW 2
 	map(0x700300, 0x70030f).w(FUNC(staraudi_state::sound_bank_w));             // Samples Banks
@@ -664,7 +634,7 @@ void staraudi_state::staraudi_map(address_map &map)
 	map(0xc00000, 0xc3ffff).ram().share("spriteram");       // Sprites
 	map(0xc40000, 0xc4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0xc50000, 0xc5ffff).ram();                             // cleared
-	map(0xc60000, 0xc6003f).w(FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
+	map(0xc60000, 0xc6003f).ram().w(FUNC(staraudi_state::vregs_w)).share("vregs");  // Video Registers
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
 
@@ -673,47 +643,32 @@ void staraudi_state::staraudi_map(address_map &map)
                             TelePachi Fever Lion
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::telpacfl_lamp1_w)
+WRITE8_MEMBER(seta2_state::telpacfl_lamp1_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_lamps[0] = BIT(data, 0); //
-		m_lamps[1] = BIT(data, 1); //
-		m_lamps[2] = BIT(data, 2); //
-		m_lamps[3] = BIT(data, 3); //
-		m_lamps[4] = BIT(data, 4); //
-		m_lamps[5] = BIT(data, 5); //
-		m_lamps[6] = BIT(data, 6); //
-		m_lamps[7] = BIT(data, 7); //
-	}
+	for (int i = 0; i <= 7; i++)
+		m_lamps[i] = BIT(data, i);
 
 //  popmessage("LAMP1 %04X", data);
 }
 
-WRITE16_MEMBER(seta2_state::telpacfl_lamp2_w)
+WRITE8_MEMBER(seta2_state::telpacfl_lamp2_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
-		m_lamps[9] = BIT(data, 1); // bet lamp
-		m_lamps[10] = BIT(data, 2); // payout lamp
-		m_dispenser->motor_w(       data & 0x0008 ); // coin out motor
-		machine().bookkeeping().coin_counter_w(0,  data & 0x0010); // coin out counter
-		//                          data & 0x0020 ); // on credit increase
-	}
+	m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
+	m_lamps[9] = BIT(data, 1); // bet lamp
+	m_lamps[10] = BIT(data, 2); // payout lamp
+	m_dispenser->motor_w(       data & 0x08 ); // coin out motor
+	machine().bookkeeping().coin_counter_w(0,  data & 0x10); // coin out counter
+	//                          data & 0x20 ); // on credit increase
 
 //  popmessage("LAMP2 %04X", data);
 }
 
-WRITE16_MEMBER(seta2_state::telpacfl_lockout_w)
+WRITE8_MEMBER(seta2_state::telpacfl_lockout_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(1,  data & 0x0002); // 100yen in
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0004); // coin blocker
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0008); // 100yen blocker
-		// bits 0x30 ?
-	}
+	machine().bookkeeping().coin_counter_w(1,  data & 0x02); // 100yen in
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04); // coin blocker
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x08); // 100yen blocker
+	// bits 0x30 ?
 
 //  popmessage("LOCK %04X", data);
 }
@@ -729,13 +684,13 @@ void seta2_state::telpacfl_map(address_map &map)
 	map(0x700002, 0x700003).portr("P1");                  // P1 + Dispenser
 	map(0x700004, 0x700005).portr("SERVICE");             // Service
 	map(0x700006, 0x700007).portr("UNKNOWN");             // (unused?)
-	map(0x700008, 0x700009).w(FUNC(seta2_state::telpacfl_lamp1_w));          // Lamps
-	map(0x70000c, 0x70000d).w(FUNC(seta2_state::telpacfl_lamp2_w));          // ""
-	map(0x800000, 0x800001).w(FUNC(seta2_state::telpacfl_lockout_w));        // Coin Blockers
+	map(0x700009, 0x700009).w(FUNC(seta2_state::telpacfl_lamp1_w));          // Lamps
+	map(0x70000d, 0x70000d).w(FUNC(seta2_state::telpacfl_lamp2_w));          // ""
+	map(0x800001, 0x800001).w(FUNC(seta2_state::telpacfl_lockout_w));        // Coin Blockers
 	map(0x900000, 0x903fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0xb00000, 0xb3ffff).ram().share("spriteram");        // Sprites
 	map(0xb40000, 0xb4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0xb60000, 0xb6003f).w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
+	map(0xb60000, 0xb6003f).ram().w(FUNC(seta2_state::vregs_w)).share("vregs"); // Video Registers
 	map(0xd00006, 0xd00007).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITE
 	map(0xe00010, 0xe0001f).w(FUNC(seta2_state::sound_bank_w)).umask16(0x00ff);              // Samples Banks
@@ -857,13 +812,13 @@ void funcube_touchscreen_device::tra_callback()
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
-READ32_MEMBER(funcube_state::funcube_nvram_dword_r)
+READ32_MEMBER(funcube_state::nvram_r)
 {
 	uint16_t val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
-WRITE32_MEMBER(funcube_state::funcube_nvram_dword_w)
+WRITE32_MEMBER(funcube_state::nvram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -875,20 +830,10 @@ WRITE32_MEMBER(funcube_state::funcube_nvram_dword_w)
 	}
 }
 
-WRITE16_MEMBER(seta2_state::spriteram16_word_w)
-{
-	COMBINE_DATA( &m_spriteram[offset] );
-}
-
-READ16_MEMBER(seta2_state::spriteram16_word_r)
-{
-	return m_spriteram[offset];
-}
-
 // Main CPU
 
 
-READ32_MEMBER(funcube_state::funcube_debug_r)
+READ32_MEMBER(funcube_state::debug_r)
 {
 	uint32_t ret = ioport("DEBUG")->read();
 
@@ -899,39 +844,22 @@ READ32_MEMBER(funcube_state::funcube_debug_r)
 	return ret;
 }
 
-READ32_MEMBER(seta2_state::oki_read)
-{
-	return m_oki->read_status() << 16;
-}
-WRITE32_MEMBER(seta2_state::oki_write)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		const uint8_t tmp = (data & 0x000000ff);
-		m_oki->write_tmp_register(tmp);
-	}
-	else if (ACCESSING_BITS_16_23)
-	{
-		const uint8_t cmd = (data & 0x00ff0000) >> 16;
-		m_oki->write_command(cmd);
-	}
-}
-
 void funcube_state::funcube_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00400000, 0x00400003).r(FUNC(funcube_state::funcube_debug_r));
+	map(0x00400000, 0x00400003).r(FUNC(funcube_state::debug_r));
 	map(0x00400004, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
-	map(0x00500000, 0x00500003).rw(FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
+	map(0x00500001, 0x00500001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
+	map(0x00500003, 0x00500003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 
-	map(0x00800000, 0x0083ffff).rw(FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
+	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w)).share("spriteram");
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
-	map(0x00860000, 0x0086003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).ram().w(FUNC(funcube_state::vregs_w)).share("vregs");
 
-	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::funcube_nvram_dword_r), FUNC(funcube_state::funcube_nvram_dword_w));
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
 
 	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
@@ -942,16 +870,17 @@ void funcube_state::funcube2_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00500000, 0x00500003).r(FUNC(funcube_state::funcube_debug_r));
+	map(0x00500000, 0x00500003).r(FUNC(funcube_state::debug_r));
 	map(0x00500004, 0x00500007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
-	map(0x00600000, 0x00600003).rw(FUNC(seta2_state::oki_read), FUNC(seta2_state::oki_write));
+	map(0x00600001, 0x00600001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
+	map(0x00600003, 0x00600003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 
-	map(0x00800000, 0x0083ffff).rw(FUNC(seta2_state::spriteram16_word_r), FUNC(seta2_state::spriteram16_word_w)).share("spriteram");
+	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w)).share("spriteram");
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x00860000, 0x0086003f).w(FUNC(seta2_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).ram().w(FUNC(funcube_state::vregs_w)).share("vregs");
 
-	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::funcube_nvram_dword_r), FUNC(funcube_state::funcube_nvram_dword_w));
+	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
 
 	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
@@ -972,31 +901,31 @@ void funcube_state::funcube_sub_map(address_map &map)
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
-READ16_MEMBER(funcube_state::funcube_coins_r)
+READ16_MEMBER(funcube_state::coins_r)
 {
 	uint8_t ret = ioport("SWITCH")->read();
 	uint8_t coin_bit0 = 1;    // active low
 	uint8_t coin_bit1 = 1;
 
-	uint8_t hopper_bit = (m_funcube_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
+	uint8_t hopper_bit = (m_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
 
-	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/20);
+	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/10);
 
-	if ( m_funcube_coin_start_cycles )
+	if ( m_coin_start_cycles )
 	{
-		uint64_t elapsed = m_sub->total_cycles() - m_funcube_coin_start_cycles;
+		uint64_t elapsed = m_sub->total_cycles() - m_coin_start_cycles;
 
 		if ( elapsed < coin_total_cycles/2 )
 			coin_bit0 = 0;
 		else if ( elapsed < coin_total_cycles )
 			coin_bit1 = 0;
 		else
-			m_funcube_coin_start_cycles = 0;
+			m_coin_start_cycles = 0;
 	}
 	else
 	{
 		if (!(ret & 1))
-			m_funcube_coin_start_cycles = m_sub->total_cycles();
+			m_coin_start_cycles = m_sub->total_cycles();
 	}
 
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;
@@ -1005,11 +934,11 @@ READ16_MEMBER(funcube_state::funcube_coins_r)
 void funcube_state::funcube_debug_outputs()
 {
 #ifdef MAME_DEBUG
-//  popmessage("LED: %02x OUT: %02x", (int)*m_funcube_leds, (int)*m_funcube_outputs);
+//  popmessage("LED: %02x OUT: %02x", (int)*m_funcube_leds, (int)*m_outputs);
 #endif
 }
 
-WRITE16_MEMBER(funcube_state::funcube_leds_w)
+WRITE16_MEMBER(funcube_state::leds_w)
 {
 	*m_funcube_leds = data;
 
@@ -1025,20 +954,20 @@ WRITE16_MEMBER(funcube_state::funcube_leds_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(funcube_state::funcube_outputs_r)
+READ16_MEMBER(funcube_state::outputs_r)
 {
 	// Bits 1,2,3 read
-	return *m_funcube_outputs;
+	return *m_outputs;
 }
 
-WRITE16_MEMBER(funcube_state::funcube_outputs_w)
+WRITE16_MEMBER(funcube_state::outputs_w)
 {
-	*m_funcube_outputs = data;
+	*m_outputs = data;
 
 	// Bits 0,1,3 written
 
 	// Bit 0: hopper motor
-	m_funcube_hopper_motor = (~data) & 0x01;
+	m_hopper_motor = (~data) & 0x01;
 
 	// Bit 1: high on pay out
 
@@ -1048,7 +977,7 @@ WRITE16_MEMBER(funcube_state::funcube_outputs_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(funcube_state::funcube_battery_r)
+READ16_MEMBER(funcube_state::battery_r)
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
@@ -1056,18 +985,18 @@ READ16_MEMBER(funcube_state::funcube_battery_r)
 // cabinet linking on sci0
 void funcube_state::funcube_sub_io(address_map &map)
 {
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::funcube_coins_r));
-	map(h8_device::PORT_4, h8_device::PORT_4).r(FUNC(funcube_state::funcube_battery_r));
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::funcube_outputs_r), FUNC(funcube_state::funcube_outputs_w)).share("funcube_outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::funcube_leds_w)).share("funcube_leds");
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::coins_r));
+	map(h8_device::PORT_4, h8_device::PORT_4).r(FUNC(funcube_state::battery_r));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::outputs_r), FUNC(funcube_state::outputs_w)).share("outputs");
+	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::leds_w)).share("funcube_leds");
 }
 
 void funcube_state::funcube2_sub_io(address_map &map)
 {
-	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::funcube_coins_r));
+	map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(funcube_state::coins_r));
 	map(h8_device::PORT_4, h8_device::PORT_4).noprw();  // unused
-	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::funcube_outputs_r), FUNC(funcube_state::funcube_outputs_w)).share("funcube_outputs");
-	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::funcube_leds_w)).share("funcube_leds");
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(funcube_state::outputs_r), FUNC(funcube_state::outputs_w)).share("outputs");
+	map(h8_device::PORT_B, h8_device::PORT_B).w(FUNC(funcube_state::leds_w)).share("funcube_leds");
 }
 
 
@@ -2345,7 +2274,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout funcube_layout_8bpp =
+static const gfx_layout tile_layout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -2360,7 +2289,7 @@ static const gfx_layout funcube_layout_8bpp =
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
 static GFXDECODE_START( gfx_seta2 )
-	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_8bpp,    0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
+	GFXDECODE_ENTRY( "sprites", 0, tile_layout, 0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
 GFXDECODE_END
 
 /***************************************************************************
@@ -2394,16 +2323,16 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(0x200, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
-	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2426,7 +2355,7 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x000, 0x0e0-1)
 MACHINE_CONFIG_END
 
 
@@ -2437,7 +2366,7 @@ MACHINE_CONFIG_START(seta2_state::grdians)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x130-1, 0x00, 0xe8 -1)
 MACHINE_CONFIG_END
 
 
@@ -2448,7 +2377,7 @@ MACHINE_CONFIG_START(seta2_state::myangel)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x10, 0x100-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2459,7 +2388,7 @@ MACHINE_CONFIG_START(seta2_state::myangel2)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x10, 0x100-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2470,7 +2399,7 @@ MACHINE_CONFIG_START(seta2_state::pzlbowl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2481,7 +2410,7 @@ MACHINE_CONFIG_START(seta2_state::penbros)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x00, 0xe0-1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::ablastb)
@@ -2503,11 +2432,8 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
-	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x80, 0x170-1)
-
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 MACHINE_CONFIG_END
 
 
@@ -2521,9 +2447,8 @@ MACHINE_CONFIG_START(seta2_state::samshoot)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 MACHINE_CONFIG_END
 
 
@@ -2538,7 +2463,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_seta2)
 MACHINE_CONFIG_END
@@ -2558,8 +2483,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0xff, 0x1ef-1)
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0x00, 0xf0-1) // still off by 1 because of different CRTC regs?
 MACHINE_CONFIG_END
 
 
@@ -2581,14 +2505,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(funcube_state::funcube_interrupt)
 void funcube_state::machine_start()
 {
 	seta2_state::machine_start();
-	save_item(NAME(m_funcube_coin_start_cycles));
-	save_item(NAME(m_funcube_hopper_motor));
+	save_item(NAME(m_coin_start_cycles));
+	save_item(NAME(m_hopper_motor));
 }
 
 void funcube_state::machine_reset()
 {
-	m_funcube_coin_start_cycles = 0;
-	m_funcube_hopper_motor = 0;
+	m_coin_start_cycles = 0;
+	m_hopper_motor = 0;
 }
 
 MACHINE_CONFIG_START(funcube_state::funcube)
@@ -2614,14 +2538,13 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x00, 0xf0-1)
+	MCFG_SCREEN_UPDATE_DRIVER(funcube_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, funcube_state, screen_vblank))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
-	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2643,7 +2566,7 @@ MACHINE_CONFIG_START(funcube_state::funcube2)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2651,7 +2574,7 @@ MACHINE_CONFIG_START(funcube_state::funcube3)
 	funcube2(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x00, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2669,14 +2592,13 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
-	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2890,38 +2812,28 @@ ROM_END
 void funcube_state::init_funcube()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
-
-	// Sub CPU
-	sub_cpu[0x506/2] = 0x5470;  // rte -> rts
 }
 
 void funcube_state::init_funcube2()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0xa5c/4] = 0x4e713e3c;       // PIC protection?
 	main_cpu[0xa74/4] = 0x4e713e3c;
 	main_cpu[0xa8c/4] = 0x4e7141f9;
 
-	// Sub CPU
-	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
 void funcube_state::init_funcube3()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
-	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
 
 	main_cpu[0x008bc/4] = 0x4a804e71;
 	main_cpu[0x19f0c/4] = 0x4e714e71;
 	main_cpu[0x19fb8/4] = 0x4e714e71;
 
-	// Sub CPU
-	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
 /***************************************************************************
@@ -3889,7 +3801,7 @@ ROM_START( staraudi )
 	ROM_LOAD( "lh28f016sat_flash.u08", 0x000000, 0x200000, CRC(002255bd) SHA1(5e94c29e9a785fe49229f57bc94234ac79dd2f3b) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "su1_snd.u32", 0x000000, 0x400000, CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
+	ROM_LOAD( "su1_snd.u32", 0x000000, 0x400000, BAD_DUMP CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
 void staraudi_state::driver_start()
@@ -4431,7 +4343,7 @@ ROM_START( telpacfl )
 	ROM_REGION( 0x800000, "unused", ROMREGION_ERASE00 )    // Sprites
 	// not decoding the bad ROM is better than loading corrupt gfx data
 	ROM_LOAD64_WORD( "mp3_cg-2__u21_v1.0.u21", 0x000004, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
-		
+
 	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x000000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
 	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x080000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )

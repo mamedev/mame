@@ -20,7 +20,7 @@ class ds1205_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	ds1205_device( const machine_config &mconfig, const char *tag, device_t *owner, u32 clock );
+	ds1205_device( const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rst );
 	DECLARE_WRITE_LINE_MEMBER( write_clk );

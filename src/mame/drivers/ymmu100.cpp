@@ -6,7 +6,7 @@
     Preliminary driver by R. Belmont and O. Galibert
 
     CPU: Hitachi H8S/2655 (HD6432655F), strapped for mode 4 (24-bit address, 16-bit data, no internal ROM)
-    Sound ASIC: Yamaha XS725A0
+    Sound ASIC: Yamaha XS725A0/SWP30
     RAM: 1 MSM51008 (1 meg * 1 bit = 128KBytes)
 
     I/O ports from service manual:
@@ -149,105 +149,6 @@ static INPUT_PORTS_START( mu100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-/*               40            41   42   43
-
-reads
-  .09 at 3e5a, tests & 0x8000
-  .05 at 3e4a: read current to change bits (sets xaxx)
-  .0a at 4070: read current to change bits (keeps 14-15)
-
-01.0f at d320:  put bits 6-13 in r0l inverted, bits 14-15 in r0h 6-7, does complex calcs from it
-
-
-
-[:] snd_w 00.09, f000 (0020a0)
-[:] snd_w 00.10, 4000 (00d376)
-[:] snd_w 00.00, 169b (00d3be)
-[:] snd_w 00.01, e0ff (00d3d0)
-[:] snd_w 00.02, 8000 (00d3f8)
-[:] snd_w 00.03, 5010 (00d400)
-[:] snd_w 00.04, 0000 (00d412)
-[:] snd_w 00.05, fb00 (00d434)
-[:] snd_w 00.20, e05d (00d43e)
-[:] snd_w 00.22, 1fa3 (00d448)
-[:] snd_w 00.24, 2000 (00d452)
-[:] snd_w 00.26, 0257 (00d45c)
-[:] snd_w 00.28, fda9 (00d466)
-[:] snd_w 00.2a, 2000 (00d470)
-[:] snd_w 00.06, 5d80 (00d48e)
-[:] snd_w 00.07, 1414 (00d4ae) 1614 1614 1614
-[:] snd_w 00.08, 18fe (00d4ce) 1afe 1afe 1afe
-[:] snd_w 00.0a, 5f00 (00d510)
-[:] snd_w 00.0b, 0000 (00d530)
-[:] snd_w 00.0b, 6f00 (00d53a)
-[:] snd_w 00.11, be29 (00d54e) be7e bdd2 be27
-[:] snd_w 00.12, 0000 (00d56c)
-[:] snd_w 00.13, 5c74 (00d570)           6f0b
-[:] snd_w 00.14, 0000 (00d586)
-[:] snd_w 00.15, 749d (00d58a) 749d 5951 5951
-[:] snd_w 00.16, ee42 (00d5d6)
-[:] snd_w 00.17, a89b (00d5da)
-[:] snd_w 00.32, 0808 (00d5ea)
-[:] snd_w 00.33, 182b (00d5fa)
-[:] snd_w 00.34, ff10 (00d60a)
-[:] snd_w 00.35, 0d00 (00d614)
-[:] snd_w 00.36, 0800 (00d61e)
-[:] snd_w 00.37, 0400 (00d628)
-[:] snd_w 00.09, 70e0 (00d634)
-[:] snd_r 00.0b (00d638)
-[:] snd_r 00.0b (00d63c)
-[:] snd_r 00.09 (00d658)
-[:] snd_r 00.09 (00d65c)
-
-    e3 = (note - ->m1b) * 100 + s8(->m2b)
-
-    compute freq adjustment in 1/100th of semitone (ex. 737)
-clamp to +/- 9599
-(2d74)
-div/rem by 300 -> e6 = 137, r6 = 2
-lookup d14c[rem].b (0-299 -> 00-ff, perfectly linear), tack div on top -> 274
-put sign back in, and with 3fff, -> g58
-
-
-
-
-
-
- 9    = attenuation?
-11    = 52|58 -> 15 flag, 14 zero, 13-0 cents frequency adjustment
-12-13 = pre-size + flags
-14-15 = post-size + flags
-16-17 = address + flags + loop size?
-32    = 6a/6b = pan l/r
-33    = 6c/6d = ? / reverb attenuation
-34    = 6e/6f = chorus attenuation / ?
-35    = 70
-36    = 72
-37    = 74
-3e    = ? / chorus lfo frequency
-3f    = ? / chorus lfo frequency
-
-09    = 0x7000 + 4c
-read 0b twice, store the second is 2114c7
-
-d510:
-  r6 = ffec54 (0)
-  if(!0) { ... }
-  r5 = r6
-  +0b = r5
-  r5h = ffec50
-  +0b = r5
-  +11 = ffec58 | (ffec52 << 8)
-  +12, +13 = ffec5c.l | (ffec5a << 24)
-  +14, +15 = ffec60.l | (ffec64 << 24)
-
-50: 6f 40 80 00 00 00 00 00 3e 27 00 00 00 00 6f 0b
-60: 00 00 59 51 00 ee 00 42 e1 87 08 08 18 2b ff 10
-
-2e1c computes everything
-
-*/
-
 class mu100_state : public driver_device
 {
 public:
@@ -262,30 +163,83 @@ public:
 
 	void mu100(machine_config &config);
 
-	int seq;
+	void regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_s2_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_s3_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_s4a_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_s4b_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_s4c_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_lfo_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_s6_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_fp_read_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_fp_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_int_read_tap(offs_t address, u16 data, u16 mem_mask);
+	void regs_int_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void voice_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void chan_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void prg_write_tap(offs_t address, u16 data, u16 mem_mask);
 
 	virtual void machine_reset() override {
-	  timer_alloc()->adjust(attotime::from_double(5));
-		seq = 0;
-	}
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override {
-		static u8 xnote[8] = { 60, 62, 64, 65, 67, 69, 71, 72 };
-		static int note = 0;
-		switch(seq) {
-		case 0: push(0x90); logerror("swp30 midi keyon %d\n", note); timer.adjust(attotime::from_double(0.0005)); if(1) machine().debug_break(); break;
-		case 1: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); break;
-		case 2: push(0x7f); timer.adjust(attotime::from_double(0.5)); break;
-		case 3: push(0x80); logerror("swp30 midi keyoff\n"); timer.adjust(attotime::from_double(0.0005)); if(0) machine().debug_break(); break;
-		case 4: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); ; if(note == 8) note = 0; break;
-		case 5: push(0x7f); timer.adjust(attotime::from_double(0.05)); seq=0; return;
-		}
-		seq ++;
-	}
-
-	void push(u8 val) {
-		logerror("push %02x\n", val);
-		machine().root_device().subdevice<h8_sci_device>("maincpu:sci0")->force(val);
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214cb8, 0x214cbf, "prg select", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												   prg_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x20cb10, 0x20cb10 + 0x122*0x22 - 1, "chan debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												   chan_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  voice_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_readwrite_tap(0x214ca2+0x20, 0x214ca2+0x320-1, "regs fp",
+												  [this](offs_t offset, u16 &data, u16 mem_mask) {
+													  regs_fp_read_tap(offset, data, mem_mask);
+												  },
+												  [this](offs_t offset, u16 &data, u16 mem_mask) {
+													  regs_fp_write_tap(offset, data, mem_mask);
+												  });
+		if(0)
+		m_maincpu->space(0).install_readwrite_tap(0x214ca2+0x320, 0x214ca2+0x420-1, "regs int",
+												  [this](offs_t offset, u16 &data, u16 mem_mask) {
+													  regs_int_read_tap(offset, data, mem_mask);
+												  },
+												  [this](offs_t offset, u16 &data, u16 mem_mask) {
+													  regs_int_write_tap(offset, data, mem_mask);
+												  });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x420, 0x214ca2+0x440-1, "regs s1", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_s1_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x440, 0x214ca2+0x460-1, "regs s2", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_s2_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x460, 0x214ca2+0x480-1, "regs s3", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_s3_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x480, 0x214ca2+0x4a0-1, "regs s4a", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_s4a_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x4a0, 0x214ca2+0x4c0-1, "regs s4b", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_s4b_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x4c0, 0x214ca2+0x4e0-1, "regs s4c", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_s4c_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x4e0, 0x214ca2+0x510-1, "regs lfo", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_lfo_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_write_tap(0x214ca2+0x510, 0x214ca2+0x520-1, "regs s6", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  regs_s6_write_tap(offset, data, mem_mask);
+											   });
 	}
 
 protected:
@@ -343,160 +297,163 @@ private:
 	virtual u16 adc7_r() override;
 };
 
-#include "../drivers/ymmu100.hxx"
-
-struct v1 {
-	u32 m0;
-	u8  m4;
-	u8  m5;
-	u16 m6;
-	u8  m8;
-	u8  m9;
-	u16 ma;
-	u8  mc;
-	u8  md;
-	u16 me;
-};
-
-// g base = ffec00
-
-// fcf30: 0010 27 1b 00 00b0f5 00 006bc4 ee 402c3e
-// ...
-// fcfd0: 0048 c9 45 00 006f0b 00 005951 ee 42e187
-
-//                            4772 616e 6450 2023  GrandP #
-// f5b1e: 0225 007f 017f 58f0 8040 7000 4040 3c77
-//        3c3f 3f3f 3f40 4040 4040 0100 441f 3c54
-//        6c42 4042 45d7 093c 3f01 020d 404e 4640
-//        406c 183c 505c 4045 3e3b 9748 902f 0b0d
-//        2075 0000 0000 0050
-
-//20f03e: 000f5b1e 0020de54 00000000 0000fdd5
-
-#if 0
-// samp2:
-//   000000  - 00 20 27 1b 00 00b0f5 00 006bc4 ee 402c3e
-//   004734  - 00 23 f9 1f 00 00bafd 00 007d3c ee 4075f0
-//   009544  - 00 28 2b 23 00 00cbc6 00 007d50 e4 40c832
-//   00e78b  - 00 2b c7 28 00 00c0a6 00 007b70 e4 4117b1
-//   013691  - 00 32 29 2d 00 00bd5e 00 007c62 ee 4165e6
-
-
-// g34 = 0x43 = note
-
-// checksums
-//   2.ef = (0/4000000) | (1 << n)
-//   3.e = 0000
-//   3.f = 0001
-//   4.e = 8000
-//   wait until 4.f.b != 0
-//   read 5.ef and compare
-//   4.e = 0000
-
-//   0..13 for 32M, 0..12 for 16M
-
-//   list of checksums at 58712/58766
-//   ff49 ffa0
-//   feb3 ff03
-//   fd93 fdd7
-//   fb76 fbb0
-//   f79d f7e7
-
-// f1e40 = select instrument
-void f1e40()
+void mu100_state::prg_write_tap(offs_t address, u16 data, u16 mem_mask)
 {
-	er3 = g04; // 20de54
-	r5 = g29; // 7f - global volume?
-	r4 = er3->mcb; // 40 - global volume?
-	r5 = r4*r5 >> 6; // -> 7f
-	r5 += 2*(er3->md - 0x40);
-	r5 = clamp(r5, 1, 0x7f);
-	g29 = r5;
-	r5 = g20f034; // 01
-	if(r5 & 1) {
-		r4 = er3->m1b; // 00
-		r4 = lcb098[r4]; // byte, 00
-		if(!r4) {
-			r4 = er3->m2b;
-			r6 = g20f031;
-			if(!r6)
-				r4 = lcb118[r4];
-			else {
-				r6 = g20f034;
-				if(r6 == 3)
-					r4 = lcb118[r4];
-				else
-					r4 = lcb218[r4];
-			}
-		} else {
-			if(r4 != 0x48)
-				r4 = lcb198[er3->m2b];
-		}
-	} else
-		r4 = lcb518[er3->m1b];
-
-	// r4 -> 55
-	r4 = (r4 << 8) | (er3->m3b << 1);
-	r4 = cb710 + lb4898[r4 >> 1]; // dword 2a404 -> f5b14 005a GrandP #
-	g0c = r4 + 0xe;
-
-
-}
-
-void f2ace(er4 *instrument) // f5b1e
-{
-	r6 = (er4->m0 << 7) | er4->m1;
-	if(r6 < 0x125)
-		r6 = lf692e + tfccde[r6].w;
-	else if(r6 < 0x147)
-		r6 = lfcf30 + tfdf80[r6 - 0x125].w;
-	else
-		r6 = lfdfc4 + t100c34[r6 - 0x147].w;
-	// r6 = fcf30
-	while(r6->m3 & 0x7f <= g34)
-		r6 += 0x10;
-}
-
-void f2d0a(...)
-{
-	//
-	f2f26(); // calc freq
-
-	// ...
-	g3f = f6b14(); // r6h
-	f330a(); // sets 6a/6b
-	f2e1c(); // sets 5a/64/5c/66/60/65
-	f3038(); // sets 38
-	f31f8(er4); // sets 46 47 48 4a
-	f32a4(); // sets 40
-	f3486(); // sets 90/92/94/96/98/9a
-	f309c();
-}
-
-void f2e1c(er4 **instrument) // 20f03e -> f5b1e
-{
-	v1 *xv1 = g18; // fcfd0
-	g5a = xv1->m4;
-	g64 = xv1->m8;
-	er1 = (xv1->m5 << 16) | xv1->m6;
-	er2 = (xv1->md << 16) | xv1->me;
-	er3 = (xv1->m9 << 16) | xv1->ma;
-	er6 = *er4;
-	r0 = xv1->mc << 8;
-	r5 = (er6->m43 << 7) + er6->m44;
-	if(!(g64 & 0x80)) {
-		er1 = max(0, er1 - er5);
-
-	} else {
-		// 2ae2
+	if(mem_mask == 0x00ff) {
+		static const char *names[4] = { "chorus", "variation", "insertion1", "insertion2" };
+		logerror("prg_select %s %d\n", names[(address - 0x214cb8)/2], data);
 	}
-	// 2ef8
-	g5c = er1;
-	g66 = er2;
-	g60 = er3;
-	g65 = r0 >> 8;
 }
-#endif
+
+void mu100_state::regs_s1_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x420)/2;
+	if(pc != 0x72912)
+		logerror("regs_s1_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_s2_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x440)/2;
+	if(pc != 0x72912)
+		logerror("regs_s2_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_s3_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x460)/2;
+	if(pc != 0x72912)
+		logerror("regs_s3_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_s4a_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x480)/2;
+	if(pc != 0x72912)
+		logerror("regs_s4a_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_s4b_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x4a0)/2;
+	if(pc != 0x72912)
+		logerror("regs_s4b_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_s4c_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x4c0)/2;
+	if(pc != 0x72912)
+		logerror("regs_s4c_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_lfo_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x4e0)/2;
+	if(pc != 0x72912)
+		logerror("regs_lfo_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_s6_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x510)/2;
+	if(pc != 0x72912)
+		logerror("regs_s6_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_fp_read_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x20)/2;
+	if(pc != 0x72912)
+		logerror("regs_fp_r %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_fp_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x20)/2;
+	logerror("regs_fp_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_int_read_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x320)/2;
+	if(pc != 0x729c6)
+		logerror("regs_int_r %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::regs_int_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t reg = (address - 0x214ca2-0x320)/2;
+	logerror("regs_int_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
+}
+
+void mu100_state::voice_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t off = address - 0x20f03e;
+	int voice = off / 0x92;
+	int slot = off % 0x92;
+	if(mem_mask == 0xffff) {
+		logerror("voice_w %02x:%02x, %04x (%06x)\n", voice, slot, data, pc);
+	} else {
+		if(mem_mask == 0xff00)
+			data >>= 8;
+		else
+			slot++;
+		logerror("voice_w %02x:%02x, %02x (%06x)\n", voice, slot, data, pc);
+	}
+}
+
+void mu100_state::chan_write_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t off = address - 0x20cb10;
+	int voice = off / 0x112;
+	int slot = off % 0x112;
+	if(mem_mask == 0xffff) {
+		if(slot == 0x102 && data == 0)
+			return;
+		if(slot == 0x100 && data == 0)
+			return;
+		if(slot == 0x0fe && data == 0)
+			return;
+		logerror("chan_w %02x:%03x, %04x (%06x)\n", voice, slot, data, pc);
+	} else {
+		if(mem_mask == 0xff00)
+			data >>= 8;
+		else
+			slot++;
+		if(slot == 0x106 && data == 0)
+			return;
+		if(slot == 0x108 && data == 0)
+			return;
+		if(slot == 0x105) // volume
+			return;
+		if(slot == 0x109 && data == 0)
+			return;
+		if(slot == 0x0e7 && data == 0)
+			return;
+		if(slot == 0x0e5 && data == 0)
+			return;
+		if(slot == 0x111 && data == 0x40)
+			return;
+		logerror("chan_w %02x:%03x, %02x (%06x)\n", voice, slot, data, pc);
+	}
+}
+
+#include "../drivers/ymmu100.hxx"
 
 void mu100_state::machine_start()
 {
@@ -560,7 +517,7 @@ void mu100_state::mu100_map(address_map &map)
 
 u16 mu100_state::adc0_r()
 {
-	logerror("adc0_r\n");
+	//  logerror("adc0_r\n");
 	return 0;
 }
 
@@ -658,7 +615,7 @@ void mu100_state::p6_w(u16 data)
 
 u16 mu100_state::p6_r()
 {
-	logerror("plug in detect read\n");
+	//  logerror("plug in detect read\n");
 	return 0x00;
 }
 
@@ -706,9 +663,9 @@ void mu100_state::mu100_iomap(address_map &map)
 
 void mu100_state::swp30_map(address_map &map)
 {
-	   map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
-	   map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
-	   map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000); // Missing roms...
+	map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
+	map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
+	map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000);
 }
 
 void mu100_state::mu100(machine_config &config)
@@ -735,13 +692,16 @@ void mu100_state::mu100(machine_config &config)
 	m_swp30->add_route(0, "lspeaker", 1.0);
 	m_swp30->add_route(1, "rspeaker", 1.0);
 
-	auto &mdin(MIDI_PORT(config, "mdin"));
-	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
+	midiin_slot(mdin_a);
+	mdin_a.rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+
+	auto &mdin_b(MIDI_PORT(config, "mdin_b"));
+	midiin_slot(mdin_b);
+	mdin_b.rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
 
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
-
 	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 }
 
@@ -756,12 +716,12 @@ ROM_START( mu100 )
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "xt71420.ic11", 0x000000, 0x200000, CRC(0e5b3bae) SHA1(3148c5bd59a3d00809d3ab1921216215fe2582c5) )
 
 	ROM_REGION( 0x1800000, "swp30", ROMREGION_ERASE00 )
-	ROM_LOAD32_WORD( "sx518b0.ic34", 0x000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
-	ROM_LOAD32_WORD( "sx743b0.ic35", 0x000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
-	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
-	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
-	ROM_LOAD32_WORD( "xt963a0.ic38", 0x1000000, 0x400000, NO_DUMP )
-	ROM_LOAD32_WORD( "xt964a0.ic39", 0x1000002, 0x400000, NO_DUMP )
+	ROM_LOAD32_WORD( "sx518b0.ic34", 0x0000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
+	ROM_LOAD32_WORD( "sx743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
+	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x0800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
+	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
+	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
+	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 
 	ROM_REGION( 0x1000, "lcd", 0)
 	// Hand made, 3 characters unused
@@ -781,8 +741,8 @@ ROM_START( mu100r )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
-	ROM_LOAD32_WORD( "xt963a0.ic38", 0x1000000, 0x400000, NO_DUMP )
-	ROM_LOAD32_WORD( "xt964a0.ic39", 0x1000002, 0x400000, NO_DUMP )
+	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
+	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 
 	ROM_REGION( 0x1000, "lcd", 0)
 	// Hand made, 3 characters unused

@@ -1081,8 +1081,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_keyboard_clock))
 
 	// keyboard
-	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
-	MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_KB_TAG, i8251_device, write_rxd))
+	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG, 0));
+	keyboard.out_tx_handler().set(m_uart_kb, FUNC(i8251_device::write_rxd));
 
 	I8251(config, m_uart_sio, 0/*16_MHz_XTAL/8,*/);
 	m_uart_sio->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

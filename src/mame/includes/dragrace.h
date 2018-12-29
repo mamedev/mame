@@ -56,7 +56,7 @@ private:
 	DECLARE_READ8_MEMBER(dragrace_steering_r);
 	DECLARE_READ8_MEMBER(dragrace_scanline_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(dragrace);
+	void dragrace_palette(palette_device &palette) const;
 	uint32_t screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
 	void dragrace_update_misc_flags( address_space &space );

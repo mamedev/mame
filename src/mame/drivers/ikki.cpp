@@ -271,12 +271,10 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikki)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
-	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ikki);
+	PALETTE(config, m_palette, FUNC(ikki_state::ikki_palette), 1024, 256 + 1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

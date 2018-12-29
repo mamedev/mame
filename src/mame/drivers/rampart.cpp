@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
+	SLAPSTIC(config, m_slapstic_device, 118, true);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
@@ -352,12 +352,10 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", rampart_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, rampart_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

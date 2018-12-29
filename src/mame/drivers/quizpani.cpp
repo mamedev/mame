@@ -201,9 +201,8 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizpani)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_quizpani);
+	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

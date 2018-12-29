@@ -17,15 +17,14 @@
 #include "sound/cem3394.h"
 
 
-#define POLY17_BITS 17
-#define POLY17_SIZE ((1 << POLY17_BITS) - 1)
-#define POLY17_SHL  7
-#define POLY17_SHR  10
-#define POLY17_ADD  0x18000
-
-
 class sente6vb_device : public device_t
 {
+	static constexpr unsigned POLY17_BITS = 17;
+	static constexpr size_t POLY17_SIZE = (1 << POLY17_BITS) - 1;
+	static constexpr unsigned POLY17_SHL = 7;
+	static constexpr unsigned POLY17_SHR = 10;
+	static constexpr uint32_t POLY17_ADD = 0x18000;
+
 public:
 	sente6vb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 

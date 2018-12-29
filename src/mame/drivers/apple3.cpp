@@ -55,12 +55,14 @@ FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
 	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT
 FLOPPY_FORMATS_END
 
-MACHINE_CONFIG_START(apple3_state::apple3)
+void apple3_state::apple3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 14.318181_MHz_XTAL / 7)        /* 2 MHz */
-	MCFG_M6502_SYNC_CALLBACK(WRITELINE(*this, apple3_state, apple3_sync_w))
-	MCFG_DEVICE_PROGRAM_MAP(apple3_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6502(config, m_maincpu, 14.318181_MHz_XTAL / 7);        /* 2 MHz */
+	m_maincpu->sync_cb().set(FUNC(apple3_state::apple3_sync_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple3_state::apple3_map);
+
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
 	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
@@ -70,13 +72,12 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple3_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_via[1], FUNC(via6522_device::write_cb1));
 	m_screen->screen_vblank().append(m_via[1], FUNC(via6522_device::write_cb2));
 	m_screen->screen_vblank().append(FUNC(apple3_state::vbl_w));
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(apple3_state, apple3 )
+	PALETTE(config, m_palette, FUNC(apple3_state::palette_init), 32);
 
 	/* keyboard controller */
 	AY3600(config, m_ay3600, 0);
@@ -94,25 +95,25 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	m_ay3600->data_ready().set(FUNC(apple3_state::ay3600_data_ready_w));
 
 	/* slot bus */
-	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
-	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple3_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple3_state, a2bus_nmi_w))
-	//MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple3_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_cputag("maincpu");
+	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
+	//m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple3_cards, nullptr);
 	A2BUS_SLOT(config, "sl4", m_a2bus, apple3_cards, nullptr);
 
 	/* fdc */
-	MCFG_DEVICE_ADD("fdc", APPLEIII_FDC, 1021800*2)
-	MCFG_FLOPPY_DRIVE_ADD("0", a3_floppies, "525", apple3_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", a3_floppies, "525", apple3_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("2", a3_floppies, "525", apple3_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("3", a3_floppies, "525", apple3_state::floppy_formats)
+	APPLEIII_FDC(config, m_fdc, 1021800*2);
+	FLOPPY_CONNECTOR(config, "0", a3_floppies, "525", apple3_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "1", a3_floppies, "525", apple3_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "2", a3_floppies, "525", apple3_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "3", a3_floppies, "525", apple3_state::floppy_formats);
 
 	/* softlist for fdc */
-	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple3")
+	SOFTWARE_LIST(config, "flop525_list").set_original("apple3");
 
 	/* acia */
 	MOS6551(config, m_acia, 0);
@@ -129,10 +130,10 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	// TODO: remove cts kludge from machine/apple3.cpp and come up with a good way of coping with pull up resistors.
 
 	/* paddle */
-	MCFG_TIMER_DRIVER_ADD("pdltimer", apple3_state, paddle_timer);
+	TIMER(config, "pdltimer").configure_generic(FUNC(apple3_state::paddle_timer));
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
+	MM58167(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* via */
 	VIA6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
@@ -147,17 +148,19 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 
 	/* sound */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "bell", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_1BIT(config, m_bell, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "bell", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
+	TIMER(config, "c040").configure_periodic(FUNC(apple3_state::apple3_c040_tick), attotime::from_hz(2000));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 512K");
-MACHINE_CONFIG_END
+}
 
 
 static INPUT_PORTS_START( apple3 )

@@ -62,7 +62,7 @@ public:
 	void tsukande(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(konmedal);
+	void konmedal_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(shuriboy);
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -199,18 +199,17 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(konmedal_state, konmedal)
+void konmedal_state::konmedal_palette(palette_device &palette) const
 {
-	int i;
-	uint8_t *PROM = memregion("proms")->base();
+	uint8_t const *const PROM = memregion("proms")->base();
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		// this is extremely wrong, see the color test screen
 		palette.set_pen_color(i,
-			PROM[i]<<4,
-			PROM[0x100+i]<<4,
-			PROM[0x200+i]<<4);
+				PROM[i] << 4,
+				PROM[0x100 + i] << 4,
+				PROM[0x200 + i] << 4);
 	}
 }
 
@@ -381,74 +380,71 @@ void konmedal_state::machine_reset()
 	m_control = m_control2 = m_shuri_irq = 0;
 }
 
-MACHINE_CONFIG_START(konmedal_state::tsukande)
+void konmedal_state::tsukande(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(medal_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::medal_main);
+	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // 16.9344MHz xtal verified on PCB
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, XTAL(16'934'400)); // 16.9344MHz xtal verified on PCB
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(konmedal_state::ddboy)
+void konmedal_state::ddboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(ddboy_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::ddboy_main);
+	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	OKIM6295(config, m_oki, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(0, "mono", 1.0);
+	m_oki->add_route(1, "mono", 1.0);
 
-	MCFG_K051649_ADD("k051649", XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	K051649(config, "k051649", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
 /*
 Shuriken Boy
@@ -542,25 +538,25 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 	m_vrom_base |= (data << 10);
 }
 
-MACHINE_CONFIG_START(konmedal_state::shuriboy)
+void konmedal_state::shuriboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(shuriboy_main)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 3); // divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
+	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER) // everything not verified, just a placeholder
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(30))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_shuriboy)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192) // not verified
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192); // not verified
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -571,11 +567,10 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_K051649_ADD("k051649", XTAL(24'000'000) / 12) // divisor unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	K051649(config, "k051649", XTAL(24'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
 	// upd7759c
-MACHINE_CONFIG_END
+}
 
 ROM_START( tsukande )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */

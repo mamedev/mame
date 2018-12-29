@@ -54,7 +54,7 @@ void stadhero_state::main_map(address_map &map)
 	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::pf_control_1_w));
 	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
-	map(0x30c002, 0x30c003).portr("COIN");
+	map(0x30c002, 0x30c003).lr8("30c002", [this]() { return uint8_t(m_coin->read()); });
 	map(0x30c004, 0x30c005).portr("DSW").w(FUNC(stadhero_state::int_ack_w));
 	map(0x30c007, 0x30c007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x310000, 0x3107ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -133,10 +133,6 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")  /* 0x30c002 & 0x30c003 */
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-
-	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
@@ -210,8 +206,7 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_stadhero);
-
-	PALETTE(config, "palette", 1024).set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO_BAC06(config, m_tilegen, 0);
 	m_tilegen->set_gfx_region_wide(1, 1, 2);

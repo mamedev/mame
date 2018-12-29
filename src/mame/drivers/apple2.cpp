@@ -103,8 +103,8 @@ II Plus: RAM options reduced to 16/32/48 KB.
 class apple2_state : public driver_device
 {
 public:
-	apple2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apple2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_screen(*this, "screen"),
 		m_scantimer(*this, "scantimer"),
@@ -150,7 +150,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -400,10 +399,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	}
 }
 
-PALETTE_INIT_MEMBER(apple2_state, apple2)
-{
-	m_video->palette_init_apple2(palette);
-}
 
 uint32_t apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1387,10 +1382,7 @@ MACHINE_CONFIG_START(apple2_state::apple2_common)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple2_state::screen_update));
-	m_screen->set_palette("palette");
-
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(DEVICE_SELF, FUNC(apple2_state::palette_init_apple2));
+	m_screen->set_palette(m_video);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

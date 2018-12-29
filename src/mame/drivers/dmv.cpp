@@ -781,10 +781,10 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DEVICE_PROGRAM_MAP(dmv_mem)
 	MCFG_DEVICE_IO_MAP(dmv_io)
 
-	MCFG_DEVICE_ADD("kb_ctrl_mcu", I8741, XTAL(6'000'000))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, dmv_state, kb_mcu_port1_r)) // bit 0 data from kb
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port1_w)) // bit 1 data to kb
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port2_w))
+	i8741_device &kbmcu(I8741(config, "kb_ctrl_mcu", XTAL(6'000'000)));
+	kbmcu.p1_in_cb().set(FUNC(dmv_state::kb_mcu_port1_r)); // bit 0 data from kb
+	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
+	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmv)
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 	config.set_default_layout(layout_dmv);
 
 	// devices
@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(dmv_state::dmac_dack3));
 
-	I8272A(config, m_fdc, true);
+	I8272A(config, m_fdc, 8'000'000, true);
 	m_fdc->intrq_wr_callback().set(FUNC(dmv_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats)

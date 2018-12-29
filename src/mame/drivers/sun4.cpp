@@ -1848,8 +1848,8 @@ void sun4_state::ncr53c90a(device_t *device)
 
 MACHINE_CONFIG_START(sun4_state::sun4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MB86901, 16'670'000)
-	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
+	MB86901(config, m_maincpu, 16'670'000);
+		m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
 	// TODO: MMU for sun4 hardware
@@ -1934,8 +1934,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MB86901, 20'000'000)
-	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
+	MB86901(config, m_maincpu, 20'000'000);
+	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4c_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
 	SUN4C_MMU(config, m_mmu, 20'000'000, 7, 0x7f);

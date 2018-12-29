@@ -743,6 +743,7 @@ mikie.cpp
 mil4000.cpp
 miniboy7.cpp
 minivadr.cpp
+minivideo.cpp
 mirage.cpp
 mirax.cpp
 missb2.cpp
@@ -997,6 +998,7 @@ route16.cpp
 rowamet.cpp
 royalmah.cpp
 rpunch.cpp
+rulechan.cpp
 runaway.cpp
 rungun.cpp
 s11.cpp

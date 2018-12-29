@@ -71,7 +71,7 @@ private:
 	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
-	DECLARE_PALETTE_INIT(matmania);
+	void matmania_palette(palette_device &palette) const;
 	uint32_t screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void maniach_map(address_map &map);

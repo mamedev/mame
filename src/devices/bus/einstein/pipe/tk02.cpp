@@ -101,7 +101,7 @@ MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) * 2, 1024, 0, 640, 312, 0, 250)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk02)
 

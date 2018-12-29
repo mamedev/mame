@@ -731,12 +731,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(asteroid_state::asteroid_base)
-
+void asteroid_state::asteroid_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(asteroid_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::asteroid_map);
+	m_maincpu->set_periodic_int(FUNC(asteroid_state::asteroid_interrupt), attotime::from_hz(CLOCK_3KHZ/12));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -753,51 +753,52 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 	outlatch.bit_handler<5>().set(FUNC(asteroid_state::coin_counter_right_w)); // COIN CNTRR
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/4)
-	MCFG_SCREEN_SIZE(400,300)
-	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 394, 1182)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(CLOCK_3KHZ/12/4);
+	screen.set_size(400,300);
+	screen.set_visarea(522, 1566, 394, 1182);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("dvg", DVG, 0)
-	MCFG_AVGDVG_VECTOR("vector")
-MACHINE_CONFIG_END
+	DVG(config, m_dvg, 0);
+	m_dvg->set_vector_tag("vector");
+}
 
-MACHINE_CONFIG_START(asteroid_state::asteroid)
+void asteroid_state::asteroid(machine_config &config)
+{
 	asteroid_base(config);
 
 	/* sound hardware */
 	asteroid_sound(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(asteroid_state::asterock)
+void asteroid_state::asterock(machine_config &config)
+{
 	asteroid(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, asterock_interrupt, CLOCK_3KHZ/12)
-MACHINE_CONFIG_END
+	m_maincpu->set_periodic_int(FUNC(asteroid_state::asterock_interrupt), attotime::from_hz(CLOCK_3KHZ/12));
+}
 
-
-MACHINE_CONFIG_START(asteroid_state::astdelux)
+void asteroid_state::astdelux(machine_config &config)
+{
 	asteroid_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(astdelux_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::astdelux_map);
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	/* sound hardware */
 	astdelux_sound(config);
 
-	MCFG_DEVICE_ADD("pokey", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
-	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	pokey_device &pokey(POKEY(config, "pokey", MASTER_CLOCK/8));
+	pokey.allpot_r().set_ioport("DSW2");
+	pokey.set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
+	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REMOVE("outlatch")
+	config.device_remove("outlatch");
+
 	ls259_device &audiolatch(*subdevice<ls259_device>("audiolatch"));
 	audiolatch.q_out_cb<0>().set_output("led0").invert(); // START1
 	audiolatch.q_out_cb<1>().set_output("led1").invert(); // START2

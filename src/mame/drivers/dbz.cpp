@@ -125,7 +125,7 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4d4000, 0x4d401f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
 	map(0x4e0000, 0x4e0001).portr("P1_P2");
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
-	map(0x4e4000, 0x4e4001).portr("DSW2");
+	map(0x4e4000, 0x4e4001).lr8("4e4000", [this]() { return uint8_t(m_dsw2->read()); });
 	map(0x4e8000, 0x4e8001).nopw();
 	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
 	map(0x4f0000, 0x4f0001).w(FUNC(dbz_state::dbz_sound_command_w));
@@ -213,10 +213,6 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-
-	PORT_START("FAKE")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -348,31 +344,29 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_SCREEN_UPDATE_DRIVER(dbz_state, screen_update_dbz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dbz)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dbz);
 
-	MCFG_PALETTE_ADD("palette", 0x4000/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x4000/2).enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(dbz_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(dbz_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 1);
+	m_k056832->set_palette("palette");
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(dbz_state::sprite_callback), this);
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -87, 32); // or -52, 16?
 	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k053936_1", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-46, -16)
+	K053936(config, m_k053936_1, 0);
+	m_k053936_1->set_wrap(1);
+	m_k053936_1->set_offsets(-46, -16);
 
-	MCFG_DEVICE_ADD("k053936_2", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-46, -16)
+	K053936(config, m_k053936_2, 0);
+	m_k053936_2->set_wrap(1);
+	m_k053936_2->set_offsets(-46, -16);
 
 	K053252(config, m_k053252, 16000000/2);
 	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));

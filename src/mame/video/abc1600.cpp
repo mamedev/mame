@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SY6845E(config, m_crtc, XTAL(64'000'000)/32);
 	m_crtc->set_screen(SCREEN_TAG);

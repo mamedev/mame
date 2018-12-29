@@ -177,7 +177,7 @@ private:
 		uint8_t   command[2];
 	} m_flash_chip[2];
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tmp95c061_device> m_maincpu;
 	required_device<cpu_device> m_z80;
 	required_device<t6w28_device> m_t6w28;
 	required_device<dac_byte_interface> m_ldac;
@@ -828,10 +828,10 @@ void ngp_state::nvram_write(emu_file &file)
 
 MACHINE_CONFIG_START(ngp_state::ngp_common)
 
-	MCFG_DEVICE_ADD( "maincpu", TMP95C061, 6.144_MHz_XTAL )
-	MCFG_TLCS900H_AM8_16(1)
-	MCFG_DEVICE_PROGRAM_MAP( ngp_mem)
-	MCFG_TMP95C061_PORTA_WRITE(WRITE8(*this, ngp_state,ngp_tlcs900_porta))
+	TMP95C061(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_am8_16(1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::ngp_mem);
+	m_maincpu->porta_write().set(FUNC(ngp_state::ngp_tlcs900_porta));
 
 	MCFG_DEVICE_ADD( "soundcpu", Z80, 6.144_MHz_XTAL/2 )
 	MCFG_DEVICE_PROGRAM_MAP( z80_mem)
@@ -860,7 +860,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ngp_state::ngp)
 	ngp_common(config);
 
-	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( *this, ngp_state, ngp_vblank_pin_w ), WRITELINE( *this, ngp_state, ngp_hblank_pin_w ) )
+	K1GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
@@ -878,7 +880,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ngp_state::ngpc)
 	ngp_common(config);
-	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( *this, ngp_state, ngp_vblank_pin_w ), WRITELINE( *this, ngp_state, ngp_hblank_pin_w ) )
+	K2GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")

@@ -127,6 +127,11 @@ public:
 
 	void init_looping();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
@@ -152,14 +157,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ay_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(speech_enable_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(looping);
+	void looping_palette(palette_device &palette) const;
 	uint32_t screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(looping_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void looping_io_map(address_map &map);
 	void looping_map(address_map &map);
 	void looping_sound_io_map(address_map &map);
@@ -193,40 +195,39 @@ private:
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(looping_state, looping)
+void looping_state::looping_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances[3] = { 1000, 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances[3] = { 1000, 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3,  &resistances[0], rweights, 470, 0,
 			3,  &resistances[0], gweights, 470, 0,
 			2,  &resistances[1], bweights, 470, 0);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < 32; i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < 32; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 1;
-		bit1 = (color_prom[i] >> 1) & 1;
-		bit2 = (color_prom[i] >> 2) & 1;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 1;
-		bit1 = (color_prom[i] >> 4) & 1;
-		bit2 = (color_prom[i] >> 5) & 1;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 1;
-		bit1 = (color_prom[i] >> 7) & 1;
-		b = combine_2_weights(bweights, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_2_weights(bweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -621,8 +622,8 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(looping_state::looping)
-
+void looping_state::looping(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::looping_map);
@@ -634,13 +635,13 @@ MACHINE_CONFIG_START(looping_state::looping)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
 
-	MCFG_DEVICE_ADD("mcu", COP420, COP_CLOCK)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, looping_state, cop_l_w))
-	MCFG_COP400_READ_L_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_G_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_IN_CB(READ8(*this, looping_state, cop_unk_r))
-	MCFG_COP400_READ_SI_CB(READLINE(*this, looping_state, cop_serial_r))
+	cop420_cpu_device &cop(COP420(config, "mcu", COP_CLOCK));
+	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	cop.write_l().set(FUNC(looping_state::cop_l_w));
+	cop.read_l().set(FUNC(looping_state::cop_unk_r));
+	cop.read_g().set(FUNC(looping_state::cop_unk_r));
+	cop.read_in().set(FUNC(looping_state::cop_unk_r));
+	cop.read_si().set(FUNC(looping_state::cop_serial_r));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C9 on CPU board
 	// Q0 = A16
@@ -655,15 +656,13 @@ MACHINE_CONFIG_START(looping_state::looping)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(looping_state::screen_update_looping));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_looping)
-
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_looping);
+	PALETTE(config, m_palette, FUNC(looping_state::looping_palette), 32);
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // E2 on video board
 	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_set));
@@ -679,13 +678,15 @@ MACHINE_CONFIG_START(looping_state::looping)
 	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	MCFG_DEVICE_ADD("tms", TMS5220, TMS_CLOCK)
-	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, looping_state, looping_spcint))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	TMS5220(config, m_tms, TMS_CLOCK);
+	m_tms->irq_cb().set(FUNC(looping_state::looping_spcint));
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	ls259_device &sen0(LS259(config, "sen0")); // B3 on sound board
 	sen0.q_out_cb<0>().set(FUNC(looping_state::looping_souint_clr));
@@ -695,7 +696,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	sen1.q_out_cb<0>().set(FUNC(looping_state::ay_enable_w));
 	sen1.q_out_cb<1>().set(FUNC(looping_state::speech_enable_w));
 	sen1.q_out_cb<2>().set(FUNC(looping_state::ballon_enable_w));
-MACHINE_CONFIG_END
+}
 
 
 

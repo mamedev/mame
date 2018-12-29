@@ -544,8 +544,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(williams_state,williams)
+	PALETTE(config, m_palette, FUNC(williams_state::williams_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

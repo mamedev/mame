@@ -262,9 +262,8 @@ MACHINE_CONFIG_START(pass_state::pass)
 	MCFG_SCREEN_UPDATE_DRIVER(pass_state, screen_update_pass)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pass)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pass);
 
 
 	/* sound hardware */

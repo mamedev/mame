@@ -6,16 +6,6 @@
 #pragma once
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SOUND_TIA_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, TIA, _clock)
-#define MCFG_SOUND_TIA_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, TIA, _clock)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

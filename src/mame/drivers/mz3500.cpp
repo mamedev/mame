@@ -46,18 +46,18 @@ class mz3500_state : public driver_device
 {
 public:
 	mz3500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_master(*this, "master"),
-			m_slave(*this, "slave"),
-			m_hgdc1(*this, "upd7220_chr"),
-			m_hgdc2(*this, "upd7220_gfx"),
-			m_fdc(*this, "upd765a"),
-			m_video_ram(*this, "video_ram"),
-			m_beeper(*this, "beeper"),
-			m_palette(*this, "palette"),
-			m_system_dsw(*this, "SYSTEM_DSW"),
-			m_fd_dsw(*this, "FD_DSW"),
-			m_floppy_connector(*this, "upd765a:%u", 0U)
+		: driver_device(mconfig, type, tag)
+		, m_master(*this, "master")
+		, m_slave(*this, "slave")
+		, m_hgdc1(*this, "upd7220_chr")
+		, m_hgdc2(*this, "upd7220_gfx")
+		, m_fdc(*this, "upd765a")
+		, m_video_ram(*this, "video_ram")
+		, m_beeper(*this, "beeper")
+		, m_palette(*this, "palette")
+		, m_system_dsw(*this, "SYSTEM_DSW")
+		, m_fd_dsw(*this, "FD_DSW")
+		, m_floppy_connector(*this, "upd765a:%u", 0U)
 	{ }
 
 	void mz3500(machine_config &config);
@@ -827,7 +827,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	ppi.out_pb_callback().set(FUNC(mz3500_state::mz3500_pb_w));
 	ppi.out_pc_callback().set(FUNC(mz3500_state::mz3500_pc_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -853,13 +853,12 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz3500)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 MACHINE_CONFIG_END
 
 

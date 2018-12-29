@@ -212,11 +212,10 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8, 48*8-1-8-2, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stlforce)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	EDEVICES_SFORCE_VID(config, m_video, 0);
 	m_video->set_bg_videoram_tag("bg_videoram");

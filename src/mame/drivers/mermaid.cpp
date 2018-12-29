@@ -447,12 +447,10 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mermaid_state, screen_vblank_mermaid))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mermaid)
-	MCFG_PALETTE_ADD("palette", 4*16+2*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(64+1)
-	MCFG_PALETTE_INIT_OWNER(mermaid_state, mermaid)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mermaid);
+	PALETTE(config, m_palette, FUNC(mermaid_state::mermaid_palette), 4*16+2*2, 64+1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -471,8 +469,7 @@ MACHINE_CONFIG_START(mermaid_state::rougien)
 	m_latch[1]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_rom_hi_w));
 	m_latch[1]->q_out_cb<3>().set(FUNC(mermaid_state::rougien_sample_rom_lo_w));
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
+	m_palette->set_init(FUNC(mermaid_state::rougien_palette));
 
 	MCFG_DEVICE_ADD("adpcm", MSM5205, 384000)
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, mermaid_state, rougien_adpcm_int))

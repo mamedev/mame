@@ -61,7 +61,7 @@ public:
 	void init_spyhunt();
 	void init_sarge();
 	DECLARE_VIDEO_START(spyhunt);
-	DECLARE_PALETTE_INIT(spyhunt);
+	void spyhunt_palette(palette_device &palette) const;
 
 	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

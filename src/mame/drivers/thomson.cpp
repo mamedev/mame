@@ -644,8 +644,7 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thomson_state, thom_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
-	MCFG_PALETTE_INIT_OWNER(thomson_state, thom)
+	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 
 /* sound */
@@ -724,7 +723,7 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */
-	MCFG_TO7_IO_LINE_ADD("to7_io")
+	TO7_IO_LINE(config, "to7_io", 0);
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */
@@ -1132,8 +1131,7 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
 	MCFG_CASSETTE_INTERFACE("mo_cass")
 
-	MCFG_PALETTE_MODIFY( "palette" )
-	MCFG_PALETTE_INIT_OWNER(thomson_state, mo5)
+	subdevice<palette_device>("palette")->set_init(FUNC(thomson_state::mo5_palette));
 
 	m_pia_sys->readpa_handler().set(FUNC(thomson_state::mo5_sys_porta_in));
 	m_pia_sys->readpb_handler().set(FUNC(thomson_state::mo5_sys_portb_in));

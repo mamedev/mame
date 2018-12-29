@@ -513,7 +513,7 @@ uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ti68k_state, ti68k)
+void ti68k_state::ti68k_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -535,8 +535,7 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(ti68k_state, ti68k)
+	PALETTE(config, "palette", FUNC(ti68k_state::ti68k_palette), 2);
 
 	SHARP_UNK128MBIT(config, "flash");  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 

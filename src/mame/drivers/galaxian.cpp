@@ -5997,9 +5997,8 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
+	PALETTE(config, m_palette, FUNC(galaxian_state::galaxian_palette), 32);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
@@ -6195,9 +6194,8 @@ MACHINE_CONFIG_START(galaxian_state::gmgalax)
 
 	/* banked video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
-	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
+	m_palette->set_entries(64);
+	m_palette->set_init(FUNC(galaxian_state::galaxian_palette));
 MACHINE_CONFIG_END
 
 
@@ -6732,8 +6730,7 @@ MACHINE_CONFIG_START(galaxian_state::moonwar)
 
 	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::moonwar_port_select_w));
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(galaxian_state,moonwar) // bullets are less yellow
+	m_palette->set_init(FUNC(galaxian_state::moonwar_palette)); // bullets are less yellow
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::fourplay)
@@ -6744,8 +6741,7 @@ MACHINE_CONFIG_START(galaxian_state::fourplay)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
+	m_palette->set_entries(64);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::videight)
@@ -6757,8 +6753,7 @@ MACHINE_CONFIG_START(galaxian_state::videight)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videight)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8*32)
+	m_palette->set_entries(8 * 32);
 MACHINE_CONFIG_END
 
 
@@ -6770,16 +6765,15 @@ MACHINE_CONFIG_END
 
 void galaxian_state::decode_mooncrst(int length, uint8_t *dest)
 {
-	uint8_t *rom = memregion("maincpu")->base();
-	int offs;
+	uint8_t const *const rom = memregion("maincpu")->base();
 
-	for (offs = 0; offs < length; offs++)
+	for (int offs = 0; offs < length; offs++)
 	{
-		uint8_t data = rom[offs];
+		uint8_t const data = rom[offs];
 		uint8_t res = data;
-		if (BIT(data,1)) res ^= 0x40;
-		if (BIT(data,5)) res ^= 0x04;
-		if ((offs & 1) == 0) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
+		if (BIT(data, 1)) res ^= 0x40;
+		if (BIT(data, 5)) res ^= 0x04;
+		if (!BIT(offs, 0)) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
 		dest[offs] = res;
 	}
 }
@@ -7247,7 +7241,7 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	dstregion = memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	PALETTE_INIT_NAME(galaxian)(*m_palette);
+	galaxian_palette(*m_palette);
 }
 
 void galaxian_state::init_tenspot()

@@ -1561,8 +1561,7 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	// video
 	pal_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga)
+	PALETTE(config, m_palette, FUNC(amiga_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga)
 

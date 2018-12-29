@@ -781,20 +781,20 @@ void psikyosh_state::psikyo3v1(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	EEPROM_93C56_8BIT(config, "eeprom").default_value(0);
+	EEPROM_93C56_8BIT(config, m_eeprom).default_value(0);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM32(config, m_spriteram); /* If using alpha */
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0, 40*8-1, 0, 28*8-1);
 	m_screen->set_screen_update(FUNC(psikyosh_state::screen_update));
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram32_device::vblank_copy_rising));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyosh);
-	PALETTE(config, m_palette, 0x5000/4).set_format(PALETTE_FORMAT_RGBX);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_888, 0x5000 / 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -814,7 +814,7 @@ void psikyosh_state::psikyo5(machine_config &config)
 
 void psikyosh_state::psikyo5_mahjong(machine_config &config)
 {
-	psikyo3v1(config);
+	psikyo5(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps5_mahjong_map);
@@ -822,10 +822,7 @@ void psikyosh_state::psikyo5_mahjong(machine_config &config)
 
 void psikyosh_state::psikyo5_240(machine_config &config)
 {
-	psikyo3v1(config);
-
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps5_map);
+	psikyo5(config);
 
 	/* Measured Hsync 16.165 KHz, Vsync 61.68 Hz */
 	/* Ideally this would be driven off the video register. However, it doesn't changeat runtime and MAME will pick a better screen resolution if it knows upfront */

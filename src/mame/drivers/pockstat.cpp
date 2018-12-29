@@ -107,8 +107,8 @@ struct ps_rtc_regs_t
 class pockstat_state : public driver_device
 {
 public:
-	pockstat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pockstat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_lcd_buffer(*this, "lcd_buffer"),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot")
@@ -992,7 +992,7 @@ MACHINE_CONFIG_START(pockstat_state::pockstat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pockstat_state, screen_update_pockstat)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC

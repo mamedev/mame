@@ -674,7 +674,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 	{
 		m_cps_b_regs[0x10/2] = 0;
 		m_maincpu->set_input_line(4, HOLD_LINE);
-		cps2_set_sprite_priorities();
 		m_screen->update_partial(param);
 		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
@@ -685,7 +684,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 	{
 		m_cps_b_regs[0x12 / 2] = 0;
 		m_maincpu->set_input_line(4, HOLD_LINE);
-		cps2_set_sprite_priorities();
 		m_screen->update_partial(param);
 		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
@@ -696,11 +694,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
 		m_cps_b_regs[0x10 / 2] = m_scanline1;
 		m_cps_b_regs[0x12 / 2] = m_scanline2;
 		m_maincpu->set_input_line(2, HOLD_LINE);
-		if(m_scancalls)
-		{
-			cps2_set_sprite_priorities();
-			m_screen->update_partial(256);
-		}
 		cps2_objram_latch();
 	}
 //  popmessage("Raster calls = %i", m_scancalls);
@@ -1322,7 +1315,7 @@ MACHINE_CONFIG_START(cps2_state::cps2)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(cps2_state, screen_update_cps1)
+	MCFG_SCREEN_UPDATE_DRIVER(cps2_state, screen_update_cps2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps2_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 

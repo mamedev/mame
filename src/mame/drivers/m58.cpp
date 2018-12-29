@@ -200,15 +200,13 @@ MACHINE_CONFIG_START(m58_state::yard)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yard)
-	MCFG_PALETTE_ADD("palette", 256+256+256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+256+16)
-	MCFG_PALETTE_INIT_OWNER(m58_state, m58)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_yard)
+	PALETTE(config, m_palette, FUNC(m58_state::m58_palette), 256+256+256, 256+256+16);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
 	MCFG_SCREEN_UPDATE_DRIVER(m58_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_LARGE_AUDIO, 0)

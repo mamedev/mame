@@ -116,7 +116,7 @@ public:
 	void apple3_via_out(uint8_t *var, uint8_t data);
 	uint8_t *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
-	DECLARE_PALETTE_INIT(apple3);
+	void palette_init(palette_device &palette) const;
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);

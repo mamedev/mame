@@ -58,7 +58,7 @@ private:
 		LED_2
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_ioport_array<12> m_y;
 	output_finder<2> m_leds;
 

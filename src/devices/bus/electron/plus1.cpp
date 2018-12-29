@@ -97,7 +97,7 @@ MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* adc */
-	ADC0844(config, m_adc, 0);
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set(FUNC(electron_plus1_device::ready_w));
 	m_adc->ch1_callback().set_ioport("JOY1");
 	m_adc->ch2_callback().set_ioport("JOY2");

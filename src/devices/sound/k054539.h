@@ -13,16 +13,6 @@
 
 #define K054539_CB_MEMBER(_name)   void _name(double left, double right)
 
-#define MCFG_K054539_APAN_CB(_class, _method) \
-	downcast<k054539_device &>(*device).set_analog_callback(k054539_device::cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K054539_REGION_OVERRRIDE(_region) \
-	downcast<k054539_device &>(*device).set_override("^" _region);
-
-#define MCFG_K054539_TIMER_HANDLER(_devcb) \
-	downcast<k054539_device &>(*device).set_timer_handler(DEVCB_##_devcb);
-
-
 class k054539_device : public device_t,
 						public device_sound_interface,
 						public device_rom_interface
@@ -42,9 +32,17 @@ public:
 	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <typename Object> void set_analog_callback(Object &&cb) { m_apan_cb = std::forward<Object>(cb); }
-	template <class Object> devcb_base &set_timer_handler(Object &&cb) { return m_timer_handler.set_callback(std::forward<Object>(cb)); }
 	auto timer_handler() { return m_timer_handler.bind(); }
+
+	void set_analog_callback(cb_delegate callback) { m_apan_cb = callback; }
+	template <class FunctionClass> void set_analog_callback(const char *devname, void (FunctionClass::*callback)(double, double), const char *name)
+	{
+		set_analog_callback(cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_analog_callback(void (FunctionClass::*callback)(double, double), const char *name)
+	{
+		set_analog_callback(cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);

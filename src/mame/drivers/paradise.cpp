@@ -747,10 +747,10 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paradise)
-	MCFG_PALETTE_ADD("palette", 0x800 + 16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_paradise);
+	PALETTE(config, m_palette).set_entries(0x800 + 16);
 
 
 	/* sound hardware */

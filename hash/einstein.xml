@@ -1328,13 +1328,13 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="theatre" supported="no">
+	<software name="theatre">
 		<description>Theatre Europe</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>Merlin Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="215296">
-				<rom name="theatre.dsk" size="215296" crc="b429b7e7" sha1="3c7b1686340204776e734652dbdce807301a7e7a" offset="000000" />
+			<dataarea name="flop" size="235776">
+				<rom name="theatre.dsk" size="235776" crc="131ea117" sha1="0e0fae54ae174933801da1c488bb405809330de9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

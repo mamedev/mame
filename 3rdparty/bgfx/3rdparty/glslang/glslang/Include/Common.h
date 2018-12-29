@@ -37,9 +37,24 @@
 #ifndef _COMMON_INCLUDED_
 #define _COMMON_INCLUDED_
 
-#if (defined(_MSC_VER) && _MSC_VER < 1900 /*vs2015*/) // || defined MINGW_HAS_SECURE_API
+#include <sstream>
+
+#if defined(__ANDROID__)
+namespace std {
+template<typename T>
+std::string to_string(const T& val) {
+  std::ostringstream os;
+  os << val;
+  return os.str();
+}
+}
+#endif
+
+#if (defined(_MSC_VER) && _MSC_VER < 1900 /*vs2015*/) || defined MINGW_HAS_SECURE_API
     #include <basetsd.h>
+    #ifndef snprintf
     #define snprintf sprintf_s
+    #endif
     #define safe_vsprintf(buf,max,format,args) vsnprintf_s((buf), (max), (max), (format), (args))
 #elif defined (solaris)
     #define safe_vsprintf(buf,max,format,args) vsnprintf((buf), (max), (format), (args))
@@ -51,31 +66,20 @@
     #define UINT_PTR uintptr_t
 #endif
 
-#if defined(__ANDROID__) || _MSC_VER < 1700
-#include <sstream>
-namespace std {
-template<typename T>
-std::string to_string(const T& val) {
-  std::ostringstream os;
-  os << val;
-  return os.str();
-}
-}
-#endif
-
 #if defined(_MSC_VER) && _MSC_VER < 1800
-inline long long int strtoll (const char* str, char** endptr, int base)
-{
-  return _strtoi64(str, endptr, base);
-}
-inline unsigned long long int strtoull (const char* str, char** endptr, int base)
-{
-  return _strtoui64(str, endptr, base);
-}
-inline long long int atoll (const char* str)
-{
-  return strtoll(str, NULL, 10);
-}
+    #include <stdlib.h>
+    inline long long int strtoll (const char* str, char** endptr, int base)
+    {
+        return _strtoi64(str, endptr, base);
+    }
+    inline unsigned long long int strtoull (const char* str, char** endptr, int base)
+    {
+        return _strtoui64(str, endptr, base);
+    }
+    inline long long int atoll (const char* str)
+    {
+        return strtoll(str, NULL, 10);
+    }
 #endif
 
 #if defined(_MSC_VER)
@@ -155,7 +159,7 @@ inline TString* NewPoolTString(const char* s)
     return new(memory) TString(s);
 }
 
-template<class T> inline T* NewPoolObject(T)
+template<class T> inline T* NewPoolObject(T*)
 {
     return new(GetThreadPoolAllocator().allocate(sizeof(T))) T;
 }

@@ -292,18 +292,21 @@ uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
+void wpc_dot_state::wpc_dot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(wpc_dot_map)
+	M6809(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_dot_state::wpc_dot_map);
 
-	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_dot_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_dot_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_dot_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_dot_state,wpc_sound_data_r),WRITE8(*this, wpc_dot_state,wpc_sound_data_w))
-	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_dot_state,wpc_dmdbank_w))
+	WPCASIC(config, m_wpc, 0);
+	m_wpc->irq_callback().set(FUNC(wpc_dot_state::wpc_irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_dot_state::wpc_firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_dot_state::wpc_rombank_w));
+	m_wpc->sound_ctrl_read().set(FUNC(wpc_dot_state::wpc_sound_ctrl_r));
+	m_wpc->sound_ctrl_write().set(FUNC(wpc_dot_state::wpc_sound_ctrl_w));
+	m_wpc->sound_data_read().set(FUNC(wpc_dot_state::wpc_sound_data_r));
+	m_wpc->sound_data_write().set(FUNC(wpc_dot_state::wpc_sound_data_w));
+	m_wpc->dmdbank_write().set(FUNC(wpc_dot_state::wpc_dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();
 	WPCSND(config, m_wpcsnd);
@@ -317,7 +320,7 @@ MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
 	screen.set_visarea(0, 128-1, 0, 32-1);
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(wpc_dot_state::screen_update));
-MACHINE_CONFIG_END
+}
 
 /*-----------------
 / Gilligan's Island #20003

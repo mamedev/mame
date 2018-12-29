@@ -116,6 +116,7 @@ c900.cpp
 camplynx.cpp
 candela.cpp
 canon_s80.cpp
+cardinal.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
@@ -406,6 +407,7 @@ mc8020.cpp
 mc8030.cpp
 mcb216.cpp
 mccpm.cpp
+mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd2.cpp
@@ -449,6 +451,7 @@ mod8.cpp
 modellot.cpp
 modena.cpp
 molecular.cpp
+monon_color.cpp
 monty.cpp
 mpc3000.cpp
 mpf1.cpp
@@ -464,6 +467,7 @@ mt735.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
+mupid2.cpp
 mvme147.cpp
 mx2178.cpp
 myb3k.cpp
@@ -821,6 +825,7 @@ votrpss.cpp
 votrtnt.cpp
 vp415.cpp
 vp60.cpp
+vsmile.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp
@@ -886,7 +891,6 @@ zx.cpp
 +jaguar
 +jaguarcd
 //konamim2.cpp
-+3do_m2
 //neogeo.cpp
 +aes
 //vectrex.cpp

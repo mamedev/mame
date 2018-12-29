@@ -455,12 +455,10 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_galivan)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
-	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
+	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
@@ -484,7 +482,7 @@ MACHINE_CONFIG_START(dangarj_state::dangarj)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(dangarj_io_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)) // divided by 2 maybe
+	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galivan_state::ninjemak)
@@ -515,12 +513,10 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_ninjemak)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
-	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
+	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 

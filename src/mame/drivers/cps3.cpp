@@ -2493,25 +2493,26 @@ void cps3_state::simm6_128mbit(machine_config &config)
 	FUJITSU_29F016A(config, "simm6.7");
 }
 
-MACHINE_CONFIG_START(cps3_state::cps3)
+void cps3_state::cps3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
-	MCFG_DEVICE_PROGRAM_MAP(cps3_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
-	MCFG_SH2_DMA_KLUDGE_CB(cps3_state, dma_callback)
+	SH2(config, m_maincpu, 6250000*4); // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps3_state::cps3_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &cps3_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps3_state::cps3_vbl_interrupt));
+	m_maincpu->set_periodic_int(FUNC(cps3_state::cps3_other_interrupt), attotime::from_hz(80)); /* ?source? */
+	m_maincpu->set_dma_kludge_callback(FUNC(cps3_state::dma_callback));
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
+	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 
 	wd33c93_device& wd33c93(WD33C93(config, "wd33c93"));
 	wd33c93.set_scsi_port("scsi");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(cps3_state, screen_update_cps3)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224);
+	screen.set_screen_update(FUNC(cps3_state::screen_update_cps3));
 /*
     Measured clocks:
         V = 59.5992Hz
@@ -2524,56 +2525,61 @@ MACHINE_CONFIG_START(cps3_state::cps3)
 */
 
 	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
-	MCFG_PALETTE_ADD("palette", 0x10000) // actually 0x20000 ...
+	PALETTE(config, m_palette).set_entries(0x10000); // actually 0x20000 ...
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("cps3sound", CPS3, MASTER_CLOCK / 3)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	CPS3(config, m_cps3sound, MASTER_CLOCK / 3);
+	m_cps3sound->add_route(1, "lspeaker", 1.0);
+	m_cps3sound->add_route(0, "rspeaker", 1.0);
+}
 
 
 /* individual configs for each machine, depending on the SIMMs installed */
-MACHINE_CONFIG_START(cps3_state::redearth)
+void cps3_state::redearth(machine_config &config)
+{
 	cps3(config);
 	simm1_64mbit(config);
 	simm3_128mbit(config);
 	simm4_128mbit(config);
 	simm5_32mbit(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cps3_state::sfiii)
+void cps3_state::sfiii(machine_config &config)
+{
 	cps3(config);
 	simm1_64mbit(config);
 	simm3_128mbit(config);
 	simm4_128mbit(config);
 	simm5_32mbit(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cps3_state::sfiii2)
+void cps3_state::sfiii2(machine_config &config)
+{
 	cps3(config);
 	simm1_64mbit(config);
 	simm2_64mbit(config);
 	simm3_128mbit(config);
 	simm4_128mbit(config);
 	simm5_128mbit(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cps3_state::jojo)
+void cps3_state::jojo(machine_config &config)
+{
 	cps3(config);
 	simm1_64mbit(config);
 	simm2_64mbit(config);
 	simm3_128mbit(config);
 	simm4_128mbit(config);
 	simm5_32mbit(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cps3_state::sfiii3)
+void cps3_state::sfiii3(machine_config &config)
+{
 	cps3(config);
 	simm1_64mbit(config);
 	simm2_64mbit(config);
@@ -2581,16 +2587,17 @@ MACHINE_CONFIG_START(cps3_state::sfiii3)
 	simm4_128mbit(config);
 	simm5_128mbit(config);
 	simm6_128mbit(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cps3_state::jojoba)
+void cps3_state::jojoba(machine_config &config)
+{
 	cps3(config);
 	simm1_64mbit(config);
 	simm2_64mbit(config);
 	simm3_128mbit(config);
 	simm4_128mbit(config);
 	simm5_128mbit(config);
-MACHINE_CONFIG_END
+}
 
 
 /* CD sets - use CD BIOS roms */

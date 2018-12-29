@@ -1181,12 +1181,11 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgakuen)
 
-	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024); // less colors than the others
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
@@ -1222,12 +1221,11 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mitchell)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
@@ -1341,12 +1339,11 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mstworld)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
@@ -1378,12 +1375,11 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marukin)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
@@ -1433,12 +1429,11 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkladiesbl)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 

@@ -15,11 +15,11 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_mainlatch(*this, "mainlatch"),
 		m_spriteram(*this,"spriteram"),
-		m_vregs(*this, "vregs"),
-		m_snowboar_protection(*this, "snowboar_prot"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_vregs(*this, "vregs"),
+		m_snowboar_protection(*this, "snowboar_prot"),
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_shareram(*this, "shareram")
 	{ }
@@ -53,6 +53,10 @@ public:
 protected:
 	required_device<m68000_device> m_maincpu;
 	optional_device<ls259_device> m_mainlatch;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
@@ -92,12 +96,8 @@ private:
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
 
-	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<uint16_t> m_vregs;
 	optional_shared_ptr<uint16_t> m_snowboar_protection;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_shared_ptr<uint16_t> m_shareram;
 };

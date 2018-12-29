@@ -214,11 +214,10 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssozumo)
-	MCFG_PALETTE_ADD("palette", 64 + 16)
-	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssozumo);
+	PALETTE(config, m_palette, FUNC(ssozumo_state::ssozumo_palette), 64 + 16);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -226,7 +225,6 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
 	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
-
 	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC

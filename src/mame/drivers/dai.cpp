@@ -212,11 +212,10 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SCREEN_SIZE(1056, 542)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dai)
-	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dai)
+	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
 
 
 	/* sound hardware */

@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/k007232.h"
-#include "video/k052109.h"
 #include "video/k051960.h"
+#include "video/k052109.h"
 
 class aliens_state : public driver_device
 {
@@ -32,7 +33,7 @@ public:
 	{ }
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<k007232_device> m_k007232;

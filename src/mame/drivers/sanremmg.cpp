@@ -31,7 +31,6 @@ Others
 M30624FG (M16C/62A family) needs CPU core and dumping of internal ROM
 */
 
-
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -43,8 +42,8 @@ class sanremmg_state : public driver_device
 {
 public:
 	sanremmg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void sanremmg(machine_config &config);
@@ -95,8 +94,7 @@ MACHINE_CONFIG_START(sanremmg_state::sanremmg)
 	MCFG_SCREEN_UPDATE_DRIVER(sanremmg_state, screen_update_sanremmg)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 MACHINE_CONFIG_END
 
 /*

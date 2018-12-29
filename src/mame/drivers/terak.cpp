@@ -23,7 +23,7 @@ public:
 	terak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		{ }
+	{ }
 
 	void terak(machine_config &config);
 
@@ -40,7 +40,7 @@ private:
 	uint8_t m_cmd;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu;
 };
 
 READ16_MEMBER( terak_state::terak_fdc_status_r )
@@ -102,24 +102,24 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 }
 
 
-MACHINE_CONFIG_START(terak_state::terak)
+void terak_state::terak(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000))
-	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	T11(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_initial_mode(6 << 13);
+	m_maincpu->set_addrmap(AS_PROGRAM, &terak_state::mem_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(terak_state, screen_update_terak)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(terak_state::screen_update_terak));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+}
 
 /* ROM definition */
 ROM_START( terak )

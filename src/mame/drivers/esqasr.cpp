@@ -116,73 +116,75 @@ READ16_MEMBER(esqasr_state::esq5506_read_adc)
 	return 0;
 }
 
-MACHINE_CONFIG_START(esqasr_state::asr)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // actually MC68302
-	MCFG_DEVICE_PROGRAM_MAP(asr_map)
+void esqasr_state::asr(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(16'000'000)); // actually MC68302
+	m_maincpu->set_addrmap(AS_PROGRAM, &esqasr_state::asr_map);
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
-	MCFG_DEVICE_DISABLE()
+	ES5510(config, m_esp, XTAL(10'000'000));
+	m_esp->set_disable();
 
-	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
+	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ESQ_5505_5510_PUMP(config, m_pump, XTAL(16'000'000) / (16 * 32));
+	m_pump->add_route(0, "lspeaker", 1.0);
+	m_pump->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ensoniq", ES5506, XTAL(16'000'000))
-	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
-	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
-	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
-	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(4)          /* channels, Not verified from real hardware */
-	MCFG_ES5506_IRQ_CB(WRITELINE(*this, esqasr_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(*this, esqasr_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
-MACHINE_CONFIG_END
+	es5506_device &ensoniq(ES5506(config, "ensoniq", XTAL(16'000'000)));
+	ensoniq.set_region0("waverom");  /* Bank 0 */
+	ensoniq.set_region1("waverom2"); /* Bank 1 */
+	ensoniq.set_region2("waverom3"); /* Bank 0 */
+	ensoniq.set_region3("waverom4"); /* Bank 1 */
+	ensoniq.set_channels(4);         /* channels, Not verified from real hardware */
+	ensoniq.irq_cb().set(FUNC(esqasr_state::esq5506_otto_irq)); /* irq */
+	ensoniq.read_port_cb().set(FUNC(esqasr_state::esq5506_read_adc));
+	ensoniq.add_route(0, "pump", 1.0, 0);
+	ensoniq.add_route(1, "pump", 1.0, 1);
+	ensoniq.add_route(2, "pump", 1.0, 2);
+	ensoniq.add_route(3, "pump", 1.0, 3);
+	ensoniq.add_route(4, "pump", 1.0, 4);
+	ensoniq.add_route(5, "pump", 1.0, 5);
+	ensoniq.add_route(6, "pump", 1.0, 6);
+	ensoniq.add_route(7, "pump", 1.0, 7);
+}
 
-MACHINE_CONFIG_START(esqasr_state::asrx)
+void esqasr_state::asrx(machine_config &config)
+{
 	M68340(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &esqasr_state::asrx_map);
 
-	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000)) // Actually ES5511
-	MCFG_DEVICE_DISABLE()
+	ES5510(config, m_esp, XTAL(10'000'000)); // Actually ES5511
+	m_esp->set_disable();
 
-	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
+	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32)) // Actually ES5511
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ESQ_5505_5510_PUMP(config, m_pump, XTAL(16'000'000) / (16 * 32)); // Actually ES5511
+	m_pump->add_route(0, "lspeaker", 1.0);
+	m_pump->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ensoniq", ES5506, XTAL(16'000'000))
-	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
-	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
-	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
-	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(*this, esqasr_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(*this, esqasr_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
-MACHINE_CONFIG_END
+	es5506_device &ensoniq(ES5506(config, "ensoniq", XTAL(16'000'000)));
+	ensoniq.set_region0("waverom");  /* Bank 0 */
+	ensoniq.set_region1("waverom2"); /* Bank 1 */
+	ensoniq.set_region2("waverom3"); /* Bank 0 */
+	ensoniq.set_region3("waverom4"); /* Bank 1 */
+	ensoniq.set_channels(4);         /* channels, Not verified from real hardware */
+	ensoniq.irq_cb().set(FUNC(esqasr_state::esq5506_otto_irq)); /* irq */
+	ensoniq.read_port_cb().set(FUNC(esqasr_state::esq5506_read_adc));
+	ensoniq.add_route(0, "pump", 1.0, 0);
+	ensoniq.add_route(1, "pump", 1.0, 1);
+	ensoniq.add_route(2, "pump", 1.0, 2);
+	ensoniq.add_route(3, "pump", 1.0, 3);
+	ensoniq.add_route(4, "pump", 1.0, 4);
+	ensoniq.add_route(5, "pump", 1.0, 5);
+	ensoniq.add_route(6, "pump", 1.0, 6);
+	ensoniq.add_route(7, "pump", 1.0, 7);
+}
 
 static INPUT_PORTS_START( asr )
 INPUT_PORTS_END

@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* devices */
 	Z80PIO(config, m_kbpio, 20_MHz_XTAL / 8);
@@ -658,8 +658,8 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
 	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
-	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(m_kbpio, z80pio_device, strobe_b))
+	XEROX_820_KEYBOARD(config, m_kb, 0);
+	m_kb->kbstb_wr_callback().set(m_kbpio, FUNC(z80pio_device::strobe_b));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820ii)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -747,8 +747,8 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	dbrg.fr_handler().append(m_sio, FUNC(z80dart_device::txca_w));
 	dbrg.ft_handler().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
-	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(WRITELINE(m_kbpio, z80pio_device, strobe_b))
+	XEROX_820_KEYBOARD(config, m_kb, 0);
+	m_kb->kbstb_wr_callback().set(m_kbpio, FUNC(z80pio_device::strobe_b));
 
 	// SASI bus
 	SCSI_PORT(config, m_sasibus, 0);

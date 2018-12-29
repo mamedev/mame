@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/prehisle.h"
+
 #include "screen.h"
 
 
@@ -25,37 +26,30 @@ WRITE16_MEMBER(prehisle_state::tx_vram_w)
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER(prehisle_state::control_r)
+void prehisle_state::fg_scrolly_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	switch (offset)
-	{
-	case 0x08: return ioport("P2")->read();                     // Player 2
-	case 0x10: return ioport("COIN")->read();                   // Coins, Tilt, Service
-	case 0x20: return ioport("P1")->read() ^ m_invert_controls; // Player 1
-	case 0x21: return ioport("DSW0")->read();                   // DIPs
-	case 0x22: return ioport("DSW1")->read();                   // DIPs + VBLANK
-	default: return 0;
-	}
+	COMBINE_DATA(&m_fg_scrolly);
+	m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 }
 
-WRITE16_MEMBER(prehisle_state::control_w)
+void prehisle_state::fg_scrollx_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int scroll = 0;
-
-	COMBINE_DATA(&scroll);
-
-	switch (offset)
-	{
-	case 0x00: m_fg_tilemap->set_scrolly(0, scroll); break;
-	case 0x08: m_fg_tilemap->set_scrollx(0, scroll); break;
-	case 0x10: m_bg_tilemap->set_scrolly(0, scroll); break;
-	case 0x18: m_bg_tilemap->set_scrollx(0, scroll); break;
-	case 0x23: m_invert_controls = data ? 0x00ff : 0x0000; break;
-	case 0x28: machine().bookkeeping().coin_counter_w(0, data & 1); break;
-	case 0x29: machine().bookkeeping().coin_counter_w(1, data & 1); break;
-	case 0x30: flip_screen_set(data & 0x01); break;
-	}
+	COMBINE_DATA(&m_fg_scrollx);
+	m_fg_tilemap->set_scrollx(0, m_fg_scrollx);
 }
+
+void prehisle_state::bg_scrolly_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg_scrolly);
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+}
+
+void prehisle_state::bg_scrollx_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg_scrollx);
+	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+}
+
 
 /* tile layout
 0  xxxx....  color
@@ -131,7 +125,10 @@ void prehisle_state::video_start()
 	m_tx_tilemap->set_transparent_pen(15);
 
 	/* register for saving */
-	save_item(NAME(m_invert_controls));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
+	save_item(NAME(m_fg_scrollx));
+	save_item(NAME(m_fg_scrolly));
 }
 
 /* sprite layout
@@ -150,14 +147,14 @@ void prehisle_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (int offs = 1024 - 4; offs >= 0; offs -= 4)
 	{
-		int const attr = spriteram16[offs + 2];
-		int const code = attr & 0x1fff;
-		int const color = spriteram16[offs + 3] >> 12;
-		int const priority = (color < 0x4) ? 0 : GFX_PMASK_1; // correct?
+		uint16_t const attr = spriteram16[offs + 2];
+		uint16_t const code = attr & 0x1fff;
+		uint16_t const color = spriteram16[offs + 3] >> 12;
+		uint32_t const priority = (color < 0x4) ? 0 : GFX_PMASK_1; // correct?
 		bool flipx = attr & 0x4000;
 		bool flipy = attr & 0x8000;
-		int sx = spriteram16[offs + 1] & 0x1ff;
-		int sy = spriteram16[offs] & 0x1ff;
+		int16_t sx = spriteram16[offs + 1] & 0x1ff;
+		int16_t sy = spriteram16[offs] & 0x1ff;
 
 		// coordinates are 9-bit signed
 		if (sx & 0x100) sx = -0x100 + (sx & 0xff);
@@ -181,7 +178,7 @@ void prehisle_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-uint32_t prehisle_state::screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prehisle_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

@@ -293,10 +293,8 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	MCFG_SCREEN_UPDATE_DRIVER(mrflea_state, screen_update_mrflea)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrflea)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrflea);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -12,6 +12,8 @@
 
 #include "audio/zaccaria.h"
 
+#include "cpu/s2650/s2650.h"
+
 #include "machine/6821pia.h"
 #include "machine/pla.h"
 #include "machine/s2636.h"
@@ -105,7 +107,7 @@ protected:
 	required_ioport m_row2;
 
 	// main CPU device
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 
 	// video devices
 	required_device<screen_device>         m_screen;
@@ -171,7 +173,7 @@ protected:
 	virtual void machine_start() override;
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
+	void laserbat_palette(palette_device &palette) const;
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
@@ -200,7 +202,7 @@ public:
 protected:
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(catnmous);
+	void catnmous_palette(palette_device &palette) const;
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;

@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -776,8 +776,8 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 
 	TRS80M2_KEYBOARD(config, m_kb, 0);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
@@ -811,7 +811,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -868,8 +868,8 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 
 	TRS80M2_KEYBOARD(config, m_kb, 0);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");

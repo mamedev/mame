@@ -267,13 +267,13 @@ MACHINE_CONFIG_START(relief_state::relief)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_relief)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_VAD_PLAYFIELD(relief_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_PLAYFIELD2(relief_state, "gfxdecode", get_playfield2_tile_info)
-	MCFG_ATARI_VAD_MOB(relief_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, m_screen);
+	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield2_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

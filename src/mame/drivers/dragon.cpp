@@ -214,8 +214,8 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	pia1.irqa_handler().set(FUNC(coco_state::pia1_firq_a));
 	pia1.irqb_handler().set(FUNC(coco_state::pia1_firq_b));
 
-	MCFG_DEVICE_ADD(SAM_TAG, SAM6883, 14.218_MHz_XTAL, MAINCPU_TAG)
-	MCFG_SAM6883_RES_CALLBACK(READ8(*this, dragon_state, sam_read))
+	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
+	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, 4.433619_MHz_XTAL)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, dragon_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, dragon_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(SAM_TAG, sam6883_device, display_read))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(m_sam, sam6883_device, display_read))
 
 	// sound hardware
 	coco_sound(config);
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(d64plus_state::d64plus)
 	MCFG_SCREEN_SIZE(640, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 264-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// crtc
 	HD6845(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);

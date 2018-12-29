@@ -418,9 +418,9 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pasha2_state, screen_update_pasha2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

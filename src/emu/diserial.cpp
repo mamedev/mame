@@ -308,41 +308,31 @@ void device_serial_interface::receive_register_extract()
 	if(m_df_parity == PARITY_NONE)
 		return;
 
-	//unsigned char computed_parity;
-	//unsigned char parity_received;
-
 	/* get state of parity bit received */
-	//parity_received = (m_rcv_register_data>>m_df_word length) & 0x01;
+	u8 parity_received = (m_rcv_register_data >> (16 - m_rcv_bit_count + m_df_word_length)) & 0x01;
 
 	/* parity enable? */
 	switch (m_df_parity)
 	{
-		/* check parity */
-		case PARITY_ODD:
-		case PARITY_EVEN:
-		{
-			/* compute parity for received bits */
-			//computed_parity = serial_helper_get_parity(data);
-
-			if (m_df_parity == PARITY_ODD)
-			{
-				/* odd parity */
-
-
-			}
-			else
-			{
-				/* even parity */
-
-
-			}
-
-		}
+	case PARITY_ODD:
+		if (parity_received != serial_helper_get_parity(data))
+			m_rcv_parity_error = true;
 		break;
-		case PARITY_MARK:
-		case PARITY_SPACE:
-			//computed_parity = parity_received;
-			break;
+
+	case PARITY_EVEN:
+		if (parity_received == serial_helper_get_parity(data))
+			m_rcv_parity_error = true;
+		break;
+
+	case PARITY_MARK:
+		if (!parity_received)
+			m_rcv_parity_error = true;
+		break;
+
+	case PARITY_SPACE:
+		if (parity_received)
+			m_rcv_parity_error = true;
+		break;
 	}
 }
 
@@ -369,7 +359,7 @@ void device_serial_interface::transmit_register_add_bit(int bit)
 void device_serial_interface::transmit_register_setup(u8 data_byte)
 {
 	int i;
-	unsigned char transmit_data;
+	u8 transmit_data;
 
 	if(m_tra_clock && !m_tra_rate.is_never())
 		m_tra_clock->adjust(m_tra_rate, 0, m_tra_rate);
@@ -401,16 +391,18 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 	if (m_df_parity!=PARITY_NONE)
 	{
 		/* odd or even parity */
-		unsigned char parity = 0;
-		switch(m_df_parity)
+		u8 parity = 0;
+		switch (m_df_parity)
 		{
-		case PARITY_EVEN:
 		case PARITY_ODD:
 
 			/* get parity */
 			/* if parity = 0, data has even parity - i.e. there is an even number of one bits in the data */
 			/* if parity = 1, data has odd parity - i.e. there is an odd number of one bits in the data */
 			parity = serial_helper_get_parity(data_byte);
+			break;
+		case PARITY_EVEN:
+			parity = serial_helper_get_parity(data_byte) ^ 1;
 			break;
 		case PARITY_MARK:
 			parity = 1;

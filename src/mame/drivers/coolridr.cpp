@@ -317,12 +317,12 @@ public:
 		//m_dmac(*this, "i8237"),
 		m_framebuffer_vram(*this, "fb_vram"),
 		m_txt_vram(*this, "txt_vram"),
-		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
-		m_sysh1_workram_h(*this, "sysh1_workrah"),
+		m_txt_blit(*this, "txt_blit"),
+		m_workram_h(*this, "workrah"),
 		m_sound_dma(*this, "sound_dma"),
-		m_soundram(*this, "soundram"),
-		m_soundram2(*this, "soundram2"),
+		m_soundram(*this, "soundram%u", 1U),
 		m_rom(*this, "share1"),
+		m_compressedgfx(*this, "compressedgfx"),
 		m_io_config(*this, "CONFIG"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -338,9 +338,8 @@ public:
 	uint16_t m_blitterAddr;
 	uint16_t m_textOffset;
 	uint32_t m_blitterClearMode;
-	int16_t m_blitterClearCount;
-	pen_t m_tilepals[0x10000];
-	pen_t m_fadedpals[0x8000];
+	int16_t  m_blitterClearCount;
+	std::unique_ptr<pen_t[]> m_fadedpals;
 
 	// store the blit params here
 	uint32_t m_spriteblit[12];
@@ -356,52 +355,44 @@ public:
 
 	required_shared_ptr<uint32_t> m_framebuffer_vram;
 	required_shared_ptr<uint32_t> m_txt_vram;
-	required_shared_ptr<uint32_t> m_sysh1_txt_blit;
-	required_shared_ptr<uint32_t> m_sysh1_workram_h;
+	required_shared_ptr<uint32_t> m_txt_blit;
+	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint32_t> m_sound_dma;
-	required_shared_ptr<uint16_t> m_soundram;
-	required_shared_ptr<uint16_t> m_soundram2;
+	required_shared_ptr_array<uint16_t, 2> m_soundram;
 	required_shared_ptr<uint32_t> m_rom;
+	required_region_ptr<uint8_t> m_compressedgfx;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	bitmap_ind16 m_temp_bitmap_sprites;
-	bitmap_ind16 m_temp_bitmap_sprites2;
-	//bitmap_ind16 m_zbuffer_bitmap;
-	//bitmap_ind16 m_zbuffer_bitmap2;
-
-	bitmap_ind16 m_bg_bitmap;
-	bitmap_ind16 m_bg_bitmap2;
+	bitmap_ind16 m_temp_bitmap_sprites[2];
+	//bitmap_ind16 m_zbuffer_bitmap[2];
 
 	bitmap_ind16 m_screen_bitmap[2];
-	uint8_t an_mux_data;
-	uint8_t sound_data, sound_fifo;
+	uint8_t m_an_mux_data;
+	uint8_t m_sound_data, m_sound_fifo;
 
-	uint8_t* m_compressedgfx;
 	std::unique_ptr<uint16_t[]> m_expanded_10bit_gfx;
 	std::unique_ptr<uint16_t[]> m_rearranged_16bit_gfx;
 
 	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
 	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
-	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
-	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
-	DECLARE_READ32_MEMBER(sysh1_unk_blit_r);
-	DECLARE_WRITE32_MEMBER(sysh1_unk_blit_w);
-	DECLARE_WRITE32_MEMBER(sysh1_blit_mode_w);
-	DECLARE_WRITE32_MEMBER(sysh1_blit_data_w);
-	DECLARE_WRITE32_MEMBER(sysh1_fb_mode_w);
-	DECLARE_WRITE32_MEMBER(sysh1_fb_data_w);
+	DECLARE_READ32_MEMBER(sound_dma_r);
+	DECLARE_WRITE32_MEMBER(sound_dma_w);
+	DECLARE_READ32_MEMBER(unk_blit_r);
+	DECLARE_WRITE32_MEMBER(unk_blit_w);
+	DECLARE_WRITE32_MEMBER(blit_mode_w);
+	DECLARE_WRITE32_MEMBER(blit_data_w);
+	DECLARE_WRITE32_MEMBER(fb_mode_w);
+	DECLARE_WRITE32_MEMBER(fb_data_w);
 
-	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
+	DECLARE_WRITE32_MEMBER(dma_w);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 	DECLARE_READ32_MEMBER(aquastge_hack_r);
-	DECLARE_READ16_MEMBER(h1_soundram_r);
-	DECLARE_READ16_MEMBER(h1_soundram2_r);
-	DECLARE_WRITE16_MEMBER(h1_soundram_w);
-	DECLARE_WRITE16_MEMBER(h1_soundram2_w);
+	template<int Chip> DECLARE_READ16_MEMBER(soundram_r);
+	template<int Chip> DECLARE_WRITE16_MEMBER(soundram_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
@@ -422,21 +413,19 @@ public:
 		uint32_t transpen);
 
 	void draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
-	uint32_t screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
-	uint32_t screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template<int Screen> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_current_sprite(address_space &space);
-	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
-	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_main);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_sub);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 
-	void sysh1_dma_transfer( address_space &space, uint16_t dma_index );
+	void dma_transfer( address_space &space, uint16_t dma_index );
 
-	int debug_randompal;
+	int m_debug_randompal;
 
-	std::unique_ptr<uint16_t[]> m_h1_vram;
-	std::unique_ptr<uint8_t[]> m_h1_pcg;
-	std::unique_ptr<uint16_t[]> m_h1_pal;
+	std::unique_ptr<uint16_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_pcgram;
+	std::unique_ptr<uint16_t[]> m_palram;
 	int m_gfx_index;
 	int m_color_bank;
 	struct {
@@ -469,11 +458,9 @@ public:
 		int colbase;
 	};
 
-	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list1;
-	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list2;
+	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list[2];
 
-	int m_listcount1;
-	int m_listcount2;
+	int m_listcount[2];
 
 	// the decode cache mechansim is an optimization
 	// we know all gfx are in ROM, and that calling the RLE decompression every time they're used is slow, so we cache the decoded tiles
@@ -519,7 +506,7 @@ public:
 		uint16_t tempshape[16*16];
 	};
 
-	objcachemanager decode[2];
+	objcachemanager m_decode[2];
 	void aquastge(machine_config &config);
 	void coolridr(machine_config &config);
 	void aquastge_h1_map(address_map &map);
@@ -527,8 +514,7 @@ public:
 	void coolridr_submap(address_map &map);
 	void system_h1_map(address_map &map);
 	void system_h1_sound_map(address_map &map);
-	void scsp1_map(address_map &map);
-	void scsp2_map(address_map &map);
+	template<int Chip> void scsp_map(address_map &map);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -544,9 +530,9 @@ static const gfx_layout h1_tile_layout =
 	16,16,
 	0x1000,
 	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,8*16) },
 	16*128
 };
 
@@ -558,17 +544,33 @@ void coolridr_state::video_start()
 		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
-	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
-	m_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
-	//m_screen->register_screen_bitmap(m_zbuffer_bitmap);
-	//m_screen->register_screen_bitmap(m_zbuffer_bitmap2);
-	m_screen->register_screen_bitmap(m_bg_bitmap);
-	m_screen->register_screen_bitmap(m_bg_bitmap2);
+	m_fadedpals = make_unique_clear<pen_t[]>(0x8000);
+	m_vram = make_unique_clear<uint16_t[]>(VRAM_SIZE);
+	m_pcgram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
+	m_palram = make_unique_clear<uint16_t[]>(VRAM_SIZE);
+
+	m_cool_render_object_list[0] = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
+	m_listcount[0] = 0;
+
+	m_cool_render_object_list[1] = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
+	m_listcount[1] = 0;
+
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites[0]);
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites[1]);
+	//m_screen->register_screen_bitmap(m_zbuffer_bitmap[0]);
+	//m_screen->register_screen_bitmap(m_zbuffer_bitmap[1]);
 
 	m_screen->register_screen_bitmap(m_screen_bitmap[0]);
 	m_screen->register_screen_bitmap(m_screen_bitmap[1]);
 
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, h1_tile_layout, m_h1_pcg.get(), 0, 8, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, h1_tile_layout, m_pcgram.get(), 0, 8, 0));
+
+	m_debug_randompal = 9;
+
+	save_pointer(NAME(m_fadedpals), 0x8000);
+	save_pointer(NAME(m_vram), VRAM_SIZE);
+	save_pointer(NAME(m_pcgram), VRAM_SIZE);
+	save_pointer(NAME(m_palram), VRAM_SIZE);
 }
 
 /*
@@ -744,7 +746,7 @@ while (0)
 void coolridr_state::coolriders_drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty)
 {
-	const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	const uint16_t *paldata = &m_palram[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	code %= gfx->elements();
 	COOLRIDERS_DRAWGFX_CORE(uint16_t, COOLRIDERS_PIXEL_OP_REMAP_OPAQUE);
 }
@@ -772,7 +774,7 @@ void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const recta
 	}
 
 	// render
-		const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())] ;
+	const uint16_t *paldata = &m_palram[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())] ;
 	COOLRIDERS_DRAWGFX_CORE(uint16_t, COOLRIDERS_PIXEL_OP_REMAP_TRANSPEN);
 }
 
@@ -798,19 +800,15 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 	}
 	else
 	{
-		uint32_t base_offset;
-		int tile,vram_data,color;
-		int scrollx;
-		int scrolly;
 		uint8_t transpen_setting;
 		gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 		#define VREG(_offs) \
 			space.read_dword(m_vregs_address+_offs+which*0x40)
 
-		scrollx = (VREG(0x2c) >> 16) & 0x7ff;
-		scrolly = VREG(0x2c) & 0x3ff;
+		uint16_t const scrollx = (VREG(0x2c) >> 16) & 0x7ff;
+		uint16_t const scrolly = VREG(0x2c) & 0x3ff;
 
-		base_offset = (VREG(0x1c) * 0x8000)/2;
+		uint32_t const base_offset = (VREG(0x1c) * 0x8000)/2;
 		m_color_bank = which * 2;
 		/* TODO: the whole transpen logic might be incorrect */
 		transpen_setting = (VREG(0x3c) & 0x80000000) >> 31;
@@ -821,16 +819,16 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		bitmap.fill(VREG(0x3c),cliprect);
 
 
-		uint16_t basey = scrolly>>4;
-		for (int y=0;y<25;y++)
+		uint16_t basey = ((scrolly + cliprect.top()) & 0x3ff) >> 4;
+		for (int y = cliprect.top() >> 4; y <= (cliprect.bottom() + 15) >> 4; y++)
 		{
-			uint16_t basex = scrollx>>4;
-			for (int x=0;x<32;x++)
+			uint16_t basex = ((scrollx + cliprect.left()) & 0x7ff) >> 4;
+			for (int x = cliprect.left() >> 4; x <= (cliprect.right() + 15) >> 4; x++)
 			{
-				vram_data = (m_h1_vram[((basex&0x7f)+((basey&0x3f)*0x80)+base_offset)&0x07ffff] & 0xffff);
-				color = m_color_bank + ((vram_data & 0x800) >> 11) * 4;
+				uint16_t const vram_data = (m_vram[((basex&0x7f)+((basey&0x3f)*0x80)+base_offset)&0x07ffff] & 0xffff);
+				uint16_t const color = m_color_bank + ((vram_data & 0x800) >> 11) * 4;
 				/* bike select enables bits 15-12, pretty sure one of these is tile bank (because there's a solid pen on 0x3ff / 0x7ff). */
-				tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
+				uint16_t const tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
 
 				coolriders_drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,(x*16)-(scrollx&0xf),(y*16)-(scrolly&0xf),transpen_setting ? -1 : 0);
 
@@ -843,18 +841,32 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 
 }
 
-uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+template<int Screen>
+uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if(m_rgb_ctrl[which].gradient)
+	if(m_rgb_ctrl[Screen].gradient)
 	{
-		if( (m_rgb_ctrl[which].setting == 0x1240) || (m_rgb_ctrl[which].setting == 0x920) || (m_rgb_ctrl[which].setting == 0x800) )
+		if( (m_rgb_ctrl[Screen].setting == 0x1240) || (m_rgb_ctrl[Screen].setting == 0x920) || (m_rgb_ctrl[Screen].setting == 0x800) )
 		{
 		}
 		else
 		{
-			popmessage("%08x %08x",m_rgb_ctrl[which].setting,m_rgb_ctrl[which].gradient);
+			popmessage("%08x %08x",m_rgb_ctrl[Screen].setting,m_rgb_ctrl[Screen].gradient);
 		}
 	}
+
+#if 0
+	if (machine().input().code_pressed_once(KEYCODE_W))
+	{
+		m_debug_randompal++;
+		popmessage("%02x",m_debug_randompal);
+	}
+	if (machine().input().code_pressed_once(KEYCODE_Q))
+	{
+		m_debug_randompal--;
+		popmessage("%02x",m_debug_randompal);
+	}
+#endif
 
 	// there are probably better ways to do this
 	for (int i = 0; i < 0x8000; i++)
@@ -863,32 +875,32 @@ uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_in
 		int g = (i >> 5)&0x1f;
 		int b = (i >> 0)&0x1f;
 
-		if(m_rgb_ctrl[which].gradient)
+		if(m_rgb_ctrl[Screen].gradient)
 		{
 			/* fade-in / outs */
-			if(m_rgb_ctrl[which].setting == 0x1240)
+			if(m_rgb_ctrl[Screen].setting == 0x1240)
 			{
-				r -= m_rgb_ctrl[which].gradient;
-				g -= m_rgb_ctrl[which].gradient;
-				b -= m_rgb_ctrl[which].gradient;
+				r -= m_rgb_ctrl[Screen].gradient;
+				g -= m_rgb_ctrl[Screen].gradient;
+				b -= m_rgb_ctrl[Screen].gradient;
 				if(r < 0) { r = 0; }
 				if(g < 0) { g = 0; }
 				if(b < 0) { b = 0; }
 			}
-			else if(m_rgb_ctrl[which].setting == 0x920) /* at bike select / outside tunnels, addition */
+			else if(m_rgb_ctrl[Screen].setting == 0x920) /* at bike select / outside tunnels, addition */
 			{
-				r += m_rgb_ctrl[which].gradient;
-				g += m_rgb_ctrl[which].gradient;
-				b += m_rgb_ctrl[which].gradient;
+				r += m_rgb_ctrl[Screen].gradient;
+				g += m_rgb_ctrl[Screen].gradient;
+				b += m_rgb_ctrl[Screen].gradient;
 				if(r > 0x1f) { r = 0x1f; }
 				if(g > 0x1f) { g = 0x1f; }
 				if(b > 0x1f) { b = 0x1f; }
 			}
-			else if(m_rgb_ctrl[which].setting == 0x800) /* when you get hit TODO: algo might be different. */
+			else if(m_rgb_ctrl[Screen].setting == 0x800) /* when you get hit TODO: algo might be different. */
 			{
-				r += m_rgb_ctrl[which].gradient;
-				g -= m_rgb_ctrl[which].gradient;
-				b -= m_rgb_ctrl[which].gradient;
+				r += m_rgb_ctrl[Screen].gradient;
+				g -= m_rgb_ctrl[Screen].gradient;
+				b -= m_rgb_ctrl[Screen].gradient;
 				if(r > 0x1f) { r = 0x1f; }
 				if(g < 0) { g = 0; }
 				if(b < 0) { b = 0; }
@@ -899,7 +911,7 @@ uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_in
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t* linesrc = &m_screen_bitmap[which].pix16(y);
+		uint16_t* linesrc = &m_screen_bitmap[Screen].pix16(y);
 		uint16_t* linedest = &bitmap.pix16(y);
 
 		for (int x = cliprect.left(); x<= cliprect.right(); x++)
@@ -909,29 +921,6 @@ uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_in
 	}
 
 	return 0;
-}
-
-uint32_t coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-#if 0
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		debug_randompal++;
-		popmessage("%02x",debug_randompal);
-	}
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		debug_randompal--;
-		popmessage("%02x",debug_randompal);
-	}
-#endif
-
-	return screen_update_coolridr(screen,bitmap,cliprect,0);
-}
-
-uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return screen_update_coolridr(screen,bitmap,cliprect,1);
 }
 
 /* end video */
@@ -1001,11 +990,11 @@ uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_i
 			} \
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
 			{ \
-				object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded = true; \
+				object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded = true; \
 				if (blankcount==0) \
-					object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
+					object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
 				else \
-					object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
+					object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
 				/* if (object->screen==0) printf("marking offset %04x as decoded (sprite number %08x ptr %08x)\n", v*used_hCellCount + h, spriteNumber, ((uint64_t)(void*)tempshape)&0xffffffff);*/ \
 			} \
 		} \
@@ -1036,7 +1025,7 @@ uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_i
 	} \
 	if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
 	{ \
-		if (object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank == true) \
+		if (object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank == true) \
 				continue; \
 	} \
 	else \
@@ -1391,7 +1380,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// note the road always has 0x8000 bit set in the palette.  I *think* this is because they do a gradual blend of some kind between the road types
 	//  see the number of transitional road bits which have various values above set
 
-	if (blit4blendlevel==object->state.debug_randompal)
+	if (blit4blendlevel==object->state.m_debug_randompal)
 	{
 		b1colorNumber = object->state.machine().rand()&0xfff;
 	}
@@ -1790,16 +1779,16 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		for (int k=0;k<DECODECACHE_NUMOBJECTCACHES;k++)
 		{
-			if(((object->state.decode[screen].objcache[k].lastromoffset == b3romoffset)) &&
-				((object->state.decode[screen].objcache[k].lastused_flipx == used_flipx)) &&
-				((object->state.decode[screen].objcache[k].lastused_flipy == used_flipy)) &&
-				((object->state.decode[screen].objcache[k].lastblit_rotate == blit_rotate)) &&
-				((object->state.decode[screen].objcache[k].lastb1mode == b1mode)) &&
-				((object->state.decode[screen].objcache[k].lastb1colorNumber == b1colorNumber)) &&
-				((object->state.decode[screen].objcache[k].lastb2colorNumber == b2colorNumber)) &&
-				((object->state.decode[screen].objcache[k].lastused_hCellCount == used_hCellCount)) &&
-				((object->state.decode[screen].objcache[k].lastused_vCellCount == used_vCellCount)) &&
-				((object->state.decode[screen].objcache[k].lastb2altpenmask == b2altpenmask)))
+			if(((object->state.m_decode[screen].objcache[k].lastromoffset == b3romoffset)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_flipx == used_flipx)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_flipy == used_flipy)) &&
+				((object->state.m_decode[screen].objcache[k].lastblit_rotate == blit_rotate)) &&
+				((object->state.m_decode[screen].objcache[k].lastb1mode == b1mode)) &&
+				((object->state.m_decode[screen].objcache[k].lastb1colorNumber == b1colorNumber)) &&
+				((object->state.m_decode[screen].objcache[k].lastb2colorNumber == b2colorNumber)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_hCellCount == used_hCellCount)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_vCellCount == used_vCellCount)) &&
+				((object->state.m_decode[screen].objcache[k].lastb2altpenmask == b2altpenmask)))
 			{
 				found = k;
 				break;
@@ -1808,32 +1797,32 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		if (found != -1)
 		{
-			object->state.decode[screen].objcache[found].repeatcount++;
+			object->state.m_decode[screen].objcache[found].repeatcount++;
 			use_object = found;
 		}
 		else
 		{
-			use_object = object->state.decode[screen].current_object;
+			use_object = object->state.m_decode[screen].current_object;
 
 			// dirty the cache
 			for (int i=0;i<DECODECACHE_NUMSPRITETILES;i++)
-				object->state.decode[screen].objcache[use_object].tiles[i].tempshape_multi_decoded = false;
+				object->state.m_decode[screen].objcache[use_object].tiles[i].tempshape_multi_decoded = false;
 
-			object->state.decode[screen].objcache[use_object].lastromoffset = b3romoffset;
-			object->state.decode[screen].objcache[use_object].lastused_flipx = used_flipx;
-			object->state.decode[screen].objcache[use_object].lastused_flipy = used_flipy;
-			object->state.decode[screen].objcache[use_object].lastblit_rotate = blit_rotate;
-			object->state.decode[screen].objcache[use_object].lastb1mode = b1mode;
-			object->state.decode[screen].objcache[use_object].lastb1colorNumber = b1colorNumber;
-			object->state.decode[screen].objcache[use_object].lastb2colorNumber = b2colorNumber;
-			object->state.decode[screen].objcache[use_object].lastused_hCellCount = used_hCellCount;
-			object->state.decode[screen].objcache[use_object].lastused_vCellCount = used_vCellCount;
-			object->state.decode[screen].objcache[use_object].lastb2altpenmask = b2altpenmask;
-			object->state.decode[screen].objcache[use_object].repeatcount = 0;
+			object->state.m_decode[screen].objcache[use_object].lastromoffset = b3romoffset;
+			object->state.m_decode[screen].objcache[use_object].lastused_flipx = used_flipx;
+			object->state.m_decode[screen].objcache[use_object].lastused_flipy = used_flipy;
+			object->state.m_decode[screen].objcache[use_object].lastblit_rotate = blit_rotate;
+			object->state.m_decode[screen].objcache[use_object].lastb1mode = b1mode;
+			object->state.m_decode[screen].objcache[use_object].lastb1colorNumber = b1colorNumber;
+			object->state.m_decode[screen].objcache[use_object].lastb2colorNumber = b2colorNumber;
+			object->state.m_decode[screen].objcache[use_object].lastused_hCellCount = used_hCellCount;
+			object->state.m_decode[screen].objcache[use_object].lastused_vCellCount = used_vCellCount;
+			object->state.m_decode[screen].objcache[use_object].lastb2altpenmask = b2altpenmask;
+			object->state.m_decode[screen].objcache[use_object].repeatcount = 0;
 
-			object->state.decode[screen].current_object++;
-			if (object->state.decode[screen].current_object >= DECODECACHE_NUMOBJECTCACHES)
-				object->state.decode[screen].current_object = 0;
+			object->state.m_decode[screen].current_object++;
+			if (object->state.m_decode[screen].current_object >= DECODECACHE_NUMOBJECTCACHES)
+				object->state.m_decode[screen].current_object = 0;
 		}
 	}
 
@@ -1927,8 +1916,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES)
 			{
-				tempshape = object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
-				current_decoded = object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded;
+				tempshape = object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
+				current_decoded = object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded;
 				/*
 				if (object->screen==0)
 				{
@@ -1940,7 +1929,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			else
 			{
 				//if (object->screen==0) printf("using base tempshape\n");
-				tempshape = object->state.decode[screen].tempshape;
+				tempshape = object->state.m_decode[screen].tempshape;
 			}
 
 
@@ -2248,8 +2237,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// which queue, which bitmap
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
-		testobject->drawbitmap = &m_temp_bitmap_sprites;
-		/* testobject->zbitmap = &m_zbuffer_bitmap; */
+		testobject->drawbitmap = &m_temp_bitmap_sprites[0];
+		/* testobject->zbitmap = &m_zbuffer_bitmap[0]; */
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[0][0];
 		testobject->clipvals[1] = m_clipvals[0][1];
@@ -2261,8 +2250,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	}
 	else // 0x90, 0xa0, 0xaf, 0xb0, 0xc0
 	{
-		testobject->drawbitmap = &m_temp_bitmap_sprites2;
-		/* testobject->zbitmap = &m_zbuffer_bitmap2; */
+		testobject->drawbitmap = &m_temp_bitmap_sprites[1];
+		/* testobject->zbitmap = &m_zbuffer_bitmap[1]; */
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[1][0];
 		testobject->clipvals[1] = m_clipvals[1][1];
@@ -2286,33 +2275,33 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
-		if (m_listcount1<1000000)
+		if (m_listcount[0]<1000000)
 		{
-			m_cool_render_object_list1[m_listcount1] =  std::move(testobject);
-			m_listcount1++;
+			m_cool_render_object_list[0][m_listcount[0]] =  std::move(testobject);
+			m_listcount[0]++;
 		}
 		else
 		{
-			popmessage("m_listcount1 overflow!\n");
+			popmessage("m_listcount[0] overflow!\n");
 		}
 	}
 	else
 	{
-		if (m_listcount2<1000000)
+		if (m_listcount[1]<1000000)
 		{
-			m_cool_render_object_list2[m_listcount2] =  std::move(testobject);
-			m_listcount2++;
+			m_cool_render_object_list[1][m_listcount[1]] =  std::move(testobject);
+			m_listcount[1]++;
 		}
 		else
 		{
-			popmessage("m_listcount2 overflow!\n");
+			popmessage("m_listcount[1] overflow!\n");
 		}
 	}
 #endif
 }
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
+WRITE32_MEMBER(coolridr_state::blit_mode_w)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
@@ -2398,7 +2387,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
+WRITE32_MEMBER(coolridr_state::blit_data_w)
 {
 	if (m_blitterMode == 0xf4)
 	{
@@ -2461,7 +2450,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
+WRITE32_MEMBER(coolridr_state::fb_mode_w)
 {
 	/*
 	This does the fb display/clear phases of blitter data processed in the previous frame.
@@ -2493,7 +2482,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
 
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
+WRITE32_MEMBER(coolridr_state::fb_data_w)
 {
 	if(m_blitterClearCount == 0)
 	{
@@ -2508,7 +2497,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 	else if(m_blitterClearCount == 2)
 	{
 		/*
-		if(data != 0x000701f7 && m_sysh1_txt_blit[offset] != 0x020703f7)
+		if(data != 0x000701f7 && m_txt_blit[offset] != 0x020703f7)
 		    printf("Blitter Clear Count == 2 used with param %08x\n",data);
 		*/
 	}
@@ -2526,16 +2515,16 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
 
 				// copy our old buffer to the actual screen
-				copybitmap(m_screen_bitmap[0], m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
+				copybitmap(m_screen_bitmap[0], m_temp_bitmap_sprites[0], 0, 0, 0, 0, visarea);
 
 
 
 
-				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
+				//m_temp_bitmap_sprites[1].fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
-				draw_bg_coolridr(m_temp_bitmap_sprites, visarea, 0);
+				draw_bg_coolridr(m_temp_bitmap_sprites[0], visarea, 0);
 				// wipe the z-buffer ready for the sprites
-				/* m_zbuffer_bitmap.fill(0xffff, visarea); */
+				/* m_zbuffer_bitmap[0].fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[0][0] = 0;
 				m_clipvals[0][1] = 0;
@@ -2543,28 +2532,28 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipblitterMode[0] = 0xff;
 
 				/* bubble sort, might be something better to use instead */
-				for (int pass = 0 ; pass < (m_listcount1 - 1); pass++)
+				for (int pass = 0 ; pass < (m_listcount[0] - 1); pass++)
 				{
-					for (int elem2 = 0 ; elem2 < m_listcount1 - pass - 1; elem2++)
+					for (int elem2 = 0 ; elem2 < m_listcount[0] - pass - 1; elem2++)
 					{
-						if (m_cool_render_object_list1[elem2]->zpri > m_cool_render_object_list1[elem2+1]->zpri)
-							std::swap(m_cool_render_object_list1[elem2], m_cool_render_object_list1[elem2+1]);
+						if (m_cool_render_object_list[0][elem2]->zpri > m_cool_render_object_list[0][elem2+1]->zpri)
+							std::swap(m_cool_render_object_list[0][elem2], m_cool_render_object_list[0][elem2+1]);
 					}
 				}
 
-				for (int i=m_listcount1-1;i>=0;i--)
+				for (int i=m_listcount[0]-1;i>=0;i--)
 				{
 					if (m_usethreads)
 					{
-						osd_work_item_queue(m_work_queue[0], draw_object_threaded, m_cool_render_object_list1[i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
+						osd_work_item_queue(m_work_queue[0], draw_object_threaded, m_cool_render_object_list[0][i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
 					}
 					else
 					{
-						draw_object_threaded((void*)m_cool_render_object_list1[i].release(), 0);
+						draw_object_threaded((void*)m_cool_render_object_list[0][i].release(), 0);
 					}
 				}
 
-				m_listcount1 = 0;
+				m_listcount[0] = 0;
 
 
 			}
@@ -2574,16 +2563,16 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
 
 				// copy our old buffer to the actual screen
-				copybitmap(m_screen_bitmap[1], m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
+				copybitmap(m_screen_bitmap[1], m_temp_bitmap_sprites[1], 0, 0, 0, 0, visarea);
 
 
 
 
-				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
+				//m_temp_bitmap_sprites[1].fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
-				draw_bg_coolridr(m_temp_bitmap_sprites2, visarea, 1);
+				draw_bg_coolridr(m_temp_bitmap_sprites[1], visarea, 1);
 				// wipe the z-buffer ready for the sprites
-				/* m_zbuffer_bitmap2.fill(0xffff, visarea); */
+				/* m_zbuffer_bitmap[1].fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[1][0] = 0;
 				m_clipvals[1][1] = 0;
@@ -2591,28 +2580,28 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipblitterMode[1] = 0xff;
 
 				/* bubble sort, might be something better to use instead */
-				for (int pass = 0 ; pass < (m_listcount2 - 1); pass++)
+				for (int pass = 0 ; pass < (m_listcount[1] - 1); pass++)
 				{
-					for (int elem2 = 0 ; elem2 < m_listcount2 - pass - 1; elem2++)
+					for (int elem2 = 0 ; elem2 < m_listcount[1] - pass - 1; elem2++)
 					{
-						if (m_cool_render_object_list2[elem2]->zpri > m_cool_render_object_list2[elem2+1]->zpri)
-							std::swap(m_cool_render_object_list2[elem2], m_cool_render_object_list2[elem2+1]);
+						if (m_cool_render_object_list[1][elem2]->zpri > m_cool_render_object_list[1][elem2+1]->zpri)
+							std::swap(m_cool_render_object_list[1][elem2], m_cool_render_object_list[1][elem2+1]);
 					}
 				}
 
-				for (int i=m_listcount2-1;i>=0;i--)
+				for (int i=m_listcount[1]-1;i>=0;i--)
 				{
 					if (m_usethreads)
 					{
-						osd_work_item_queue(m_work_queue[1], draw_object_threaded, m_cool_render_object_list2[i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
+						osd_work_item_queue(m_work_queue[1], draw_object_threaded, m_cool_render_object_list[1][i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
 					}
 					else
 					{
-						draw_object_threaded((void*)m_cool_render_object_list2[i].release(), 0);
+						draw_object_threaded((void*)m_cool_render_object_list[1][i].release(), 0);
 					}
 				}
 
-				m_listcount2 = 0;
+				m_listcount[1] = 0;
 
 			}
 
@@ -2621,23 +2610,23 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 	}
 	else
 	{
-		printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_sysh1_txt_blit[offset]);
+		printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_txt_blit[offset]);
 	}
 
 	m_blitterClearCount++;
 }
 
-READ32_MEMBER(coolridr_state::sysh1_unk_blit_r)
+READ32_MEMBER(coolridr_state::unk_blit_r)
 {
 //  if(offset == 0x0c/4) // TODO
 
-	return m_sysh1_txt_blit[offset];
+	return m_txt_blit[offset];
 }
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
+WRITE32_MEMBER(coolridr_state::unk_blit_w)
 {
-	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
+	COMBINE_DATA(&m_txt_blit[offset]);
 
 	switch(offset)
 	{
@@ -2669,7 +2658,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 
 
 
-void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_index )
+void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 {
 	uint32_t src = 0,dst = 0,size = 0;
 	uint8_t end_dma_mark;
@@ -2699,7 +2688,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 
 				for(int i=0;i<size;i+=2)
 				{
-					m_h1_vram[dst] = space.read_word(src);
+					m_vram[dst] = space.read_word(src);
 					dst++;
 					src+=2;
 				}
@@ -2717,7 +2706,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 
 				for(int i=0;i<size;i++)
 				{
-					m_h1_pcg[dst] = space.read_byte(src);
+					m_pcgram[dst] = space.read_byte(src);
 					m_gfxdecode->gfx(m_gfx_index)->mark_dirty(dst/256);
 					dst++;
 					src++;
@@ -2738,8 +2727,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 
 				for(int i=0;i<size;i+=2)
 				{
-					m_h1_pal[dst] = space.read_word(src);
-					m_tilepals[dst&0xffff] = m_h1_pal[dst];
+					m_palram[dst] = space.read_word(src);
 					dst++;
 					src+=2;
 				}
@@ -2780,7 +2768,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 	}while(!end_dma_mark );
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
+WRITE32_MEMBER(coolridr_state::dma_w)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
@@ -2788,7 +2776,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 	{
 		/* enable */
 		if((m_framebuffer_vram[offset] & 0xff000000) == 0x0f000000)
-			sysh1_dma_transfer(space, m_framebuffer_vram[offset] & 0xffff);
+			dma_transfer(space, m_framebuffer_vram[offset] & 0xffff);
 	}
 }
 
@@ -2798,17 +2786,17 @@ void coolridr_state::system_h1_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().share("share1").nopw();
 	map(0x01000000, 0x01ffffff).rom().region("gfx_data", 0x0000000);
 
-	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::sysh1_dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
+	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
 
 	map(0x03f00000, 0x03f0ffff).ram().share("share3"); /*Communication area RAM*/
 	map(0x03f40000, 0x03f4ffff).ram().share("txt_vram");//text tilemap + "lineram"
-	map(0x04000000, 0x0400000f).rw(FUNC(coolridr_state::sysh1_unk_blit_r), FUNC(coolridr_state::sysh1_unk_blit_w)).share("sysh1_txt_blit");
-	map(0x04000010, 0x04000013).w(FUNC(coolridr_state::sysh1_blit_mode_w));
-	map(0x04000014, 0x04000017).w(FUNC(coolridr_state::sysh1_blit_data_w));
-	map(0x04000018, 0x0400001b).w(FUNC(coolridr_state::sysh1_fb_mode_w));
-	map(0x0400001c, 0x0400001f).w(FUNC(coolridr_state::sysh1_fb_data_w));
+	map(0x04000000, 0x0400000f).rw(FUNC(coolridr_state::unk_blit_r), FUNC(coolridr_state::unk_blit_w)).share("txt_blit");
+	map(0x04000010, 0x04000013).w(FUNC(coolridr_state::blit_mode_w));
+	map(0x04000014, 0x04000017).w(FUNC(coolridr_state::blit_data_w));
+	map(0x04000018, 0x0400001b).w(FUNC(coolridr_state::fb_mode_w));
+	map(0x0400001c, 0x0400001f).w(FUNC(coolridr_state::fb_data_w));
 
-	map(0x06000000, 0x060fffff).ram().share("sysh1_workrah");
+	map(0x06000000, 0x060fffff).ram().share("workrah");
 	map(0x20000000, 0x201fffff).rom().share("share1");
 
 	map(0x60000000, 0x600003ff).nopw();
@@ -2817,30 +2805,22 @@ void coolridr_state::system_h1_map(address_map &map)
 void coolridr_state::aquastge_h1_map(address_map &map)
 {
 	system_h1_map(map);
-	map(0x03c00000, 0x03c0ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::sysh1_dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
+	map(0x03c00000, 0x03c0ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
 	map(0x03f50000, 0x03f5ffff).ram(); // video registers
 	map(0x03e10000, 0x03e1ffff).ram().share("share3"); /*Communication area RAM*/
 	map(0x03f00000, 0x03f0ffff).ram();  /*Communication area RAM*/
 }
 
-READ16_MEMBER( coolridr_state::h1_soundram_r)
+template<int Chip>
+READ16_MEMBER( coolridr_state::soundram_r)
 {
-	return m_soundram[offset];
+	return m_soundram[Chip][offset];
 }
 
-READ16_MEMBER( coolridr_state::h1_soundram2_r)
+template<int Chip>
+WRITE16_MEMBER( coolridr_state::soundram_w)
 {
-	return m_soundram2[offset];
-}
-
-WRITE16_MEMBER( coolridr_state::h1_soundram_w)
-{
-	COMBINE_DATA(&m_soundram[offset]);
-}
-
-WRITE16_MEMBER( coolridr_state::h1_soundram2_w)
-{
-	COMBINE_DATA(&m_soundram2[offset]);
+	COMBINE_DATA(&m_soundram[Chip][offset]);
 }
 
 
@@ -2858,17 +2838,17 @@ WRITE8_MEMBER( coolridr_state::lamps_w )
 }
 
 
-READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
+READ32_MEMBER(coolridr_state::sound_dma_r)
 {
 	if(offset == 8)
 	{
-		//popmessage("%02x",sound_data);
+		//popmessage("%02x",m_sound_data);
 		/*
 		Checked in irq routine
 		--x- ---- second SCSP
 		---x ---- first SCSP
 		*/
-		return sound_data;
+		return m_sound_data;
 	}
 
 	if(offset == 2 || offset == 6) // DMA status
@@ -2879,7 +2859,7 @@ READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
 	return m_sound_dma[offset];
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
+WRITE32_MEMBER(coolridr_state::sound_dma_w)
 {
 	address_space &main_space = m_maincpu->space(AS_PROGRAM);
 	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
@@ -2901,7 +2881,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 			uint32_t dst = m_sound_dma[1];
 			uint32_t size = (m_sound_dma[2]>>16)*0x40;
 
-			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
+			//printf("%08x %08x %08x %02x\n",src,dst,size,m_sound_fifo);
 
 			for(int i = 0;i < size; i+=2)
 			{
@@ -2920,7 +2900,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 			uint32_t dst = m_sound_dma[5];
 			uint32_t size = (m_sound_dma[6]>>16)*0x40;
 
-			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
+			//printf("%08x %08x %08x %02x\n",src,dst,size,m_sound_fifo);
 
 			for(int i = 0;i < size; i+=2)
 			{
@@ -2942,12 +2922,12 @@ void coolridr_state::coolridr_submap(address_map &map)
 
 	map(0x01000000, 0x0100ffff).ram(); //communication RAM
 
-	map(0x03000000, 0x0307ffff).rw(FUNC(coolridr_state::h1_soundram_r), FUNC(coolridr_state::h1_soundram_w)); //.share("soundram");
+	map(0x03000000, 0x0307ffff).rw(FUNC(coolridr_state::soundram_r<0>), FUNC(coolridr_state::soundram_w<0>)); //.share("soundram1");
 	map(0x03100000, 0x03100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	map(0x03200000, 0x0327ffff).rw(FUNC(coolridr_state::h1_soundram2_r), FUNC(coolridr_state::h1_soundram2_w)); //.share("soundram2");
+	map(0x03200000, 0x0327ffff).rw(FUNC(coolridr_state::soundram_r<1>), FUNC(coolridr_state::soundram_w<1>)); //.share("soundram2");
 	map(0x03300000, 0x03300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
 
-	map(0x04000000, 0x0400003f).rw(FUNC(coolridr_state::sysh1_sound_dma_r), FUNC(coolridr_state::sysh1_sound_dma_w)).share("sound_dma");
+	map(0x04000000, 0x0400003f).rw(FUNC(coolridr_state::sound_dma_r), FUNC(coolridr_state::sound_dma_w)).share("sound_dma");
 //  map(0x04200000, 0x0420003f).ram(); /* unknown */
 
 	map(0x05000000, 0x05000fff).ram();
@@ -2971,12 +2951,12 @@ void coolridr_state::aquastge_submap(address_map &map)
 /* TODO: what is this for, volume mixing? MIDI? */
 WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 {
-	sound_fifo = data;
+	m_sound_fifo = data;
 }
 
 void coolridr_state::system_h1_sound_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("soundram");
+	map(0x000000, 0x07ffff).ram().share("soundram1");
 	map(0x100000, 0x100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x200000, 0x27ffff).ram().share("soundram2");
 	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
@@ -2984,18 +2964,11 @@ void coolridr_state::system_h1_sound_map(address_map &map)
 	map(0x900001, 0x900001).w(FUNC(coolridr_state::sound_to_sh1_w));
 }
 
-void coolridr_state::scsp1_map(address_map &map)
+template<int Chip>
+void coolridr_state::scsp_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("soundram");
+	map(0x000000, 0x07ffff).ram().share(m_soundram[Chip]);
 }
-
-void coolridr_state::scsp2_map(address_map &map)
-{
-	map(0x000000, 0x07ffff).ram().share("soundram2");
-}
-
-
-
 
 
 static GFXDECODE_START( gfx_coolridr )
@@ -3081,7 +3054,7 @@ INPUT_PORTS_END
 
 
 // IRQs 4 & 6 are valid on SH-2
-TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
+TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::interrupt_main)
 {
 	int scanline = param;
 
@@ -3092,7 +3065,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
+TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::interrupt_sub)
 {
 	int scanline = param;
 
@@ -3156,8 +3129,7 @@ uint16_t coolridr_state::get_10bit_data(uint32_t romoffset, int _10bitwordnum)
 
 void coolridr_state::machine_start()
 {
-	m_compressedgfx = memregion( "compressedgfx" )->base();
-	size_t  size    = memregion( "compressedgfx" )->bytes();
+	size_t  size    = m_compressedgfx.length();
 
 	// we're expanding 10bit packed data to 16bits(10 used)
 	m_expanded_10bit_gfx = std::make_unique<uint16_t[]>(((size/10)*16)/2);
@@ -3171,7 +3143,7 @@ void coolridr_state::machine_start()
 	// be referenced this way?!
 	m_rearranged_16bit_gfx = std::make_unique<uint16_t[]>(size/2);
 
-	uint16_t* compressed = (uint16_t*)memregion( "compressedgfx" )->base();
+	uint16_t* compressed = (uint16_t*)&m_compressedgfx[0];
 	int count = 0;
 	for (int i=0;i<size/2/10;i++)
 	{
@@ -3206,25 +3178,13 @@ void coolridr_state::machine_start()
 		}
 	}
 
-	m_h1_vram = make_unique_clear<uint16_t[]>(VRAM_SIZE);
-	m_h1_pcg = make_unique_clear<uint8_t[]>(VRAM_SIZE);
-	m_h1_pal = make_unique_clear<uint16_t[]>(VRAM_SIZE);
-
-	m_cool_render_object_list1 = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
-	m_listcount1 = 0;
-
-	m_cool_render_object_list2 = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
-	m_listcount2 = 0;
-
 	m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 	m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
-	decode[0].current_object = 0;
-	decode[1].current_object = 0;
-	debug_randompal = 9;
+	m_decode[0].current_object = 0;
+	m_decode[1].current_object = 0;
 
-	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_sound_fifo));
 }
 
 void coolridr_state::machine_reset()
@@ -3243,18 +3203,18 @@ WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
-		sound_data |= 0x10;
+		m_sound_data |= 0x10;
 	else
-		sound_data &= ~0x10;
+		m_sound_data &= ~0x10;
 }
 
 WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
-		sound_data |= 0x20;
+		m_sound_data |= 0x20;
 	else
-		sound_data &= ~0x20;
+		m_sound_data &= ~0x20;
 }
 
 #define MAIN_CLOCK XTAL(28'636'363)
@@ -3262,14 +3222,14 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 MHz
 	MCFG_DEVICE_PROGRAM_MAP(system_h1_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, interrupt_main, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("soundcpu", M68000, 22579000/2) // 22.579 MHz XTAL / 2 = 11.2895 MHz
 	MCFG_DEVICE_PROGRAM_MAP(system_h1_sound_map)
 
 	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 MHz
 	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, interrupt_sub, "screen", 0, 1)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3291,17 +3251,17 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
 	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<0>)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
 	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<1>)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -3309,14 +3269,14 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	SPEAKER(config, "rspeaker").front_right();
 
 	scsp_device &scsp1(SCSP(config, "scsp1", 22579000)); // 22.579 MHz XTAL
-	scsp1.set_addrmap(0, &coolridr_state::scsp1_map);
+	scsp1.set_addrmap(0, &coolridr_state::scsp_map<0>);
 	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
 	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
 	scsp1.add_route(0, "lspeaker", 1.0);
 	scsp1.add_route(1, "rspeaker", 1.0);
 
 	scsp_device &scsp2(SCSP(config, "scsp2", 22579000)); // 22.579 MHz XTAL
-	scsp2.set_addrmap(0, &coolridr_state::scsp2_map);
+	scsp2.set_addrmap(0, &coolridr_state::scsp_map<1>);
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
@@ -3442,7 +3402,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 	if(pc == 0x06002cbc || pc == 0x06002d44)
 		return 0;
 
-	return m_sysh1_workram_h[0xd8894/4];
+	return m_workram_h[0xd8894/4];
 }
 
 
@@ -3457,7 +3417,7 @@ READ32_MEMBER(coolridr_state::aquastge_hack_r)
 //      printf("pc %08x\n", pc);
 	}
 
-	return m_sysh1_workram_h[0xc3fd8/4];
+	return m_workram_h[0xc3fd8/4];
 }
 
 
@@ -3471,8 +3431,8 @@ void coolridr_state::init_coolridr()
 	m_colbase = 0x7b20;
 
 	// work around the hack when mapping the workram directly
-	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_sysh1_workram_h[0]);
-	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_sysh1_workram_h[0xd9000/4]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_workram_h[0]);
+	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_workram_h[0xd9000/4]);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, 1, &m_rom[0]);
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }

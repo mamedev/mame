@@ -10,7 +10,7 @@ todo - convert to tilemap
 #include "emu.h"
 #include "includes/funybubl.h"
 
-PALETTE_DECODER_MEMBER(funybubl_state, funybubl_R6B6G6)
+rgb_t funybubl_state::funybubl_R6B6G6(uint32_t raw)
 {
 	return rgb_t(pal6bit(raw >> 12), pal6bit(raw >>  0), pal6bit(raw >>  6));
 }

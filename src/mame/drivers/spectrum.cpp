@@ -687,11 +687,10 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	m_screen->screen_vblank().set(FUNC(spectrum_state::screen_vblank_spectrum));
 	m_screen->set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(palette_init_delegate(FUNC(spectrum_state::palette_init_spectrum), this));
-
+	PALETTE(config, "palette", FUNC(spectrum_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_spectrum);
-	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
+
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

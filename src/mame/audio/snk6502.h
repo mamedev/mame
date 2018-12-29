@@ -115,7 +115,7 @@ protected:
 	required_device<snk6502_sound_device> m_custom;
 
 private:
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	uint8_t m_last_port1;
 };

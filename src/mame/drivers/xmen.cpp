@@ -321,9 +321,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
@@ -334,7 +332,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
 	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -364,9 +362,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -398,7 +394,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	m_k053246->set_screen(m_screen);
 	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 

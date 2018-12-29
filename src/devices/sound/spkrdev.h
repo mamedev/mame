@@ -13,9 +13,6 @@
 #pragma once
 
 
-#define MCFG_SPEAKER_LEVELS(_num, _levels) \
-	downcast<speaker_sound_device &>(*device).set_levels(_num, _levels);
-
 class speaker_sound_device : public device_t,
 								public device_sound_interface
 {
