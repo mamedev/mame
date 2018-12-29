@@ -944,17 +944,16 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wgp)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wgp);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(1);
+	m_tc0100scn->set_tx_region(3);
+	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn->set_palette_tag(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -967,9 +966,9 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("sub")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_subcpu);
+	m_tc0140syt->set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 
@@ -980,10 +979,7 @@ MACHINE_CONFIG_START(wgp_state::wgp2)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(wgp_state, wgp2)
 
-	MCFG_DEVICE_MODIFY("tc0100scn")
-	MCFG_TC0100SCN_OFFSETS(4, 2)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	m_tc0100scn->set_offsets(4, 2);
 MACHINE_CONFIG_END
 
 

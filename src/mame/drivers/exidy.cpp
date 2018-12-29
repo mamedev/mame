@@ -918,11 +918,11 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
 	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
-	MCFG_DEVICE_ADD("soundbd", EXIDY_VENTURE, 0)
-	MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(WRITE8("pia", pia6821_device, portb_w))
-	MCFG_EXIDY_VENTURE_WRITEPB_HANDLER(WRITE8("pia", pia6821_device, porta_w))
-	MCFG_EXIDY_VENTURE_CA2_HANDLER(WRITELINE("pia", pia6821_device, cb1_w))
-	MCFG_EXIDY_VENTURE_CB2_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
+	venture_sound_device &soundbd(EXIDY_VENTURE(config, "soundbd", 0));
+	soundbd.pa_callback().set("pia", FUNC(pia6821_device::portb_w));
+	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
+	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
+	soundbd.cb2_callback().set("pia", FUNC(pia6821_device::ca1_w));
 MACHINE_CONFIG_END
 
 
@@ -954,11 +954,11 @@ MACHINE_CONFIG_START(exidy_state::mtrap)
 	pia.ca2_handler().set("soundbd", FUNC(venture_sound_device::cb_w));
 	pia.cb2_handler().set("soundbd", FUNC(venture_sound_device::ca_w));
 
-	MCFG_DEVICE_ADD("soundbd", EXIDY_MTRAP, 0)
-	MCFG_EXIDY_VENTURE_WRITEPA_HANDLER(WRITE8("pia", pia6821_device, portb_w))
-	MCFG_EXIDY_VENTURE_WRITEPB_HANDLER(WRITE8("pia", pia6821_device, porta_w))
-	MCFG_EXIDY_VENTURE_CA2_HANDLER(WRITELINE("pia", pia6821_device, cb1_w))
-	MCFG_EXIDY_VENTURE_CB2_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
+	mtrap_sound_device &soundbd(EXIDY_MTRAP(config, "soundbd", 0));
+	soundbd.pa_callback().set("pia", FUNC(pia6821_device::portb_w));
+	soundbd.pb_callback().set("pia", FUNC(pia6821_device::porta_w));
+	soundbd.ca2_callback().set("pia", FUNC(pia6821_device::cb1_w));
+	soundbd.cb2_callback().set("pia", FUNC(pia6821_device::ca1_w));
 MACHINE_CONFIG_END
 
 

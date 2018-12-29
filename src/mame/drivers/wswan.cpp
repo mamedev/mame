@@ -90,22 +90,22 @@ static GFXDECODE_START( gfx_wswan )
 GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
-PALETTE_INIT_MEMBER(wswan_state, wswan)
+void wswan_state::wswan_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 16; i++)
 	{
-		uint8_t shade = i * (256 / 16);
+		uint8_t const shade = i * (256 / 16);
 		palette.set_pen_color(15 - i, shade, shade, shade);
 	}
 }
 
-PALETTE_INIT_MEMBER(wscolor_state, wscolor)
+void wscolor_state::wscolor_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4096; i++)
 	{
-		int r = (i & 0x0f00) >> 8;
-		int g = (i & 0x00f0) >> 4;
-		int b = i & 0x000f;
+		int const r = (i & 0x0f00) >> 8;
+		int const g = (i & 0x00f0) >> 4;
+		int const b = i & 0x000f;
 		palette.set_pen_color(i, r << 4, g << 4, b << 4);
 	}
 }
@@ -123,10 +123,10 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_DEVICE_PROGRAM_MAP(wswan_mem)
 	MCFG_DEVICE_IO_MAP(wswan_io)
 
-	MCFG_DEVICE_ADD(m_vdp, WSWAN_VIDEO, 0)
-	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSWAN)
-	MCFG_WSWAN_VIDEO_IRQ_CB(wswan_state, set_irq_line)
-	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
+	WSWAN_VIDEO(config, m_vdp, 0);
+	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
+	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line), this);
+	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb), this);
 
 	MCFG_SCREEN_ADD("screen", LCD)
 //  MCFG_SCREEN_REFRESH_RATE(75)
@@ -144,8 +144,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wswan)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
+	PALETTE(config, "palette", FUNC(wswan_state::wswan_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -171,12 +170,11 @@ MACHINE_CONFIG_START(wscolor_state::wscolor)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wscolor_mem)
 
-	MCFG_DEVICE_MODIFY("vdp")
-	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSC)
+	m_vdp->set_vdp_type(VDP_TYPE_WSC);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4096)
-	MCFG_PALETTE_INIT_OWNER(wscolor_state, wscolor)
+	auto &palette(*subdevice<palette_device>("palette"));
+	palette.set_entries(4096);
+	palette.set_init(FUNC(wscolor_state::wscolor_palette));
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")

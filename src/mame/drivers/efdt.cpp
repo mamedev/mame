@@ -157,9 +157,9 @@
 
 **********************************************************************************/
 
-
 #include "emu.h"
 #include "includes/efdt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
@@ -179,21 +179,19 @@
 *               Video Hardware               *
 *********************************************/
 
-PALETTE_INIT_MEMBER(efdt_state, efdt)
+void efdt_state::efdt_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("prom")->base();
+	uint8_t const *const color_prom = memregion("prom")->base();
 
 	for (int i = 0; i < 256; ++i)
 	{
-		uint8_t r, g, b;
+		uint8_t const v = color_prom[i];
 
-		uint8_t v = color_prom[i];
+		uint8_t const g = (v & 7) << 5;
+		uint8_t const r = ((v >> 3) & 7) << 5;
+		uint8_t const b = ((v >> 6) & 3) << 6;
 
-		g = (v & 7) << 5;
-		r = ((v >> 3) & 7) << 5;
-		b = ((v >> 6) & 3) << 6;
-
-		if((i & 7) == 0)
+		if ((i & 7) == 0)
 			palette.set_pen_color(i, 0);
 		else
 			palette.set_pen_color(i, rgb_t(r, g, b));
@@ -221,7 +219,7 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
 	SET_TILE_INFO_MEMBER(1, code, 0x1c, 0);
 }
 
-VIDEO_START_MEMBER(efdt_state, efdt)
+void efdt_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_0), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_1), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -570,14 +568,11 @@ MACHINE_CONFIG_START( efdt_state::efdt )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8 - 1, 16, 30*8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(efdt_state, screen_update_efdt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, efdt_state, vblank_nmi_w))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_efdt)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(efdt_state, efdt)
-
-	MCFG_VIDEO_START_OVERRIDE(efdt_state, efdt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_efdt);
+	PALETTE(config, m_palette, FUNC(efdt_state::efdt_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

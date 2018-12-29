@@ -41,13 +41,13 @@ void gaelco_wrally_sprites_device::device_reset()
       0  | x------- -------- | flipy
 
       1  | xxxxxxxx xxxxxxxx | unknown
-      
-	  2  | ------xx xxxxxxxx | x position
-      2  | --xxxx-- -------- | sprite color (low 4 bits)  
-	  2  | -x------ -------- | shadows/highlights (see below)
+
+      2  | ------xx xxxxxxxx | x position
+      2  | --xxxx-- -------- | sprite color (low 4 bits)
+      2  | -x------ -------- | shadows/highlights (see below)
       2  | x------- -------- | not used?
-      
-	  3  | --xxxxxx xxxxxxxx | sprite code
+
+      3  | --xxxxxx xxxxxxxx | sprite code
       3  | xx------ -------- | not used?
 
     For shadows/highlights, the tile color below the sprite will be set using a
@@ -133,7 +133,7 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 
 					// if there's already a sprite pixel use the existing priority value? (or you get a glitch against the start line arch at the start of a night stage) possibly because existing priority scheme is bogus?
 					// this causes a slight shadow of your car to be visible as you pass through the arch instead, but looking at 14:01 in this video seems to show the same on a PCB https://www.youtube.com/watch?v=vZUUK8c-GZ0
-					if (src_color != 0) 
+					if (src_color != 0)
 					{
 						*pixel = src_color |= ((gfx_pen - 8) << 12) | 0x200;
 					}
@@ -167,7 +167,7 @@ void gaelco_wrally_sprites_device::mix_sprites(bitmap_ind16 &bitmap, const recta
 				if (pridat == priority)
 				{
 					const int shadow = (spriteptr[x] & 0x200) >> 9;
-					
+
 					if (!shadow)
 					{
 						const uint16_t pendat = (spriteptr[x] & 0xff);

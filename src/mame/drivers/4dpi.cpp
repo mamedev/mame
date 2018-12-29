@@ -13,11 +13,11 @@
         R2000:
             NYI
 
-	Year  Model  Board  CPU    Clock    I/D Cache
-	1988  4D/20  IP6    R2000  12.5MHz  16KiB/8KiB
-	      4D/25  IP10   R3000  20MHz    64KiB/32KiB
-	      4D/30  IP14   R3000  30MHz
-	1991  4D/35  IP12   R3000  36MHz
+    Year  Model  Board  CPU    Clock    I/D Cache
+    1988  4D/20  IP6    R2000  12.5MHz  16KiB/8KiB
+          4D/25  IP10   R3000  20MHz    64KiB/32KiB
+          4D/30  IP14   R3000  30MHz
+    1991  4D/35  IP12   R3000  36MHz
 
 ****************************************************************************/
 

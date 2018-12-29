@@ -13,7 +13,8 @@
         - Bt478 RAMDAC
         - MC6805 keyboard and NVRAM handler
 
-        68020 IRQs: 2 = keyboard, 3 = LANCE, 4 = DUART, 5 = vblank
+        68020 IRQs: 1 = software-triggered IRQ, 2 = keyboard, 3 = LANCE, 4 = DUART, 5 = vblank
+        68000     : 1 = DUART, 2 = keyboard, 3 = LANCE, 7 = vblank
 
         6805 port assignments:
         A0 - I/O - PS/2 connector DATA
@@ -47,46 +48,63 @@
 class ncd_020_state : public driver_device
 {
 public:
-	ncd_020_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ncd_020_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
+		m_vram(*this, "vram"),
+		m_mainram16(*this, "mainram16"),
+		m_vram16(*this, "vram16"),
 		m_duart(*this, "duart"),
 		m_lance(*this, "am79c90")
 	{
 	}
 
+	void ncd_16(machine_config &config);
 	void ncd_17c(machine_config &config);
-	void ncd_17c_map(address_map &map);
 	void ncd_19(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void ncd_16_map(address_map &map);
+	void ncd_17c_map(address_map &map);
 	void ncd_19_map(address_map &map);
 	void ncd_mcu_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(lance_irq_w);
 	DECLARE_READ16_MEMBER(lance_dma_r);
 	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	DECLARE_READ16_MEMBER(lance19_dma_r);
+	DECLARE_WRITE16_MEMBER(lance19_dma_w);
+	DECLARE_READ16_MEMBER(lance16_dma_r);
+	DECLARE_WRITE16_MEMBER(lance16_dma_w);
 	DECLARE_WRITE32_MEMBER(bt478_palette_w);
 	DECLARE_READ32_MEMBER(from_mcu_r);
 	DECLARE_WRITE32_MEMBER(to_mcu_w);
+	DECLARE_READ16_MEMBER(from_mcu16_r);
+	DECLARE_WRITE16_MEMBER(to_mcu16_w);
 	DECLARE_READ32_MEMBER(mcu_status_r);
-	DECLARE_WRITE32_MEMBER(mcu_irq_w);
+	DECLARE_WRITE32_MEMBER(irq_w);
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_READ8_MEMBER(mcu_ports_r);
 	DECLARE_WRITE8_MEMBER(mcu_ports_w);
 
-private:
-	virtual void machine_reset() override;
-
-	required_device<m68020_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<m6805_device> m_mcu;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<uint32_t> m_mainram;
+	optional_shared_ptr<uint32_t> m_mainram;
+	optional_shared_ptr<uint32_t> m_vram;
+	optional_shared_ptr<uint16_t> m_mainram16;
+	optional_shared_ptr<uint16_t> m_vram16;
 	required_device<scn2681_device> m_duart;
 	required_device<am7990_device> m_lance;
 
@@ -138,14 +156,14 @@ uint32_t ncd_020_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	uint32_t *scanline;
 	int x, y;
 	uint8_t pixels;
-	uint8_t *m_vram = (uint8_t *)m_mainram.target();
+	uint8_t *vram = (uint8_t *)m_mainram.target();
 
 	for (y = 0; y < 768; y++)
 	{
 		scanline = &bitmap.pix32(y);
 		for (x = 0; x < 1024; x++)
 		{
-			pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+			pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 			*scanline++ = m_palette[pixels];
 		}
 	}
@@ -155,30 +173,40 @@ uint32_t ncd_020_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 uint32_t ncd_020_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *m_vram = (uint8_t *)m_mainram.target();
+	static constexpr uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t const *const vram = (uint8_t *)m_vram.target();
 
-	for (y = 0; y < 1024; y++)
+	for (int y = 0; y < 1024; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1024/8; x++)
+		uint32_t *scanline = &bitmap.pix32(y);
+		for (int x = 0; x < 1024/8; x++)
 		{
-			pixels = m_vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
 
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
+			for (int b = 0; b < 8; b++)
+				*scanline++ = palette[BIT(pixels, 7 - b)];
 		}
 	}
 
+	return 0;
+}
+
+uint32_t ncd_020_state::screen_update_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	static constexpr uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t const *const vram = (uint8_t *)m_vram16.target();
+
+	for (int y = 0; y < 1024; y++)
+	{
+		uint32_t *scanline = &bitmap.pix32(y);
+		for (int x = 0; x < 1024/8; x++)
+		{
+			uint8_t const pixels = vram[(y * (1024/8)) + (x^1)];
+
+			for (int b = 0; b < 8; b++)
+				*scanline++ = palette[BIT(pixels, 7 - b)];
+		}
+	}
 	return 0;
 }
 
@@ -188,7 +216,7 @@ void ncd_020_state::ncd_17c_map(address_map &map)
 	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_020_state::from_mcu_r), FUNC(ncd_020_state::to_mcu_w));
 	map(0x001c8000, 0x001c803f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
 	map(0x001d0000, 0x001d0003).w(FUNC(ncd_020_state::bt478_palette_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::mcu_irq_w));
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::irq_w));
 	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
 	map(0x01000000, 0x02ffffff).ram();
 	map(0x03000000, 0x03ffffff).ram().share("mainram");
@@ -198,11 +226,21 @@ void ncd_020_state::ncd_19_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
 	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_020_state::from_mcu_r), FUNC(ncd_020_state::to_mcu_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::mcu_irq_w));
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::irq_w));
 	map(0x001e0000, 0x001e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
 	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
-	map(0x00400000, 0x0043ffff).ram().share("mainram");
-	map(0x00800000, 0x00ffffff).ram();
+	map(0x00400000, 0x0043ffff).ram().share("vram");
+	map(0x00800000, 0x00ffffff).ram().share("mainram");
+}
+
+void ncd_020_state::ncd_16_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom().region("maincpu", 0);
+	//map(0x0c0000, 0x0c0001).rw(FUNC(ncd_020_state::from_mcu16_r), FUNC(ncd_020_state::to_mcu16_w));
+	map(0x0e0000, 0x0e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
+	map(0x100000, 0x100003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+	map(0x200000, 0x21ffff).ram().share("vram16");
+	map(0x380000, 0x5fffff).ram().share("mainram16");
 }
 
 READ8_MEMBER(ncd_020_state::mcu_ports_r)
@@ -251,7 +289,7 @@ WRITE8_MEMBER(ncd_020_state::mcu_ports_w)
 			//if (data != m_porta) printf("%02x to port A\n", data);
 			if ((data & 0x40) && !(m_porta & 0x40))
 			{
-				//printf("Promoting portB %02x to 020\n", m_portb);
+				//printf("Sending %02x to 020\n", m_portb);
 				m_to020 = m_portb;
 				m_unread_to020 = true;
 				m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
@@ -272,6 +310,7 @@ WRITE8_MEMBER(ncd_020_state::mcu_ports_w)
 
 READ32_MEMBER(ncd_020_state::from_mcu_r)
 {
+	//printf("020 read %02x\n", m_to020);
 	m_unread_to020 = false;
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 	return m_to020<<24;
@@ -282,6 +321,23 @@ WRITE32_MEMBER(ncd_020_state::to_mcu_w)
 	//printf("Sending %02x to MCU\n", data);
 	m_from020 = data>>24;
 	m_unread_from020 = true;
+	m_maincpu->yield();
+}
+
+READ16_MEMBER(ncd_020_state::from_mcu16_r)
+{
+	//printf("68k read %02x\n", m_to020);
+	m_unread_to020 = false;
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+	return m_to020;
+}
+
+WRITE16_MEMBER(ncd_020_state::to_mcu16_w)
+{
+	//printf("Sending %02x to MCU\n", data);
+	m_from020 = data&0xff;
+	m_unread_from020 = true;
+	m_maincpu->yield();
 }
 
 READ32_MEMBER(ncd_020_state::mcu_status_r)
@@ -299,8 +355,16 @@ READ32_MEMBER(ncd_020_state::mcu_status_r)
 	return rv;
 }
 
-WRITE32_MEMBER(ncd_020_state::mcu_irq_w)
+WRITE32_MEMBER(ncd_020_state::irq_w)
 {
+	if (data & 0x80000000)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	}
 }
 
 void ncd_020_state::ncd_mcu_map(address_map &map)
@@ -324,8 +388,6 @@ WRITE_LINE_MEMBER(ncd_020_state::lance_irq_w)
 
 READ16_MEMBER(ncd_020_state::lance_dma_r)
 {
-	// FIXME: ncd19 lance is trying to access 0x80xxxx-0xfxxxxx, which is
-	// not the "mainram" and therefore hates R.Belmont :)
 	u32 const data = m_mainram.target()[offset >> 2];
 
 	return (offset & 2) ? u16(data) : u16(data >> 16);
@@ -339,6 +401,61 @@ WRITE16_MEMBER(ncd_020_state::lance_dma_w)
 		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
 	else
 		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
+}
+
+READ16_MEMBER(ncd_020_state::lance19_dma_r)
+{
+	if (offset < 0x800000)
+	{
+		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+	}
+
+	offset &= 0x7fffff;
+	u32 const data = m_mainram.target()[offset >> 2];
+
+	return (offset & 2) ? u16(data) : u16(data >> 16);
+}
+
+WRITE16_MEMBER(ncd_020_state::lance19_dma_w)
+{
+	if (offset < 0x800000)
+	{
+		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+	}
+
+	offset &= 0x7fffff;
+	u32 const existing = m_mainram.target()[offset >> 2];
+
+	if (offset & 2)
+		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
+	else
+		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
+}
+
+READ16_MEMBER(ncd_020_state::lance16_dma_r)
+{
+	//printf("lance16_r @ %x\n", offset);
+	if (offset < 0x380000)
+	{
+		logerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+		return 0;
+	}
+
+	offset -= 0x380000;
+	return m_mainram16.target()[offset>>1];
+}
+
+WRITE16_MEMBER(ncd_020_state::lance16_dma_w)
+{
+	//printf("lance16_w: %04x @ %x\n", data, offset);
+	if (offset < 0x380000)
+	{
+		logerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+		return;
+	}
+
+	offset -= 0x380000;
+	COMBINE_DATA(&m_mainram16.target()[offset>>1]);
 }
 
 WRITE32_MEMBER(ncd_020_state::bt478_palette_w)
@@ -418,14 +535,39 @@ void ncd_020_state::ncd_19(machine_config &config)
 
 	AM7990(config, m_lance);
 	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
-	m_lance->dma_in().set(FUNC(ncd_020_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(ncd_020_state::lance_dma_w));
+	m_lance->dma_in().set(FUNC(ncd_020_state::lance19_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_020_state::lance19_dma_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(72);
 	m_screen->set_visarea(0, 1280-1, 0, 1024-1);
 	m_screen->set_size(1400, 1152);
 	m_screen->set_screen_update(FUNC(ncd_020_state::screen_update_19));
+}
+
+void ncd_020_state::ncd_16(machine_config &config)
+{
+	/* basic machine hardware */
+	M68000(config, m_maincpu, 12500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_16_map);
+	m_maincpu->set_periodic_int(FUNC(ncd_020_state::vblank), attotime::from_hz(72));
+
+	M6805(config, m_mcu, 3.6864_MHz_XTAL);  // MC68705P2
+	m_mcu->set_addrmap(AS_PROGRAM, &ncd_020_state::ncd_mcu_map);
+
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set(FUNC(ncd_020_state::duart_irq_handler));
+
+	AM7990(config, m_lance);
+	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
+	m_lance->dma_in().set(FUNC(ncd_020_state::lance16_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_020_state::lance16_dma_w));
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(72);
+	m_screen->set_visarea(0, 1024-1, 0, 1024-1);
+	m_screen->set_size(1280, 1152);
+	m_screen->set_screen_update(FUNC(ncd_020_state::screen_update_16));
 }
 
 static INPUT_PORTS_START( ncd_17c )
@@ -459,6 +601,23 @@ ROM_START( ncd19 )
 	ROM_LOAD( "ncd4200005.bin", 0x000000, 0x000800, CRC(075c3746) SHA1(6954cfab5141138df975f1b15d2c8e08d4d203c1) )
 ROM_END
 
+ROM_START( ncd16 )
+	ROM_REGION16_BE(0xc0000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "b0e.bin",      0x000000, 0x020000, CRC(8996f939) SHA1(8d6c5649fa927ee16b8632c2f2949997014346d0) )
+	ROM_LOAD16_BYTE( "b0o.bin",      0x000001, 0x020000, CRC(3143e82c) SHA1(37b917304705a450b3272945d4cff851afb97dbe) )
+	ROM_LOAD16_BYTE( "b1e.bin",      0x040000, 0x020000, CRC(82712624) SHA1(7e2ff025bf4e9638bdd58b99dc4dabd86c0d21ee) )
+	ROM_LOAD16_BYTE( "b1o.bin",      0x040001, 0x020000, CRC(432aaa02) SHA1(960291a9b692449e4e787b88528c83a37b3562f2) )
+	ROM_LOAD16_BYTE( "b2e.bin",      0x080000, 0x020000, CRC(290116df) SHA1(1042764eb5f308046c0f019f31df457d360c9db1) )
+	ROM_LOAD16_BYTE( "b2o.bin",      0x080001, 0x020000, CRC(2b364281) SHA1(63c2b3093eee6d40f405ead911843ebeb5193b7a) )
+
+	ROM_REGION(0x80, "eeprom", 0)
+	ROM_LOAD( "eepr_96c43.bin", 0x000000, 0x000080, CRC(656c8444) SHA1(162a71e2d91a104f4251beb17a4a53f24d1e5e03) )
+
+	ROM_REGION(0x800, "mcu", 0)
+	ROM_LOAD( "4903001_v2.00_key_scan_68705p3.bin", 0x000000, 0x000800, CRC(acec6140) SHA1(003a27cb22652d37b3be05d4ad4e924fc6c5c8de) )
+ROM_END
+
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT               COMPANY                 FULLNAME           FLAGS
-COMP( 1990, ncd17c, 0,      0,      ncd_17c, ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD-17C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-COMP( 1990, ncd19,  0,      0,      ncd_19,  ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD-19", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1989, ncd16,  0,      0,      ncd_16,  ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD 16", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1990, ncd17c, 0,      0,      ncd_17c, ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD 17C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1990, ncd19,  0,      0,      ncd_19,  ncd_17c, ncd_020_state,  empty_init,   "Network Computing Devices", "NCD 19", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

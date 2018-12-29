@@ -37,11 +37,11 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag),
-	m_prev_cia1_porta(0xff),
-	m_parallel_data(0xff),
-	m_ppi(*this, "ppi")
+	upscope_state(const machine_config &mconfig, device_type type, const char *tag) :
+		amiga_state(mconfig, type, tag),
+		m_prev_cia1_porta(0xff),
+		m_parallel_data(0xff),
+		m_ppi(*this, "ppi")
 	{ }
 
 	void upscope(machine_config &config);
@@ -278,8 +278,7 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(upscope_state,amiga)
+	PALETTE(config, m_palette, FUNC(upscope_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 

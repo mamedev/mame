@@ -524,6 +524,17 @@ public:
 	   updating is complete, end_update() */
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	template <typename T, typename U>
+	static void add_pal_screen(machine_config &config, T &&screen_tag, U &&mc_tag)
+	{
+		screen_device &screen(SCREEN(config, std::forward<T>(screen_tag), SCREEN_TYPE_RASTER));
+		screen.set_screen_update(std::forward<U>(mc_tag), FUNC(mc6847_base_device::screen_update));
+		screen.set_refresh_hz(50);
+		screen.set_size(320, 243);
+		screen.set_visarea(0, 320-1, 1, 241-1);
+		screen.set_vblank_time(0);
+	}
+
 	// mode changing operations
 	DECLARE_WRITE_LINE_MEMBER( ag_w )       { change_mode(MODE_AG, state); }
 	DECLARE_WRITE_LINE_MEMBER( gm2_w )      { change_mode(MODE_GM2, state); }

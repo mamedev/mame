@@ -253,7 +253,7 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_SCREEN_SIZE(720, 351)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 351-1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_att4425)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	// ch.3 -- timer?
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(32'000'000))); // XXX;

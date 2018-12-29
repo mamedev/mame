@@ -68,7 +68,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(darkmist);
+	void darkmist_palette(palette_device &palette) const;
 
 	bitmap_ind16 m_temp_bitmap;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -483,9 +483,8 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radio86)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(radio86_state,radio86)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_radio86);
+	PALETTE(config, m_palette, FUNC(radio86_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);

@@ -19,17 +19,18 @@ similar hardware.
 class drtomy_state : public driver_device
 {
 public:
-	drtomy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	drtomy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram_fg(*this, "videorafg"),
 		m_videoram_bg(*this, "videorabg"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
-		void drtomy(machine_config &config);
+	void drtomy(machine_config &config);
 
 private:
 	/* memory pointers */
@@ -320,12 +321,10 @@ MACHINE_CONFIG_START(drtomy_state::drtomy)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drtomy)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drtomy);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_gc" description="Takara e-kara G-xx / GCxxxx- series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	Japanese cart listing (by G code)  (G-x on cartridge / box, GC in cart identifier code)
+
+	These are for use with 2 different units
+	1. e-Kara
+	2. Blue thing with 4 buttons on it (see note in D series)
+
+	G-1   GC0001-BAT  BAT Volume 1 (Artist Selection?)
+	G-2  *GC0002-BHT  BHT Volume 1 (Best Artists?)
+	G-3   GC0003-BAT  BAT Volume 2 (Artist Selection?)
+	G-4   GC0004-BHT  BHT Volume 2 (Best Artists?)
+	G-5   GC0005-     TV Pop Volume 1
+	G-6  *GC0006-BHT  BHT Volume 3 (Best Artists?)
+	G-7   GC0007-BAT  BAT Volume 3 (Artist Selection?)
+	G-8   GC0008-MIN? untranslated (no volume)
+	G-9   GC0009-     TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
+	G-10  GC0010-     BAT Volume 4 (Artist Selection?)
+	G-11  GC0011-     TV Pop Volume 4
+	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
+	G-13  GC0013-     (unknown) Volume 6
+	G-14  GC0014-     (unknown) Volume 2
+	G-15  GC0015-     (unknown) Volume 5
+	G-16  GC0016-     (unknown)
+	G-17  GC0017-     TV Pop Volume 6
+
+	(more? what's the G highest number?)
+
+	-->
+
+	<software name="gc0002">
+		<description>BHT Volume 1 (Japan) (GC0002-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gc0006">
+		<description>BHT Volume 3 (Japan) (GC0006-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0006-bht.u1" size="0x100000" crc="76bbefae" sha1="a2a41f58b5750fafa92d6e3094562dd05a5d9029" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

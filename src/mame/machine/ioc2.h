@@ -142,8 +142,8 @@ protected:
 		FRONT_PANEL_VOL_UP_HOLD      = 0x80,
 
 		FRONT_PANEL_INT_MASK         = FRONT_PANEL_POWER_BUTTON_INT |
-                                       FRONT_PANEL_VOL_DOWN_INT |
-                                       FRONT_PANEL_VOL_UP_INT
+									   FRONT_PANEL_VOL_DOWN_INT |
+									   FRONT_PANEL_VOL_UP_INT
 	};
 
 	enum

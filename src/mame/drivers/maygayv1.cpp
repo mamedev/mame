@@ -882,12 +882,12 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("soundcpu", I8052, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
-	MCFG_DEVICE_DATA_MAP(sound_data)
-	MCFG_DEVICE_IO_MAP(sound_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, maygayv1_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, maygayv1_state, data_to_i8031))
+	I8052(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &maygayv1_state::sound_prg);
+	m_soundcpu->set_addrmap(AS_DATA, &maygayv1_state::sound_data);
+	m_soundcpu->set_addrmap(AS_IO, &maygayv1_state::sound_io);
+	m_soundcpu->serial_tx_cb().set(FUNC(maygayv1_state::data_from_i8031));
+	m_soundcpu->serial_rx_cb().set(FUNC(maygayv1_state::data_to_i8031));
 
 	/* U25 ST 2 9148 EF68B21P */
 	pia6821_device &pia(PIA6821(config, "pia", 0));

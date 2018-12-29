@@ -349,35 +349,33 @@ void simpbowl_state::machine_start()
 
 void konamigv_state::cdrom_config(device_t *device)
 {
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
-MACHINE_CONFIG_START(konamigv_state::konamigv)
+void konamigv_state::konamigv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( konamigv_map )
+	CXD8530BQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigv_state::konamigv_map);
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this));
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
-
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this ) )
-
-	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
+	MB89371(config, "mb89371", 0);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	AM53CF96(config, m_am53cf96, 0);
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8514Q(config, "gpu", XTAL(53'693'175), 0x100000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
@@ -385,10 +383,10 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.75 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.75 )
-MACHINE_CONFIG_END
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
+	spu.add_route(0, "lspeaker", 0.75);
+	spu.add_route(1, "rspeaker", 0.75);
+}
 
 
 static INPUT_PORTS_START( konamigv )

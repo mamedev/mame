@@ -15,14 +15,12 @@
 #define ENV_DIR_DOWN            0
 #define ENV_DIR_UP              1
 
-#define MCFG_CMI01A_IRQ_CALLBACK(_devcb) \
-	downcast<cmi01a_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 class cmi01a_device : public device_t, public device_sound_interface {
 public:
 	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_irq_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );

@@ -11,14 +11,14 @@ CPUs    :   2 x 8086? / V20 + 8088
 Sound   :   YM2151 [+ DAC] / 4 x MSM5205
 Video   :   2 x I.G.1BB 48844758V
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 Year + Game             Main CPU    Sound CPU    Sound            Video
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
 >=1987  Born To Fight   V20         8088         4 x MSM5205      2 x I.G.1BB 48844758V
 >=1987  Fantasy Land    8086?       8086?        YM2151 + DAC     ?
 1988?   Wheels Runner   V20         Z80          YM3526 + ?       2 x PLCC84 FPGA
-1989    Galaxy Gunners  8086?       8086?        YM2151           ?
-----------------------------------------------------------------------------------------
+1989    Galaxy Gunners  8088        V20          YM2151           2 x I.G.1BB 48844758V (labeled "INGA 1" and "INGA 2")
+------------------------------------------------------------------------------------------------------------------------
 
 [fantland, galaxygn]
 
@@ -510,10 +510,10 @@ static INPUT_PORTS_START( galaxygn )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  // Demo Sounds? doesn't work
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  // "Demo Sounds" according to the Test Mode, but it doesn't work
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  // Allow Continue? doesn't work
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  // "Allow Continue" according to the Test Mode, but it doesn't work
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )
@@ -829,12 +829,11 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -857,10 +856,10 @@ WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 MACHINE_CONFIG_START(fantland_state::galaxygn)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)        // ?
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(16'000'000) / 2) // AMD P8088-2
 	MCFG_DEVICE_PROGRAM_MAP(galaxygn_map)
 
-	MCFG_DEVICE_ADD("audiocpu", I8088, 8000000)        // ?
+	MCFG_DEVICE_ADD("audiocpu", V20, XTAL(7'995'500)) // NEC D70108C-8
 	MCFG_DEVICE_PROGRAM_MAP(fantland_sound_map)
 	MCFG_DEVICE_IO_MAP(galaxygn_sound_iomap)
 	// IRQ by YM2151, NMI when soundlatch is written
@@ -872,12 +871,11 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -949,12 +947,11 @@ MACHINE_CONFIG_START(borntofi_state::borntofi)
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(borntofi_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, borntofi_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1001,12 +998,11 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_SIZE(256,224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1148,6 +1144,70 @@ ROM_START( galaxygn )
 	ROMX_LOAD( "gg46.bin", 0x180001, 0x10000, CRC(5f1bf8ad) SHA1(b831ea433ff008377b522a3be4666d6d1b86cbb4) , ROM_SKIP(2) )
 	ROMX_LOAD( "gg30.bin", 0x180002, 0x10000, CRC(ded7cacf) SHA1(adbfaa8f46e5ce8df264d5b5a201d75ca2b3dbeb) , ROM_SKIP(2) )
 ROM_END
+
+ROM_START( galaxygnh )
+	ROM_REGION( 0x80000, "maincpu", 0 )   // Main CPU
+	ROM_LOAD( "3_en_a.bin", 0x10000, 0x10000, CRC(9e469189) SHA1(07e5d36ca9665bdd13e3bb4241d34b9042371b79) )
+	ROM_LOAD( "2_eo_a.bin", 0x20000, 0x10000, CRC(9d893ea5) SHA1(a84effb2dde9895de79d84243e337d3d052a7c83) ) // Just two bytes differs from the older set, to change the year from 1989 to 1990 (offsets 80C0 and 80C1)
+	ROM_LOAD( "1_eq_a.bin", 0x70000, 0x10000, CRC(ad0e5b29) SHA1(f9a7ebce9f47a009af213e4e10811bb1c26f891a) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound CPU
+	ROM_LOAD( "31_u10_b.bin", 0xc0000, 0x10000, CRC(f5c65a85) SHA1(a094fa9531ea4e68ec0a448568e7d4b2307c8185) )
+	ROM_COPY( "audiocpu", 0xc0000, 0xd0000, 0x10000 )
+	ROM_COPY( "audiocpu", 0xc0000, 0xe0000, 0x10000 )
+	ROM_COPY( "audiocpu", 0xc0000, 0xf0000, 0x10000 )
+
+	ROM_REGION( 0x1b0000, "gfx1", 0 )     // Sprites
+	ROMX_LOAD( "4_ck0_b.bin",  0x000000, 0x10000, CRC(b3621119) SHA1(66ade772077e57f872ef1c8f45e244f4006023f0) , ROM_SKIP(2) )
+	ROMX_LOAD( "13_cj0_b.bin", 0x000001, 0x10000, CRC(52b70f3e) SHA1(65f11d5700337d6d9b6325ff70c86d076e1bdc26) , ROM_SKIP(2) )
+	ROMX_LOAD( "22_ci0_b.bin", 0x000002, 0x10000, BAD_DUMP CRC(ea49fee4) SHA1(29ae3e5dfade421a5e97efe5be1cb17862fdcea1) , ROM_SKIP(2) ) // Bad on this set, taken from the older set
+	ROMX_LOAD( "5_ck1_b.bin",  0x030000, 0x10000, CRC(bffe278f) SHA1(b8077794c4af5aa13ea6f231988e698c1bf229bd) , ROM_SKIP(2) )
+	ROMX_LOAD( "14_cj1_b.bin", 0x030001, 0x10000, CRC(3f7df1e6) SHA1(c1ef3a2f7aaf2e7e850c884dc5d3c1f1545a2526) , ROM_SKIP(2) )
+	ROMX_LOAD( "23_ci1_b.bin", 0x030002, 0x10000, CRC(4dcbbc99) SHA1(57ba915043a2c3867bb28875a0d0bc3f81ae69d5) , ROM_SKIP(2) )
+	ROMX_LOAD( "6_ck2_b.bin",  0x060000, 0x10000, CRC(0306069e) SHA1(e10b142a23a93caac0b505d59b6d5d6a4e195d4b) , ROM_SKIP(2) )
+	ROMX_LOAD( "15_cj2_b.bin", 0x060001, 0x10000, CRC(f635aa7e) SHA1(3e5ce1c3b25cb2c0387ae5dfe650040ccc353d8a) , ROM_SKIP(2) )
+	ROMX_LOAD( "24_ci2_b.bin", 0x060002, 0x10000, CRC(733f5dcf) SHA1(e516537dcb3f18da2af307ffded3ee7914e28e20) , ROM_SKIP(2) )
+	ROMX_LOAD( "7_ck3_b.bin",  0x090000, 0x10000, CRC(c3919bef) SHA1(1eebe888135c51c053d689fda3031769f1efa70a) , ROM_SKIP(2) )
+	ROMX_LOAD( "16_cj3_b.bin", 0x090001, 0x10000, CRC(ff9a3872) SHA1(b16df400190a8089ed603eb2e8ff78266e2ac1ba) , ROM_SKIP(2) ) // Different from the older set (just one byte at offset F28F)
+	ROMX_LOAD( "25_ci3_b.bin", 0x090002, 0x10000, CRC(1d094f95) SHA1(bcb654c7edd8eec9a655261ebc7c812144d4ff6d) , ROM_SKIP(2) )
+	ROMX_LOAD( "8_ck4_b.bin",  0x0c0000, 0x10000, CRC(4a459cb8) SHA1(e17de49c56d91942a274206d005dd7bf0f074a7f) , ROM_SKIP(2) )
+	ROMX_LOAD( "17_cj4_b.bin", 0x0c0001, 0x10000, CRC(ae7a8e1e) SHA1(8714d2b58a26138a9644f9117fcdd89256135a98) , ROM_SKIP(2) )
+	ROMX_LOAD( "26_ci4_b.bin", 0x0c0002, 0x10000, CRC(c2f310b4) SHA1(510e3bc773456b69609c4e29583753f21dac6165) , ROM_SKIP(2) )
+	ROMX_LOAD( "9_ck5_b.bin",  0x0f0000, 0x10000, CRC(c8d4fbc2) SHA1(f8e9e7d31fa4c7920a3db36295999ef0ee86dbe9) , ROM_SKIP(2) )
+	ROMX_LOAD( "18_cj5_b.bin", 0x0f0001, 0x10000, CRC(74d3a0df) SHA1(c8d611c969898f135a254ea53b465305715625c6) , ROM_SKIP(2) )
+	ROMX_LOAD( "27_ci5_b.bin", 0x0f0002, 0x10000, CRC(c2cfd3f9) SHA1(8c2ad28aa64a124d3c97fde804bf167378ba4c20) , ROM_SKIP(2) )
+	ROMX_LOAD( "10_ck6_b.bin", 0x120000, 0x10000, CRC(6e32b549) SHA1(541860ad2f2b197fdf3877d8aeded0609ccb7fb0) , ROM_SKIP(2) )
+	ROMX_LOAD( "19_cj6_b.bin", 0x120001, 0x10000, CRC(fcda6efa) SHA1(b4eb575dee8f78c4f0d3ae26204315924d4ce9bd) , ROM_SKIP(2) )
+	ROMX_LOAD( "28_ci6_b.bin", 0x120002, 0x10000, CRC(4d4fc01c) SHA1(1ab5186ac440dc004140d5a8bf19df521b60e62d) , ROM_SKIP(2) )
+	ROMX_LOAD( "11_ck7_b.bin", 0x150000, 0x10000, CRC(177a767a) SHA1(09e2883eaefeb20782bdd5aad069fe35b06b8329) , ROM_SKIP(2) )
+	ROMX_LOAD( "20_cj7_b.bin", 0x150001, 0x10000, CRC(2ba49d47) SHA1(380943bde589dd2ea079a54fa7bcf327da2990a7) , ROM_SKIP(2) )
+	ROMX_LOAD( "29_ci7_b.bin", 0x150002, 0x10000, CRC(c1c68148) SHA1(171d25aa20accf6638e1b0886a15db9fac2d8b85) , ROM_SKIP(2) )
+	ROMX_LOAD( "12_ck8_b.bin", 0x180000, 0x10000, CRC(0fb2d41a) SHA1(41b179e4e9ae142b3057e7cdad6eee8efcd952c4) , ROM_SKIP(2) )
+	ROMX_LOAD( "21_cj8_b.bin", 0x180001, 0x10000, CRC(5f1bf8ad) SHA1(b831ea433ff008377b522a3be4666d6d1b86cbb4) , ROM_SKIP(2) )
+	ROMX_LOAD( "30_ci8_b.bin", 0x180002, 0x10000, CRC(ded7cacf) SHA1(adbfaa8f46e5ce8df264d5b5a201d75ca2b3dbeb) , ROM_SKIP(2) )
+
+	ROM_REGION( 0x001556, "plds", 0 )     // PLDs, unused
+	ROM_LOAD ("pal1_ae_a_palce16v8h-25pc.bin",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal2_ad_a_tibpal16r8-25cn.bin",  0x0117, 0x0104, NO_DUMP )
+	ROM_LOAD ("pal3_af_a_palce16v8h-25pc.bin",  0x021b, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal4_u7_b_palce16v8h-25pc.bin",  0x0332, 0x0117, CRC(3472975d) SHA1(b29f7b22138e624e84436cb2abac70777dba17dc) )
+	ROM_LOAD ("pal5_x_b_pal20l10acns.bin",      0x0449, 0x00cc, NO_DUMP )
+	ROM_LOAD ("pal6_ar_a_palce16v8h-25pc.bin",  0x0515, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal7_dc_a_palce16v8h-25pc.bin",  0x062c, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal8_db_a_pal20l8acns.bin",      0x0743, 0x0144, NO_DUMP )
+	ROM_LOAD ("pal9_da_a_pal20l8acns.bin",      0x0887, 0x0144, NO_DUMP )
+	ROM_LOAD ("pal10_as_a_palce16v8h-25pc.bin", 0x09cb, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal11_de_a_tibpal16r4-25cn.bin", 0x0ae2, 0x0104, NO_DUMP )
+	ROM_LOAD ("pal12_dd_a_palce16v8h-25pc.bin", 0x0be6, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal13_d_a_palce16v8h-25pc.bin",  0x0cfd, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal14_c_a_palce16v8h-25pc.bin",  0x0e14, 0x0117, NO_DUMP )
+	ROM_LOAD ("pal15_a_a_tibpal16r8-25cn.bin",  0x102f, 0x0104, NO_DUMP )
+	ROM_LOAD ("pal16_ag_a_tibpal16r4-25cn.bin", 0x1133, 0x0104, NO_DUMP )
+	ROM_LOAD ("pal17_b_a_palce16v8h-25pc.bin",  0x1237, 0x0117, CRC(4793ed97) SHA1(7d684b2a2f10cabc1df45a38a8e497bdcf34d831) )
+	ROM_LOAD ("pal18_ah_a_tibpal16r4-25cn.bin", 0x134e, 0x0104, NO_DUMP )
+	ROM_LOAD ("pal19_ai_a_tibpal16r4-25cn.bin", 0x1452, 0x0104, NO_DUMP )
+ROM_END
+
 
 /*
 Born To Fight
@@ -1365,8 +1425,9 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games",       "Born To Fight",                   MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galaxygnh, galaxygn, galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners (1990 year hack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

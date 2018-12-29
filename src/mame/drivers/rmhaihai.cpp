@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rmhaihai)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(rmhaisei_state::rmhaisei)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
 
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(themj_state::themj)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
 

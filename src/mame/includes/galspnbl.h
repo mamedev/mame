@@ -57,7 +57,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(galspnbl);
+	void galspnbl_palette(palette_device &palette) const;
 	uint32_t screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	bitmap_ind16 m_sprite_bitmap;

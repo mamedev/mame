@@ -297,10 +297,10 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_holeland)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
 	/* sound hardware */
@@ -378,10 +378,10 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crzrally)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 
 	/* sound hardware */

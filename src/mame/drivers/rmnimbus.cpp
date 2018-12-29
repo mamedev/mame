@@ -14,7 +14,7 @@
 #include "machine/rmnkbd.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "bus/isa/fdc.h"
 #include "bus/rs232/rs232.h"
@@ -130,7 +130,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* Backing storage */
 	WD2793(config, m_fdc, 1000000);

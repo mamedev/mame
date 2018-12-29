@@ -755,7 +755,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

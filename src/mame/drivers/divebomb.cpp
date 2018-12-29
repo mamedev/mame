@@ -415,19 +415,19 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	GENERIC_LATCH_8(config, m_roz2fg_latch);
 	m_roz2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_bpp(8);
+	m_k051316[0]->set_wrap(0);
+	m_k051316[0]->set_offsets(-88, -16);
+	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_bpp(8);
+	m_k051316[1]->set_wrap(0);
+	m_k051316[1]->set_offsets(-88, -16);
+	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2), this);
 
 	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
 	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
@@ -441,15 +441,13 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 256-1-32);
 	screen.set_screen_update(FUNC(divebomb_state::screen_update_divebomb));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_fgcpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_spritecpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_rozcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_divebomb)
-	MCFG_PALETTE_ADD("palette", 0x400+0x400+0x400+0x100)
-
-	MCFG_PALETTE_INIT_OWNER(divebomb_state, divebomb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_divebomb);
+	PALETTE(config, m_palette, FUNC(divebomb_state::divebomb_palette), 0x400+0x400+0x400+0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -11,13 +11,6 @@
 
 #pragma once
 
-
-
-// ports setup
-
-// 4-bit ports (3210 = DCBA)
-// valid ports: 4-7 for TMS1024, 1-7 for TMS1025
-
 // pinout reference
 
 /*
@@ -51,6 +44,8 @@
 class tms1024_device : public device_t
 {
 public:
+	// 4-bit ports (3210 = DCBA)
+	// valid ports: 4-7 for TMS1024, 1-7 for TMS1025
 	enum
 	{
 		PORT1 = 0,

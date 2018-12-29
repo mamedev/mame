@@ -214,8 +214,7 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	MCFG_SCREEN_UPDATE_DRIVER(pp01_state, screen_update_pp01)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(pp01_state, pp01)
+	PALETTE(config, "palette", FUNC(pp01_state::pp01_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

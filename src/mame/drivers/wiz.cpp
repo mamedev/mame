@@ -808,11 +808,10 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stinger)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stinger);
+	PALETTE(config, m_palette, FUNC(wiz_state::wiz_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

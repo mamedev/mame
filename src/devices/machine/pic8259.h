@@ -33,9 +33,9 @@ class pic8259_device : public device_t
 public:
 	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto out_int_callback() { return m_out_int_func.bind(); }
-	auto in_sp_callback() { return m_in_sp_func.bind(); }
-	auto read_slave_ack_callback() { return m_read_slave_ack_func.bind(); }
+	auto out_int_callback() { return m_out_int_func.bind(); } // Interrupt request output to CPU or master 8259 (active high)
+	auto in_sp_callback() { return m_in_sp_func.bind(); } // Slave program select (VCC = master; GND = slave; pin becomes EN output in buffered mode)
+	auto read_slave_ack_callback() { return m_read_slave_ack_func.bind(); } // Cascaded interrupt acknowledge request for slave 8259 to place vector on data bus
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

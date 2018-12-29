@@ -10,15 +10,13 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 
-#define MCFG_M24_Z8000_HALT(_devcb) \
-	downcast<m24_z8000_device &>(*device).set_halt_callback(DEVCB_##_devcb);
 
 class m24_z8000_device :  public device_t
 {
 public:
 	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_halt_callback(Object &&cb) { return m_halt_out.set_callback(std::forward<Object>(cb)); }
+	auto halt_callback() { return m_halt_out.bind(); }
 
 	DECLARE_READ16_MEMBER(pmem_r);
 	DECLARE_WRITE16_MEMBER(pmem_w);

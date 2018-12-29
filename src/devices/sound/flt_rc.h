@@ -33,22 +33,13 @@
  * Same as FLT_RC_HIGHPASS, but with standard frequency of 16 HZ
  * This filter may be setup just with
  *
- * MCFG_FILTER_RC_ADD("tag", 0)
- * MCFG_FILTER_RC_AC()
+ * FILTER_RC(config, "tag", 0).set_ac();
  *
  * Default behaviour:
  *
- * Without MCFG_FILTER_RC_AC, a disabled FLT_RC_LOWPASS is created
+ * Without set_ac(), a disabled FLT_RC_LOWPASS is created
  *
  */
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_FILTER_RC_AC() \
-	downcast<filter_rc_device &>(*device).set_rc(filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -85,6 +76,11 @@ public:
 		set_rc(type, R1, R2, R3, C);
 		recalc();
 		return *this;
+	}
+
+	filter_rc_device &set_ac()
+	{
+		return set_rc(filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
 	}
 
 protected:

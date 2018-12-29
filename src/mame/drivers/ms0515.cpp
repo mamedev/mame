@@ -29,6 +29,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -80,8 +81,11 @@ public:
 
 	void ms0515(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_PALETTE_INIT(ms0515);
+	void ms0515_palette(palette_device &palette) const;
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
@@ -108,11 +112,9 @@ private:
 
 	void ms0515_mem(address_map &map);
 
-	virtual void machine_reset() override;
-
 	void irq_encoder(int irq, int state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu; // actual CPU is T11 clone, KR1807VM1
 	required_device<ram_device> m_ram;
 	required_device<kr1818vg93_device> m_fdc;
 	required_device<floppy_image_device> m_floppy0;
@@ -443,7 +445,7 @@ WRITE_LINE_MEMBER(ms0515_state::screen_vblank)
 		irq11_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-PALETTE_INIT_MEMBER(ms0515_state, ms0515)
+void ms0515_state::ms0515_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));
 	palette.set_pen_color(1, rgb_t(0, 0, 127));
@@ -523,9 +525,9 @@ WRITE_LINE_MEMBER(ms0515_state::irq11_w)
 
 MACHINE_CONFIG_START(ms0515_state::ms0515)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", T11, XTAL(15'000'000) / 2) // actual CPU is T11 clone, KR1807VM1
-	MCFG_T11_INITIAL_MODE(0xf2ff)
-	MCFG_DEVICE_PROGRAM_MAP(ms0515_mem)
+	T11(config, m_maincpu, XTAL(15'000'000) / 2); // actual CPU is T11 clone, KR1807VM1
+	m_maincpu->set_initial_mode(0xf2ff);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms0515_state::ms0515_mem);
 
 	/* video hardware -- 50 Hz refresh rate */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -535,8 +537,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_SCREEN_PALETTE("palette")
 	config.set_default_layout(layout_ms0515);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
+	PALETTE(config, "palette", FUNC(ms0515_state::ms0515_palette), 16);
 
 	KR1818VG93(config, m_fdc, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
@@ -568,9 +569,9 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_i8251kbd->rxrdy_handler().set(FUNC(ms0515_state::irq5_w));
 	m_i8251kbd->txd_handler().set("ms7004", FUNC(ms7004_device::write_rxd));
 
-	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_rxd))
-	MCFG_MS7004_RTS_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_cts))
+	MS7004(config, m_ms7004, 0);
+	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
+	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)

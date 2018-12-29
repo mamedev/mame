@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_SCREEN_RAW_PARAMS(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576)
 	MCFG_SCREEN_UPDATE_DRIVER(can09_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Floppy */
 	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used

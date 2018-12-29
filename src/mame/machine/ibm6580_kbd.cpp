@@ -3,9 +3,6 @@
 #include "emu.h"
 #include "ibm6580_kbd.h"
 
-#include "cpu/mcs48/mcs48.h"
-
-
 #define VERBOSE_DBG 0       /* general debug messages */
 
 #define DBG_LOG(N,M,A) \
@@ -32,16 +29,17 @@ const tiny_rom_entry *dw_keyboard_device::device_rom_region() const
 	return ROM_NAME( dw_keyboard );
 }
 
-MACHINE_CONFIG_START(dw_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mcu", I8049, XTAL(6'000'000))   // XXX RC oscillator
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, dw_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, dw_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dw_keyboard_device, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, dw_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dw_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, dw_keyboard_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, dw_keyboard_device, t1_r))
-MACHINE_CONFIG_END
+void dw_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8049(config, m_mcu, XTAL(6'000'000));   // XXX RC oscillator
+	m_mcu->bus_in_cb().set(FUNC(dw_keyboard_device::bus_r));
+	m_mcu->bus_out_cb().set(FUNC(dw_keyboard_device::bus_w));
+	m_mcu->p1_out_cb().set(FUNC(dw_keyboard_device::p1_w));
+	m_mcu->p2_in_cb().set(FUNC(dw_keyboard_device::p2_r));
+	m_mcu->p2_out_cb().set(FUNC(dw_keyboard_device::p2_w));
+	m_mcu->t0_in_cb().set(FUNC(dw_keyboard_device::t0_r));
+	m_mcu->t1_in_cb().set(FUNC(dw_keyboard_device::t1_r));
+}
 
 
 INPUT_PORTS_START( dw_keyboard )

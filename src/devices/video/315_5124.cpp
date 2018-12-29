@@ -119,7 +119,7 @@ DEFINE_DEVICE_TYPE(SEGA315_5246, sega315_5246_device, "sega315_5246", "Sega 315-
 DEFINE_DEVICE_TYPE(SEGA315_5377, sega315_5377_device, "sega315_5377", "Sega 315-5377 Gamegear VDP")
 
 
-PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
+void sega315_5124_device::sega315_5124_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 64; i++)
 	{
@@ -128,8 +128,8 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 		const int b = (i & 0x30) >> 4;
 		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
-	/* sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette */
-	/* TMS9918 palette */
+	// sms and sg1000-mark3 uses a different palette for modes 0 to 3 - see http://www.smspower.org/Development/Palette
+	// TMS9918 palette
 	palette.set_pen_color(64+ 0,   0,   0,   0); // palette.set_pen_color(64+ 0,   0,   0,   0);
 	palette.set_pen_color(64+ 1,   0,   0,   0); // palette.set_pen_color(64+ 1,   0,   0,   0);
 	palette.set_pen_color(64+ 2,   0, 170,   0); // palette.set_pen_color(64+ 2,  33, 200,  66);
@@ -149,7 +149,7 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 }
 
 
-PALETTE_INIT_MEMBER(sega315_5377_device, sega315_5377)
+void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 4096; i++)
 	{
@@ -1931,10 +1931,10 @@ void sega315_5124_device::device_reset()
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sega315_5124_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", SEGA315_5124_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
-MACHINE_CONFIG_END
+void sega315_5124_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette, FUNC(sega315_5124_device::sega315_5124_palette), SEGA315_5124_PALETTE_SIZE);
+}
 
 void sega315_5377_device::device_reset()
 {
@@ -1946,7 +1946,9 @@ void sega315_5377_device::device_reset()
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sega315_5377_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", SEGA315_5377_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(sega315_5377_device, sega315_5377)
-MACHINE_CONFIG_END
+void sega315_5377_device::device_add_mconfig(machine_config &config)
+{
+	sega315_5246_device::device_add_mconfig(config);
+	m_palette->set_entries(SEGA315_5377_PALETTE_SIZE);
+	m_palette->set_init(FUNC(sega315_5377_device::sega315_5377_palette));
+}

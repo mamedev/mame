@@ -297,14 +297,14 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, istellar_state, screen_update_istellar)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, istellar_state, vblank_irq))
 
 	// Daphne says "TODO: get the real interstellar resistor values"
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istellar)
 

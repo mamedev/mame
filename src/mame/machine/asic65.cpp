@@ -538,14 +538,14 @@ void asic65_device::asic65_io_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(asic65_device::device_add_mconfig)
-
+void asic65_device::device_add_mconfig(machine_config &config)
+{
 	/* ASIC65 */
-	MCFG_DEVICE_ADD("asic65cpu", TMS32010, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(asic65_program_map)
-	MCFG_DEVICE_IO_MAP(asic65_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, asic65_device, get_bio))
-MACHINE_CONFIG_END
+	TMS32010(config, m_ourcpu, 20000000);
+	m_ourcpu->set_addrmap(AS_PROGRAM, &asic65_device::asic65_program_map);
+	m_ourcpu->set_addrmap(AS_IO, &asic65_device::asic65_io_map);
+	m_ourcpu->bio().set(FUNC(asic65_device::get_bio));
+}
 
 
 

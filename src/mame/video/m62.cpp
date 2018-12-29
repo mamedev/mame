@@ -175,21 +175,21 @@ void m62_state::m62_amplify_contrast(bool include_fg)
 	}
 }
 
-PALETTE_INIT_MEMBER(m62_state, m62_spr)
+void m62_state::m62_spr(palette_device &palette) const
 {
 	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, m_sprite_color_proms, m62_decode_info, m62_sprite_net_info);
 	palette.set_pen_colors(0x000, rgb);
 }
 
-PALETTE_INIT_MEMBER(m62_state, m62_chr)
+void m62_state::m62_chr(palette_device &palette) const
 {
 	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, m_chr_color_proms, m62_decode_info, m62_tile_net_info);
 	palette.set_pen_colors(0x000, rgb);
 }
 
-PALETTE_INIT_MEMBER(m62_state, m62_lotlot_fg)
+void m62_state::m62_lotlot_fg(palette_device &palette) const
 {
 	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, m_fg_color_proms, m62_decode_info, m62_tile_net_info);
@@ -197,7 +197,7 @@ PALETTE_INIT_MEMBER(m62_state, m62_lotlot_fg)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,m62_battroad_fg)
+void m62_state::m62_battroad_fg(palette_device &palette) const
 {
 	// custom palette for foreground
 	std::vector<rgb_t> rgb;
@@ -206,7 +206,7 @@ PALETTE_INIT_MEMBER(m62_state,m62_battroad_fg)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,spelunk2)
+void m62_state::spelunk2_palette(palette_device &palette) const
 {
 	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, m_chr_color_proms, spelunk2_tile_decode_info, m62_tile_net_info);
@@ -214,7 +214,7 @@ PALETTE_INIT_MEMBER(m62_state,spelunk2)
 }
 
 
-void m62_state::register_savestate(  )
+void m62_state::register_savestate()
 {
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_m62_background_hscroll));

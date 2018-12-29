@@ -35,6 +35,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
@@ -322,7 +323,7 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dim68k)
 
 	/* sound hardware */
@@ -331,7 +332,7 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	UPD765A(config, "fdc", true, true); // these options unknown
+	UPD765A(config, "fdc", 8'000'000, true, true); // these options unknown
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
@@ -341,8 +342,8 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row), this);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(dim68k_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")

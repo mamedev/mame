@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	MCFG_SCREEN_UPDATE_DRIVER(mc8030_state, screen_update_mc8030)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
 	z80pio_device& zve_pio(Z80PIO(config, "zve_pio", XTAL(2'457'600)));

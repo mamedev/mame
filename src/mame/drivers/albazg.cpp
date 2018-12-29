@@ -390,9 +390,8 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yumefuda )
-	MCFG_PALETTE_ADD("palette", 0x80)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yumefuda)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x80);
 
 
 	/* sound hardware */

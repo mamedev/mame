@@ -100,11 +100,12 @@ public:
 
 	void saiyukip(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
-
-	virtual void machine_start() override;
 
 	void saiyukip_map(address_map &map);
 
@@ -689,6 +690,8 @@ GFXDECODE_END
 
 void saiyukip_state::machine_start()
 {
+	umipoker_state::machine_start();
+
 	m_lamps.resolve();
 }
 
@@ -713,13 +716,11 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(umipoker_state, screen_update_umipoker)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 6))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_umipoker)
-
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_umipoker);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 
 
 	/* sound hardware */

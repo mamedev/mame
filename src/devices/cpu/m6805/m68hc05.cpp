@@ -165,7 +165,7 @@ void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interr
 	if (diff) update_port_irq();
 }
 
-READ8_MEMBER(m68hc05_device::port_r)
+READ8_MEMBER(m68hc05_device::port_read)
 {
 	offset &= PORT_COUNT - 1;
 	if (!machine().side_effects_disabled() && !m_port_cb_r[offset].isnull())
@@ -723,7 +723,7 @@ void m68hc05c4_device::c4_map(address_map &map)
 	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0003).rw(FUNC(m68hc05c4_device::port_r), FUNC(m68hc05c4_device::port_latch_w));
+	map(0x0000, 0x0003).rw(FUNC(m68hc05c4_device::port_read), FUNC(m68hc05c4_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc05c4_device::port_ddr_r), FUNC(m68hc05c4_device::port_ddr_w));
 	// 0x0007-0x0009 unused
 	// 0x000a SPCR
@@ -789,7 +789,7 @@ void m68hc05c8_device::c8_map(address_map &map)
 	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0003).rw(FUNC(m68hc05c8_device::port_r), FUNC(m68hc05c8_device::port_latch_w));
+	map(0x0000, 0x0003).rw(FUNC(m68hc05c8_device::port_read), FUNC(m68hc05c8_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc05c8_device::port_ddr_r), FUNC(m68hc05c8_device::port_ddr_w));
 	// 0x0007-0x0009 unused
 	// 0x000a SPCR
@@ -854,7 +854,7 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0003).rw(FUNC(m68hc705c8a_device::port_r), FUNC(m68hc705c8a_device::port_latch_w));
+	map(0x0000, 0x0003).rw(FUNC(m68hc705c8a_device::port_read), FUNC(m68hc705c8a_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc705c8a_device::port_ddr_r), FUNC(m68hc705c8a_device::port_ddr_w));
 	// 0x0007-0x0009 unused
 	// 0x000a SPCR

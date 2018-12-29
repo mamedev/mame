@@ -446,11 +446,11 @@ MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 	m_latch->q_out_cb<4>().set_inputline(m_sounddsp, INPUT_LINE_HALT).invert(); // RES320
 	m_latch->q_out_cb<7>().set(FUNC(harddriv_sound_board_device::led_w));
 
-	MCFG_DEVICE_ADD("sounddsp", TMS32010, XTAL(20'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(driversnd_dsp_program_map)
+	TMS32010(config, m_sounddsp, XTAL(20'000'000));
+	m_sounddsp->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(driversnd_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, harddriv_sound_board_device, hdsnddsp_get_bio))
+	m_sounddsp->set_addrmap(AS_IO, &harddriv_sound_board_device::driversnd_dsp_io_map);
+	m_sounddsp->bio().set(FUNC(harddriv_sound_board_device::hdsnddsp_get_bio));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

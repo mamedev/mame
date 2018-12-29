@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#include "machine/nmk112.h"
+#ifndef MAME_INCLUDES_POWERINS_H
+#define MAME_INCLUDES_POWERINS_H
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -65,3 +67,5 @@ private:
 	void powerinsa_oki_map(address_map &map);
 	void powerinsb_sound_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_POWERINS_H

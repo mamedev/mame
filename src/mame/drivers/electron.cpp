@@ -83,9 +83,9 @@ static const rgb_t electron_palette[8]=
 	rgb_t(0x000,0x000,0x000)
 };
 
-PALETTE_INIT_MEMBER(electron_state, electron)
+void electron_state::electron_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
+	palette.set_pen_colors(0, electron_palette);
 }
 
 void electron_state::electron_mem(address_map &map)
@@ -222,12 +222,10 @@ MACHINE_CONFIG_START(electron_state::electron)
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(palette_init_delegate(FUNC(electron_state::palette_init_electron), this));
+	PALETTE(config, "palette", FUNC(electron_state::electron_colours), 16);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300);
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RAM(config, m_ram).set_default_size("32K");
 

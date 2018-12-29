@@ -81,7 +81,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
 	DECLARE_VIDEO_START(joinem);
-	DECLARE_PALETTE_INIT(joinem);
+	void joinem_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(striv);
 	DECLARE_MACHINE_RESET(striv);
 	DECLARE_MACHINE_START(joinem);

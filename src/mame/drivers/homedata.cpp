@@ -1236,12 +1236,11 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mrokumei)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrokumei)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrokumei);
+	PALETTE(config, m_palette, FUNC(homedata_state::mrokumei_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
@@ -1291,10 +1290,9 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_reikaids)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_reikaids);
+	PALETTE(config, m_palette, FUNC(homedata_state::reikaids_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
@@ -1349,10 +1347,9 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pteacher)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pteacher);
+	PALETTE(config, m_palette, FUNC(homedata_state::pteacher_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
@@ -1516,12 +1513,11 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mirderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirderby)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirderby);
+	PALETTE(config, m_palette, FUNC(homedata_state::mirderby_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */

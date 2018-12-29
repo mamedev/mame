@@ -1914,13 +1914,12 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 	m_irq5_mask = 0;
 }
 
-
-MACHINE_CONFIG_START(tmnt_state::cuebrick)
-
+void tmnt_state::cuebrick(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cuebrick_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	M68000(config, m_maincpu, 8000000);    /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::cuebrick_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::tmnt_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -1928,20 +1927,19 @@ MACHINE_CONFIG_START(tmnt_state::cuebrick)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_mia)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->set_membits(8);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1964,18 +1962,17 @@ MACHINE_CONFIG_START(tmnt_state::cuebrick)
 	ymsnd.irq_handler().set_inputline(m_maincpu, M68K_IRQ_6);
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(tmnt_state::mia)
-
+void tmnt_state::mia(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(mia_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	M68000(config, m_maincpu, XTAL(24'000'000)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::mia_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::tmnt_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(mia_audio_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::mia_audio_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -1983,19 +1980,18 @@ MACHINE_CONFIG_START(tmnt_state::mia)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_mia)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->set_membits(8);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,mia)
 
@@ -2016,12 +2012,11 @@ MACHINE_CONFIG_START(tmnt_state::mia)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_CONFIG_END
-
+	K007232(config, m_k007232, XTAL(3'579'545));
+	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
+	m_k007232->add_route(0, "mono", 0.20);
+	m_k007232->add_route(1, "mono", 0.20);
+}
 
 MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 {
@@ -2030,15 +2025,15 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 	m_upd7759->reset_w(1);
 }
 
-MACHINE_CONFIG_START(tmnt_state::tmnt)
-
+void tmnt_state::tmnt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(tmnt_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+	M68000(config, m_maincpu, XTAL(24'000'000)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::tmnt_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(tmnt_audio_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt_audio_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,tmnt)
@@ -2046,20 +2041,20 @@ MACHINE_CONFIG_START(tmnt_state::tmnt)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1 );
 	// verified against real hardware
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt));
+	screen.set_palette(m_palette);
+
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->set_membits(8);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,tmnt)
 
@@ -2080,31 +2075,29 @@ MACHINE_CONFIG_START(tmnt_state::tmnt)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "mono", 0.33)
-	MCFG_SOUND_ROUTE(1, "mono", 0.33)
+	K007232(config, m_k007232, XTAL(3'579'545));
+	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
+	m_k007232->add_route(0, "mono", 0.33);
+	m_k007232->add_route(1, "mono", 0.33);
 
-	MCFG_DEVICE_ADD("upd", UPD7759, XTAL(640'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	UPD7759(config, "upd", XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1) /* 1 channel for the title music */
-	MCFG_SAMPLES_START_CB(tmnt_state, tmnt_decode_sample)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1); /* 1 channel for the title music */
+	m_samples->set_samples_start_callback(FUNC(tmnt_state::tmnt_decode_sample));
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(tmnt_state::punkshot)
-
+void tmnt_state::punkshot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(punkshot_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::punkshot_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(punkshot_audio_map)
-								/* NMIs are generated by the 053260 */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::punkshot_audio_map);
+	/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2112,19 +2105,18 @@ MACHINE_CONFIG_START(tmnt_state::punkshot)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_punkshot)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_punkshot));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -2142,20 +2134,19 @@ MACHINE_CONFIG_START(tmnt_state::punkshot)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
 
-	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	K053260(config, m_k053260, XTAL(3'579'545));
+	m_k053260->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-
-MACHINE_CONFIG_START(tmnt_state::lgtnfght)
-
+void tmnt_state::lgtnfght(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::lgtnfght_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::lgtnfght_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_audio_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::lgtnfght_audio_map);
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2163,19 +2154,18 @@ MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_lgtnfght));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
@@ -2195,22 +2185,21 @@ MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
-MACHINE_CONFIG_END
+	K053260(config, m_k053260, XTAL(3'579'545));
+	m_k053260->add_route(0, "lspeaker", 0.70);
+	m_k053260->add_route(1, "rspeaker", 0.70);
+}
 
-
-MACHINE_CONFIG_START(tmnt_state::blswhstl)
-
+void tmnt_state::blswhstl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(blswhstl_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);       /* Confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::blswhstl_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
-								/* NMIs are generated by the 053260 */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_audio_map);
+	/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2220,22 +2209,21 @@ MACHINE_CONFIG_START(tmnt_state::blswhstl)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tmnt_state, screen_vblank_blswhstl))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_lgtnfght));
+	screen.screen_vblank().set(FUNC(tmnt_state::screen_vblank_blswhstl));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
-	MCFG_VIDEO_START_OVERRIDE(tmnt_state, blswhstl )
+	MCFG_VIDEO_START_OVERRIDE(tmnt_state, blswhstl)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -2246,7 +2234,6 @@ MACHINE_CONFIG_START(tmnt_state::blswhstl)
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::blswhstl_sprite_callback), this);
 
 	K053251(config, m_k053251, 0);
-
 	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
@@ -2255,10 +2242,10 @@ MACHINE_CONFIG_START(tmnt_state::blswhstl)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70);
 
-	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)   /* fixed inverted stereo channels */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
-MACHINE_CONFIG_END
+	K053260(config, m_k053260, XTAL(3'579'545));
+	m_k053260->add_route(0, "rspeaker", 0.50);   /* fixed inverted stereo channels */
+	m_k053260->add_route(1, "lspeaker", 0.50);
+}
 
 
 
@@ -2278,16 +2265,16 @@ static GFXDECODE_START( gfx_glfgreat )
 	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(tmnt_state::glfgreat)
-
+void tmnt_state::glfgreat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(glfgreat_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);       /* Confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::glfgreat_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::lgtnfght_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(glfgreat_audio_map)
-								/* NMIs are generated by the 053260 */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::glfgreat_audio_map);
+	/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2295,21 +2282,20 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_glfgreat));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glfgreat);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,glfgreat)
 
@@ -2321,9 +2307,9 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(85, 0)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(85, 0);
 
 	K053251(config, m_k053251, 0);
 
@@ -2331,11 +2317,10 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
+	K053260(config, m_k053260, XTAL(3'579'545));
+	m_k053260->add_route(0, "lspeaker", 1.0);
+	m_k053260->add_route(1, "rspeaker", 1.0);
+}
 
 MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 {
@@ -2344,16 +2329,16 @@ MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-MACHINE_CONFIG_START(tmnt_state::prmrsocr)
-
+void tmnt_state::prmrsocr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);       /* Confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::prmrsocr_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::lgtnfght_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_audio_map)
-								/* NMIs are generated by the 054539 */
+	Z80(config, m_audiocpu, 8000000);  /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::prmrsocr_audio_map);
+	/* NMIs are generated by the 054539 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,prmrsocr)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2363,21 +2348,20 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_glfgreat));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glfgreat);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,prmrsocr)
 
@@ -2389,8 +2373,8 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt_state::prmrsocr_sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_OFFSETS(85, 1)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_offsets(85, 1);
 
 	K053251(config, m_k053251, 0);
 
@@ -2402,27 +2386,25 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 	GENERIC_LATCH_8(config, "soundlatch2");
 	GENERIC_LATCH_8(config, "soundlatch3");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539, XTAL(18'432'000));
+	m_k054539->timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_k054539->add_route(0, "lspeaker", 1.0);
+	m_k054539->add_route(1, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(tmnt_state::tmnt2)
-
+void tmnt_state::tmnt2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(tmnt2_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt2_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
-						/* access. Access speed of ROM/RAM used on the machine is 150ns, */
-						/* without the wait, they cannot run on 8MHz.                    */
-						/* We are not emulating the wait state, so the ROM test ends at  */
-						/* 02 instead of 00. */
-	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
-								/* NMIs are generated by the 053260 */
+	Z80(config, m_audiocpu, 8000000);
+	/* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM access. */
+	/* Access speed of ROM/RAM used on the machine is 150ns, without the wait, they cannot run on 8MHz. */
+	/* We are not emulating the wait state, so the ROM test ends at 02 instead of 00. */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_audio_map);
+	/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2432,19 +2414,18 @@ MACHINE_CONFIG_START(tmnt_state::tmnt2)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
@@ -2464,22 +2445,21 @@ MACHINE_CONFIG_START(tmnt_state::tmnt2)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	K053260(config, m_k053260, XTAL(3'579'545));
+	m_k053260->add_route(0, "lspeaker", 0.75);
+	m_k053260->add_route(1, "rspeaker", 0.75);
+}
 
-
-MACHINE_CONFIG_START(tmnt_state::ssriders)
-
+void tmnt_state::ssriders(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(ssriders_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
-								/* NMIs are generated by the 053260 */
+	Z80(config, m_audiocpu, 8000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_audio_map);
+	/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2489,19 +2469,18 @@ MACHINE_CONFIG_START(tmnt_state::ssriders)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
@@ -2521,18 +2500,17 @@ MACHINE_CONFIG_START(tmnt_state::ssriders)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
-MACHINE_CONFIG_END
+	K053260(config, m_k053260, XTAL(3'579'545));
+	m_k053260->add_route(0, "lspeaker", 0.70);
+	m_k053260->add_route(1, "rspeaker", 0.70);
+}
 
-
-MACHINE_CONFIG_START(tmnt_state::sunsetbl)
-
+void tmnt_state::sunsetbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sunsetbl_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::sunsetbl_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::irq4_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2540,19 +2518,18 @@ MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -2568,21 +2545,21 @@ MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(tmnt_state::thndrx2)
-
+void tmnt_state::thndrx2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(thndrx2_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
+	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::thndrx2_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(thndrx2_audio_map)
-								/* NMIs are generated by the 053260 */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::thndrx2_audio_map);
+	/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2590,18 +2567,17 @@ MACHINE_CONFIG_START(tmnt_state::thndrx2)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_thndrx2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tmnt_state::screen_update_thndrx2));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -2622,10 +2598,10 @@ MACHINE_CONFIG_START(tmnt_state::thndrx2)
 
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	K053260(config, m_k053260, XTAL(3'579'545));
+	m_k053260->add_route(0, "lspeaker", 0.75);
+	m_k053260->add_route(1, "rspeaker", 0.75);
+}
 
 
 

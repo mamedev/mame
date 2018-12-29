@@ -222,10 +222,8 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sbasketb_state, vblank_irq))
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_sbasketb)
-	MCFG_PALETTE_ADD(m_palette, 16*16+16*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(sbasketb_state, sbasketb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sbasketb);
+	PALETTE(config, m_palette, FUNC(sbasketb_state::sbasketb_palette), 16*16+16*16*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

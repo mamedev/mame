@@ -1712,19 +1712,19 @@ void apollo_graphics_15i::register_vblank_callback()
  MACHINE DRIVERS
  ***************************************************************************/
 
-MACHINE_CONFIG_START(apollo_state::apollo_graphics)
+MACHINE_CONFIG_START(apollo_graphics_15i::device_add_mconfig)
 	config.set_default_layout(layout_apollo_15i);
-	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(68000000, 1346, 0, 1024, 841, 0, 800)
-	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_15i, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, apollo_graphics_15i, screen_update)
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i, "apollo_graphics_15i", "Apollo Screen")
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, tag, owner, clock),
-	m_screen(*this, "^" VIDEO_SCREEN_TAG),
+	m_screen(*this, VIDEO_SCREEN_TAG),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {
@@ -1732,7 +1732,7 @@ apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const cha
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_screen(*this, "^" VIDEO_SCREEN_TAG),
+	m_screen(*this, VIDEO_SCREEN_TAG),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)
 {
@@ -1884,14 +1884,14 @@ void apollo_graphics_15i::device_reset()
 
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(apollo_state::apollo_mono19i)
+MACHINE_CONFIG_START(apollo_graphics_19i::device_add_mconfig)
 	config.set_default_layout(layout_apollo);
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(120000000, 1728, 0, 1280, 1066, 0, 1024)
-	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_19i, screen_update)
-	MACHINE_CONFIG_END
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, apollo_graphics_19i, screen_update)
+MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i, "apollo_graphics_19i", "Apollo 19\" Monochrome Screen")
 

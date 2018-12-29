@@ -256,10 +256,10 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exzisus)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -269,9 +269,9 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("cpub")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag("cpub");
+	ciu.set_slave_tag("audiocpu");
 MACHINE_CONFIG_END
 
 

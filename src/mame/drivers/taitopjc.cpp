@@ -116,8 +116,8 @@ public:
 	void init_optiger();
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_iocpu;
+	required_device<ppc603e_device> m_maincpu;
+	required_device<tmp95c063_device> m_iocpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_dsp;
 	required_device<tc0780fpa_device> m_tc0780fpa;
@@ -769,51 +769,50 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 }
 
 
-MACHINE_CONFIG_START(taitopjc_state::taitopjc)
-	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
-	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ppc603e_mem)
+void taitopjc_state::taitopjc(machine_config &config)
+{
+	PPC603E(config, m_maincpu, 100000000);
+	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitopjc_state::ppc603e_mem);
 
 	/* TMP95C063F I/O CPU */
-	MCFG_DEVICE_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_TMP95C063_PORT5_READ(IOPORT("INPUTS1"))
-	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS2"))
-	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS3"))
-	MCFG_TMP95C063_AN0_READ(IOPORT("ANALOG1"))
-	MCFG_TMP95C063_AN1_READ(IOPORT("ANALOG2"))
-	MCFG_TMP95C063_AN2_READ(IOPORT("ANALOG3"))
-	MCFG_TMP95C063_AN3_READ(IOPORT("ANALOG4"))
-	MCFG_DEVICE_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
+	TMP95C063(config, m_iocpu, 25000000);
+	m_iocpu->port5_read().set_ioport("INPUTS1");
+	m_iocpu->portd_read().set_ioport("INPUTS2");
+	m_iocpu->porte_read().set_ioport("INPUTS3");
+	m_iocpu->an_read<0>().set_ioport("ANALOG1");
+	m_iocpu->an_read<1>().set_ioport("ANALOG2");
+	m_iocpu->an_read<2>().set_ioport("ANALOG3");
+	m_iocpu->an_read<3>().set_ioport("ANALOG4");
+	m_iocpu->set_addrmap(AS_PROGRAM, &taitopjc_state::tlcs900h_mem);
+	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::taitopjc_vbi));
 
 	/* TMS320C53 DSP */
-	MCFG_DEVICE_ADD("dsp", TMS32053, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
-	MCFG_DEVICE_DATA_MAP(tms_data_map)
-	MCFG_DEVICE_IO_MAP(tms_io_map)
+	TMS32053(config, m_dsp, 40000000);
+	m_dsp->set_addrmap(AS_PROGRAM, &taitopjc_state::tms_program_map);
+	m_dsp->set_addrmap(AS_DATA, &taitopjc_state::tms_data_map);
+	m_dsp->set_addrmap(AS_IO, &taitopjc_state::tms_io_map);
 
-	MCFG_DEVICE_ADD("mn10200", MN1020012A, 10000000) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
-	MCFG_DEVICE_PROGRAM_MAP(mn10200_map)
+	MN1020012A(config, m_soundcpu, 10000000); /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &taitopjc_state::mn10200_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(taitopjc_state, screen_update_taitopjc)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 384);
+	screen.set_visarea(0, 511, 0, 383);
+	screen.set_screen_update(FUNC(taitopjc_state::screen_update_taitopjc));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
-
-	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
-
-MACHINE_CONFIG_END
+	TC0780FPA(config, m_tc0780fpa, 0);
+}
 
 
 void taitopjc_state::init_optiger()

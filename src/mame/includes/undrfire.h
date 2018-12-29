@@ -10,16 +10,6 @@
 #include "video/tc0480scp.h"
 #include "emupal.h"
 
-struct uf_tempsprite
-{
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
-};
-
 class undrfire_state : public driver_device
 {
 public:
@@ -44,12 +34,22 @@ public:
 	void init_cbombers();
 
 protected:
-	virtual void video_start() override;
-
-private:
 	enum
 	{
 		TIMER_INTERRUPT5
+	};
+
+	virtual void video_start() override;
+
+private:
+	struct uf_tempsprite
+	{
+		int gfx;
+		int code,color;
+		int flipx,flipy;
+		int x,y;
+		int zoomx,zoomy;
+		int primask;
 	};
 
 	required_device<cpu_device> m_maincpu;

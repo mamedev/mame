@@ -300,10 +300,10 @@ INPUT_PORTS_END
 
 
 /*************************************
-*
-*  Graphics layouts
-*
-*************************************/
+ *
+ *  Graphics layouts
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -384,10 +384,10 @@ GFXDECODE_END
 
 
 /*************************************
-*
-*  Machine drivers
-*
-*************************************/
+ *
+ *  Machine drivers
+ *
+ *************************************/
 
 void m52_state::machine_reset()
 {
@@ -407,16 +407,14 @@ MACHINE_CONFIG_START(m52_state::m52)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m52_state, irq0_line_hold)
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("sp_palette", 256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_DEVICE_ADD("sp_gfxdecode", GFXDECODE, "sp_palette", gfx_m52_sp)
+	PALETTE(config, m_sp_palette).set_entries(256, 32);
+	GFXDECODE(config, m_sp_gfxdecode, m_sp_palette, gfx_m52_sp);
 
-	MCFG_PALETTE_ADD("tx_palette", 512)
-	MCFG_DEVICE_ADD("tx_gfxdecode", GFXDECODE, "tx_palette", gfx_m52_tx)
+	PALETTE(config, m_tx_palette).set_entries(512);
+	GFXDECODE(config, m_tx_gfxdecode, m_tx_palette, gfx_m52_tx);
 
-	MCFG_PALETTE_ADD("bg_palette", 3 * 4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_DEVICE_ADD("bg_gfxdecode", GFXDECODE, "bg_palette", gfx_m52_bg)
+	PALETTE(config, m_bg_palette).set_entries(3 * 4, 32);
+	GFXDECODE(config, m_bg_gfxdecode, m_bg_palette, gfx_m52_bg);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 3, 384, 136, 376, 282, 22, 274)
@@ -443,10 +441,10 @@ MACHINE_CONFIG_END
 
 
 /*************************************
-*
-*  ROM definitions
-*
-*************************************/
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START(mpatrol)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -624,10 +622,10 @@ ROM_END
 
 
 /*************************************
-*
-*  Game drivers
-*
-*************************************/
+ *
+ *  Game drivers
+ *
+ *************************************/
 
 GAME(1982, mpatrol,  0,       m52,     mpatrol,  m52_state,         empty_init, ROT0, "Irem",                    "Moon Patrol", MACHINE_SUPPORTS_SAVE)
 GAME(1982, mpatrolw, mpatrol, m52,     mpatrolw, m52_state,         empty_init, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", MACHINE_SUPPORTS_SAVE) // USA

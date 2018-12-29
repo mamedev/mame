@@ -13,6 +13,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/i8291a.h"
 #include "machine/wd_fdc.h"
+#include "hp9122c.lh"
 
 DEFINE_DEVICE_TYPE(HP9122C, hp9122c_device, "hp9122c", "HP9122C Dual High density disk drive")
 
@@ -25,6 +26,7 @@ hp9122c_device::hp9122c_device(const machine_config &mconfig, const char *tag, d
 	  m_floppy{*this, "floppy%u", 0},
 	  m_hpib_addr{*this , "ADDRESS"},
 	  m_testmode{*this, "TESTMODE"},
+	  m_leds{*this, "led%d", 0U},
 	  m_intsel{3},
 	  m_fdc_irq{false},
 	  m_i8291a_irq{false},
@@ -72,6 +74,9 @@ ioport_constructor hp9122c_device::device_input_ports() const
 
 void hp9122c_device::device_start()
 {
+
+	m_leds.resolve();
+
 	for (auto &floppy : m_floppy)
 		floppy->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&hp9122c_device::index_pulse_cb, this));
 
@@ -292,19 +297,26 @@ WRITE8_MEMBER(hp9122c_device::cmd_w)
 
 	m_ds0 = !(data & REG_CNTL_DS0) && floppy0;
 	m_ds1 = !(data & REG_CNTL_DS1) && floppy1;
+	m_leds[2] = (data & 0x40) ? true : false;
 
-	 if (m_ds0) {
-		 floppy0->mon_w(0);
-		 floppy0->ss_w(!(data & REG_CNTL_HEADSEL));
-		 m_fdc->set_floppy(floppy0);
-		 m_motor_timer->reset();
-	 } else if (m_ds1) {
-		 floppy1->mon_w(0);
-		 floppy1->ss_w(!(data & REG_CNTL_HEADSEL));
-		 m_fdc->set_floppy(floppy1);
-		 m_motor_timer->reset();
+	if (m_ds0) {
+		floppy0->mon_w(0);
+		floppy0->ss_w(!(data & REG_CNTL_HEADSEL));
+		m_fdc->set_floppy(floppy0);
+		m_motor_timer->reset();
+		m_leds[0] = true;
+		m_leds[1] = false;
+	} else if (m_ds1) {
+		floppy1->mon_w(0);
+		floppy1->ss_w(!(data & REG_CNTL_HEADSEL));
+		m_fdc->set_floppy(floppy1);
+		m_motor_timer->reset();
+		m_leds[0] = false;
+		m_leds[1] = true;
 	} else {
 		m_motor_timer->adjust(attotime::from_msec(2000));
+		m_leds[0] = false;
+		m_leds[1] = false;
 	}
 
 	if (data & REG_CNTL_CLOCK_SEL)
@@ -393,4 +405,5 @@ MACHINE_CONFIG_START(hp9122c_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_SLOT_FIXED(true)
+	config.set_default_layout(layout_hp9122c);
 MACHINE_CONFIG_END

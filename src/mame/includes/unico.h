@@ -16,19 +16,19 @@ public:
 	unico_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_leds(*this, "led%u", 0U),
 		m_vram(*this, "vram", 0),
 		m_scroll(*this, "scroll", 0),
 		m_spriteram(*this, "spriteram", 0),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_oki(*this, "oki")
 	{ }
 
 	void burglarx(machine_config &config);
 
 protected:
-	DECLARE_PALETTE_DECODER(unico_R6G6B6X);
+	static rgb_t unico_R6G6B6X(uint32_t raw);
 	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(scroll_r);
@@ -46,6 +46,7 @@ protected:
 	void burglarx_map(address_map &map);
 
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<2> m_leds;
 
 private:
@@ -58,7 +59,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 class zeropnt_state : public unico_state

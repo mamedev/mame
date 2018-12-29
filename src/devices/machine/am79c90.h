@@ -42,6 +42,8 @@ protected:
 	void dma_out(u32 address, u8 *buf, int length);
 	void dump_bytes(u8 *buf, int length);
 
+	virtual int get_buf_length(u16 data) const = 0;
+
 	// constants and masks
 	static constexpr u32 FCS_RESIDUE = 0xdebb20e3;
 	static const u8 ETH_BROADCAST[];
@@ -161,6 +163,7 @@ private:
 
 	emu_timer *m_transmit_poll;
 	int m_intr_out_state;
+	bool m_idon;
 
 	// internal loopback buffer
 	u8 m_lb_buf[36];
@@ -171,12 +174,18 @@ class am7990_device : public am7990_device_base
 {
 public:
 	am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual int get_buf_length(u16 data) const override { return (data == 0xf000) ? 4096 : -s16(0xf000 | data); }
 };
 
 class am79c90_device : public am7990_device_base
 {
 public:
 	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual int get_buf_length(u16 data) const override { return data ? ((data == 0xf000) ? 4096 : -s16(0xf000 | data)) : 0; }
 };
 
 DECLARE_DEVICE_TYPE(AM7990, am7990_device)

@@ -9,6 +9,7 @@ endif(WIN32)
 set(SOURCES
     MachineIndependent/glslang.y
     MachineIndependent/glslang_tab.cpp
+    MachineIndependent/attribute.cpp
     MachineIndependent/Constant.cpp
     MachineIndependent/iomapper.cpp
     MachineIndependent/InfoSink.cpp
@@ -51,6 +52,7 @@ set(HEADERS
     Include/revision.h
     Include/ShHandle.h
     Include/Types.h
+    MachineIndependent/attribute.h
     MachineIndependent/glslang_tab.cpp.h
     MachineIndependent/gl_types.h
     MachineIndependent/Initialize.h
@@ -78,10 +80,18 @@ set(HEADERS
 #                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 # set(BISON_GLSLParser_OUTPUT_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/MachineIndependent/glslang_tab.cpp)
 
-add_library(glslang STATIC ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
+glslang_pch(SOURCES MachineIndependent/pch.cpp)
+
+add_library(glslang ${LIB_TYPE} ${BISON_GLSLParser_OUTPUT_SOURCE} ${SOURCES} ${HEADERS})
 set_property(TARGET glslang PROPERTY FOLDER glslang)
 set_property(TARGET glslang PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(glslang OGLCompiler OSDependent)
+target_include_directories(glslang PUBLIC ..)
+
+if(WIN32 AND BUILD_SHARED_LIBS)
+    set_target_properties(glslang PROPERTIES PREFIX "")
+endif()
+
 if(ENABLE_HLSL)
     target_link_libraries(glslang HLSL)
 endif()
@@ -95,8 +105,14 @@ if(WIN32)
 endif(WIN32)
 
 if(ENABLE_GLSLANG_INSTALL)
-    install(TARGETS glslang
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    if(BUILD_SHARED_LIBS)
+        install(TARGETS glslang
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    else()
+        install(TARGETS glslang
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    endif()
 endif(ENABLE_GLSLANG_INSTALL)
 
 if(ENABLE_GLSLANG_INSTALL)

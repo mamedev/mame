@@ -247,7 +247,7 @@ private:
 	DECLARE_WRITE8_MEMBER(outport5_w);
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
-	DECLARE_PALETTE_INIT(mgames);
+	void mgames_palette(palette_device &palette) const;
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 
@@ -270,30 +270,25 @@ void mgames_state::video_start()
 
 uint32_t mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y,x;
-	int count;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
 
-	count = 0;
-	for (y = 0; y < 32; y++)
+	int count = 0;
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 32; x++)
+		for (int x = 0; x < 32; x++)
 		{
-			uint16_t dat = m_video[count];
-			uint16_t col = m_video[count + 0x400] & 0x7f;
+			uint16_t const dat = m_video[count];
+			uint16_t const col = m_video[count + 0x400] & 0x7f;
 			gfx->opaque(bitmap, cliprect, dat, col, 0, 0, x * 16, y * 16);
 			count++;
 		}
-
 	}
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(mgames_state, mgames)
+void mgames_state::mgames_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		rgb_t color;
 
@@ -659,11 +654,10 @@ MACHINE_CONFIG_START(mgames_state::mgames)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgames)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgames);
+	PALETTE(config, m_palette, FUNC(mgames_state::mgames_palette), 0x200);
 
 	/* sound hardware */
 	//  to do...

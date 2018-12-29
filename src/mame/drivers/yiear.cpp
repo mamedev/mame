@@ -297,9 +297,8 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, yiear_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yiear)
-	MCFG_PALETTE_ADD(m_palette, 32)
-	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yiear);
+	PALETTE(config, m_palette, FUNC(yiear_state::yiear_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

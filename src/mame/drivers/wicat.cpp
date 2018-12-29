@@ -22,6 +22,7 @@ Wicat - various systems.
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/am9517a.h"
@@ -595,25 +596,25 @@ WRITE8_MEMBER(wicat_state::video_dma_w)
 READ8_MEMBER(wicat_state::video_uart0_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart0->read(space,noff);
+	return m_videouart0->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart0_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart0->write(space,noff,data);
+	m_videouart0->write(noff,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart1_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart1->read(space,noff);
+	return m_videouart1->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart1_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart1->write(space,noff,data);
+	m_videouart1->write(noff,data);
 }
 
 // XD2210 64 x 4bit NOVRAM
@@ -827,8 +828,7 @@ void wicat_state::wicat(machine_config &config)
 	screen.set_raw(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300);
 	screen.set_screen_update("video", FUNC(i8275_device::screen_update));
 
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
 	m_crtc->set_character_width(10);

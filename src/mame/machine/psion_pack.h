@@ -71,12 +71,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PSION_DATAPACK, datapack_device)
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_PSION_DATAPACK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PSION_DATAPACK, 0)
-
 #endif // MAME_MACHINE_PSION_PACK_H

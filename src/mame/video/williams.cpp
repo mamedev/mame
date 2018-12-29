@@ -313,27 +313,26 @@ uint32_t williams2_state::screen_update_williams2(screen_device &screen, bitmap_
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(williams_state,williams)
+void williams_state::williams_palette(palette_device &palette) const
 {
-	static const int resistances_rg[3] = { 1200, 560, 330 };
-	static const int resistances_b[2]  = { 560, 330 };
-	double weights_r[3], weights_g[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1200, 560, 330 };
+	static constexpr int resistances_b[2]  = { 560, 330 };
 
-	/* compute palette information */
-	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
-	/* by the use of transistors, so we ignore that and just use the relative resistor weights */
+	// compute palette information
+	// note that there really are pullup/pulldown resistors, but this situation is complicated
+	// by the use of transistors, so we ignore that and just use the relative resistor weights
+	double weights_r[3], weights_g[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_r, 0, 0,
 			3, resistances_rg, weights_g, 0, 0,
 			2, resistances_b,  weights_b, 0, 0);
 
-	/* build a palette lookup */
-	for (i = 0; i < 256; i++)
+	// build a palette lookup
+	for (int i = 0; i < 256; i++)
 	{
-		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));
-		int g = combine_3_weights(weights_g, BIT(i,3), BIT(i,4), BIT(i,5));
-		int b = combine_2_weights(weights_b, BIT(i,6), BIT(i,7));
+		int const r = combine_3_weights(weights_r, BIT(i, 0), BIT(i, 1), BIT(i, 2));
+		int const g = combine_3_weights(weights_g, BIT(i, 3), BIT(i, 4), BIT(i, 5));
+		int const b = combine_2_weights(weights_b, BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

@@ -11,10 +11,11 @@
 #pragma once
 
 #include "audio/m72.h"
-#include "sound/dac.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -91,7 +92,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	optional_device<mb8421_mb8431_16_device> m_dpram;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<m72_audio_device> m_audio;

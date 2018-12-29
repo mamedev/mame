@@ -622,10 +622,9 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	screen.set_size(288, 256);
 	screen.set_visarea(0, 288-1, 0, 256-1);
 	screen.set_screen_update(FUNC(pmd85_state::screen_update_pmd85));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 3);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

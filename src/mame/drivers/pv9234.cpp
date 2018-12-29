@@ -164,8 +164,7 @@ MACHINE_CONFIG_START(pv9234_state::pv9234)
 	MCFG_SCREEN_UPDATE_DRIVER(pv9234_state, screen_update_pv9234)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 /* ROM definition */

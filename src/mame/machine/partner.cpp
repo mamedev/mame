@@ -14,7 +14,6 @@
 #include "imagedev/cassette.h"
 #include "includes/radio86.h"
 #include "includes/partner.h"
-#include "imagedev/flopdrv.h"
 
 /* Driver initialization */
 void partner_state::init_partner()

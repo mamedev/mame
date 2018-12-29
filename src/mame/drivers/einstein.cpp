@@ -18,6 +18,7 @@
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/adc0844.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -624,7 +625,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	m_psg->port_a_write_callback().set(FUNC(einstein_state::keyboard_line_write));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	adc0844_device &adc(ADC0844(config, "adc", 0));
+	adc0844_device &adc(ADC0844(config, "adc"));
 	adc.intr_callback().set(m_adc_daisy, FUNC(z80daisy_generic_device::int_w));
 	adc.ch1_callback().set_ioport("analogue_1_x");
 	adc.ch2_callback().set_ioport("analogue_1_y");

@@ -403,6 +403,10 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #define UNICODE_YEN             "\xC2\xA5"
 #define PWRKICK_HOPPER_PULSE    50          // time between hopper pulses in milliseconds (probably wrong)
 
+//#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
+
+constexpr unsigned toaplan2_state::T2PALETTE_LENGTH;
+
 
 /***************************************************************************
   Initialisation handlers
@@ -729,8 +733,8 @@ WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 
 WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 {
-	m_nmk112->okibank_w(space, offset, data & 0x0f);
-	m_nmk112->okibank_w(space, offset + 1, (data >> 4) & 0x0f);
+	m_nmk112->okibank_w(offset, data & 0x0f);
+	m_nmk112->okibank_w(offset + 1, (data >> 4) & 0x0f);
 }
 
 
@@ -3226,8 +3230,7 @@ MACHINE_CONFIG_START(toaplan2_state::tekipaki)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3269,8 +3272,7 @@ MACHINE_CONFIG_START(toaplan2_state::ghox)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3356,8 +3358,7 @@ MACHINE_CONFIG_START(toaplan2_state::dogyuun)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3404,8 +3405,7 @@ MACHINE_CONFIG_START(toaplan2_state::kbash)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3440,8 +3440,7 @@ MACHINE_CONFIG_START(toaplan2_state::kbash2)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3474,9 +3473,8 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_truxton2)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_truxton2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3529,8 +3527,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3569,8 +3566,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL); // FIXME: bootleg has no VDP
 	m_vdp[0]->set_palette(m_palette);
@@ -3647,9 +3643,8 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_truxton2)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_truxton2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3685,9 +3680,8 @@ MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3726,8 +3720,7 @@ MACHINE_CONFIG_START(toaplan2_state::vfive)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3766,8 +3759,7 @@ MACHINE_CONFIG_START(toaplan2_state::batsugun)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3807,8 +3799,7 @@ MACHINE_CONFIG_START(toaplan2_state::pwrkick)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3840,8 +3831,7 @@ MACHINE_CONFIG_START(toaplan2_state::othldrby)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3870,8 +3860,7 @@ MACHINE_CONFIG_START(toaplan2_state::enmadaio)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3906,8 +3895,7 @@ MACHINE_CONFIG_START(toaplan2_state::snowbro2)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3949,9 +3937,8 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -3993,9 +3980,8 @@ MACHINE_CONFIG_START(toaplan2_state::shippumd)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -4036,9 +4022,8 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -4102,9 +4087,8 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batrider)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
@@ -4170,9 +4154,8 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batrider)
-	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);

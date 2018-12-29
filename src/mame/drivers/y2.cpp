@@ -55,17 +55,17 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(system_board_y2_state::system_board_y2)
 	/*
-	MCFG_CPU_ADD("maincpu", SH4LE, 266666666)
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(CPU_CLOCK)
+	SH4LE(config, m_maincpu, 266666666);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	*/
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -11,18 +11,13 @@
 
 dc_common_device::dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	maple_device(mconfig, type, tag, owner, clock)
+	, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 {
-	memset(port_tag, 0, sizeof(port_tag));
 }
 
 void dc_common_device::device_start()
 {
 	maple_device::device_start();
-
-	for (int i = 0; i < 8; i++)
-	{
-		port[i] = ioport(port_tag[i]);
-	}
 }
 
 void dc_common_device::maple_w(const uint32_t *data, uint32_t in_size)

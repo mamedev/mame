@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jchan)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_jchan);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -622,18 +622,17 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jchan_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x10000);
 
-	MCFG_DEVICE_ADD("view2", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(0)
-	MCFG_KANEKO_TMAP_OFFSET(33, 11, 320, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2);
+	m_view2->set_gfx_region(0);
+	m_view2->set_offset(33, 11, 320, 240);
+	m_view2->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
-	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
+	for (auto &spritegen : m_spritegen)
+		SKNS_SPRITE(config, spritegen, 0);
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 

@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

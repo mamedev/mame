@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "includes/xavix.h"
 
-#define VERBOSE 1
+// #define VERBOSE 1
 #include "logmacro.h"
 
 // 16 stereo voices?
@@ -75,10 +75,10 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 							/* need envelopes or some of these loop forever!
 							else if (m_voice[v].type == 2)
 							{
-								m_voice[v].position[channel] = m_voice[v].startposition[channel];
-								// presumably don't want to play 0x80 byte, so read in a new one
-								pos = (m_voice[v].bank << 16) | (m_voice[v].position[channel] >> 14);
-								sample = m_readsamples_cb(pos);
+							    m_voice[v].position[channel] = m_voice[v].startposition[channel];
+							    // presumably don't want to play 0x80 byte, so read in a new one
+							    pos = (m_voice[v].bank << 16) | (m_voice[v].position[channel] >> 14);
+							    sample = m_readsamples_cb(pos);
 							}
 							*/
 						}
@@ -103,10 +103,10 @@ bool xavix_sound_device::is_voice_enabled(int voice)
 	m_stream->update();
 
 /*
-	if ((m_voice[voice].enabled[0] == true) || (m_voice[voice].enabled[1] == true))
-		return true;
-	else
-		return false;
+    if ((m_voice[voice].enabled[0] == true) || (m_voice[voice].enabled[1] == true))
+        return true;
+    else
+        return false;
 */
 	if ((m_voice[voice].enabled[0] == true) && (m_voice[voice].enabled[1] == true))
 		return true;
@@ -161,7 +161,7 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 		// mode 2 is used on monster truck
 
 		LOG("voice %01x (possible meanings mode %01x rate %04x sampleaddrleft_full %08x sampleaddrright_full %08x envaddrleft_full %08x envaddrright_full %08x envfreq %02x envmode_unk [%01x, %01x])\n", voice, freq_mode & 0x3, freq_mode >> 2, sampleaddrleft_full, sampleaddrright_full, envaddrleft_full, envaddrright_full, envfreq, envmode, envunk);
-		
+
 		LOG("  (ENV1 ");
 		for (int i = 0; i < 8; i++)
 		{
@@ -177,7 +177,7 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 			LOG("%02x ", env);
 		}
 		LOG(")  \n");
-	
+
 	}
 
 	if (envmode_unk & 0xc0)
@@ -244,7 +244,7 @@ WRITE8_MEMBER(xavix_state::sound_startstop_w)
 	  offset 0
 	  data & 0x01 - voice 0  (registers at regbase + 0x00) eg 0x3b00 - 0x3b0f in monster truck
 	  data & 0x02 - voice 1  (registers at regbase + 0x10) eg 0x3b10 - 0x3b1f in monster truck
-	  data & 0x04 - voice 2  
+	  data & 0x04 - voice 2
 	  data & 0x08 - voice 3
 	  data & 0x10 - voice 4
 	  data & 0x20 - voice 5
@@ -448,7 +448,7 @@ READ8_MEMBER(xavix_state::sound_irqstatus_r)
 	// rad_rh checks this after doing something that looks like an irq ack
 	// the UK ekara sets check the upper bit to see if the interrupt is from the sound timer (rather than checking interrupt source register)
 	// and decrease a counter that controls the tempo (the US / Japan sets don't enable the sound timer at all)
-	return m_sound_irqstatus; 
+	return m_sound_irqstatus;
 }
 
 WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
@@ -483,8 +483,18 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 		{
 			if (data & bit)
 			{
-				// period should be based on m_sndtimer[t] at least, maybe also some other regs?
-				m_sound_timer[t]->adjust(attotime::from_usec(1000), t, attotime::from_usec(1000));
+				/* period should be based on m_sndtimer[t] at least, maybe also some other regs?
+
+				   rad_crdn : sound_timer0_w 06
+				   ddrfammt, popira etc. : sound_timer3_w 80
+				   so higher value definitely needs to be faster? (unless there's another multiplier elsewhere)
+
+				   11 is too fast (popira checked on various tracks, finish before getting to 100% then jump to 100%) where is this multiplier coming from? clock divided?
+				   10 seems close to correct for ddrfammt, popira, might need fine tuning.  seems too slow for rad_crdn / rad_bass?
+				   tweaked to 10.3f stay in time with the first song in https://www.youtube.com/watch?v=3x1C9bhC2rc
+				*/
+				attotime period = attotime::from_hz(10.3f * (m_sndtimer[t]));
+				m_sound_timer[t]->adjust(period, t, period);
 			}
 			else
 			{
@@ -495,7 +505,7 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 
 	// see if we're enabling any timers (should probably check if they're already running so we don't end up restarting them)
 	m_sound_irqstatus |= data & 0x0f; // look like IRQ enable flags - 4 sources? voices? timers?
-	
+
 
 	LOG("%s: sound_irqstatus_w %02x\n", machine().describe_context(), data);
 }

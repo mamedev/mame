@@ -550,11 +550,10 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shadfrce_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shadfrce)
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shadfrce);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

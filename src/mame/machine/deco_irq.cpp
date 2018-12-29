@@ -90,10 +90,10 @@ void deco_irq_device::device_reset()
 TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 {
 	const rectangle visible = m_screen->visible_area();
-	uint8_t y = m_screen->vpos();
+	uint16_t y = m_screen->vpos();
 
 	// raster irq?
-	if (m_raster_irq_scanline > 0 && m_raster_irq_scanline < 240 && y == (m_raster_irq_scanline - 1))
+	if (m_raster_irq_scanline >= visible.top() && m_raster_irq_scanline <= visible.bottom() && y == m_raster_irq_scanline)
 	{
 		if (!m_raster_irq_masked)
 		{

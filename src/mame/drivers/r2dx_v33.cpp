@@ -745,9 +745,8 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", r2dx_v33_state::gfx_raiden2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, r2dx_v33_state::gfx_raiden2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
@@ -782,9 +781,8 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", r2dx_v33_state::gfx_raiden2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, r2dx_v33_state::gfx_raiden2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
@@ -800,11 +798,12 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)

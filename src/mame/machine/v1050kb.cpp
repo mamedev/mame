@@ -73,11 +73,11 @@ DISCRETE_SOUND_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(v1050_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8049_TAG, I8049, XTAL(4'608'000))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, v1050_keyboard_device, kb_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, v1050_keyboard_device, kb_p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, v1050_keyboard_device, kb_p2_w))
-	MCFG_DEVICE_DISABLE() // TODO
+	I8049(config, m_maincpu, XTAL(4'608'000));
+	m_maincpu->p1_in_cb().set(FUNC(v1050_keyboard_device::kb_p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(v1050_keyboard_device::kb_p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(v1050_keyboard_device::kb_p2_w));
+	m_maincpu->set_disable(); // TODO
 
 	// discrete sound
 	SPEAKER(config, "mono").front_center();

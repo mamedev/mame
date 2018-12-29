@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sorcerer)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -484,8 +484,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
-	MCFG_DEVICE_ADD(m_fdc, MICROPOLIS, 0)
-	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS
+	MICROPOLIS(config, m_fdc, 0);
+	m_fdc->set_default_drive_tags();
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 
 	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock

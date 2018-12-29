@@ -65,6 +65,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
 #include "machine/clock.h"
@@ -926,14 +927,15 @@ static void ngen_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(ngen_state::ngen)
+void ngen_state::ngen(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(ngen_mem)
-	MCFG_DEVICE_IO_MAP(ngen_io)
-	MCFG_80186_CHIP_SELECT_CB(WRITE16(*this, ngen_state, cpu_peripheral_cb))
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE(*this, ngen_state, cpu_timer_w))
-	MCFG_80186_IRQ_SLAVE_ACK(READ8(*this, ngen_state, irq_cb))
+	I80186(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngen_state::ngen_mem);
+	m_maincpu->set_addrmap(AS_IO, &ngen_state::ngen_io);
+	m_maincpu->chip_select_callback().set(FUNC(ngen_state::cpu_peripheral_cb));
+	m_maincpu->tmrout0_handler().set(FUNC(ngen_state::cpu_timer_w));
+	m_maincpu->read_slave_ack_callback().set(FUNC(ngen_state::irq_cb));
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -988,11 +990,11 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
 	// video board
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(720,348)
-	MCFG_SCREEN_VISIBLE_AREA(0,719,0,347)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(720, 348);
+	screen.set_visarea(0, 719, 0, 347);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	MC6845(config, m_crtc, 19980000 / 9);  // divisor unknown -- /9 gives 60Hz output, so likely correct
 	m_crtc->set_screen("screen");
@@ -1007,8 +1009,7 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen_state,timer_clk_out))
+	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // should be 19530Hz
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1038,16 +1039,16 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	PIT8253(config, m_hdc_timer, 0);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_HARDDISK_ADD("hard0")
+	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	HARDDISK(config, "hard0", 0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ngen386_state::ngen386)
-	MCFG_DEVICE_ADD("i386cpu", I386, 50_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(ngen386_mem)
-	MCFG_DEVICE_IO_MAP(ngen386_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+void ngen386_state::ngen386(machine_config &config)
+{
+	I386(config, m_i386cpu, 50_MHz_XTAL / 2);
+	m_i386cpu->set_addrmap(AS_PROGRAM, &ngen386_state::ngen386_mem);
+	m_i386cpu->set_addrmap(AS_IO, &ngen386_state::ngen386_io);
+	m_i386cpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_i386cpu, 0);
@@ -1102,11 +1103,11 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
 	// video board
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(720,348)
-	MCFG_SCREEN_VISIBLE_AREA(0,719,0,347)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(720, 348);
+	screen.set_visarea(0, 719, 0, 347);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	MC6845(config, m_crtc, 19980000 / 9);  // divisor unknown -- /9 gives 60Hz output, so likely correct
 	m_crtc->set_screen("screen");
@@ -1121,8 +1122,7 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen386_state,timer_clk_out))
+	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // should be 19530Hz
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1152,15 +1152,15 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	PIT8253(config, m_hdc_timer, 0);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_HARDDISK_ADD("hard0")
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	HARDDISK(config, "hard0", 0);
+}
 
-MACHINE_CONFIG_START(ngen386_state::_386i)
+void ngen386_state::_386i(machine_config &config)
+{
 	ngen386(config);
-	MCFG_DEVICE_MODIFY("i386cpu")
-	MCFG_DEVICE_PROGRAM_MAP(ngen386i_mem)
-MACHINE_CONFIG_END
+	m_i386cpu->set_addrmap(AS_PROGRAM, &ngen386_state::ngen386i_mem);
+}
 
 ROM_START( ngen )
 	ROM_REGION( 0x2000, "bios", 0)

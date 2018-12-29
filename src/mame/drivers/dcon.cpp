@@ -293,15 +293,14 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_dcon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(dcon_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(dcon_state::layer_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dcon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -313,11 +312,12 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
@@ -338,15 +338,14 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_sdgndmps)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(dcon_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(dcon_state::layer_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dcon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -359,11 +358,12 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/16, okim6295_device::PIN7_LOW) /* 1.25Mhz? unverified clock & divisor (was 1320000) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 MACHINE_CONFIG_END
 
 /***************************************************************************/

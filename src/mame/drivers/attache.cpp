@@ -69,6 +69,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/msm5832.h"
 #include "machine/nvram.h"
@@ -1132,7 +1133,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);
@@ -1178,7 +1179,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
@@ -1213,7 +1214,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);
@@ -1266,7 +1267,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	m_dma->out_iow_callback<0>().set(FUNC(attache_state::fdc_dma_w));
 	// m_dma->out_dack_callback<0>().set(FUNC(attache_state::fdc_dack_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);

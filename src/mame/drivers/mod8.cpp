@@ -154,8 +154,8 @@ MACHINE_CONFIG_START(mod8_state::mod8)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(mod8_state, kbd_put))
+	TELEPRINTER(config, m_teleprinter, 0);
+	m_teleprinter->set_keyboard_callback(FUNC(mod8_state::kbd_put));
 MACHINE_CONFIG_END
 
 

@@ -43,8 +43,9 @@ class p112_state : public driver_device
 {
 public:
 	p112_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void p112(machine_config &config);
 
@@ -105,7 +106,7 @@ MACHINE_CONFIG_START(p112_state::p112)
 	MCFG_SCREEN_UPDATE_DRIVER(p112_state, screen_update_p112)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 MACHINE_CONFIG_END
 

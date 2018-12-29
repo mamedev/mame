@@ -1715,8 +1715,8 @@ void ngarcade_base_state::neogeo_main_map(address_map &map)
 	map(0x000000, 0x00007f).r(FUNC(ngarcade_base_state::banked_vectors_r));
 	map(0x100000, 0x10ffff).mirror(0x0f0000).ram();
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
-	map(0x300080, 0x300081).mirror(0x01ff7e).portr("TEST");
 	map(0x300001, 0x300001).mirror(0x01fffe).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x300080, 0x300081).mirror(0x01ff7e).portr("TEST");
 	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO/COIN");
 	map(0x380000, 0x380001).mirror(0x01fffe).portr("SYSTEM");
 	map(0x800000, 0x800fff).r(FUNC(ngarcade_base_state::unmapped_r)); // memory card mapped here if present
@@ -1729,9 +1729,8 @@ void ngarcade_base_state::neogeo_main_map(address_map &map)
 
 READ16_MEMBER(aes_base_state::aes_in2_r)
 {
-	uint32_t ret = m_io_in2->read();
-	ret = (ret & 0xfcff) | (m_ctrl1->read_start_sel() << 8);
-	ret = (ret & 0xf3ff) | (m_ctrl2->read_start_sel() << 10);
+	uint32_t ret = m_io_in2->read() & 0xf0ff;
+	ret |= ((m_ctrl1->read_start_sel() & 0x03) << 8) | ((m_ctrl2->read_start_sel() & 0x03) << 10);
 	return ret;
 }
 
@@ -1933,7 +1932,7 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_SCREEN_UPDATE_DRIVER(neogeo_base_state, screen_update)
 
 	/* 4096 colors * two banks * normal and shadow */
-	MCFG_PALETTE_ADD_INIT_BLACK(m_palette, 4096*2*2)
+	MCFG_DEVICE_ADD(m_palette, PALETTE, palette_device::BLACK, 4096*2*2)
 
 	MCFG_DEVICE_ADD(m_sprgen, NEOGEO_SPRITE_OPTIMZIED, 0)
 

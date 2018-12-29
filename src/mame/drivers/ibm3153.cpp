@@ -54,14 +54,16 @@ public:
 
 	void ibm3153(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_PALETTE_INIT(ibm3153);
+	void ibm3153_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -90,11 +92,11 @@ uint32_t ibm3153_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-PALETTE_INIT_MEMBER( ibm3153_state, ibm3153 )
+void ibm3153_state::ibm3153_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
-	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0,   0, 0); // Black
+	palette.set_pen_color(1, 0, 255, 0); // Full
+	palette.set_pen_color(2, 0, 128, 0); // Dimmed
 }
 
 void ibm3153_state::machine_reset()
@@ -116,8 +118,7 @@ MACHINE_CONFIG_START(ibm3153_state::ibm3153)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(ibm3153_state, ibm3153)
+	PALETTE(config, "palette", FUNC(ibm3153_state::ibm3153_palette), 3);
 MACHINE_CONFIG_END
 
 /* ROM definition */

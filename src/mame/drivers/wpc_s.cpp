@@ -1985,7 +1985,7 @@ MACHINE_CONFIG_START(wpc_s_state::wpc_s)
 	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
+	DCS_AUDIO_8K(config, dcs, 0);
 MACHINE_CONFIG_END
 
 /*-----------------

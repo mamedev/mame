@@ -609,7 +609,6 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 #include "includes/toaplan1.h"
 #include "includes/toaplipt.h"
 
-#include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
 #include "machine/74259.h"
@@ -927,14 +926,14 @@ void toaplan1_state::outzone_sound_io_map(address_map &map)
 
 /***************************** TMS32010 Memory Map **************************/
 
-void toaplan1_state::DSP_program_map(address_map &map)
+void toaplan1_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-void toaplan1_state::DSP_io_map(address_map &map)
+void toaplan1_state::dsp_io_map(address_map &map)
 {
 	map(0, 0).w(FUNC(toaplan1_state::demonwld_dsp_addrsel_w));
 	map(1, 1).rw(FUNC(toaplan1_state::demonwld_dsp_r), FUNC(toaplan1_state::demonwld_dsp_w));
@@ -1934,13 +1933,14 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_rallybik_state, screen_update_rallybik)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_rallybik_state, screen_vblank_rallybik))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(31, 15);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallybik)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rallybik);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_rallybik_state,rallybik)
 
@@ -1973,11 +1973,10 @@ MACHINE_CONFIG_START(toaplan1_state::truxton)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2010,11 +2009,10 @@ MACHINE_CONFIG_START(toaplan1_state::hellfire)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2047,11 +2045,10 @@ MACHINE_CONFIG_START(toaplan1_state::zerowing)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2074,10 +2071,10 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_DEVICE_IO_MAP(demonwld_sound_io_map)
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
-	MCFG_DEVICE_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, toaplan1_state, demonwld_BIO_r))
+	TMS32010(config, m_dsp, XTAL(28'000'000)/2);
+	m_dsp->set_addrmap(AS_PROGRAM, &toaplan1_state::dsp_program_map);
+	m_dsp->set_addrmap(AS_IO, &toaplan1_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(toaplan1_state::demonwld_bio_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2089,11 +2086,10 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2126,11 +2122,10 @@ MACHINE_CONFIG_START(toaplan1_state::samesame)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_samesame))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2163,11 +2158,10 @@ MACHINE_CONFIG_START(toaplan1_state::outzone)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2200,11 +2194,10 @@ MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2237,11 +2230,10 @@ MACHINE_CONFIG_START(toaplan1_state::vimana)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toaplan1)
-	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toaplan1);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, (64*16)+(64*16));
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 

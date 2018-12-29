@@ -142,9 +142,8 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	MCFG_SCREEN_UPDATE_DRIVER(gomoku_state, screen_update_gomoku)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gomoku)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(gomoku_state, gomoku)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gomoku);
+	PALETTE(config, "palette", FUNC(gomoku_state::gomoku_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

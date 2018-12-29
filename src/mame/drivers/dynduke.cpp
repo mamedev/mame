@@ -327,8 +327,8 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
+	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
+	sei80bu.set_addrmap(AS_PROGRAM, &dynduke_state::sei80bu_encrypted_full_map);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
@@ -345,10 +345,9 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	screen.screen_vblank().append(FUNC(dynduke_state::vblank_irq));
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynduke)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dynduke);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -360,11 +359,12 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynduke_state::dbldyn)
