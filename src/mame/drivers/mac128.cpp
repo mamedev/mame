@@ -506,6 +506,7 @@ void mac128_state::scc_mouse_irq(int x, int y)
 	static int lasty = 0;
 	static int lastx = 0;
 
+	// DCD lines are active low in hardware but active high to software
 	if (x && y)
 	{
 		if (m_last_was_x)
@@ -514,12 +515,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 0;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 1;
 				}
 			}
@@ -527,12 +528,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 1;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 0;
 				}
 			}
@@ -544,12 +545,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 0;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 1;
 				}
 			}
@@ -557,12 +558,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 1;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 0;
 				}
 			}
@@ -579,12 +580,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 0;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 1;
 				}
 			}
@@ -592,12 +593,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 1;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 0;
 				}
 			}
@@ -609,12 +610,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 0;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 1;
 				}
 			}
@@ -622,12 +623,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 1;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 0;
 				}
 			}
