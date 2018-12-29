@@ -512,8 +512,7 @@ void pgm_state::pgm(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pgm);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_all_black));
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x1200/2);
 
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
