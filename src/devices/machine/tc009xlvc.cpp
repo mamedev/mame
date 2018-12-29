@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 
 void tc0091lvc_device::device_add_mconfig(machine_config &config)
 {
-	PALETTE(config, "palette").set_format(2, &tc0091lvc_device::tc0091lvc_xBGRBBBBGGGGRRRR, 256);
+	PALETTE(config, "palette", palette_device::BLACK).set_format(2, &tc0091lvc_device::tc0091lvc_xBGRBBBBGGGGRRRR, 256);
 }
 
 void tc0091lvc_device::device_start()
