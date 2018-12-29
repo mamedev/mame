@@ -1349,20 +1349,11 @@ void segas18_state::system18(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);
 
 	// video hardware
-<<<<<<< HEAD
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.23) // verified on pcb
-	MCFG_SCREEN_SIZE(342,262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
-=======
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57.23); // verified on pcb
 	m_screen->set_size(342,262);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas18_state::screen_update));
-	m_screen->set_palette(m_palette);
->>>>>>> b49825bf25c256656556d97beb12625504356adb
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas18);
 	PALETTE(config, m_palette).set_entries(2048*3+2048 + 64*3);
