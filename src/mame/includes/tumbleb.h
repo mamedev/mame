@@ -47,6 +47,7 @@ public:
 	void chokchok(machine_config &config);
 	void cookbib_mcu(machine_config &config);
 	void jumpkids(machine_config &config);
+	void funkyjetb(machine_config &config);
 
 	void init_dquizgo();
 	void init_jumpkids();
@@ -176,6 +177,7 @@ private:
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
 	void tumblepopba_main_map(address_map &map);
+	void funkyjetb_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TUMBLEB_H
