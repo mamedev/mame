@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'971'200)/2, 93*6, 0, 64*6, 268, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	CRT5027(config, m_vtac, XTAL(17'971'200)/2/6);
 	m_vtac->set_char_width(6);

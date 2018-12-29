@@ -61,7 +61,7 @@ ROM_END
 
 void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	MB8877(config, m_fdc, DERIVED_CLOCK(1, 8));
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));
@@ -72,7 +72,7 @@ void bbc_cumana1_device::device_add_mconfig(machine_config &config)
 
 void bbc_cumana2_device::device_add_mconfig(machine_config &config)
 {
-	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
+	MB8877(config, m_fdc, DERIVED_CLOCK(1, 8));
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_cumanafdc_device::fdc_drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_cumanafdc_device::motor_w));

@@ -72,8 +72,6 @@ private:
 
 	virtual void handle() override;
 	virtual void update_input(struct input_item_data *seqchangeditem) = 0;
-
-	static int compare_items(const void *i1, const void *i2);
 };
 
 class menu_input_general : public menu_input

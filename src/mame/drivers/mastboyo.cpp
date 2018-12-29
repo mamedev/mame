@@ -21,8 +21,8 @@
 class mastboyo_state : public driver_device
 {
 public:
-	mastboyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mastboyo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_fgram2(*this, "fgram2"),
 		m_maincpu(*this, "maincpu"),
@@ -57,7 +57,7 @@ private:
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(mastboyo);
+	void mastboyo_palette(palette_device &palette) const;
 };
 
 
@@ -94,7 +94,7 @@ WRITE8_MEMBER(mastboyo_state::fgram2_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-PALETTE_INIT_MEMBER(mastboyo_state, mastboyo)
+void mastboyo_state::mastboyo_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -217,8 +217,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboyo)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(mastboyo_state, mastboyo)
+	PALETTE(config, "palette", FUNC(mastboyo_state::mastboyo_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

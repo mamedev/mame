@@ -73,7 +73,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(nc_uart_control_w);
 	DECLARE_WRITE8_MEMBER(nc100_display_memory_start_w);
 
-	DECLARE_PALETTE_INIT(nc);
+	void nc_colours(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);

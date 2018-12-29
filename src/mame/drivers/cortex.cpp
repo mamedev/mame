@@ -179,7 +179,8 @@ void cortex_state::init_init()
 	membank("bankw0")->configure_entry(0, &main[0x00000]);
 }
 
-MACHINE_CONFIG_START(cortex_state::cortex)
+void cortex_state::cortex(machine_config &config)
+{
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
@@ -205,17 +206,17 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	crtc.set_vram_size(0x4000);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(cortex_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(cortex_state::kbd_put));
 
-	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL(12'000'000) / 4)
-	//MCFG_DEVICE_ADD("uart2", TMS9902, XTAL(12'000'000) / 4)
+	//TMS9902(config, "uart1", XTAL(12'000'000) / 4);
+	//TMS9902(config, "uart2", XTAL(12'000'000) / 4);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, 950); // guess
+	m_beep->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 /* ROM definition */
 ROM_START( cortex )

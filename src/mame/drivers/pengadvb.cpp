@@ -216,7 +216,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 ***************************************************************************/
 
 void pengadvb_state::pengadvb(machine_config &config)
-{	/* basic machine hardware */
+{   /* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pengadvb_state::program_mem);
 	m_maincpu->set_addrmap(AS_IO, &pengadvb_state::io_mem);

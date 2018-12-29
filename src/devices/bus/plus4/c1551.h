@@ -13,6 +13,7 @@
 
 #include "exp.h"
 #include "cpu/m6502/m6510t.h"
+#include "imagedev/floppy.h"
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
 #include "machine/pla.h"

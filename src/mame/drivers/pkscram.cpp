@@ -26,15 +26,15 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 class pkscram_state : public driver_device
 {
 public:
-	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pkscram_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_scan_timer(*this, "scan_timer"),
-		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
-		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
-		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram")
+		m_fgtilemap_ram(*this, "fgtilemap_ram"),
+		m_mdtilemap_ram(*this, "mdtilemap_ram"),
+		m_bgtilemap_ram(*this, "bgtilemap_ram")
 	{ }
 
 	void pkscramble(machine_config &config);
@@ -62,9 +62,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_scan_timer;
-	required_shared_ptr<uint16_t> m_pkscramble_fgtilemap_ram;
-	required_shared_ptr<uint16_t> m_pkscramble_mdtilemap_ram;
-	required_shared_ptr<uint16_t> m_pkscramble_bgtilemap_ram;
+	required_shared_ptr<uint16_t> m_fgtilemap_ram;
+	required_shared_ptr<uint16_t> m_mdtilemap_ram;
+	required_shared_ptr<uint16_t> m_bgtilemap_ram;
 
 	uint16_t m_out;
 	uint8_t m_interrupt_line_active;
@@ -79,19 +79,19 @@ enum { interrupt_scanline=192 };
 
 WRITE16_MEMBER(pkscram_state::pkscramble_fgtilemap_w)
 {
-	COMBINE_DATA(&m_pkscramble_fgtilemap_ram[offset]);
+	COMBINE_DATA(&m_fgtilemap_ram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(pkscram_state::pkscramble_mdtilemap_w)
 {
-	COMBINE_DATA(&m_pkscramble_mdtilemap_ram[offset]);
+	COMBINE_DATA(&m_mdtilemap_ram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
 {
-	COMBINE_DATA(&m_pkscramble_bgtilemap_ram[offset]);
+	COMBINE_DATA(&m_bgtilemap_ram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
@@ -220,26 +220,26 @@ INPUT_PORTS_END
 
 TILE_GET_INFO_MEMBER(pkscram_state::get_bg_tile_info)
 {
-	int tile  = m_pkscramble_bgtilemap_ram[tile_index*2];
-	int color = m_pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
+	int const tile  = m_bgtilemap_ram[tile_index*2];
+	int const color = m_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
 {
-	int tile  = m_pkscramble_mdtilemap_ram[tile_index*2];
-	int color = m_pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
+	int const tile  = m_mdtilemap_ram[tile_index*2];
+	int const color = m_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
 {
-	int tile  = m_pkscramble_fgtilemap_ram[tile_index*2];
-	int color = m_pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
+	int const tile  = m_fgtilemap_ram[tile_index*2];
+	int const color = m_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
@@ -333,10 +333,8 @@ MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	MCFG_SCREEN_UPDATE_DRIVER(pkscram_state, screen_update_pkscramble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkscram)
-
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pkscram);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

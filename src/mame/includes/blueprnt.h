@@ -59,7 +59,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(blueprnt);
-	DECLARE_PALETTE_INIT(blueprnt);
+	void blueprnt_palette(palette_device &palette) const;
 	uint32_t screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void blueprnt(machine_config &config);

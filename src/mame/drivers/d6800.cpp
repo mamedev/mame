@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(25))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

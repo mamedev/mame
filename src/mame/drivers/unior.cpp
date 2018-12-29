@@ -75,7 +75,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi1_a_w);
 	DECLARE_WRITE8_MEMBER(ppi1_c_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_PALETTE_INIT(unior);
+	void unior_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
@@ -281,16 +281,16 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }
 
-static const rgb_t unior_palette[3] =
+static constexpr rgb_t unior_pens[3] =
 {
-	rgb_t(0x00, 0x00, 0x00), // black
-	rgb_t(0xa0, 0xa0, 0xa0), // white
-	rgb_t(0xff, 0xff, 0xff)  // highlight
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0xa0, 0xa0, 0xa0 }, // white
+	{ 0xff, 0xff, 0xff }  // highlight
 };
 
-PALETTE_INIT_MEMBER(unior_state,unior)
+void unior_state::unior_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, unior_palette, ARRAY_LENGTH(unior_palette));
+	palette.set_pen_colors(0, unior_pens);
 }
 
 
@@ -389,9 +389,8 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unior)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_unior)
+	PALETTE(config, m_palette, FUNC(unior_state::unior_palette), 3);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

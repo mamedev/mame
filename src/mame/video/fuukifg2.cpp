@@ -64,15 +64,11 @@ TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info)
 
 /* Not used atm, seems to be fine without clearing pens? */
 #if 0
-PALETTE_INIT_MEMBER(fuuki16_state,fuuki16)
+void fuuki16_state::fuuki16_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int pen;
-
-	/* The game does not initialise the palette at startup. It should
-	   be totally black */
-	for (pen = 0; pen < palette.entries(); pen++)
-		palette.set_pen_color(pen,rgb_t(0,0,0));
+	// The game does not initialise the palette at startup. It should be totally black
+	for (int pen = 0; pen < palette.entries(); pen++)
+		palette.set_pen_color(pen, rgb_t:black());
 }
 #endif
 

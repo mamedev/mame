@@ -27,7 +27,6 @@
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
-#include "diexec.h"
 #include "speaker.h"
 
 #include "rendlay.h"
@@ -417,8 +416,8 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal_base)
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, "lpalette", gfx_interleaved);
 
-	PALETTE(config, "lpalette", 2048).set_format(PALETTE_FORMAT_IRRRRRGGGGGBBBBB);
-	PALETTE(config, "rpalette", 2048).set_format(PALETTE_FORMAT_IRRRRRGGGGGBBBBB);
+	PALETTE(config, "lpalette").set_format(palette_device::IRGB_1555, 2048);
+	PALETTE(config, "rpalette").set_format(palette_device::IRGB_1555, 2048);
 
 	TILEMAP(config, m_playfield, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,64)
 		.set_info_callback(FUNC(cyberbal_state::get_playfield_tile_info));
@@ -500,9 +499,8 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyberbal)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_cyberbal);
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	TILEMAP(config, m_playfield, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,64)
 		.set_info_callback(FUNC(cyberbal2p_state::get_playfield_tile_info));

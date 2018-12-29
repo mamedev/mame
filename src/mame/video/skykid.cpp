@@ -17,32 +17,31 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(skykid_state, skykid)
+void skykid_state::skykid_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* text palette */
-	for (i = 0; i < 0x100; i++)
+	// text palette
+	for (int i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* tiles/sprites */
-	for (i = 0x100; i < 0x500; i++)
+	// tiles/sprites
+	for (int i = 0x100; i < 0x500; i++)
 	{
-		uint8_t ctabentry = color_prom[i - 0x100];
+		uint8_t const ctabentry = color_prom[i - 0x100];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

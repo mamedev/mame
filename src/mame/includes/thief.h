@@ -3,6 +3,7 @@
 #include "sound/samples.h"
 #include "video/tms9927.h"
 #include "emupal.h"
+#include "screen.h"
 
 struct coprocessor_t {
 	std::unique_ptr<uint8_t[]> context_ram;
@@ -19,6 +20,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_tms(*this, "tms"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
 	void natodef(machine_config &config);
@@ -60,6 +62,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<tms9927_device> m_tms;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	void io_map(address_map &map);

@@ -359,6 +359,7 @@ public:
 		m_znmcu(*this, "znmcu"),
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "taito_zoom:mn10200"),
+		m_pccard(*this, "pccard"),
 		m_flashbank(*this, "flashbank"),
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom"),
@@ -412,6 +413,7 @@ private:
 	required_device<znmcu_device> m_znmcu;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
+	required_device<pccard_slot_device> m_pccard;
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<mb3773_device> m_mb3773;
 	required_device<taito_zoom_device> m_zoom;
@@ -686,8 +688,8 @@ void slot_ataflash(device_slot_interface &device)
 	device.option_add("ataflash", ATA_FLASH_PCCARD);
 }
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t)
-
+void taitogn_state::coh3002t(machine_config &config)
+{
 	/* basic machine hardware */
 	CXD8661R(config, m_maincpu, XTAL(100'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_map);
@@ -714,11 +716,10 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	m_znmcu->analog1_handler().set_ioport("ANALOG1");
 	m_znmcu->analog2_handler().set_ioport("ANALOG2");
 
-	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
+	AT28C16(config, "at28c16", 0);
 	RF5C296(config, "rf5c296", 0).set_pccard("pccard");
 
-	MCFG_DEVICE_ADD("pccard", PCCARD_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(slot_ataflash, nullptr, false)
+	PCCARD_SLOT(config, m_pccard, slot_ataflash, nullptr);
 
 	MB3773(config, "mb3773");
 
@@ -734,8 +735,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	// we don't have a 78K0 emulation core yet..
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8654Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
@@ -743,52 +743,51 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPU_ADD("spu", XTAL(67'737'600)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
+	spu.add_route(0, "lspeaker", 0.3);
+	spu.add_route(1, "rspeaker", 0.3);
 
 	TAITO_ZOOM(config, m_zoom);
 	m_zoom->set_use_flash();
 	m_zoom->add_route(0, "lspeaker", 1.0);
 	m_zoom->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
-	MCFG_ZSG2_EXT_READ_HANDLER(READ32(*this, taitogn_state, zsg2_ext_r))
-MACHINE_CONFIG_END
+	m_zoom->subdevice<zsg2_device>("zsg2")->ext_read().set(FUNC(taitogn_state::zsg2_ext_r));
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t1)
+void taitogn_state::coh3002t_t1(machine_config &config)
+{
 	coh3002t(config);
-	MCFG_DEVICE_MODIFY("pccard")
-	MCFG_SLOT_DEFAULT_OPTION("taitopccard1")
-MACHINE_CONFIG_END
+	m_pccard->set_default_option("taitopccard1");
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t2)
+void taitogn_state::coh3002t_t2(machine_config &config)
+{
 	coh3002t(config);
-	MCFG_DEVICE_MODIFY("pccard")
-	MCFG_SLOT_DEFAULT_OPTION("taitopccard2")
-MACHINE_CONFIG_END
+	m_pccard->set_default_option("taitopccard2");
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t1_mp)
+void taitogn_state::coh3002t_t1_mp(machine_config &config)
+{
 	coh3002t_t1(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(taitogn_mp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_mp_map);
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t2_mp)
+void taitogn_state::coh3002t_t2_mp(machine_config &config)
+{
 	coh3002t_t2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(taitogn_mp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_mp_map);
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_cf)
+void taitogn_state::coh3002t_cf(machine_config &config)
+{
 	coh3002t(config);
-	MCFG_DEVICE_MODIFY("pccard")
-	MCFG_SLOT_DEFAULT_OPTION("taitocf")
-MACHINE_CONFIG_END
+	m_pccard->set_default_option("taitocf");
+}
 
 
 static INPUT_PORTS_START( coh3002t )

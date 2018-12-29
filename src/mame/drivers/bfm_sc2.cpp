@@ -2285,14 +2285,14 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
-	MCFG_BFMBD1_ADD("vfd0",0)
-	MCFG_BFMBD1_ADD("vfd1",1)
+	BFM_BD1(config, m_vfd0, 60, 0);
+	BFM_BD1(config, m_vfd1, 60, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
 	config.set_default_layout(layout_sc2_vid);
 
-	MCFG_BFM_ADDER2_ADD("adder2")
+	BFM_ADDER2(config, "adder2", 0);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd", UPD7759)
@@ -3754,8 +3754,8 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
-	MCFG_BFMBD1_ADD("vfd0",0)
-	MCFG_BFMBD1_ADD("vfd1",1)
+	BFM_BD1(config, m_vfd0, 60, 0);
+	BFM_BD1(config, m_vfd1, 60, 1);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd",UPD7759)

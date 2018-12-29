@@ -56,8 +56,8 @@ RAM = 4116 (x11)
 class r2dtank_state : public driver_device
 {
 public:
-	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
@@ -68,7 +68,8 @@ public:
 		m_pia_main(*this, "pia_main"),
 		m_pia_audio(*this, "pia_audio"),
 		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2") { }
+		m_ay2(*this, "ay2")
+	{ }
 
 	void r2dtank(machine_config &config);
 
@@ -455,7 +456,7 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen("screen");

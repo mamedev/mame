@@ -424,40 +424,40 @@ void mexico86_state::machine_reset()
 	m_charbank = 0;
 }
 
-MACHINE_CONFIG_START(mexico86_state::mexico86)
-
+void mexico86_state::mexico86(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MCFG_DEVICE_PROGRAM_MAP(mexico86_map)
+	Z80(config, m_maincpu, 24000000/4); /* 6 MHz, Uses clock divided 24MHz OSC */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mexico86_state::mexico86_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MCFG_DEVICE_PROGRAM_MAP(mexico86_sound_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 24000000/4); /* 6 MHz, Uses clock divided 24MHz OSC */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mexico86_state::mexico86_sound_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(mexico86_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("mcu", M68705P3, 4000000) /* xtal is 4MHz, divided by 4 internally */
-	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"));
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, mexico86_state, mexico86_68705_port_a_w));
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, mexico86_state, mexico86_68705_port_b_w));
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state, mexico86_m68705_interrupt)
+	M68705P3(config, m_mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
+	m_mcu->portc_r().set_ioport("IN0");
+	m_mcu->porta_w().set(FUNC(mexico86_state::mexico86_68705_port_a_w));
+	m_mcu->portb_w().set(FUNC(mexico86_state::mexico86_68705_port_b_w));
+	m_mcu->set_vblank_int("screen", FUNC(mexico86_state::mexico86_m68705_interrupt));
 
-	MCFG_DEVICE_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
-	MCFG_DEVICE_PROGRAM_MAP(mexico86_sub_cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 8000000/2); /* 4 MHz, Uses 8Mhz OSC */
+	m_subcpu->set_addrmap(AS_PROGRAM, &mexico86_state::mexico86_sub_cpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(mexico86_state::irq0_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
-
+	/* 100 CPU slices per frame - high value to ensure proper synchronization of the CPUs */
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_mexico86)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* frames per second, vblank duration */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(mexico86_state::screen_update_mexico86));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mexico86)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mexico86);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -469,36 +469,27 @@ MACHINE_CONFIG_START(mexico86_state::mexico86)
 	m_ymsnd->add_route(1, "mono", 0.30);
 	m_ymsnd->add_route(2, "mono", 0.30);
 	m_ymsnd->add_route(3, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(mexico86_state::knightb)
+void mexico86_state::knightb(machine_config &config)
+{
 	mexico86(config);
+	config.device_remove("sub");
+	m_screen->set_screen_update(FUNC(mexico86_state::screen_update_kikikai));
+}
 
-	/* basic machine hardware */
-
-	MCFG_DEVICE_REMOVE("sub")
-
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_kikikai)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(mexico86_state::kikikai)
+void mexico86_state::kikikai(machine_config &config)
+{
 	knightb(config);
 
-	/* basic machine hardware */
+	// IRQs should be triggered by the MCU, but we don't have it
+	m_maincpu->set_vblank_int("screen", FUNC(mexico86_state::kikikai_interrupt));
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mexico86_state,  kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
-
-	MCFG_DEVICE_REMOVE("mcu")   // we don't have code for the MC6801U4
+	config.device_remove("mcu");   // we don't have code for the MC6801U4
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_kikikai)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(mexico86_state::screen_update_kikikai));
+}
 
 
 /*************************************

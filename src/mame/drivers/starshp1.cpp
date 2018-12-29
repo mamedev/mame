@@ -319,12 +319,10 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_SCREEN_RAW_PARAMS(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(starshp1_state, screen_update_starshp1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, starshp1_state, screen_vblank_starshp1))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starshp1)
-	MCFG_PALETTE_ADD("palette", 19)
-	MCFG_PALETTE_INDIRECT_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(starshp1_state, starshp1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_starshp1)
+	PALETTE(config, m_palette, FUNC(starshp1_state::starshp1_palette), 19, 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -62,7 +62,6 @@ and 1 SFX channel controlled by an 8039:
 #include "includes/konamipt.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
@@ -487,11 +486,11 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_DEVICE_PROGRAM_MAP(audio_cpu1_map)
 	MCFG_DEVICE_IO_MAP(audio_cpu1_io_map)
 
-	MCFG_DEVICE_ADD("audio2", I8039, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(audio_cpu2_map)
-	MCFG_DEVICE_IO_MAP(audio_cpu2_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, gyruss_state, gyruss_dac_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, gyruss_state, gyruss_irq_clear_w))
+	I8039(config, m_audiocpu_2, XTAL(8'000'000));
+	m_audiocpu_2->set_addrmap(AS_PROGRAM, &gyruss_state::audio_cpu2_map);
+	m_audiocpu_2->set_addrmap(AS_IO, &gyruss_state::audio_cpu2_io_map);
+	m_audiocpu_2->p1_out_cb().set(FUNC(gyruss_state::gyruss_dac_w));
+	m_audiocpu_2->p2_out_cb().set(FUNC(gyruss_state::gyruss_irq_clear_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -505,13 +504,11 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(gyruss_state, screen_update_gyruss)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gyruss_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gyruss)
-	MCFG_PALETTE_ADD("palette", 16*4+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gyruss);
+	PALETTE(config, m_palette, FUNC(gyruss_state::gyruss_palette), 16*4+16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

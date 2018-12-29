@@ -2,22 +2,22 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
-	SGI Crimson deskside skeleton driver
+    SGI Crimson deskside skeleton driver
 
-	To Do: Everything
+    To Do: Everything
 
-	Memory map:
-	1fc00000 - 1fc7ffff      Boot ROM
+    Memory map:
+    1fc00000 - 1fc7ffff      Boot ROM
 
 **********************************************************************/
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 
-#define LOG_UNKNOWN		(1 << 0)
-#define LOG_ALL			(LOG_UNKNOWN)
+#define LOG_UNKNOWN     (1 << 0)
+#define LOG_ALL         (LOG_UNKNOWN)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 class crimson_state : public driver_device

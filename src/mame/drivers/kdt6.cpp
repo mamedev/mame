@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
@@ -627,7 +628,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(13'516'800), 824, 48, 688, 274, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_kdt6);
 
 	MC6845(config, m_crtc, XTAL(13'516'800) / 8);
@@ -708,7 +709,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("ctc1", FUNC(z80ctc_device::trg0));
 	m_fdc->drq_wr_callback().set(FUNC(kdt6_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats)

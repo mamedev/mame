@@ -63,7 +63,7 @@ void deco_irq_device::device_start()
 
 	// allocate scanline timer and start it
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(deco_irq_device::scanline_callback), this));
-	m_scanline_timer->adjust(m_screen->time_until_pos(0, m_screen->visible_area().right() + 1));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	// register for save states
 	save_item(NAME(m_lightgun_irq));
@@ -93,7 +93,7 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 	uint16_t y = m_screen->vpos();
 
 	// raster irq?
-	if (m_raster_irq_scanline >= visible.top() && m_raster_irq_scanline <= visible.bottom() && y == (m_raster_irq_scanline - 1))
+	if (m_raster_irq_scanline >= visible.top() && m_raster_irq_scanline <= visible.bottom() && y == m_raster_irq_scanline)
 	{
 		if (!m_raster_irq_masked)
 		{
@@ -115,14 +115,14 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 	}
 
 	// vblank-in?
-	if (y == visible.bottom())
+	if (y == (visible.bottom() + 1))
 	{
 		m_vblank_irq = true;
 		m_vblank_irq_cb(ASSERT_LINE);
 	}
 
 	// wait for next line
-	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, visible.right() + 1));
+	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1));
 }
 
 

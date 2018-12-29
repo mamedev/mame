@@ -12,6 +12,7 @@
 #pragma once
 
 #include "video/mc6845.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
@@ -192,7 +193,7 @@ private:
 	int m_DrawInterlace;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dgn);
+	void dgn_beta_palette(palette_device &palette) const;
 
 	DECLARE_READ8_MEMBER(d_pia0_pa_r);
 	DECLARE_WRITE8_MEMBER(d_pia0_pa_w);

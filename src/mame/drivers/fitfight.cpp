@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	audiocpu.pc_in_cb().set(FUNC(fitfight_state::snd_portc_r));
 	audiocpu.pc_out_cb().set(FUNC(fitfight_state::snd_portc_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fitfight)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fitfight);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -746,9 +746,7 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF2, m_audiocpu->minimum_quantum_time()); });
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -762,8 +760,7 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 	MCFG_DEVICE_PROGRAM_MAP(bbprot_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prot)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prot);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -773,9 +770,7 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
 
 	SPEAKER(config, "mono").front_center();
 

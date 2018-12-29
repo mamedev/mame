@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(taitoh_state::syvalion)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_syvalion)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_h);
 	PALETTE(config, m_palette, 33*16);
@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_recordbr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_h);
 	PALETTE(config, m_palette, 33*16);
@@ -785,7 +785,7 @@ MACHINE_CONFIG_START(taitoh_state::dleague)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_dleague)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_h);
 	PALETTE(config, m_palette, 33*16);

@@ -40,8 +40,8 @@
 class jongkyo_state : public driver_device
 {
 public:
-	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
 		m_bank1d(*this, "bank1d"),
@@ -78,7 +78,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jongkyo);
+	void jongkyo_palette(palette_device &palette) const;
 	uint32_t screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void decrypted_opcodes_map(address_map &map);
 	void jongkyo_memmap(address_map &map);
@@ -471,20 +471,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(jongkyo_state, jongkyo)
+void jongkyo_state::jongkyo_palette(palette_device &palette) const
 {
-	int i;
-	uint8_t* proms = memregion("proms")->base();
-	for (i = 0; i < 0x40; i++)
+	uint8_t const *const proms = memregion("proms")->base();
+	for (int i = 0; i < 0x40; i++)
 	{
-		int data = proms[i];
+		int const data = proms[i];
 
-		int r = (data  >> 0) & 0x07;
-		int g = (data  >> 3) & 0x07;
-		int b = (data  >> 6) & 0x03;
+		int const r = pal3bit((data  >> 0) & 0x07);
+		int const g = pal3bit((data  >> 3) & 0x07);
+		int const b = pal2bit((data  >> 6) & 0x03);
 
-			palette.set_pen_color(i, r << 5, g << 5, b << 6 );
-
+		palette.set_pen_color(i, r, g, b);
 	}
 }
 
@@ -513,15 +511,14 @@ void jongkyo_state::machine_reset()
 MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(jongkyo_memmap)
-	MCFG_DEVICE_IO_MAP(jongkyo_portmap)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_SIZE(0x6c00)
-	MCFG_SEGACRPT_SET_NUMBANKS(8)
-	MCFG_SEGACRPT_SET_BANKSIZE(0x400)
-	//  sega_decode(rom, opcodes, 0x6c00, convtable, 8, 0x400);
+	sega_315_5084_device &maincpu(SEGA_315_5084(config, m_maincpu, JONGKYO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &jongkyo_state::jongkyo_memmap);
+	maincpu.set_addrmap(AS_IO, &jongkyo_state::jongkyo_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &jongkyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(jongkyo_state::irq0_line_hold));
+	maincpu.set_size(0x6c00);
+	maincpu.set_numbanks(8);
+	maincpu.set_banksize(0x400);
 
 
 	/* video hardware */
@@ -533,8 +530,7 @@ MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 	MCFG_SCREEN_UPDATE_DRIVER(jongkyo_state, screen_update_jongkyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(jongkyo_state, jongkyo)
+	PALETTE(config, "palette", FUNC(jongkyo_state::jongkyo_palette), 0x100);
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", JONGKYO_CLOCK/8));

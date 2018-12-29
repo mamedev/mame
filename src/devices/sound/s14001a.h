@@ -8,13 +8,6 @@
 #ifndef MAME_SOUND_S14001A_H
 #define MAME_SOUND_S14001A_H
 
-#define MCFG_S14001A_BSY_HANDLER(_devcb) \
-	downcast<s14001a_device &>(*device).set_bsy_handler(DEVCB_##_devcb);
-
-#define MCFG_S14001A_EXT_READ_HANDLER(_devcb) \
-	downcast<s14001a_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
-
-
 class s14001a_device : public device_t, public device_sound_interface
 {
 public:

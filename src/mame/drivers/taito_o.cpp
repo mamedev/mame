@@ -246,11 +246,10 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 31*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_parentj);
-	PALETTE(config, m_palette, 33*16);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);

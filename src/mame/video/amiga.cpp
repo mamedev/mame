@@ -108,11 +108,9 @@ const uint16_t delay[256] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(amiga_state,amiga)
+void amiga_state::amiga_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 		palette.set_pen_color(i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
 }
 

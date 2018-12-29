@@ -264,16 +264,6 @@ struct mips3_tlb_entry {
 
 #define MIPS3_MAX_TLB_ENTRIES       48
 
-#define MCFG_MIPS3_ICACHE_SIZE(_size) \
-	downcast<mips3_device &>(*device).set_icache_size(_size);
-
-#define MCFG_MIPS3_DCACHE_SIZE(_size) \
-	downcast<mips3_device &>(*device).set_dcache_size(_size);
-
-#define MCFG_MIPS3_SYSTEM_CLOCK(_clock) \
-	downcast<mips3_device &>(*device).set_system_clock(_clock);
-
-
 class mips3_frontend;
 
 class mips3_device : public cpu_device, public device_vtlb_interface {

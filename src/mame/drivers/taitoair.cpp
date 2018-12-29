@@ -736,11 +736,11 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	// Estimated, assume same as mlanding.cpp
 	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 3*16, 28*16)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airsys);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
+	PALETTE(config, m_palette, palette_device::BLACK, 512*16+512*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);

@@ -278,12 +278,11 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ksayakyu_state, screen_update_ksayakyu)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksayakyu)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ksayakyu);
+	PALETTE(config, m_palette, FUNC(ksayakyu_state::ksayakyu_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

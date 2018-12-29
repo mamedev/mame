@@ -190,13 +190,14 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(qsound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dsp", DSP16A, DERIVED_CLOCK(1, 1))
-	MCFG_DEVICE_IO_MAP(dsp_io_map)
-	MCFG_DSP16_OCK_CB(WRITELINE(*this, qsound_device, dsp_ock_w))
-	MCFG_DSP16_PIO_R_CB(READ16(*this, qsound_device, dsp_pio_r))
-	MCFG_DSP16_PIO_W_CB(WRITE16(*this, qsound_device, dsp_pio_w))
-MACHINE_CONFIG_END
+void qsound_device::device_add_mconfig(machine_config &config)
+{
+	DSP16A(config, m_dsp, DERIVED_CLOCK(1, 1));
+	m_dsp->set_addrmap(AS_IO, &qsound_device::dsp_io_map);
+	m_dsp->ock_cb().set(FUNC(qsound_device::dsp_ock_w));
+	m_dsp->pio_r_cb().set(FUNC(qsound_device::dsp_pio_r));
+	m_dsp->pio_w_cb().set(FUNC(qsound_device::dsp_pio_w));
+}
 
 
 //-------------------------------------------------

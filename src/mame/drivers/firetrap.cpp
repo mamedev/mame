@@ -639,11 +639,10 @@ MACHINE_CONFIG_START(firetrap_state::firetrap)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_firetrap)
+	PALETTE(config, m_palette, FUNC(firetrap_state::firetrap_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -684,11 +683,10 @@ MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_firetrap)
+	PALETTE(config, m_palette, FUNC(firetrap_state::firetrap_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -48,14 +48,18 @@ Dumped: 06/04/2009 f205v
 class murogmbl_state : public driver_device
 {
 public:
-	murogmbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	murogmbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_video(*this, "video") { }
+		m_video(*this, "video")
+	{ }
 
 	void murogmbl(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -64,8 +68,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_video;
 
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(murogmbl);
+	void murogmbl_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void murogmbl_map(address_map &map);
@@ -74,14 +77,18 @@ private:
 class slotunbl_state : public driver_device
 {
 public:
-	slotunbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	slotunbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_video(*this, "video") { }
+		m_video(*this, "video")
+	{ }
 
 	void slotunbl(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -90,62 +97,63 @@ private:
 
 	required_shared_ptr<uint8_t> m_video;
 
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(slotunbl);
+	void slotunbl_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void slotunbl_map(address_map &map);
 };
 
-PALETTE_INIT_MEMBER(murogmbl_state, murogmbl)
+void murogmbl_state::murogmbl_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x20; ++i)
+	for (int i = 0; i < 0x20; ++i)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int bit0, bit1, bit2;
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
-PALETTE_INIT_MEMBER(slotunbl_state, slotunbl)
+void slotunbl_state::slotunbl_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x20; ++i)
+	for (int i = 0; i < 0x20; ++i)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int bit0, bit1, bit2;
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
@@ -345,7 +353,7 @@ MACHINE_CONFIG_START(murogmbl_state::murogmbl)
 	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_DEVICE_PROGRAM_MAP(murogmbl_map)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_murogmbl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_murogmbl);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -354,10 +362,9 @@ MACHINE_CONFIG_START(murogmbl_state::murogmbl)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(murogmbl_state, murogmbl)
+	PALETTE(config, m_palette, FUNC(murogmbl_state::murogmbl_palette), 0x100);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -370,8 +377,7 @@ MACHINE_CONFIG_START(slotunbl_state::slotunbl)
 	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_DEVICE_PROGRAM_MAP(slotunbl_map)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotunbl)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slotunbl);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -380,10 +386,9 @@ MACHINE_CONFIG_START(slotunbl_state::slotunbl)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slotunbl_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(slotunbl_state, slotunbl)
+	PALETTE(config, m_palette, FUNC(slotunbl_state::slotunbl_palette), 0x100);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC

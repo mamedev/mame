@@ -1301,7 +1301,7 @@ void address_space::prepare_map()
 			// find the region
 			memory_region *region = m_manager.machine().root_device().memregion(fulltag.c_str());
 			if (region == nullptr)
-				fatalerror("device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				fatalerror("device '%s' %s space memory map entry %X-%X references nonexistent region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 
 			// validate the region
 			if (entry.m_rgnoffs + m_config.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > region->bytes())
@@ -2739,7 +2739,6 @@ memory_block::~memory_block()
 
 memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
 	: m_machine(space.m_manager.machine()),
-	  m_baseptr(nullptr),
 	  m_anonymous(tag == nullptr),
 	  m_addrstart(addrstart),
 	  m_addrend(addrend),
@@ -2815,7 +2814,7 @@ void memory_bank::set_base(void *base)
 		m_entries.resize(1);
 		m_curentry = 0;
 	}
-	m_baseptr = m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
+	m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
 	for(auto cb : m_alloc_notifier)
 		cb(base);
 	m_alloc_notifier.clear();
@@ -2846,7 +2845,6 @@ void memory_bank::set_entry(int entrynum)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
 
 	m_curentry = entrynum;
-	m_baseptr = m_entries[entrynum];
 }
 
 
@@ -2866,10 +2864,6 @@ void memory_bank::configure_entry(int entrynum, void *base)
 
 	// set the entry
 	m_entries[entrynum] = reinterpret_cast<u8 *>(base);
-
-	// if the bank base is not configured, and we're the first entry, set us up
-	if (!m_baseptr && !entrynum)
-		m_baseptr = m_entries[0];
 }
 
 
@@ -2885,8 +2879,6 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 	// fill in the requested bank entries
 	for (int entrynum = 0; entrynum < numentries; entrynum ++)
 		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride ;
-	if(!m_baseptr && !startentry)
-		m_baseptr = reinterpret_cast<u8 *>(base);
 }
 
 

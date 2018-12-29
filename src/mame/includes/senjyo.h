@@ -50,6 +50,11 @@ public:
 	void init_starfore();
 	void init_starforc();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -104,8 +109,8 @@ private:
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
 	DECLARE_READ8_MEMBER(pio_pa_r);
 
-	DECLARE_PALETTE_DECODER(IIBBGGRR);
-	DECLARE_PALETTE_INIT(radar);
+	static rgb_t IIBBGGRR(uint32_t raw);
+	void radar_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);
@@ -113,9 +118,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect);

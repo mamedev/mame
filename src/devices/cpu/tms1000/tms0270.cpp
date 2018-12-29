@@ -32,16 +32,13 @@ tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char
 
 
 // machine configs
-MACHINE_CONFIG_START(tms0270_cpu_device::device_add_mconfig)
-
+void tms0270_cpu_device::device_add_mconfig(machine_config &config)
+{
 	// main opcodes PLA, microinstructions PLA, output PLA
-	MCFG_PLA_ADD("ipla", 9, 22, 24)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-	MCFG_PLA_ADD("mpla", 6, 22, 64)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-	MCFG_PLA_ADD("opla", 6, 16, 48)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-MACHINE_CONFIG_END
+	PLA(config, "ipla", 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, "opla", 6, 16, 48).set_format(pla_device::FMT::BERKELEY);
+}
 
 
 // device_start/reset

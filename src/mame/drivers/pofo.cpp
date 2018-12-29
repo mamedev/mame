@@ -141,7 +141,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 	DECLARE_WRITE_LINE_MEMBER( wake_w );
 
-	DECLARE_PALETTE_INIT(portfolio);
+	void portfolio_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
@@ -926,7 +926,7 @@ WRITE8_MEMBER( portfolio_state::contrast_w )
 //  PALETTE_INIT( portfolio )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER(portfolio_state, portfolio)
+void portfolio_state::portfolio_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(142, 193, 172));
 	palette.set_pen_color(1, rgb_t(67, 71, 151));
@@ -1029,10 +1029,9 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
+	PALETTE(config, "palette", FUNC(portfolio_state::portfolio_palette), 2);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portfolio)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_portfolio);
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)

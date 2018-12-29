@@ -85,9 +85,15 @@ C-chip EXTERNAL memory map (it acts as a device mapped to ram; dtack is asserted
 0x000-0x3FF = RW ram window, a 1k window into the 8k byte sram inside the c-chip; the 'bank' visible is selected by 0x600 below
 0x400-0x403 = "ASIC RAM", 4 bytes of ram on the asic
 0x400 = unknown, no idea if /DTACK is asserted for R or W here
-0x401 = RW 'test command/status register', writing a 0x02 here starts test mode, will return 0x01 set if ok/ready for command and 0x04 set if error; this register is very likely handled by the internal rom in the upd78c11 itself rather than the eprom, and probably tests the sram and the 78c11 internal ram, among other things.
-Current guess: 0x401 is actually attached to the high 2 bits of the PF register; bit 0 is pf6 out, bit 1 is pf6 in (attached to pf6 thru a resistor?), bit 2 is pf7 out, bit 3 is pf7 in (attached to pf7 through a resistor). The 78c11 (I'm guessing) reads pf6 and pf7 once per int; if pf6-in is set it reruns the startup selftest, clears pf6-out, then re-sets it. if there is an error, it also sets pf7.
-Alternate guess: pf4 selects between rom and ram but pf5,6,7 are all mapped to 0x401. a memory mapped register in upd78c11 space selects low vs high half of rom/ram access
+0x401 = RW 'test command/status register', writing a 0x02 here starts test mode, will return 0x01 set if ok/ready for
+    command and 0x04 set if error; this register is very likely handled by the internal rom in the upd78c11 itself rather
+    than the eprom, and probably tests the sram and the 78c11 internal ram, among other things.
+    * Current guess: 0x401 is actually attached to the high 2 bits of the PF register; bit 0 is pf6 out, bit 1 is pf6 in
+	  (attached to pf6 thru a resistor?), bit 2 is pf7 out, bit 3 is pf7 in (attached to pf7 through a resistor).
+	  The 78c11 (I'm guessing) reads pf6 and pf7 once per int; if pf6-in is set it reruns the startup selftest,
+	  clears pf6-out, then re-sets it. if there is an error, it also sets pf7.
+    * Alternate guess: pf4 selects between rom and ram but pf5,6,7 are all mapped to 0x401. a memory mapped register in
+	  upd78c11 space selects low vs high half of rom/ram access
 0x402-0x5ff = unknown (may be mirror of 0x400 and 0x401?) no idea if /DTACK is asserted for R or W here
 0x600 = ?W ram window bank select, selects one of 8 1k banks to be accessible at 0x000-0x3ff , only low 3 bits are valid on this register. not sure if readable.
 0x601-0x7ff = unknown, no idea if /DTACK is asserted for R or W here

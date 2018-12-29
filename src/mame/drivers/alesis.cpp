@@ -329,7 +329,7 @@ static INPUT_PORTS_START( sr16 )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(alesis_state, alesis)
+void alesis_state::alesis_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -432,8 +432,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
+	PALETTE(config, "palette", FUNC(alesis_state::alesis_palette), 2);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
@@ -443,7 +442,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
+	ALESIS_DM3AG(config, "dm3ag", 12_MHz_XTAL/2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -467,7 +466,8 @@ MACHINE_CONFIG_START(alesis_state::sr16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(alesis_state::mmt8)
+void alesis_state::mmt8(machine_config &config)
+{
 	hr16(config);
 
 	/* basic machine hardware */
@@ -476,8 +476,8 @@ MACHINE_CONFIG_START(alesis_state::mmt8)
 	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::mmt8_p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::mmt8_p3_w));
 
-	MCFG_DEVICE_REMOVE("dm3ag")
-MACHINE_CONFIG_END
+	config.device_remove("dm3ag");
+}
 
 /* ROM definition */
 ROM_START( hr16 )

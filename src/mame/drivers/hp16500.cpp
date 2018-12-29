@@ -65,7 +65,7 @@ public:
 		m_mlc(*this, "mlc")
 	{ }
 
-	void hp16500(machine_config &config);
+	void hp16500b(machine_config &config);
 	void hp16500a(machine_config &config);
 	void hp1651(machine_config &config);
 	void hp1650(machine_config &config);
@@ -477,7 +477,8 @@ MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(hp16500_state::hp16500)
+void hp16500_state::hp16500b(machine_config &config)
+{
 	/* basic machine hardware */
 	M68EC030(config, m_maincpu, 25'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
@@ -498,9 +499,11 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 	// later with a 16500b specific keyboard implementation
 	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
 
+	//WD37C65C(config, "fdc", 16_MHz_XTAL);
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( hp16500 )
 INPUT_PORTS_END
@@ -534,4 +537,4 @@ ROM_END
 COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp16500b, 0, 0, hp16500b, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

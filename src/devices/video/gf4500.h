@@ -44,12 +44,6 @@ private:
 	int m_screen_y_min;
 };
 
-
-
-#define MCFG_GF4500_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GF4500, 0)
-
-
 DECLARE_DEVICE_TYPE(GF4500, gf4500_device)
 
 #endif // MAME_VIDEO_GF4500_H

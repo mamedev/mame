@@ -46,7 +46,7 @@ private:
 	DECLARE_READ8_MEMBER(k7658_data_r);
 	DECLARE_WRITE8_MEMBER(k7658_data_w);
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
-	DECLARE_PALETTE_INIT(rt1715);
+	void rt1715_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 	void k7658_io(address_map &map);
@@ -179,11 +179,11 @@ GFXDECODE_END
     PALETTE
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(rt1715_state, rt1715)
+void rt1715_state::rt1715_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); /* black */
-	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x00)); /* low intensity */
-	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x00)); // low intensity
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // high intensitiy
 }
 
 
@@ -301,9 +301,8 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	MCFG_SCREEN_UPDATE_DEVICE("a26", i8275_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(13.824_MHz_XTAL, 864, 0, 624, 320, 0, 300) // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rt1715)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_rt1715);
+	PALETTE(config, "palette", FUNC(rt1715_state::rt1715_palette), 3);
 
 	MCFG_DEVICE_ADD("a26", I8275, 13.824_MHz_XTAL / 8)
 	MCFG_I8275_CHARACTER_WIDTH(8)

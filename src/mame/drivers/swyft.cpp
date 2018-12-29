@@ -767,7 +767,7 @@ void swyft_state::swyft(machine_config &config)
 	screen.set_screen_update(FUNC(swyft_state::screen_update_swyft));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	ACIA6850(config, m_acia6850, 0);
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008

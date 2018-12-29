@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "cococart.h"
 #include "coco_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
 #include "machine/wd_fdc.h"

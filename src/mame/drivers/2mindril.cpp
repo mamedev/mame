@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_DEVICE_PROGRAM_MAP(drill_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2mindril)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2mindril);
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_0_callback().set_ioport("DSW");
@@ -384,8 +384,7 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_SCREEN_UPDATE_DRIVER(_2mindril_state, screen_update_f3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, _2mindril_state, screen_vblank_f3))
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

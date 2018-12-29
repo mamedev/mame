@@ -436,45 +436,44 @@ INPUT_PORTS_END
 
 static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
 
-MACHINE_CONFIG_START(vtech1_state::laser110)
-
+void vtech1_state::laser110(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(laser110_mem)
-	MCFG_DEVICE_IO_MAP(vtech1_io)
+	Z80(config, m_maincpu, VTECH1_CLK);  /* 3.57950 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vtech1_state::laser110_mem);
+	m_maincpu->set_addrmap(AS_IO, &vtech1_state::vtech1_io);
 
 	// video hardware
-	MCFG_SCREEN_MC6847_PAL_ADD("screen", "mc6847")
-
 	MC6847_PAL(config, m_mc6847, XTAL(4'433'619));
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
 	m_mc6847->input_callback().set(FUNC(vtech1_state::mc6847_videoram_r));
 	m_mc6847->set_black_and_white(true);
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
+	mc6847_base_device::add_pal_screen(config, "screen", "mc6847");
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// peripheral and memory expansion slots
-	MCFG_IOEXP_SLOT_ADD("io")
-	MCFG_MEMEXP_SLOT_ADD("mem")
+	VTECH_IOEXP_SLOT(config, m_ioexp);
+	VTECH_MEMEXP_SLOT(config, m_memexp);
 
 	// snapshot
-	MCFG_SNAPSHOT_ADD("snapshot", vtech1_state, vtech1, "vz", 1.5)
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(vtech1_state, vtech1), this), "vz", 1.5);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(vtech1_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("vtech1_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(vtech1_cassette_formats);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY));
+	m_cassette->set_interface("vtech1_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "vz_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("vz_cass");
+}
 
 void vtech1_state::laser200(machine_config &config)
 {
@@ -487,23 +486,24 @@ void vtech1_state::laser200(machine_config &config)
 	// other lines not connected
 }
 
-MACHINE_CONFIG_START(vtech1_state::laser210)
+void vtech1_state::laser210(machine_config &config)
+{
 	laser200(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(laser210_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &vtech1_state::laser210_mem);
+}
 
-MACHINE_CONFIG_START(vtech1_state::laser310)
+void vtech1_state::laser310(machine_config &config)
+{
 	laser200(config);
-	MCFG_DEVICE_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(laser310_mem)
-	MCFG_DEVICE_IO_MAP(vtech1_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(VZ300_XTAL1_CLK / 5);  /* 3.546894 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vtech1_state::laser310_mem);
+	m_maincpu->set_addrmap(AS_IO, &vtech1_state::vtech1_io);
+}
 
-MACHINE_CONFIG_START(vtech1_state::laser310h)
+void vtech1_state::laser310h(machine_config &config)
+{
 	laser310(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(vtech1_shrg_io)
+	m_maincpu->set_addrmap(AS_IO, &vtech1_state::vtech1_shrg_io);
 
 	MC6847_PAL(config.replace(), m_mc6847, XTAL(4'433'619));
 	m_mc6847->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(vtech1_state::laser310h)
 	m_mc6847->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
 	// INTEXT = GND
 	// other lines not connected
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

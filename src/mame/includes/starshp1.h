@@ -88,7 +88,7 @@ private:
 	DECLARE_WRITE8_MEMBER(starshp1_analog_out_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(starshp1);
+	void starshp1_palette(palette_device &palette) const;
 	uint32_t screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_starshp1);
 	INTERRUPT_GEN_MEMBER(starshp1_interrupt);

@@ -14,11 +14,12 @@
 #pragma once
 
 
-#include "video/ppu2c0x.h"
 #include "bus/nes/disksys.h"
 #include "bus/nes/nes_slot.h"
 #include "bus/nes/nes_carts.h"
 #include "bus/nes_ctrl/ctrl.h"
+#include "video/ppu2c0x.h"
+#include "screen.h"
 
 /***************************************************************************
     CONSTANTS
@@ -73,6 +74,7 @@ public:
 	nes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: nes_base_state(mconfig, type, tag),
 		m_ppu(*this, "ppu"),
+		m_screen(*this, "screen"),
 		m_exp(*this, "exp"),
 		m_cartslot(*this, "nes_slot"),
 		m_disk(*this, "disk")
@@ -125,6 +127,7 @@ private:
 
 
 	required_device<ppu2c0x_device> m_ppu;
+	required_device<screen_device> m_screen;
 	optional_device<nes_control_port_device> m_exp;
 	optional_device<nes_cart_slot_device> m_cartslot;
 	optional_device<nes_disksys_device> m_disk;

@@ -15,6 +15,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/am9519.h"
 #include "machine/upd765.h"
 #include "machine/mc2661.h"
@@ -197,14 +198,14 @@ static void floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware
-	Z80(config, m_maincpu, 4000000);
+	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dps1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dps1_state::io_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
-	mc2661_device &uart(MC2661(config, "uart", XTAL(5'068'800)));
+	mc2661_device &uart(MC2661(config, "uart", 5.0688_MHz_XTAL)); // Signetics 2651N
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -218,7 +219,7 @@ MACHINE_CONFIG_START(dps1_state::dps1)
 	AM9519(config, "am9519b", 0);
 
 	// floppy
-	UPD765A(config, m_fdc, false, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);
 	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
 	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats)

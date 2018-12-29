@@ -22,10 +22,10 @@ public:
 	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_cpu_tags(const char *maintag, const char *subtag)
+	template <typename T, typename U> void set_cpu_tags(T &&maintag, U &&subtag)
 	{
-		m_maincpu_tag = maintag;
-		m_subcpu_tag = subtag;
+		m_cpuexec[0].set_tag(std::forward<T>(maintag));
+		m_cpuexec[1].set_tag(std::forward<U>(subtag));
 	}
 	auto subres_cb() { return m_subres_cb.bind(); }
 
@@ -66,12 +66,8 @@ private:
 	address_space *            m_program;
 
 	// cpu interfaces
-	device_execute_interface * m_cpuexec[2];
+	required_device<cpu_device> m_cpuexec[2];
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cpucache[2];
-
-	// configuration
-	const char *               m_maincpu_tag;
-	const char *               m_subcpu_tag;
 
 	required_device<watchdog_timer_device> m_watchdog;
 };

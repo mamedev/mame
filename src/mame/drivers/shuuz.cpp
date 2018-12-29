@@ -26,6 +26,7 @@
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -121,7 +122,7 @@ void shuuz_state::main_map(address_map &map)
 	map(0x105002, 0x105003).portr("BUTTONS");
 	map(0x106001, 0x106001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x107000, 0x107007).noprw();
-	map(0x3e0000, 0x3e07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x3e0000, 0x3e07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f4000, 0x3f5eff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_msb_w)).share("vad:playfield");
 	map(0x3f5f00, 0x3f5f7f).ram().share("vad:eof");
@@ -244,12 +245,12 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shuuz)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 1024);
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, shuuz_state, scanline_int_write_line))
-	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_MOB(shuuz_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, m_screen);
+	m_vad->scanline_int_cb().set(FUNC(shuuz_state::scanline_int_write_line));
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(shuuz_state::get_playfield_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, shuuz_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

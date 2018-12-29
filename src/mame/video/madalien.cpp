@@ -17,12 +17,11 @@
 #define PIXEL_CLOCK (MADALIEN_MAIN_CLOCK / 2)
 
 
-PALETTE_INIT_MEMBER(madalien_state,madalien)
+void madalien_state::madalien_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		int r = 0;
 		int g = 0;
@@ -44,10 +43,10 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 		palette.set_pen_indirect(i, i);
 
-	for (i = 0x10; i < 0x20; i++)
+	for (int i = 0x10; i < 0x20; i++)
 	{
 		uint8_t ctabentry = i - 0x10;
 
@@ -60,7 +59,7 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	for (i = 0x20; i < 0x30; i++)
+	for (int i = 0x20; i < 0x30; i++)
 		palette.set_pen_indirect(i, (i - 0x20) | 0x10);
 }
 
@@ -369,12 +368,10 @@ MACHINE_CONFIG_START(madalien_state::madalien_video)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madalien)
-	MCFG_PALETTE_ADD("palette", 0x30)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
-	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_madalien)
+	PALETTE(config, m_palette, FUNC(madalien_state::madalien_palette), 0x30, 0x20);
 	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 
 	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK / 8));

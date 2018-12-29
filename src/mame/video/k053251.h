@@ -53,7 +53,5 @@ private:
 
 DECLARE_DEVICE_TYPE(K053251, k053251_device)
 
-#define MCFG_K053251_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K053251, 0)
 
 #endif // MAME_VIDEO_K053251_H

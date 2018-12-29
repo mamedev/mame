@@ -4,6 +4,13 @@
 
     Olivetti M24 emulation
 
+    http://olivettim24.hadesnet.org/index.html
+    https://sites.google.com/site/att6300shrine/Home
+    http://www.ti99.com/exelvision/website/index.php?page=logabax-persona-1600
+
+    The AT&T PC6300, the Xerox 6060 and the Logabax Persona 1600 were
+    badge-engineered Olivetti M24s.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -36,12 +43,18 @@ public:
 
 	void olivetti(machine_config &config);
 
+protected:
+	void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
-	required_device<cpu_device> m_kbc;
+	required_device<tms7000_device> m_kbc;
 	required_device<m24_keyboard_device> m_keyboard;
 	optional_device<m24_z8000_device> m_z8000_apb;
+
+	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
+	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -55,10 +68,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void machine_reset() override;
-
-	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
-	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 	static void cfg_m20_format(device_t *device);
 	void kbc_map(address_map &map);
 	void m24_io(address_map &map);
@@ -278,20 +287,21 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
-	MCFG_DEVICE_ADD("kbc", TMS7000, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(kbc_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, m24_state, pa_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, m24_state, pb_w))
+	TMS7000(config, m_kbc, XTAL(4'000'000));
+	m_kbc->set_addrmap(AS_PROGRAM, &m24_state::kbc_map);
+	m_kbc->in_porta().set(FUNC(m24_state::pa_r));
+	m_kbc->out_portb().set(FUNC(m24_state::pb_w));
 
-	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
-	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(*this, m24_state, kbcin_w))
+	M24_KEYBOARD(config, m_keyboard, 0);
+	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
 
 	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // ?
 	MCFG_MM58274C_DAY1(1)   // ?
 
-	MCFG_DEVICE_ADD("z8000_apb", M24_Z8000, 0)
-	MCFG_M24_Z8000_HALT(WRITELINE(*this, m24_state, halt_i86_w))
+	M24_Z8000(config, m_z8000_apb, 0);
+	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));
+
 	subdevice<am9517a_device>("mb:dma8237")->out_hreq_callback().set(FUNC(m24_state::dma_hrq_w));
 	subdevice<pic8259_device>("mb:pic8259")->out_int_callback().set(FUNC(m24_state::int_w));
 
@@ -301,8 +311,21 @@ MACHINE_CONFIG_END
 
 ROM_START( m24 )
 	ROM_REGION16_LE(0x8000,"bios", 0)
-	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0x4001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1))
-	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
+	ROM_SYSTEM_BIOS(0,"v1.1","v1.1")
+	ROMX_LOAD("m24_bios11h.rom",0x4001, 0x2000, CRC(f08e859a) SHA1(c2ede7ce4472c77462d1d841e2b47e8b306c563d), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("m24_bios11l.rom", 0x4000, 0x2000, CRC(ec494e66) SHA1(51259cf9fd9f6a6855d52730206ff66ad3367ea4), ROM_SKIP(1) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1,"v1.21","v1.21")
+	ROMX_LOAD("m24_bios121h.rom",0x4001, 0x2000, CRC(93292715) SHA1(863eccfb3beca6e64c5b0cc070c64394bad7da82), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("m24_bios121l.rom", 0x4000, 0x2000, CRC(1acbc9d7) SHA1(d3696e38853cea31e70ffa4e13e127ec7551bf57), ROM_SKIP(1) | ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2,"v1.36","v1.36")
+	ROMX_LOAD("m24_bios136h.rom",0x4001, 0x2000, CRC(25cbf8ba) SHA1(1ab90985852544d2c12b47bb7f20f9faccabdf88), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("m24_bios136l.rom", 0x4000, 0x2000, CRC(e2f738c0) SHA1(da9771325a5021cf9908997e0e0d14e47258125f), ROM_SKIP(1) | ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3,"v1.43","v1.43")
+	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0x4001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1) | ROM_BIOS(3))
 
 	ROM_REGION(0x800, "kbc", 0)
 	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))

@@ -37,6 +37,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
@@ -53,14 +54,15 @@
 class pyl601_state : public driver_device
 {
 public:
-	pyl601_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pyl601_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_fdc(*this, "upd765"),
 		m_floppy(*this, "upd765:%u", 0U),
 		m_ram(*this, RAM_TAG),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void pyl601(machine_config &config);
 	void pyl601a(machine_config &config);
@@ -556,7 +558,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pyl601)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -570,7 +572,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	crtc.set_char_width(8);   /* ? */
 	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row), this);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")

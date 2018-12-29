@@ -65,7 +65,7 @@
 
 /*************************************
  *
- *  Initialization
+ *  Interrupt handling
  *
  *************************************/
 
@@ -75,6 +75,18 @@ void atarigt_state::update_interrupts()
 	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
+{
+	scanline_int_write_line(1);
+}
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
 
 MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 {
@@ -819,7 +831,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_ATARIRLE_ADD("rle", modesc)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
 
 	/* sound hardware */
 	ATARI_CAGE(config, m_cage, 0);

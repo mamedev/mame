@@ -468,11 +468,10 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
@@ -537,11 +536,10 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);

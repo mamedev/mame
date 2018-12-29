@@ -21,21 +21,17 @@
 **
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(contra_state, contra)
+void contra_state::contra_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int chip;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (chip = 0; chip < 2; chip++)
+	for (int chip = 0; chip < 2; chip++)
 	{
-		int pal;
-
-		for (pal = 0; pal < 8; pal++)
+		for (int pal = 0; pal < 8; pal++)
 		{
-			int i;
-			int clut = (chip << 1) | (pal & 1);
+			int const clut = (chip << 1) | (pal & 1);
 
-			for (i = 0; i < 0x100; i++)
+			for (int i = 0; i < 0x100; i++)
 			{
 				uint8_t ctabentry;
 

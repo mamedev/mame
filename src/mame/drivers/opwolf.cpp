@@ -963,9 +963,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolf);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 2048);
 
 	PC080SN(config, m_pc080sn, 0);
 	m_pc080sn->set_gfx_region(1);
@@ -1038,9 +1037,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opwolfb)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_opwolfb);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 2048);
 
 	PC080SN(config, m_pc080sn, 0);
 	m_pc080sn->set_gfx_region(1);

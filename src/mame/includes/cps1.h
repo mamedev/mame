@@ -465,6 +465,7 @@ private:
 	void cps2_objram_latch();
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_MACHINE_START(cps2);
 	virtual void video_start() override;

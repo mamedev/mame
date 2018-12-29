@@ -372,9 +372,8 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	screen.screen_vblank().set(FUNC(bombjack_state::vblank_irq));
 	screen.screen_vblank().append_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombjack)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombjack);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 128);
 
 
 	/* sound hardware */

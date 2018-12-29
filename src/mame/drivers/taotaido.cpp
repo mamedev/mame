@@ -374,7 +374,7 @@ MACHINE_CONFIG_START(taotaido_state::taotaido)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taotaido)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taotaido);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -385,8 +385,7 @@ MACHINE_CONFIG_START(taotaido_state::taotaido)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taotaido_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 
 	VSYSTEM_SPR(config, m_spr, 0);
 	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback), this);

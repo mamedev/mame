@@ -494,30 +494,29 @@ void spy_state::machine_reset()
 	m_old_3f90 = -1;
 }
 
-MACHINE_CONFIG_START(spy_state::spy)
-
+void spy_state::spy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(24'000'000) / 8) // 3 MHz? (divided by 051961)
-	MCFG_DEVICE_PROGRAM_MAP(spy_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spy_state,  spy_interrupt)
+	MC6809E(config, m_maincpu, XTAL(24'000'000) / 8); // 3 MHz? (divided by 051961)
+	m_maincpu->set_addrmap(AS_PROGRAM, &spy_state::spy_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spy_state::spy_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(spy_sound_map) /* nmi by the sound chip */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spy_state::spy_sound_map); /* nmi by the sound chip */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(spy_state, screen_update_spy)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(spy_state::screen_update_spy));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -533,20 +532,20 @@ MACHINE_CONFIG_START(spy_state::spy)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, spy_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	K007232(config, m_k007232_1, 3579545);
+	m_k007232_1->port_write().set(FUNC(spy_state::volume_callback0));
+	m_k007232_1->add_route(0, "mono", 0.20);
+	m_k007232_1->add_route(1, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, spy_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, 3579545);
+	m_k007232_2->port_write().set(FUNC(spy_state::volume_callback1));
+	m_k007232_2->add_route(0, "mono", 0.20);
+	m_k007232_2->add_route(1, "mono", 0.20);
+}
 
 
 /***************************************************************************

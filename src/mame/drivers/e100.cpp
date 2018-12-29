@@ -593,7 +593,7 @@ MACHINE_CONFIG_START(e100_state::e100)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265)
 	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */

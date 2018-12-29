@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 	template <class Object> devcb_base &set_irq_cb(Object &&wr) { return m_irq_w.set_callback(std::forward<Object>(wr)); }
+	auto irq() { return m_irq_w.bind(); }
 
 	devcb_write_line m_irq_w;
 

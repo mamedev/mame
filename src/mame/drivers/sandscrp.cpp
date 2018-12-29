@@ -98,7 +98,7 @@ public:
 		, m_view2(*this, "view2")
 		, m_soundlatch(*this, "soundlatch%u", 1)
 		, m_audiobank(*this, "audiobank")
-		{ }
+	{ }
 
 	void sandscrp(machine_config &config);
 
@@ -490,17 +490,15 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sandscrp_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sandscrp)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sandscrp);
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 2048);
 
 	KANEKO_TMAP(config, m_view2);
 	m_view2->set_gfx_region(1);
 	m_view2->set_offset(0x5b, 0, 256, 224);
 	m_view2->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	MCFG_KANEKO_HIT_TYPE(0)
+	KANEKO_HIT(config, "calc1_mcu").set_type(0);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_gfxdecode_tag("gfxdecode");
@@ -510,11 +508,10 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
- 
+
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	OKIM6295(config, "oki", 12000000/6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	/* YM3014B + YM2203C */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));

@@ -8,6 +8,7 @@
 
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"

@@ -362,9 +362,7 @@ D                                                                               
 #include "includes/equites.h"
 
 #include "cpu/alph8201/alph8201.h"
-#include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -388,8 +386,8 @@ D                                                                               
 
 WRITE_LINE_MEMBER(equites_state::equites_8155_timer_pulse)
 {
-	if (!state) // active low
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (!state)
+		m_audiocpu->set_input_line(I8085_TRAP_LINE, ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
@@ -410,12 +408,12 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 	switch (offset)
 	{
 		case 0: // c0f8: NMI ack (written by NMI handler)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			m_audiocpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			m_audiocpu->pulse_input_line(I8085_RST75_LINE, m_audiocpu->minimum_quantum_time());
+			m_audiocpu->pulse_input_line(I8085_RST75_LINE, attotime::zero);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
@@ -1040,55 +1038,58 @@ static const char *const alphamc07_sample_names[] =
 #define MSM5232_BASE_VOLUME 1.0
 
 // the sound board is the same in all games
-MACHINE_CONFIG_START(equites_state::common_sound)
+void equites_state::common_sound(machine_config &config)
+{
+	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &equites_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &equites_state::sound_portmap);
+	m_audiocpu->set_clk_out("audio8155", FUNC(i8155_device::set_unscaled_clock));
 
-	MCFG_DEVICE_ADD("audiocpu", I8085A, 6.144_MHz_XTAL) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
-
-	i8155_device &i8155(I8155(config, "audio8155", 0));
-	i8155.out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
-	i8155.out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
-	i8155.out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
-	i8155.out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
+	I8155(config, m_audio8155, 0);
+	m_audio8155->out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
+	m_audio8155->out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
+	m_audio8155->out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
+	m_audio8155->out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
-	MCFG_MSM5232_SET_CAPACITORS(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6) // verified
-	MCFG_MSM5232_GATE_HANDLER_CB(WRITELINE(*this, equites_state, equites_msm5232_gate))
-	MCFG_SOUND_ROUTE(0, "speaker", MSM5232_BASE_VOLUME/2.2)    // pin 28  2'-1 : 22k resistor
-	MCFG_SOUND_ROUTE(1, "speaker", MSM5232_BASE_VOLUME/1.5)    // pin 29  4'-1 : 15k resistor
-	MCFG_SOUND_ROUTE(2, "speaker", MSM5232_BASE_VOLUME)        // pin 30  8'-1 : 10k resistor
-	MCFG_SOUND_ROUTE(3, "speaker", MSM5232_BASE_VOLUME)        // pin 31 16'-1 : 10k resistor
-	MCFG_SOUND_ROUTE(4, "speaker", MSM5232_BASE_VOLUME/2.2)    // pin 36  2'-2 : 22k resistor
-	MCFG_SOUND_ROUTE(5, "speaker", MSM5232_BASE_VOLUME/1.5)    // pin 35  4'-2 : 15k resistor
-	MCFG_SOUND_ROUTE(6, "speaker", MSM5232_BASE_VOLUME)        // pin 34  8'-2 : 10k resistor
-	MCFG_SOUND_ROUTE(7, "speaker", MSM5232_BASE_VOLUME)        // pin 33 16'-2 : 10k resistor
-	MCFG_SOUND_ROUTE(8, "speaker", 1.0)        // pin 1 SOLO  8' (this actually feeds an analog section)
-	MCFG_SOUND_ROUTE(9, "speaker", 1.0)        // pin 2 SOLO 16' (this actually feeds an analog section)
-	MCFG_SOUND_ROUTE(10,"speaker", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
+	MSM5232(config, m_msm, MSM5232_MAX_CLOCK);   // will be adjusted at runtime through PORT_ADJUSTER
+	m_msm->set_capacitors(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6); // verified
+	m_msm->gate().set(FUNC(equites_state::equites_msm5232_gate));
+	m_msm->add_route(0, "speaker", MSM5232_BASE_VOLUME/2.2);   // pin 28  2'-1 : 22k resistor
+	m_msm->add_route(1, "speaker", MSM5232_BASE_VOLUME/1.5);   // pin 29  4'-1 : 15k resistor
+	m_msm->add_route(2, "speaker", MSM5232_BASE_VOLUME);       // pin 30  8'-1 : 10k resistor
+	m_msm->add_route(3, "speaker", MSM5232_BASE_VOLUME);       // pin 31 16'-1 : 10k resistor
+	m_msm->add_route(4, "speaker", MSM5232_BASE_VOLUME/2.2);   // pin 36  2'-2 : 22k resistor
+	m_msm->add_route(5, "speaker", MSM5232_BASE_VOLUME/1.5);   // pin 35  4'-2 : 15k resistor
+	m_msm->add_route(6, "speaker", MSM5232_BASE_VOLUME);       // pin 34  8'-2 : 10k resistor
+	m_msm->add_route(7, "speaker", MSM5232_BASE_VOLUME);       // pin 33 16'-2 : 10k resistor
+	m_msm->add_route(8, "speaker", 1.0);       // pin 1 SOLO  8' (this actually feeds an analog section)
+	m_msm->add_route(9, "speaker", 1.0);       // pin 2 SOLO 16' (this actually feeds an analog section)
+	m_msm->add_route(10,"speaker", 0.12);      // pin 22 Noise Output (this actually feeds an analog section)
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 6.144_MHz_XTAL/4)); /* verified on pcb */
 	aysnd.port_a_write_callback().set(FUNC(equites_state::equites_8910porta_w));
 	aysnd.port_b_write_callback().set(FUNC(equites_state::equites_8910portb_w));
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_6BIT_R2R(config, m_dac_1, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_6BIT_R2R(config, m_dac_2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(alphamc07_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(alphamc07_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.3);
+}
 
 /******************************************************************************/
 
@@ -1150,15 +1151,16 @@ void splndrbt_state::machine_start()
 
 void equites_state::machine_reset()
 {
+	m_audiocpu->set_input_line(I8085_INTR_LINE, CLEAR_LINE);
+	m_audiocpu->set_input_line(I8085_TRAP_LINE, CLEAR_LINE);
 }
 
-
-MACHINE_CONFIG_START(equites_state::equites)
-
+void equites_state::equites(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL/4) /* 68000P8 running at 3mhz! verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(equites_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, 12_MHz_XTAL/4); /* 68000P8 running at 3mhz! verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &equites_state::equites_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::equites_scanline), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_w));
@@ -1167,49 +1169,46 @@ MACHINE_CONFIG_START(equites_state::equites)
 
 	common_sound(config);
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
+
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 3*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(equites_state, screen_update_equites)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 3*8, 29*8-1);
+	m_screen->set_screen_update(FUNC(equites_state::screen_update_equites));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_equites)
-	MCFG_PALETTE_ADD("palette", 0x180)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
-	MCFG_PALETTE_INIT_OWNER(equites_state,equites)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_equites);
+	PALETTE(config, m_palette, FUNC(equites_state::equites_palette), 0x180, 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gekisou_state::gekisou)
+void gekisou_state::gekisou(machine_config &config)
+{
 	equites(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gekisou_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gekisou_state::gekisou_map);
 
 	// mcu not dumped, so add simulated mcu
-	MCFG_DEVICE_ADD("mcu", ALPHA8301L, 4000000/8)
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	ALPHA8301L(config, "mcu", 4000000/8).set_addrmap(AS_PROGRAM, &gekisou_state::mcu_map);
 
 	// gekisou has battery-backed RAM to store settings
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(splndrbt_state::splndrbt)
-
+void splndrbt_state::splndrbt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(splndrbt_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", splndrbt_state, splndrbt_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, 24_MHz_XTAL/4); /* 68000P8 running at 6mhz, verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &splndrbt_state::splndrbt_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(splndrbt_state::splndrbt_scanline), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(equites_state::flip_screen_w));
@@ -1219,32 +1218,30 @@ MACHINE_CONFIG_START(splndrbt_state::splndrbt)
 
 	common_sound(config);
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
+	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(splndrbt_state, screen_update_splndrbt)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(splndrbt_state::screen_update_splndrbt));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splndrbt)
-	MCFG_PALETTE_ADD("palette", 0x280)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
-	MCFG_PALETTE_INIT_OWNER(splndrbt_state,splndrbt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_splndrbt);
+	PALETTE(config, m_palette, FUNC(splndrbt_state::splndrbt_palette), 0x280, 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(splndrbt_state,splndrbt)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(splndrbt_state::hvoltage)
+void splndrbt_state::hvoltage(machine_config &config)
+{
 	splndrbt(config);
 
 	// mcu not dumped, so add simulated mcu
-	MCFG_DEVICE_ADD("mcu", ALPHA8301L, 4000000/8)
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-MACHINE_CONFIG_END
+	ALPHA8301L(config, "mcu", 4000000/8).set_addrmap(AS_PROGRAM, &splndrbt_state::mcu_map);
+}
 
 
 

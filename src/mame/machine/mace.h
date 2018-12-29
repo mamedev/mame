@@ -69,9 +69,9 @@ protected:
 
 	enum
 	{
-		ISA_INT_COMPARE1	= 0x2000,
-		ISA_INT_COMPARE2	= 0x4000,
-		ISA_INT_COMPARE3	= 0x8000,
+		ISA_INT_COMPARE1    = 0x2000,
+		ISA_INT_COMPARE2    = 0x4000,
+		ISA_INT_COMPARE3    = 0x8000,
 	};
 
 	struct isa_t

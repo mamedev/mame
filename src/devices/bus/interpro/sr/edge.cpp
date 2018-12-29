@@ -461,22 +461,23 @@ ROM_END
  * FIXME: diag reports 128KiB static ram, 1MiB video ram, 4 screens, 1 user, z-buffer absent
  *
  */
-MACHINE_CONFIG_START(mpcb828_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34)
-	//MCFG_SCREEN_RAW_PARAMS(83'020'800, 1184, 0, 1184, 884, 0, 884)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb828_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, mpcb828_device, vblank))
+void mpcb828_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
+	//m_screen->set_raw(83'020'800, 1184, 0, 1184, 884, 0, 884);
+	m_screen->set_screen_update(FUNC(mpcb828_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(mpcb828_device::vblank));
 
 	RAM(config, "sram").set_default_size("128KiB").set_default_value(0);
 	RAM(config, "vram").set_default_size("2560KiB").set_default_value(0);
 
-	MCFG_DEVICE_ADD("dsp", TMS32030, 30_MHz_XTAL)
-	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
-	MCFG_DEVICE_DISABLE()
+	TMS32030(config, m_dsp, 30_MHz_XTAL);
+	m_dsp->holda().set(FUNC(mpcb828_device::holda));
+	m_dsp->set_disable();
 	//MCFG_DEVICE_ADDRESS_MAP(0, map_dynamic<2>)
 
-	MCFG_DEVICE_ADD("ramdac", BT458, 83'020'800)
+	BT458(config, "ramdac", 83'020'800);
 
 	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb828_device::scc_irq));
@@ -493,27 +494,28 @@ MACHINE_CONFIG_END
  *
  * Inputs htotal=? (1664+?) and vtotal=? (1248+?) give hsync=?kHz.
  */
-MACHINE_CONFIG_START(mpcb849_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(164'609'300, 2112, 0, 1664, 1299, 0, 1248)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb849_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, irq3))
+void mpcb849_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
+	m_screen->set_screen_update(FUNC(mpcb849_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
 
 	RAM(config, "sram").set_default_size("128KiB").set_default_value(0);
 	RAM(config, "vram").set_default_size("5120KiB").set_default_value(0); // size is a guess
 
-	MCFG_DEVICE_ADD("dsp", TMS32030, 30_MHz_XTAL)
-	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
-	MCFG_DEVICE_DISABLE()
+	TMS32030(config, m_dsp, 30_MHz_XTAL);
+	m_dsp->holda().set(FUNC(mpcb828_device::holda));
+	m_dsp->set_disable();
 
-	MCFG_DEVICE_ADD("ramdac", BT458, 0) // unconfirmed clock
+	BT458(config, "ramdac", 0); // unconfirmed clock
 
 	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb849_device::scc_irq));
 	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 
 	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));
-MACHINE_CONFIG_END
+}
 
 /*
  * MPCB030/MPCBA63: EDGE-2 graphics, 1 megapixel, single/dual screen, 60Hz refresh.
@@ -523,19 +525,21 @@ MACHINE_CONFIG_END
  *
  * Inputs htotal=? (1184+?) and vtotal=? (884+?) give hsync=?kHz.
  */
-MACHINE_CONFIG_START(mpcb030_device::device_add_mconfig)
-MACHINE_CONFIG_END
+void mpcb030_device::device_add_mconfig(machine_config &config)
+{
+}
 
-MACHINE_CONFIG_START(mpcba63_device::device_add_mconfig)
-	//MCFG_SCREEN_ADD("screen", RASTER)
+void mpcba63_device::device_add_mconfig(machine_config &config)
+{
+	//SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// screen params copied from GT
-	//MCFG_SCREEN_RAW_PARAMS(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34)
-	//MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcba63_device, screen_update)
-	//MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(?, vblank))
-	//MCFG_DEVICE_ADD("ramdac0", BT457, 0) // PS045701-165
-	//MCFG_DEVICE_ADD("ramdac0", BT457, 0)
-	//MCFG_DEVICE_ADD("ramdac0", BT457, 0)
-MACHINE_CONFIG_END
+	//m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
+	//m_screen->set_screen_update().set(FUNC(mpcba63_device::screen_update));
+	//m_screen->screen_vblank().set(FUNC(?, vblank));
+	//BT457(config, "ramdac0", 0); // PS045701-165
+	//BT457(config, "ramdac1", 0);
+	//BT457(config, "ramdac2", 0);
+}
 
 /*
  * MSMT094/MPCB896: EDGE-2 Plus graphics, 2 megapixels, single screen, 60Hz refresh.
@@ -545,16 +549,17 @@ MACHINE_CONFIG_END
  *
  * Inputs htotal=2112 (1664+448) and vtotal=1299 (1248+51) give hsync=77.940kHz.
  */
-MACHINE_CONFIG_START(msmt094_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dsp1", TMS32030, 33.333_MHz_XTAL)
-	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, msmt094_device, holda))
-	MCFG_DEVICE_ADDRESS_MAP(0, dsp1_map)
-	MCFG_DEVICE_DISABLE()
+void msmt094_device::device_add_mconfig(machine_config &config)
+{
+	TMS32030(config, m_dsp1, 33.333_MHz_XTAL);
+	m_dsp1->holda().set(FUNC(msmt094_device::holda));
+	m_dsp1->set_addrmap(0, &msmt094_device::dsp1_map);
+	m_dsp1->set_disable();
 
 	RAM(config, "ram").set_default_size("6MiB").set_default_value(0);
 
-	//MCFG_DEVICE_ADD("dsp2", TMS32030, 40_MHz_XTAL)
-	//MCFG_DEVICE_ADD("dsp3", TMS32030, 40_MHz_XTAL)
+	//TMS32030(config, m_dsp2, 40_MHz_XTAL);
+	//TMS32030(config, m_dsp3, 40_MHz_XTAL);
 
 	// FIXME: actually Z0853006VSC
 	scc8530_device& scc(SCC8530N(config, "scc", 4.9152_MHz_XTAL));
@@ -562,21 +567,22 @@ MACHINE_CONFIG_START(msmt094_device::device_add_mconfig)
 	scc.out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 
 	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set("scc", FUNC(z80scc_device::rxa_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mpcb896_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(164'609'300, 2112, 0, 1664, 1299, 0, 1248)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb896_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, irq3))
+void mpcb896_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
+	m_screen->set_screen_update(FUNC(mpcb896_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
 
 	RAM(config, "sram").set_default_size("256KiB").set_default_value(0);
 	RAM(config, "vram").set_default_size("18MiB").set_default_value(0);
 
-	MCFG_DEVICE_ADD("ramdac0", BT457, 164'609'300)
-	MCFG_DEVICE_ADD("ramdac1", BT457, 164'609'300)
-	MCFG_DEVICE_ADD("ramdac2", BT457, 164'609'300)
-MACHINE_CONFIG_END
+	BT457(config, "ramdac0", 164'609'300);
+	BT457(config, "ramdac1", 164'609'300);
+	BT457(config, "ramdac2", 164'609'300);
+}
 
 edge1_device_base::edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)

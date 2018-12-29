@@ -843,15 +843,15 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
 	MCFG_DEVICE_PROGRAM_MAP(m68k_program_map)
 
-	MCFG_DEVICE_ADD("dsp", TMS34010, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(40000000/16) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(jpmimpct_state, scanline_update)   /* scanline updater (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, jpmimpct_state, tms_irq))
-	MCFG_TMS340X0_TO_SHIFTREG_CB(jpmimpct_state, to_shiftreg)       /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(jpmimpct_state, from_shiftreg)      /* read from shiftreg function */
+	TMS34010(config, m_dsp, 40000000);
+	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
+	m_dsp->set_halt_on_reset(true);
+	m_dsp->set_pixel_clock(40000000/16);
+	m_dsp->set_pixels_per_clock(4);
+	m_dsp->set_scanline_rgb32_callback(FUNC(jpmimpct_state::scanline_update));
+	m_dsp->output_int().set(FUNC(jpmimpct_state::tms_irq));
+	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
+	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)

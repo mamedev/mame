@@ -492,11 +492,10 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   // based on ddragon driver
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_xain)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xain);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -520,6 +519,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xain_state::xsleenab)
 	xsleena(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 

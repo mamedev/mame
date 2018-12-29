@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -269,8 +269,8 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rm380z_state::rm480z)
@@ -292,8 +292,8 @@ MACHINE_CONFIG_START(rm380z_state::rm480z)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard */
-//  MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-//  MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
+//  generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+//  keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 MACHINE_CONFIG_END
 
 

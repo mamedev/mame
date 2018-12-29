@@ -31,24 +31,28 @@ TODO:
 class jackpool_state : public driver_device
 {
 public:
-	jackpool_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jackpool_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void jackpool(machine_config &config);
 
 	void init_jackpool();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	DECLARE_READ8_MEMBER(jackpool_io_r);
 	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
-	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
+	void jackpool_mem(address_map &map);
 
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_map_vreg;
@@ -56,7 +60,6 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void jackpool_mem(address_map &map);
 };
 
 
@@ -235,7 +238,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_DEVICE_PROGRAM_MAP(jackpool_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackpool)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackpool);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -268,10 +271,9 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
+	NS16550(config, "uart", 1843200); // exact type and clock unknown
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200);
 
 	SPEAKER(config, "mono").front_center();
 

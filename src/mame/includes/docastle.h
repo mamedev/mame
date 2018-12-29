@@ -37,6 +37,11 @@ public:
 	void idsoccer(machine_config &config);
 	void docastle(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -78,10 +83,7 @@ private:
 	DECLARE_READ8_MEMBER(idsoccer_adpcm_status_r);
 	DECLARE_WRITE8_MEMBER(idsoccer_adpcm_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(docastle);
+	void docastle_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(dorunrun);
 	uint32_t screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void video_start_common( uint32_t tile_transmask );

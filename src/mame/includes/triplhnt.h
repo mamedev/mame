@@ -67,7 +67,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(triplhnt);
+	void triplhnt_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,7 +80,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<f9334_device> m_latch;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

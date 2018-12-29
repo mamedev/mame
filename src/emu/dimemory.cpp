@@ -94,7 +94,8 @@ void device_memory_interface::interface_config_complete()
 void device_memory_interface::interface_validity_check(validity_checker &valid) const
 {
 	// loop over all address spaces
-	for (int spacenum = 0; spacenum < int(m_address_config.size()); ++spacenum)
+	const int max_spaces = std::max(m_address_map.size(), m_address_config.size());
+	for (int spacenum = 0; spacenum < max_spaces; ++spacenum)
 	{
 		if (space_config(spacenum))
 		{
@@ -104,5 +105,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 			// let the map check itself
 			addrmap.map_validity_check(valid, spacenum);
 		}
+		else if (spacenum < int(m_address_map.size()) && !m_address_map[spacenum].isnull())
+			osd_printf_warning("Map configured for nonexistent memory space %d\n", spacenum);
 	}
 }

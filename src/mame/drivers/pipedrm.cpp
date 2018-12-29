@@ -175,8 +175,8 @@ Added Multiple Coin Feature:
 class pipedrm_state : public fromance_state
 {
 public:
-	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fromance_state(mconfig, type, tag),
+	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fromance_state(mconfig, type, tag),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
@@ -601,11 +601,10 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_SCREEN_SIZE(44*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_pipedrm)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pipedrm)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pipedrm);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
@@ -655,11 +654,10 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	MCFG_SCREEN_SIZE(44*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_fromance)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hatris)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hatris);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));

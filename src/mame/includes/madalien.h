@@ -80,7 +80,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_BG_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_FG);
 	DECLARE_VIDEO_START(madalien);
-	DECLARE_PALETTE_INIT(madalien);
+	void madalien_palette(palette_device &palette) const;
 	uint32_t screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scan_helper(int col, int row, int section);
 	void draw_edges(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode);

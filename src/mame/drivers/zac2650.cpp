@@ -180,7 +180,7 @@ static INPUT_PORTS_START( dodgem )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(zac2650_state, zac2650)
+void zac2650_state::zac2650_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());
@@ -226,12 +226,12 @@ static const gfx_layout s2636_character =
 
 static GFXDECODE_START( gfx_tinvader )
 	GFXDECODE_SCALE( "gfx1", 0, tinvader_character,   0, 2, 3, 3 )
-	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 4, 3 )  /* dynamic */
-	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 8, 6 )  /* dynamic */
+	GFXDECODE_SCALE( nullptr,   0x1f00, s2636_character, 0, 2, 4, 3 )  // dynamic
+	GFXDECODE_SCALE( nullptr,   0x1f00, s2636_character, 0, 2, 8, 6 )  // dynamic
 GFXDECODE_END
 
-MACHINE_CONFIG_START(zac2650_state::tinvader)
-
+void zac2650_state::tinvader(machine_config &config)
+{
 	/* basic machine hardware */
 	s2650_device &maincpu(S2650(config, m_maincpu, 3800000/4));
 	maincpu.set_addrmap(AS_PROGRAM, &zac2650_state::main_map);
@@ -246,16 +246,14 @@ MACHINE_CONFIG_START(zac2650_state::tinvader)
 	m_screen->set_screen_update(FUNC(zac2650_state::screen_update_tinvader));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tinvader)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(zac2650_state, zac2650)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tinvader);
+	PALETTE(config, m_palette, FUNC(zac2650_state::zac2650_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	S2636(config, m_s2636, 0);
-	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+	S2636(config, m_s2636, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 WRITE8_MEMBER(zac2650_state::tinvader_sound_w)
 {

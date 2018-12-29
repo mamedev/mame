@@ -108,7 +108,7 @@ namespace
 		uint8_t                                 m_tms7000_portc;
 		uint8_t                                 m_tms7000_portd;
 		emu_timer                               *m_tms7000_busy_timer;
-		required_device<cpu_device>             m_tms7040;
+		required_device<tms7040_device>         m_tms7040;
 		required_device<ram_device>             m_staticram;
 		required_device<ay8910_device>          m_ay;
 		required_device<sp0256_device>          m_spo;
@@ -153,13 +153,13 @@ DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sou
 //**************************************************************************
 
 MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(2, 1))
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, coco_ssc_device, ssc_port_a_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, coco_ssc_device, ssc_port_b_w))
-	MCFG_TMS7000_IN_PORTC_CB(READ8(*this, coco_ssc_device, ssc_port_c_r))
-	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(*this, coco_ssc_device, ssc_port_c_w))
-	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, coco_ssc_device, ssc_port_d_r))
-	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, coco_ssc_device, ssc_port_d_w))
+	TMS7040(config, m_tms7040, DERIVED_CLOCK(2, 1));
+	m_tms7040->in_porta().set(FUNC(coco_ssc_device::ssc_port_a_r));
+	m_tms7040->out_portb().set(FUNC(coco_ssc_device::ssc_port_b_w));
+	m_tms7040->in_portc().set(FUNC(coco_ssc_device::ssc_port_c_r));
+	m_tms7040->out_portc().set(FUNC(coco_ssc_device::ssc_port_c_w));
+	m_tms7040->in_portd().set(FUNC(coco_ssc_device::ssc_port_d_r));
+	m_tms7040->out_portd().set(FUNC(coco_ssc_device::ssc_port_d_w));
 
 	RAM(config, "staticram").set_default_size("2K").set_default_value(0);
 

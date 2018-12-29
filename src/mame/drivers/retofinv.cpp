@@ -448,12 +448,10 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_retofinv)
-	MCFG_PALETTE_ADD("palette", 256*2+64*16+64*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_retofinv);
+	PALETTE(config, m_palette, FUNC(retofinv_state::retofinv_palette), 256*2 + 64*16 + 64*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -470,13 +468,14 @@ MACHINE_CONFIG_END
 /* bootleg which has different palette clut */
 MACHINE_CONFIG_START(retofinv_state::retofinvb1)
 	retofinv(config);
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
+
+	m_palette->set_init(FUNC(retofinv_state::retofinv_bl_palette));
 MACHINE_CONFIG_END
 
 /* bootleg which has no mcu */
 MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
 	retofinv(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 

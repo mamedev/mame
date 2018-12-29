@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include "sound/okim6295.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "sound/okim6295.h"
 #include "emupal.h"
 
 class kickgoal_state : public driver_device
@@ -32,7 +33,7 @@ public:
 		m_okibank(*this, "okibank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") 
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void kickgoal(machine_config &config);
@@ -42,8 +43,8 @@ public:
 	void init_actionhw();
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
@@ -113,7 +114,7 @@ private:
 	/* devices */
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<pic16c57_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
 	required_memory_bank m_okibank;
 	required_device<gfxdecode_device> m_gfxdecode;

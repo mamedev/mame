@@ -89,7 +89,7 @@ public:
 		m_nvram->set_base(ram()->pointer(), ram()->size());
 	}
 
-	DECLARE_PALETTE_INIT(clcd)
+	void clcd_palette(palette_device &palette) const
 	{
 		palette.set_pen_color(0, rgb_t(36,72,36));
 		palette.set_pen_color(1, rgb_t(2,4,2));
@@ -719,8 +719,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
+	PALETTE(config, "palette", FUNC(clcd_state::clcd_palette), 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

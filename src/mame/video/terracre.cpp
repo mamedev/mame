@@ -89,57 +89,45 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-PALETTE_INIT_MEMBER(terracre_state, terracre)
+void terracre_state::terracre_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* characters use colors 0-0x0f */
-	for (i = 0; i < 0x10; i++)
+	// characters use colors 0-0x0f
+	for (int i = 0; i < 0x10; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* background tiles use colors 0xc0-0xff in four banks */
-	/* the bottom two bits of the color code select the palette bank for */
-	/* pens 0-7; the top two bits for pens 8-0x0f. */
-	for (i = 0; i < 0x100; i++)
+	// background tiles use colors 0xc0-0xff in four banks
+	// the bottom two bits of the color code select the palette bank for pens 0-7;
+	// the top two bits for pens 8-0x0f.
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry;
-
-		if (i & 0x08)
-			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0xc0) >> 2);
-		else
-			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0x30) >> 0);
+		uint8_t const ctabentry = 0xc0 | (i & 0x0f) | ((i >> ((i & 0x08) ? 2 : 0)) & 0x30);
 
 		palette.set_pen_indirect(0x10 + i, ctabentry);
 	}
 
-	/* sprites use colors 128-191 in four banks */
-	/* The lookup table tells which colors to pick from the selected bank */
-	/* the bank is selected by another PROM and depends on the top 8 bits of */
-	/* the sprite code. The PROM selects the bank *separately* for pens 0-7 and */
-	/* 8-15 (like for tiles). */
-	for (i = 0; i < 0x1000; i++)
+	// sprites use colors 128-191 in four banks
+	// The lookup table tells which colors to pick from the selected bank
+	// the bank is selected by another PROM and depends on the top 8 bits of the sprite code.
+	// The PROM selects the bank *separately* for pens 0-7 and 8-15 (like for tiles).
+	for (int i = 0; i < 0x1000; i++)
 	{
-		uint8_t ctabentry;
+		uint8_t const ctabentry = 0x80 | ((i << ((i & 0x80) ? 2 : 4)) & 0x30) | (color_prom[i >> 4] & 0x0f);
 		int i_swapped = ((i & 0x0f) << 8) | ((i & 0xff0) >> 4);
-
-		if (i & 0x80)
-			ctabentry = 0x80 | ((i & 0x0c) << 2) | (color_prom[i >> 4] & 0x0f);
-		else
-			ctabentry = 0x80 | ((i & 0x03) << 4) | (color_prom[i >> 4] & 0x0f);
 
 		palette.set_pen_indirect(0x110 + i_swapped, ctabentry);
 	}
@@ -147,14 +135,14 @@ PALETTE_INIT_MEMBER(terracre_state, terracre)
 
 WRITE16_MEMBER(terracre_state::amazon_background_w)
 {
-	COMBINE_DATA( &m_bg_videoram[offset] );
-	m_background->mark_tile_dirty(offset );
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_background->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(terracre_state::amazon_foreground_w)
 {
-	COMBINE_DATA( &m_fg_videoram[offset] );
-	m_foreground->mark_tile_dirty(offset );
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_foreground->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(terracre_state::amazon_flipscreen_w)

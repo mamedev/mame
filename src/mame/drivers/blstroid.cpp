@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -81,7 +82,7 @@ void blstroid_state::main_map(address_map &map)
 	map(0x801804, 0x801805).mirror(0x0383f8).portr("DIAL1");
 	map(0x801c00, 0x801c01).mirror(0x0383fc).portr("IN0");
 	map(0x801c02, 0x801c03).mirror(0x0383fc).portr("IN1");
-	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x803000, 0x8033ff).mirror(0x038c00).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x804000, 0x804fff).mirror(0x038000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x805000, 0x805fff).mirror(0x038000).ram().share("mob");
@@ -185,14 +186,14 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blstroid)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_blstroid);
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, blstroid_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", blstroid_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, blstroid_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

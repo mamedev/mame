@@ -53,6 +53,8 @@ public:
 	auto out_pa_callback() { return m_out_pa_cb.bind(); }
 	auto out_pb_callback() { return m_out_pb_cb.bind(); }
 	auto out_pc_callback() { return m_out_pc_cb.bind(); }
+
+	// output state when pins are in tri-state, default 0xff
 	auto tri_pa_callback() { return m_tri_pa_cb.bind(); }
 	auto tri_pb_callback() { return m_tri_pb_cb.bind(); }
 

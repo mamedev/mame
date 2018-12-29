@@ -6,6 +6,7 @@
 #include "cpu/i86/i86.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "imagedev/floppy.h"
 #include "machine/pc_fdc.h"
 
 #include "formats/asst128_dsk.h"
@@ -125,7 +126,7 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 
-	MCFG_PC_JOY_ADD("pc_joy")
+	PC_JOY(config, "pc_joy");
 
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("64K, 128K, 256K");
 MACHINE_CONFIG_END

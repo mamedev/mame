@@ -127,7 +127,7 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7
 
-	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750_device &te7750(TE7750(config, "te7750"));
 	te7750.ios_cb().set_constant(3);
 	te7750.in_port1_cb().set_ioport("IN1");
 	te7750.in_port2_cb().set_ioport("IN2");

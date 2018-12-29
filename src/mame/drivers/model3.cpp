@@ -2769,7 +2769,7 @@ ROM_START( vf3a )   /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-1
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vf3tb )  /* step 1.0? */
+ROM_START( vf3tb )  /* step 1.0?, Sega game ID# is 833-13279 VIRTUA FIGHTER 3TB */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20126.17",  0x600006, 0x080000, CRC(27ecd3b0) SHA1(a9b913294ac925adb501d3b47f346006b70dfcd6) )
@@ -4673,7 +4673,7 @@ ROM_START( dirtdvlsg )   /* Step 2.1 presumable German version, might be origina
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
 ROM_END
 
-ROM_START( daytona2 )   /* Step 2.1, ROM board ID# 834-13428 DAYTONA USA2, Security board ID# 837-13507-COM */
+ROM_START( daytona2 )   /* Step 2.1, Sega game ID# is 833-13427, ROM board ID# 834-13428 DAYTONA USA2, Security board ID# 837-13507-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20861a.17", 0x000006, 0x200000, CRC(89ba8e78) SHA1(7d27124b976a63fdadd16551a664b2cc8cc08e79) )
@@ -6023,7 +6023,7 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 
 void model3_state::add_base_devices(machine_config &config)
 {
-	M68000(config, m_audiocpu, 12000000);
+	M68000(config, m_audiocpu, 45158000/4); // SCSP Clock / 2
 	m_audiocpu->set_addrmap(AS_PROGRAM, &model3_state::model3_snd);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
@@ -6036,24 +6036,23 @@ void model3_state::add_base_devices(machine_config &config)
 	m_screen->set_size(512, 400);
 	m_screen->set_screen_update(FUNC(model3_state::screen_update_model3));
 
-	PALETTE(config, m_palette, 32768);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SCSP(config, m_scsp1);
+	SCSP(config, m_scsp1, 45158000/2); // 45.158 MHz XTAL
 	m_scsp1->set_addrmap(0, &model3_state::scsp1_map);
 	m_scsp1->irq_cb().set(FUNC(model3_state::scsp_irq));
-	m_scsp1->add_route(0, "lspeaker", 2.0);
-	m_scsp1->add_route(0, "rspeaker", 2.0);
+	m_scsp1->add_route(0, "lspeaker", 1.0);
+	m_scsp1->add_route(1, "rspeaker", 1.0);
 
-	scsp_device &scsp2(SCSP(config, "scsp2"));
+	scsp_device &scsp2(SCSP(config, "scsp2", 45158000/2));
 	scsp2.set_addrmap(0, &model3_state::scsp2_map);
-	scsp2.add_route(0, "lspeaker", 2.0);
-	scsp2.add_route(0, "rspeaker", 2.0);
+	scsp2.add_route(0, "lspeaker", 1.0);
+	scsp2.add_route(1, "rspeaker", 1.0);
 }
 
 void model3_state::add_scsi_devices(machine_config &config)

@@ -152,7 +152,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
 
-	void palette_init(palette_device &palette);
+	void victor9k_palette(palette_device &palette) const;
 
 	// video state
 	int m_brt;
@@ -608,7 +608,7 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-void victor9k_state::palette_init(palette_device &palette)
+void victor9k_state::victor9k_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 
@@ -695,8 +695,7 @@ void victor9k_state::victor9k(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 
-	PALETTE(config, m_palette, 16);
-	m_palette->set_init(FUNC(victor9k_state::palette_init));
+	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
 
 	HD6845(config, m_crtc, XTAL(30'000'000)/10); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);

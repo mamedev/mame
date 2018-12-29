@@ -29,9 +29,6 @@ enum
 #define Z8000_SYSCALL   0x0200  /* system call (lsb is vector) */
 #define Z8000_HALT      0x0100  /* halted flag  */
 
-#define MCFG_Z8000_MO(_devcb) \
-	downcast<z8002_device &>(*device).set_mo_callback(DEVCB_##_devcb);
-
 class z8002_device : public cpu_device, public z8000_disassembler::config
 {
 public:
@@ -39,7 +36,7 @@ public:
 	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~z8002_device();
 
-	template <class Object> devcb_base &set_mo_callback(Object &&cb) { return m_mo_out.set_callback(std::forward<Object>(cb)); }
+	auto mo() { return m_mo_out.bind(); }
 	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:

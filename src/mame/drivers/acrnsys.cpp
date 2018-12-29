@@ -360,7 +360,8 @@ void acrnsys_state::kbd_put_pb(uint8_t data)
     6502 CPU Board - Part No. 200,000
 ***************************************************************************/
 
-MACHINE_CONFIG_START(acrnsys_state::a6502)
+void acrnsys_state::a6502(machine_config &config)
+{
 	M6502(config, m_maincpu, 24_MHz_XTAL / 12); /* 1MHz 6502 CPU */
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys_state::a6502_mem);
 
@@ -371,16 +372,17 @@ MACHINE_CONFIG_START(acrnsys_state::a6502)
 	//m_ins8154->out_a().set(FUNC(acrnsys_state::ins8154_pa_w));
 	m_ins8154->in_b().set(FUNC(acrnsys_state::kbd_r));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(acrnsys_state, kbd_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(acrnsys_state::kbd_put));
+}
 
 
 /***************************************************************************
     6502A CPU Board - Part No. 200,005
 ***************************************************************************/
 
-MACHINE_CONFIG_START(acrnsys_state::a6502a)
+void acrnsys_state::a6502a(machine_config &config)
+{
 	M6502(config, m_maincpu, 24_MHz_XTAL / 12); /* 2MHz 6502A CPU */
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys_state::a6502a_mem);
 
@@ -391,16 +393,17 @@ MACHINE_CONFIG_START(acrnsys_state::a6502a)
 	//m_via6522->cb2_handler().set(FUNC(acrnsys_state::cass_w));
 	m_via6522->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(acrnsys_state, kbd_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(acrnsys_state::kbd_put));
+}
 
 
 /***************************************************************************
     6809 CPU Board - Part No. 200,012
 ***************************************************************************/
 
-MACHINE_CONFIG_START(acrnsys_state::a6809)
+void acrnsys_state::a6809(machine_config &config)
+{
 	MC6809(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys_state::a6809_mem);
 
@@ -415,11 +418,12 @@ MACHINE_CONFIG_START(acrnsys_state::a6809)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_via6522, FUNC(via6522_device::write_ca1));
 	m_centronics->busy_handler().set(m_via6522, FUNC(via6522_device::write_pa7));
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(acrnsys_state, kbd_put_pb))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(acrnsys_state::kbd_put_pb));
+}
 
 
 /***************************************************************************
