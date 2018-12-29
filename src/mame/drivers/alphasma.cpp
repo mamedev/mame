@@ -52,7 +52,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(alphasmart);
+	void alphasmart_palette(palette_device &palette) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(kb_r);
@@ -398,7 +398,7 @@ static INPUT_PORTS_START( alphasmart )
 	PORT_CONFSETTING (0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(alphasmart_state, alphasmart)
+void alphasmart_state::alphasmart_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -454,8 +454,7 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	MCFG_SCREEN_VISIBLE_AREA(0, (6*40)-1, 0, (9*4)-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
+	PALETTE(config, "palette", FUNC(alphasmart_state::alphasmart_palette), 2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

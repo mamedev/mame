@@ -84,7 +84,7 @@ private:
 	virtual void machine_reset() override;
 	void base_machine_start(hp48_models model);
 
-	DECLARE_PALETTE_INIT(hp48);
+	void hp48_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(hp49g);
 	DECLARE_MACHINE_START(hp48gx);
 	DECLARE_MACHINE_START(hp48g);

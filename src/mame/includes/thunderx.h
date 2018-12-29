@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
 #include "video/k051960.h"

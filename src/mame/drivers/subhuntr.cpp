@@ -37,13 +37,15 @@ public:
 
 	void subhuntr(machine_config &config);
 
-private:
-	INTERRUPT_GEN_MEMBER(subhuntr_interrupt);
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(subhuntr);
+
+private:
+	INTERRUPT_GEN_MEMBER(subhuntr_interrupt);
+
+	void subhuntr_palette(palette_device &palette) const;
 	uint32_t screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void subhuntr_data_map(address_map &map);
@@ -60,7 +62,7 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(subhuntr_state, subhuntr)
+void subhuntr_state::subhuntr_palette(palette_device &palette) const
 {
 }
 
@@ -166,8 +168,7 @@ void subhuntr_state::subhuntr(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_subhuntr);
-
-	PALETTE(config, "palette", 26).set_init(FUNC(subhuntr_state::palette_init_subhuntr));
+	PALETTE(config, "palette", FUNC(subhuntr_state::subhuntr_palette), 26);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

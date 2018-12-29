@@ -960,14 +960,13 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
@@ -1033,14 +1032,13 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
@@ -1086,14 +1084,13 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 

@@ -295,7 +295,7 @@ void lola8a_state::lola8a(machine_config &config)
 	crtc.set_update_row_callback(FUNC(lola8a_state::crtc_update_row), this);
 	crtc.out_vsync_callback().set(FUNC(lola8a_state::crtc_vsync));
 
-	PALETTE(config, m_palette, 8).set_init("palette", FUNC(palette_device::palette_init_3bit_brg));
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	/* Cassette */
 	CASSETTE(config, m_cass);

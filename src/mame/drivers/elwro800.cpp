@@ -573,9 +573,8 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, elwro800_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
+	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_elwro800);
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum)
 

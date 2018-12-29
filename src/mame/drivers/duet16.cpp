@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
 
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")
+	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "chrpal", gfx_duet16)
 

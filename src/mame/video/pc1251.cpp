@@ -9,7 +9,7 @@
 
 #define LOG_LCD (1 << 0)
 
-#define VERBOSE	(0)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 const char *const pc1251_state::s_def[5] =

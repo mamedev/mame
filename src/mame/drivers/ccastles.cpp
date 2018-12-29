@@ -455,7 +455,7 @@ void ccastles_state::ccastles(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ccastles);
-	PALETTE(config, m_palette, 32);
+	PALETTE(config, m_palette).set_entries(32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1); /* will be adjusted later */

@@ -33,7 +33,7 @@ public:
 	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 
 private:
-	DECLARE_PALETTE_INIT(gmaster);
+	void gmaster_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(gmaster_io_r);
 	DECLARE_WRITE8_MEMBER(gmaster_io_w);
 	DECLARE_READ8_MEMBER(gmaster_portb_r);
@@ -260,12 +260,11 @@ static INPUT_PORTS_START( gmaster )
 INPUT_PORTS_END
 
 
-/* palette in red, green, blue tribles */
-static const unsigned char gmaster_palette[2][3] =
+static constexpr rgb_t gmaster_pens[2] =
 {
 #if 1
 	{ 130, 159, 166 },
-	{ 45,45,43 }
+	{ 45, 45, 43 }
 #else
 	{ 255,255,255 },
 	{ 0, 0, 0 }
@@ -273,14 +272,9 @@ static const unsigned char gmaster_palette[2][3] =
 };
 
 
-PALETTE_INIT_MEMBER(gmaster_state, gmaster)
+void gmaster_state::gmaster_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 2; i++)
-	{
-		palette.set_pen_color(i, gmaster_palette[i][0], gmaster_palette[i][1], gmaster_palette[i][2]);
-	}
+	palette.set_pen_colors(0, gmaster_pens);
 }
 
 
@@ -354,8 +348,7 @@ MACHINE_CONFIG_START(gmaster_state::gmaster)
 	screen.set_screen_update(FUNC(gmaster_state::screen_update_gmaster));
 	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gmaster_palette))
-	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)
+	PALETTE(config, "palette", FUNC(gmaster_state::gmaster_palette), ARRAY_LENGTH(gmaster_pens));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 0.50);

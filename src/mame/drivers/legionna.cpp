@@ -1220,16 +1220,15 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_SCREEN_SIZE(36*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	SEIBU_CRTC(config, m_crtc, 0);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
@@ -1275,17 +1274,15 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_SCREEN_SIZE(36*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_heatbrl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	SEIBU_CRTC(config, m_crtc, 0);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
 
@@ -1332,7 +1329,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_RAW_PARAMS(14318180/2,455,0,320,258,0,224) // ~61 Hz, 15.734 kHz
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	SEIBU_CRTC(config, m_crtc, 0);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
@@ -1340,10 +1337,8 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 	m_crtc->layer_scroll_base_callback().set(FUNC(legionna_state::tile_scroll_base_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
@@ -1389,17 +1384,15 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	SEIBU_CRTC(config, m_crtc, 0);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
@@ -1445,17 +1438,15 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_SCREEN_SIZE(64*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	SEIBU_CRTC(config, m_crtc, 0);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grainbow)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grainbow);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
@@ -1502,17 +1493,15 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	SEIBU_CRTC(config, m_crtc, 0);
 	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
 	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cupsoc)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cupsoc);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 

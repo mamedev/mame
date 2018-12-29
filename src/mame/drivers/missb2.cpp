@@ -41,13 +41,15 @@ public:
 
 	void init_missb2();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE8_MEMBER(missb2_oki_w);
 	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_MACHINE_START(missb2);
-	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void maincpu_map(address_map &map);
@@ -449,18 +451,17 @@ WRITE_LINE_MEMBER(missb2_state::irqhandler)
 
 /* Machine Driver */
 
-MACHINE_START_MEMBER(missb2_state,missb2)
+void missb2_state::machine_start()
 {
-	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
+	MACHINE_START_CALL_MEMBER(common);
 
-	m_sreset_old = CLEAR_LINE;
-	save_item(NAME(m_video_enable));
-	save_item(NAME(m_sreset_old));
+	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 }
 
-MACHINE_RESET_MEMBER(missb2_state,missb2)
+void missb2_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER(common);
+
 	m_oki->reset();
 	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
@@ -484,9 +485,6 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 
-	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
-	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -495,20 +493,14 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_missb2)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_PALETTE_ADD("bgpalette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_missb2);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
+	PALETTE(config, m_bgpalette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	GENERIC_LATCH_8(config, m_main_to_sound);
 	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
@@ -525,6 +517,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(missb2_state::bublpong)
 	missb2(config);
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bublpong)
 MACHINE_CONFIG_END
 

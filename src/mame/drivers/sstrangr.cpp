@@ -18,11 +18,12 @@
 class sstrangr_state : public driver_device
 {
 public:
-	sstrangr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sstrangr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_ram(*this, "ram") { }
+		m_ram(*this, "ram")
+	{ }
 
 	void sstrngr2(machine_config &config);
 	void sstrangr(machine_config &config);
@@ -272,7 +273,7 @@ MACHINE_CONFIG_START(sstrangr_state::sstrngr2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrngr2)
 
-	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 MACHINE_CONFIG_END
 
 

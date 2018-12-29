@@ -44,7 +44,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void grfd2301(machine_config &config);
 
@@ -131,7 +131,7 @@ MACHINE_CONFIG_START(grfd2301_state::grfd2301)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 ROM_START( grfd2301 )

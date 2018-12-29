@@ -31,7 +31,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void jonos(machine_config &config);
 
@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(jonos_state::jonos)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jonos)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(jonos_state::kbd_put));

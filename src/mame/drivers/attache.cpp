@@ -1133,7 +1133,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);
@@ -1214,7 +1214,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_SCREEN_RAW_PARAMS(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, 8_MHz_XTAL / 4);

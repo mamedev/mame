@@ -54,16 +54,27 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 class cb2001_state : public driver_device
 {
 public:
-	cb2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cb2001_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram_fg(*this, "vrafg"),
 		m_vram_bg(*this, "vrabg"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void cb2001(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint16_t> m_vram_fg;
 	required_shared_ptr<uint16_t> m_vram_bg;
+	required_device<v35_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	int m_videobank;
 	int m_videomode;
 	tilemap_t *m_reel1_tilemap;
@@ -71,21 +82,17 @@ public:
 	tilemap_t *m_reel3_tilemap;
 	int m_other1;
 	int m_other2;
+
 	DECLARE_WRITE16_MEMBER(cb2001_vidctrl_w);
 	DECLARE_WRITE16_MEMBER(cb2001_vidctrl2_w);
 	DECLARE_WRITE16_MEMBER(cb2001_bg_w);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cb2001);
+	void cb2001_palette(palette_device &palette) const;
 	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_READ8_MEMBER(irq_ack_r);
-	required_device<v35_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void cb2001(machine_config &config);
 	void cb2001_io(address_map &map);
 	void cb2001_map(address_map &map);
 };
@@ -792,25 +799,20 @@ static GFXDECODE_START( gfx_cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(cb2001_state, cb2001)
+void cb2001_state::cb2001_palette(palette_device &palette) const
 {
-	int i;
-	for (i = 0; i < 0x200; i++)
+	uint8_t const *const proms = memregion("proms")->base();
+	int const length = memregion("proms")->bytes();
+
+	for (int i = 0; i < 0x200; i++)
 	{
-		int r,g,b;
+		uint16_t dat = (proms[0x000+i] << 8) | proms[0x200+i];
 
-		uint8_t*proms = memregion("proms")->base();
-		int length = memregion("proms")->bytes();
-		uint16_t dat;
+		int const b = ((dat >> 1) & 0x1f) << 3;
+		int const r = ((dat >> 6 )& 0x1f) << 3;
+		int const g = ((dat >> 11 ) & 0x1f) << 3;
 
-		dat = (proms[0x000+i] << 8) | proms[0x200+i];
-
-
-		b = ((dat >> 1) & 0x1f)<<3;
-		r = ((dat >> 6 )& 0x1f)<<3;
-		g = ((dat >> 11 ) & 0x1f)<<3;
-
-		if (length==0x400) // are the cb2001 proms dumped incorrectly?
+		if (length == 0x400) // are the cb2001 proms dumped incorrectly?
 		{
 			if (!(i&0x20)) palette.set_pen_color((i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
 		}
@@ -848,7 +850,7 @@ void cb2001_state::cb2001(machine_config &config)
 	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(cb2001_state::screen_update_cb2001));
 
-	PALETTE(config, m_palette, 0x100).set_init(FUNC(cb2001_state::palette_init_cb2001));
+	PALETTE(config, m_palette, FUNC(cb2001_state::cb2001_palette), 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

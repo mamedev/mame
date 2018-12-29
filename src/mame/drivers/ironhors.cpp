@@ -399,12 +399,10 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	MCFG_SCREEN_RAW_PARAMS(18432000/4,296,8,256-8,255,16,240) // pixel clock is a guesswork
 
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ironhors)
-	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
+	PALETTE(config, m_palette, FUNC(ironhors_state::ironhors_palette), 16*8*16+16*8*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

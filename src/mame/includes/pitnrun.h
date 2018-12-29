@@ -88,7 +88,7 @@ private:
 	TIMER_CALLBACK_MEMBER(mcu_data_real_r);
 	TIMER_CALLBACK_MEMBER(mcu_status_real_w);
 
-	DECLARE_PALETTE_INIT(pitnrun);
+	void pitnrun_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spotlights();

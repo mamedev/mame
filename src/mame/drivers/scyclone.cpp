@@ -637,7 +637,7 @@ void scyclone_state::scyclone(machine_config &config)
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE); // due to hw collisions
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scyclone);
-	PALETTE(config, m_palette, 8 + 4*4);
+	PALETTE(config, m_palette).set_entries(8 + 4*4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

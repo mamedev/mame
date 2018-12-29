@@ -1286,18 +1286,16 @@ MACHINE_CONFIG_START(armedf_state::terraf)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	terraf_sound(config);
@@ -1325,17 +1323,16 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1372,17 +1369,16 @@ MACHINE_CONFIG_START(armedf_state::kozure)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 ) // 320 x 240, trusted
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	terraf_sound(config);
@@ -1406,17 +1402,16 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1453,17 +1448,16 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1495,17 +1489,16 @@ MACHINE_CONFIG_START(armedf_state::legion_common)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1568,17 +1561,16 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_armedf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	terraf_sound(config);

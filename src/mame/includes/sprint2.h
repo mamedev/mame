@@ -84,7 +84,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sprint2_noise_reset_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(sprint2);
+	void sprint2_palette(palette_device &palette) const;
 	uint32_t screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sprint2);
 	INTERRUPT_GEN_MEMBER(sprint2);

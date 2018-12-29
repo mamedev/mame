@@ -331,13 +331,11 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sub_state, main_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sub)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
-	MCFG_PALETTE_INIT_OWNER(sub_state, sub)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sub);
+	PALETTE(config, m_palette, FUNC(sub_state::sub_palette), 0x400, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

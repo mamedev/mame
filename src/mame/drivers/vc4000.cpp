@@ -340,7 +340,7 @@ PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CE
 #endif
 INPUT_PORTS_END
 
-static const rgb_t vc4000_palette[] =
+static constexpr rgb_t vc4000_pens[] =
 {
 	// background colors
 	rgb_t(0, 0, 0), // black
@@ -356,9 +356,9 @@ static const rgb_t vc4000_palette[] =
 	We can do that in the code with ^7 */
 };
 
-PALETTE_INIT_MEMBER(vc4000_state, vc4000)
+void vc4000_state::vc4000_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, vc4000_palette, ARRAY_LENGTH(vc4000_palette));
+	palette.set_pen_colors(0, vc4000_pens);
 }
 
 
@@ -543,7 +543,7 @@ void vc4000_state::vc4000(machine_config &config)
 	m_screen->set_screen_update(FUNC(vc4000_state::screen_update_vc4000));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", 8).set_init(FUNC(vc4000_state::palette_init_vc4000));
+	PALETTE(config, "palette", FUNC(vc4000_state::vc4000_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

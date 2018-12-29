@@ -296,8 +296,8 @@ void rugby_state::rugby_map(address_map &map)
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2000, 0xffff).rom().region("maincpu", 0x2000);
-	map(0x6000, 0x6fff).ram().w(FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0x6fff).ram().w(FUNC(rugby_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(rugby_state::funworld_colorram_w)).share("colorram");
 }
 
 READ8_MEMBER(rugby_state::rugby_opcode_r)
@@ -474,9 +474,7 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4roses)
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
-	MCFG_VIDEO_START_OVERRIDE(_4roses_state,funworld)
+	PALETTE(config, "palette", FUNC(_4roses_state::funworld_palette), 0x1000);
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8)); /* 2MHz, guess */
 	crtc.set_screen("screen");

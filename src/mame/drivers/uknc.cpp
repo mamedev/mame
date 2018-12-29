@@ -87,7 +87,7 @@ void uknc_state::uknc(machine_config &config)
 	screen.set_screen_update(FUNC(uknc_state::screen_update_uknc));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 }
 
 /* ROM definition */

@@ -87,7 +87,7 @@ void advision_state::advision(machine_config &config)
 	screen.set_visarea(84, 235, 60, 142);
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8).set_init(FUNC(advision_state::palette_init_advision));
+	PALETTE(config, m_palette, FUNC(advision_state::advision_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

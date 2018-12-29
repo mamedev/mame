@@ -75,7 +75,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	DECLARE_PALETTE_INIT(kcgd);
+	void kcgd_palette(palette_device &palette) const;
 
 	enum
 	{
@@ -178,12 +178,12 @@ void kcgd_state::video_start()
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 }
 
-PALETTE_INIT_MEMBER(kcgd_state, kcgd)
+void kcgd_state::kcgd_palette(palette_device &palette) const
 {
+	// FIXME: this doesn't seem right at all - no actual black, and all the grey levels are very close to black
+	// should it just initialise everything besides the first entry to black, or should it be a greyscale ramp?
 	for (int i = 0; i < 16; i++)
-	{
-		palette.set_pen_color(i, i?i:255, i?i:255, i?i:255);
-	}
+		palette.set_pen_color(i, i ? i : 255, i ? i : 255, i ? i : 255);
 }
 
 /*
@@ -359,10 +359,9 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(30'800'000), KCGD_TOTAL_HORZ, KCGD_HORZ_START,
 		KCGD_HORZ_START+KCGD_DISP_HORZ, KCGD_TOTAL_VERT, KCGD_VERT_START,
 		KCGD_VERT_START+KCGD_DISP_VERT);
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(kcgd_state, kcgd)
+	PALETTE(config, m_palette, FUNC(kcgd_state::kcgd_palette), 16);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kcgd)
 #if 0

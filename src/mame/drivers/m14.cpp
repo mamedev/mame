@@ -59,16 +59,16 @@ Dumped by Chackn
 class m14_state : public driver_device
 {
 public:
-	m14_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m14_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_video_ram(*this, "video_ram"),
 		m_color_ram(*this, "color_ram"),
-		m_samples(*this,"samples")
-		{ }
+		m_samples(*this, "samples")
+	{ }
 
 	void m14(machine_config &config);
 
@@ -99,7 +99,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m14);
+	void m14_palette(palette_device &palette) const;
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
 
@@ -122,15 +122,13 @@ private:
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m14_state, m14)
+void m14_state::m14_palette(palette_device &palette) const
 {
-	int i;
 	const rgb_t green_pen = rgb_t(pal1bit(0), pal1bit(1), pal1bit(0));
 
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		rgb_t color;
-
 		if (i & 0x01)
 			color = rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
 		else
@@ -450,8 +448,7 @@ void m14_state::m14(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m14);
-	PALETTE(config, m_palette, 0x20);
-	m_palette->set_init(FUNC(m14_state::palette_init_m14));
+	PALETTE(config, m_palette, FUNC(m14_state::m14_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -460,9 +457,9 @@ void m14_state::m14(machine_config &config)
 	m_samples->set_samples_names(m14_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
 
-//  MCFG_DEVICE_ADD("discrete", DISCRETE)
-//  MCFG_DISCRETE_INTF(m14)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+//  DISCRETE(config, m_discrete);
+//  m_discrete->set_intf(m14);
+//  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 /***************************************************************************

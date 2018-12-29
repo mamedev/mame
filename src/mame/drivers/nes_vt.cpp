@@ -1361,7 +1361,7 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.0988);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
-	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
@@ -1454,7 +1454,7 @@ void nes_vt_state::nes_vt_dg(machine_config &config)
 
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 }
@@ -1477,7 +1477,7 @@ void nes_vt_state::nes_vt_hh(machine_config &config)
 	/* video hardware */
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-	                         (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 }

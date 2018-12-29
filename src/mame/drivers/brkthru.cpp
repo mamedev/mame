@@ -468,16 +468,15 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_brkthru)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
+	PALETTE(config, m_palette, FUNC(brkthru_state::brkthru_palette), 256);
 
 	/* not sure; assuming to be the same as darwin */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
@@ -509,10 +508,9 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_brkthru)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
+	PALETTE(config, m_palette, FUNC(brkthru_state::brkthru_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
@@ -529,7 +527,7 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	              = 57.444855Hz
 	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
@@ -766,7 +764,7 @@ ROM_START( darwin )
 
 	// A PCB has been found with the first PROM substituted with a TBP28S42 (4b56a744) SHA1(5fdc336d90c8a289c146c66f241dd217fc11bf35), see brkthrut ROM loading for how they did it.
 	// With that in mind, there's a one byte difference at 0x55 (0xf0 instead of 0x70). It is unknown if it's bitrot or if it's intended.
-	ROM_REGION( 0x0200, "proms", 0 ) 
+	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "df.12",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) /* red and green component */
 	ROM_LOAD( "df.13",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) /* blue component */
 

@@ -153,8 +153,8 @@
 class replicator_state : public driver_device
 {
 public:
-	replicator_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	replicator_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lcdc(*this, "hd44780"),
 		m_dac(*this, "dac")
@@ -189,7 +189,7 @@ private:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(replicator);
+	void replicator_palette(palette_device &palette) const;
 	void replicator_data_map(address_map &map);
 	void replicator_io_map(address_map &map);
 	void replicator_prg_map(address_map &map);
@@ -587,11 +587,11 @@ void replicator_state::machine_reset()
 	m_port_l = 0;
 }
 
-PALETTE_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::replicator_palette(palette_device &palette) const
 {
 	// These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
-	palette.set_pen_color(0, rgb_t(0xCA, 0xE7, 0xEB));
-	palette.set_pen_color(1, rgb_t(0x78, 0xAB, 0xA8));
+	palette.set_pen_color(0, rgb_t(0xca, 0xe7, 0xeb));
+	palette.set_pen_color(1, rgb_t(0x78, 0xab, 0xa8));
 }
 
 static const gfx_layout hd44780_charlayout =
@@ -633,7 +633,7 @@ void replicator_state::replicator(machine_config &config)
 	screen.set_visarea(0, 120-1, 0, 18*2-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init(FUNC(replicator_state::palette_init_replicator));
+	PALETTE(config, "palette", FUNC(replicator_state::replicator_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
 	HD44780(config, "hd44780", 0).set_lcd_size(4, 20);

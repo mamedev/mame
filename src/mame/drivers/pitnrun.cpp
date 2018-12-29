@@ -310,7 +310,7 @@ void pitnrun_state::pitnrun(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pitnrun);
-	PALETTE(config, m_palette, 32*3).set_init(FUNC(pitnrun_state::palette_init_pitnrun));
+	PALETTE(config, m_palette, FUNC(pitnrun_state::pitnrun_palette), 32 * 3);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -327,12 +327,13 @@ void pitnrun_state::pitnrun(machine_config &config)
 	ay2.port_b_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	LS259(config, "noiselatch", 0); // 1J
+	LS259(config, "noiselatch"); // 1J
 }
 
 void pitnrun_state::pitnrun_mcu(machine_config &config)
 {
 	pitnrun(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &pitnrun_state::pitnrun_map_mcu);
 
 	M68705P5(config, m_mcu, XTAL(18'432'000)/6); /* verified on pcb */

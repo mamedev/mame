@@ -733,8 +733,7 @@ void sslam_state::sslam(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sslam);
-
-	PALETTE(config, m_palette, 0x800).set_format(PALETTE_FORMAT_RRRRGGGGBBBBRGBx);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -765,8 +764,7 @@ void powerbls_state::powerbls(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbls);
-
-	PALETTE(config, m_palette, 0x200).set_format(PALETTE_FORMAT_RRRRGGGGBBBBRGBx);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

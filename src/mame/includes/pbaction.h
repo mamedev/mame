@@ -94,13 +94,14 @@ public:
 class pbaction_tecfri_state : public pbaction_state
 {
 public:
-	pbaction_tecfri_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pbaction_state(mconfig, type, tag),
+	pbaction_tecfri_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pbaction_state(mconfig, type, tag),
 		m_subcpu(*this, "subcpu"),
 		m_ctc2(*this, "ctc2"),
 		m_maintosublatch(*this, "maintosublatch"),
 		//m_subtomainlatch(*this, "subtomainlatch"),
-		m_digits(*this, "digit%u", 0U) { }
+		m_digits(*this, "digit%u", 0U)
+	{ }
 
 	void pbactiont(machine_config &config);
 

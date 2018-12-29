@@ -613,7 +613,7 @@ void ghosteo_state::ghosteo(machine_config &config)
 	screen.set_visarea(0, 320-1, 0, 256-1);
 	screen.set_screen_update("s3c2410", FUNC(s3c2410_device::screen_update));
 
-	PALETTE(config, "palette", 256);
+	PALETTE(config, "palette").set_entries(256);
 
 	S3C2410(config, m_s3c2410, 12000000);
 	m_s3c2410->set_palette_tag("palette");

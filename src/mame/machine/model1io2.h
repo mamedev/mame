@@ -41,13 +41,13 @@ public:
 	template <typename T> void set_lightgun_p2y_tag(T && tag) { m_lightgun_ports[2].set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_lightgun_p2x_tag(T && tag) { m_lightgun_ports[3].set_tag(std::forward<T>(tag)); }
 
+protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	DECLARE_PALETTE_INIT(lcd);
+	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;

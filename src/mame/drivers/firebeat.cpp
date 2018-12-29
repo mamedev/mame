@@ -177,8 +177,8 @@ struct IBUTTON
 class firebeat_state : public driver_device
 {
 public:
-	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	firebeat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_work_ram(*this, "work_ram"),
@@ -1196,7 +1196,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	m_ata->slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	/* video hardware */
-	PALETTE(config, "palette", 32768).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	K057714(config, m_gcu[0], 0);
 	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));
@@ -1252,7 +1252,7 @@ void firebeat_state::firebeat2(machine_config &config)
 	m_ata->slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	/* video hardware */
-	PALETTE(config, "palette", 32768).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	K057714(config, m_gcu[0], 0);
 	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));

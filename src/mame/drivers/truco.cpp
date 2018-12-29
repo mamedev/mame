@@ -444,8 +444,7 @@ MACHINE_CONFIG_START(truco_state::truco)
 	MCFG_SCREEN_UPDATE_DRIVER(truco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(truco_state, truco)
+	PALETTE(config, "palette", FUNC(truco_state::truco_palette), 16);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* Identified as UM6845 */
 	crtc.set_screen("screen");

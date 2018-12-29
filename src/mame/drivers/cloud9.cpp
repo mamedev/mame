@@ -410,7 +410,7 @@ void cloud9_state::cloud9(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloud9);
-	PALETTE(config, m_palette, 64);
+	PALETTE(config, m_palette).set_entries(64);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL);

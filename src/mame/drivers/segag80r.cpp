@@ -887,7 +887,7 @@ MACHINE_CONFIG_START(segag80r_state::spaceod)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spaceod)
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound hardware */
@@ -913,7 +913,7 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
@@ -939,7 +939,7 @@ MACHINE_CONFIG_START(segag80r_state::pignewt)
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound hardware */
@@ -967,7 +967,7 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound hardware */

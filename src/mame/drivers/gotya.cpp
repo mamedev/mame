@@ -228,9 +228,7 @@ void gotya_state::gotya(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gotya);
-	PALETTE(config, m_palette, 16*4);
-	m_palette->set_indirect_entries(32);
-	m_palette->set_init(FUNC(gotya_state::palette_init_gotya));
+	PALETTE(config, m_palette, FUNC(gotya_state::gotya_palette), 16*4, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

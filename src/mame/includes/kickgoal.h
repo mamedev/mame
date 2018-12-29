@@ -43,8 +43,8 @@ public:
 	void init_actionhw();
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);

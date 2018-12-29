@@ -630,18 +630,18 @@ void midwunit_state::wunit(machine_config &config)
 
 	TMS34010(config, m_maincpu, 50000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midwunit_state::main_map);
-	m_maincpu->set_halt_on_reset(false);	 /* halt on reset */
+	m_maincpu->set_halt_on_reset(false);     /* halt on reset */
 	m_maincpu->set_pixel_clock(PIXEL_CLOCK); /* pixel clock */
-	m_maincpu->set_pixels_per_clock(1);		 /* pixels per clock */
-	m_maincpu->set_scanline_ind16_callback("video", FUNC(midtunit_video_device::scanline_update));	/* scanline updater (indexed16) */
-	m_maincpu->set_shiftreg_in_callback("video", FUNC(midtunit_video_device::to_shiftreg));			/* write to shiftreg function */
-	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));		/* read from shiftreg function */
+	m_maincpu->set_pixels_per_clock(1);      /* pixels per clock */
+	m_maincpu->set_scanline_ind16_callback("video", FUNC(midtunit_video_device::scanline_update));  /* scanline updater (indexed16) */
+	m_maincpu->set_shiftreg_in_callback("video", FUNC(midtunit_video_device::to_shiftreg));         /* write to shiftreg function */
+	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));      /* read from shiftreg function */
 	m_maincpu->set_screen("screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 32768);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// from TMS340 registers

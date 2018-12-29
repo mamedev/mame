@@ -1181,7 +1181,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
@@ -1198,7 +1198,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
@@ -1212,7 +1212,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
@@ -1229,7 +1229,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
@@ -1246,7 +1246,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
@@ -1255,7 +1255,7 @@ MACHINE_CONFIG_END
 void midyunit_state::term2(machine_config &config)
 {
 	yunit_adpcm_6bit_faster(config);
-	ADC0844(config, m_term2_adc, 0); // U2 on Coil Lamp Driver Board (A-14915)
+	ADC0844(config, m_term2_adc); // U2 on Coil Lamp Driver Board (A-14915)
 	m_term2_adc->ch1_callback().set_ioport("STICK0_X");
 	m_term2_adc->ch2_callback().set_ioport("STICK0_Y");
 	m_term2_adc->ch3_callback().set_ioport("STICK1_X");
@@ -1272,7 +1272,7 @@ MACHINE_CONFIG_START(midyunit_state::mkyawdim)
 	MCFG_DEVICE_PROGRAM_MAP(yawdim_sound_map)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,mkyawdim)
 

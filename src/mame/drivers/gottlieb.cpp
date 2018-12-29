@@ -1775,7 +1775,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 	m_screen->set_screen_update(FUNC(gottlieb_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode);
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	// basic speaker configuration
 	SPEAKER(config, "speaker").front_center();

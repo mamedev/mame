@@ -546,20 +546,16 @@ void buggychl_state::buggychl(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buggychl);
-	PALETTE(config, m_palette, 128+128);
-	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
+	PALETTE(config, m_palette, FUNC(buggychl_state::buggychl_palette)).set_format(palette_device::xRGB_444, 128 + 128);
 	m_palette->set_endianness(ENDIANNESS_BIG);
-	m_palette->set_init(FUNC(buggychl_state::palette_init_buggychl));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
-
-	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
-
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 	GENERIC_LATCH_8(config, m_soundlatch2);
+
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	TA7630(config, m_ta7630);
 

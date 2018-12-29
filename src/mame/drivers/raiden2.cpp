@@ -1440,9 +1440,8 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
@@ -1518,9 +1517,8 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));

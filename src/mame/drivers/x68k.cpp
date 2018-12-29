@@ -1592,8 +1592,8 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 
 	GFXDECODE(config, m_gfxdecode, "pcgpalette", gfxdecode_device::empty);
 
-	PALETTE(config, m_gfxpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
-	PALETTE(config, m_pcgpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
+	PALETTE(config, m_gfxpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
+	PALETTE(config, m_pcgpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
 
 	config.set_default_layout(layout_x68000);
 

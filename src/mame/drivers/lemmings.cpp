@@ -236,8 +236,7 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lemmings_state, screen_vblank_lemmings))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lemmings)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(1);

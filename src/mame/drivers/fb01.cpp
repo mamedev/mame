@@ -39,6 +39,10 @@ public:
 
 	void fb01(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
@@ -46,14 +50,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
 	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	DECLARE_PALETTE_INIT(fb01);
+	void fb01_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
 	void fb01_io(address_map &map);
 	void fb01_mem(address_map &map);
+
+	void update_int();
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
@@ -61,8 +64,6 @@ private:
 	int m_ym2164_irq;
 	int m_upd71051_txrdy;
 	int m_upd71051_rxrdy;
-
-	void update_int();
 };
 
 
@@ -171,7 +172,7 @@ HD44780_PIXEL_UPDATE(fb01_state::fb01_pixel_update)
 }
 
 
-PALETTE_INIT_MEMBER(fb01_state, fb01)
+void fb01_state::fb01_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(30, 0, 0));
 	palette.set_pen_color(1, rgb_t(150, 0, 0));
@@ -195,8 +196,7 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 
 	config.set_default_layout(layout_fb01);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(fb01_state, fb01)
+	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16

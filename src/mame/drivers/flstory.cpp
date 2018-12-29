@@ -754,8 +754,7 @@ void flstory_state::common(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flstory);
-	PALETTE(config, m_palette, 512);
-	m_palette->set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(aeroboto_state::formatz)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aeroboto)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

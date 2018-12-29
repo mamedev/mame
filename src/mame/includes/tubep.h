@@ -102,10 +102,10 @@ private:
 	DECLARE_MACHINE_RESET(tubep);
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_PALETTE_INIT(tubep);
+	void tubep_palette(palette_device &palette);
 	DECLARE_MACHINE_START(rjammer);
 	DECLARE_MACHINE_RESET(rjammer);
-	DECLARE_PALETTE_INIT(rjammer);
+	void rjammer_palette(palette_device &palette) const;
 	uint32_t screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tubep_scanline_callback);

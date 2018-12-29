@@ -247,7 +247,6 @@ private:
 
 	TIMER_CALLBACK_MEMBER(mac_scanline);
 	DECLARE_VIDEO_START(mac);
-	void palette_init(palette_device &palette);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
@@ -1231,12 +1230,6 @@ void mac128_state::mac128_state_load()
 {
 }
 
-void mac128_state::palette_init(palette_device &palette)
-{
-	palette.set_pen_color(0, 0xff, 0xff, 0xff);
-	palette.set_pen_color(1, 0x00, 0x00, 0x00);
-}
-
 VIDEO_START_MEMBER(mac128_state,mac)
 {
 }
@@ -1347,8 +1340,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
 	m_screen->set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init(DEVICE_SELF, FUNC(mac128_state::palette_init));
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	MCFG_VIDEO_START_OVERRIDE(mac128_state,mac)
 

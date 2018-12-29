@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
+#ifndef MAME_INCLUDES_POPEYE_H
+#define MAME_INCLUDES_POPEYE_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -10,8 +14,8 @@
 class tnx1_state : public driver_device
 {
 public:
-	tnx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tnx1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_aysnd(*this, "aysnd"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -20,10 +24,12 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_color_prom(*this, "proms"),
-		m_color_prom_spr(*this, "sprpal") { }
+		m_color_prom_spr(*this, "sprpal")
+	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
 	DECLARE_CUSTOM_INPUT_MEMBER(pop_field_r);
+
 	virtual void config(machine_config &config);
 
 protected:
@@ -68,7 +74,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void driver_start() override;
 	virtual void video_start() override;
-	virtual DECLARE_PALETTE_INIT(tnx1);
+	virtual void tnx1_palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void update_palette();
@@ -87,7 +93,7 @@ class tpp1_state : public tnx1_state
 {
 	using tnx1_state::tnx1_state;
 protected:
-	virtual DECLARE_PALETTE_INIT(tnx1) override;
+	virtual void tnx1_palette(palette_device &palette) override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	static const res_net_info tpp1_bak_mb7051_net_info;
@@ -125,6 +131,9 @@ protected:
 class tpp2_noalu_state : public tpp2_state
 {
 	using tpp2_state::tpp2_state;
+
 protected:
 	virtual void maincpu_program_map(address_map &map) override;
 };
+
+#endif // MAME_INCLUDES_POPEYE_H

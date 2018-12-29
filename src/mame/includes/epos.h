@@ -43,9 +43,9 @@ private:
 	DECLARE_WRITE8_MEMBER(dealer_pal_w);
 	DECLARE_MACHINE_START(epos);
 	DECLARE_MACHINE_START(dealer);
-	DECLARE_PALETTE_INIT(epos);
+	void epos_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void set_pal_color( uint8_t offset, uint8_t data );
+	static void set_pal_color(palette_device &palette, uint8_t offset, uint8_t data); // TODO: convert to an RGB converter and set_format
 	void dealer_io_map(address_map &map);
 	void dealer_map(address_map &map);
 	void epos_io_map(address_map &map);

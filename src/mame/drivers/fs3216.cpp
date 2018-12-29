@@ -13,6 +13,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/8x300/8x300.h"
 //#include "imagedev/floppy.h"
+#include "machine/bankdev.h"
 //#include "machine/com8116.h"
 #include "machine/upd765.h"
 #include "machine/x2212.h"
@@ -28,6 +29,7 @@ public:
 	fs3216_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_clb(*this, "clb")
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
 		, m_earom(*this, "earom")
@@ -38,9 +40,15 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
+
+	DECLARE_READ16_MEMBER(mmu_read);
+	DECLARE_WRITE16_MEMBER(mmu_write);
+	DECLARE_WRITE_LINE_MEMBER(mmu_reset_w);
+	void mmu_init_w(u16 data);
 
 	DECLARE_READ8_MEMBER(ctc_r);
 	DECLARE_WRITE8_MEMBER(ctc_w);
@@ -53,15 +61,20 @@ private:
 	u16 earom_store_r();
 
 	void main_map(address_map &map);
+	void clb_map(address_map &map);
 	void wdcpu_prog_map(address_map &map);
 	void wdcpu_bank_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
+	required_device<address_map_bank_device> m_clb;
 	required_device<z80ctc_device> m_ctc;
 	required_device<upd765a_device> m_fdc;
 	required_device<x2212_device> m_earom;
 
 	std::unique_ptr<u8[]> m_fdc_ram;
+
+	bool m_in_reset;
+	bool m_mmu_init;
 };
 
 
@@ -69,6 +82,18 @@ void fs3216_state::machine_start()
 {
 	m_fdc_ram = make_unique_clear<u8[]>(0x400);
 	save_pointer(NAME(m_fdc_ram), 0x400);
+
+	save_item(NAME(m_in_reset));
+	save_item(NAME(m_mmu_init));
+}
+
+void fs3216_state::machine_reset()
+{
+	m_in_reset = true;
+	m_mmu_init = false;
+
+	// FIXME: fix the 68000 so that it doesn't read vectors during device_reset
+	m_maincpu->reset();
 }
 
 
@@ -76,6 +101,48 @@ MC6845_UPDATE_ROW(fs3216_state::update_row)
 {
 }
 
+
+READ16_MEMBER(fs3216_state::mmu_read)
+{
+	if (m_in_reset)
+	{
+		if (m_mmu_init && !BIT(offset, 22) && !machine().side_effects_disabled())
+			m_in_reset = false;
+		else
+			offset = (offset & 0x03ffff) | 0x1c0000;
+	}
+
+	// TODO: MMU segments
+	return m_clb->read16(space, offset & 0x1fffff, mem_mask);
+}
+
+WRITE16_MEMBER(fs3216_state::mmu_write)
+{
+	if (m_in_reset)
+	{
+		if (m_mmu_init && !BIT(offset, 22) && !machine().side_effects_disabled())
+			m_in_reset = false;
+		else
+			offset = (offset & 0x03ffff) | 0x1c0000;
+	}
+
+	// TODO: MMU segments
+	m_clb->write16(space, offset & 0x1fffff, data, mem_mask);
+}
+
+WRITE_LINE_MEMBER(fs3216_state::mmu_reset_w)
+{
+	if (state)
+	{
+		m_in_reset = true;
+		m_mmu_init = false;
+	}
+}
+
+void fs3216_state::mmu_init_w(u16 data)
+{
+	m_mmu_init = true;
+}
 
 READ8_MEMBER(fs3216_state::ctc_r)
 {
@@ -134,23 +201,27 @@ void fs3216_state::fdc_ram_w(offs_t offset, u8 data)
 
 void fs3216_state::main_map(address_map &map)
 {
-	map(0x000000, 0x003fff).rom().region("bios", 0);
-	map(0x015000, 0x017fff).ram();
+	map(0x000000, 0xffffff).rw(FUNC(fs3216_state::mmu_read), FUNC(fs3216_state::mmu_write));
+}
+
+void fs3216_state::clb_map(address_map &map)
+{
+	map(0x000000, 0x017fff).ram();
+	map(0x380000, 0x383fff).rom().region("momrom", 0);
+	map(0x392000, 0x392003).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x392041, 0x392041).w(FUNC(fs3216_state::floppy_select_w));
+	map(0x392051, 0x392051).r(FUNC(fs3216_state::floppy_status_r));
 	map(0x394680, 0x39468f).rw(FUNC(fs3216_state::ctc_r), FUNC(fs3216_state::ctc_w)).umask16(0x00ff);
 	map(0x394701, 0x394701).rw("dart", FUNC(z80dart_device::da_r), FUNC(z80dart_device::da_w));
 	map(0x394709, 0x394709).rw("dart", FUNC(z80dart_device::ca_r), FUNC(z80dart_device::ca_w));
 	map(0x394711, 0x394711).rw("dart", FUNC(z80dart_device::db_r), FUNC(z80dart_device::db_w));
 	map(0x394719, 0x394719).rw("dart", FUNC(z80dart_device::cb_r), FUNC(z80dart_device::cb_w));
-	map(0x780000, 0x783fff).rom().region("bios", 0);
-	map(0x792000, 0x792003).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0x792041, 0x792041).w(FUNC(fs3216_state::floppy_select_w));
-	map(0x792051, 0x792051).r(FUNC(fs3216_state::floppy_status_r));
-	map(0x7f6000, 0x7f6001).w(FUNC(fs3216_state::fdc_reset_w));
-	map(0x7f6800, 0x7f6fff).rw(FUNC(fs3216_state::fdc_ram_r), FUNC(fs3216_state::fdc_ram_w)).umask16(0x00ff);
-	map(0x7f7000, 0x7f7001).r(FUNC(fs3216_state::earom_recall_r));
-	map(0x7f7200, 0x7f7201).r(FUNC(fs3216_state::earom_store_r));
-	map(0x7f7400, 0x7f75ff).rw(m_earom, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
-	map(0x800000, 0x803fff).rom().region("bios", 0);
+	map(0x3f5000, 0x3f5001).w(FUNC(fs3216_state::mmu_init_w));
+	map(0x3f6000, 0x3f6001).w(FUNC(fs3216_state::fdc_reset_w));
+	map(0x3f6800, 0x3f6fff).rw(FUNC(fs3216_state::fdc_ram_r), FUNC(fs3216_state::fdc_ram_w)).umask16(0x00ff);
+	map(0x3f7000, 0x3f7001).r(FUNC(fs3216_state::earom_recall_r));
+	map(0x3f7200, 0x3f7201).r(FUNC(fs3216_state::earom_store_r));
+	map(0x3f7400, 0x3f75ff).rw(m_earom, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 }
 
 void fs3216_state::wdcpu_prog_map(address_map &map)
@@ -168,6 +239,13 @@ void fs3216_state::fs3216(machine_config &config)
 {
 	M68000(config, m_maincpu, 44.2368_MHz_XTAL / 8); // 5.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fs3216_state::main_map);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(fs3216_state::mmu_reset_w), this));
+
+	ADDRESS_MAP_BANK(config, m_clb);
+	m_clb->set_addrmap(0, &fs3216_state::clb_map);
+	m_clb->set_data_width(16);
+	m_clb->set_addr_width(24);
+	m_clb->set_endianness(ENDIANNESS_BIG);
 
 	Z80CTC(config, m_ctc, 44.2368_MHz_XTAL / 8); // Z8430BPS
 	m_ctc->set_clk<0>(44.2368_MHz_XTAL / 16); // CLK0 rate guessed
@@ -207,7 +285,7 @@ INPUT_PORTS_END
 // XTALs on Video Controller board (1000443-1 Rev. I): 14.580 MHz (1H)
 // XTALs on WD-1001 CLB Disk Controller board (1473-008): 20.000 (Y1), 8.00? [somewhat defaced] (Y2)
 ROM_START(fs3216)
-	ROM_REGION16_BE(0x4000, "bios", 0)
+	ROM_REGION16_BE(0x4000, "momrom", 0)
 	ROM_LOAD16_BYTE("17k_1260-02_h.bin", 0x0000, 0x2000, CRC(75ed6de8) SHA1(0360548493b778995ae436da475b6356945e1872))
 	ROM_LOAD16_BYTE("15k_1260-01_l.bin", 0x0001, 0x2000, CRC(82695233) SHA1(0d69309f41306298bf6a4ba6928c53f908bb3f2c))
 

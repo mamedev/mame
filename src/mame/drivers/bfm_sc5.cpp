@@ -30,7 +30,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_duart->write(space,offset,(data>>8)&0x00ff);
+		m_duart->write(offset,(data>>8)&0x00ff);
 	}
 	else
 	{

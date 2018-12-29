@@ -424,9 +424,8 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	screen.screen_vblank().append(m_spriteram2, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crshrace)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crshrace);
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 2048);
 
 	VSYSTEM_SPR(config, m_spr, 0);
 	m_spr->set_tile_indirect_cb(FUNC(crshrace_state::crshrace_tile_callback), this);

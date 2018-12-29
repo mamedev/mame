@@ -672,11 +672,10 @@ MACHINE_CONFIG_START(taitoh_state::syvalion)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_syvalion)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_syvalion)
-	MCFG_PALETTE_ADD(m_palette, 33*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_syvalion);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);
@@ -728,11 +727,10 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_recordbr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_recordbr)
-	MCFG_PALETTE_ADD(m_palette, 32*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_recordbr);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 32*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);
@@ -795,11 +793,10 @@ MACHINE_CONFIG_START(taitoh_state::dleague)
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_dleague)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dleague)
-	MCFG_PALETTE_ADD(m_palette, 33*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dleague);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 33*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
 	m_tc0080vco->set_gfx_region(0);

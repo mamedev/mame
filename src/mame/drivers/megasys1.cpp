@@ -1702,13 +1702,11 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_abc)
+	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
@@ -1807,13 +1805,11 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_abc)
+	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
@@ -1888,12 +1884,10 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
-	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_abc)
+	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RGBx_555, 1024);
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
@@ -1939,11 +1933,10 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_z)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
@@ -3070,7 +3063,7 @@ ROM_START( iganinjub )
 	ROM_LOAD16_BYTE( "19.a12", 0x000000, 0x010000, CRC(6b4c16ac) SHA1(edb5fe3b3e4e94e59348c0a7034df9df6ef157d3) )
 	ROM_LOAD16_BYTE( "23.13",  0x000001, 0x010000, CRC(03bfda29) SHA1(ced6ddcbb86d3109bcfb8e1982a5f666ca7dc10e) )
 	ROM_LOAD16_BYTE( "20.a13", 0x020000, 0x010000, CRC(fa0705fb) SHA1(110ebca62a57f9d8e355a339a99819faf1fe57f1) )
-	ROM_LOAD16_BYTE( "24.12",  0x020001, 0x010000, CRC(2de40303) SHA1(5c841295c0d804163a7da3c122dd40af7780d1f2) )	
+	ROM_LOAD16_BYTE( "24.12",  0x020001, 0x010000, CRC(2de40303) SHA1(5c841295c0d804163a7da3c122dd40af7780d1f2) )
 	ROM_LOAD16_BYTE( "c",      0x040000, 0x010000, CRC(de5937ad) SHA1(d3039e5391feb925ea10f33a1363bf3ffc1ebb3d) )
 	ROM_LOAD16_BYTE( "b",      0x040001, 0x010000, CRC(afaf0480) SHA1(b8d0ec859a94941650bdd2b01e98d054d49fef67) )
 

@@ -323,7 +323,7 @@ void ms6102_state::ms6102(machine_config &config)
 	m_screen->set_raw(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_ms6102);
-	PALETTE(config, m_palette, 3).set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	I8257(config, m_dma8257, XTAL(18'432'000) / 9);
 	m_dma8257->out_hrq_cb().set(FUNC(ms6102_state::hrq_w));

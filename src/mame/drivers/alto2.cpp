@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(alto2_state::alto2)
 	screen.set_screen_update("maincpu", FUNC(alto2_cpu_device::screen_update));
 	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();

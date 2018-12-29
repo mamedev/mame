@@ -39,11 +39,11 @@ void hp700_state::mem_map(address_map &map)
 	map(0x30000, 0x31fff).ram().share("nvram");
 	map(0x34000, 0x34000).nopr();
 	map(0x38000, 0x38fff).lrw8("duart_rw",
-							   [this](address_space &space, offs_t offset, u8 mem_mask) {
-								   return m_duart->read(space, offset >> 8, mem_mask);
+							   [this](offs_t offset) {
+								   return m_duart->read(offset >> 8);
 							   },
-							   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-								   m_duart->write(space, offset >> 8, data, mem_mask);
+							   [this](offs_t offset, u8 data) {
+								   m_duart->write(offset >> 8, data);
 							   });
 	map(0xffff0, 0xfffff).rom().region("maincpu", 0x1fff0);
 }

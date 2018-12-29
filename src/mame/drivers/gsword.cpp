@@ -692,7 +692,7 @@ static INPUT_PORTS_START( gsword )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )           PORT_DIPLOCATION("A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) )		    PORT_DIPLOCATION("A:3,4,5")
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("A:3,4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -942,19 +942,17 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gsword_state, screen_update_gsword)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(gsword_state,gsword)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
+	PALETTE(config, m_palette, FUNC(gsword_state::gsword_palette), 64*4 + 64*4, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, m_ay0, XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30); /* verified on pcb */
+	AY8910(config, m_ay0, XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30); // Clock verified on PCB
 
 	AY8910(config, m_ay1, 1500000);
 	m_ay1->port_a_write_callback().set(FUNC(gsword_state::nmi_set_w));
@@ -1009,12 +1007,10 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(josvolly_state, screen_update_gsword)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(josvolly_state, josvolly)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
+	PALETTE(config, m_palette, FUNC(josvolly_state::josvolly_palette), 64*4 + 64*4, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

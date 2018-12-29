@@ -386,7 +386,7 @@ void arabian_state::arabian(machine_config &config)
 	screen.set_screen_update(FUNC(arabian_state::screen_update_arabian));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 256*32).set_init(FUNC(arabian_state::palette_init_arabian));
+	PALETTE(config, m_palette, FUNC(arabian_state::arabian_palette), 256 * 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

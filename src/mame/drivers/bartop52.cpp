@@ -148,7 +148,7 @@ void bartop52_state::a5200(machine_config &config)
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", 256).set_init(FUNC(bartop52_state::palette_init_atari));
+	PALETTE(config, "palette", FUNC(bartop52_state::atari_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

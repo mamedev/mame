@@ -30,9 +30,9 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 	if (data & 0xf8)
 		logerror("%s: videobank = %02x\n", machine().describe_context(), data);
 
-	/* bit 0 = select 053245 at 0000-07ff */
-	/* bit 1 = select palette at 0000-07ff */
-	/* bit 2 = select palette bank 0 or 1 */
+	// bit 0 = select 053245 at 0000-07ff
+	// bit 1 = select palette at 0000-07ff
+	// bit 2 = select palette bank 0 or 1
 	if (BIT(data, 1))
 		m_bank0000->set_bank(2 + BIT(data, 2));
 	else
@@ -44,14 +44,14 @@ WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
 
-	/* bit 0/1 = coin counters */
+	// bit 0/1 = coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
-	/* bit 3 = enable char ROM reading through the video RAM */
+	// bit 3 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* other bits unknown */
+	// other bits unknown
 }
 
 
@@ -188,9 +188,8 @@ void surpratk_state::surpratk(machine_config &config)
 	screen.set_screen_update(FUNC(surpratk_state::screen_update_surpratk));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);

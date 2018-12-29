@@ -235,9 +235,7 @@ void flkatck_state::flkatck(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_flkatck);
-	palette_device &palette(PALETTE(config, "palette", 512));
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	palette.set_endianness(ENDIANNESS_LITTLE);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121, 0);
 	m_k007121->set_palette_tag("palette");

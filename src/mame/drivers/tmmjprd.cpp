@@ -748,9 +748,7 @@ void tmmjprd_state::tmpdoki(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tmmjprd);
-
-	PALETTE(config, m_palette, 0x1000);
-	m_palette->set_format(PALETTE_FORMAT_XGRB);
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_888, 0x1000);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

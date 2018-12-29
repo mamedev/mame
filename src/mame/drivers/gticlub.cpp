@@ -988,7 +988,7 @@ void gticlub_state::gticlub(machine_config &config)
 	screen.set_visarea(0, 511, 0, 383);
 	screen.set_screen_update(FUNC(gticlub_state::screen_update_gticlub));
 
-	PALETTE(config, m_palette, 65536);
+	PALETTE(config, m_palette).set_entries(65536);
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
@@ -1100,7 +1100,7 @@ void gticlub_state::hangplt(machine_config &config)
 	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
-	PALETTE(config, m_palette, 65536);
+	PALETTE(config, m_palette).set_entries(65536);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);

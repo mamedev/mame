@@ -129,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::scanline_timer)
     {
         //logerror("scanline\n");
         m_dma8257->dreq1_w(0x01);
-    	m_dma8257->hlda_w(1);
+        m_dma8257->hlda_w(1);
     }
     */
 }
@@ -204,7 +204,7 @@ WRITE8_MEMBER(fastinvaders_state::dark_2_clr)
 		m_dma8257->dreq2_w(0x00);
 	}
 /*  if (!data)
-	{
+    {
         m_dma1 = 0;
     }
     */
@@ -659,7 +659,7 @@ void fastinvaders_state::fastinvaders(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_fastinvaders);
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	// TODO

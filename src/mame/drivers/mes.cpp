@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(mes_state::mes)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	Z80CTC(config, "ctc", 0);
 	Z80PIO(config, "pio", 0);

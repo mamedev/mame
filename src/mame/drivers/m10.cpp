@@ -151,19 +151,11 @@ WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m10_state,m10)
+void m10_state::m10_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 	{
-		rgb_t color;
-
-		if (i & 0x01)
-			color = rgb_t(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1));
-		else
-			color = rgb_t::black();
-
+		rgb_t const color = BIT(i, 0) ? rgb_t(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1)) : rgb_t::black();
 		palette.set_pen_color(i, color);
 	}
 }
@@ -828,9 +820,7 @@ void m10_state::m10(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m10);
-
-	PALETTE(config, m_palette, 2*8);
-	m_palette->set_init(FUNC(m10_state::palette_init_m10));
+	PALETTE(config, m_palette, FUNC(m10_state::m10_palette), 2 * 8);
 
 	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
 
@@ -889,11 +879,9 @@ void m10_state::m15(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
+	PALETTE(config, m_palette, FUNC(m10_state::m10_palette), 2 * 8);
 
-	PALETTE(config, m_palette, 2*8);
-	m_palette->set_init(FUNC(m10_state::palette_init_m10));
-
-	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
+	MCFG_VIDEO_START_OVERRIDE(m10_state, m15)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

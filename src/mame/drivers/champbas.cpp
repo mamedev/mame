@@ -554,12 +554,10 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_talbot)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_talbot)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -598,12 +596,10 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbas)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_champbas)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -709,12 +705,10 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -769,12 +763,10 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

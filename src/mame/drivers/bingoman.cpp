@@ -250,25 +250,27 @@ class bingoman_state : public driver_device
 {
 public:
 	bingoman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void bingoman(machine_config &config);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(bingoman);
-	void bingoman(machine_config &config);
+	void bingoman_palette(palette_device &palette) const;
 	void bingoman_io_map(address_map &map);
 	void bingoman_prg_map(address_map &map);
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 };
 
 void bingoman_state::video_start()
@@ -373,7 +375,7 @@ void bingoman_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(bingoman_state, bingoman)
+void bingoman_state::bingoman_palette(palette_device &palette) const
 {
 }
 
@@ -393,10 +395,8 @@ MACHINE_CONFIG_START(bingoman_state::bingoman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bingoman)
-
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(bingoman_state, bingoman)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_bingoman);
+	PALETTE(config, "palette", FUNC(bingoman_state::bingoman_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

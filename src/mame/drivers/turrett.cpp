@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(turrett_state::turrett)
 	MCFG_SCREEN_UPDATE_DRIVER(turrett_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, Grull Osgo
-
 #ifndef MAME_INCLUDES_AMPOKER2_H
 #define MAME_INCLUDES_AMPOKER2_H
 
@@ -42,7 +41,7 @@ private:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
-	DECLARE_PALETTE_INIT(ampoker2);
+	void ampoker2_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(sigma2k);
 
 	void io_map(address_map &map);

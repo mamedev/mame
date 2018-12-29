@@ -216,10 +216,10 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 	// rate on a snk68.c with very similar hardware board is 59.16Hz.
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prehisle);
-	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_RRRRGGGGBBBBxxxx);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

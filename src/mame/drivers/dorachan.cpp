@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(dorachan_state::dorachan)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(dorachan_state, screen_update_dorachan)
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 MACHINE_CONFIG_END
 
 

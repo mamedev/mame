@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_SCREEN_SIZE(80*8, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_tavernie);
 
 	/* sound hardware */

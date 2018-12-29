@@ -2143,7 +2143,7 @@ void ksys573_state::konami573(machine_config &config)
 
 	M48T58(config, "m48t58", 0);
 
-	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
 }
 

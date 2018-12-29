@@ -178,7 +178,7 @@ void vector06_state::vector06(machine_config &config)
 	m_screen->set_screen_update(FUNC(vector06_state::screen_update_vector06));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 16).set_init(FUNC(vector06_state::palette_init_vector06));
+	PALETTE(config, m_palette, palette_device::BLACK, 16);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);

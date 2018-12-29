@@ -30,17 +30,17 @@ ToDo:
 #include "softlist.h"
 #include "speaker.h"
 
-const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
+static constexpr rgb_t mbc55x_pens[SCREEN_NO_COLOURS]
 {
-	/*normal brightness */
-	{ 0x00,0x00,0x00 }, /* black */
-	{ 0x00,0x00,0x80 }, /* blue */
-	{ 0x00,0x80,0x00 }, /* green */
-	{ 0x00,0x80,0x80 }, /* cyan */
-	{ 0x80,0x00,0x00 }, /* red */
-	{ 0x80,0x00,0x80 }, /* magenta */
-	{ 0x80,0x80,0x00 }, /* yellow */
-	{ 0x80,0x80,0x80 }, /* light grey */
+	// normal brightness
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0x00, 0x00, 0x80 }, // blue
+	{ 0x00, 0x80, 0x00 }, // green
+	{ 0x00, 0x80, 0x80 }, // cyan
+	{ 0x80, 0x00, 0x00 }, // red
+	{ 0x80, 0x00, 0x80 }, // magenta
+	{ 0x80, 0x80, 0x00 }, // yellow
+	{ 0x80, 0x80, 0x80 }  // light grey
 };
 
 
@@ -224,14 +224,11 @@ static INPUT_PORTS_START( mbc55x )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(mbc55x_state, mbc55x)
+void mbc55x_state::mbc55x_palette(palette_device &palette) const
 {
-	int colourno;
-
 	logerror("initializing palette\n");
 
-	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
-		palette.set_pen_color(colourno, mbc55x_palette[colourno][RED], mbc55x_palette[colourno][GREEN], mbc55x_palette[colourno][BLUE]);
+	palette.set_pen_colors(0, mbc55x_pens);
 }
 
 
@@ -281,8 +278,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	screen.set_raw(14.318181_MHz_XTAL, 896, 0, 640, 262, 0, 200);
 	screen.set_screen_update(VID_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS * 3)
-	MCFG_PALETTE_INIT_OWNER(mbc55x_state, mbc55x)
+	PALETTE(config, m_palette, FUNC(mbc55x_state::mbc55x_palette), SCREEN_NO_COLOURS * 3);
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("128K,192K,256K,320K,384K,448K,512K,576K,640K");
 

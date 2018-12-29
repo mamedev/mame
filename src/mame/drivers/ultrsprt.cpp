@@ -21,8 +21,8 @@
 class ultrsprt_state : public driver_device
 {
 public:
-	ultrsprt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ultrsprt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k056800(*this, "k056800"),
@@ -30,7 +30,8 @@ public:
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
 		m_upd(*this, "upd%u", 1),
-		m_service(*this, "SERVICE") { }
+		m_service(*this, "SERVICE")
+	{ }
 
 	void ultrsprt(machine_config &config);
 
@@ -264,8 +265,7 @@ void ultrsprt_state::ultrsprt(machine_config &config)
 	screen.set_screen_update(FUNC(ultrsprt_state::screen_update_ultrsprt));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8192);
-	m_palette->set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
 	/* sound hardware */
 	K056800(config, m_k056800, XTAL(18'432'000));

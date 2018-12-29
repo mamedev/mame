@@ -808,7 +808,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	screen.set_screen_update(FUNC(taitopjc_state::screen_update_taitopjc));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 32768);
+	PALETTE(config, m_palette).set_entries(32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	TC0780FPA(config, m_tc0780fpa, 0);

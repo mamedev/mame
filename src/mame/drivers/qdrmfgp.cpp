@@ -547,8 +547,7 @@ void qdrmfgp_state::qdrmfgp(machine_config &config)
 	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
@@ -593,8 +592,7 @@ void qdrmfgp_state::qdrmfgp2(machine_config &config)
 	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 

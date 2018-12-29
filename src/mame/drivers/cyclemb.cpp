@@ -84,8 +84,8 @@ Dumped by Chack'n
 class cyclemb_state : public driver_device
 {
 public:
-	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -95,7 +95,8 @@ public:
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
-		m_obj3_ram(*this, "obj3_ram")
+		m_obj3_ram(*this, "obj3_ram"),
+		m_pad(*this, "PAD_P%u", 1U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -109,6 +110,8 @@ public:
 	required_shared_ptr<uint8_t> m_obj1_ram;
 	required_shared_ptr<uint8_t> m_obj2_ram;
 	required_shared_ptr<uint8_t> m_obj3_ram;
+
+	optional_ioport_array<2> m_pad;
 
 	struct
 	{
@@ -131,11 +134,13 @@ public:
 	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(pad_r);
+
 	void init_skydest();
 	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(cyclemb);
+	void cyclemb_palette(palette_device &palette) const;
 
 	uint32_t screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -155,28 +160,29 @@ public:
 
 
 
-PALETTE_INIT_MEMBER(cyclemb_state, cyclemb)
+void cyclemb_state::cyclemb_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i,r,g,b,val;
-	int bit0,bit1,bit2;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
+		int const val = color_prom[i | 0x100] | (color_prom[i | 0x000] << 4);
+		int bit0, bit1, bit2;
 
 		bit0 = 0;
-		bit1 = (val >> 6) & 0x01;
-		bit2 = (val >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 3) & 0x01;
-		bit1 = (val >> 4) & 0x01;
-		bit2 = (val >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (val >> 0) & 0x01;
-		bit1 = (val >> 1) & 0x01;
-		bit2 = (val >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(val, 6);
+		bit2 = BIT(val, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(val, 3);
+		bit1 = BIT(val, 4);
+		bit2 = BIT(val, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(val, 0);
+		bit1 = BIT(val, 1);
+		bit2 = BIT(val, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -662,6 +668,12 @@ void cyclemb_state::machine_reset()
 	skydest_i8741_reset();
 }
 
+template <int P>
+CUSTOM_INPUT_MEMBER(cyclemb_state::pad_r)
+{
+	return m_pad[P]->read();
+}
+
 
 static INPUT_PORTS_START( cyclemb )
 	PORT_START("SYSTEM")
@@ -696,7 +708,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "PAD_P1")
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<0>, nullptr)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P1")
@@ -719,7 +731,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "PAD_P2")
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<1>, nullptr)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P2")
@@ -983,12 +995,10 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclemb)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclemb);
+	PALETTE(config, m_palette, FUNC(cyclemb_state::cyclemb_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -29,13 +29,14 @@
 class odyssey2_state : public driver_device
 {
 public:
-	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
 		m_cart(*this, "cartslot"),
 		m_keyboard(*this, "KEY.%u", 0),
-		m_joysticks(*this, "JOY.%u", 0) { }
+		m_joysticks(*this, "JOY.%u", 0)
+	{ }
 
 	void odyssey2_cartslot(machine_config &config);
 	void videopac(machine_config &config);
@@ -58,7 +59,7 @@ protected:
 
 
 	DECLARE_READ_LINE_MEMBER(t1_read);
-	DECLARE_PALETTE_INIT(odyssey2);
+	void odyssey2_palette(palette_device &palette) const;
 
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
@@ -107,7 +108,7 @@ private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef9340_1;
 
-	DECLARE_PALETTE_INIT(g7400);
+	void g7400_palette(palette_device &palette) const;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(p2_write);
@@ -232,67 +233,59 @@ INPUT_PORTS_END
    light back / grid colors
    black, blue, green, light green, red, violet, yellow, light grey */
 
-const uint8_t odyssey2_colors[] =
+constexpr rgb_t odyssey2_colors[] =
 {
-	/* Background,Grid Dim */
-	0x00,0x00,0x00,   /* Black */                                         // i r g b
-	0x1A,0x37,0xBE,   /* Blue           - Calibrated To Real VideoPac */  // i r g B
-	0x00,0x6D,0x07,   /* Green          - Calibrated To Real VideoPac */  // i r G b
-	0x2A,0xAA,0xBE,   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
-	0x79,0x00,0x00,   /* Red            - Calibrated To Real VideoPac */  // i R g b
-	0x94,0x30,0x9F,   /* Violet         - Calibrated To Real VideoPac */  // i R g B
-	0x77,0x67,0x0B,   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
-	0xCE,0xCE,0xCE,   /* Lt Grey */                                       // i R G B
+	// Background,Grid Dim
+	{ 0x00, 0x00, 0x00 },   /* Black */                                         // i r g b
+	{ 0x1a, 0x37, 0xbe },   /* Blue           - Calibrated To Real VideoPac */  // i r g B
+	{ 0x00, 0x6d, 0x07 },   /* Green          - Calibrated To Real VideoPac */  // i r G b
+	{ 0x2a, 0xaa, 0xbe },   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
+	{ 0x79, 0x00, 0x00 },   /* Red            - Calibrated To Real VideoPac */  // i R g b
+	{ 0x94, 0x30, 0x9f },   /* Violet         - Calibrated To Real VideoPac */  // i R g B
+	{ 0x77, 0x67, 0x0b },   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
+	{ 0xce, 0xce, 0xce },   /* Lt Grey */                                       // i R G B
 
-	/* Background,Grid Bright */
-	0x67,0x67,0x67,   /* Grey           - Calibrated To Real VideoPac */  // I R g B
-	0x5C,0x80,0xF6,   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
-	0x56,0xC4,0x69,   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
-	0x77,0xE6,0xEB,   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
-	0xC7,0x51,0x51,   /* Lt Red         - Calibrated To Real VideoPac */  // I R g b
-	0xDC,0x84,0xE8,   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
-	0xC6,0xB8,0x6A,   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
-	0xFF,0xFF,0xFF,   /* White */                                         // I R G B
+	// Background,Grid Bright
+	{ 0x67, 0x67, 0x67 },   /* Grey           - Calibrated To Real VideoPac */  // I R g B
+	{ 0x5c, 0x80, 0xf6 },   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
+	{ 0x56, 0xc4, 0x69 },   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
+	{ 0x77, 0xe6, 0xeb },   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
+	{ 0xc7, 0x51, 0x51 },   /* Lt Red         - Calibrated To Real VideoPac */  // I R g b
+	{ 0xdc, 0x84, 0xe8 },   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
+	{ 0xc6, 0xb8, 0x6a },   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
+	{ 0xff, 0xff, 0xff }    /* White */                                         // I R G B
 };
 
 
-PALETTE_INIT_MEMBER(odyssey2_state, odyssey2)
+void odyssey2_state::odyssey2_palette(palette_device &palette) const
 {
-	for ( int i = 0; i < 16; i++ )
-	{
-		palette.set_pen_color( i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
-	}
+	palette.set_pen_colors(0, odyssey2_colors);
 }
 
 
-PALETTE_INIT_MEMBER(g7400_state, g7400)
+void g7400_state::g7400_palette(palette_device &palette) const
 {
-	const uint8_t g7400_colors[] =
-	{
-	0x00,0x00,0x00, // Black
-	0x1A,0x37,0xBE, // Blue
-	0x00,0x6D,0x07, // Green
-	0x2A,0xAA,0xBE, // Blue-Green
-	0x79,0x00,0x00, // Red
-	0x94,0x30,0x9F, // Violet
-	0x77,0x67,0x0B, // Khaki
-	0xCE,0xCE,0xCE, // Lt Grey
+	constexpr rgb_t g7400_colors[]{
+		{ 0x00, 0x00, 0x00 }, // Black
+		{ 0x1a, 0x37, 0xbe }, // Blue
+		{ 0x00, 0x6d, 0x07 }, // Green
+		{ 0x2a, 0xaa, 0xbe }, // Blue-Green
+		{ 0x79, 0x00, 0x00 }, // Red
+		{ 0x94, 0x30, 0x9f }, // Violet
+		{ 0x77, 0x67, 0x0b }, // Khaki
+		{ 0xce, 0xce, 0xce }, // Lt Grey
 
-	0x67,0x67,0x67, // Grey
-	0x5C,0x80,0xF6, // Lt Blue
-	0x56,0xC4,0x69, // Lt Green
-	0x77,0xE6,0xEB, // Lt Blue-Green
-	0xC7,0x51,0x51, // Lt Red
-	0xDC,0x84,0xE8, // Lt Violet
-	0xC6,0xB8,0x6A, // Lt Yellow
-	0xff,0xff,0xff  // White
-
+		{ 0x67, 0x67, 0x67 }, // Grey
+		{ 0x5c, 0x80, 0xf6 }, // Lt Blue
+		{ 0x56, 0xc4, 0x69 }, // Lt Green
+		{ 0x77, 0xe6, 0xeb }, // Lt Blue-Green
+		{ 0xc7, 0x51, 0x51 }, // Lt Red
+		{ 0xdc, 0x84, 0xe8 }, // Lt Violet
+		{ 0xc6, 0xb8, 0x6a }, // Lt Yellow
+		{ 0xff, 0xff, 0xff }  // White
 	};
 
-	for ( int i = 0; i < 16; i++ )
-	{
-		palette.set_pen_color( i, g7400_colors[i*3], g7400_colors[i*3+1], g7400_colors[i*3+2] );
-	}
+	palette.set_pen_colors(0, g7400_colors);
 }
 
 void odyssey2_state::init_odyssey2()
@@ -709,9 +702,8 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -736,9 +728,8 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -772,9 +763,8 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(g7400_state::g7400_palette), 16);
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));
@@ -818,9 +808,8 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(g7400_state::g7400_palette), 16);
 
 	I8243(config, m_i8243);
 	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));

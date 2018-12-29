@@ -59,13 +59,13 @@
 class tek440x_state : public driver_device
 {
 public:
-	tek440x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tek440x_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdccpu(*this, "fdccpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram")
-	{}
+	{ }
 
 	void tek4404(machine_config &config);
 
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(tek440x_state::tek4404)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(tek440x_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	mos6551_device &aica(MOS6551(config, "aica", 0));
 	aica.set_xtal(1.8432_MHz_XTAL);

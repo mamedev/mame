@@ -4,30 +4,22 @@
 #include "includes/usgames.h"
 
 
-PALETTE_INIT_MEMBER(usgames_state, usgames)
+void usgames_state::usgames_palette(palette_device &palette) const
 {
-	int j;
-
-	for (j = 0; j < 0x200; j++)
+	for (int j = 0; j < 0x200; j++)
 	{
-		int data;
-		int r, g, b, i;
+		int const data = (j >> ((j & 0x01) ? 5 : 1)) & 0x0f;
 
-		if (j & 0x01)
-			data = (j >> 5) & 0x0f;
-		else
-			data = (j >> 1) & 0x0f;
-
-		r = (data & 1) >> 0;
-		g = (data & 2) >> 1;
-		b = (data & 4) >> 2;
-		i = (data & 8) >> 3;
+		int r = BIT(data, 0);
+		int g = BIT(data, 1);
+		int b = BIT(data, 2);
+		int const i = BIT(data, 3);
 
 		r = 0xff * r;
 		g = 0x7f * g * (i + 1);
 		b = 0x7f * b * (i + 1);
 
-		palette.set_pen_color(j,rgb_t(r, g, b));
+		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
 }
 
@@ -35,10 +27,10 @@ PALETTE_INIT_MEMBER(usgames_state, usgames)
 
 TILE_GET_INFO_MEMBER(usgames_state::get_tile_info)
 {
-	int tileno = m_videoram[tile_index*2];
-	int colour = m_videoram[tile_index*2+1];
+	int const tileno = m_videoram[tile_index*2];
+	int const colour = m_videoram[tile_index*2+1];
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
 }
 
 void usgames_state::video_start()

@@ -221,13 +221,12 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 //  add machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sega315_5313_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
+void sega315_5313_device::device_add_mconfig(machine_config &config)
+{
+	sega315_5313_mode4_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, DERIVED_CLOCK(1, 15))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.5, 0)
-MACHINE_CONFIG_END
+	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+}
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 {

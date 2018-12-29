@@ -40,8 +40,8 @@ TODO:
 class dotrikun_state : public driver_device
 {
 public:
-	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_vram(*this, "vram"),
@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(dotrikun_state::dotrikun)
 	MCFG_SCREEN_UPDATE_DRIVER(dotrikun_state, screen_update)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	/* no sound hardware */
 MACHINE_CONFIG_END

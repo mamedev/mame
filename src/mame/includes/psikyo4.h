@@ -29,12 +29,14 @@ public:
 		m_palette(*this, {"lpalette", "rpalette"}),
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen"),
+		m_system(*this, "SYSTEM"),
 		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void ps4big(machine_config &config);
 	void ps4small(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 
 private:
@@ -61,6 +63,7 @@ private:
 	required_device_array<palette_device, 2> m_palette;
 	required_device<screen_device> m_lscreen;
 	required_device<screen_device> m_rscreen;
+	optional_ioport m_system;
 	optional_ioport_array<8> m_keys;
 
 	DECLARE_WRITE32_MEMBER(paletteram_w);

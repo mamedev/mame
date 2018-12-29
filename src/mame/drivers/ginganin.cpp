@@ -267,11 +267,10 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0 + 16 , 255 - 16)
 	MCFG_SCREEN_UPDATE_DRIVER(ginganin_state, screen_update_ginganin)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ginganin)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_ginganin)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

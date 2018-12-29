@@ -26,8 +26,9 @@ class mk90_state : public driver_device
 {
 public:
 	mk90_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void mk90(machine_config &config);
 
@@ -92,7 +93,7 @@ void mk90_state::mk90(machine_config &config)
 	screen.set_screen_update(FUNC(mk90_state::screen_update_mk90));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 }
 
 /* ROM definition */

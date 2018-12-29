@@ -261,7 +261,7 @@ public:
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
-	{}
+	{ }
 
 	void spc1500(machine_config &config);
 
@@ -291,7 +291,7 @@ private:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_PALETTE_INIT(spc);
+	void spc_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
@@ -507,7 +507,7 @@ WRITE8_MEMBER( spc1500_state::palet_w)
 	}
 }
 
-PALETTE_INIT_MEMBER(spc1500_state,spc)
+void spc1500_state::spc_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0x00,0x00,0xff));
@@ -893,8 +893,9 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
+
+	PALETTE(config, m_palette, FUNC(spc1500_state::spc_palette), 8);
+
 	MC6845(config, m_vdg, (VDP_CLOCK/48)); //unknown divider
 	m_vdg->set_screen("screen");
 	m_vdg->set_show_border_area(false);

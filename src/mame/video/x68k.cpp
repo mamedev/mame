@@ -40,12 +40,12 @@
 #include "logmacro.h"
 
 
-PALETTE_DECODER_MEMBER(x68k_state, GGGGGRRRRRBBBBBI)
+rgb_t x68k_state::GGGGGRRRRRBBBBBI(uint32_t raw)
 {
-	uint8_t i = raw & 1;
-	uint8_t r = pal6bit(((raw >> 5) & 0x3e) | i);
-	uint8_t g = pal6bit(((raw >> 10) & 0x3e) | i);
-	uint8_t b = pal6bit(((raw >> 0) & 0x3e) | i);
+	uint8_t const i = raw & 1;
+	uint8_t const r = pal6bit(((raw >> 5) & 0x3e) | i);
+	uint8_t const g = pal6bit(((raw >> 10) & 0x3e) | i);
+	uint8_t const b = pal6bit(((raw >> 0) & 0x3e) | i);
 	return rgb_t(r, g, b);
 }
 
@@ -418,7 +418,7 @@ void x68k_state::draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 			{
 				colour = m_gfxbitmap.pix16(scanline, pixel);
 				if(colour || (m_video.gfx_pri == 2))
-					bitmap.pix32(scanline, pixel) = GGGGGRRRRRBBBBBI_decoder(colour);
+					bitmap.pix32(scanline, pixel) = GGGGGRRRRRBBBBBI(colour);
 			}
 			else if(gfxblend)
 			{

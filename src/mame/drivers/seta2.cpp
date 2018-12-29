@@ -2328,12 +2328,11 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
-	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2542,11 +2541,10 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(funcube_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, funcube_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
-	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2597,11 +2595,10 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x00, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
-	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -4346,7 +4343,7 @@ ROM_START( telpacfl )
 	ROM_REGION( 0x800000, "unused", ROMREGION_ERASE00 )    // Sprites
 	// not decoding the bad ROM is better than loading corrupt gfx data
 	ROM_LOAD64_WORD( "mp3_cg-2__u21_v1.0.u21", 0x000004, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
-		
+
 	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x000000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )
 	ROM_LOAD( "mp3_sound1__u112_v1.0.u112", 0x080000, 0x080000, CRC(27fd83cd) SHA1(d0261b2c5354ea17061e71bcea747d70efc18a49) )

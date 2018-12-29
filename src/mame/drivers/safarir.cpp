@@ -59,8 +59,8 @@ modified by Hau
 class safarir_state : public driver_device
 {
 public:
-	safarir_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	safarir_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_ram(*this, "ram"),
@@ -93,7 +93,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(safarir);
+	void safarir_palette(palette_device &palette) const;
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void safarir_audio(machine_config &config);
 	void main_map(address_map &map);
@@ -156,14 +156,12 @@ static GFXDECODE_START( gfx_safarir )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(safarir_state, safarir)
+void safarir_state::safarir_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < palette.entries() / 2; i++)
+	for (int i = 0; i < palette.entries() >> 1; i++)
 	{
-		palette.set_pen_color((i * 2) + 0, rgb_t::black());
-		palette.set_pen_color((i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+		palette.set_pen_color((i << 1) | 0, rgb_t::black());
+		palette.set_pen_color((i << 1) | 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 
@@ -414,8 +412,7 @@ void safarir_state::safarir(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &safarir_state::main_map);
 
 	/* video hardware */
-	PALETTE(config, "palette", 2*8).set_init(FUNC(safarir_state::palette_init_safarir));
-
+	PALETTE(config, "palette", FUNC(safarir_state::safarir_palette), 2 * 8);
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_safarir);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

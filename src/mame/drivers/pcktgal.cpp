@@ -241,12 +241,11 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcktgal)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(pcktgal_state, pcktgal)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pcktgal);
+	PALETTE(config, m_palette, FUNC(pcktgal_state::pcktgal_palette), 512);
 
 	DECO_BAC06(config, m_tilegen, 0);
 	m_tilegen->set_gfx_region_wide(0, 0, 0);
@@ -264,8 +263,8 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pcktgal_state, adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pcktgal_state, adpcm_int))  // interrupt function
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8kHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

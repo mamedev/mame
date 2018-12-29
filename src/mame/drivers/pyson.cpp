@@ -212,7 +212,7 @@ void pyson_state::pyson(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
 
-	PALETTE(config, "palette", 65536);
+	PALETTE(config, "palette").set_entries(65536);
 }
 
 #define PYSON_BIOS  \

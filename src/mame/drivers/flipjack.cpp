@@ -93,8 +93,8 @@ ________________________|___________________________
 class flipjack_state : public driver_device
 {
 public:
-	flipjack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	flipjack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_prgbank(*this, "prgbank"),
@@ -106,13 +106,14 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch")
 	{
-		m_bank = 0;
-		m_layer = 0;
 	}
 
 	void flipjack(machine_config &config);
 
 	DECLARE_WRITE_LINE_MEMBER(coin_nmi_w);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,11 +127,10 @@ private:
 	required_region_ptr<uint8_t> m_playfield;
 
 	required_device<palette_device> m_palette;
-
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	uint8_t m_bank;
-	uint8_t m_layer;
+	uint8_t m_bank = 0;
+	uint8_t m_layer = 0;
 
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
@@ -138,8 +138,7 @@ private:
 	DECLARE_WRITE8_MEMBER(layer_w);
 	DECLARE_READ8_MEMBER(soundlatch_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
-	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(flipjack);
+	void flipjack_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW(update_row);
 
 	void main_io_map(address_map &map);
@@ -155,10 +154,10 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(flipjack_state, flipjack)
+void flipjack_state::flipjack_palette(palette_device &palette) const
 {
-	// from prom
-	const uint8_t *color_prom = memregion("proms")->base();
+	// from PROM
+	uint8_t const *const color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x40; i++)
 	{
 		palette.set_pen_color(2*i+1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
@@ -450,10 +449,8 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	crtc.out_vsync_callback().append_inputline("audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 	crtc.set_update_row_callback(FUNC(flipjack_state::update_row), this);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_flipjack);
-
-	MCFG_PALETTE_ADD("palette", 128+8)
-	MCFG_PALETTE_INIT_OWNER(flipjack_state, flipjack)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_flipjack);
+	PALETTE(config, m_palette, FUNC(flipjack_state::flipjack_palette), 128+8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

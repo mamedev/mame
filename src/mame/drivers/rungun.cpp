@@ -420,8 +420,7 @@ void rungun_state::rng(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 
-	PALETTE(config, m_palette, 1024);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 
@@ -438,10 +437,9 @@ void rungun_state::rng(machine_config &config)
 	m_k053252->set_offsets(9*8, 24);
 	m_k053252->set_screen("screen");
 
-	PALETTE(config, m_palette2, 1024);
-	m_palette2->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	m_palette2->enable_shadows();
-	m_palette2->enable_hilights();
+	PALETTE(config, m_palette2).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -469,6 +467,7 @@ void rungun_state::rng(machine_config &config)
 void rungun_state::rng_dual(machine_config &config)
 {
 	rng(config);
+
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update_rng_dual_left));
 
 	screen_device &demultiplex2(SCREEN(config, "demultiplex2", SCREEN_TYPE_RASTER));

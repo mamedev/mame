@@ -939,15 +939,13 @@ static GFXDECODE_START( gfx_decocass )
 	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(decocass_state, decocass)
+void decocass_state::decocass_palette(palette_device &palette) const
 {
-	int i;
-
 	// set up 32 colors 1:1 pens and flipped colors for background tiles (D7 of color_center_bot)
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		palette.set_pen_indirect(i, i);
-		palette.set_pen_indirect(32+i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
+		palette.set_pen_indirect(32 + i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
 	}
 }
 
@@ -978,12 +976,10 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 0*8, 256, 272, 1*8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_decocass)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_decocass)
+	PALETTE(config, m_palette, FUNC(decocass_state::decocass_palette), 64, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

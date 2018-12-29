@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mbc200)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	H46505(config, m_crtc, 8_MHz_XTAL / 4); // HD46505SP
 	m_crtc->set_screen("screen");

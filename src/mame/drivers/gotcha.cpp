@@ -280,9 +280,8 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
 	screen.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotcha)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gotcha);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 768);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(1);

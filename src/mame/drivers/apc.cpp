@@ -74,8 +74,8 @@
 class apc_state : public driver_device
 {
 public:
-	apc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
@@ -989,7 +989,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_screen->set_size(640, 494);
 	m_screen->set_visarea(0*8, 640-1, 0*8, 494-1);
 
-	MCFG_PALETTE_ADD_3BIT_BRG(m_palette)
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
 

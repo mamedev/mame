@@ -316,14 +316,13 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blktiger_state, screen_update_blktiger)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blktiger)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

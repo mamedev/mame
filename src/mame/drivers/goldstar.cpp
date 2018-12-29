@@ -799,8 +799,8 @@ WRITE8_MEMBER(goldstar_state::cm_coincount_w)
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  /* Counter 4 Coin D */
 	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* Counter 5 Payout */
 
-//	if (data & 0x86) // triggered by fb2010
-//		popmessage("counters: %02X", data);
+//  if (data & 0x86) // triggered by fb2010
+//      popmessage("counters: %02X", data);
 }
 
 void cmaster_state::cm_portmap(address_map &map)
@@ -5057,125 +5057,125 @@ static INPUT_PORTS_START( fb2010 ) // hit 'start1' to init NVRAM for first time
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1") 
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2") 
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3") 
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4") 
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5") 
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6") 
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7") 
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8") 
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Double Up" ) PORT_DIPLOCATION("DSW2:1") 
+	PORT_DIPNAME( 0x01, 0x01, "Double Up" ) PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Skill Spin" ) PORT_DIPLOCATION("DSW2:2") 
+	PORT_DIPNAME( 0x02, 0x02, "Skill Spin" ) PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:3") 
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:4") 
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5") 
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6") 
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7") 
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8") 
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:1") 
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:2") 
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:3") 
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:4") 
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:5") 
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:6") 
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:7") 
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8") 
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1") 
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:2") 
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:3") 
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:4") 
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:5") 
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:6") 
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:7") 
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8") 
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:1") 
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:2") 
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:3") 
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Show Odds / Title" ) PORT_DIPLOCATION("DSW5:4") 
+	PORT_DIPNAME( 0x08, 0x08, "Show Odds / Title" ) PORT_DIPLOCATION("DSW5:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:5") 
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:6") 
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:7") 
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Show 'Game' Text" ) PORT_DIPLOCATION("DSW5:8") // causes corruption in D-Up game?
@@ -8457,12 +8457,11 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldstar)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldstar);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
@@ -8494,12 +8493,11 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bl);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
@@ -8540,13 +8538,13 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sanghopm_state, screen_update_sangho)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sangho)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sangho);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -8581,12 +8579,11 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super9)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_super9);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
@@ -8603,61 +8600,46 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 MACHINE_CONFIG_END
 
 
-PALETTE_INIT_MEMBER(goldstar_state, cm)
+void goldstar_state::cm_palette(palette_device &palette) const
 {
-	/* BBGGGRRR */
-
-	int i;
-
-	for (i = 0; i < 0x100; i++)
+	// BBGGGRRR
+	uint8_t const *const proms = memregion("proms")->base();
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t data;
-		uint8_t*proms = memregion("proms")->base();
-
-		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
-
+		uint8_t const data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state, cmast91)
+void goldstar_state::cmast91_palette(palette_device &palette) const
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
+	uint8_t const *const proms = memregion("proms")->base();
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r,g,b;
-
-		uint8_t*proms = memregion("proms")->base();
-
-		b = proms[0x000 + i] << 4;
-		g = proms[0x100 + i] << 4;
-		r = proms[0x200 + i] << 4;
+		int const b = pal4bit(proms[0x000 + i]);
+		int const g = pal4bit(proms[0x100 + i]);
+		int const r = pal4bit(proms[0x200 + i]);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state, lucky8)
+void goldstar_state::lucky8_palette(palette_device &palette) const
 {
-	/* BBGGGRRR */
-
-	int i;
-	uint8_t data;
-	uint8_t *proms;
+	// BBGGGRRR
+	uint8_t const *proms;
 
 	proms = memregion("proms")->base();
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
-
+		uint8_t const data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
 	proms = memregion("proms2")->base();
-	for (i=0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
-		data = proms[i];
-
+		uint8_t const data = proms[i];
 		palette.set_pen_color(i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
@@ -8689,12 +8671,11 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -8764,12 +8745,11 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb3e)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cb3e);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
@@ -8811,12 +8791,11 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmbitmap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmbitmap);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
@@ -8859,12 +8838,11 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmast91)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cmast91)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmast91);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cmast91_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
@@ -8915,13 +8893,11 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
@@ -8970,12 +8946,11 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_bingowng)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
@@ -9051,14 +9026,14 @@ MACHINE_CONFIG_END
 
 
 
-PALETTE_INIT_MEMBER(wingco_state, magodds)
+void wingco_state::magodds_palette(palette_device &palette) const
 {
+	uint8_t const *const proms = memregion("proms")->base();
 	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t *proms = memregion("proms")->base();
-		uint8_t b = proms[0x000 + i] << 4;
-		uint8_t g = proms[0x100 + i] << 4;
-		uint8_t r = proms[0x200 + i] << 4;
+		uint8_t const b = pal4bit(proms[0x000 + i]);
+		uint8_t const g = pal4bit(proms[0x100 + i]);
+		uint8_t const r = pal4bit(proms[0x200 + i]);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -9094,12 +9069,11 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_magical)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magodds)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wingco_state, magodds)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magodds);
+	PALETTE(config, m_palette, FUNC(wingco_state::magodds_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
@@ -9145,12 +9119,11 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -9185,12 +9158,11 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
@@ -9235,12 +9207,11 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
@@ -9286,12 +9257,11 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cm)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
@@ -9343,12 +9313,11 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cm)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
@@ -9394,12 +9363,11 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, unkch_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unkch)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unkch);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
@@ -9431,12 +9399,11 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkrmast)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkrmast);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
@@ -9468,12 +9435,11 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megaline)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -9516,12 +9482,11 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megaline)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -9568,13 +9533,11 @@ MACHINE_CONFIG_START(unkch_state::feverch)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 

@@ -112,7 +112,7 @@ private:
 	DECLARE_VIDEO_START(ojankohs);
 	DECLARE_MACHINE_START(ojankoy);
 	DECLARE_VIDEO_START(ojankoy);
-	DECLARE_PALETTE_INIT(ojankoy);
+	void ojankoy_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(ccasino);
 	DECLARE_MACHINE_START(ojankoc);
 	DECLARE_VIDEO_START(ojankoc);

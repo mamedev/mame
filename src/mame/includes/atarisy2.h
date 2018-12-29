@@ -129,7 +129,7 @@ private:
 	DECLARE_WRITE16_MEMBER(yscroll_w);
 	DECLARE_WRITE16_MEMBER(xscroll_w);
 	DECLARE_WRITE16_MEMBER(spriteram_w);
-	DECLARE_PALETTE_DECODER(RRRRGGGGBBBBIIII);
+	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
 	void main_map(address_map &map);

@@ -157,6 +157,10 @@ public:
 
 	void gal3(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device_array<namco_c355spr_device, 2> m_c355spr;
 	required_device_array<palette_device, 2> m_palette;
@@ -165,12 +169,12 @@ private:
 	required_device<c140_device> m_c140_16a;
 	required_device<c140_device> m_c140_16g;
 
-
 	required_device_array<namcos21_3d_device, 2> m_namcos21_3d;
 	required_device_array<namcos21_dsp_c67_device, 2> m_namcos21_dsp_c67;
 
 	uint32_t m_led_mst;
 	uint32_t m_led_slv;
+
 	DECLARE_READ32_MEMBER(led_mst_r);
 	DECLARE_WRITE32_MEMBER(led_mst_w);
 	DECLARE_READ32_MEMBER(led_slv_r);
@@ -179,8 +183,6 @@ private:
 	template<int Screen> DECLARE_WRITE16_MEMBER(video_enable_w);
 	DECLARE_READ16_MEMBER(rso_r);
 	DECLARE_WRITE16_MEMBER(rso_w);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	// using ind16 for now because namco_c355spr_device::zdrawgfxzoom does not support rgb32, will probably need to be improved for LD use
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -647,10 +649,9 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette_1")
 
-	MCFG_DEVICE_ADD("gfxdecode_1", GFXDECODE, "palette_1", gfx_gal3_l)
-	MCFG_PALETTE_ADD("palette_1", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_MEMBITS(16)
-	MCFG_PALETTE_FORMAT(XBRG)
+	GFXDECODE(config, "gfxdecode_1", m_palette[0], gfx_gal3_l);
+	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	m_palette[0]->set_membits(16);
 
 	NAMCO_C355SPR(config, m_c355spr[0], 0);
 	m_c355spr[0]->set_screen("lscreen");
@@ -678,10 +679,9 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("palette_2")
 
-	MCFG_DEVICE_ADD("gfxdecode_2", GFXDECODE, "palette_2", gfx_gal3_r)
-	MCFG_PALETTE_ADD("palette_2", NAMCOS21_NUM_COLORS)
-	MCFG_PALETTE_MEMBITS(16)
-	MCFG_PALETTE_FORMAT(XBRG)
+	GFXDECODE(config, "gfxdecode_2", m_palette[1], gfx_gal3_r);
+	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	m_palette[1]->set_membits(16);
 
 	NAMCO_C355SPR(config, m_c355spr[1], 0);
 	m_c355spr[1]->set_screen("rscreen");

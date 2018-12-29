@@ -799,7 +799,7 @@ void psikyosh_state::psikyo3v1(machine_config &config)
 	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram32_device::vblank_copy_rising));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyosh);
-	PALETTE(config, m_palette, 0x5000/4).set_format(PALETTE_FORMAT_RGBX);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_888, 0x5000 / 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -403,8 +403,8 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uts)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_uts);
 
 	dp835x_device &crtc(DP835X_A(config, "crtc", 19'980'000));
 	crtc.set_screen("screen");

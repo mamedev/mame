@@ -106,6 +106,7 @@
 
 #include "emu.h"
 #include "includes/atarifb.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
@@ -121,25 +122,25 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(atarifb_state, atarifb)
+void atarifb_state::atarifb_palette(palette_device &palette) const
 {
-	/* chars */
-	palette.set_pen_color(0, rgb_t(0xff,0xff,0xff)); /* white  */
-	palette.set_pen_color(1, rgb_t(0x00,0x00,0x00)); /* black  */
+	// chars
+	palette.set_pen_color(0, rgb_t(0xff,0xff,0xff)); // white
+	palette.set_pen_color(1, rgb_t(0x00,0x00,0x00)); // black
 
-	/* sprites */
-	palette.set_pen_color(2, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(3, rgb_t(0xff,0xff,0xff)); /* white  */
-	palette.set_pen_color(4, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(5, rgb_t(0x00,0x00,0x00)); /* black  */
+	// sprites
+	palette.set_pen_color(2, rgb_t(0x40,0x40,0x40)); // dark grey (?) - used in Soccer only
+	palette.set_pen_color(3, rgb_t(0xff,0xff,0xff)); // white
+	palette.set_pen_color(4, rgb_t(0x40,0x40,0x40)); // dark grey (?) - used in Soccer only
+	palette.set_pen_color(5, rgb_t(0x00,0x00,0x00)); // black
 
-	/* sprite masks */
-	palette.set_pen_color(6, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(7, rgb_t(0x80,0x80,0x80)); /* grey  */
-	palette.set_pen_color(8, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(9, rgb_t(0x00,0x00,0x00)); /* black  */
-	palette.set_pen_color(10, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(11, rgb_t(0xff,0xff,0xff)); /* white  */
+	// sprite masks
+	palette.set_pen_color(6, rgb_t(0x40,0x40,0x40)); // dark grey (?) - used in Soccer only
+	palette.set_pen_color(7, rgb_t(0x80,0x80,0x80)); // grey
+	palette.set_pen_color(8, rgb_t(0x40,0x40,0x40)); // dark grey (?) - used in Soccer only
+	palette.set_pen_color(9, rgb_t(0x00,0x00,0x00)); // black
+	palette.set_pen_color(10, rgb_t(0x40,0x40,0x40)); // dark grey (?) - used in Soccer only
+	palette.set_pen_color(11, rgb_t(0xff,0xff,0xff)); // white
 }
 
 
@@ -572,11 +573,10 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarifb)
-	MCFG_PALETTE_ADD("palette", 12)
-	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_atarifb)
+	PALETTE(config, m_palette, FUNC(atarifb_state::atarifb_palette), 12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

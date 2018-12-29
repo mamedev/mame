@@ -204,11 +204,10 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pk8020)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_pk8020)
+	PALETTE(config, m_palette, FUNC(pk8020_state::pk8020_palette), 16);
 
 	I8255(config, m_ppi8255_1);
 	m_ppi8255_1->in_pa_callback().set(FUNC(pk8020_state::pk8020_porta_r));

@@ -562,7 +562,7 @@ void a7150_state::a7150(machine_config &config)
 	screen.set_screen_update(FUNC(a7150_state::screen_update_k7072));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 }
 
 /* ROM definition */

@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(d64plus_state::d64plus)
 	MCFG_SCREEN_SIZE(640, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 264-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// crtc
 	HD6845(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);

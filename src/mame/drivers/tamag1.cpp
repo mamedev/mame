@@ -34,7 +34,7 @@ public:
 
 private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_PALETTE_INIT(tama);
+	void tama_palette(palette_device &palette) const;
 	E0C6S46_PIXEL_UPDATE(pixel_update);
 
 	virtual void machine_start() override;
@@ -82,7 +82,7 @@ E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 	m_out_x[y][x] = state;
 }
 
-PALETTE_INIT_MEMBER(tamag1_state, tama)
+void tamag1_state::tama_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0xf1, 0xf0, 0xf9)); // background
 	palette.set_pen_color(1, rgb_t(0x3c, 0x38, 0x38)); // lcd pixel
@@ -152,7 +152,7 @@ void tamag1_state::tama(machine_config &config)
 	screen.set_palette("palette");
 	config.set_default_layout(layout_tama);
 
-	PALETTE(config, "palette", 2).set_init(FUNC(tamag1_state::palette_init_tama));
+	PALETTE(config, "palette", FUNC(tamag1_state::tama_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

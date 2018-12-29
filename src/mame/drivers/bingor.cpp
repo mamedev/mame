@@ -509,6 +509,7 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "machine/gen_latch.h"
 #include "machine/intelfsh.h"
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"
@@ -521,30 +522,31 @@
 class bingor_state : public driver_device
 {
 public:
-	bingor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bingor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_slavecpu(*this, "slavecpu"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
-	required_shared_ptr<uint16_t> m_blit_ram;
+	void bingor(machine_config &config);
+	void bingor2(machine_config &config);
+	void vip2000(machine_config &config);
+
+protected:
 	virtual void video_start() override;
-	uint32_t screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
+	required_shared_ptr<uint16_t> m_blit_ram;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_slavecpu;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(toslave_w);
-	DECLARE_READ8_MEMBER(toslave_r);
-	DECLARE_WRITE8_MEMBER(fromslave_w);
-	DECLARE_READ8_MEMBER(fromslave_r);
+	uint32_t screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	DECLARE_WRITE16_MEMBER(vip2000_outputs_w);
-	u8 m_toslave;
-	u8 m_fromslave;
-	void bingor(machine_config &config);
-	void bingor2(machine_config &config);
-	void vip2000(machine_config &config);
+
 	void bingor2_map(address_map &map);
 	void bingor_io(address_map &map);
 	void bingor_map(address_map &map);
@@ -711,7 +713,7 @@ void bingor_state::bingor(machine_config &config)
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(bingor_state::screen_update_bingor));
 
-	PALETTE(config, m_palette, 0x100).set_format(PALETTE_FORMAT_RRRRGGGGBBBBIIII);
+	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
 
 	SPEAKER(config, "mono").front_center();
 	SAA1099(config, "saa", 6000000).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -738,28 +740,8 @@ void bingor_state::vip2000_io(address_map &map)
 {
 	map(0x0000, 0x0001).nopr(); // watchdog
 	map(0x0080, 0x009f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x0100, 0x0100).rw(FUNC(bingor_state::fromslave_r), FUNC(bingor_state::toslave_w));
+	map(0x0100, 0x0100).r("fromslave", FUNC(generic_latch_8_device::read)).w("toslave", FUNC(generic_latch_8_device::write));
 	map(0x0280, 0x0281).w(FUNC(bingor_state::vip2000_outputs_w));
-}
-
-WRITE8_MEMBER(bingor_state::toslave_w)
-{
-	m_toslave = data;
-}
-
-READ8_MEMBER(bingor_state::toslave_r)
-{
-	return m_toslave;
-}
-
-WRITE8_MEMBER(bingor_state::fromslave_w)
-{
-	m_fromslave = data;
-}
-
-READ8_MEMBER(bingor_state::fromslave_r)
-{
-	return m_fromslave;
 }
 
 WRITE16_MEMBER(bingor_state::vip2000_outputs_w)
@@ -774,7 +756,7 @@ void bingor_state::slave_map(address_map &map)
 
 void bingor_state::slave_io(address_map &map)
 {
-	map(0x0000, 0x0000).rw(FUNC(bingor_state::toslave_r), FUNC(bingor_state::fromslave_w));
+	map(0x0000, 0x0000).r("toslave", FUNC(generic_latch_8_device::read)).w("fromslave", FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xcfff).ram();
 }
 
@@ -801,15 +783,18 @@ void bingor_state::vip2000(machine_config &config)
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(bingor_state::screen_update_bingor));
 
-	PALETTE(config, m_palette, 0x100).set_format(PALETTE_FORMAT_RRRRGGGGBBBBIIII);
+	PALETTE(config, m_palette).set_format(palette_device::RGBI_4444, 0x100);
 
 	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, "toslave");
+	GENERIC_LATCH_8(config, "fromslave");
 
 	ymz284_device &ymz(YMZ284(config, "ymz", 1250000)); // probably clocked by square wave output of 80186 timer 0
 	ymz.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-// I doubt we need to load the eeproms
+// I doubt we need to load the EEPROMs
 
 ROM_START( bingor1 )
 	ROM_REGION( 0x10000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */

@@ -79,15 +79,16 @@ Dumped 06/15/2000
 class srmp6_state : public driver_device
 {
 public:
-	srmp6_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	srmp6_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sprram(*this, "sprram"),
 		m_chrram(*this, "chrram"),
 		m_dmaram(*this, "dmaram"),
 		m_video_regs(*this, "video_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void srmp6(machine_config &config);
 private:
@@ -696,8 +697,7 @@ void srmp6_state::srmp6(machine_config &config)
 	screen.set_visarea(0*8, 42*8-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(srmp6_state::screen_update_srmp6));
 
-	PALETTE(config, m_palette, 0x800);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

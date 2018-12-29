@@ -47,7 +47,7 @@ public:
 protected:
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(atari);
+	void atari_palette(palette_device &palette) const;
 
 	POKEY_INTERRUPT_CB_MEMBER(interrupt_cb);
 	POKEY_KEYBOARD_CB_MEMBER(a5200_keypads);

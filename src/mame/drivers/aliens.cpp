@@ -216,9 +216,7 @@ void aliens_state::aliens(machine_config &config)
 	screen.set_screen_update(FUNC(aliens_state::screen_update_aliens));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 512));
-	palette.enable_shadows();
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");

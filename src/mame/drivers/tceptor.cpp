@@ -343,9 +343,7 @@ void tceptor_state::tceptor(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tceptor);
-	PALETTE(config, m_palette, 4096);
-	m_palette->set_indirect_entries(1024);
-	m_palette->set_init(FUNC(tceptor_state::palette_init_tceptor));
+	PALETTE(config, m_palette, FUNC(tceptor_state::tceptor_palette), 4096, 1024);
 
 	NAMCO_C45_ROAD(config, m_c45_road, 0);
 	m_c45_road->set_palette(m_palette);

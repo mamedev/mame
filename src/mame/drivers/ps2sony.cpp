@@ -780,7 +780,7 @@ void ps2sony_state::ps2sony(machine_config &config)
 	screen.set_size(640, 256);
 	screen.set_visarea(0, 639, 0, 223);
 
-	PALETTE(config, "palette", 65536);
+	PALETTE(config, "palette").set_entries(65536);
 }
 
 

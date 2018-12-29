@@ -54,7 +54,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 
-	DECLARE_PALETTE_INIT(efdt);
+	void efdt_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clear_w);

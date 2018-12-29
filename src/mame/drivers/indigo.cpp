@@ -567,7 +567,7 @@ void indigo_state::indigo_base(machine_config &config)
 	screen.set_visarea(0, 1024-1, 0, 768-1);
 	screen.set_screen_update(FUNC(indigo_state::screen_update));
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 }

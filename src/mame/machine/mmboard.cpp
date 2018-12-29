@@ -328,8 +328,7 @@ MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-1, 0, 9*2-3)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mephisto_display_modul_device, lcd_palette)
+	PALETTE(config, "palette", FUNC(mephisto_display_modul_device::lcd_palette), 2);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
@@ -341,7 +340,7 @@ MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-PALETTE_INIT_MEMBER(mephisto_display_modul_device,lcd_palette)
+void mephisto_display_modul_device::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

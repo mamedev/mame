@@ -392,12 +392,11 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mainsnk)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mainsnk);
+	PALETTE(config, m_palette, FUNC(mainsnk_state::mainsnk_palette), 0x400);
+	m_palette->enable_shadows();
 
 	SPEAKER(config, "mono").front_center();
 
@@ -406,12 +405,11 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	m_soundlatch->set_separate_acknowledge(true);
 
 	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
-
 	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
 MACHINE_CONFIG_END
 
 
-ROM_START( mainsnk)
+ROM_START(mainsnk)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "snk.p01",      0x0000, 0x2000, CRC(00db1ca2) SHA1(efe83488cf88adc185e6024b8f6ad5f8ef7f4cfd) )
 	ROM_LOAD( "snk.p02",      0x2000, 0x2000, CRC(df5c86b5) SHA1(e9c854524e3d8231c874314cdff321e66ec7f0c4) )
@@ -478,4 +476,4 @@ ROM_END
 
 
 GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT180, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0,   "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

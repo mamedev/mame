@@ -74,7 +74,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_tx_tile_info);
-	DECLARE_PALETTE_INIT(galivan);
+	void galivan_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(galivan);
 	DECLARE_MACHINE_RESET(galivan);
 	DECLARE_VIDEO_START(galivan);

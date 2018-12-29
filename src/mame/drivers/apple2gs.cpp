@@ -357,7 +357,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2gs);
+	void palette_init(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void apple2gs(machine_config &config);
@@ -1579,7 +1579,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 }
 
-PALETTE_INIT_MEMBER(apple2gs_state, apple2gs)
+void apple2gs_state::palette_init(palette_device &palette)
 {
 	static const unsigned char apple2gs_palette[] =
 	{
@@ -4583,8 +4583,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_screen->set_visarea(0,703,0,230);
 	m_screen->set_screen_update(FUNC(apple2gs_state::screen_update));
 
-	palette_device &palette(PALETTE(config, "palette", 256));
-	palette.set_init(DEVICE_SELF, FUNC(apple2gs_state::palette_init_apple2gs));
+	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

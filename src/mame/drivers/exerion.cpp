@@ -385,12 +385,10 @@ MACHINE_CONFIG_START(exerion_state::exerion)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(exerion_state, screen_update_exerion)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exerion)
-	MCFG_PALETTE_ADD("palette", 256*3)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exerion_state, exerion)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exerion);
+	PALETTE(config, m_palette, FUNC(exerion_state::exerion_palette), 256*3, 32);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

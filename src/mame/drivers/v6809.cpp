@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_v6809)
 
 	/* sound hardware */

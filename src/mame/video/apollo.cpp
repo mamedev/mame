@@ -1886,7 +1886,7 @@ void apollo_graphics_15i::device_reset()
 
 MACHINE_CONFIG_START(apollo_graphics_19i::device_add_mconfig)
 	config.set_default_layout(layout_apollo);
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(120000000, 1728, 0, 1280, 1066, 0, 1024)

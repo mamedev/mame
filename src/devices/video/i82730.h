@@ -18,7 +18,7 @@
 //**************************************************************************
 
 #define I82730_UPDATE_ROW(name) \
-       void name(bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)
+	   void name(bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)
 
 // ======================> i82730_device
 

@@ -1927,13 +1927,11 @@ MACHINE_CONFIG_START(alpha68k_state::sstingry)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_sstingry)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sstingry)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sstingry)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::kyros_palette), 256 + 1, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1979,13 +1977,11 @@ MACHINE_CONFIG_START(alpha68k_state::kyros)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kyros)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::kyros_palette), 256 + 1, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2030,13 +2026,11 @@ MACHINE_CONFIG_START(alpha68k_state::jongbou)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jongbou)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_jongbou)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::kyros_palette), 256 + 1, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2069,13 +2063,11 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_I)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_I)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::paddlem_palette), 1024, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2122,9 +2114,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_II)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
@@ -2188,9 +2180,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_V)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 
@@ -2243,13 +2235,11 @@ MACHINE_CONFIG_START(alpha68k_state::tnextspc)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alpha68k_I)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_alpha68k_I)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
+	PALETTE(config, m_palette, FUNC(alpha68k_state::paddlem_palette), 1024, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

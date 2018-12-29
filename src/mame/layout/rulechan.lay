@@ -3,7 +3,7 @@
 
 	<element name="DIGIT" defstate="0">
 		<led7seg><color red="0.0" green="0.45" blue="0.45" /></led7seg>
-	</element>	
+	</element>
 	<element name="BALL0">
 		<disk state = "0">
 			<color red="0.0" green="0.3" blue="0" />
@@ -203,14 +203,14 @@
 		<screen index="0">
 			<bounds left="100" top="0" right="832" bottom="1072" />
 		</screen>
-		
+
 		<bezel name="lamp10" element="DIGIT"><bounds x="1140" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
 		<bezel name="lamp11" element="DIGIT"><bounds x="1160" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
 		<bezel name="lamp12" element="DIGIT"><bounds x="1180" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
 		<bezel name="lamp13" element="DIGIT"><bounds x="1200" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
 		<bezel name="lamp14" element="DIGIT"><bounds x="1220" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
 		<bezel name="lamp15" element="DIGIT"><bounds x="1240" y="550" width="20" height="30" /><orientation rotate="0" /></bezel>
-		
+
 		<bezel element="BBET" inputtag="IN0" inputmask="0x04" >
 			<bounds x="270" y="50" width="42" height="42" />
 		</bezel>

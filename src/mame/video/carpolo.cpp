@@ -66,27 +66,27 @@
  *
  **************************************************************************/
 
-PALETTE_INIT_MEMBER(carpolo_state, carpolo)
+void carpolo_state::carpolo_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = m_proms->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	/* thanks to Jarek Burczynski for analyzing the circuit */
 	/* static const float MAX_VOLTAGE = 6.9620f; */
-	static const float MIN_VOLTAGE = 1.7434f;
-	static const float MAX_VOLTAGE = 5.5266f;
+	static constexpr float MIN_VOLTAGE = 1.7434f;
+	static constexpr float MAX_VOLTAGE = 5.5266f;
 
-	static const float r_voltage[] =
+	static constexpr float r_voltage[] =
 	{
 		1.7434f, 2.1693f, 2.5823f, 3.0585f, 3.4811f, 4.0707f, 4.7415f, 5.4251f
 	};
 
-	static const float g_voltage[] =
+	static constexpr float g_voltage[] =
 	{
 		1.7434f, 2.1693f, 2.5823f, 3.0585f, 3.4811f, 4.0707f, 4.7415f, 5.4251f
 		/* 4.7871f, 5.0613f, 5.3079f, 5.6114f, 5.7940f, 6.1608f, 6.5436f, 6.9620f */
 	};
 
-	static const float b_voltage[] =
+	static constexpr float b_voltage[] =
 	{
 		1.9176f, 2.8757f, 3.9825f, 5.5266f
 	};
@@ -95,6 +95,7 @@ PALETTE_INIT_MEMBER(carpolo_state, carpolo)
 	for (int i = 0; i < palette.entries(); i++)
 	{
 		uint8_t pen;
+
 		if (i < 0x18)
 		{
 			/* sprites */
@@ -112,10 +113,10 @@ PALETTE_INIT_MEMBER(carpolo_state, carpolo)
 			{
 			case (0x00 | (0x07 ^ 0x0f)): pen = LEFT_GOAL_COLOR; break;
 			case (0x00 | (0x0d ^ 0x0f)): pen = NET_COLOR; break;
-			case (0x00 | (0x09 ^ 0x0f)): pen = NET_COLOR; break;  /* score */
+			case (0x00 | (0x09 ^ 0x0f)): pen = NET_COLOR; break; // score
 			case (0x10 | (0x07 ^ 0x0f)): pen = RIGHT_GOAL_COLOR; break;
 			case (0x10 | (0x0d ^ 0x0f)): pen = NET_COLOR; break;
-			case (0x10 | (0x09 ^ 0x0f)): pen = NET_COLOR; break; /* score */
+			case (0x10 | (0x09 ^ 0x0f)): pen = NET_COLOR; break; // score
 			default: pen = 0; break;
 			}
 		}

@@ -365,8 +365,8 @@ private:
 	WRITE_LINE_MEMBER( fdc_index_2_w );
 	WRITE_LINE_MEMBER( fdc_index_3_w );
 	void thomson_index_callback(int index, int state);
-	DECLARE_PALETTE_INIT(thom);
-	DECLARE_PALETTE_INIT(mo5);
+	void thom_palette(palette_device &palette);
+	void mo5_palette(palette_device &palette);
 
 	optional_device<mc6854_device> m_mc6854;
 

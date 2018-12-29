@@ -604,7 +604,7 @@ void tnx1_state::config(machine_config &config)
 	screen.screen_vblank().set(FUNC(tnx1_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popeye);
-	PALETTE(config, m_palette, 16+16*2+8*4).set_init(FUNC(tnx1_state::palette_init_tnx1));
+	PALETTE(config, m_palette, FUNC(tnx1_state::tnx1_palette), 16 + 16*2 + 8*4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -636,8 +636,7 @@ void tpp2_state::config(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	netlist_mame_stream_output_device &nl_out(NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1"));
-	nl_out.set_mult_offset(30000.0, -65000.0);
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(30000.0, -65000.0);
 }
 
 

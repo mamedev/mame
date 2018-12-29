@@ -588,12 +588,11 @@ MACHINE_CONFIG_START(srmp5_state::srmp5)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp5_state, screen_update_srmp5)
 
-	MCFG_PALETTE_ADD("palette", 0x10000) // 0x20000? only first 0x1800 entries seem to be used outside memory test
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000); // 0x20000? only first 0x1800 entries seem to be used outside memory test
+	m_palette->set_membits(16);
 
 #ifdef DEBUG_CHAR
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp5)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_srmp5);
 #endif
 
 MACHINE_CONFIG_END

@@ -353,7 +353,9 @@ WRITE8_MEMBER( play_2_state::psg_w )
 }
 
 // **************** Machine *****************************
-MACHINE_CONFIG_START(play_2_state::play_2)
+
+void play_2_state::play_2(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 2.95_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &play_2_state::play_2_map);
@@ -371,8 +373,7 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	/* Video */
 	config.set_default_layout(layout_play_2);
 
-	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_2_state, clock2_w))
+	CLOCK(config, "xpoint", 60).signal_handler().set(FUNC(play_2_state::clock2_w)); // crossing-point detector
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
 	TTL7474(config, m_4013a, 0);
@@ -391,9 +392,10 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1863_ADD("1863", 0, 2.95_MHz_XTAL / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	CDP1863(config, m_1863, 0);
+	m_1863->set_clock2(2.95_MHz_XTAL / 8);
+	m_1863->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 void play_2_state::zira(machine_config &config)
 {

@@ -425,8 +425,7 @@ void _8080bw_state::invadpt2(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -544,8 +543,7 @@ void _8080bw_state::spcewarla(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
 }
@@ -672,8 +670,7 @@ void _8080bw_state::cosmo(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_cosmo));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -838,7 +835,7 @@ void _8080bw_state::spacecom(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_spacecom));
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	invaders_audio(config);
@@ -952,8 +949,7 @@ void _8080bw_state::invrvnge(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1127,8 +1123,7 @@ void _8080bw_state::lrescue(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1161,7 +1156,7 @@ void _8080bw_state::escmars(machine_config &config)
 	m_screen->set_raw(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_mw8080bw));
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1407,8 +1402,7 @@ void _8080bw_state::rollingc(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_rollingc));
 
-	PALETTE(config, m_palette, 16);
-	m_palette->set_init(FUNC(_8080bw_state::palette_init_rollingc));
+	PALETTE(config, m_palette, FUNC(_8080bw_state::rollingc_palette), 16);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -1556,8 +1550,7 @@ void _8080bw_state::schaser(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_schaser));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1686,8 +1679,7 @@ void _8080bw_state::schasercv(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_schasercv));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -1787,8 +1779,7 @@ void _8080bw_state::sflush(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_sflush));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init(FUNC(_8080bw_state::palette_init_sflush));
+	PALETTE(config, m_palette, FUNC(_8080bw_state::sflush_palette), 8);
 }
 
 
@@ -1892,8 +1883,7 @@ void _8080bw_state::lupin3(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_indianbt));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1933,8 +1923,7 @@ void _8080bw_state::lupin3a(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_lupin3));
 
-	PALETTE(config.replace(), m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config.replace(), m_palette, palette_device::RBG_3BIT);
 }
 
 
@@ -2065,8 +2054,7 @@ void _8080bw_state::polaris(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_polaris));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2192,8 +2180,7 @@ void _8080bw_state::ballbomb(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_ballbomb));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -2441,8 +2428,7 @@ void _8080bw_state::indianbt(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_indianbt));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -2468,8 +2454,7 @@ void _8080bw_state::indianbtbr(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_indianbt));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -2544,8 +2529,7 @@ void _8080bw_state::steelwkr(machine_config &config)
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rbg));
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	invaders_samples_audio(config);
@@ -2769,7 +2753,7 @@ void _8080bw_state::shuttlei(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_shuttlei));
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	invaders_samples_audio(config);

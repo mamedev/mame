@@ -5,13 +5,13 @@
     mupid M-Disk Comp.-A
     Grundig FL-100
 
-	Floppy disk station, usually connected to a mupid C2D2/C2A2 or the
-	Grundig PTC-100.
+    Floppy disk station, usually connected to a mupid C2D2/C2A2 or the
+    Grundig PTC-100.
 
-	Everything here is guessed based on the software and a PCB image. You
-	can see garbled output when you connect the builtin terminal to the
-	first serial port ('ser'). It does boot from floppy too, so presumely
-	only needs an emulated main system to work.
+    Everything here is guessed based on the software and a PCB image. You
+    can see garbled output when you connect the builtin terminal to the
+    first serial port ('ser'). It does boot from floppy too, so presumely
+    only needs an emulated main system to work.
 
 ***************************************************************************/
 

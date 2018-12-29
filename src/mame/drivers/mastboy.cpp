@@ -834,7 +834,7 @@ void mastboy_state::mastboy(machine_config &config)
 	screen.screen_vblank().set(FUNC(mastboy_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mastboy);
-	PALETTE(config, m_palette, 0x100);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

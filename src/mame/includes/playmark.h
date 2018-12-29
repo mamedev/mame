@@ -68,7 +68,7 @@ protected:
 	int         m_yoffset;
 	int         m_pri_masks[3];
 	uint16_t      m_scroll[7];
-	int			m_sprtranspen;
+	int         m_sprtranspen;
 
 	/* misc */
 	uint16_t      m_snd_command;

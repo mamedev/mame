@@ -141,7 +141,7 @@ public:
 
 	DECLARE_VIDEO_START(bbc);
 
-	DECLARE_PALETTE_INIT(bbc);
+	void bbc_colours(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(tape_timer_cb);
 	TIMER_CALLBACK_MEMBER(reset_timer_cb);

@@ -751,7 +751,7 @@ void sol20_state::sol20(machine_config &config)
 	m_screen->set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sol20);
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

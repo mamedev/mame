@@ -846,10 +846,8 @@ void rallyx_state::rallyx(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rallyx);
 
-	PALETTE(config, m_palette, 64*4+4);
-	m_palette->set_indirect_entries(32);
+	PALETTE(config, m_palette, FUNC(rallyx_state::rallyx_palette), 64*4 + 4, 32);
 	m_palette->enable_shadows();
-	m_palette->set_init(FUNC(rallyx_state::palette_init_rallyx));
 
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
@@ -898,10 +896,8 @@ void rallyx_state::jungler(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jungler);
 
-	PALETTE(config, m_palette, 64*4+4+64);
-	m_palette->set_indirect_entries(32+64);
+	PALETTE(config, m_palette, FUNC(rallyx_state::jungler_palette), 64*4 + 4 + 64, 32 + 64);
 	m_palette->enable_shadows();
-	m_palette->set_init(FUNC(rallyx_state::palette_init_jungler));
 
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 

@@ -218,10 +218,7 @@ void fastlane_state::fastlane(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fastlane);
-	PALETTE(config, m_palette, 1024*16);
-	m_palette->set_indirect_entries(0x400);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	m_palette->set_init(FUNC(fastlane_state::palette_init_fastlane));
+	PALETTE(config, m_palette, FUNC(fastlane_state::fastlane_palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
 	K007121(config, m_k007121, 0);
 	m_k007121->set_palette_tag(m_palette);

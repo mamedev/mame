@@ -182,8 +182,7 @@ void xorworld_state::xorworld(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xorworld);
-	PALETTE(config, m_palette, 256);
-	m_palette->set_init(FUNC(xorworld_state::palette_init_xorworld));
+	PALETTE(config, m_palette, FUNC(xorworld_state::xorworld_palette), 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

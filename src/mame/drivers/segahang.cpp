@@ -783,7 +783,7 @@ void segahang_state::shared_base(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segahang);
-	PALETTE(config, m_palette, 2048*3);
+	PALETTE(config, m_palette).set_entries(2048*3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);

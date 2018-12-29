@@ -3641,7 +3641,7 @@ void namcos23_state::gorgon(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
 
-	PALETTE(config, m_palette, 0x8000);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
@@ -3706,7 +3706,7 @@ void namcos23_state::s23(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
 
-	PALETTE(config, m_palette, 0x8000);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 
@@ -3785,7 +3785,7 @@ void namcos23_state::ss23(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::sub_irq));
 
-	PALETTE(config, m_palette, 0x8000);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos23);
 

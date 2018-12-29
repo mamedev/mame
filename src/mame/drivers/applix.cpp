@@ -100,11 +100,16 @@ public:
 		m_io_k3b0(*this, "K3b_0"),
 		m_io_k0b(*this, "K0b"),
 		m_expansion(*this, "expansion"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette")
+	{ }
 
 	void applix(machine_config &config);
 
 	void init_applix();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	DECLARE_READ16_MEMBER(applix_inputs_r);
@@ -143,11 +148,10 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
+	void applix_palette(palette_device &palette) const;
+
 	uint8_t m_video_latch;
 	uint8_t m_pa;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(applix);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
 
@@ -756,33 +760,28 @@ static void applix_floppies(device_slot_interface &device)
 }
 
 
-PALETTE_INIT_MEMBER(applix_state, applix)
-{ // shades need to be verified - the names on the right are from the manual
-	const uint8_t colors[16*3] = {
-	0x00, 0x00, 0x00,   //  0 Black
-	0x40, 0x40, 0x40,   //  1 Dark Grey
-	0x00, 0x00, 0x80,   //  2 Dark Blue
-	0x00, 0x00, 0xff,   //  3 Mid Blue
-	0x00, 0x80, 0x00,   //  4 Dark Green
-	0x00, 0xff, 0x00,   //  5 Green
-	0x00, 0xff, 0xff,   //  6 Blue Grey
-	0x00, 0x7f, 0x7f,   //  7 Light Blue
-	0x7f, 0x00, 0x00,   //  8 Dark Red
-	0xff, 0x00, 0x00,   //  9 Red
-	0x7f, 0x00, 0x7f,   // 10 Dark Violet
-	0xff, 0x00, 0xff,   // 11 Violet
-	0x7f, 0x7f, 0x00,   // 12 Brown
-	0xff, 0xff, 0x00,   // 13 Yellow
-	0xbf, 0xbf, 0xbf,   // 14 Light Grey
-	0xff, 0xff, 0xff }; // 15 White
+void applix_state::applix_palette(palette_device &palette) const
+{
+	// shades need to be verified - the names on the right are from the manual
+	constexpr rgb_t colors[16] = {
+			{ 0x00, 0x00, 0x00 },   //  0 Black
+			{ 0x40, 0x40, 0x40 },   //  1 Dark Grey
+			{ 0x00, 0x00, 0x80 },   //  2 Dark Blue
+			{ 0x00, 0x00, 0xff },   //  3 Mid Blue
+			{ 0x00, 0x80, 0x00 },   //  4 Dark Green
+			{ 0x00, 0xff, 0x00 },   //  5 Green
+			{ 0x00, 0xff, 0xff },   //  6 Blue Grey
+			{ 0x00, 0x7f, 0x7f },   //  7 Light Blue
+			{ 0x7f, 0x00, 0x00 },   //  8 Dark Red
+			{ 0xff, 0x00, 0x00 },   //  9 Red
+			{ 0x7f, 0x00, 0x7f },   // 10 Dark Violet
+			{ 0xff, 0x00, 0xff },   // 11 Violet
+			{ 0x7f, 0x7f, 0x00 },   // 12 Brown
+			{ 0xff, 0xff, 0x00 },   // 13 Yellow
+			{ 0xbf, 0xbf, 0xbf },   // 14 Light Grey
+			{ 0xff, 0xff, 0xff } }; // 15 White
 
-	uint8_t r, b, g, i, color_count = 0;
-
-	for (i = 0; i < 48; color_count++)
-	{
-		r = colors[i++]; g = colors[i++]; b = colors[i++];
-		palette.set_pen_color(color_count, rgb_t(r, g, b));
-	}
+	palette.set_pen_colors(0, colors);
 }
 
 
@@ -792,32 +791,31 @@ void applix_state::video_start()
 
 MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 {
-// The display is bitmapped. 2 modes are supported here, 320x200x16 and 640x200x4.
-// Need to display a border colour.
-// There is a monochrome mode, but no info found as yet.
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t i;
-	uint16_t chr,x;
-	uint32_t mem, vidbase = (m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
+	// The display is bitmapped. 2 modes are supported here, 320x200x16 and 640x200x4.
+	// Need to display a border colour.
+	// There is a monochrome mode, but no info found as yet.
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t const vidbase = (m_video_latch & 15) << 14;
+	uint32_t *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)
+	for (uint16_t x = 0; x < x_count; x++)
 	{
-		mem = vidbase + ma + x + (ra<<12);
-		chr = m_base[mem];
+		uint32_t const mem = vidbase + ma + x + (ra<<12);
+		uint16_t chr = m_base[mem];
 
 		if (BIT(m_pa, 3))
-		// 640 x 200 x 4of16 mode
 		{
-			for (i = 0; i < 8; i++)
+			// 640 x 200 x 4of16 mode
+			for (int i = 0; i < 8; i++)
 			{
 				*p++ = palette[m_palette_latch[chr>>14]];
 				chr <<= 2;
 			}
 		}
 		else
-		// 320 x 200 x 16 mode
 		{
-			for (i = 0; i < 4; i++)
+			// 320 x 200 x 16 mode
+			for (int i = 0; i < 4; i++)
 			{
 				*p++ = palette[chr>>12];
 				*p++ = palette[chr>>12];
@@ -875,8 +873,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(applix_state, applix)
+	PALETTE(config, m_palette, FUNC(applix_state::applix_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

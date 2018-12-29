@@ -68,109 +68,95 @@ Note:   if MAME_DEBUG is defined, pressing:
 
 ***************************************************************************/
 
-void cave_state::palette_init_cave(palette_device &palette)
+void cave_state::cave_palette(palette_device &palette)
 {
 	for (int chip = 0; chip < 4; chip++)
 	{
-		/* create a 1:1 palette map covering everything */
+		// create a 1:1 palette map covering everything
 		m_palette_map[chip] = std::make_unique<uint16_t[]>(palette.entries());
 
-		int maxpens = m_paletteram[chip].bytes() / 2;
-		if (!maxpens)
-			continue;
-
-		for (int pen = 0; pen < palette.entries(); pen++)
-			m_palette_map[chip][pen] = pen % maxpens;
+		int const maxpens = m_paletteram[chip].bytes() / 2;
+		if (maxpens)
+		{
+			for (int pen = 0; pen < palette.entries(); pen++)
+				m_palette_map[chip][pen] = pen % maxpens;
+		}
 	}
 }
 
-void cave_state::palette_init_dfeveron(palette_device &palette)
+void cave_state::dfeveron_palette(palette_device &palette)
 {
-	int color, pen;
-
 	/* Fill the 0-3fff range, used by sprites ($40 color codes * $100 pens)
 	   Here sprites have 16 pens, but the sprite drawing routine always
 	   multiplies the color code by $100 (for consistency).
 	   That's why we need this function.    */
 
-	palette_init_cave(palette);
+	cave_palette(palette);
 
-	for (color = 0; color < 0x40; color++)
-		for (pen = 0; pen < 0x10; pen++)
+	for (int color = 0; color < 0x40; color++)
+		for (int pen = 0; pen < 0x10; pen++)
 			m_palette_map[0][(color << 8) | pen] = (color << 4) | pen;
 }
 
-void cave_state::palette_init_mazinger(palette_device &palette)
+void cave_state::mazinger_palette(palette_device &palette)
 {
-	int color, pen;
+	cave_palette(palette);
 
-	palette_init_cave(palette);
+	// sprites (encrypted) are 4 bit deep
+	for (int color = 0; color < 0x40; color++)
+		for (int pen = 0; pen < 0x100; pen++)
+			m_palette_map[0][(color << 8) | pen] = (color << 4) + pen; // yes, PLUS, not OR
 
-	/* sprites (encrypted) are 4 bit deep */
-	for (color = 0; color < 0x40; color++)
-		for (pen = 0; pen < 0x100; pen++)
-			m_palette_map[0][(color << 8) | pen] = (color << 4) + pen; /* yes, PLUS, not OR */
-
-	/* layer 0 is 6 bit deep, there are 64 color codes but only $400
-	   colors are actually addressable */
-	for (color = 0; color < 0x40; color++)
-		for (pen = 0; pen < 0x40; pen++)
+	// layer 0 is 6 bit deep, there are 64 color codes but only $400 colors are actually addressable
+	for (int color = 0; color < 0x40; color++)
+		for (int pen = 0; pen < 0x40; pen++)
 			m_palette_map[0][0x4400 + ((color << 6) | pen)] = 0x400 | ((color & 0x0f) << 6) | pen;
 }
 
-void cave_state::palette_init_sailormn(palette_device &palette)
+void cave_state::sailormn_palette(palette_device &palette)
 {
-	int color, pen;
+	cave_palette(palette);
 
-	palette_init_cave(palette);
+	// sprites (encrypted) are 4 bit deep
+	for (int color = 0; color < 0x40; color++)
+		for (int pen = 0; pen < 0x100; pen++)
+			m_palette_map[0][(color << 8) | pen] = (color << 4) + pen; // yes, PLUS, not OR
 
-	/* sprites (encrypted) are 4 bit deep */
-	for (color = 0; color < 0x40; color++)
-		for (pen = 0; pen < 0x100; pen++)
-			m_palette_map[0][(color << 8) | pen] = (color << 4) + pen; /* yes, PLUS, not OR */
-
-	/* layer 2 is 6 bit deep, there are 64 color codes but only $400
-	   colors are actually addressable */
-	for (color = 0; color < 0x40; color++)
-		for (pen = 0; pen < 0x40; pen++)
+	// layer 2 is 6 bit deep, there are 64 color codes but only $400 colors are actually addressable
+	for (int color = 0; color < 0x40; color++)
+		for (int pen = 0; pen < 0x40; pen++)
 			m_palette_map[0][0x4c00 + ((color << 6) | pen)] = 0xc00 | ((color & 0x0f) << 6) | pen;
 }
 
-void cave_state::palette_init_pwrinst2(palette_device &palette)
+void cave_state::pwrinst2_palette(palette_device &palette)
 {
-	int color, pen;
+	cave_palette(palette);
 
-	palette_init_cave(palette);
-
-	for (color = 0; color < 0x80; color++)
-		for (pen = 0; pen < 0x10; pen++)
+	for (int color = 0; color < 0x80; color++)
+		for (int pen = 0; pen < 0x10; pen++)
 			m_palette_map[0][(color << 8) | pen] = (color << 4) | pen;
 
-	for (pen = 0x8000; pen < 0xa800; pen++)
-			m_palette_map[0][pen] = pen - 0x8000;
+	for (int pen = 0x8000; pen < 0xa800; pen++)
+		m_palette_map[0][pen] = pen - 0x8000;
 }
 
-void cave_state::palette_init_korokoro(palette_device &palette)
+void cave_state::korokoro_palette(palette_device &palette)
 {
-	int color, pen;
+	cave_palette(palette);
 
-	palette_init_cave(palette);
-
-	for (color = 0; color < 0x40; color++)
-		for (pen = 0; pen < 0x10; pen++)
+	for (int color = 0; color < 0x40; color++)
+		for (int pen = 0; pen < 0x10; pen++)
 			m_palette_map[0][(color << 8) | pen] = 0x3c00 | (color << 4) | pen;
 }
 
 
 void cave_state::set_pens(int chip)
 {
-	int pen;
-
-	for (pen = 0; pen < m_palette->entries(); pen++)
+	for (int pen = 0; pen < m_palette->entries(); pen++)
 	{
-		uint16_t data = m_paletteram[chip][m_palette_map[chip][pen]];
+		uint16_t const data = m_paletteram[chip][m_palette_map[chip][pen]];
 
-		rgb_t color = rgb_t(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
+		rgb_t const color(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 
 		m_palette->set_pen_color(pen, color);
 	}
@@ -1579,22 +1565,20 @@ void cave_state::device_post_load()
 
 // Poka Poka Satan: 3 screens * (1 Sprite chip + 1 Tilemap chip)
 
-void cave_state::palette_init_ppsatan(palette_device &palette)
+void cave_state::ppsatan_palette(palette_device &palette)
 {
-	int color, pen;
-
-	palette_init_cave(palette);
+	cave_palette(palette);
 
 	for (int chip = 0; chip < 3; chip++)
 	{
 		//  Sprites: 0x987800 - 0x988fff
-		for (color = 0; color < 0x40; color++)
-			for (pen = 0; pen < 0x10; pen++)
+		for (int color = 0; color < 0x40; color++)
+			for (int pen = 0; pen < 0x10; pen++)
 				m_palette_map[chip][(color << 8) | pen] = 0x7800/2 + ((color << 4) | pen);
 
 		//  Tiles:   0x980000 - 0x9803ff
-		for (color = 0; color < 0x40; color++)
-			for (pen = 0; pen < 0x10; pen++)
+		for (int color = 0; color < 0x40; color++)
+			for (int pen = 0; pen < 0x10; pen++)
 				m_palette_map[chip][0x4000 + ((color << 4) | pen)] = ((color << 4) | pen);
 	}
 }
