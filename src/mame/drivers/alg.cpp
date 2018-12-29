@@ -322,10 +322,9 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	MCFG_LASERDISC_SCREEN("screen")
 	MCFG_LASERDISC_OVERLAY_DRIVER(512*2, 262, amiga_state, screen_update_amiga)
 	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 4097)
-	MCFG_PALETTE_INIT_OWNER(alg_state,amiga)
+	PALETTE(config, m_palette, FUNC(alg_state::amiga_palette), 4097);
 
 	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 

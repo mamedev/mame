@@ -184,17 +184,17 @@ void mcs48_cpu_device::program_12bit(address_map &map)
 
 void mcs48_cpu_device::data_6bit(address_map &map)
 {
-	map(0x00, 0x3f).ram();
+	map(0x00, 0x3f).ram().share("data");
 }
 
 void mcs48_cpu_device::data_7bit(address_map &map)
 {
-	map(0x00, 0x7f).ram();
+	map(0x00, 0x7f).ram().share("data");
 }
 
 void mcs48_cpu_device::data_8bit(address_map &map)
 {
-	map(0x00, 0xff).ram();
+	map(0x00, 0xff).ram().share("data");
 }
 
 
@@ -213,6 +213,7 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	, m_t0_clk_func()
 	, m_prog_out_cb(*this)
 	, m_psw(0)
+	, m_dataptr(*this, "data")
 	, m_feature_mask(feature_mask)
 	, m_int_rom_size(rom_size)
 	, m_opcode_table(opcode_table)
@@ -385,7 +386,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 
 void mcs48_cpu_device::update_regptr()
 {
-	m_regptr = (uint8_t *)m_data->get_write_ptr((m_psw & B_FLAG) ? 24 : 0);
+	m_regptr = &m_dataptr[(m_psw & B_FLAG) ? 24 : 0];
 }
 
 

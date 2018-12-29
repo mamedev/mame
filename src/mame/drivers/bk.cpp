@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "includes/bk.h"
 
-#include "cpu/t11/t11.h"
 #include "sound/wave.h"
 #include "formats/rk_cas.h"
 
@@ -165,34 +164,34 @@ static INPUT_PORTS_START( bk0010 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(bk_state::bk0010)
+void bk_state::bk0010(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", T11, 3000000)
-	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
-	MCFG_DEVICE_PROGRAM_MAP(bk0010_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(bk_state,bk0010_irq_callback)
+	T11(config, m_maincpu, 3000000);
+	m_maincpu->set_initial_mode(0x36ff); /* initial mode word has DAL15,14,11,8 pulled low */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bk_state::bk0010_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(bk_state::bk0010_irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bk_state, screen_update_bk0010)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(bk_state::screen_update_bk0010));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("bk0010_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_interface("bk0010_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","bk0010")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("bk0010");
+}
 
 MACHINE_CONFIG_START(bk_state::bk0010fd)
 	bk0010(config);

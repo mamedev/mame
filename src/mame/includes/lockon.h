@@ -139,7 +139,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
-	DECLARE_PALETTE_INIT(lockon);
+	void lockon_palette(palette_device &palette) const;
 	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lockon);
 	TIMER_CALLBACK_MEMBER(cursor_callback);

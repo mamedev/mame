@@ -2182,14 +2182,6 @@ MACHINE_START_MEMBER(x1_state,x1)
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
-PALETTE_INIT_MEMBER(x1_state,x1)
-{
-	int i;
-
-	for(i=0;i<(0x10+0x1000);i++)
-		palette.set_pen_color(i,rgb_t(0x00,0x00,0x00));
-}
-
 FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
@@ -2240,10 +2232,9 @@ MACHINE_CONFIG_START(x1_state::x1)
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
+	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 

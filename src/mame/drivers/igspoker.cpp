@@ -1941,11 +1941,10 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_SCREEN_SIZE(64*8, 32*8) // TODO: wrong screen size!
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igspoker)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_igspoker)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

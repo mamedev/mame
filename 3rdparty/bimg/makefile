@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2018 Branimir Karadzic. All rights reserved.
 # License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
 #
 
@@ -39,27 +39,22 @@ clean: ## Clean all intermediate files.
 	@mkdir .build
 
 projgen: ## Generate project files for all configurations.
-	$(GENIE) --with-tools                     vs2012
-	$(GENIE) --with-tools                     vs2013
-	$(GENIE) --with-tools                     vs2015
 	$(GENIE) --with-tools                     vs2017
 	$(GENIE) --with-tools --gcc=mingw-gcc     gmake
 	$(GENIE) --with-tools --gcc=linux-gcc     gmake
 	$(GENIE) --with-tools --gcc=osx           gmake
-	$(GENIE) --with-tools --xcode=osx         xcode4
-	$(GENIE) --with-tools --xcode=ios         xcode4
+	$(GENIE) --with-tools --xcode=osx         xcode8
+	$(GENIE) --with-tools --xcode=ios         xcode8
 	$(GENIE)              --gcc=freebsd       gmake
-	$(GENIE)                                --gcc=android-arm   gmake
-	$(GENIE)                                --gcc=android-mips  gmake
-	$(GENIE)                                --gcc=android-x86   gmake
-	$(GENIE)                                --gcc=asmjs         gmake
-	$(GENIE)                                --gcc=ios-arm       gmake
-	$(GENIE)                                --gcc=ios-arm64     gmake
-	$(GENIE)                                --gcc=ios-simulator gmake
-	$(GENIE)                                --gcc=nacl          gmake
-	$(GENIE)                                --gcc=nacl-arm      gmake
-	$(GENIE)                                --gcc=pnacl         gmake
-	$(GENIE)                                --gcc=rpi           gmake
+	$(GENIE)                                --gcc=android-arm     gmake
+	$(GENIE)                                --gcc=android-mips    gmake
+	$(GENIE)                                --gcc=android-x86     gmake
+	$(GENIE)                                --gcc=asmjs           gmake
+	$(GENIE)                                --gcc=ios-arm         gmake
+	$(GENIE)                                --gcc=ios-arm64       gmake
+	$(GENIE)                                --gcc=ios-simulator   gmake
+	$(GENIE)                                --gcc=ios-simulator64 gmake
+	$(GENIE)                                --gcc=rpi             gmake
 
 .build/projects/gmake-android-arm:
 	$(GENIE) --gcc=android-arm gmake
@@ -95,15 +90,11 @@ asmjs: asmjs-debug asmjs-release ## Build - Emscripten Debug and Release
 
 .build/projects/gmake-linux:
 	$(GENIE) --with-tools --gcc=linux-gcc gmake
-linux-debug32: .build/projects/gmake-linux ## Build - Linux x86 Debug
-	$(MAKE) -R -C .build/projects/gmake-linux config=debug32
-linux-release32: .build/projects/gmake-linux ## Build - Linux x86 Release
-	$(MAKE) -R -C .build/projects/gmake-linux config=release32
 linux-debug64: .build/projects/gmake-linux ## Build - Linux x64 Debug
 	$(MAKE) -R -C .build/projects/gmake-linux config=debug64
 linux-release64: .build/projects/gmake-linux ## Build - Linux x64 Release
 	$(MAKE) -R -C .build/projects/gmake-linux config=release64
-linux: linux-debug32 linux-release32 linux-debug64 linux-release64 ## Build - Linux x86/x64 Debug and Release
+linux: linux-debug64 linux-release64 ## Build - Linux x64 Debug and Release
 
 .build/projects/gmake-freebsd:
 	$(GENIE) --with-tools --gcc=freebsd gmake
@@ -141,42 +132,6 @@ mingw-clang-release64: .build/projects/gmake-mingw-clang ## Build - MinGW Clang 
 	$(MAKE) -R -C .build/projects/gmake-mingw-clang config=release64
 mingw-clang: mingw-clang-debug32 mingw-clang-release32 mingw-clang-debug64 mingw-clang-release64 ## Build - MinGW Clang x86/x64 Debug and Release
 
-.build/projects/vs2012:
-	$(GENIE) --with-tools vs2012
-vs2012-debug32: .build/projects/vs2012 ## Build - VS2012 x86 Debug
-	devenv .build/projects/vs2012/bimg.sln /Build "Debug|Win32"
-vs2012-release32: .build/projects/vs2012 ## Build - VS2012 x86 Release
-	devenv .build/projects/vs2012/bimg.sln /Build "Release|Win32"
-vs2012-debug64: .build/projects/vs2012 ## Build - VS2012 x64 Debug
-	devenv .build/projects/vs2012/bimg.sln /Build "Debug|x64"
-vs2012-release64: .build/projects/vs2012 ## Build - VS2012 x64 Release
-	devenv .build/projects/vs2012/bimg.sln /Build "Release|x64"
-vs2012: vs2012-debug32 vs2012-release32 vs2012-debug64 vs2012-release64 ## Build - VS2012 x86/x64 Debug and Release
-
-.build/projects/vs2013:
-	$(GENIE) --with-tools vs2013
-vs2013-debug32: .build/projects/vs2013 ## Build - VS2013 x86 Debug
-	devenv .build/projects/vs2013/bimg.sln /Build "Debug|Win32"
-vs2013-release32: .build/projects/vs2013 ## Build - VS2013 x86 Release
-	devenv .build/projects/vs2013/bimg.sln /Build "Release|Win32"
-vs2013-debug64: .build/projects/vs2013 ## Build - VS2013 x64 Debug
-	devenv .build/projects/vs2013/bimg.sln /Build "Debug|x64"
-vs2013-release64: .build/projects/vs2013 ## Build - VS2013 x64 Release
-	devenv .build/projects/vs2013/bimg.sln /Build "Release|x64"
-vs2013: vs2013-debug32 vs2013-release32 vs2013-debug64 vs2013-release64 ## Build - VS2013 x86/x64 Debug and Release
-
-.build/projects/vs2015:
-	$(GENIE) --with-tools vs2015
-vs2015-debug32: .build/projects/vs2015 ## Build - VS2015 x86 Debug
-	devenv .build/projects/vs2015/bimg.sln /Build "Debug|Win32"
-vs2015-release32: .build/projects/vs2015 ## Build - VS2015 x86 Release
-	devenv .build/projects/vs2015/bimg.sln /Build "Release|Win32"
-vs2015-debug64: .build/projects/vs2015 ## Build - VS2015 x64 Debug
-	devenv .build/projects/vs2015/bimg.sln /Build "Debug|x64"
-vs2015-release64: .build/projects/vs2015 ## Build - VS2015 x64 Release
-	devenv .build/projects/vs2015/bimg.sln /Build "Release|x64"
-vs2015: vs2015-debug32 vs2015-release32 vs2015-debug64 vs2015-release64 ## Build - VS2015 x86/x64 Debug and Release
-
 .build/projects/vs2017:
 	$(GENIE) --with-tools vs2017
 vs2017-debug32: .build/projects/vs2017 ## Build - vs2017 x86 Debug
@@ -189,45 +144,13 @@ vs2017-release64: .build/projects/vs2017 ## Build - vs2017 x64 Release
 	devenv .build/projects/vs2017/bimg.sln /Build "Release|x64"
 vs2017: vs2017-debug32 vs2017-release32 vs2017-debug64 vs2017-release64 ## Build - vs2017 x86/x64 Debug and Release
 
-.build/projects/gmake-nacl:
-	$(GENIE) --gcc=nacl gmake
-nacl-debug32: .build/projects/gmake-nacl ## Build - Native Client x86 Debug
-	$(MAKE) -R -C .build/projects/gmake-nacl config=debug32
-nacl-release32: .build/projects/gmake-nacl ## Build - Native Client x86 Release
-	$(MAKE) -R -C .build/projects/gmake-nacl config=release32
-nacl-debug64: .build/projects/gmake-nacl ## Build - Native Client x64 Debug
-	$(MAKE) -R -C .build/projects/gmake-nacl config=debug64
-nacl-release64: .build/projects/gmake-nacl ## Build - Native Client x64 Release
-	$(MAKE) -R -C .build/projects/gmake-nacl config=release64
-nacl: nacl-debug32 nacl-release32 nacl-debug64 nacl-release64 ## Build - Native Client x86/x64 Debug and Release
-
-.build/projects/gmake-nacl-arm:
-	$(GENIE) --gcc=nacl-arm gmake
-nacl-arm-debug: .build/projects/gmake-nacl-arm ## Build - Native Client ARM Debug
-	$(MAKE) -R -C .build/projects/gmake-nacl-arm config=debug
-nacl-arm-release: .build/projects/gmake-nacl-arm ## Build - Native Client ARM Release
-	$(MAKE) -R -C .build/projects/gmake-nacl-arm config=release
-nacl-arm: nacl-arm-debug32 nacl-arm-release32 ## Build - Native Client ARM Debug and Release
-
-.build/projects/gmake-pnacl:
-	$(GENIE) --gcc=pnacl gmake
-pnacl-debug: .build/projects/gmake-pnacl ## Build - Portable Native Client Debug
-	$(MAKE) -R -C .build/projects/gmake-pnacl config=debug
-pnacl-release: .build/projects/gmake-pnacl ## Build - Portable Native Client Release
-	$(MAKE) -R -C .build/projects/gmake-pnacl config=release
-pnacl: pnacl-debug pnacl-release ## Build - Portable Native Client Debug and Release
-
 .build/projects/gmake-osx:
 	$(GENIE) --with-tools --gcc=osx gmake
-osx-debug32: .build/projects/gmake-osx ## Build - OSX x86 Debug
-	$(MAKE) -C .build/projects/gmake-osx config=debug32
-osx-release32: .build/projects/gmake-osx ## Build - OSX x86 Release
-	$(MAKE) -C .build/projects/gmake-osx config=release32
 osx-debug64: .build/projects/gmake-osx ## Build - OSX x64 Debug
 	$(MAKE) -C .build/projects/gmake-osx config=debug64
 osx-release64: .build/projects/gmake-osx ## Build - OSX x64 Release
 	$(MAKE) -C .build/projects/gmake-osx config=release64
-osx: osx-debug32 osx-release32 osx-debug64 osx-release64 ## Build - OSX x86/x64 Debug and Release
+osx: osx-debug64 osx-release64 ## Build - OSX x64 Debug and Release
 
 .build/projects/gmake-ios-arm:
 	$(GENIE) --gcc=ios-arm gmake
@@ -252,6 +175,14 @@ ios-simulator-debug: .build/projects/gmake-ios-simulator ## Build - iOS Simulato
 ios-simulator-release: .build/projects/gmake-ios-simulator ## Build - iOS Simulator Release
 	$(MAKE) -R -C .build/projects/gmake-ios-simulator config=release
 ios-simulator: ios-simulator-debug ios-simulator-release ## Build - iOS Simulator Debug and Release
+
+.build/projects/gmake-ios-simulator64:
+	$(GENIE) --gcc=ios-simulator64 gmake
+ios-simulator64-debug: .build/projects/gmake-ios-simulator64 ## Build - iOS Simulator 64 Debug
+	$(MAKE) -R -C .build/projects/gmake-ios-simulator64 config=debug
+ios-simulator64-release: .build/projects/gmake-ios-simulator64 ## Build - iOS Simulator 64 Release
+	$(MAKE) -R -C .build/projects/gmake-ios-simulator64 config=release
+ios-simulator64: ios-simulator64-debug ios-simulator64-release ## Build - iOS Simulator 64 Debug and Release
 
 .build/projects/gmake-rpi:
 	$(GENIE) --gcc=rpi gmake
@@ -338,7 +269,7 @@ texturev: .build/projects/$(BUILD_PROJECT_DIR) ## Build texturev tool.
 	$(SILENT) $(MAKE) -C .build/projects/$(BUILD_PROJECT_DIR) texturev config=$(BUILD_TOOLS_CONFIG)
 	$(SILENT) cp .build/$(BUILD_OUTPUT_DIR)/bin/texturev$(BUILD_TOOLS_SUFFIX)$(EXE) tools/bin/$(OS)/texturev$(EXE)
 
-tools: geometryc shaderc texturec texturev ## Build tools.
+tools: texturec ## Build tools.
 
 clean-tools: ## Clean tools projects.
 	-$(SILENT) rm -r .build/projects/$(BUILD_PROJECT_DIR)

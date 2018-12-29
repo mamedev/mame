@@ -714,24 +714,24 @@ void ninjaw_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-MACHINE_CONFIG_START(ninjaw_state::ninjaw)
-
+void ninjaw_state::ninjaw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(ninjaw_master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 16000000/2);  /* 8 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ninjaw_state::ninjaw_master_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(ninjaw_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 16/4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));    /* 16/4 MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &ninjaw_state::sound_map);
 
-	MCFG_DEVICE_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(ninjaw_slave_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	M68000(config, m_subcpu, 16000000/2);  /* 8 MHz ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &ninjaw_state::ninjaw_slave_map);
+	m_subcpu->set_vblank_int("lscreen", FUNC(ninjaw_state::irq4_line_hold));
 
 	// TODO: if CPUs are unsynched then seldomly stages loads up with no enemies
 	//       Let's use a better timer (was 6000 before) based off actual CPU timing.
 	//       Might as well bump the divider in case the bug still occurs before resorting to perfect CPU.
-	MCFG_QUANTUM_TIME(attotime::from_hz(16000000/1024))  /* CPU slices */
+	config.m_minimum_quantum = attotime::from_hz(16000000/1024);  /* CPU slices */
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
@@ -743,36 +743,36 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjaw)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_ADD("palette2", 4096)
-	MCFG_PALETTE_ADD("palette3", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjaw);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
+	PALETTE(config, "palette3").set_entries(4096);
 
 	config.set_default_layout(layout_ninjaw);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(36*8, 32*8);
+	lscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
+	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("mscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_middle)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	mscreen.set_refresh_hz(60);
+	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	mscreen.set_size(36*8, 32*8);
+	mscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
+	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
+	mscreen.set_palette("palette2");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette3")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(36*8, 32*8);
+	rscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
+	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
+	rscreen.set_palette("palette3");
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
@@ -808,14 +808,14 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "2610.1.l", 1.0);
+	ymsnd.add_route(1, "2610.1.r", 1.0);
+	ymsnd.add_route(2, "2610.2.l", 1.0);
+	ymsnd.add_route(2, "2610.2.r", 1.0);
 
 	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -827,25 +827,25 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(ninjaw_state::darius2)
-
+void ninjaw_state::darius2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(darius2_master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 16000000/2);  /* 8 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ninjaw_state::darius2_master_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(ninjaw_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));    /* 4 MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &ninjaw_state::sound_map);
 
-	MCFG_DEVICE_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(darius2_slave_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	M68000(config, m_subcpu, 16000000/2);  /* 8 MHz ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &ninjaw_state::darius2_slave_map);
+	m_subcpu->set_vblank_int("lscreen", FUNC(ninjaw_state::irq4_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(16000000/1024))  /* CPU slices */
-	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_minimum_quantum = attotime::from_hz(16000000/1024);  /* CPU slices */
+	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -856,36 +856,36 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjaw)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_ADD("palette2", 4096)
-	MCFG_PALETTE_ADD("palette3", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjaw);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
+	PALETTE(config, "palette3").set_entries(4096);
 
 	config.set_default_layout(layout_ninjaw);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(36*8, 32*8);
+	lscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
+	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("mscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_middle)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	mscreen.set_refresh_hz(60);
+	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	mscreen.set_size(36*8, 32*8);
+	mscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
+	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
+	mscreen.set_palette("palette2");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette3")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(36*8, 32*8);
+	rscreen.set_visarea(0*8, 36*8-1, 3*8, 31*8-1);
+	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
+	rscreen.set_palette("palette3");
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
@@ -921,14 +921,14 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "2610.1.l", 1.0);
+	ymsnd.add_route(1, "2610.1.r", 1.0);
+	ymsnd.add_route(2, "2610.2.l", 1.0);
+	ymsnd.add_route(2, "2610.2.r", 1.0);
 
 	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -940,7 +940,7 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

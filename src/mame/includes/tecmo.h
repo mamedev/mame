@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_TECMO_H
+#define MAME_INCLUDES_TECMO_H
+
+#pragma once
 
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
@@ -9,8 +13,8 @@
 class tecmo_state : public driver_device
 {
 public:
-	tecmo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tecmo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_msm(*this, "msm"),
@@ -25,7 +29,8 @@ public:
 		m_fgscroll(*this, "fgscroll"),
 		m_bgscroll(*this, "bgscroll"),
 		m_adpcm_rom(*this, "adpcm"),
-		m_mainbank(*this, "mainbank") { }
+		m_mainbank(*this, "mainbank")
+	{ }
 
 	void geminib(machine_config &config);
 	void backfirt(machine_config &config);
@@ -102,3 +107,5 @@ private:
 	void silkwormp_sound_map(address_map &map);
 	void backfirt_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TECMO_H

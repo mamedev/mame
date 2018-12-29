@@ -1010,66 +1010,60 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_4k)
-
+void cinemat_state::cinemat_nojmi_4k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CCPU, MASTER_CLOCK/4)
-	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
-	MCFG_CCPU_EXTERNAL_FUNC(READ8(*this, cinemat_state,joystick_read))
-	MCFG_DEVICE_PROGRAM_MAP(program_map_4k)
-	MCFG_DEVICE_DATA_MAP(data_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	CCPU(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_vector_func(FUNC(cinemat_state::cinemat_vector_callback));
+	m_maincpu->external_func().set(FUNC(cinemat_state::joystick_read));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_4k);
+	m_maincpu->set_addrmap(AS_DATA, &cinemat_state::data_map);
+	m_maincpu->set_addrmap(AS_IO, &cinemat_state::io_map);
 
 	LS259(config, m_outlatch); // 7J on CCG-1
 	m_outlatch->q_out_cb<5>().set(FUNC(cinemat_state::coin_reset_w));
 	m_outlatch->q_out_cb<6>().set(FUNC(cinemat_state::vector_control_w));
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(MASTER_CLOCK/4/16/16/16/16/2)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 767)
-	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_cinemat)
-MACHINE_CONFIG_END
+	VECTOR(config, "vector", 0);
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(MASTER_CLOCK/4/16/16/16/16/2);
+	m_screen->set_size(1024, 768);
+	m_screen->set_visarea(0, 1023, 0, 767);
+	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_cinemat));
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_4k)
+void cinemat_state::cinemat_jmi_4k(machine_config &config)
+{
 	cinemat_nojmi_4k(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
-	MCFG_CCPU_EXTERNAL_FUNC(READ8("maincpu",ccpu_cpu_device,read_jmi))
-MACHINE_CONFIG_END
+	m_maincpu->set_vector_func(FUNC(cinemat_state::cinemat_vector_callback));
+	m_maincpu->external_func().set("maincpu", FUNC(ccpu_cpu_device::read_jmi));
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_8k)
+void cinemat_state::cinemat_nojmi_8k(machine_config &config)
+{
 	cinemat_nojmi_4k(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(program_map_8k)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_8k);
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_8k)
+void cinemat_state::cinemat_jmi_8k(machine_config &config)
+{
 	cinemat_jmi_4k(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(program_map_8k)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_8k);
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_16k)
+void cinemat_state::cinemat_jmi_16k(machine_config &config)
+{
 	cinemat_jmi_4k(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(program_map_16k)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_16k);
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_32k)
+void cinemat_state::cinemat_jmi_32k(machine_config &config)
+{
 	cinemat_jmi_4k(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(program_map_32k)
-MACHINE_CONFIG_END
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_32k);
+}
 
 
 
@@ -1079,117 +1073,112 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cinemat_state::spacewar)
+void cinemat_state::spacewar(machine_config &config)
+{
 	cinemat_nojmi_4k(config);
 	spacewar_sound(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_spacewar)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_spacewar));
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::barrier)
+void cinemat_state::barrier(machine_config &config)
+{
 	cinemat_jmi_4k(config);
 	barrier_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::speedfrk)
+void cinemat_state::speedfrk(machine_config &config)
+{
 	cinemat_nojmi_8k(config);
 	speedfrk_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::starhawk)
+void cinemat_state::starhawk(machine_config &config)
+{
 	cinemat_jmi_4k(config);
 	starhawk_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_16level_state::sundance)
+void cinemat_16level_state::sundance(machine_config &config)
+{
 	cinemat_jmi_8k(config);
 	sundance_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::tailg)
+void cinemat_state::tailg(machine_config &config)
+{
 	cinemat_nojmi_8k(config);
 	tailg_sound(config);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::warrior)
+void cinemat_state::warrior(machine_config &config)
+{
 	cinemat_jmi_8k(config);
 	warrior_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::armora)
+void cinemat_state::armora(machine_config &config)
+{
 	cinemat_jmi_16k(config);
 	armora_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::ripoff)
+void cinemat_state::ripoff(machine_config &config)
+{
 	cinemat_jmi_8k(config);
 	ripoff_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::starcas)
+void cinemat_state::starcas(machine_config &config)
+{
 	cinemat_jmi_8k(config);
 	starcas_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_64level_state::solarq)
+void cinemat_64level_state::solarq(machine_config &config)
+{
 	cinemat_jmi_16k(config);
 	solarq_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_color_state::boxingb)
+void cinemat_color_state::boxingb(machine_config &config)
+{
 	cinemat_jmi_32k(config);
 	boxingb_sound(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
+	m_screen->set_visarea(0, 1024, 0, 788);
 
 	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_state::wotw)
+void cinemat_state::wotw(machine_config &config)
+{
 	cinemat_jmi_16k(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 767)
+	m_screen->set_visarea(0, 1120, 0, 767);
 	wotw_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cinemat_color_state::wotwc)
+void cinemat_color_state::wotwc(machine_config &config)
+{
 	cinemat_jmi_16k(config);
 	wotw_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(demon_state::demon)
+void demon_state::demon(machine_config &config)
+{
 	cinemat_jmi_16k(config);
 	demon_sound(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 805)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 1024, 0, 805);
+}
 
-
-MACHINE_CONFIG_START(qb3_state::qb3)
+void qb3_state::qb3(machine_config &config)
+{
 	cinemat_jmi_32k(config);
 	qb3_sound(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_DATA_MAP(data_map_qb3)
-	MCFG_DEVICE_IO_MAP(io_map_qb3)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &qb3_state::data_map_qb3);
+	m_maincpu->set_addrmap(AS_IO, &qb3_state::io_map_qb3);
+	m_screen->set_visarea(0, 1120, 0, 780);
+}
 
 
 

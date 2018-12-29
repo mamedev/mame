@@ -236,7 +236,7 @@ void galastrm_state::galastrm(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galastrm);
-	PALETTE(config, m_palette, 4096);
+	PALETTE(config, m_palette).set_entries(4096);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(0);

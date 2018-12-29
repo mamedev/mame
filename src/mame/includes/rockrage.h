@@ -58,7 +58,7 @@ private:
 	DECLARE_WRITE8_MEMBER(rockrage_speech_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(rockrage);
+	void rockrage_palette(palette_device &palette) const;
 	uint32_t screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	K007342_CALLBACK_MEMBER(rockrage_tile_callback);

@@ -31,13 +31,13 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tnzs_base_state, prompalette)
+void tnzs_base_state::prompalette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int col = (color_prom[i] << 8) + color_prom[i + 512];
+		int const col = (color_prom[i] << 8) + color_prom[i + 512];
 		palette.set_pen_color(i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
 	}
 }

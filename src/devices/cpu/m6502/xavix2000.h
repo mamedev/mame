@@ -12,9 +12,6 @@
 
 #include "xavix.h"
 
-#define MCFG_XAVIX2000_VECTOR_CALLBACK(_class, _method) \
-	downcast<xavix2000_device &>(*device).set_vector_callback(xavix2000_device::xavix2000_interrupt_vector_delegate(&_class::_method, #_class "::" #_method, this));
-
 class xavix2000_device : public xavix_device {
 public:
 	xavix2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

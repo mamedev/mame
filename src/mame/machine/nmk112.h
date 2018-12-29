@@ -50,18 +50,4 @@ private:
 DECLARE_DEVICE_TYPE(NMK112, nmk112_device)
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_NMK112_ROM0(_tag) \
-	downcast<nmk112_device &>(*device).set_rom0_tag(_tag);
-
-#define MCFG_NMK112_ROM1(_tag) \
-	downcast<nmk112_device &>(*device).set_rom1_tag(_tag);
-
-#define MCFG_NMK112_DISABLE_PAGEMASK(_mask) \
-	downcast<nmk112_device &>(*device).set_page_mask(_mask);
-
-
 #endif // MAME_MACHINE_NMK112_H

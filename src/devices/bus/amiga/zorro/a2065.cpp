@@ -17,6 +17,7 @@
 //**************************************************************************
 
 #define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -76,11 +77,8 @@ void a2065_device::device_start()
 
 void a2065_device::autoconfig_base_address(offs_t address)
 {
-	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
-
-	if (VERBOSE)
-		logerror("-> installing a2065\n");
+	LOG("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
+	LOG("-> installing a2065\n");
 
 	// stop responding to default autoconfig
 	m_slot->m_space->unmap_readwrite(0xe80000, 0xe8007f);
@@ -106,8 +104,7 @@ void a2065_device::autoconfig_base_address(offs_t address)
 
 WRITE_LINE_MEMBER( a2065_device::cfgin_w )
 {
-	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
+	LOG("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
 
 	if (state == 0)
 	{

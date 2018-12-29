@@ -269,9 +269,8 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_volfied)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_volfied);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_gfxdecode_tag("gfxdecode");

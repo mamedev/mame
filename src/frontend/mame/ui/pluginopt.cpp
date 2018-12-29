@@ -96,6 +96,9 @@ void menu_plugin_opt::handle()
 			case IPT_UI_CLEAR:
 				key = "clear";
 				break;
+			case IPT_UI_CANCEL:
+				key = "cancel";
+				break;
 			default:
 				return;
 		}

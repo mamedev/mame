@@ -89,8 +89,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
-	DECLARE_PALETTE_INIT(kyros);
-	DECLARE_PALETTE_INIT(paddlem);
+	void kyros_palette(palette_device &palette) const;
+	void paddlem_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(alpha68k_II);
 	DECLARE_MACHINE_RESET(alpha68k_II);
 	DECLARE_VIDEO_START(alpha68k);

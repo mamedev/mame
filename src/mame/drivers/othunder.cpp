@@ -604,16 +604,16 @@ void othunder_state::machine_start()
 	save_item(NAME(m_pan));
 }
 
-MACHINE_CONFIG_START(othunder_state::othunder)
-
+void othunder_state::othunder(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(othunder_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &othunder_state::othunder_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/2/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &othunder_state::z80_sound_map);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	adc0808_device &adc(ADC0808(config, "adc", 16_MHz_XTAL/2/2/8));
 	adc.eoc_callback().set(FUNC(othunder_state::adc_eoc_w));
@@ -632,17 +632,17 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, othunder_state, vblank_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(othunder_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(othunder_state::vblank_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_othunder)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_othunder);
+	PALETTE(config, m_palette).set_entries(4096);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
@@ -655,14 +655,14 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "2610.0l", 0.25)
-	MCFG_SOUND_ROUTE(0, "2610.0r", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "2610.0l", 0.25);
+	ymsnd.add_route(0, "2610.0r", 0.25);
+	ymsnd.add_route(1, "2610.1l", 1.0);
+	ymsnd.add_route(1, "2610.1r", 1.0);
+	ymsnd.add_route(2, "2610.2l", 1.0);
+	ymsnd.add_route(2, "2610.2r", 1.0);
 
 	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, primo_state, vblank_irq))
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

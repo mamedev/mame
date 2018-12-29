@@ -246,12 +246,10 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bogeyman)
-	MCFG_PALETTE_ADD("palette", 16+256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
-	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bogeyman);
+	PALETTE(config, m_palette, FUNC(bogeyman_state::bogeyman_palette)).set_format(palette_device::BGR_233_inverted, 16 + 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

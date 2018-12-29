@@ -621,12 +621,11 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidearms)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -670,12 +669,11 @@ MACHINE_CONFIG_START(sidearms_state::turtship)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -722,12 +720,11 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

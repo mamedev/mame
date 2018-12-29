@@ -100,18 +100,17 @@ ioport_constructor pcd_video_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("graphics", I8741, 16_MHz_XTAL / 2)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcd_video_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcd_video_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcd_video_device, t1_r))
+	i8741_device &mcu(I8741(config, "graphics", 16_MHz_XTAL / 2));
+	mcu.p1_in_cb().set(FUNC(pcd_video_device::p1_r));
+	mcu.p2_out_cb().set(FUNC(pcd_video_device::p2_w));
+	mcu.t1_in_cb().set(FUNC(pcd_video_device::t1_r));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL, 832, 0, 640, 381, 0, 350);
 	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
+	PALETTE(config, "palette", FUNC(pcd_video_device::pcdx_palette), 3);
 
 	SCN2674(config, m_crtc, 16_MHz_XTAL / 16);
 	m_crtc->set_character_width(16);
@@ -146,20 +145,21 @@ void pcx_video_device::pcx_attr_ram(address_map &map)
 	map(0x0000, 0x07ff).ram();
 }
 
-MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("graphics", I8031, 24_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(pcx_vid_map)
-	MCFG_DEVICE_IO_MAP(pcx_vid_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, pcx_video_device, p1_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, pcx_video_device, tx_callback))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pcx_video_device, rx_callback))
+void pcx_video_device::device_add_mconfig(machine_config &config)
+{
+	i8031_device &gfx(I8031(config, "graphics", 24_MHz_XTAL / 2));
+	gfx.set_addrmap(AS_PROGRAM, &pcx_video_device::pcx_vid_map);
+	gfx.set_addrmap(AS_IO, &pcx_video_device::pcx_vid_io);
+	gfx.port_out_cb<1>().set(FUNC(pcx_video_device::p1_w));
+	gfx.serial_tx_cb().set(FUNC(pcx_video_device::tx_callback));
+	gfx.serial_rx_cb().set(FUNC(pcx_video_device::rx_callback));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL, 1272, 0, 960, 381, 0, 350);
 	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SCN2672(config, m_crtc, 24_MHz_XTAL / 12); // used with SCB2673B
 	m_crtc->intr_callback().set_inputline("graphics", MCS51_INT0_LINE);
@@ -168,7 +168,7 @@ MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
 	m_crtc->set_screen("screen");
 	m_crtc->set_addrmap(0, &pcx_video_device::pcx_char_ram);
 	m_crtc->set_addrmap(1, &pcx_video_device::pcx_attr_ram);
-MACHINE_CONFIG_END
+}
 
 
 SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
@@ -239,7 +239,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	}
 }
 
-PALETTE_INIT_MEMBER(pcdx_video_device, pcdx)
+void pcdx_video_device::pcdx_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());

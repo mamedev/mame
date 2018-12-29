@@ -17,17 +17,15 @@ Taito Super Speed Race driver
 
 
 
-PALETTE_INIT_MEMBER(sspeedr_state, sspeedr)
+void sspeedr_state::sspeedr_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		int r = (i & 1) ? 0xb0 : 0x20;
-		int g = (i & 2) ? 0xb0 : 0x20;
-		int b = (i & 4) ? 0xb0 : 0x20;
+		int r = BIT(i, 0) ? 0xb0 : 0x20;
+		int g = BIT(i, 1) ? 0xb0 : 0x20;
+		int b = BIT(i, 2) ? 0xb0 : 0x20;
 
-		if (i & 8)
+		if (BIT(i, 3))
 		{
 			r += 0x4f;
 			g += 0x4f;
@@ -208,11 +206,10 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sspeedr_state, screen_vblank_sspeedr))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sspeedr)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(sspeedr_state, sspeedr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sspeedr);
+	PALETTE(config, m_palette, FUNC(sspeedr_state::sspeedr_palette), 16);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

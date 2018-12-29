@@ -78,16 +78,16 @@ void ms9540_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(ms9540_state::ms9540)
+void ms9540_state::ms9540(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	M68000(config, m_maincpu, 8000000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms9540_state::mem_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ms9540_state, kbd_put))
-
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(ms9540_state::kbd_put));
+}
 
 /* ROM definition */
 ROM_START( ms9540 )

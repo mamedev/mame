@@ -1342,7 +1342,7 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
 	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp85_state, vblank_w))
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_TIMER_DRIVER_ADD("vm_timer", hp85_state, vm_timer)
 
 	// No idea at all about the actual keyboard scan frequency

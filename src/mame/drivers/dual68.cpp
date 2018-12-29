@@ -103,8 +103,8 @@ MACHINE_CONFIG_START(dual68_state::dual68)
 	MCFG_DEVICE_IO_MAP(sio4_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(dual68_state::kbd_put));
 
 	MCFG_DEVICE_ADD("usart1", MC2661, 9.8304_MHz_XTAL / 2) // SCN2661B
 	MCFG_DEVICE_ADD("usart2", MC2661, 9.8304_MHz_XTAL / 2) // SCN2661B

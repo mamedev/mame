@@ -11,9 +11,6 @@
 struct ssg_callbacks;
 
 
-#define MCFG_YM2610_IRQ_HANDLER(cb) \
-		downcast<ym2610_device &>(*device).set_irq_handler((DEVCB_##cb));
-
 class ym2610_device : public ay8910_device,
 	public device_memory_interface
 {

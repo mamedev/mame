@@ -136,7 +136,7 @@ protected:
 	required_shared_ptr<uint8_t> m_main_ram;
 	optional_shared_ptr<uint8_t> m_colorram;
 	optional_shared_ptr<uint8_t> m_colorram2;
-	optional_device<discrete_device> m_discrete;
+	optional_device<discrete_sound_device> m_discrete;
 
 	/* other devices */
 	optional_device<samples_device> m_samples;

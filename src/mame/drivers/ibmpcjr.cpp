@@ -33,8 +33,8 @@
 class pcjr_state : public driver_device
 {
 public:
-	pcjr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pcjr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pic8259(*this, "pic8259"),
 		m_pit8253(*this, "pit8253"),
@@ -654,13 +654,13 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
 	lpt0.irq_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
-	MCFG_PC_JOY_ADD("pc_joy")
+	PC_JOY(config, "pc_joy");
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	UPD765A(config, m_fdc, false, false);
+	UPD765A(config, m_fdc, 8'000'000, false, false);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)

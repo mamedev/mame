@@ -126,7 +126,7 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 
 void nscsi_cdrom_device::return_no_cd()
 {
-	sense(false, 3);
+	sense(false, SK_NOT_READY, SK_ASC_MEDIUM_NOT_PRESENT);
 	scsi_status_complete(SS_CHECK_CONDITION);
 }
 
@@ -142,7 +142,7 @@ void nscsi_cdrom_device::scsi_command()
 		cur_sector = -1;
 
 		// report unit attention condition
-		sense(false, 6);
+		sense(false, SK_UNIT_ATTENTION);
 		scsi_status_complete(SS_CHECK_CONDITION);
 		return;
 	}

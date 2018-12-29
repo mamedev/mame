@@ -26,8 +26,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/bsktball.h"
+
+#include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -40,17 +41,15 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(bsktball_state, bsktball)
+void bsktball_state::bsktball_palette(palette_device &palette) const
 {
-	int i;
-
-	palette.set_indirect_color(0,rgb_t(0x00,0x00,0x00)); /* BLACK */
-	palette.set_indirect_color(1,rgb_t(0x80,0x80,0x80)); /* LIGHT GREY */
-	palette.set_indirect_color(2,rgb_t(0x50,0x50,0x50)); /* DARK GREY */
-	palette.set_indirect_color(3,rgb_t(0xff,0xff,0xff)); /* WHITE */
+	palette.set_indirect_color(0,rgb_t(0x00,0x00,0x00)); // BLACK
+	palette.set_indirect_color(1,rgb_t(0x80,0x80,0x80)); // LIGHT GREY
+	palette.set_indirect_color(2,rgb_t(0x50,0x50,0x50)); // DARK GREY
+	palette.set_indirect_color(3,rgb_t(0xff,0xff,0xff)); // WHITE
 
 	/* playfield */
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		palette.set_pen_indirect(i*4 + 0, 1);
 		palette.set_pen_indirect(i*4 + 1, 3 * i);
@@ -59,7 +58,7 @@ PALETTE_INIT_MEMBER(bsktball_state, bsktball)
 	}
 
 	/* motion */
-	for (i = 0; i < 4*4*4; i++)
+	for (int i = 0; i < 4*4*4; i++)
 	{
 		palette.set_pen_indirect(2*4 + i*4 + 0, 1);
 		palette.set_pen_indirect(2*4 + i*4 + 1, (i >> 2) & 3);
@@ -262,18 +261,15 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bsktball)
-	MCFG_PALETTE_ADD("palette", 2*4 + 4*4*4*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(4)
-	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_bsktball)
+	PALETTE(config, m_palette, FUNC(bsktball_state::bsktball_palette), 2*4 + 4*4*4*4, 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, bsktball_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, bsktball_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

@@ -316,11 +316,10 @@ MACHINE_CONFIG_START(goal92_state::goal92)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1) // black border at bottom is a game bug...
 	MCFG_SCREEN_UPDATE_DRIVER(goal92_state, screen_update_goal92)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, goal92_state, screen_vblank_goal92))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goal92)
-	MCFG_PALETTE_ADD("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goal92);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 128*16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -43,16 +43,18 @@ public:
 	{ }
 
 	void controlidx628(machine_config &config);
-private:
+
+protected:
 	virtual void machine_start() override;
 
+private:
 	DECLARE_WRITE8_MEMBER(p0_w);
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_READ8_MEMBER(p3_r);
 	DECLARE_WRITE8_MEMBER(p3_w);
-	DECLARE_PALETTE_INIT(controlidx628);
+	void controlidx628_palette(palette_device &palette) const;
 
 	void io_map(address_map &map);
 
@@ -130,12 +132,12 @@ WRITE8_MEMBER(controlidx628_state::p3_w)
 //static INPUT_PORTS_START( controlidx628 )
 //INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
+void controlidx628_state::controlidx628_palette(palette_device &palette) const
 {
 	// These colors were selected from a photo of the display
 	// using the color-picker in Inkscape:
-		palette.set_pen_color(0, rgb_t(0x06, 0x61, 0xEE));
-		palette.set_pen_color(1, rgb_t(0x00, 0x23, 0x84));
+	palette.set_pen_color(0, rgb_t(0x06, 0x61, 0xee));
+	palette.set_pen_color(1, rgb_t(0x00, 0x23, 0x84));
 }
 
 /*************************
@@ -144,14 +146,14 @@ PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 
 MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", AT89S52, XTAL(11'059'200))
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, controlidx628_state, p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, controlidx628_state, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, controlidx628_state, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, controlidx628_state, p2_r))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, controlidx628_state, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, controlidx628_state, p3_w))
+	at89s52_device &maincpu(AT89S52(config, "maincpu", XTAL(11'059'200)));
+	maincpu.set_addrmap(AS_IO, &controlidx628_state::io_map);
+	maincpu.port_out_cb<0>().set(FUNC(controlidx628_state::p0_w));
+	maincpu.port_in_cb<1>().set(FUNC(controlidx628_state::p1_r));
+	maincpu.port_out_cb<1>().set(FUNC(controlidx628_state::p1_w));
+	maincpu.port_in_cb<2>().set(FUNC(controlidx628_state::p2_r));
+	maincpu.port_in_cb<3>().set(FUNC(controlidx628_state::p3_r));
+	maincpu.port_out_cb<3>().set(FUNC(controlidx628_state::p3_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -162,8 +164,7 @@ MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
+	PALETTE(config, "palette", FUNC(controlidx628_state::controlidx628_palette), 2);
 
 	NT7534(config, m_lcdc);
 MACHINE_CONFIG_END

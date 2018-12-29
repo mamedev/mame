@@ -392,12 +392,10 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint4_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint4_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint4)
-	MCFG_PALETTE_ADD("palette", 10)
-	MCFG_PALETTE_INDIRECT_ENTRIES(6)
-	MCFG_PALETTE_INIT_OWNER(sprint4_state, sprint4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sprint4)
+	PALETTE(config, m_palette, FUNC(sprint4_state::sprint4_palette), 10, 6);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

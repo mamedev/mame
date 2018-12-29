@@ -616,9 +616,8 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_SCREEN_UPDATE_DRIVER(topspeed_state, screen_update_topspeed)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_topspeed)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_topspeed);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

@@ -26,6 +26,7 @@
 #include "bus/wangpc/wangpc.h"
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
@@ -1326,7 +1327,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_epci->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_epci->txemt_dschg_handler().set(FUNC(wangpc_state::epci_irq_w));
 
-	UPD765A(config, m_fdc, false, false);
+	UPD765A(config, m_fdc, 8'000'000, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)

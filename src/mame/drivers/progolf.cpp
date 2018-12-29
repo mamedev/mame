@@ -67,14 +67,15 @@ Twenty four 8116 rams.
 class progolf_state : public driver_device
 {
 public:
-	progolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	progolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_fbram(*this, "fbram")  { }
+		m_fbram(*this, "fbram")
+	{ }
 
 	void progolfa(machine_config &config);
 	void progolf(machine_config &config);
@@ -107,7 +108,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(progolf);
+	void progolf_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_cpu(address_map &map);
@@ -389,32 +390,31 @@ static GFXDECODE_START( gfx_progolf )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(progolf_state, progolf)
+void progolf_state::progolf_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0;i < m_palette->entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		m_palette->set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -439,11 +439,10 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_progolf)
-	MCFG_PALETTE_ADD("palette", 32*3)
-	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_progolf)
+	PALETTE(config, m_palette, FUNC(progolf_state::progolf_palette), 32 * 3);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* hand tuned to get ~57 fps */
 	crtc.set_screen("screen");

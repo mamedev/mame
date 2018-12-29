@@ -115,7 +115,7 @@ private:
 	DECLARE_WRITE8_MEMBER(bootleg_soundlatch_w);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	DECLARE_PALETTE_INIT(polepos);
+	void polepos_palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_road(bitmap_ind16 &bitmap);

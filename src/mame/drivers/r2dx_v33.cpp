@@ -80,8 +80,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 class r2dx_v33_state : public raiden2_state
 {
 public:
-	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raiden2_state(mconfig, type, tag),
+	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag) :
+		raiden2_state(mconfig, type, tag),
 		m_r2dxbank(0),
 		m_r2dxgameselect(0),
 		m_eeprom(*this, "eeprom"),
@@ -802,9 +802,8 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rdx_v33);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -841,9 +840,8 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rdx_v33);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 

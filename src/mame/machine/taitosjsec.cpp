@@ -125,10 +125,10 @@ void taito_sj_security_mcu_device::device_reset()
 void taito_sj_security_mcu_device::device_add_mconfig(machine_config &config)
 {
 	M68705P5(config, m_mcu, DERIVED_CLOCK(1, 1));
-	m_mcu->porta_r_cb().set(FUNC(taito_sj_security_mcu_device::mcu_pa_r));
-	m_mcu->portc_r_cb().set(FUNC(taito_sj_security_mcu_device::mcu_pc_r));
-	m_mcu->porta_w_cb().set(FUNC(taito_sj_security_mcu_device::mcu_pa_w));
-	m_mcu->portb_w_cb().set(FUNC(taito_sj_security_mcu_device::mcu_pb_w));
+	m_mcu->porta_r().set(FUNC(taito_sj_security_mcu_device::mcu_pa_r));
+	m_mcu->portc_r().set(FUNC(taito_sj_security_mcu_device::mcu_pc_r));
+	m_mcu->porta_w().set(FUNC(taito_sj_security_mcu_device::mcu_pa_w));
+	m_mcu->portb_w().set(FUNC(taito_sj_security_mcu_device::mcu_pb_w));
 }
 
 READ8_MEMBER(taito_sj_security_mcu_device::mcu_pa_r)

@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("isa_lpt", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
 	MCFG_DEVICE_ADD("isa_com", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
 
-	MCFG_PC_JOY_ADD("pc_joy")
+	PC_JOY(config, "pc_joy");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K");

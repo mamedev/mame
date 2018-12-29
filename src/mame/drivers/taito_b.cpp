@@ -1729,16 +1729,16 @@ void taitob_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(taitob_state::rastsag2)
-
+void taitob_state::rastsag2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(rastsag2_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::rastsag2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1749,16 +1749,15 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -1774,28 +1773,28 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, m_ym, 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::masterw)
-
+void taitob_state::masterw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(masterw_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::masterw_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)  /* 6 MHz Z80B */
-	MCFG_DEVICE_PROGRAM_MAP(masterw_sound_map)
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz Z80B */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::masterw_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1806,16 +1805,15 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	tc0040ioc.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -1842,38 +1840,34 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::tetrist) /* Nastar conversion kit with slightly different memory map */
+void taitob_state::tetrist(machine_config &config) /* Nastar conversion kit with slightly different memory map */
+{
 	rastsag2(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tetrist_map)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::tetrist_map);
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
+}
 
 
-MACHINE_CONFIG_START(taitob_state::tetrista) /* Master of Weapon conversion kit with slightly different memory map */
+void taitob_state::tetrista(machine_config &config) /* Master of Weapon conversion kit with slightly different memory map */
+{
 	masterw(config);
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tetrista_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::tetrista_map);
+}
 
 
-MACHINE_CONFIG_START(taitob_state::ashura)
-
+void taitob_state::ashura(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(rastsag2_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::rastsag2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1884,16 +1878,15 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -1909,28 +1902,28 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, m_ym, 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::crimec)
-
+void taitob_state::crimec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crimec_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::crimec_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1941,16 +1934,15 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -1966,27 +1958,26 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, m_ym, 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::hitice)
-
+void taitob_state::hitice(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hitice_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::hitice_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)  /* 6 MHz Z80B */
-	MCFG_DEVICE_PROGRAM_MAP(viofight_sound_map)
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz Z80B */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::viofight_sound_map);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -1999,16 +1990,15 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
 	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
@@ -2033,25 +2023,25 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::rambo3p)
-
+void taitob_state::rambo3p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rambo3_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::rambo3_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2062,16 +2052,15 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2087,29 +2076,28 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)   /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));   /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::rambo3)
-
+void taitob_state::rambo3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12MHz verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rambo3_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12MHz verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::rambo3_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4) /* 4MHz verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); /* 4MHz verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2120,16 +2108,15 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2145,29 +2132,28 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::pbobble)
-
+void taitob_state::pbobble(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pbobble_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::pbobble_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 2);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2183,16 +2169,15 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2208,29 +2193,28 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::spacedx)
-
+void taitob_state::spacedx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(spacedx_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::spacedx_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2246,16 +2230,15 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2271,28 +2254,28 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::spacedxo)
-
+void taitob_state::spacedxo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(spacedxo_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::spacedxo_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2303,16 +2286,15 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2328,29 +2310,28 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::qzshowby)
-
+void taitob_state::qzshowby(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz according to the readme*/
-	MCFG_DEVICE_PROGRAM_MAP(qzshowby_map)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz according to the readme*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::qzshowby_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2366,16 +2347,15 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2391,28 +2371,28 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::viofight)
-
+void taitob_state::viofight(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(viofight_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::viofight_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)  /* 6 MHz verified */
-	MCFG_DEVICE_PROGRAM_MAP(viofight_sound_map)
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 4);  /* 6 MHz verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::viofight_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2423,16 +2403,15 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2456,25 +2435,25 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 4.224_MHz_XTAL / 4, okim6295_device::PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	okim6295_device &oki(OKIM6295(config, "oki", 4.224_MHz_XTAL / 4, okim6295_device::PIN7_HIGH)); // 1.056MHz clock frequency, but pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::silentd)
-
+void taitob_state::silentd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(silentd_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::silentd_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2485,16 +2464,15 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2510,28 +2488,28 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(taitob_state::selfeena)
-
+void taitob_state::selfeena(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(selfeena_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::selfeena_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2542,16 +2520,15 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2567,16 +2544,16 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);;
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 #if 0
 void taitob_state::ryujin_patch(void)
@@ -2588,16 +2565,16 @@ void taitob_state::ryujin_patch(void)
 }
 #endif
 
-MACHINE_CONFIG_START(taitob_state::ryujin)
-
+void taitob_state::ryujin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(selfeena_map)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::selfeena_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -2608,16 +2585,15 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2633,16 +2609,16 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL / 2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 #if 0
 void taitob_state::sbm_patch(void)
@@ -2652,16 +2628,16 @@ void taitob_state::sbm_patch(void)
 }
 #endif
 
-MACHINE_CONFIG_START(taitob_state::sbm)
-
+void taitob_state::sbm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sbm_map)
+	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::sbm_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -2672,16 +2648,15 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	m_tc0510nio->read_7_callback().set_ioport("PHOTOSENSOR");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
@@ -2697,27 +2672,28 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(taitob_c_state::realpunc)
 
+void taitob_c_state::realpunc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(realpunc_map)
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_c_state::realpunc_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 6000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_c_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -2728,20 +2704,21 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_c_state, screen_update_realpunc)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitob_c_state::screen_update_taitob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_c_state,realpunc)
 
-	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
-	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)
+	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
+	hd63484.set_addrmap(0, &taitob_c_state::realpunc_hd63484_map);
+	hd63484.set_auto_configure_screen(false);
 
 	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
 	m_tc0180vcu->set_fb_colorbase(0x40);
@@ -2755,16 +2732,16 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

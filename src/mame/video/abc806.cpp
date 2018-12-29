@@ -460,7 +460,7 @@ uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  PALETTE_INIT( abc806 )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc806_state, abc806 )
+void abc806_state::abc806_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
@@ -490,6 +490,5 @@ MACHINE_CONFIG_START(abc806_state::abc806_video)
 	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xfa)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(abc806_state, abc806)
+	PALETTE(config, m_palette, FUNC(abc806_state::abc806_palette), 8);
 MACHINE_CONFIG_END

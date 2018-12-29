@@ -376,11 +376,10 @@ MACHINE_CONFIG_START(special_state::special)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 2)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -417,7 +416,6 @@ MACHINE_CONFIG_START(special_state::specialp)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specialp)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
 void special_state::specialm(machine_config &config)
@@ -444,13 +442,11 @@ MACHINE_CONFIG_START(special_state::specimx)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specimx)
 	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(special_state, specimx )
+	m_palette->set_init(FUNC(special_state::specimx_palette));
+	m_palette->set_entries(16);
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("custom", SPECIMX_SND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SPECIMX_SND(config, "custom", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	/* Devices */
 	PIT8253(config, m_pit, 0);
@@ -491,12 +487,10 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(special_state,erik)
+	PALETTE(config, m_palette, FUNC(special_state::erik_palette), 8);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

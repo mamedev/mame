@@ -53,10 +53,10 @@ protected:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	DECLARE_READ8_MEMBER(pvtc_r);
-	DECLARE_WRITE8_MEMBER(pvtc_w);
-	DECLARE_READ8_MEMBER(sio_r);
-	DECLARE_WRITE8_MEMBER(sio_w);
+	u8 pvtc_r(offs_t offset);
+	void pvtc_w(offs_t offset, u8 data);
+	u8 sio_r(offs_t offset);
+	void sio_w(offs_t offset, u8 data);
 	u8 rbreg_r();
 	void keyboard_w(u8 data);
 	void earom_w(u8 data);
@@ -88,24 +88,24 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy50_state::draw_character)
 {
 }
 
-READ8_MEMBER(wy50_state::pvtc_r)
+u8 wy50_state::pvtc_r(offs_t offset)
 {
-	return m_pvtc->read(space, offset >> 8);
+	return m_pvtc->read(offset >> 8);
 }
 
-WRITE8_MEMBER(wy50_state::pvtc_w)
+void wy50_state::pvtc_w(offs_t offset, u8 data)
 {
-	m_pvtc->write(space, offset >> 8, data);
+	m_pvtc->write(offset >> 8, data);
 }
 
-READ8_MEMBER(wy50_state::sio_r)
+u8 wy50_state::sio_r(offs_t offset)
 {
-	return m_sio->read(space, offset >> 8);
+	return m_sio->read(offset >> 8);
 }
 
-WRITE8_MEMBER(wy50_state::sio_w)
+void wy50_state::sio_w(offs_t offset, u8 data)
 {
-	m_sio->write(space, offset >> 8, data);
+	m_sio->write(offset >> 8, data);
 }
 
 u8 wy50_state::rbreg_r()

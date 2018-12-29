@@ -30,8 +30,12 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL(8'200'000)
-#define VIDEO_CLOCK     XTAL(19'600'000)
+namespace {
+
+constexpr XTAL MAIN_CLOCK  =  8.2_MHz_XTAL;
+constexpr XTAL VIDEO_CLOCK = 19.6_MHz_XTAL;
+
+} // anonymous namespace
 
 
 
@@ -182,12 +186,10 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrdo)
-	MCFG_PALETTE_ADD("palette", 64*4+16*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrdo);
+	PALETTE(config, m_palette, FUNC(mrdo_state::mrdo_palette), 64*4 + 16*4, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

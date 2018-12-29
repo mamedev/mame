@@ -166,11 +166,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(suprloco_state::suprloco)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprloco_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	sega_315_5015_device &maincpu(SEGA_315_5015(config, m_maincpu, 4000000));   /* 4 MHz (?) */
+	maincpu.set_addrmap(AS_PROGRAM, &suprloco_state::main_map);
+	maincpu.set_addrmap(AS_OPCODES, &suprloco_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(suprloco_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -191,9 +191,8 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprloco)
-	MCFG_PALETTE_ADD("palette", 512+256)
-	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_suprloco);
+	PALETTE(config, "palette", FUNC(suprloco_state::suprloco_palette), 512+256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

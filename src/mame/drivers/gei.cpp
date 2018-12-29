@@ -992,7 +992,7 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	PALETTE(config, "palette", palette_device::GBR_3BIT);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1031,8 +1031,7 @@ MACHINE_CONFIG_START(gei_state::quizvid)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(quizvid_map)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_3BIT_GRB("palette")
+	PALETTE(config.replace(), "palette", palette_device::GRB_3BIT);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::gselect)
@@ -1744,11 +1743,11 @@ ROM_START( quizvid )
 	ROM_LOAD( "quiz.reva.attuale.5", 0x30000, 0x8000, CRC(a3642478) SHA1(57851aabc6d2f5acff426c09574559e141da5d13) )
 
 	ROM_REGION( 0x0104, "plds", 0 )
-	ROM_LOAD( "pal10l8cn.pal1",            0x0000, 0x002c, CRC(7f4499de) SHA1(74838150d0b71171f00f65e03748b262c2bb6e4c) )
-	ROM_LOAD( "pal10l8cn.pal4",            0x0000, 0x002c, CRC(f14a34ab) SHA1(78af7f5eafbf2d52ee7b01b497ad59448c986693) )
-	ROM_LOAD( "pal16l8a-2.bad.dump",       0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "pal16l8cn.pal3.bad.dump",   0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "pal16l8cn.pal5.bad.dump",   0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal10l8cn.pal1", 0x0000, 0x002c, CRC(7f4499de) SHA1(74838150d0b71171f00f65e03748b262c2bb6e4c) )
+	ROM_LOAD( "pal10l8cn.pal4", 0x0000, 0x002c, CRC(f14a34ab) SHA1(78af7f5eafbf2d52ee7b01b497ad59448c986693) )
+	ROM_LOAD( "pal16l8a-2.bin", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8cn.pal3", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8cn.pal5", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 ROM_START( quiz211 )

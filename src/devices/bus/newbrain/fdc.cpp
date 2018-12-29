@@ -109,7 +109,7 @@ MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(newbrain_fdc_mem)
 	MCFG_DEVICE_IO_MAP(newbrain_fdc_io)
 
-	UPD765A(config, m_fdc, false, true);
+	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

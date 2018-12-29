@@ -289,11 +289,10 @@ MACHINE_CONFIG_START(targeth_state::targeth)
 	MCFG_SCREEN_SIZE(64*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 23*16-8-1, 16, 16*16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_targeth)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_targeth);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

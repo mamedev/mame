@@ -91,8 +91,8 @@ CHIP #  POSITION   TYPE
 class flower_state : public driver_device
 {
 public:
-	flower_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	flower_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mastercpu(*this, "mastercpu"),
 		m_slavecpu(*this, "slavecpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -512,10 +512,10 @@ MACHINE_CONFIG_START(flower_state::flower)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3,384,0,288,264,16,240) // derived from Galaxian HW, 60.606060
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flower)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 

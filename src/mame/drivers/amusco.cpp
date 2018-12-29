@@ -102,8 +102,8 @@
 class amusco_state : public driver_device
 {
 public:
-	amusco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	amusco_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_pit(*this, "pit8253"),
@@ -120,6 +120,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;
+
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_READ8_MEMBER(mc6845_r);
@@ -133,10 +137,7 @@ private:
 	DECLARE_WRITE8_MEMBER(rtc_control_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_PALETTE_INIT(amusco);
-
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	void amusco_palette(palette_device &palette) const;
 
 	void amusco_mem_map(address_map &map);
 	void amusco_io_map(address_map &map);
@@ -483,13 +484,13 @@ MC6845_UPDATE_ROW(amusco_state::update_row)
 	m_bg_tilemap->draw(*m_screen, bitmap, rowrect, 0, 0);
 }
 
-PALETTE_INIT_MEMBER(amusco_state,amusco)
+void amusco_state::amusco_palette(palette_device &palette) const
 {
 	// add some templates first
 	for (int i = 0; i < 8; i++)
 	{
-		for(int j=0;j<8;j++)
-			palette.set_pen_color(i*8+j, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		for (int j = 0; j < 8; j++)
+			palette.set_pen_color((i * 8) + j, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 
 	// override colors
@@ -580,10 +581,8 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amusco)
-
-	MCFG_PALETTE_ADD("palette",8*8)
-	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_amusco);
+	PALETTE(config, "palette", FUNC(amusco_state::amusco_palette), 8*8);
 
 	R6545_1(config, m_crtc, CRTC_CLOCK); /* guess */
 	m_crtc->set_screen(m_screen);

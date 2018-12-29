@@ -488,6 +488,10 @@ public:
 
 	void init_majorpkr();
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
@@ -508,9 +512,6 @@ private:
 	void palettebanks(address_map &map);
 	void portmap(address_map &map);
 	void vrambanks(address_map &map);
-
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<address_map_bank_device> m_palette_bank;
@@ -1021,10 +1022,9 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majorpkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_majorpkr);
 
-	MCFG_PALETTE_ADD("palette", 0x100 * 16)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x100 * 16);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));  // verified.
 	crtc.set_screen("screen");

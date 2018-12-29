@@ -267,11 +267,10 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(groundfx_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_groundfx)
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_groundfx);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(2);

@@ -125,12 +125,14 @@ void human_interface_device::device_start()
 	save_item(NAME(m_hil_read));
 	save_item(NAME(m_kbd_nmi));
 	save_item(NAME(m_gpib_irq_line));
+	save_item(NAME(m_gpib_dma_line));
 	save_item(NAME(m_old_latch_enable));
 	save_item(NAME(m_hil_data));
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_ppoll_mask));
 	save_item(NAME(m_ppoll_sc));
+	save_item(NAME(m_gpib_dma_enable));
 }
 
 void human_interface_device::device_reset()
@@ -144,12 +146,13 @@ void human_interface_device::device_reset()
 	m_rtc->write_w(CLEAR_LINE);
 	m_rtc->read_w(CLEAR_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
+	m_iocpu->reset();
 }
 
 WRITE_LINE_MEMBER(human_interface_device::reset_in)
 {
 	if (state)
-		reset();
+		device_reset();
 }
 
 void human_interface_device::update_gpib_irq()
@@ -164,9 +167,15 @@ WRITE_LINE_MEMBER(human_interface_device::gpib_irq)
 	update_gpib_irq();
 }
 
+void human_interface_device::update_gpib_dma()
+{
+	dmar0_out(m_gpib_dma_enable && m_gpib_dma_line);
+}
+
 WRITE_LINE_MEMBER(human_interface_device::gpib_dreq)
 {
-	dmar0_out(state);
+	m_gpib_dma_line = state;
+	update_gpib_dma();
 }
 
 WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
@@ -191,9 +200,13 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 
 	switch (offset) {
 	case 0:
-		reset();
+		device_reset();
 		break;
 
+	case 1:
+		m_gpib_dma_enable = data & 0x01;
+		update_gpib_dma();
+		break;
 	case 3:
 		m_ppoll_sc = data & PPOLL_IE;
 
@@ -231,7 +244,7 @@ READ8_MEMBER(human_interface_device::gpib_r)
 		break;
 	case 1:
 		/* Int control */
-		data = 0x80 | (m_gpib_irq_line ? 0x40 : 0);
+		data = 0x80 | (m_gpib_irq_line ? 0x40 : 0) | (m_gpib_dma_enable ? 0x01 : 0);
 		break;
 	case 2:
 		/* Address */
@@ -352,7 +365,7 @@ void human_interface_device::dmack_w_in(int channel, uint8_t data)
 
 uint8_t human_interface_device::dmack_r_in(int channel)
 {
-	if (channel)
+	if (channel || !m_gpib_dma_enable)
 		return 0xff;
 	return m_tms9914->reg8_r(machine().dummy_space(), 7);
 }

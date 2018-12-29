@@ -393,30 +393,34 @@ void de_3_state::machine_reset()
 	genpin_class::machine_reset();
 }
 
-MACHINE_CONFIG_START(de_3_state::de_3)
+void de_3_state::de_3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_3_state,display_r),WRITE8(*this, de_3_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_3_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_3_state,switch_r),WRITE8(*this, de_3_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_3_state,lamps_w))
-	MCFG_DECOCPU_DMDSTATUS(READ8(*this, de_3_state,dmd_status_r))
+	decocpu_type3_device &decocpu(DECOCPU3(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_3_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_3_state::display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_3_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_3_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_3_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_3_state::lamps_w));
+	decocpu.dmdstatus_read_callback().set(FUNC(de_3_state::dmd_status_r));
 
 	genpin_audio(config);
 
 	DECOBSMT(config, m_decobsmt, 0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(de_3_state::de_3_dmd2)
+void de_3_state::de_3_dmd2(machine_config &config)
+{
 	de_3(config);
-	MCFG_DECODMD_TYPE2_ADD("decodmd2",":gfx3")
-MACHINE_CONFIG_END
+	DECODMD2(config, m_dmdtype2, 0, "gfx3");
+}
 
-MACHINE_CONFIG_START(de_3_state::de_3_dmd1)
+void de_3_state::de_3_dmd1(machine_config &config)
+{
 	de_3(config);
-	MCFG_DECODMD_TYPE1_ADD("decodmd1",":gfx3")
-MACHINE_CONFIG_END
+	DECODMD1(config, m_dmdtype1, 0, "gfx3");
+}
 
 /*-------------------------------------------------------------
 / Adventures of Rocky and Bullwinkle and Friends - CPU Rev 3b /DMD  Type 2 512K Rom - 64K CPU Rom

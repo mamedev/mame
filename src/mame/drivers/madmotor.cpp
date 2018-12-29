@@ -280,22 +280,23 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madmotor)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 1, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 2, 1)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(3)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_BAC06(config, m_tilegen[2], 0);
+	m_tilegen[2]->set_gfx_region_wide(0, 2, 1);
+	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(3);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

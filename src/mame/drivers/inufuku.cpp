@@ -333,30 +333,28 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-MACHINE_CONFIG_START(inufuku_state::inufuku)
-
+void inufuku_state::inufuku(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(inufuku_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 32000000/2); /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &inufuku_state::inufuku_map);
+	m_maincpu->set_vblank_int("screen", FUNC(inufuku_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(inufuku_sound_map)
-	MCFG_DEVICE_IO_MAP(inufuku_sound_io_map)
-								/* IRQs are triggered by the YM2610 */
-
+	Z80(config, m_audiocpu, 32000000/4);       /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inufuku_state::inufuku_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &inufuku_state::inufuku_sound_io_map); /* IRQs are triggered by the YM2610 */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2300))
-	MCFG_SCREEN_SIZE(2048, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, inufuku_state, screen_vblank_inufuku))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300));
+	screen.set_size(2048, 256);
+	screen.set_visarea(0, 319, 0, 223);
+	screen.set_screen_update(FUNC(inufuku_state::screen_update_inufuku));
+	screen.screen_vblank().set(FUNC(inufuku_state::screen_vblank_inufuku));
+	screen.set_palette(m_palette);
 
 	VSYSTEM_SPR(config, m_spr, 0);
 	m_spr->set_offsets(0, 1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
@@ -365,9 +363,8 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_inufuku)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_inufuku);
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -376,18 +373,18 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 32000000/4)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 32000000/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-
-MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
+void inufuku_state::_3on3dunk(machine_config &config)
+{
 	inufuku(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_3on3dunk)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_3on3dunk);
+}
 
 
 

@@ -789,11 +789,13 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
@@ -832,15 +834,16 @@ void karnov_state::chelnovjbl_mcu_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(karnov_state::chelnovjbl)
+void karnov_state::chelnovjbl(machine_config &config)
+{
 	karnov(config);
-	MCFG_DEVICE_ADD("mcu", I8031, 2000000) // ??mhz
-	MCFG_DEVICE_PROGRAM_MAP(chelnovjbl_mcu_map)
-//  MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, karnov_state, p1_r))
-//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, karnov_state, p1_w))
-//  MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, karnov_state, p3_r))
-//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, karnov_state, p3_w))
-MACHINE_CONFIG_END
+	i8031_device &mcu(I8031(config, "mcu", 2000000)); // ??mhz
+	mcu.set_addrmap(AS_PROGRAM, &karnov_state::chelnovjbl_mcu_map);
+//  mcu.port_in_cb<1>().set(FUNC(karnov_state::p1_r));
+//  mcu.port_out_cb<1>().set(FUNC(karnov_state::p1_w));
+//  mcu.port_in_cb<3>().set(FUNC(karnov_state::p3_r));
+//  mcu.port_out_cb<3>().set(FUNC(karnov_state::p3_w));
+}
 
 
 
@@ -866,11 +869,13 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
-	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
-	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
+	DECO_KARNOVSPRITES(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 

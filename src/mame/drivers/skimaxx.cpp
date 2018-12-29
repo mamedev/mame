@@ -513,15 +513,15 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(50000000/8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(skimaxx_state, scanline_update)     /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, skimaxx_state, tms_irq))
-	MCFG_TMS340X0_TO_SHIFTREG_CB(skimaxx_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(skimaxx_state, from_shiftreg) /* read from shiftreg function */
+	TMS34010(config, m_tms, XTAL(50'000'000));
+	m_tms->set_addrmap(AS_PROGRAM, &skimaxx_state::tms_program_map);
+	m_tms->set_halt_on_reset(false);
+	m_tms->set_pixel_clock(50000000/8);
+	m_tms->set_pixels_per_clock(2);
+	m_tms->set_scanline_ind16_callback(FUNC(skimaxx_state::scanline_update));
+	m_tms->output_int().set(FUNC(skimaxx_state::tms_irq));
+	m_tms->set_shiftreg_in_callback(FUNC(skimaxx_state::to_shiftreg));
+	m_tms->set_shiftreg_out_callback(FUNC(skimaxx_state::from_shiftreg));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300) // TODO - Wrong but TMS overrides it anyway
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 
 //  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skimaxx)
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

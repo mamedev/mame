@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	TMS9927(config, m_tms, 25.39836_MHz_XTAL / 8).set_char_width(8);
 

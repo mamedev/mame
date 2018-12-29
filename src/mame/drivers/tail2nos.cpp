@@ -256,18 +256,17 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tail2nos)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tail2nos);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(-4)
-	MCFG_K051316_OFFSETS(-89, -14)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(tail2nos_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_bpp(-4);
+	m_k051316->set_offsets(-89, -14);
+	m_k051316->set_wrap(1);
+	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback), this);
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 

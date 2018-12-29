@@ -67,23 +67,27 @@
 class itgambl2_state : public driver_device
 {
 public:
-	itgambl2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	itgambl2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void itgambl2(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(itgambl2);
+
+	void itgambl2_palette(palette_device &palette) const;
 	uint32_t screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	void itgambl2_map(address_map &map);
 };
 
@@ -102,7 +106,6 @@ void itgambl2_state::video_start()
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
 uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
 	const uint8_t *blit_ram = memregion("gfx1")->base();
 
 	if(machine().input().code_pressed(KEYCODE_Z))
@@ -133,15 +136,13 @@ uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rg
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = (m_start_offs);
+	int count = m_start_offs;
 
-	for(y = 0; y < m_test_y; y++)
+	for(int y = 0; y < m_test_y; y++)
 	{
-		for(x = 0; x < m_test_x; x++)
+		for(int x = 0; x < m_test_x; x++)
 		{
-			uint32_t color;
-
-			color = (blit_ram[count] & 0xff) >> 0;
+			uint32_t const color = (blit_ram[count] & 0xff) >> 0;
 
 			if(cliprect.contains(x, y))
 				bitmap.pix32(y, x) = m_palette->pen(color);
@@ -259,15 +260,13 @@ void itgambl2_state::machine_reset()
 }
 
 /* default 444 palette for debug purpose*/
-PALETTE_INIT_MEMBER(itgambl2_state, itgambl2)
+void itgambl2_state::itgambl2_palette(palette_device &palette) const
 {
-	int x, r, g, b;
-
-	for(x = 0; x < 0x100; x++)
+	for(int x = 0; x < 0x100; x++)
 	{
-		r = (x & 0xf) * 0x10;
-		g = ((x & 0x3c) >> 2) * 0x10;
-		b = ((x & 0xf0) >> 4) * 0x10;
+		int const r = (x & 0xf) * 0x10;
+		int const g = ((x & 0x3c) >> 2) * 0x10;
+		int const b = ((x & 0xf0) >> 4) * 0x10;
 		palette.set_pen_color(x, rgb_t(r, g, b));
 	}
 }
@@ -278,11 +277,11 @@ PALETTE_INIT_MEMBER(itgambl2_state, itgambl2)
 
 MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 
-	/* basic machine hardware */
+	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", H83337, MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(itgambl2_map)
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -290,15 +289,12 @@ MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl2_state, screen_update_itgambl2)
 
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_itgambl2);
+	PALETTE(config, m_palette, FUNC(itgambl2_state::itgambl2_palette), 0x200);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgambl2)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(itgambl2_state, itgambl2)
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	UPD7759(config, "upd").add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

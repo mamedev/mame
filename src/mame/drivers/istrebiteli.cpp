@@ -32,19 +32,20 @@
 
 /////////////////////////////////////////////////////////////
 
-class istrebiteli_sound_device : public device_t,
-	public device_sound_interface
+class istrebiteli_sound_device : public device_t, public device_sound_interface
 {
 public:
 	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void sound_w(uint8_t data);
+
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override;
 
-	// sound stream update overrides
+	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
 private:
 	// internal state
 	sound_stream *m_channel;
@@ -136,8 +137,25 @@ public:
 	{
 	}
 
-	DECLARE_PALETTE_INIT(istrebiteli);
-	DECLARE_PALETTE_INIT(motogonki);
+	void init_istreb();
+	void init_moto();
+
+	void istreb(machine_config &config);
+	void motogonki(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	void istrebiteli_palette(palette_device &palette) const;
+	void motogonki_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(ppi0_r);
 	DECLARE_WRITE8_MEMBER(ppi0_w);
 	DECLARE_READ8_MEMBER(ppi1_r);
@@ -150,23 +168,13 @@ public:
 	DECLARE_WRITE8_MEMBER(tileram_w);
 	DECLARE_WRITE8_MEMBER(moto_tileram_w);
 	DECLARE_WRITE8_MEMBER(road_ctrl_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
 	DECLARE_VIDEO_START(moto);
-
-	void init_istreb();
-	void init_moto();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<istrebiteli_sound_device> m_sound_dev;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	tilemap_t *m_tilemap;
@@ -179,10 +187,9 @@ public:
 	uint8_t m_spr_xy[8];
 	uint8_t m_tileram[16];
 	uint8_t m_road_scroll;
-	void istreb(machine_config &config);
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	void motogonki(machine_config &config);
 	void moto_io_map(address_map &map);
 	void moto_mem_map(address_map &map);
 };
@@ -206,27 +213,25 @@ void istrebiteli_state::machine_reset()
 }
 
 static const rgb_t istreb_palette[4] = {
-	rgb_t(0x00, 0x00, 0x00),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0xff, 0xff),
-	rgb_t(0x00, 0x00, 0xff)
-};
+		rgb_t(0x00, 0x00, 0x00),
+		rgb_t(0x00, 0x00, 0xff),
+		rgb_t(0xff, 0xff, 0xff),
+		rgb_t(0x00, 0x00, 0xff) };
 
-PALETTE_INIT_MEMBER(istrebiteli_state,istrebiteli)
+void istrebiteli_state::istrebiteli_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, istreb_palette, ARRAY_LENGTH(istreb_palette));
+	palette.set_pen_colors(0, istreb_palette);
 }
 
 static const rgb_t moto_palette[4] = {
-	rgb_t(0x00, 0x00, 0x00),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0xff, 0xff),
-	rgb_t(0x00, 0x00, 0x00)
-};
+		rgb_t(0x00, 0x00, 0x00),
+		rgb_t(0x00, 0x00, 0xff),
+		rgb_t(0xff, 0xff, 0xff),
+		rgb_t(0x00, 0x00, 0x00) };
 
-PALETTE_INIT_MEMBER(istrebiteli_state, motogonki)
+void istrebiteli_state::motogonki_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, moto_palette, ARRAY_LENGTH(moto_palette));
+	palette.set_pen_colors(0, moto_palette);
 }
 
 TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
@@ -581,7 +586,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
+	MCFG_DEVICE_ADD(m_maincpu, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
@@ -601,19 +606,17 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istrebiteli)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, istrebiteli)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_istrebiteli);
+	PALETTE(config, "palette", FUNC(istrebiteli_state::istrebiteli_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(istrebiteli_state::motogonki)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(15'700'000) / 9)       // KR580VM80A
+	MCFG_DEVICE_ADD(m_maincpu, I8080, XTAL(15'700'000) / 9)       // KR580VM80A
 	MCFG_DEVICE_PROGRAM_MAP(moto_mem_map)
 	MCFG_DEVICE_IO_MAP(moto_io_map)
 
@@ -632,15 +635,13 @@ MACHINE_CONFIG_START(istrebiteli_state::motogonki)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, moto_screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_motogonki)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, motogonki)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_motogonki);
+	PALETTE(config, "palette", FUNC(istrebiteli_state::motogonki_palette), 4);
 	MCFG_VIDEO_START_OVERRIDE(istrebiteli_state, moto)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 ROM_START( istreb )

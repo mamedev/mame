@@ -48,6 +48,8 @@
 #include "emu.h"
 #include "mc68681.h"
 
+#include <algorithm>
+
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
@@ -87,6 +89,7 @@ static const int baud_rate_ACR_1_X_1[] = { 50, 110, 134, 200, 3600, 14400, 28800
 #define STATUS_RECEIVER_READY       0x01
 
 #define MODE_RX_INT_SELECT_BIT      0x40
+#define MODE_BLOCK_ERROR            0x20
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
@@ -459,12 +462,12 @@ TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 
 }
 
-READ8_MEMBER(mc68681_device::read)
+uint8_t mc68681_device::read(offs_t offset)
 {
 	if (offset == 0x0c)
 		return IVR;
 
-	uint8_t r = duart_base_device::read(space, offset, mem_mask);
+	uint8_t r = duart_base_device::read(offset);
 
 	if (offset == 0x0d)
 	{
@@ -478,7 +481,7 @@ READ8_MEMBER(mc68681_device::read)
 	return r;
 }
 
-READ8_MEMBER(mc68340_duart_device::read)
+uint8_t mc68340_duart_device::read(offs_t offset)
 {
 	uint8_t r = 0;
 
@@ -497,19 +500,19 @@ READ8_MEMBER(mc68340_duart_device::read)
 		r = m_chanB->read_MR2();
 		break;
 	default:
-		r = duart_base_device::read(space, offset, mem_mask);
+		r = duart_base_device::read(offset);
 	}
 	return r;
 }
 
-READ8_MEMBER(sc28c94_device::read)
+uint8_t sc28c94_device::read(offs_t offset)
 {
 	uint8_t r = 0;
 	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
-		return duart_base_device::read(space, offset, mem_mask);
+		return duart_base_device::read(offset);
 	}
 
 	switch (offset)
@@ -530,7 +533,7 @@ READ8_MEMBER(sc28c94_device::read)
 	return r;
 }
 
-READ8_MEMBER(xr68c681_device::read)
+uint8_t xr68c681_device::read(offs_t offset)
 {
 	if (offset == 0x02)
 	{
@@ -538,10 +541,10 @@ READ8_MEMBER(xr68c681_device::read)
 		return ISR & IMR;
 	}
 	else
-		return mc68681_device::read(space, offset, mem_mask);
+		return mc68681_device::read(offset);
 }
 
-READ8_MEMBER(duart_base_device::read)
+uint8_t duart_base_device::read(offs_t offset)
 {
 	uint8_t r = 0xff;
 
@@ -631,15 +634,15 @@ READ8_MEMBER(duart_base_device::read)
 	return r;
 }
 
-WRITE8_MEMBER(mc68681_device::write)
+void mc68681_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x0c)
 		IVR = data;
 	else
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 }
 
-WRITE8_MEMBER(mc68340_duart_device::write)
+void mc68340_duart_device::write(offs_t offset, uint8_t data)
 {
 	//printf("Duart write %02x -> %02x\n", data, offset);
 
@@ -658,17 +661,17 @@ WRITE8_MEMBER(mc68340_duart_device::write)
 		m_chanB->write_MR2(data);
 		break;
 	default:
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 	}
 }
 
-WRITE8_MEMBER(sc28c94_device::write)
+void sc28c94_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 	}
 
 	switch (offset)
@@ -689,7 +692,7 @@ WRITE8_MEMBER(sc28c94_device::write)
 	}
 }
 
-WRITE8_MEMBER(xr68c681_device::write)
+void xr68c681_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x02) /* CRA */
 		switch (data >> 4)
@@ -761,10 +764,10 @@ WRITE8_MEMBER(xr68c681_device::write)
 			break;
 		}
 
-	mc68681_device::write(space, offset, data, mem_mask); /* pass on 68681 command */
+	mc68681_device::write(offset, data); /* pass on 68681 command */
 }
 
-WRITE8_MEMBER(duart_base_device::write)
+void duart_base_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x0f;
 	LOG("Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data);
@@ -1062,6 +1065,7 @@ duart_channel::duart_channel(const machine_config &mconfig, const char *tag, dev
 	, rx_fifo_num(0)
 	, tx_enabled(0)
 {
+	std::fill_n(&rx_fifo[0], MC68681_RX_FIFO_SIZE, 0);
 }
 
 void duart_channel::device_start()
@@ -1109,20 +1113,38 @@ void duart_channel::rcv_complete()
 
 	if (rx_enabled)
 	{
-		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
-		{
-			logerror("68681: FIFO overflow\n");
-			SR |= STATUS_OVERRUN_ERROR;
-			return;
-		}
-		rx_fifo[rx_fifo_write_ptr++] = get_received_char();
-		if ( rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE )
-		{
-			rx_fifo_write_ptr = 0;
-		}
-		rx_fifo_num++;
-		update_interrupts();
+		uint8_t errors = 0;
+		if (is_receive_framing_error())
+			errors |= STATUS_FRAMING_ERROR;
+		if (is_receive_parity_error())
+			errors |= STATUS_PARITY_ERROR;
+		rx_fifo_push(get_received_char(), errors);
 	}
+}
+
+void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
+{
+	if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
+	{
+		logerror("68681: FIFO overflow\n");
+		SR |= STATUS_OVERRUN_ERROR;
+		return;
+	}
+
+	rx_fifo[rx_fifo_write_ptr++] = data | (errors << 8);
+	if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
+		rx_fifo_write_ptr = 0;
+
+	if (rx_fifo_num++ == 0)
+	{
+		SR |= STATUS_RECEIVER_READY;
+		if (!(MR1 & MODE_BLOCK_ERROR))
+			SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
+		SR |= errors;
+	}
+	if (rx_fifo_num == MC68681_RX_FIFO_SIZE)
+		SR |= STATUS_FIFO_FULL;
+	update_interrupts();
 }
 
 void duart_channel::tra_complete()
@@ -1138,22 +1160,7 @@ void duart_channel::tra_complete()
 
 	// if local loopback is on, write the transmitted data as if a byte had been received
 	if ((MR2 & 0xc0) == 0x80)
-	{
-		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
-		{
-			LOG("68681: FIFO overflow\n");
-			SR |= STATUS_OVERRUN_ERROR;
-		}
-		else
-		{
-			rx_fifo[rx_fifo_write_ptr++]= tx_data;
-			if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
-			{
-				rx_fifo_write_ptr = 0;
-			}
-			rx_fifo_num++;
-		}
-	}
+		rx_fifo_push(tx_data, 0);
 
 	update_interrupts();
 }
@@ -1190,26 +1197,6 @@ void duart_channel::tra_callback()
 
 void duart_channel::update_interrupts()
 {
-	if (rx_enabled)
-	{
-		if (rx_fifo_num > 0)
-		{
-			SR |= STATUS_RECEIVER_READY;
-		}
-		else
-		{
-			SR &= ~STATUS_RECEIVER_READY;
-		}
-		if (rx_fifo_num == MC68681_RX_FIFO_SIZE)
-		{
-			SR |= STATUS_FIFO_FULL;
-		}
-		else
-		{
-			SR &= ~STATUS_FIFO_FULL;
-		}
-	}
-
 	// Handle the TxEMT and TxRDY bits based on mode
 	switch (MR2 & 0xc0) // what mode are we in?
 	{
@@ -1298,6 +1285,13 @@ uint8_t duart_channel::read_rx_fifo()
 	}
 
 	rx_fifo_num--;
+	SR &= ~STATUS_FIFO_FULL;
+	if (!(MR1 & MODE_BLOCK_ERROR))
+		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
+	if (rx_fifo_num == 0)
+		SR &= ~STATUS_RECEIVER_READY;
+	else
+		SR |= rx_fifo[rx_fifo_read_ptr] >> 8;
 	update_interrupts();
 
 	//printf("Rx read %02x\n", rv);
@@ -1446,6 +1440,7 @@ void duart_channel::write_CR(uint8_t data)
 	case 2: /* Reset channel receiver (disable receiver and flush fifo) */
 		rx_enabled = 0;
 		SR &= ~STATUS_RECEIVER_READY;
+		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
 		SR &= ~STATUS_OVERRUN_ERROR; // is this correct?
 		rx_fifo_read_ptr = 0;
 		rx_fifo_write_ptr = 0;

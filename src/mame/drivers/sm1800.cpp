@@ -50,7 +50,7 @@ private:
 	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
 	uint8_t m_irq_state;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(sm1800);
+	void sm1800_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
@@ -133,7 +133,7 @@ READ8_MEMBER( sm1800_state::sm1800_8255_portc_r )
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(sm1800_state, sm1800)
+void sm1800_state::sm1800_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black()); // black
 	palette.set_pen_color(1, 0xa0, 0xa0, 0xa0); // white
@@ -175,10 +175,9 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
+	PALETTE(config, m_palette, FUNC(sm1800_state::sm1800_palette), 3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm1800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sm1800)
 
 	/* Devices */
 	I8255(config, m_ppi);

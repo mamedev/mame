@@ -388,9 +388,8 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_SCREEN_UPDATE_DRIVER(rastan_state, screen_update_rastan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rastan)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_rastan);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048);
 
 	PC080SN(config, m_pc080sn, 0);
 	m_pc080sn->set_gfxdecode_tag("gfxdecode");

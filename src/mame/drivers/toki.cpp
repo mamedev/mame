@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
@@ -515,11 +515,10 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_toki)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toki)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toki);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -561,7 +560,7 @@ MACHINE_CONFIG_START(toki_state::tokib)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -569,11 +568,10 @@ MACHINE_CONFIG_START(toki_state::tokib)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_tokib)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tokib)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tokib);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

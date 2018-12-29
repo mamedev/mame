@@ -100,6 +100,9 @@ private:
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
+	void add_base_config(machine_config &config);
+	void add_ymz(machine_config &config);
+
 	u16 irq_cause_r(offs_t offset);
 	u8 soundflags_r();
 	DECLARE_READ16_MEMBER(soundflags_ack_r);
@@ -142,13 +145,13 @@ private:
 	DECLARE_VIDEO_START(cave_3_layers);
 	DECLARE_VIDEO_START(cave_4_layers);
 	DECLARE_VIDEO_START(sailormn_3_layers);
-	void palette_init_cave(palette_device &palette);
-	void palette_init_dfeveron(palette_device &palette);
-	void palette_init_korokoro(palette_device &palette);
-	void palette_init_mazinger(palette_device &palette);
-	void palette_init_pwrinst2(palette_device &palette);
-	void palette_init_sailormn(palette_device &palette);
-	void palette_init_ppsatan(palette_device &palette);
+	void cave_palette(palette_device &palette);
+	void dfeveron_palette(palette_device &palette);
+	void korokoro_palette(palette_device &palette);
+	void mazinger_palette(palette_device &palette);
+	void pwrinst2_palette(palette_device &palette);
+	void sailormn_palette(palette_device &palette);
+	void ppsatan_palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ppsatan_core (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip);
 	uint32_t screen_update_ppsatan_top  (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

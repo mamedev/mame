@@ -773,9 +773,8 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_gaiden)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiden)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiden);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -859,11 +858,10 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnbowl)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnbowl);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
@@ -876,8 +874,7 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	YM2151(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /*
@@ -1017,11 +1014,10 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastninj)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mastninj);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
@@ -1329,9 +1325,9 @@ ROM_START( mastninj )
 	ROM_LOAD( "19.ic2",            0x0f0000, 0x10000, CRC(c12c367b) SHA1(9835292f335f1353f7b9bd0bb85124942822646f) )
 
 	ROM_REGION( 0x080000, "misc", 0 )
-	ROM_LOAD( "gal16v8.ic42.bad.dump",    0x000, 0x117, BAD_DUMP CRC(61d6a8d7) SHA1(d3a6331b1fccd374e4f080740094d3832ff98ad9) )
-	ROM_LOAD( "tibpal16l8.ic15.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "tibpal16l8.ic54.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "gal16v8.ic42",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "tibpal16l8.ic15", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8.ic54", 0x000, 0x104, NO_DUMP )
 ROM_END
 
 

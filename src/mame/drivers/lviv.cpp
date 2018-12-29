@@ -454,8 +454,7 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD(m_palette, sizeof (s_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(lviv_state, lviv)
+	PALETTE(config, m_palette, FUNC(lviv_state::lviv_palette), ARRAY_LENGTH(s_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

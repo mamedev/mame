@@ -55,7 +55,7 @@ ROM_END
 
 void bbc_microware_device::device_add_mconfig(machine_config &config)
 {
-	WD2793(config, m_fdc, 16_MHz_XTAL / 16); // Replay advert suggests Type R8272 UDM DFS
+	WD2793(config, m_fdc, DERIVED_CLOCK(1, 8)); // Replay advert suggests Type R8272 UDM DFS
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 	m_fdc->hld_wr_callback().set(FUNC(bbc_microware_device::motor_w));

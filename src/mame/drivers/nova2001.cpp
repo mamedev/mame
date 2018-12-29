@@ -661,13 +661,11 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_nova2001)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nova2001)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nova2001);
+	PALETTE(config, m_palette, FUNC(nova2001_state::nova2001_palette)).set_format(1, &nova2001_state::BBGGRRII, 512);
 
-	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
 
 	/* sound hardware */
@@ -706,11 +704,10 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_ninjakun)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakun)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjakun);
+	PALETTE(config, m_palette).set_format(1, &nova2001_state::BBGGRRII, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
@@ -742,13 +739,11 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_pkunwar)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkunwar)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkunwar);
+	PALETTE(config, m_palette, FUNC(nova2001_state::nova2001_palette)).set_format(1, &nova2001_state::BBGGRRII, 512);
 
-	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
 
 	/* sound hardware */
@@ -785,11 +780,10 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_raiders5)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiders5)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiders5);
+	PALETTE(config, m_palette).set_format(1, &nova2001_state::BBGGRRII, 768);
 
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 

@@ -2861,14 +2861,13 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
-	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_buffered_spriteram);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2955,14 +2954,13 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lufykzku)
-	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lufykzku);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
-//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // same as sammymdl?
+	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // same as sammymdl?
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -3019,14 +3017,13 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sigmab98_state, screen_vblank_sammymdl))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
-	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
-//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // not on sammymdl?
+	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // not on sammymdl?
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();

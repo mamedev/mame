@@ -145,6 +145,10 @@ void i8251_device::receive_clock()
 		if (is_receive_register_full())
 		{
 			receive_register_extract();
+			if (is_receive_parity_error())
+				m_status |= I8251_STATUS_PARITY_ERROR;
+			if (is_receive_framing_error())
+				m_status |= I8251_STATUS_FRAMING_ERROR;
 			receive_character(get_received_char());
 		}
 	}

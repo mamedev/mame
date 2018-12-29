@@ -846,15 +846,15 @@ WRITE8_MEMBER(asuka_state::counters_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
-MACHINE_CONFIG_START(asuka_state::bonzeadv)
-
+void asuka_state::bonzeadv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)    /* checked on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(bonzeadv_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  bonze_interrupt)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);    /* checked on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::bonzeadv_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::bonze_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)    /* sound CPU, also required for test mode */
-	MCFG_DEVICE_PROGRAM_MAP(bonzeadv_z80_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    /* sound CPU, also required for test mode */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::bonzeadv_z80_map);
 
 	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); // 12MHz OSC near C-Chip
 	m_cchip->in_pa_callback().set_ioport("800007");
@@ -863,24 +863,24 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	m_cchip->in_ad_callback().set_ioport("80000D");
 	m_cchip->out_pb_callback().set(FUNC(asuka_state::counters_w));
 
-	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", asuka_state, cchip_irq_clear_cb)
+	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(asuka_state::cchip_irq_clear_cb));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 3*8, 31*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
@@ -897,29 +897,28 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(asuka_state::asuka)
-
+void asuka_state::asuka(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(asuka_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);   /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::asuka_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -930,17 +929,17 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
@@ -964,10 +963,10 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, asuka_state, asuka_msm5205_vck))  /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
+	m_msm->vck_legacy_callback().set(FUNC(asuka_state::asuka_msm5205_vck));  /* VCK function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
@@ -975,24 +974,23 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(asuka_state::cadash)
-
+void asuka_state::cadash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 68000p12 running at 16Mhz, verified on pcb  */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  cadash_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);   /* 68000p12 running at 16Mhz, verified on pcb  */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::cadash_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_z80_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
-	MCFG_DEVICE_ADD("subcpu", Z180, XTAL(8'000'000))   /* 8MHz HD64180RP8 Z180 */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_sub_map)
-	MCFG_DEVICE_IO_MAP(cadash_sub_io)
+	z180_device &subcpu(Z180(config, "subcpu", XTAL(8'000'000)));   /* 8MHz HD64180RP8 Z180 */
+	subcpu.set_addrmap(AS_PROGRAM, &asuka_state::cadash_sub_map);
+	subcpu.set_addrmap(AS_IO, &asuka_state::cadash_sub_io);
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1003,17 +1001,17 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_bonzeadv));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
@@ -1041,20 +1039,19 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(asuka_state::mofflott)
-
+void asuka_state::mofflott(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(asuka_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
+	M68000(config, m_maincpu, 8000000);    /* 8 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::asuka_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1065,17 +1062,17 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);   /* only Mofflott uses full palette space */
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
@@ -1099,10 +1096,10 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	ymsnd.add_route(0, "mono", 0.25);
 	ymsnd.add_route(1, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, asuka_state, asuka_msm5205_vck))  /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(asuka_state::asuka_msm5205_vck));  /* VCK function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
@@ -1110,20 +1107,19 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(asuka_state::eto)
-
+void asuka_state::eto(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(eto_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", asuka_state,  irq5_line_hold)
+	M68000(config, m_maincpu, 8000000);    /* 8 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &asuka_state::eto_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asuka_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(cadash_z80_map)
+	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1134,17 +1130,17 @@ MACHINE_CONFIG_START(asuka_state::eto)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(asuka_state::screen_update_asuka));
+	screen.screen_vblank().set(FUNC(asuka_state::screen_vblank_asuka));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_asuka);
+	PALETTE(config, "palette").set_entries(4096);
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_offsets(0, 8);
@@ -1171,7 +1167,7 @@ MACHINE_CONFIG_START(asuka_state::eto)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

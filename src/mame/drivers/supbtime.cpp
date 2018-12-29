@@ -353,8 +353,7 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supbtime)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);
@@ -370,9 +369,9 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

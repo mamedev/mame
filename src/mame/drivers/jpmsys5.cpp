@@ -804,7 +804,8 @@ void jpmsys5_state::machine_reset()
  *************************************/
 
 // later (incompatible with earlier revision) motherboards used a YM2413
-MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
+void jpmsys5_state::jpmsys5_ym(machine_config &config)
+{
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map);
 
@@ -835,12 +836,12 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("upd7759", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	/* Earlier revisions use an SAA1099 */
-	MCFG_DEVICE_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ym2413_device &ym2413(YM2413(config, "ym2413", 4000000)); /* Unconfirmed */
+	ym2413.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	pia6821_device &pia(PIA6821(config, "6821pia", 0));
 	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
@@ -857,12 +858,12 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
 	config.set_default_layout(layout_jpmsys5);
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+	METERS(config, m_meters, 0).set_number_meters(8);
+}
 
 // the first rev PCB used an SAA1099
-MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
+void jpmsys5_state::jpmsys5(machine_config &config)
+{
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys5_state::m68000_awp_map_saa);
 
@@ -893,11 +894,10 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("upd7759", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_SAA1099_ADD("saa", 4000000 /* guess */)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SAA1099(config, "saa", 4000000 /* guess */).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	pia6821_device &pia(PIA6821(config, "6821pia", 0));
 	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
@@ -914,9 +914,8 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
 	config.set_default_layout(layout_jpmsys5);
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+	METERS(config, m_meters, 0).set_number_meters(8);
+}
 
 /*************************************
  *

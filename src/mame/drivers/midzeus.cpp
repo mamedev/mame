@@ -1267,7 +1267,7 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	PALETTE(config, "palette", 32768);
+	PALETTE(config, "palette").set_entries(32768);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MIDZEUS_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);

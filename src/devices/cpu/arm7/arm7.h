@@ -33,10 +33,6 @@
 #define ARM7_MAX_FASTRAM       4
 #define ARM7_MAX_HOTSPOTS      16
 
-#define MCFG_ARM_HIGH_VECTORS() \
-	downcast<arm7_cpu_device &>(*device).set_high_vectors();
-
-
 /***************************************************************************
     COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/

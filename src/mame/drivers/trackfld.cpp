@@ -931,11 +931,8 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
-	MCFG_PALETTE_ADD(m_palette, 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
-	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
+	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1007,10 +1004,8 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
-	MCFG_PALETTE_ADD(m_palette, 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
+	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */

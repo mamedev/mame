@@ -432,8 +432,8 @@
 class amaticmg_state : public driver_device
 {
 public:
-	amaticmg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	amaticmg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
@@ -446,27 +446,36 @@ public:
 	void amaticmg2(machine_config &config);
 	void amaticmg(machine_config &config);
 	void amaticmg4(machine_config &config);
+
 	void init_ama8000_3_o();
 	void init_ama8000_2_i();
 	void init_ama8000_2_v();
 	void init_ama8000_1_x();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<7> m_lamps;
+
+	uint8_t m_nmi_mask;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(unk80_w);
 
-	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(amaticmg);
-	DECLARE_PALETTE_INIT(amaticmg2);
+	void amaticmg_palette(palette_device &palette) const;
+	void amaticmg2_palette(palette_device &palette) const;
 	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(amaticmg2_irq);
@@ -477,11 +486,6 @@ private:
 	void amaticmg4_portmap(address_map &map);
 	void amaticmg_map(address_map &map);
 	void amaticmg_portmap(address_map &map);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	output_finder<7> m_lamps;
 };
 
 
@@ -542,47 +546,46 @@ uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_i
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
+void amaticmg_state::amaticmg_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x200; ++i)
+	for (int i = 0; i < 0x200; ++i)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
 
-PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
+void amaticmg_state::amaticmg2_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int r, g, b;
-	int i;
 
-	for (i = 0; i < memregion("proms")->bytes(); i+=2)
+	for (int i = 0, n = memregion("proms")->bytes(); i < n; i += 2)
 	{
-		b = ((color_prom[1] & 0xf8) >> 3);
-		g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
-		r = ((color_prom[0] & 0x3e) >> 1);
+		int const b = ((color_prom[1] & 0xf8) >> 3);
+		int const g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
+		int const r = ((color_prom[0] & 0x3e) >> 1);
 
 		palette.set_pen_color(i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
-		color_prom+=2;
+		color_prom += 2;
 	}
 }
 
@@ -869,7 +872,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen("screen");
@@ -877,10 +880,8 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	crtc.set_char_width(4);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // no NMI mask?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amaticmg)
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_amaticmg);
+	PALETTE(config, m_palette, FUNC(amaticmg_state::amaticmg_palette), 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -911,9 +912,8 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x10000)
-	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
+	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
+	m_palette->set_entries(0x10000);
 MACHINE_CONFIG_END
 
 
@@ -931,9 +931,8 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x10000)
-	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
+	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
+	m_palette->set_entries(0x10000);
 MACHINE_CONFIG_END
 
 

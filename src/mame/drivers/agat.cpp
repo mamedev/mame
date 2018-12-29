@@ -56,7 +56,6 @@
 #include "cpu/m6502/m6502.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 
 #include "machine/bankdev.h"
 #include "machine/kb3600.h"
@@ -73,8 +72,6 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-#include "formats/ap2_dsk.h"
 
 
 #define A7_CPU_TAG "maincpu"

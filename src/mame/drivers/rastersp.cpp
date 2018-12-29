@@ -62,7 +62,8 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_tms_timer1(nullptr)
 		, m_tms_tx_timer(nullptr)
-	{}
+	{
+	}
 
 	void rastersp(machine_config &config);
 
@@ -904,11 +905,10 @@ void rastersp_state::rastersp(machine_config &config)
 	screen.set_screen_update(FUNC(rastersp_state::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(rastersp_state::vblank_irq));
 
-	PALETTE(config, m_palette, 65536);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB));
+	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();

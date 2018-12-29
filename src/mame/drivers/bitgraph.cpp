@@ -498,9 +498,9 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bitgraph_state, screen_update)
-
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	ACIA6850(config, m_acia0, 0);
 	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
@@ -560,10 +560,10 @@ MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
 MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
-	MCFG_DEVICE_ADD(PPU_TAG, I8035, XTAL(6'900'000))
-	MCFG_DEVICE_IO_MAP(ppu_io)
-//  MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, bitgraph_state, ppu_t0_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	i8035_device &ppu(I8035(config, PPU_TAG, XTAL(6'900'000)));
+	ppu.set_addrmap(AS_IO, &bitgraph_state::ppu_io);
+//  ppu.t0_in_cb().set(FUNC(bitgraph_state::ppu_t0_r));
+	ppu.prog_out_cb().set("i8243", FUNC(i8243_device::prog_w));
 
 	i8243_device &i8243(I8243(config, "i8243"));
 	i8243.read_handler().set_nop();

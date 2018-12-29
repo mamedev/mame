@@ -492,9 +492,8 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 	MCFG_SCREEN_UPDATE_DRIVER(renegade_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_renegade)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_renegade);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

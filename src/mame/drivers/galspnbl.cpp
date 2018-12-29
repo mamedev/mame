@@ -233,15 +233,13 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galspnbl_state, screen_update_galspnbl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galspnbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_galspnbl)
 
-	MCFG_PALETTE_ADD("palette", 1024 + 32768)
-	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette, FUNC(galspnbl_state::galspnbl_palette)).set_format(palette_device::xBGR_444, 1024 + 32768);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(1);

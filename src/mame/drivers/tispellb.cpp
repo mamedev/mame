@@ -348,17 +348,17 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tispellb_state::rev1)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0270, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, main_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, main_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, main_write_r))
-	MCFG_TMS0270_READ_CTL_CB(READ8(*this, tispellb_state, rev1_ctl_r))
-	MCFG_TMS0270_WRITE_CTL_CB(WRITE8(*this, tispellb_state, rev1_ctl_w))
+	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, 350000)); // approximation
+	tms.k().set(FUNC(tispellb_state::main_read_k));
+	tms.o().set(FUNC(tispellb_state::main_write_o));
+	tms.r().set(FUNC(tispellb_state::main_write_r));
+	tms.read_ctl().set(FUNC(tispellb_state::rev1_ctl_r));
+	tms.write_ctl().set(FUNC(tispellb_state::rev1_ctl_w));
 
-	MCFG_DEVICE_ADD("subcpu", TMS1980, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, sub_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, sub_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, sub_write_r))
+	tms1980_cpu_device &subcpu(TMS1980(config, m_subcpu, 350000)); // approximation
+	subcpu.k().set(FUNC(tispellb_state::sub_read_k));
+	subcpu.o().set(FUNC(tispellb_state::sub_write_o));
+	subcpu.r().set(FUNC(tispellb_state::sub_write_r));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -372,12 +372,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispellb_state::rev2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0270, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, main_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, rev2_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, rev2_write_r))
-	MCFG_TMS0270_READ_CTL_CB(READ8(m_tms6100, tms6100_device, data_r))
-	MCFG_TMS0270_WRITE_CTL_CB(WRITE8(m_tms6100, tms6100_device, add_w))
+	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, 350000)); // approximation
+	tms.k().set(FUNC(tispellb_state::main_read_k));
+	tms.o().set(FUNC(tispellb_state::rev2_write_o));
+	tms.r().set(FUNC(tispellb_state::rev2_write_r));
+	tms.read_ctl().set(m_tms6100, FUNC(tms6100_device::data_r));
+	tms.write_ctl().set(m_tms6100, FUNC(tms6100_device::add_w));
 
 	TMS6100(config, m_tms6100, 350000);
 	m_tms6100->enable_4bit_mode(true);

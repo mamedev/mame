@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "spu.h"
 #include "spureverb.h"
+#include "cpu/psx/psx.h"
 
 //
 //
@@ -933,6 +934,16 @@ static int shift_register15(int &shift)
 //-------------------------------------------------
 //  spu_device - constructor
 //-------------------------------------------------
+
+spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu)
+	: spu_device(mconfig, tag, owner, clock)
+{
+	cpu->spu_read().set(tag, FUNC(spu_device::read));
+	cpu->spu_write().set(tag, FUNC(spu_device::write));
+	cpu->subdevice<psxdma_device>("dma")->install_read_handler(4, psxdma_device::read_delegate(&spu_device::dma_read, this));
+	cpu->subdevice<psxdma_device>("dma")->install_write_handler(4, psxdma_device::write_delegate(&spu_device::dma_write, this));
+	irq_handler().set(*cpu->subdevice<psxirq_device>("irq"), FUNC(psxirq_device::intin9));
+}
 
 spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPU, tag, owner, clock),

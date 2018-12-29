@@ -385,12 +385,11 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidepckt)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sidepckt)
+	PALETTE(config, m_palette, FUNC(sidepckt_state::sidepckt_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

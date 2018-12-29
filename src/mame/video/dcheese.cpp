@@ -27,11 +27,11 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dcheese_state, dcheese)
+void dcheese_state::dcheese_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 65536; i++)
 	{
-		int data = m_palrom[i];
+		int const data = m_palrom[i];
 		palette.set_pen_color(i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
 	}
 }
