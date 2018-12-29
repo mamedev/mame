@@ -1505,8 +1505,7 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigx2_state, get_playfield_tile_info, 8,8, atarigx2_playfield_scan, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarigx2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
@@ -1532,17 +1531,19 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x200)
+void atarigx2_state::atarigx2_0x200(machine_config &config)
+{
 	atarigx2(config);
-	MCFG_DEVICE_ADD("xga", ATARI_136094_0072, 0)
-	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
-MACHINE_CONFIG_END
+	ATARI_136094_0072(config, m_xga, 0);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
+}
 
-MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x400)
+void atarigx2_state::atarigx2_0x400(machine_config &config)
+{
 	atarigx2(config);
-	MCFG_DEVICE_ADD("xga", ATARI_136095_0072, 0)
-	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
-MACHINE_CONFIG_END
+	ATARI_136095_0072(config, m_xga, 0);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
+}
 
 
 

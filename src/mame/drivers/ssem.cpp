@@ -16,8 +16,8 @@
 class ssem_state : public driver_device
 {
 public:
-	ssem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ssem_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_store(*this, "store"),
 		m_screen(*this, "screen")
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(ssem_state::ssem)
 	MCFG_SCREEN_SIZE(256, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
 	MCFG_SCREEN_UPDATE_DRIVER(ssem_state, screen_update_ssem)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ssem_state, ssem_store, "snp,asm", 1)

@@ -20,7 +20,6 @@
 
 ***********************************/
 
-
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
@@ -48,6 +47,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void cardline(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
 	DECLARE_WRITE8_MEMBER(video_w);
@@ -58,19 +63,15 @@ public:
 	DECLARE_WRITE8_MEMBER(asic_w);
 	DECLARE_WRITE8_MEMBER(a3003_w);
 
-	DECLARE_PALETTE_INIT(cardline);
+	void cardline_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void cardline(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
-
-protected:
-	virtual void machine_start() override;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -78,7 +79,7 @@ protected:
 	uint8_t m_video;
 	uint8_t m_hsync_q;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c32_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -90,7 +91,7 @@ void cardline_state::machine_start()
 	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
-	for (int i=0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
 	save_item(NAME(m_video));
 	save_item(NAME(m_hsync_q));
@@ -295,43 +296,46 @@ static GFXDECODE_START( gfx_cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(cardline_state, cardline)
+void cardline_state::cardline_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i,r,g,b,data;
-	int bit0,bit1,bit2;
-	for (i = 0;i < palette.entries();i++)
-	{
-		data=color_prom[i];
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-		/* red component */
-		bit0 = (data >> 5) & 0x01;
-		bit1 = (data >> 6) & 0x01;
-		bit2 = (data >> 7) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (data >> 2) & 0x01;
-		bit1 = (data >> 3) & 0x01;
-		bit2 = (data >> 4) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = (data >> 0) & 0x01;
-		bit1 = (data >> 1) & 0x01;
-		b = 0x55 * bit0 + 0xaa * bit1;
-		palette.set_pen_color(i,rgb_t(r,g,b));
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const data = color_prom[i];
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(data, 5);
+		bit1 = BIT(data, 6);
+		bit2 = BIT(data, 7);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(data, 2);
+		bit1 = BIT(data, 3);
+		bit2 = BIT(data, 4);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = BIT(data, 0);
+		bit1 = BIT(data, 1);
+		int const b = 0x55 * bit0 + 0xaa * bit1;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C32, MASTER_CLOCK)
-	MCFG_MCS51_PORT1_CONFIG(0x10)
-	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
-	MCFG_DEVICE_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cardline_state, hsync_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, cardline_state, video_w))
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
+	I80C32(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_port_forced_input(1, 0x10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cardline_state::mem_prg);
+	m_maincpu->set_addrmap(AS_IO, &cardline_state::mem_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(cardline_state::hsync_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(cardline_state::video_w));
+	//m_maincpu->set_vblank_int("screen", FUNC(cardline_state::irq1_line_hold));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,12 +344,11 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_SCREEN_SIZE(64*8, 35*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	//MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
-	//MCFG_SCREEN_PALETTE("palette")
+	//MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cardline)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cardline);
+	PALETTE(config, m_palette, FUNC(cardline_state::cardline_palette), 512);
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8));   /* divisor guessed - result is 56 Hz */
 	crtc.set_screen("screen");

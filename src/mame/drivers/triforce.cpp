@@ -591,10 +591,12 @@ MACHINE_CONFIG_START(triforce_state::triforce_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(triforce_state::triforcegd)
+void triforce_state::triforcegd(machine_config &config)
+{
 	triforce_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
-MACHINE_CONFIG_END
+	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, ":gdrom", "pic"));
+	rom_board.irq_callback().set_nop();
+}
 
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

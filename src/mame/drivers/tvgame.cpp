@@ -115,7 +115,7 @@ MACHINE_CONFIG_START(tvgame_state::tvgame)
 	MCFG_SCREEN_SIZE(216, 213)
 	MCFG_SCREEN_VISIBLE_AREA(0, 215, 0, 212)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

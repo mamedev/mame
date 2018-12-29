@@ -297,17 +297,14 @@ MACHINE_CONFIG_START(fcombat_state::fcombat)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/3)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fcombat)
-	MCFG_PALETTE_ADD("palette", 256*3)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fcombat);
+	PALETTE(config, m_palette, FUNC(fcombat_state::fcombat_palette), 256*3, 32);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

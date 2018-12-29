@@ -183,13 +183,13 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		device_sound_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),
-		m_output_type(LEGACY_LINEAR),
 		m_icount(0),
 		m_stream(nullptr),
 		m_pot_r_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 		m_allpot_r_cb(*this),
 		m_serin_r_cb(*this),
-		m_serout_w_cb(*this)
+		m_serout_w_cb(*this),
+		m_output_type(LEGACY_LINEAR)
 {
 }
 

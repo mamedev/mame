@@ -526,8 +526,7 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig42)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarig42_state, get_playfield_tile_info, 8,8, atarig42_playfield_scan, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarig42_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
@@ -552,25 +551,27 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
+void atarig42_0x200_state::atarig42_0x200(machine_config &config)
+{
 	atarig42(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz / 16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
 	m_adc->in_callback<1>().set_ioport("A2D1");
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
-MACHINE_CONFIG_END
+	ASIC65(config, m_asic65, 0, ASIC65_ROMBASED);
+}
 
-MACHINE_CONFIG_START(atarig42_0x400_state::atarig42_0x400)
+void atarig42_0x400_state::atarig42_0x400(machine_config &config)
+{
 	atarig42(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
 
 	/* ASIC65 */
-	MCFG_ASIC65_ADD("asic65", ASIC65_GUARDIANS)
-MACHINE_CONFIG_END
+	ASIC65(config, m_asic65, 0, ASIC65_GUARDIANS);
+}
 
 
 

@@ -105,7 +105,7 @@ void v102_state::v102(machine_config &config)
 
 	I8255(config, "ppi");
 
-	mcs48_cpu_device &kbdcpu(I8039(config, "kbdcpu", 11000000));
+	mcs48_cpu_device &kbdcpu(I8039(config, "kbdcpu", 4.608_MHz_XTAL)); // oscillator marked "4608 - 300 107 - KSS4D"
 	kbdcpu.set_addrmap(AS_PROGRAM, &v102_state::kbd_map);
 }
 

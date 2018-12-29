@@ -56,11 +56,13 @@
 #include "includes/mikromik.h"
 #include "softlist.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 #define MMU_IOEN    0x01
 #define MMU_RAMEN   0x02
@@ -215,12 +217,12 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 	switch (offset)
 	{
 	case 0: // IC24 A8
-		if (LOG) logerror("IC24 A8 %u\n", d);
+		LOG("IC24 A8 %u\n", d);
 		m_a8 = d;
 		break;
 
 	case 1: // RECALL
-		if (LOG) logerror("RECALL %u\n", d);
+		LOG("RECALL %u\n", d);
 		m_recall = d;
 		if (d) m_fdc->soft_reset();
 		break;
@@ -242,12 +244,12 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 		break;
 
 	case 6: // LLEN
-		if (LOG) logerror("LLEN %u\n", d);
+		LOG("LLEN %u\n", d);
 		m_llen = d;
 		break;
 
 	case 7: // MOTOR ON
-		if (LOG) logerror("MOTOR %u\n", d);
+		LOG("MOTOR %u\n", d);
 		m_floppy0->mon_w(!d);
 		m_floppy1->mon_w(!d);
 		break;
@@ -457,13 +459,15 @@ void mm1_state::machine_reset()
 //  MACHINE_CONFIG( mm1 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1)
+void mm1_state::mm1(machine_config &config)
+{
 	// basic system hardware
-	MCFG_DEVICE_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mm1_map)
-	MCFG_I8085A_SID(READLINE(*this, mm1_state, dsra_r))
-	MCFG_I8085A_SOD(WRITELINE(KB_TAG, mm1_keyboard_device, bell_w))
-	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
+	m_maincpu->in_sid_func().set(FUNC(mm1_state::dsra_r));
+	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w));
+
+	config.m_perfect_cpu_quantum = subtag(I8085A_TAG);
 
 	// peripheral hardware
 	I8212(config, m_iop, 0);
@@ -490,13 +494,11 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	m_pit->set_clk<2>(6.144_MHz_XTAL/2/2);
 	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
-	UPD765A(config, m_fdc, /* 16_MHz_XTAL/2/2, */ true, true);
+	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
 
 	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
 	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
@@ -518,8 +520,8 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mm1_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("mm1_flop");
+}
 
 
 //-------------------------------------------------

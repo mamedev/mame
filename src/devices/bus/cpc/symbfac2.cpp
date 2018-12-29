@@ -88,11 +88,8 @@ cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, cons
 
 void cpc_symbiface2_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_IO);
-
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
-
+	address_space &space = m_slot->cpu().space(AS_IO);
 	space.install_readwrite_handler(0xfd00,0xfd07,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
 	space.install_readwrite_handler(0xfd08,0xfd0f,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
 	space.install_read_handler(0xfd10,0xfd10,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));

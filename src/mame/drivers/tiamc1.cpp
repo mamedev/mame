@@ -343,11 +343,10 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tiamc1)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(tiamc1_state, tiamc1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tiamc1);
+	PALETTE(config, m_palette, FUNC(tiamc1_state::tiamc1_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -358,6 +357,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tiamc1_state::kot)
 	tiamc1(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(kotrybolov_map)
 	MCFG_DEVICE_IO_MAP(kotrybolov_io_map)

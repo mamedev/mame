@@ -161,7 +161,7 @@ MACHINE_CONFIG_START( olytext_state::olytext )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(olytext_state, screen_update)
 	//MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
 	WD1772(config, "fdc", 16_MHz_XTAL / 8); // divisor guess
@@ -171,8 +171,8 @@ MACHINE_CONFIG_START( olytext_state::olytext )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(olytext_state, keyboard_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(olytext_state::keyboard_put));
 MACHINE_CONFIG_END
 
 

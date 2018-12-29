@@ -47,7 +47,7 @@ static void drives(device_slot_interface &device)
 
 void mufdc_device::device_add_mconfig(machine_config &config)
 {
-	mcs3201_device &mcs3201(MCS3201(config, m_fdc));
+	mcs3201_device &mcs3201(MCS3201(config, m_fdc, 24_MHz_XTAL));
 	mcs3201.input_handler().set(FUNC(mufdc_device::fdc_input_r));
 	mcs3201.intrq_wr_callback().set(FUNC(mufdc_device::fdc_irq_w));
 	mcs3201.drq_wr_callback().set(FUNC(mufdc_device::fdc_drq_w));

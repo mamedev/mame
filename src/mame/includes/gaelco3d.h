@@ -12,14 +12,15 @@
 
 #pragma once
 
-#include "sound/dmadac.h"
-#include "video/poly.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/tms32031/tms32031.h"
+#include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 #include "machine/gen_latch.h"
-#include "machine/74259.h"
 #include "machine/timer.h"
-#include "cpu/adsp2100/adsp2100.h"
+#include "sound/dmadac.h"
+#include "video/poly.h"
 #include "screen.h"
 
 #define SOUND_CHANNELS  4
@@ -109,7 +110,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<adsp21xx_device> m_adsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<cpu_device> m_tms;
+	required_device<tms32031_device> m_tms;
 	required_device_array<dmadac_sound_device, SOUND_CHANNELS> m_dmadac;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;

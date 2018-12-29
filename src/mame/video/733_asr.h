@@ -51,8 +51,6 @@ private:
 	void linefeed();
 	void transmit(uint8_t data);
 
-	DECLARE_PALETTE_INIT(asr733);
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<screen_device> m_screen;

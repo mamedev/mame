@@ -370,8 +370,8 @@ void hp64k_state::cpu_io_map(address_map &map)
 	map(HP_MAKE_IOADDR(12, 0), HP_MAKE_IOADDR(12, 3)).w(FUNC(hp64k_state::hp64k_irl_mask_w));
 }
 
-hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig , type , tag),
+hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig , type , tag),
 	m_cpu(*this , "cpu"),
 	m_crtc(*this , "crtc"),
 	m_palette(*this , "palette"),
@@ -1402,7 +1402,7 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(720, 390)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 390-1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed

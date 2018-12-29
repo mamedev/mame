@@ -441,15 +441,13 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 256-1-32);
 	screen.set_screen_update(FUNC(divebomb_state::screen_update_divebomb));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_fgcpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_spritecpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_rozcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_divebomb)
-	MCFG_PALETTE_ADD("palette", 0x400+0x400+0x400+0x100)
-
-	MCFG_PALETTE_INIT_OWNER(divebomb_state, divebomb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_divebomb);
+	PALETTE(config, m_palette, FUNC(divebomb_state::divebomb_palette), 0x400+0x400+0x400+0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

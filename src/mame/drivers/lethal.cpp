@@ -489,37 +489,36 @@ void lethal_state::machine_reset()
 	m_bank4000->set_bank(0);
 }
 
-MACHINE_CONFIG_START(lethal_state::lethalen)
-
+void lethal_state::lethalen(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(le_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lethal_state,  lethalen_interrupt)
+	HD6309(config, m_maincpu, MAIN_CLOCK/2);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::le_main);
+	m_maincpu->set_vblank_int("screen", FUNC(lethal_state::lethalen_interrupt));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(le_sound)
+	Z80(config, m_soundcpu, MAIN_CLOCK/4);  /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lethal_state::le_sound);
 
-	ADDRESS_MAP_BANK(config, "bank4000").set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
+	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(216, 504-1, 16, 240-1);
+	screen.set_screen_update(FUNC(lethal_state::screen_update_lethalen));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(lethal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8LE, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8LE, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette(m_palette);
@@ -535,20 +534,20 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set_inputline("soundcpu", INPUT_LINE_NMI);
+	k054539.add_route(0, "rspeaker", 1.0);
+	k054539.add_route(1, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(lethal_state::lethalej)
+void lethal_state::lethalej(machine_config &config)
+{
 	lethalen(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
+	subdevice<screen_device>("screen")->set_visarea(224, 512-1, 16, 240-1);
 
 	m_k053244->set_offsets(-105, 0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( lethalen )   // US version UAE
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */

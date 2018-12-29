@@ -321,12 +321,10 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wolfpack)
-	MCFG_PALETTE_ADD("palette", 12)
-	MCFG_PALETTE_INDIRECT_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_wolfpack)
+	PALETTE(config, m_palette, FUNC(wolfpack_state::wolfpack_palette), 12, 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -53,9 +53,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MIDWAY_SERIAL_PIC, midway_serial_pic_device)
 
-#define MCFG_MIDWAY_SERIAL_PIC_UPPER(_upper) \
-	downcast<midway_serial_pic_device &>(*device).set_upper(_upper);
-
 /* 1st generation Midway serial PIC - emulation */
 
 class midway_serial_pic_emu_device : public device_t
@@ -140,11 +137,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MIDWAY_SERIAL_PIC2, midway_serial_pic2_device)
 
-#define MCFG_MIDWAY_SERIAL_PIC2_UPPER   MCFG_MIDWAY_SERIAL_PIC_UPPER
-
-#define MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(_yearoffs) \
-	downcast<midway_serial_pic2_device &>(*device).set_yearoffs(_yearoffs);
-
 /* I/O ASIC connected to 2nd generation PIC */
 
 // ======================> midway_ioasic_device
@@ -227,29 +219,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device)
-
-#define MCFG_MIDWAY_IOASIC_UPPER    MCFG_MIDWAY_SERIAL_PIC_UPPER
-
-#define MCFG_MIDWAY_IOASIC_YEAR_OFFS MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS
-
-#define MCFG_MIDWAY_IOASIC_SHUFFLE(_shuffle) \
-	downcast<midway_ioasic_device &>(*device).set_shuffle(_shuffle);
-
-#define MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(_shuffle) \
-	downcast<midway_ioasic_device &>(*device).set_shuffle_default(_shuffle);
-
-#define MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(_write) \
-	downcast<midway_ioasic_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
-
-#define MCFG_MIDWAY_IOASIC_AUTO_ACK(_ack) \
-	downcast<midway_ioasic_device &>(*device).set_auto_ack(_ack);
-
-#define MCFG_MIDWAY_IOASIC_OUT_TX_CB(_devcb) \
-	downcast<midway_ioasic_device &>(*device).set_serial_tx_callback(DEVCB_##_devcb);
-
-#define MCFG_MIDWAY_IOASIC_AUX_OUT_CB(_devcb) \
-	downcast<midway_ioasic_device &>(*device).set_aux_output_callback(DEVCB_##_devcb);
-
 
 enum
 {

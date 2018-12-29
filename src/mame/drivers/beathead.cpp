@@ -352,11 +352,11 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	MCFG_SCREEN_UPDATE_DRIVER(beathead_state, screen_update)
 	MCFG_SCREEN_SIZE(42*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette);
+	m_palette->set_format(palette_device::IRGB_1555, 32768);
+	m_palette->set_membits(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

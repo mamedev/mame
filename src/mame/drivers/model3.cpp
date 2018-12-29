@@ -2769,7 +2769,7 @@ ROM_START( vf3a )   /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-1
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vf3tb )  /* step 1.0? */
+ROM_START( vf3tb )  /* step 1.0?, Sega game ID# is 833-13279 VIRTUA FIGHTER 3TB */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20126.17",  0x600006, 0x080000, CRC(27ecd3b0) SHA1(a9b913294ac925adb501d3b47f346006b70dfcd6) )
@@ -4673,7 +4673,7 @@ ROM_START( dirtdvlsg )   /* Step 2.1 presumable German version, might be origina
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
 ROM_END
 
-ROM_START( daytona2 )   /* Step 2.1, ROM board ID# 834-13428 DAYTONA USA2, Security board ID# 837-13507-COM */
+ROM_START( daytona2 )   /* Step 2.1, Sega game ID# is 833-13427, ROM board ID# 834-13428 DAYTONA USA2, Security board ID# 837-13507-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20861a.17", 0x000006, 0x200000, CRC(89ba8e78) SHA1(7d27124b976a63fdadd16551a664b2cc8cc08e79) )
@@ -6036,8 +6036,7 @@ void model3_state::add_base_devices(machine_config &config)
 	m_screen->set_size(512, 400);
 	m_screen->set_screen_update(FUNC(model3_state::screen_update_model3));
 
-	PALETTE(config, m_palette, 32768);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

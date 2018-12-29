@@ -10,14 +10,12 @@ Atari Tank 8 video emulation
 #include "includes/tank8.h"
 
 
-PALETTE_INIT_MEMBER(tank8_state, tank8)
+void tank8_state::tank8_palette(palette_device &palette) const
 {
-	int i;
-
 	palette.set_indirect_color(8, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(9, rgb_t(0xff, 0xff, 0xff));
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		palette.set_pen_indirect(2 * i + 0, 8);
 		palette.set_pen_indirect(2 * i + 1, i);

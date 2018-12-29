@@ -75,7 +75,7 @@ void pc_fdc_family_device::dma_w(uint8_t data)
 
 void pc_fdc_family_device::device_add_mconfig(machine_config &config)
 {
-	UPD765A(config, fdc, false, false);
+	UPD765A(config, fdc, 8'000'000, false, false);
 	fdc->intrq_wr_callback().set(FUNC(pc_fdc_family_device::irq_w));
 	fdc->drq_wr_callback().set(FUNC(pc_fdc_family_device::drq_w));
 }

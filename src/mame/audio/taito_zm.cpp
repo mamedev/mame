@@ -183,14 +183,15 @@ WRITE16_MEMBER(taito_zoom_device::reg_address_w)
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
+void taito_zoom_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("mn10200", MN1020012A, XTAL(25'000'000)/2)
-	MCFG_MN10200_READ_PORT_CB(1, READ8(DEVICE_SELF, taito_zoom_device, tms_ctrl_r))
-	MCFG_MN10200_WRITE_PORT_CB(1, WRITE8(DEVICE_SELF, taito_zoom_device, tms_ctrl_w))
-	MCFG_DEVICE_PROGRAM_MAP(taitozoom_mn_map)
+	MN1020012A(config, m_soundcpu, XTAL(25'000'000)/2);
+	m_soundcpu->read_port<1>().set(FUNC(taito_zoom_device::tms_ctrl_r));
+	m_soundcpu->write_port<1>().set(FUNC(taito_zoom_device::tms_ctrl_w));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &taito_zoom_device::taitozoom_mn_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 	TMS57002(config, m_tms57002, XTAL(25'000'000)/2);
 	//m_tms57002->empty_callback().set_inputline(m_soundcpu, MN10200_IRQ1, m_tms57002->empty_r()); /*.invert();*/
@@ -205,4 +206,4 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 	m_zsg2->add_route(1, *m_tms57002, 0.5, 1); // chorus effect
 	m_zsg2->add_route(2, *m_tms57002, 1.0, 2); // left direct
 	m_zsg2->add_route(3, *m_tms57002, 1.0, 3); // right direct
-MACHINE_CONFIG_END
+}

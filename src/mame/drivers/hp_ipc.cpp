@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
 	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
@@ -824,7 +824,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
 	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 

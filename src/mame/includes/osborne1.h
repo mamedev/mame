@@ -75,6 +75,7 @@ protected:
 
 	required_device<ram_device>             m_ram;
 	required_device<screen_device>          m_screen;
+	required_device<z80_device>             m_maincpu;
 
 private:
 	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
@@ -99,7 +100,6 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device>             m_maincpu;
 	required_device<gfxdecode_device>       m_gfxdecode;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<pia6821_device>         m_pia0;

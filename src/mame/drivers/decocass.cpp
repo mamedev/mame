@@ -939,15 +939,13 @@ static GFXDECODE_START( gfx_decocass )
 	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(decocass_state, decocass)
+void decocass_state::decocass_palette(palette_device &palette) const
 {
-	int i;
-
 	// set up 32 colors 1:1 pens and flipped colors for background tiles (D7 of color_center_bot)
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		palette.set_pen_indirect(i, i);
-		palette.set_pen_indirect(32+i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
+		palette.set_pen_indirect(32 + i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
 	}
 }
 
@@ -962,11 +960,11 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_DEVICE_PROGRAM_MAP(decocass_sound_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
-	MCFG_DEVICE_ADD("mcu", I8041, HCLK)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, decocass_state, i8041_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, decocass_state, i8041_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, decocass_state, i8041_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, decocass_state, i8041_p2_w))
+	I8041(config, m_mcu, HCLK);
+	m_mcu->p1_in_cb().set(FUNC(decocass_state::i8041_p1_r));
+	m_mcu->p1_out_cb().set(FUNC(decocass_state::i8041_p1_w));
+	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));
+	m_mcu->p2_out_cb().set(FUNC(decocass_state::i8041_p2_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 
@@ -978,12 +976,10 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 0*8, 256, 272, 1*8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_decocass)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_decocass)
+	PALETTE(config, m_palette, FUNC(decocass_state::decocass_palette), 64, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

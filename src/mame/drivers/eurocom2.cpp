@@ -445,12 +445,12 @@ MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
-
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(eurocom2_state, kbd_put))
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(eurocom2_state::kbd_put));
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readca1_handler().set(FUNC(eurocom2_state::pia1_ca1_r));  // keyboard strobe

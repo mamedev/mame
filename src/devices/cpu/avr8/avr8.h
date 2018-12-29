@@ -44,30 +44,6 @@
 
 
 //**************************************************************************
-//  FUSE BITS CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CPU_AVR8_LFUSE(byte) \
-	((avr8_device*) device)->set_low_fuses(byte);
-
-#define MCFG_CPU_AVR8_HFUSE(byte) \
-	((avr8_device*) device)->set_high_fuses(byte);
-
-#define MCFG_CPU_AVR8_EFUSE(byte) \
-	((avr8_device*) device)->set_extended_fuses(byte);
-
-#define MCFG_CPU_AVR8_LOCK(byte) \
-	((avr8_device*) device)->set_lock_bits(byte);
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CPU_AVR8_EEPROM(_tag) \
-	downcast<avr8_device &>(*device).set_eeprom_tag(_tag);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

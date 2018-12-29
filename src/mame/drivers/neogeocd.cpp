@@ -1049,11 +1049,11 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update)
 
 	// temporary until things are cleaned up
-	MCFG_DEVICE_ADD("tempcdc", LC89510_TEMP, 0) // cd controller
-	MCFG_SEGACD_HACK_SET_NEOCD
-	MCFG_SET_TYPE1_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type1 )
-	MCFG_SET_TYPE2_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type2 )
-	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type3 )
+	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
+	m_tempcdc->set_is_neoCD(true);
+	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
+	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
+	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3), this);
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 

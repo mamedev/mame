@@ -48,16 +48,16 @@ MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 	// - PIO
 	// - CGC
 	// - WDT
-	MCFG_DEVICE_ADD("tmpz84c015af", TMPZ84C015, XTAL(12'000'000)/2)         /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bm_012_memory_map)
+	TMPZ84C015(config, m_tmpz84c015af, XTAL(12'000'000)/2);         /* 6 MHz */
+	m_tmpz84c015af->set_addrmap(AS_PROGRAM, &msx_cart_bm_012_device::bm_012_memory_map);
 	// PIO callbacks
-	MCFG_TMPZ84C015_IN_PA_CB(READ8("bm012_pio", z80pio_device, pa_r))
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8("bm012_pio", z80pio_device, pa_w))
-	MCFG_TMPZ84C015_IN_PB_CB(READ8("bm012_pio", z80pio_device, pb_r))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8("bm012_pio", z80pio_device, pb_w))
-	MCFG_TMPZ84C015_OUT_BRDY_CB(WRITELINE("bm012_pio", z80pio_device, strobe_b))
+	m_tmpz84c015af->in_pa_callback().set("bm012_pio", FUNC(z80pio_device::pa_r));
+	m_tmpz84c015af->out_pa_callback().set("bm012_pio", FUNC(z80pio_device::pa_w));
+	m_tmpz84c015af->in_pb_callback().set("bm012_pio", FUNC(z80pio_device::pb_r));
+	m_tmpz84c015af->out_pb_callback().set("bm012_pio", FUNC(z80pio_device::pb_w));
+	m_tmpz84c015af->out_brdy_callback().set("bm012_pio", FUNC(z80pio_device::strobe_b));
 	// SIO callbacks
-	MCFG_TMPZ84C015_OUT_TXDA_CB(WRITELINE("mdout", midi_port_device, write_txd))
+	m_tmpz84c015af->out_txda_callback().set("mdout", FUNC(midi_port_device::write_txd));
 
 	// Sony CXK5864BSP-10L  (8KB ram)
 	// Sharp LH0081A Z80A-PIO-0 - For communicating between the MSX and the TMP

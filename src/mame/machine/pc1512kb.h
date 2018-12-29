@@ -62,7 +62,7 @@ private:
 		LED_NUM
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_device<vcs_control_port_device> m_joy;
 
 	required_ioport_array<11> m_y;

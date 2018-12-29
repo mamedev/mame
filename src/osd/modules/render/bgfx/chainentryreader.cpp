@@ -89,8 +89,8 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 					if (selection == "")
 					{
 						// create texture for specified file name
-						uint32_t flags = bilinear ? 0u : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-						flags |= clamp ? (BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_W_CLAMP) : 0u;
+						uint32_t flags = bilinear ? 0u : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+						flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP) : 0u;
 						bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), texture_name, texture_name, flags, screen_index);
 						if (texture == nullptr)
 						{
@@ -100,8 +100,8 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 					else
 					{
 						// create texture for specified file name
-						uint32_t flags = bilinear ? 0u : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-						flags |= clamp ? (BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_W_CLAMP) : 0u;
+						uint32_t flags = bilinear ? 0u : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+						flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP) : 0u;
 						bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), texture_name, texture_name, flags, screen_index);
 						if (texture == nullptr)
 						{
@@ -153,8 +153,8 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 									if (file_extension == extension)
 									{
 										// create textures for all files containd in the path of the specified file name
-										uint32_t flags = bilinear ? 0u : (BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-										flags |= clamp ? (BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_W_CLAMP) : 0u;
+										uint32_t flags = bilinear ? 0u : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+										flags |= clamp ? (BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP) : 0u;
 										bgfx_texture* texture = chains.textures().create_png_texture(chains.options().art_path(), file_path, file_path, flags, screen_index);
 										if (texture == nullptr)
 										{

@@ -23,12 +23,12 @@ public:
 		m_palette(*this, "palette"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_soundcpu(*this, "soundcpu"),
 		m_pcm(*this, "pcm"),
 		m_pcm_region(*this, "pcm"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_screen(*this, "screen"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_mainbank(*this, "mainbank")
 	{ }
@@ -52,6 +52,8 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_bg_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<cpu_device> m_soundcpu;
 
 	uint8_t m_vram_bank_mask;
 	int m_robokid_sprites;
@@ -84,12 +86,10 @@ protected:
 	void ninjakd2_core(machine_config &config);
 
 private:
-	required_device<cpu_device> m_soundcpu;
 	optional_device<samples_device> m_pcm;
 	optional_memory_region m_pcm_region;
 	required_shared_ptr<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_device<screen_device> m_screen;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	required_memory_bank m_mainbank;

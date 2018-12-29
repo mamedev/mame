@@ -74,19 +74,19 @@ static GFXDECODE_START( gfx_vdt911 )
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_device::frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 GFXDECODE_END
 
-static const unsigned char vdt911_colors[] =
+static constexpr rgb_t vdt911_colors[] =
 {
-	0x00,0x00,0x00, /* black */
-	0xC0,0xC0,0xC0, /* low intensity */
-	0xFF,0xFF,0xFF  /* high intensity */
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0xc0, 0xc0, 0xc0 }, // low intensity
+	{ 0xff, 0xff, 0xff }  // high intensity
 };
 
-static const unsigned short vdt911_palette[] =
+static const unsigned short vdt911_pens[] =
 {
-	0, 2,   /* high intensity */
-	0, 1,   /* low intensity */
-	2, 0,   /* high intensity, reverse */
-	2, 1    /* low intensity, reverse */
+	0, 2,   // high intensity
+	0, 1,   // low intensity
+	2, 0,   // high intensity, reverse
+	2, 1    // low intensity, reverse
 };
 
 /*
@@ -104,18 +104,13 @@ static const unsigned short vdt911_palette[] =
 /*
     Initialize vdt911 palette
 */
-PALETTE_INIT_MEMBER(vdt911_device, vdt911)
+void vdt911_device::vdt911_palette(palette_device &palette) const
 {
-	uint8_t i, r, g, b;
+	for (int i = 0; i < ARRAY_LENGTH(vdt911_colors); i++)
+		palette.set_indirect_color(i, vdt911_colors[i]);
 
-	for ( i = 0; i < 3; i++ )
-	{
-		r = vdt911_colors[i*3]; g = vdt911_colors[i*3+1]; b = vdt911_colors[i*3+2];
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	for(i=0;i<8;i++)
-		palette.set_pen_indirect(i, vdt911_palette[i]);
+	for (int i = 0; i < ARRAY_LENGTH(vdt911_pens); i++)
+		palette.set_pen_indirect(i, vdt911_pens[i]);
 }
 
 /*
@@ -809,9 +804,7 @@ MACHINE_CONFIG_START(vdt911_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(3)
-	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
+	PALETTE(config, "palette", FUNC(vdt911_device::vdt911_palette), ARRAY_LENGTH(vdt911_pens), ARRAY_LENGTH(vdt911_colors));
 MACHINE_CONFIG_END
 
 ioport_constructor vdt911_device::device_input_ports() const

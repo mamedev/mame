@@ -9,7 +9,6 @@
     By R. Belmont, Ryan Holtz
 
 ***************************************************************************/
-
 #ifndef MAME_VIDEO_GBA_LCD_H
 #define MAME_VIDEO_GBA_LCD_H
 
@@ -209,8 +208,7 @@ private:
 	uint32_t decrease_brightness(uint32_t color);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(gba);
-
+	void gba_palette(palette_device &palette) const;
 
 	devcb_write_line m_int_hblank_cb;   /* H-Blank interrupt callback function */
 	devcb_write_line m_int_vblank_cb;   /* V-Blank interrupt callback function */

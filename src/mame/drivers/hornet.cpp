@@ -1101,7 +1101,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	screen.set_visarea(0, 64 * 8 - 1, 0, 48 * 8 - 1);
 	screen.set_screen_update(FUNC(hornet_state::screen_update));
 
-	PALETTE(config, "palette", 65536);
+	PALETTE(config, "palette").set_entries(65536);
 
 	K037122(config, m_k037122_1, 0);
 	m_k037122_1->set_screen("screen");
@@ -1181,6 +1181,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
 	hornet_2board(config);
+
 	VOODOO_2(config.replace(), m_voodoo[0], STD_VOODOO_2_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4, 0);

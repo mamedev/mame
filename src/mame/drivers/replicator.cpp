@@ -153,8 +153,8 @@
 class replicator_state : public driver_device
 {
 public:
-	replicator_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	replicator_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lcdc(*this, "hd44780"),
 		m_dac(*this, "dac")
@@ -189,7 +189,7 @@ private:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(replicator);
+	void replicator_palette(palette_device &palette) const;
 	void replicator_data_map(address_map &map);
 	void replicator_io_map(address_map &map);
 	void replicator_prg_map(address_map &map);
@@ -587,11 +587,11 @@ void replicator_state::machine_reset()
 	m_port_l = 0;
 }
 
-PALETTE_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::replicator_palette(palette_device &palette) const
 {
-//These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
-	palette.set_pen_color(0, rgb_t(0xCA, 0xE7, 0xEB));
-	palette.set_pen_color(1, rgb_t(0x78, 0xAB, 0xA8));
+	// These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
+	palette.set_pen_color(0, rgb_t(0xca, 0xe7, 0xeb));
+	palette.set_pen_color(1, rgb_t(0x78, 0xab, 0xa8));
 }
 
 static const gfx_layout hd44780_charlayout =
@@ -609,44 +609,43 @@ static GFXDECODE_START( gfx_replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(replicator_state::replicator)
+void replicator_state::replicator(machine_config &config)
+{
+	ATMEGA1280(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &replicator_state::replicator_prg_map);
+	m_maincpu->set_addrmap(AS_DATA, &replicator_state::replicator_data_map);
+	m_maincpu->set_addrmap(AS_IO, &replicator_state::replicator_io_map);
 
-	MCFG_DEVICE_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(replicator_prg_map)
-	MCFG_DEVICE_DATA_MAP(replicator_data_map)
-	MCFG_DEVICE_IO_MAP(replicator_io_map)
-
-	MCFG_CPU_AVR8_EEPROM("eeprom")
-	MCFG_CPU_AVR8_LFUSE(0xFF)
-	MCFG_CPU_AVR8_HFUSE(0xDA)
-	MCFG_CPU_AVR8_EFUSE(0xF4)
-	MCFG_CPU_AVR8_LOCK(0x0F)
+	m_maincpu->set_eeprom_tag("eeprom");
+	m_maincpu->set_low_fuses(0xff);
+	m_maincpu->set_high_fuses(0xda);
+	m_maincpu->set_extended_fuses(0xf4);
+	m_maincpu->set_lock_bits(0x0f);
 
 	/*TODO: Add an ATMEGA8U2 for USB-Serial communications */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(120, 18*2) //4x20 chars
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18*2-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(120, 18*2); //4x20 chars
+	screen.set_visarea(0, 120-1, 0, 18*2-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_replicator)
+	PALETTE(config, "palette", FUNC(replicator_state::replicator_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(4, 20)
+	HD44780(config, "hd44780", 0).set_lcd_size(4, 20);
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(0, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
 ROM_START( replica1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )

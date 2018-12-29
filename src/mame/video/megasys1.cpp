@@ -752,7 +752,7 @@ void megasys1_state::priority_create()
 
 }
 
-PALETTE_INIT_MEMBER(megasys1_state,megasys1)
+void megasys1_state::megasys1_palette(palette_device &palette)
 {
 	priority_create();
 }

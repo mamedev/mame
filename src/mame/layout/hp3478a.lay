@@ -131,10 +131,10 @@
 
 
 <!-- to match the schematics, we consider Col.0-3 to be driven by P14-17. The value in "inputmask" is the one read as "p1 & 0x0F", i.e. P13-P10. -->
-<!--	col.0 : (nc)|shift|ACA|DCA
-		col.1 : 4W|2W|ACV|DCV
-		col.2 : int|dn|up|auto
-		col.3 : (nc)|loc|srq|sgl -->
+<!--    col.0 : (nc)|shift|ACA|DCA
+        col.1 : 4W|2W|ACV|DCV
+        col.2 : int|dn|up|auto
+        col.3 : (nc)|loc|srq|sgl -->
 		<bezel element="hl" inputtag="COL.0" inputmask="0x01"><bounds x="65" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
 		<bezel element="hl" inputtag="COL.0" inputmask="0x02"><bounds x="80" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
 		<bezel element="hl" inputtag="COL.0" inputmask="0x04"><bounds x="95" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>

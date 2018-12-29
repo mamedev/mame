@@ -1592,8 +1592,8 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 
 	GFXDECODE(config, m_gfxdecode, "pcgpalette", gfxdecode_device::empty);
 
-	PALETTE(config, m_gfxpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
-	PALETTE(config, m_pcgpalette, 256).set_format(raw_to_rgb_converter(2, &x68k_state::GGGGGRRRRRBBBBBI_decoder));
+	PALETTE(config, m_gfxpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
+	PALETTE(config, m_pcgpalette).set_format(2, &x68k_state::GGGGGRRRRRBBBBBI, 256);
 
 	config.set_default_layout(layout_x68000);
 
@@ -1616,7 +1616,7 @@ MACHINE_CONFIG_START(x68k_state::x68000_base)
 	FILTER_VOLUME(config, m_adpcm_out[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, m_adpcm_out[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	UPD72065(config, m_upd72065, 0, true, false);
+	UPD72065(config, m_upd72065, 16_MHz_XTAL / 2, true, false); // clocked through SED9420CAC
 	m_upd72065->intrq_wr_callback().set(FUNC(x68k_state::fdc_irq));
 	m_upd72065->drq_wr_callback().set(m_hd63450, FUNC(hd63450_device::drq0_w));
 	FLOPPY_CONNECTOR(config, "upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats);

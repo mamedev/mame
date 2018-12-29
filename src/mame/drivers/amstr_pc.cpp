@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	PC_LPT(config, m_lpt2);
 	m_lpt2->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir5_w));
 
-	MCFG_PC_JOY_ADD("pc_joy")
+	PC_JOY(config, "pc_joy");
 
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 

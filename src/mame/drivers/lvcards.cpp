@@ -475,9 +475,8 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lvcards)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_lvcards);
+	PALETTE(config, "palette", FUNC(lvcards_state::lvcards_palette), 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -506,8 +505,7 @@ MACHINE_CONFIG_START(lvpoker_state::ponttehk)
 	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
 
 	// video hardware
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config.replace(), "palette", palette_device::RGB_444_PROMS, "proms", 256);
 MACHINE_CONFIG_END
 
 ROM_START( lvpoker )

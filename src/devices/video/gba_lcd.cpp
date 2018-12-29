@@ -16,54 +16,56 @@
 #include "screen.h"
 
 
-/* LCD I/O Registers */
-#define DISPCNT     HWLO(0x000)  /* 0x4000000  2  R/W   LCD Control */
-#define GRNSWAP     HWHI(0x000)  /* 0x4000002  2  R/W   Undocumented - Green Swap */
-#define DISPSTAT    HWLO(0x004)  /* 0x4000004  2  R/W   General LCD Status (STAT,LYC) */
-#define VCOUNT      HWHI(0x004)  /* 0x4000006  2  R     Vertical Counter (LY) */
-#define BG0CNT      HWLO(0x008)  /* 0x4000008  2  R/W   BG0 Control */
-#define BG1CNT      HWHI(0x008)  /* 0x400000a  2  R/W   BG1 Control */
-#define BG2CNT      HWLO(0x00c)  /* 0x400000c  2  R/W   BG2 Control */
-#define BG3CNT      HWHI(0x00c)  /* 0x400000e  2  R/W   BG3 Control */
-#define BG0HOFS     HWLO(0x010)  /* 0x4000010  2  W     BG0 X-Offset */
-#define BG0VOFS     HWHI(0x010)  /* 0x4000012  2  W     BG0 Y-Offset */
-#define BG1HOFS     HWLO(0x014)  /* 0x4000014  2  W     BG1 X-Offset */
-#define BG1VOFS     HWHI(0x014)  /* 0x4000016  2  W     BG1 Y-Offset */
-#define BG2HOFS     HWLO(0x018)  /* 0x4000018  2  W     BG2 X-Offset */
-#define BG2VOFS     HWHI(0x018)  /* 0x400001a  2  W     BG2 Y-Offset */
-#define BG3HOFS     HWLO(0x01c)  /* 0x400001c  2  W     BG3 X-Offset */
-#define BG3VOFS     HWHI(0x01c)  /* 0x400001e  2  W     BG3 Y-Offset */
-#define BG2PA       HWLO(0x020)  /* 0x4000020  2  W     BG2 Rotation/Scaling Parameter A (dx) */
-#define BG2PB       HWHI(0x020)  /* 0x4000022  2  W     BG2 Rotation/Scaling Parameter B (dmx) */
-#define BG2PC       HWLO(0x024)  /* 0x4000024  2  W     BG2 Rotation/Scaling Parameter C (dy) */
-#define BG2PD       HWHI(0x024)  /* 0x4000026  2  W     BG2 Rotation/Scaling Parameter D (dmy) */
-#define BG2X        WORD(0x028)  /* 0x4000028  4  W     BG2 Reference Point X-Coordinate */
-#define BG2Y        WORD(0x02c)  /* 0x400002c  4  W     BG2 Reference Point Y-Coordinate */
-#define BG3PA       HWLO(0x030)  /* 0x4000030  2  W     BG3 Rotation/Scaling Parameter A (dx) */
-#define BG3PB       HWHI(0x030)  /* 0x4000032  2  W     BG3 Rotation/Scaling Parameter B (dmx) */
-#define BG3PC       HWLO(0x034)  /* 0x4000034  2  W     BG3 Rotation/Scaling Parameter C (dy) */
-#define BG3PD       HWHI(0x034)  /* 0x4000036  2  W     BG3 Rotation/Scaling Parameter D (dmy) */
-#define BG3X        WORD(0x038)  /* 0x4000038  4  W     BG3 Reference Point X-Coordinate */
-#define BG3Y        WORD(0x03c)  /* 0x400003c  4  W     BG3 Reference Point Y-Coordinate */
-#define WIN0H       HWLO(0x040)  /* 0x4000040  2  W     Window 0 Horizontal Dimensions */
-#define WIN1H       HWHI(0x040)  /* 0x4000042  2  W     Window 1 Horizontal Dimensions */
-#define WIN0V       HWLO(0x044)  /* 0x4000044  2  W     Window 0 Vertical Dimensions */
-#define WIN1V       HWHI(0x044)  /* 0x4000046  2  W     Window 1 Vertical Dimensions */
-#define WININ       HWLO(0x048)  /* 0x4000048  2  R/W   Inside of Window 0 and 1 */
-#define WINOUT      HWHI(0x048)  /* 0x400004a  2  R/W   Inside of OBJ Window & Outside of Windows */
-#define MOSAIC      HWLO(0x04c)  /* 0x400004c  2  W     Mosaic Size */
-								 /* 0x400004e  2  -     Unused */
-#define BLDCNT      HWLO(0x050)  /* 0x4000050  2  R/W   Color Special Effects Selection */
-#define BLDALPHA    HWHI(0x050)  /* 0x4000052  2  W     Alpha Blending Coefficients */
-#define BLDY        HWLO(0x054)  /* 0x4000054  2  W     Brightness (Fade-In/Out) Coefficient */
-								 /* 0x4000056  2  -     Unused */
+namespace {
+
+// LCD I/O Registers
+#define DISPCNT     HWLO(0x000)  // 0x4000000  2  R/W   LCD Control
+#define GRNSWAP     HWHI(0x000)  // 0x4000002  2  R/W   Undocumented - Green Swap
+#define DISPSTAT    HWLO(0x004)  // 0x4000004  2  R/W   General LCD Status (STAT,LYC)
+#define VCOUNT      HWHI(0x004)  // 0x4000006  2  R     Vertical Counter (LY)
+#define BG0CNT      HWLO(0x008)  // 0x4000008  2  R/W   BG0 Control
+#define BG1CNT      HWHI(0x008)  // 0x400000a  2  R/W   BG1 Control
+#define BG2CNT      HWLO(0x00c)  // 0x400000c  2  R/W   BG2 Control
+#define BG3CNT      HWHI(0x00c)  // 0x400000e  2  R/W   BG3 Control
+#define BG0HOFS     HWLO(0x010)  // 0x4000010  2  W     BG0 X-Offset
+#define BG0VOFS     HWHI(0x010)  // 0x4000012  2  W     BG0 Y-Offset
+#define BG1HOFS     HWLO(0x014)  // 0x4000014  2  W     BG1 X-Offset
+#define BG1VOFS     HWHI(0x014)  // 0x4000016  2  W     BG1 Y-Offset
+#define BG2HOFS     HWLO(0x018)  // 0x4000018  2  W     BG2 X-Offset
+#define BG2VOFS     HWHI(0x018)  // 0x400001a  2  W     BG2 Y-Offset
+#define BG3HOFS     HWLO(0x01c)  // 0x400001c  2  W     BG3 X-Offset
+#define BG3VOFS     HWHI(0x01c)  // 0x400001e  2  W     BG3 Y-Offset
+#define BG2PA       HWLO(0x020)  // 0x4000020  2  W     BG2 Rotation/Scaling Parameter A (dx)
+#define BG2PB       HWHI(0x020)  // 0x4000022  2  W     BG2 Rotation/Scaling Parameter B (dmx)
+#define BG2PC       HWLO(0x024)  // 0x4000024  2  W     BG2 Rotation/Scaling Parameter C (dy)
+#define BG2PD       HWHI(0x024)  // 0x4000026  2  W     BG2 Rotation/Scaling Parameter D (dmy)
+#define BG2X        WORD(0x028)  // 0x4000028  4  W     BG2 Reference Point X-Coordinate
+#define BG2Y        WORD(0x02c)  // 0x400002c  4  W     BG2 Reference Point Y-Coordinate
+#define BG3PA       HWLO(0x030)  // 0x4000030  2  W     BG3 Rotation/Scaling Parameter A (dx)
+#define BG3PB       HWHI(0x030)  // 0x4000032  2  W     BG3 Rotation/Scaling Parameter B (dmx)
+#define BG3PC       HWLO(0x034)  // 0x4000034  2  W     BG3 Rotation/Scaling Parameter C (dy)
+#define BG3PD       HWHI(0x034)  // 0x4000036  2  W     BG3 Rotation/Scaling Parameter D (dmy)
+#define BG3X        WORD(0x038)  // 0x4000038  4  W     BG3 Reference Point X-Coordinate
+#define BG3Y        WORD(0x03c)  // 0x400003c  4  W     BG3 Reference Point Y-Coordinate
+#define WIN0H       HWLO(0x040)  // 0x4000040  2  W     Window 0 Horizontal Dimensions
+#define WIN1H       HWHI(0x040)  // 0x4000042  2  W     Window 1 Horizontal Dimensions
+#define WIN0V       HWLO(0x044)  // 0x4000044  2  W     Window 0 Vertical Dimensions
+#define WIN1V       HWHI(0x044)  // 0x4000046  2  W     Window 1 Vertical Dimensions
+#define WININ       HWLO(0x048)  // 0x4000048  2  R/W   Inside of Window 0 and 1
+#define WINOUT      HWHI(0x048)  // 0x400004a  2  R/W   Inside of OBJ Window & Outside of Windows
+#define MOSAIC      HWLO(0x04c)  // 0x400004c  2  W     Mosaic Size
+								 // 0x400004e  2  -     Unused
+#define BLDCNT      HWLO(0x050)  // 0x4000050  2  R/W   Color Special Effects Selection
+#define BLDALPHA    HWHI(0x050)  // 0x4000052  2  W     Alpha Blending Coefficients
+#define BLDY        HWLO(0x054)  // 0x4000054  2  W     Brightness (Fade-In/Out) Coefficient
+								 // 0x4000056  2  -     Unused
 
 #define DISPSTAT_SET(val)       HWLO_SET(0x004, val)
 #define DISPSTAT_RESET(val)     HWLO_RESET(0x004, val)
 
 #define VERBOSE_LEVEL   (0)
 
-static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -138,6 +140,8 @@ private:
 	uint16_t m_attr1;
 	uint16_t m_attr2;
 };
+
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE(GBA_LCD, gba_lcd_device, "gba_lcd", "GBA LCD")
 
@@ -1728,7 +1732,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 	m_scan_timer->adjust(screen().time_until_pos((scanline + 1) % 228, 0));
 }
 
-PALETTE_INIT_MEMBER(gba_lcd_device, gba)
+void gba_lcd_device::gba_palette(palette_device &palette) const
 {
 	for (uint8_t b = 0; b < 32; b++)
 	{
@@ -1809,6 +1813,5 @@ MACHINE_CONFIG_START(gba_lcd_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_INIT_OWNER(gba_lcd_device, gba)
+	PALETTE(config, "palette", FUNC(gba_lcd_device::gba_palette), 32768);
 MACHINE_CONFIG_END

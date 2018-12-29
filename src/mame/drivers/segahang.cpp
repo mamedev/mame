@@ -757,17 +757,17 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segahang_state::shared_base)
-
+void segahang_state::shared_base(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/4)
-	MCFG_DEVICE_PROGRAM_MAP(hangon_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
+	M68000(config, m_maincpu, MASTER_CLOCK_25MHz/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::hangon_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, MASTER_CLOCK_25MHz/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segahang_state::sub_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	I8255(config, m_i8255_1);
 	m_i8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
@@ -779,20 +779,19 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	m_i8255_2->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
 
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
-	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
+	SEGAIC16_ROAD(config, m_segaic16road, 0);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segahang)
-	MCFG_PALETTE_ADD("palette", 2048*3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_segahang);
+	PALETTE(config, m_palette).set_entries(2048*3);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segahang_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segahang_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-MACHINE_CONFIG_END
-
+}
 
 void segahang_state::hangon_base(machine_config &config)
 {
@@ -801,115 +800,112 @@ void segahang_state::hangon_base(machine_config &config)
 	SEGA_HANGON_SPRITES(config, m_sprites, 0);
 }
 
-
-MACHINE_CONFIG_START(segahang_state::sharrier_base)
+void segahang_state::sharrier_base(machine_config &config)
+{
 	shared_base(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(MASTER_CLOCK_10MHz)
-	MCFG_DEVICE_PROGRAM_MAP(sharrier_map)
+	m_maincpu->set_clock(MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::sharrier_map);
 
-	MCFG_DEVICE_MODIFY("subcpu")
-	MCFG_DEVICE_CLOCK(MASTER_CLOCK_10MHz)
+	m_subcpu->set_clock(MASTER_CLOCK_10MHz);
 
 	// video hardware
 	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segahang_state::enduror_base)
+void segahang_state::enduror_base(machine_config &config)
+{
 	sharrier_base(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
-	MCFG_DEVICE_PROGRAM_MAP(sharrier_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::sharrier_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::irq4_line_hold));
+}
 
-MACHINE_CONFIG_START(segahang_state::endurord_base)
+void segahang_state::endurord_base(machine_config &config)
+{
 	sharrier_base(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REPLACE("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MCFG_DEVICE_PROGRAM_MAP(sharrier_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	M68000(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::sharrier_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::irq4_line_hold));
+}
 
-MACHINE_CONFIG_START(segahang_state::sound_board_2203)
-
+void segahang_state::sound_board_2203(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_2203)
-	MCFG_DEVICE_IO_MAP(sound_portmap_2203)
+	Z80(config, m_soundcpu, MASTER_CLOCK_8MHz/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segahang_state::sound_map_2203);
+	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2203);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(3, "lspeaker",  0.37)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.37)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK_8MHz/2));
+	ymsnd.irq_handler().set_inputline("soundcpu", 0);
+	ymsnd.add_route(0, "lspeaker",  0.13);
+	ymsnd.add_route(0, "rspeaker", 0.13);
+	ymsnd.add_route(1, "lspeaker",  0.13);
+	ymsnd.add_route(1, "rspeaker", 0.13);
+	ymsnd.add_route(2, "lspeaker",  0.13);
+	ymsnd.add_route(2, "rspeaker", 0.13);
+	ymsnd.add_route(3, "lspeaker",  0.37);
+	ymsnd.add_route(3, "rspeaker", 0.37);
 
-	MCFG_DEVICE_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz));
+	pcm.set_bank(segapcm_device::BANK_512);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(segahang_state::sound_board_2203x2)
-
+void segahang_state::sound_board_2203x2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_2151)
-	MCFG_DEVICE_IO_MAP(sound_portmap_2203x2)
+	Z80(config, m_soundcpu, MASTER_CLOCK_8MHz/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segahang_state::sound_map_2151);
+	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2203x2);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(3, "lspeaker",  0.37)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.37)
+	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK_8MHz/2));
+	ym1.irq_handler().set_inputline("soundcpu", 0);
+	ym1.add_route(0, "lspeaker",  0.13);
+	ym1.add_route(0, "rspeaker", 0.13);
+	ym1.add_route(1, "lspeaker",  0.13);
+	ym1.add_route(1, "rspeaker", 0.13);
+	ym1.add_route(2, "lspeaker",  0.13);
+	ym1.add_route(2, "rspeaker", 0.13);
+	ym1.add_route(3, "lspeaker",  0.37);
+	ym1.add_route(3, "rspeaker", 0.37);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, MASTER_CLOCK_8MHz/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.13)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.13)
-	MCFG_SOUND_ROUTE(3, "lspeaker",  0.37)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.37)
+	ym2203_device &ym2(YM2203(config, "ym2", MASTER_CLOCK_8MHz/2));
+	ym2.add_route(0, "lspeaker",  0.13);
+	ym2.add_route(0, "rspeaker", 0.13);
+	ym2.add_route(1, "lspeaker",  0.13);
+	ym2.add_route(1, "rspeaker", 0.13);
+	ym2.add_route(2, "lspeaker",  0.13);
+	ym2.add_route(2, "rspeaker", 0.13);
+	ym2.add_route(3, "lspeaker",  0.37);
+	ym2.add_route(3, "rspeaker", 0.37);
 
-	MCFG_DEVICE_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz/2));
+	pcm.set_bank(segapcm_device::BANK_512);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(segahang_state::sound_board_2151)
-
+void segahang_state::sound_board_2151(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_2151)
-	MCFG_DEVICE_IO_MAP(sound_portmap_2151)
+	Z80(config, m_soundcpu, MASTER_CLOCK_8MHz/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segahang_state::sound_map_2151);
+	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2151);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -920,97 +916,93 @@ MACHINE_CONFIG_START(segahang_state::sound_board_2151)
 	ymsnd.add_route(0, "lspeaker", 0.43);
 	ymsnd.add_route(1, "rspeaker", 0.43);
 
-	MCFG_DEVICE_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
+	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz/2));
+	pcm.set_bank(segapcm_device::BANK_512);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
 
 //**************************************************************************
 //  SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segahang_state::hangon)
+void segahang_state::hangon(machine_config &config)
+{
 	hangon_base(config);
 	sound_board_2203(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segahang_state::shangupb)
+void segahang_state::shangupb(machine_config &config)
+{
 	hangon_base(config);
 	sound_board_2151(config);
 
 	// not sure about these speeds, but at 6MHz, the road is not updated fast enough
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_DEVICE_MODIFY("subcpu")
-	MCFG_DEVICE_CLOCK(10000000)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(10000000);
+	m_subcpu->set_clock(10000000);
+}
 
-
-MACHINE_CONFIG_START(segahang_state::shangonro)
+void segahang_state::shangonro(machine_config &config)
+{
 	shangupb(config);
-	MCFG_DEVICE_REPLACE("subcpu", FD1094, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_OPCODES_MAP(fd1094_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_subcpu, 10000000);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segahang_state::sub_map);
+	m_subcpu->set_addrmap(AS_OPCODES, &segahang_state::fd1094_decrypted_opcodes_map);
+}
 
-
-MACHINE_CONFIG_START(segahang_state::sharrier)
+void segahang_state::sharrier(machine_config &config)
+{
 	sharrier_base(config);
 	sound_board_2203(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, i8751_main_cpu_vblank)
+	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::i8751_main_cpu_vblank));
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	I8751(config, m_mcu, 8000000);
+	m_mcu->set_addrmap(AS_IO, &segahang_state::mcu_io_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set_inputline("mcu", INPUT_LINE_IRQ0);
+}
 
-
-MACHINE_CONFIG_START(segahang_state::enduror)
+void segahang_state::enduror(machine_config &config)
+{
 	enduror_base(config);
 	sound_board_2151(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segahang_state::enduror1)
+void segahang_state::enduror1(machine_config &config)
+{
 	enduror_base(config);
 	sound_board_2203(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segahang_state::endurord)
+void segahang_state::endurord(machine_config &config)
+{
 	endurord_base(config);
 	sound_board_2151(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segahang_state::enduror1d)
+void segahang_state::enduror1d(machine_config &config)
+{
 	endurord_base(config);
 	sound_board_2203(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segahang_state::endurobl)
+void segahang_state::endurobl(machine_config &config)
+{
 	sharrier_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	m_maincpu->set_addrmap(AS_OPCODES, &segahang_state::decrypted_opcodes_map);
 
 	sound_board_2203(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segahang_state::endurob2)
+void segahang_state::endurob2(machine_config &config)
+{
 	sharrier_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	m_maincpu->set_addrmap(AS_OPCODES, &segahang_state::decrypted_opcodes_map);
 
 	sound_board_2203x2(config);
-MACHINE_CONFIG_END
+}
 
 
 

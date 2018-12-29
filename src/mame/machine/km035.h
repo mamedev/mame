@@ -36,7 +36,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8035_device> m_maincpu;
 	required_device<beep_device> m_speaker;
 
 	required_ioport_array<16> m_kbd;

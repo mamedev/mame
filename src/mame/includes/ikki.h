@@ -57,7 +57,7 @@ private:
 	DECLARE_READ8_MEMBER(ikki_e000_r);
 	DECLARE_WRITE8_MEMBER(ikki_coin_counters);
 	DECLARE_WRITE8_MEMBER(ikki_scrn_ctrl_w);
-	DECLARE_PALETTE_INIT(ikki);
+	void ikki_palette(palette_device &palette);
 	uint32_t screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ikki_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

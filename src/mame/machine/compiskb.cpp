@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "compiskb.h"
 
-#include "cpu/mcs48/mcs48.h"
-
 #include "speaker.h"
 
 
@@ -55,20 +53,20 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8748_TAG, I8748, 2016000) // XTAL(4'032'000)/2 ???
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, compis_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, compis_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, compis_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, compis_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(CONSTANT(0)) // ???
-	MCFG_MCS48_PORT_T1_IN_CB(CONSTANT(0)) // ???
+void compis_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8748(config, m_maincpu, 2016000); // XTAL(4'032'000)/2 ???
+	m_maincpu->bus_in_cb().set(FUNC(compis_keyboard_device::bus_r));
+	m_maincpu->bus_out_cb().set(FUNC(compis_keyboard_device::bus_w));
+	m_maincpu->p1_in_cb().set(FUNC(compis_keyboard_device::p1_r));
+	m_maincpu->p2_in_cb().set(FUNC(compis_keyboard_device::p2_r));
+	m_maincpu->t0_in_cb().set_constant(0); // ???
+	m_maincpu->t1_in_cb().set_constant(0); // ???
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 //-------------------------------------------------

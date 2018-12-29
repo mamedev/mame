@@ -859,11 +859,10 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superman);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
@@ -907,11 +906,10 @@ MACHINE_CONFIG_START(taitox_state::daisenpu)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superman);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
@@ -953,11 +951,10 @@ MACHINE_CONFIG_START(taitox_state::gigandes)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superman);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
@@ -1001,11 +998,10 @@ MACHINE_CONFIG_START(taitox_state::ballbros)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ballbros)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ballbros);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state, kyustrkr_no_layers)
 

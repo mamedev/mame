@@ -175,7 +175,7 @@ private:
 
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
-	DECLARE_PALETTE_INIT(megasys1);
+	void megasys1_palette(palette_device &palette);
 	DECLARE_MACHINE_RESET(megasys1_hachoo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

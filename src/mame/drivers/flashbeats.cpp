@@ -21,6 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/315_5296.h"
+#include "machine/315_5338a.h"
 #include "machine/te7750.h"
 #include "sound/scsp.h"
 #include "screen.h"
@@ -36,7 +37,8 @@ public:
 		m_scsp(*this, "scsp"),
 		m_sound_ram(*this, "sound_ram"),
 		m_eeprom(*this, "eeprom"),
-		m_315_5296(*this, "segaio1")
+		m_315_5296(*this, "segaio1"),
+		m_315_5338a(*this, "segaio2")
 	{
 	}
 
@@ -61,6 +63,7 @@ private:
 	required_shared_ptr<uint16_t> m_sound_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<sega_315_5296_device> m_315_5296;
+	required_device<sega_315_5338a_device> m_315_5338a;
 
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 };
@@ -116,6 +119,7 @@ void flashbeats_state::flashbeats_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x400000, 0x40007f).rw(m_315_5296, FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0xff00);
 	map(0x600000, 0x60001f).rw("telio", FUNC(te7752_device::read), FUNC(te7752_device::write)).umask16(0xff00);
+	map(0x800000, 0x80001f).rw(m_315_5338a, FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa0ffff).ram();
 	map(0xa10000, 0xa10fff).ram();
 }
@@ -150,6 +154,8 @@ void flashbeats_state::flashbeats(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	SEGA_315_5296(config, m_315_5296, 8_MHz_XTAL);
+
+	SEGA_315_5338A(config, m_315_5338a, 32_MHz_XTAL);
 
 	te7752_device &te7752(TE7752(config, "telio"));
 	te7752.ios_cb().set_constant(1);

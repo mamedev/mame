@@ -21,8 +21,8 @@ void pitnrun_state::machine_start()
 	save_item(NAME(m_toz80));
 	save_item(NAME(m_zaccept));
 	save_item(NAME(m_zready));
-	save_item(NAME(m_portA_in));
-	save_item(NAME(m_portA_out));
+	save_item(NAME(m_porta_in));
+	save_item(NAME(m_porta_out));
 	save_item(NAME(m_address));
 }
 
@@ -66,14 +66,14 @@ READ8_MEMBER(pitnrun_state::mcu_status_r)
 }
 
 
-READ8_MEMBER(pitnrun_state::m68705_portA_r)
+READ8_MEMBER(pitnrun_state::m68705_porta_r)
 {
-	return m_portA_in;
+	return m_porta_in;
 }
 
-WRITE8_MEMBER(pitnrun_state::m68705_portA_w)
+WRITE8_MEMBER(pitnrun_state::m68705_porta_w)
 {
-	m_portA_out = data;
+	m_porta_out = data;
 }
 
 
@@ -96,7 +96,7 @@ WRITE8_MEMBER(pitnrun_state::m68705_portA_w)
  *               the main Z80 memory location to access)
  */
 
-READ8_MEMBER(pitnrun_state::m68705_portB_r)
+READ8_MEMBER(pitnrun_state::m68705_portb_r)
 {
 	return 0xff;
 }
@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_status_real_w)
 	m_zaccept = 0;
 }
 
-WRITE8_MEMBER(pitnrun_state::m68705_portB_w)
+WRITE8_MEMBER(pitnrun_state::m68705_portb_w)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	if (~data & 0x02)
@@ -121,28 +121,28 @@ WRITE8_MEMBER(pitnrun_state::m68705_portB_w)
 		/* 68705 is going to read data from the Z80 */
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_data_real_r),this));
 		m_mcu->set_input_line(0,CLEAR_LINE);
-		m_portA_in = m_fromz80;
+		m_porta_in = m_fromz80;
 	}
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_status_real_w),this), m_portA_out);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_status_real_w),this), m_porta_out);
 	}
 	if (~data & 0x10)
 	{
-		cpu0space.write_byte(m_address, m_portA_out);
+		cpu0space.write_byte(m_address, m_porta_out);
 	}
 	if (~data & 0x20)
 	{
-		m_portA_in = cpu0space.read_byte(m_address);
+		m_porta_in = cpu0space.read_byte(m_address);
 	}
 	if (~data & 0x40)
 	{
-		m_address = (m_address & 0xff00) | m_portA_out;
+		m_address = (m_address & 0xff00) | m_porta_out;
 	}
 	if (~data & 0x80)
 	{
-		m_address = (m_address & 0x00ff) | (m_portA_out << 8);
+		m_address = (m_address & 0x00ff) | (m_porta_out << 8);
 	}
 }
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER(pitnrun_state::m68705_portB_w)
  *                  passes through)
  */
 
-READ8_MEMBER(pitnrun_state::m68705_portC_r)
+READ8_MEMBER(pitnrun_state::m68705_portc_r)
 {
 	return (m_zready << 0) | (m_zaccept << 1);
 }

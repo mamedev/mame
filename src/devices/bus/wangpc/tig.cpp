@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(wangpc_tig_device::device_add_mconfig)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	UPD7220(config, m_hgdc0, XTAL(52'832'000)/28);
 	m_hgdc0->set_addrmap(0, &wangpc_tig_device::upd7220_0_map);

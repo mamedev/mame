@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 /*
-** msx.c : driver for MSX
+** msx.cpp : driver for MSX
 **
 ** cpc300:
 **  To get out of the MSX Tutor press the SELECT key. Entering SET SYSTEM 1 should
@@ -1310,7 +1310,7 @@ void msx_state::msx_mb8877a(machine_config & config)
 
 void msx_state::msx_tc8566af(machine_config &config)
 {
-	TC8566AF(config, "fdc");
+	TC8566AF(config, "fdc", 16'000'000);
 }
 
 void msx_state::msx_microsol(machine_config &config)
@@ -7953,7 +7953,7 @@ MACHINE_CONFIG_START(msx2_state::fsa1fx)
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
 	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
 	msx_tc8566af(config);
 	msx_1_35_dd_drive(config);
@@ -7999,7 +7999,7 @@ MACHINE_CONFIG_START(msx2_state::fsa1wsx)
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
 	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
 	msx_ym2413(config);
 
@@ -8047,7 +8047,7 @@ MACHINE_CONFIG_START(msx2_state::fsa1wx)
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
 	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
 	msx_ym2413(config);
 
@@ -8093,7 +8093,7 @@ MACHINE_CONFIG_START(msx2_state::fsa1wxa)
 	msx_matsushita_device &matsushita(MSX_MATSUSHITA(config, "matsushita", 0));
 	matsushita.turbo_callback().set(FUNC(msx2_state::turbo_w));
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
 	msx_ym2413(config);
 
@@ -8130,7 +8130,7 @@ MACHINE_CONFIG_START(msx2_state::phc35j)
 	MCFG_MSX_LAYOUT_ROM("ext", 3, 1, 0, 1, "maincpu", 0x8000)
 	MCFG_MSX_LAYOUT_ROM("kdr", 3, 1, 1, 2, "maincpu", 0xc000)
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -8168,7 +8168,7 @@ MACHINE_CONFIG_START(msx2_state::phc70fd)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x18000)
 	MCFG_MSX_LAYOUT_ROM("bas", 3, 3, 2, 1, "maincpu", 0x1c000)
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
 	msx_ym2413(config);
 
@@ -8211,7 +8211,7 @@ MACHINE_CONFIG_START(msx2_state::phc70fd2)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x18000)
 	MCFG_MSX_LAYOUT_ROM("bas", 3, 3, 2, 1, "maincpu", 0x1c000)
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0xff);
 
 	msx_ym2413(config);
 
@@ -8256,7 +8256,7 @@ MACHINE_CONFIG_START(msx2_state::hbf1xdj)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x18000)
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -8303,7 +8303,7 @@ MACHINE_CONFIG_START(msx2_state::hbf1xv)
 	MCFG_MSX_LAYOUT_DISK1("disk", 3, 2, 1, 1, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_MUSIC("mus", 3, 3, 1, 1, "maincpu", 0x18000)
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
 	MSX_S1985(config, "s1985", 0);
 
@@ -8340,7 +8340,7 @@ MACHINE_CONFIG_START(msx2_state::hbf9sp)
 	MCFG_MSX_LAYOUT_ROM("firm2", 3, 1, 1, 2, "maincpu", 0x10000)
 	MCFG_MSX_LAYOUT_RAM_MM("ram_mm", 3, 2, 0x10000)   /* 64KB?? Mapper RAM */
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
 	msx2_cartlist(config);
 MACHINE_CONFIG_END
@@ -8378,7 +8378,7 @@ MACHINE_CONFIG_START(msx2_state::fsa1gt)
 	MCFG_MSX_LAYOUT_DISK4("dos", 3, 2, 1, 3, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 0, 4, "maincpu", 0x6c000)
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
 	msx_ym2413(config);
 
@@ -8421,7 +8421,7 @@ MACHINE_CONFIG_START(msx2_state::fsa1st)
 	MCFG_MSX_LAYOUT_DISK4("dos", 3, 2, 1, 3, "maincpu", 0xc000)
 	MCFG_MSX_LAYOUT_ROM("firm", 3, 3, 0, 4, "maincpu", 0x6c000)
 
-	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0x00)
+	MSX_SYSTEMFLAGS(config, "sysflags", m_maincpu, 0x00);
 
 	msx_ym2413(config);
 

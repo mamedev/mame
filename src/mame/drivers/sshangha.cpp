@@ -431,7 +431,7 @@ void sshangha_state::sshangha(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_sshangha);
 
-	PALETTE(config, m_palette, 0x4000).set_format(PALETTE_FORMAT_XBGR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4000);
 
 	DECO16IC(config, m_tilegen, 0);
 	m_tilegen->set_split(0);

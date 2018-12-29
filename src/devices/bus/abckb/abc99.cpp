@@ -153,30 +153,30 @@ void abc99_device::abc99_z5_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
+void abc99_device::device_add_mconfig(machine_config &config)
+{
 	// keyboard CPU
-	MCFG_DEVICE_ADD(I8035_Z2_TAG, I8035, XTAL(6'000'000)/3) // from Z5 T0 output
-	MCFG_DEVICE_PROGRAM_MAP(abc99_z2_mem)
-	MCFG_DEVICE_IO_MAP(abc99_z2_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, abc99_device, z2_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, abc99_device, z2_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, abc99_device, z2_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, abc99_device, z2_t1_r))
+	I8035(config, m_maincpu, XTAL(6'000'000)/3); // from Z5 T0 output
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z2_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc99_device::abc99_z2_io);
+	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(abc99_device::z2_p2_r));
+	m_maincpu->t0_in_cb().set(FUNC(abc99_device::z2_t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(abc99_device::z2_t1_r));
 
 	// mouse CPU
-	MCFG_DEVICE_ADD(I8035_Z5_TAG, I8035, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(abc99_z5_mem)
-	//MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, abc99_device, z5_p1_r))
-	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, abc99_device, z5_p2_w))
+	I8035(config, m_mousecpu, XTAL(6'000'000));
+	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z5_mem);
+	//m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
+	//m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM() // Z2 CLK
-	//MCFG_MCS48_PORT_T1_IN_CB(READ8(*this, abc99_device, z5_t1_r))
-	MCFG_DEVICE_DISABLE() // HACK fix for broken serial I/O
+	//m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
+	m_mousecpu->set_disable(); // HACK fix for broken serial I/O
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 //-------------------------------------------------

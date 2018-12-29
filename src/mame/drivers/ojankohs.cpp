@@ -730,10 +730,10 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
-	MCFG_PALETTE_ADD("palette", 1024)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ojankohs);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	VSYSTEM_GGA(config, "gga", XTAL(13'333'000)/2); // divider not verified
 
@@ -771,11 +771,10 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(ojankohs_state,ojankoy)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ojankohs);
+	PALETTE(config, m_palette, FUNC(ojankohs_state::ojankoy_palette), 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
@@ -811,10 +810,10 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
-	MCFG_PALETTE_ADD("palette", 1024)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ojankohs);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	VSYSTEM_GGA(config, "gga", XTAL(13'333'000)/2); // divider not verified
 
@@ -852,9 +851,9 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 248-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankoc)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoc)
 

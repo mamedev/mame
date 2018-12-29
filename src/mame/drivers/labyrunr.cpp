@@ -183,11 +183,9 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_labyrunr)
-	MCFG_PALETTE_ADD("palette", 2*8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(labyrunr_state, labyrunr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_labyrunr);
+	PALETTE(config, m_palette, FUNC(labyrunr_state::labyrunr_palette));
+	m_palette->set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
 	K007121(config, m_k007121, 0);
 	m_k007121->set_palette_tag(m_palette);

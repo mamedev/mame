@@ -5,11 +5,11 @@
     Sharp MZ-2500 (c) 1985 Sharp Corporation
 
 ********************************************************************************************************************************/
+#ifndef MAME_INCLUDES_MZ2500_H
+#define MAME_INCLUDES_MZ2500_H
 
 #pragma once
 
-#ifndef MAME_INCLUDES_MZ2500_H
-#define MAME_INCLUDES_MZ2500_H
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -34,8 +34,8 @@
 class mz2500_state : public driver_device
 {
 public:
-	mz2500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mz2500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_rtc(*this, RP5C15_TAG),
@@ -170,7 +170,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mz2500);
+	void mz2500_palette(palette_device &palette) const;
 	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
 
@@ -203,7 +203,7 @@ private:
 
 	void mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  pen,uint8_t width,uint8_t height);
 	void mz2500_reconfigure_screen();
-	uint8_t pal_256_param(int index, int param);
+	static uint8_t pal_256_param(int index, int param);
 	void reset_banks(uint8_t type);
 
 	void mz2500_io(address_map &map);
@@ -211,5 +211,4 @@ private:
 	void mz2500_bank_window_map(address_map &map);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_MZ2500_H

@@ -59,7 +59,7 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 
 // device type definition
 DEFINE_DEVICE_TYPE(I2CMEM, i2cmem_device, "i2cmem", "I2C Memory")
-
+DEFINE_DEVICE_TYPE(X2404P, x2404p_device, "x2404p", "X2404P I2C Memory")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -69,8 +69,8 @@ DEFINE_DEVICE_TYPE(I2CMEM, i2cmem_device, "i2cmem", "I2C Memory")
 //  i2cmem_device - constructor
 //-------------------------------------------------
 
-i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, I2CMEM, tag, owner, clock),
+i2cmem_device::i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
 	m_slave_address( I2CMEM_SLAVE_ADDRESS ),
@@ -89,8 +89,17 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 {
 }
 
+i2cmem_device::i2cmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i2cmem_device(mconfig, I2CMEM, tag, owner, clock)
+{
+}
 
-
+x2404p_device::x2404p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i2cmem_device(mconfig, X2404P, tag, owner, clock)
+{
+	set_page_size(8);
+	set_data_size(0x200);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

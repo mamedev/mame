@@ -362,9 +362,8 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	screen.screen_vblank().append(FUNC(raiden_state::vblank_irq));
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

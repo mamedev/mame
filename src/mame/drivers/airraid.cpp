@@ -392,7 +392,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(airraid_state::airraid)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)        /* verified on pcb */
+	MCFG_DEVICE_ADD(m_maincpu, Z80,XTAL(12'000'000)/2)        /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
 
@@ -403,8 +403,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
 	AIRRAID_VIDEO(config, m_airraid_video, 0);
 

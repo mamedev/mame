@@ -26,8 +26,8 @@ class bbc_fdc_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	template <typename T>
-	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
-		: bbc_fdc_slot_device(mconfig, tag, owner)
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+		: bbc_fdc_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		slot_options(*this);
@@ -35,7 +35,7 @@ public:
 		set_fixed(false);
 	}
 
-	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	auto intrq_wr_callback() { return m_intrq_cb.bind(); }

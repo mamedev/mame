@@ -66,8 +66,8 @@ struct EVENT_LIST_ITEM
 class spectrum_state : public driver_device
 {
 public:
-	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spectrum_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -95,7 +95,8 @@ public:
 		m_io_plus3(*this, "PLUS3"),
 		m_io_plus4(*this, "PLUS4"),
 		m_io_joy1(*this, "JOY1"),
-		m_io_joy2(*this, "JOY2") { }
+		m_io_joy2(*this, "JOY2")
+	{ }
 
 	void spectrum_common(machine_config &config);
 	void spectrum(machine_config &config);
@@ -179,7 +180,7 @@ protected:
 
 	DECLARE_MACHINE_RESET(spectrum);
 	DECLARE_VIDEO_START(spectrum);
-	DECLARE_PALETTE_INIT(spectrum);
+	void spectrum_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(tc2048);
 	DECLARE_VIDEO_START(spectrum_128);
 	DECLARE_MACHINE_RESET(spectrum_128);

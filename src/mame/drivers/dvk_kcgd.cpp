@@ -75,7 +75,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	DECLARE_PALETTE_INIT(kcgd);
+	void kcgd_palette(palette_device &palette) const;
 
 	enum
 	{
@@ -116,7 +116,7 @@ private:
 	} m_video;
 	std::unique_ptr<uint32_t[]> m_videoram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<k1801vm2_device> m_maincpu;
 //  required_device<ms7004_device> m_ms7004;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -178,12 +178,12 @@ void kcgd_state::video_start()
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 }
 
-PALETTE_INIT_MEMBER(kcgd_state, kcgd)
+void kcgd_state::kcgd_palette(palette_device &palette) const
 {
+	// FIXME: this doesn't seem right at all - no actual black, and all the grey levels are very close to black
+	// should it just initialise everything besides the first entry to black, or should it be a greyscale ramp?
 	for (int i = 0; i < 16; i++)
-	{
-		palette.set_pen_color(i, i?i:255, i?i:255, i?i:255);
-	}
+		palette.set_pen_color(i, i ? i : 255, i ? i : 255, i ? i : 255);
 }
 
 /*
@@ -347,9 +347,9 @@ static GFXDECODE_START( gfx_kcgd )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(kcgd_state::kcgd)
-	MCFG_DEVICE_ADD("maincpu", K1801VM2, XTAL(30'800'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(kcgd_mem)
-	MCFG_T11_INITIAL_MODE(0100000)
+	K1801VM2(config, m_maincpu, XTAL(30'800'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kcgd_state::kcgd_mem);
+	m_maincpu->set_initial_mode(0100000);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", kcgd_state, scanline_callback, attotime::from_hz(50*28*11)) // XXX verify
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(30'800'000)/KCGD_HORZ_START))
@@ -359,10 +359,9 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(30'800'000), KCGD_TOTAL_HORZ, KCGD_HORZ_START,
 		KCGD_HORZ_START+KCGD_DISP_HORZ, KCGD_TOTAL_VERT, KCGD_VERT_START,
 		KCGD_VERT_START+KCGD_DISP_VERT);
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(kcgd_state, kcgd)
+	PALETTE(config, m_palette, FUNC(kcgd_state::kcgd_palette), 16);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kcgd)
 #if 0

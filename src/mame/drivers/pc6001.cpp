@@ -1491,7 +1491,7 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 
 //  MCFG_DEVICE_ADD("subcpu", I8049, 7987200)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc6001m2)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc6001m2);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1499,10 +1499,9 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 16+4)
-	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)
+	PALETTE(config, m_palette, FUNC(pc6001_state::pc6001_palette), 16+4);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(pc6001_state::ppi_porta_r));
@@ -1547,9 +1546,8 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001mk2_state, screen_update_pc6001mk2)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16+16)
-	MCFG_PALETTE_INIT_OWNER(pc6001mk2_state,pc6001mk2)
+	m_palette->set_entries(16+16);
+	m_palette->set_init(FUNC(pc6001mk2_state::pc6001mk2_palette));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pc6001m2)
 

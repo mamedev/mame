@@ -252,17 +252,17 @@ void tb303_state::machine_start()
 MACHINE_CONFIG_START(tb303_state::tb303)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D650, TP2_HZ)
-	MCFG_UCOM4_READ_A_CB(READ8(*this, tb303_state, input_r))
-	MCFG_UCOM4_READ_B_CB(READ8(*this, tb303_state, input_r))
-	MCFG_UCOM4_READ_C_CB(READ8(*this, tb303_state, ram_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tb303_state, switch_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tb303_state, switch_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tb303_state, strobe_w))
+	NEC_D650(config, m_maincpu, TP2_HZ);
+	m_maincpu->read_a().set(FUNC(tb303_state::input_r));
+	m_maincpu->read_b().set(FUNC(tb303_state::input_r));
+	m_maincpu->read_c().set(FUNC(tb303_state::ram_r));
+	m_maincpu->write_c().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_d().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_e().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_f().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_g().set(FUNC(tb303_state::switch_w));
+	m_maincpu->write_h().set(FUNC(tb303_state::switch_w));
+	m_maincpu->write_i().set(FUNC(tb303_state::strobe_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clock", tb303_state, tp3_clock, TP3_PERIOD)
 	MCFG_TIMER_START_DELAY(TP3_PERIOD - TP3_LOW)

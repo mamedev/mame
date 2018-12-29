@@ -13,6 +13,7 @@
 #include "machine/i2cmem.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/nvram.h"
 
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
@@ -69,8 +70,9 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_maincpu(*this, "maincpu"),
-		m_sprite_xhigh_ignore_hack(true),
+		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
+		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
 		m_rom_dma_src(*this,"rom_dma_src"),
@@ -114,6 +116,8 @@ protected:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_device<xavix_device> m_maincpu;
+	required_device<nvram_device> m_nvram;
+	required_device<screen_device> m_screen;
 
 private:
 
@@ -406,8 +410,6 @@ private:
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
-	required_device<screen_device> m_screen;
-
 	void update_irqs();
 	uint8_t m_irqsource;
 
@@ -519,6 +521,7 @@ public:
 		hackaddress2(-1)
 	{ }
 
+	void xavix_i2c_24lc02(machine_config &config);
 	void xavix_i2c_24lc04(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
 
@@ -588,24 +591,55 @@ protected:
 };
 
 
-class xavix_ekara_state : public xavix_state
+class xavix_cart_state : public xavix_state
+{
+public:
+	xavix_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{ }
+
+	void xavix_cart(machine_config &config);
+	void xavix_cart_ekara(machine_config &config);
+	void xavix_cart_popira(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
+	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
+};
+
+class xavix_i2c_cart_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig,type,tag),
+		m_cart(*this, "cartslot")
+	{ }
+
+	void xavix_i2c_taiko(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(taiko_cart);
+	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
+};
+
+
+class xavix_ekara_state : public xavix_cart_state
 {
 public:
 	xavix_ekara_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_state(mconfig, type, tag),
-		m_cart(*this, "cartslot"),
+		: xavix_cart_state(mconfig, type, tag),
 		m_extra0(*this, "EXTRA0"),
 		m_extra1(*this, "EXTRA1"),
 		m_extraioselect(0),
 		m_extraiowrite(0)
 	{ }
 
-	void xavix_ekara(machine_config &config);
+//	void xavix_ekara(machine_config &config);
 
 protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
-	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
 
 	required_ioport m_extra0;
 	required_ioport m_extra1;
@@ -617,5 +651,6 @@ protected:
 	uint8_t m_extraioselect;
 	uint8_t m_extraiowrite;
 };
+
 
 #endif // MAME_INCLUDES_XAVIX_H

@@ -110,7 +110,7 @@ private:
 	TILE_GET_INFO_MEMBER(congo_get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(zaxxon);
+	void zaxxon_palette(palette_device &palette);
 	DECLARE_VIDEO_START(razmataz);
 	DECLARE_VIDEO_START(congo);
 	uint32_t screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

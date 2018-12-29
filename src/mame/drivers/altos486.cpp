@@ -134,12 +134,12 @@ void altos486_state::altos486_z80_io(address_map &map)
 
 void altos486_state::altos486(machine_config &config)
 {
-	I80186(config, m_maincpu, XTAL(8'000'000));
+	I80186(config, m_maincpu, 32_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &altos486_state::altos486_mem);
 	m_maincpu->set_addrmap(AS_IO, &altos486_state::altos486_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb)); // yes, really
 
-	z80_device &iocpu(Z80(config, "iocpu", XTAL(8'000'000) / 2));
+	z80_device &iocpu(Z80(config, "iocpu", 32_MHz_XTAL / 8));
 	iocpu.set_addrmap(AS_PROGRAM, &altos486_state::altos486_z80_mem);
 	iocpu.set_addrmap(AS_IO, &altos486_state::altos486_z80_io);
 
@@ -150,10 +150,10 @@ void altos486_state::altos486(machine_config &config)
 
 	I8255(config, "ppi8255");
 
-	UPD765A(config, "fdc", false, false);
+	UPD765A(config, "fdc", 32_MHz_XTAL / 4, false, false);
 	FLOPPY_CONNECTOR(config, "fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats).set_fixed(true);
 
-	z80sio0_device& sio0(Z80SIO0(config, "sio0", 4000000));
+	z80sio0_device& sio0(Z80SIO0(config, "sio0", 32_MHz_XTAL / 8));
 	sio0.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	sio0.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	sio0.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -162,7 +162,7 @@ void altos486_state::altos486(machine_config &config)
 	sio0.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	//sio0.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	z80sio0_device& sio1(Z80SIO0(config, "sio1", 4000000));
+	z80sio0_device& sio1(Z80SIO0(config, "sio1", 32_MHz_XTAL / 8));
 	sio1.out_txda_callback().set("rs232c", FUNC(rs232_port_device::write_txd));
 	sio1.out_dtra_callback().set("rs232c", FUNC(rs232_port_device::write_dtr));
 	sio1.out_rtsa_callback().set("rs232c", FUNC(rs232_port_device::write_rts));
@@ -171,13 +171,13 @@ void altos486_state::altos486(machine_config &config)
 	sio1.out_rtsb_callback().set("rs232d", FUNC(rs232_port_device::write_rts));
 	//sio1.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	z80sio0_device& sio2(Z80SIO0(config, "sio2", 4000000));
+	z80sio0_device& sio2(Z80SIO0(config, "sio2", 32_MHz_XTAL / 8));
 	sio2.out_txda_callback().set("rs232_lp", FUNC(rs232_port_device::write_txd));
 	sio2.out_dtra_callback().set("rs232_lp", FUNC(rs232_port_device::write_dtr));
 	sio2.out_rtsa_callback().set("rs232_lp", FUNC(rs232_port_device::write_rts));
 	//sio2.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	i8274_device& i8274(I8274(config, "i8274", XTAL(16'000'000)/4));
+	i8274_device& i8274(I8274(config, "i8274", 32_MHz_XTAL / 8));
 	i8274.out_txda_callback().set("rs422_wn", FUNC(rs232_port_device::write_txd));
 	i8274.out_dtra_callback().set("rs422_wn", FUNC(rs232_port_device::write_dtr));
 	i8274.out_rtsa_callback().set("rs422_wn", FUNC(rs232_port_device::write_rts));
@@ -215,14 +215,14 @@ void altos486_state::altos486(machine_config &config)
 	rs422_wn.cts_handler().set("i8274", FUNC(z80dart_device::ctsa_w));
 
 	pit8253_device &pit0(PIT8253(config, "pit0", 0));
-	pit0.set_clk<0>(XTAL(22'118'400)/18);
-	pit0.set_clk<1>(XTAL(22'118'400)/144);
-	pit0.set_clk<2>(XTAL(22'118'400)/18);
+	pit0.set_clk<0>(XTAL(22'118'400)/18); // FIXME
+	pit0.set_clk<1>(XTAL(22'118'400)/144); // FIXME
+	pit0.set_clk<2>(XTAL(22'118'400)/18); // FIXME
 
 	pit8253_device &pit1(PIT8253(config, "pit1", 0));
-	pit1.set_clk<0>(XTAL(22'118'400)/18);
-	pit1.set_clk<1>(XTAL(22'118'400)/144);
-	pit1.set_clk<2>(XTAL(22'118'400)/18);
+	pit1.set_clk<0>(XTAL(22'118'400)/18); // FIXME
+	pit1.set_clk<1>(XTAL(22'118'400)/144); // FIXME
+	pit1.set_clk<2>(XTAL(22'118'400)/18); // FIXME
 }
 
 

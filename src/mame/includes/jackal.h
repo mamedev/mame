@@ -61,7 +61,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jackal);
+	void jackal_palette(palette_device &palette) const;
 	uint32_t screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void jackal_mark_tile_dirty( int offset );

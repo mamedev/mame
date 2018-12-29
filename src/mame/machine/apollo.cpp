@@ -722,7 +722,7 @@ void apollo_sio::device_reset()
 	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( apollo_sio::read )
+uint8_t apollo_sio::read(offs_t offset)
 {
 	static int last_read8_offset[2] = { -1, -1 };
 	static int last_read8_value[2] = { -1, -1 };
@@ -732,7 +732,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = duart_base_device::read(space, offset/2, mem_mask);
+	int data = duart_base_device::read(offset/2);
 
 	switch (offset / 2)
 	{
@@ -766,7 +766,7 @@ READ8_MEMBER( apollo_sio::read )
 	return data;
 }
 
-WRITE8_MEMBER( apollo_sio::write )
+void apollo_sio::write(offs_t offset, uint8_t data)
 {
 	static const char * const duart68681_reg_write_names[0x10] = { "MRA",
 			"CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB",
@@ -788,7 +788,7 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	duart_base_device::write(space, offset/2, data, mem_mask);
+	duart_base_device::write(offset/2, data);
 }
 
 // device type definition
@@ -1108,10 +1108,10 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_rtc->set_24hrs(false);
 	m_rtc->set_epoch(0);
 
-	MCFG_APOLLO_NI_ADD(APOLLO_NI_TAG, 0)
+	APOLLO_NI(config, m_node_id, 0);
 
-	MCFG_APOLLO_SIO_ADD(APOLLO_SIO2_TAG, 3.6864_MHz_XTAL)
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio2_irq_handler))
+	APOLLO_SIO(config, m_sio2, 3.6864_MHz_XTAL);
+	m_sio2->irq_cb().set(FUNC(apollo_state::sio2_irq_handler));
 
 	ISA16(config, m_isa, 0);
 	m_isa->set_cputag(MAINCPU);
@@ -1147,17 +1147,18 @@ MACHINE_CONFIG_START(apollo_state::common)
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head
-MACHINE_CONFIG_START(apollo_state::apollo)
+void apollo_state::apollo(machine_config &config)
+{
 	common(config);
-	MCFG_APOLLO_SIO_ADD(APOLLO_SIO_TAG, 3.6864_MHz_XTAL)
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio_irq_handler))
-	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
-	MCFG_APOLLO_SIO_A_TX_CALLBACK(WRITELINE(m_keyboard, apollo_kbd_device, rx_w))
+	APOLLO_SIO(config, m_sio, 3.6864_MHz_XTAL);
+	m_sio->irq_cb().set(FUNC(apollo_state::sio_irq_handler));
+	m_sio->outport_cb().set(FUNC(apollo_state::sio_output));
+	m_sio->a_tx_cb().set(m_keyboard, FUNC(apollo_kbd_device::rx_w));
 
 #ifdef APOLLO_XXL
-	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE(APOLLO_STDIO_TAG, apollo_stdio_device, rx_w))
+	m_sio->b_tx_cb().set(APOLLO_STDIO_TAG, FUNC(apollo_stdio_device::rx_w));
 #endif
-MACHINE_CONFIG_END
+}
 
 static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
@@ -1169,17 +1170,18 @@ static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 // for headless machines using a serial console
-MACHINE_CONFIG_START(apollo_state::apollo_terminal)
+void apollo_state::apollo_terminal(machine_config &config)
+{
 	common(config);
-	MCFG_APOLLO_SIO_ADD(APOLLO_SIO_TAG, 3.6864_MHz_XTAL)
-	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(*this, apollo_state, sio_irq_handler))
-	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
-	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	APOLLO_SIO(config, m_sio, 3.6864_MHz_XTAL);
+	m_sio->irq_cb().set(FUNC(apollo_state::sio_irq_handler));
+	m_sio->outport_cb().set(FUNC(apollo_state::sio_output));
+	m_sio->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(APOLLO_SIO_TAG, FUNC(apollo_sio::rx_b_w));
+	rs232.rxd_handler().set(m_sio, FUNC(apollo_sio::rx_b_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(apollo_terminal));
-MACHINE_CONFIG_END
+}
 
 void apollo_state::init_apollo()
 {

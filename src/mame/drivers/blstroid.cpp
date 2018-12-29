@@ -186,14 +186,14 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blstroid)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_blstroid);
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, blstroid_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", blstroid_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, blstroid_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

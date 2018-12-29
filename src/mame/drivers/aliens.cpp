@@ -14,7 +14,6 @@ Preliminary driver by:
 #include "includes/konamipt.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "emupal.h"
@@ -195,31 +194,29 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 	m_rombank->set_entry(data & 0x1f);
 }
 
-MACHINE_CONFIG_START(aliens_state::aliens)
-
+void aliens_state::aliens(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)       /* 052001 (verified on pcb) */
-	MCFG_DEVICE_PROGRAM_MAP(aliens_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, aliens_state, banking_callback))
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 052001 (verified on pcb) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aliens_state::aliens_map);
+	m_maincpu->line().set(FUNC(aliens_state::banking_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(aliens_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aliens_state::aliens_sound_map);
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&aliens_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 11, 0x400);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240) // measured 59.17
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240); // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(aliens_state, screen_update_aliens)
-	MCFG_SCREEN_PALETTE("palette")
+//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_screen_update(FUNC(aliens_state::screen_update_aliens));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
@@ -241,11 +238,11 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 	ymsnd.add_route(0, "mono", 0.60);
 	ymsnd.add_route(1, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232, XTAL(3'579'545));    /* verified on pcb */
+	m_k007232->port_write().set(FUNC(aliens_state::volume_callback));
+	m_k007232->add_route(0, "mono", 0.20);
+	m_k007232->add_route(1, "mono", 0.20);
+}
 
 
 /***************************************************************************

@@ -19,8 +19,8 @@
 class ipds_state : public driver_device
 {
 public:
-	ipds_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ipds_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "i8275"),
 		m_palette(*this, "palette")
@@ -148,14 +148,14 @@ MACHINE_CONFIG_START(ipds_state::ipds)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ipds)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(19'660'800) / 4)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ipds_state, crtc_display_pixels)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(ipds_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(ipds_state::kbd_put));
 MACHINE_CONFIG_END
 
 /* ROM definition */

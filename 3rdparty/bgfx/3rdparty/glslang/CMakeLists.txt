@@ -9,10 +9,19 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Adhere to GNU filesystem layout conventions
 include(GNUInstallDirs)
 
+option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
+
+set(LIB_TYPE STATIC)
+
+if(BUILD_SHARED_LIBS)
+    set(LIB_TYPE SHARED)
+endif()
+
 option(SKIP_GLSLANG_INSTALL "Skip installation" ${SKIP_GLSLANG_INSTALL})
 if(NOT ${SKIP_GLSLANG_INSTALL})
   set(ENABLE_GLSLANG_INSTALL ON)
 endif()
+option(ENABLE_SPVREMAPPER "Enables building of SPVRemapper" ON)
 
 option(ENABLE_AMD_EXTENSIONS "Enables support of AMD-specific extensions" ON)
 option(ENABLE_GLSLANG_BINARIES "Builds glslangValidator and spirv-remap" ON)
@@ -26,6 +35,30 @@ option(ENABLE_OPT "Enables spirv-opt capability if present" ON)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND WIN32)
     set(CMAKE_INSTALL_PREFIX "install" CACHE STRING "..." FORCE)
 endif()
+
+option(USE_CCACHE "Use ccache" OFF)
+if(USE_CCACHE)
+    find_program(CCACHE_FOUND ccache)
+    if(CCACHE_FOUND)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    endif(CCACHE_FOUND)
+endif()
+
+# Precompiled header macro. Parameters are source file list and filename for pch cpp file.
+macro(glslang_pch SRCS PCHCPP)
+  if(MSVC)
+    if (CMAKE_GENERATOR MATCHES "^Visual Studio")
+      set(PCH_NAME "$(IntDir)\\pch.pch")
+    else()
+      set(PCH_NAME "${CMAKE_CURRENT_BINARY_DIR}/pch.pch")
+    endif()
+    # make source files use/depend on PCH_NAME
+    set_source_files_properties(${${SRCS}} PROPERTIES COMPILE_FLAGS "/Yupch.h /FIpch.h /Fp${PCH_NAME} /Zm300" OBJECT_DEPENDS "${PCH_NAME}")
+    # make PCHCPP file compile and generate PCH_NAME
+    set_source_files_properties(${PCHCPP} PROPERTIES COMPILE_FLAGS "/Ycpch.h /Fp${PCH_NAME} /Zm300" OBJECT_OUTPUTS "${PCH_NAME}")
+    list(APPEND ${SRCS} "${PCHCPP}")
+  endif()
+endmacro(glslang_pch)
 
 project(glslang)
 # make testing optional
@@ -44,7 +77,7 @@ if(ENABLE_HLSL)
 endif(ENABLE_HLSL)
 
 if(WIN32)
-    set(CMAKE_DEBUG_POSTFIX "d")
+    set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Adds a postfix for debug-built libraries.")
     if(MSVC)
         include(ChooseMSVCCRT.cmake)
     endif(MSVC)
@@ -94,9 +127,12 @@ endif()
 
 if(ENABLE_OPT)
     message(STATUS "optimizer enabled")
-    add_definitions(-DENABLE_OPT)
-elseif(ENABLE_HLSL)
-    message(STATUS "spirv-tools not linked - illegal SPIRV may be generated for HLSL")
+    add_definitions(-DENABLE_OPT=1)
+else()
+    if(ENABLE_HLSL)
+        message(STATUS "spirv-tools not linked - illegal SPIRV may be generated for HLSL")
+    endif()
+    add_definitions(-DENABLE_OPT=0)
 endif()
 
 add_subdirectory(glslang)

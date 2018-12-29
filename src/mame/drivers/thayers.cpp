@@ -798,39 +798,42 @@ void thayers_state::machine_reset()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(thayers_state::thayers)
-
+void thayers_state::thayers(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(thayers_map)
-	MCFG_DEVICE_IO_MAP(thayers_io_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &thayers_state::thayers_map);
+	m_maincpu->set_addrmap(AS_IO, &thayers_state::thayers_io_map);
 
-	MCFG_DEVICE_ADD("mcu", COP421, XTAL(4'000'000)/2) // COP421L-PCA/N
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_READ_L_CB(READ8(*this, thayers_state, cop_l_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, thayers_state, cop_l_w))
-	MCFG_COP400_READ_G_CB(READ8(*this, thayers_state, cop_g_r))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, thayers_state, cop_g_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, thayers_state, cop_d_w))
-	MCFG_COP400_READ_SI_CB(READLINE(*this, thayers_state, kbdata_r))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, thayers_state, kbclk_w))
-
-	MCFG_LASERDISC_PR7820_ADD("laserdisc")
+	cop421_cpu_device &mcu(COP421(config, "mcu", XTAL(4'000'000)/2)); // COP421L-PCA/N
+	mcu.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	mcu.read_l().set(FUNC(thayers_state::cop_l_r));
+	mcu.write_l().set(FUNC(thayers_state::cop_l_w));
+	mcu.read_g().set(FUNC(thayers_state::cop_g_r));
+	mcu.write_g().set(FUNC(thayers_state::cop_g_w));
+	mcu.write_d().set(FUNC(thayers_state::cop_d_w));
+	mcu.read_si().set(FUNC(thayers_state::kbdata_r));
+	mcu.write_so().set(FUNC(thayers_state::kbclk_w));
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	PIONEER_PR7820(config, m_pr7820, 0);
+	m_pr7820->set_screen("screen");
 
-	MCFG_PALETTE_ADD("palette", 256)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
+
+	PALETTE(config, "palette").set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	// SSI 263 @ 2MHz
 
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	m_pr7820->add_route(0, "lspeaker", 1.0);
+	m_pr7820->add_route(1, "rspeaker", 1.0);
+}
 
 /* ROMs */
 

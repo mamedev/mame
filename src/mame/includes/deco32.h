@@ -63,7 +63,7 @@ protected:
 	template<int Chip> DECLARE_READ32_MEMBER(spriteram_r);
 	template<int Chip> DECLARE_WRITE32_MEMBER(spriteram_w);
 	template<int Chip> DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
-	void pri_w(u32 data, u32 mem_mask);
+	void pri_w(u32 data);
 
 	// all but captaven
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);
@@ -82,6 +82,7 @@ protected:
 	optional_device<ym2151_device> m_ym2151;
 	optional_device_array<okim6295_device, 3> m_oki;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	required_device<cpu_device> m_maincpu;
 
 	void allocate_spriteram(int chip);
 	void allocate_buffered_palette();
@@ -96,8 +97,6 @@ protected:
 	std::unique_ptr<uint16_t[]> m_pf_rowscroll[4]; // common
 
 private:
-	required_device<cpu_device> m_maincpu;
-
 	// we use the pointers below to store a 32-bit copy..
 	required_shared_ptr_array<uint32_t, 4> m_pf_rowscroll32;
 	optional_shared_ptr<uint32_t> m_paletteram;

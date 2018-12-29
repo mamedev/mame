@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mjkjidai_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mjkjidai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

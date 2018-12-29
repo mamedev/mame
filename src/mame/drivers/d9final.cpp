@@ -37,13 +37,14 @@
 class d9final_state : public driver_device
 {
 public:
-	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	d9final_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lo_vram(*this, "lo_vram"),
 		m_hi_vram(*this, "hi_vram"),
-		m_cram(*this, "cram") { }
+		m_cram(*this, "cram")
+	{ }
 
 	void d9final(machine_config &config);
 
@@ -320,8 +321,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_d9final)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBRG_444, 0x400);
 
 	SPEAKER(config, "mono").front_center();
 

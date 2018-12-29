@@ -23,18 +23,7 @@ enum
 	S2650_DATA_PORT = 1
 };
 
-
 DECLARE_DEVICE_TYPE(S2650, s2650_device)
-
-
-#define MCFG_S2650_SENSE_INPUT(_devcb) \
-	downcast<s2650_device &>(*device).set_sense_handler(DEVCB_##_devcb);
-
-#define MCFG_S2650_FLAG_OUTPUT(_devcb) \
-	downcast<s2650_device &>(*device).set_flag_handler(DEVCB_##_devcb);
-
-#define MCFG_S2650_INTACK_HANDLER(_devcb) \
-	downcast<s2650_device &>(*device).set_intack_handler(DEVCB_##_devcb);
 
 class s2650_device : public cpu_device, public s2650_disassembler::config
 {

@@ -107,7 +107,7 @@ private:
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
-	required_device<cpu_device> m_mermaid;
+	required_device<i80c51_device> m_mermaid;
 	required_device<cpu_device> m_soundcpu;
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -635,15 +635,15 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_DEVICE_IO_MAP(sound_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("mermaid", I80C51, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, hvyunit_state, mermaid_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, hvyunit_state, mermaid_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, hvyunit_state, mermaid_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, hvyunit_state, mermaid_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hvyunit_state, mermaid_p3_w))
+	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
+	m_mermaid->port_out_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_w));
+	m_mermaid->port_in_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_r));
+	m_mermaid->port_out_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_w));
+	m_mermaid->port_in_cb<2>().set(FUNC(hvyunit_state::mermaid_p2_r));
+	m_mermaid->port_out_cb<2>().set(FUNC(hvyunit_state::mermaid_p2_w));
+	m_mermaid->port_in_cb<3>().set(FUNC(hvyunit_state::mermaid_p3_r));
+	m_mermaid->port_out_cb<3>().set(FUNC(hvyunit_state::mermaid_p3_w));
 
 	GENERIC_LATCH_8(config, m_mermaidlatch);
 	m_mermaidlatch->data_pending_callback().set_inputline(m_mermaid, INPUT_LINE_IRQ0);
@@ -659,11 +659,10 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hvyunit_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvyunit)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
 	KANEKO_PANDORA(config, m_pandora, 0);
 	m_pandora->set_gfxdecode_tag(m_gfxdecode);

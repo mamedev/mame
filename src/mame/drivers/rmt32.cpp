@@ -196,15 +196,17 @@ public:
 
 	void mt32(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<i8x9x_device> cpu;
 	required_device<ram_device> ram;
 	optional_device<sed1200d0a_device> lcd;
 	required_device<timer_device> midi_timer;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(mt32);
+	void mt32_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -328,7 +330,7 @@ WRITE8_MEMBER(mt32_state::so_w)
 	//  logerror("so: x1=%d bank=%d led=%d\n", (data >> 5) & 1, (data >> 1) & 3, data & 1);
 }
 
-PALETTE_INIT_MEMBER(mt32_state, mt32)
+void mt32_state::mt32_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));
 	palette.set_pen_color(1, rgb_t(0, 255, 0));
@@ -364,8 +366,7 @@ MACHINE_CONFIG_START(mt32_state::mt32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-2, 0, (20*6-1)*3/4-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mt32_state, mt32)
+	PALETTE(config, "palette", FUNC(mt32_state::mt32_palette), 2);
 
 	MCFG_SED1200D0A_ADD( "lcd" )
 

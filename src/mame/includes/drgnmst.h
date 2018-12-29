@@ -83,9 +83,9 @@ private:
 	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan_cols);
 	TILEMAP_MAPPER_MEMBER(md_tilemap_scan_cols);
 	TILEMAP_MAPPER_MEMBER(bg_tilemap_scan_cols);
-	DECLARE_PALETTE_DECODER(drgnmst_IIIIRRRRGGGGBBBB);
+	static rgb_t drgnmst_IIIIRRRRGGGGBBBB(uint32_t raw);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	uint8_t drgnmst_asciitohex( uint8_t data );
 	required_device<cpu_device> m_maincpu;
 	required_device<pic16c55_device> m_audiocpu;

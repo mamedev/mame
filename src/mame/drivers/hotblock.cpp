@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // right?
 
-	PALETTE(config, m_palette, 0x200/2).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

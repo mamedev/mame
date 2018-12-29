@@ -239,7 +239,7 @@ protected:
 	inline void write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, uint8_t data);
 	inline int read_pcb(offs_t pma, offs_t cma, uint8_t pmd);
 	inline void update_prd_changed_timer();
-	inline rgb_t get_rgb(int i, int c, int l);
+	static rgb_t get_rgb(int i, int c, int l);
 	inline int get_lines();
 	inline uint16_t get_pmemsize(int cols, int rows);
 	inline uint16_t get_pma();
@@ -288,7 +288,7 @@ private:
 	uint8_t m_wnfreq;                 // white noise range select
 	uint8_t m_wnamp;                  // white noise output amplitude
 
-	DECLARE_PALETTE_INIT(cdp1869);
+	void cdp1869_palette(palette_device &palette) const;
 };
 
 
