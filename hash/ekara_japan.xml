@@ -596,23 +596,13 @@
 	<!-- EC0043-ENK  ENK Volume 5 -->
 
 	<software name="ec0044">
-		<description>Artist Selection Volume 9 (Every Little Thing) (Japan) (EC0044-ATS) (set 1)</description>
-		<year>2001</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="ekara_cart">
-			<dataarea name="rom" size="0x100000">
-				<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ec0044a"> <!-- this differs by a single bit, one of them is probably bad? -->
 		<description>Artist Selection Volume 9 (Every Little Thing) (Japan) (EC0044-ATS) (set 2)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="alt_ec0044-ats.u1" size="0x100000" crc="5ed25544" sha1="2cb30b442d97813af32530c6f61d7fcc7653f533" offset="0" />
+				<rom name="ec0044-ats.u1" size="0x100000" crc="5ed25544" sha1="2cb30b442d97813af32530c6f61d7fcc7653f533" offset="0" />
+				<!--<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985" offset="0" />--> <!-- this has 0x0b at address 0x00007 in an otherwise list of ascending values, above dump has 0x0f and looks more correct -->
 			</dataarea>
 		</part>
 	</software>
