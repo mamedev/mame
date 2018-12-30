@@ -1175,7 +1175,7 @@ void qb3_state::qb3(machine_config &config)
 {
 	cinemat_jmi_32k(config);
 	qb3_sound(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &qb3_state::data_map_qb3);
+	m_maincpu->set_addrmap(AS_DATA, &qb3_state::data_map_qb3);
 	m_maincpu->set_addrmap(AS_IO, &qb3_state::io_map_qb3);
 	m_screen->set_visarea(0, 1120, 0, 780);
 }

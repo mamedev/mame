@@ -726,24 +726,24 @@ void r2dx_v33_state::r2dx_oki_map(address_map &map)
 	map(0x00000, 0x3ffff).bankr("okibank");
 }
 
-MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
-
+void r2dx_v33_state::rdx_v33(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V33, 32000000/2 ) // ?
-	MCFG_DEVICE_PROGRAM_MAP(rdx_v33_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state, interrupt)
+	V33(config, m_maincpu, 32000000/2); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::rdx_v33_map);
+	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 34*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(55.47);    /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
+	screen.set_size(44*8, 34*8);
+	screen.set_visarea(0*8, 40*8-1, 0, 30*8-1);
+	screen.set_screen_update(FUNC(r2dx_v33_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, r2dx_v33_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -755,31 +755,31 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, r2dx_oki_map)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.set_addrmap(0, &r2dx_v33_state::r2dx_oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
-
+void r2dx_v33_state::nzerotea(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V33,XTAL(32'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(nzerotea_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state, interrupt)
+	V33(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::nzerotea_map);
+	m_maincpu->set_vblank_int("screen", FUNC(r2dx_v33_state::interrupt));
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
-	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'636'363)/8));
+	audiocpu.set_addrmap(AS_PROGRAM, &r2dx_v33_state::zeroteam_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 34*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(55.47);    /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
+	screen.set_size(44*8, 34*8);
+	screen.set_visarea(0*8, 40*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(r2dx_v33_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, r2dx_v33_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -791,12 +791,12 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'636'363)/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(28'636'363)/8));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
@@ -804,15 +804,15 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	m_seibu_sound->set_rombank_tag("seibu_bank1");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
+void r2dx_v33_state::zerotm2k(machine_config &config)
+{
 	nzerotea(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zerotm2k_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &r2dx_v33_state::zerotm2k_map);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, m_eeprom);
+}
 
 void r2dx_v33_state::init_rdx_v33()
 {

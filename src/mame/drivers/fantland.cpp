@@ -931,24 +931,24 @@ void borntofi_state::machine_reset()
 	adpcm_stop(3);
 }
 
-MACHINE_CONFIG_START(borntofi_state::borntofi)
-
+void borntofi_state::borntofi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	V20(config, m_maincpu, 16000000/2);		// D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	m_maincpu->set_addrmap(AS_PROGRAM, &borntofi_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	I8088(config, m_audiocpu, 18432000/3);	// 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	m_audiocpu->set_addrmap(AS_PROGRAM, &borntofi_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)    // 54 Hz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(352,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(borntofi_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, borntofi_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(54);    // 54 Hz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(352,256);
+	m_screen->set_visarea(0, 352-1, 0, 256-1);
+	m_screen->set_screen_update(FUNC(borntofi_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(borntofi_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
@@ -959,47 +959,46 @@ MACHINE_CONFIG_START(borntofi_state::borntofi)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<0>))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	msm5205_device &msm1(MSM5205(config, "msm1", 384000));
+	msm1.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<0>));   /* IRQ handler */
+	msm1.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz, 4 Bits  */
+	msm1.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<1>))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	msm5205_device &msm2(MSM5205(config, "msm2", 384000));
+	msm2.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<1>));   /* IRQ handler */
+	msm2.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz, 4 Bits  */
+	msm2.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm3", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<2>))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	msm5205_device &msm3(MSM5205(config, "msm3", 384000));
+	msm3.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<2>));   /* IRQ handler */
+	msm3.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz, 4 Bits  */
+	msm3.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm4", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<3>))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	msm5205_device &msm4(MSM5205(config, "msm4", 384000));
+	msm4.vck_legacy_callback().set(FUNC(borntofi_state::adpcm_int<3>));   /* IRQ handler */
+	msm4.set_prescaler_selector(msm5205_device::S48_4B);      /* 8 kHz, 4 Bits  */
+	msm3.add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(fantland_state::wheelrun)
-
+void fantland_state::wheelrun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V20, XTAL(18'000'000)/2)      // D701080C-8 (V20)
-	MCFG_DEVICE_PROGRAM_MAP(wheelrun_map)
+	V20(config, m_maincpu, XTAL(18'000'000)/2);		// D701080C-8 (V20)
+	m_maincpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'000'000)/2)     // Z8400BB1 (Z80B)
-	MCFG_DEVICE_PROGRAM_MAP(wheelrun_sound_map)
+	Z80(config, m_audiocpu, XTAL(18'000'000)/2);	// Z8400BB1 (Z80B)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_sound_map);
 	// IRQ by YM3526, NMI when soundlatch is written
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256,224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256,224);
+	m_screen->set_visarea(0, 256-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(fantland_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(fantland_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fantland);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
@@ -1009,10 +1008,10 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(14'000'000)/4)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL(14'000'000)/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 /***************************************************************************

@@ -481,7 +481,7 @@ flags {
 	"StaticRuntime",
 }
 
-configuration { "vs*" }
+configuration { "vs20*" }
 	buildoptions {
 		"/bigobj",
 	}
@@ -496,13 +496,13 @@ configuration { "vs*" }
 	end
 
 
-configuration { "Debug", "vs*" }
+configuration { "Debug", "vs20*" }
 	flags {
 		"Symbols",
 		"NoMultiProcessorCompilation",
 	}
 
-configuration { "Release", "vs*" }
+configuration { "Release", "vs20*" }
 	flags {
 		"Optimize",
 		"NoEditAndContinue",
@@ -1267,7 +1267,7 @@ configuration { "mingw-clang" }
 	end
 
 
-configuration { "vs*" }
+configuration { "vs20*" }
 		defines {
 			"XML_STATIC",
 			"WIN32",
