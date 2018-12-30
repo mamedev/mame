@@ -602,7 +602,9 @@
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0044-ats.u1" size="0x100000" crc="5ed25544" sha1="2cb30b442d97813af32530c6f61d7fcc7653f533" offset="0" />
-				<!--<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985" offset="0" />--> <!-- this has 0x0b at address 0x00007 in an otherwise list of ascending values, above dump has 0x0f and looks more correct -->
+				<!-- this has 0x0b at address 0x00007 in an otherwise list of ascending values, above dump has 0x0f and looks more correct
+				     both dumps have been verified multiple times, so this appears to be a case of bitrot in the cartridge the dump below was taken from -->
+				<!--<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985" offset="0" />--> 
 			</dataarea>
 		</part>
 	</software>
