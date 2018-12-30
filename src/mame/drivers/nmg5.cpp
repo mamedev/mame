@@ -981,22 +981,22 @@ void nmg5_state::machine_reset()
 MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(nmg5_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nmg5_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 16000000);	/* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nmg5_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)      /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(nmg5_sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	Z80(config, m_soundcpu, 4000000);		/* 4 MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &nmg5_state::nmg5_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &nmg5_state::sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 319, 0, 239);
+	screen.set_screen_update(FUNC(nmg5_state::screen_update));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_nmg5);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x400);
@@ -1008,66 +1008,46 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	m_sprgen->set_offsets(0, 8);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 4000000)); /* 4MHz */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000 , okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000 , okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(nmg5_state::garogun)
+void nmg5_state::garogun(machine_config &config)
+{
 	nmg5(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmg5_state::pclubys_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &nmg5_state::pclubys_sound_map);
+}
 
-	/* basic machine hardware */
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pclubys_map)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(nmg5_state::pclubys)
+void nmg5_state::pclubys(machine_config &config)
+{
 	nmg5(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmg5_state::pclubys_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &nmg5_state::pclubys_sound_map);
+	m_gfxdecode->set_info(gfx_pclubys);
+}
 
-	/* basic machine hardware */
-
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pclubys_map)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pclubys)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(nmg5_state::searchp2)
+void nmg5_state::searchp2(machine_config &config)
+{
 	nmg5(config);
+	subdevice<screen_device>("screen")->set_refresh_hz(55); // !
+	m_gfxdecode->set_info(gfx_pclubys);
+}
 
-	/* basic machine hardware */
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(55) // !
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pclubys)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(nmg5_state::_7ordi)
+void nmg5_state::_7ordi(machine_config &config)
+{
 	nmg5(config);
-
-	/* basic machine hardware */
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
-MACHINE_CONFIG_END
+	m_soundcpu->set_addrmap(AS_PROGRAM, &nmg5_state::pclubys_sound_map);
+}
 
 
 /*
