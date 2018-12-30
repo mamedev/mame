@@ -24,8 +24,13 @@
 	gives 'memory error' if plugged into Popira (needs cartridge SEEPROM emulating)
 	gives 'eep-rom error' if plugged into Taiko de Popira (same reason)
 	
-	 SP-1  (unknown)
-	*SP-2  (unknown)
+	 SP-01  (unknown)
+	*SP-02  'Super Cartridge' SP-2
+	 SP-03  (unknown)
+	 SP-04  (unknown)
+	 SP-05
+	 SP-06  (seen)
+	 SP-07  (seen)
 
 	(more? what's the SP highest number?)
 
