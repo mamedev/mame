@@ -596,7 +596,7 @@
 	<!-- EC0043-ENK  ENK Volume 5 -->
 
 	<software name="ec0044">
-		<description>Artist Selection Volume 9 (Every Little Thing) (Japan) (EC0044-ATS) (set 2)</description>
+		<description>Artist Selection Volume 9 (Every Little Thing) (Japan) (EC0044-ATS)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
