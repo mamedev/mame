@@ -69,6 +69,7 @@
 #include "machine/nscsi_hd.h"
 #include "machine/dec_lk201.h"
 #include "machine/am79c90.h"
+#include "machine/dc7085.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 #include "video/bt459.h"
@@ -90,7 +91,8 @@ public:
 		m_vrom(*this, "gfx"),
 		m_bt459(*this, "bt459"),
 		m_lance(*this, "am79c90"),
-		m_kn01vram(*this, "vram")
+		m_kn01vram(*this, "vram"),
+		m_dz(*this, "dc7085")
 		{ }
 
 	void kn01(machine_config &config);
@@ -140,6 +142,7 @@ private:
 	optional_device<bt459_device> m_bt459;
 	required_device<am79c90_device> m_lance;
 	optional_shared_ptr<uint32_t> m_kn01vram;
+	optional_device<dc7085_device> m_dz;
 
 	void kn01_map(address_map &map);
 	void threemin_map(address_map &map);
@@ -600,7 +603,7 @@ void decstation_state::kn01_map(address_map &map)
 	map(0x11000000, 0x1100003f).rw(FUNC(decstation_state::pcc_r), FUNC(decstation_state::pcc_w));
 	map(0x12000000, 0x1200001f).rw(FUNC(decstation_state::bt478_palette_r), FUNC(decstation_state::bt478_palette_w));
 	//map(0x18000000, 0x18000007).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0x0000ffff);
-	map(0x1c000000, 0x1c000003).r(FUNC(decstation_state::dz_r));
+	map(0x1c000000, 0x1c00001b).m(m_dz, FUNC(dc7085_device::map)).umask32(0xffff);
 	map(0x1d000000, 0x1d0000ff).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct)).umask32(0x000000ff);
 	map(0x1e000000, 0x1effffff).rw(FUNC(decstation_state::kn01_status_r), FUNC(decstation_state::kn01_control_w));
 	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
@@ -657,6 +660,8 @@ MACHINE_CONFIG_START(decstation_state::kn01)
 
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(decstation_state::scanline_timer), "screen", 0, 1);
+
+	DC7085(config, m_dz, 0);
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
 
