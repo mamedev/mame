@@ -149,9 +149,9 @@
 	80   EC0080-     (unknown)
 	81   EC0081-JPM  J-Pop Mix Volume 42
 	82  *EC0082-MBH  Matthew's Best Hit Selection
-	83   EC0083-     (unknown)
-	84   EC0084-     (unknown)
-	85   EC0085-     (unknown, seen in the wild)
+	83   EC0083-JPM  J-Pop Mix Volume 43
+	84   EC0084-     (unknown, seen)
+	85   EC0085-     (unknown, seen)
 
 	(more? what's the highest regular number?)
 
@@ -837,9 +837,9 @@
 		</part>
 	</software>	
 	
-	<!-- EC0083-     (unknown) -->
+	<!-- EC0083-JPM  J-Pop Mix Volume 43
 	
-	<!-- EC0084-     (unknown) -->
+	<!-- EC0084-     (unknown, seen) -->
 	
 	<!-- EC0085-     (unknown, seen in the wild) -->
 	
