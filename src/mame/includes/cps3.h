@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
+#ifndef MAME_INCLUDES_CPS3_H
+#define MAME_INCLUDES_CPS3_H
+
+#pragma once
+
 /***************************************************************************
 
     Capcom CPS-3 Hardware
@@ -182,3 +187,5 @@ private:
 	void cps3_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CPS3_H
