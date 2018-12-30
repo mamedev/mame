@@ -671,25 +671,25 @@ void welltris_state::machine_start()
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
-MACHINE_CONFIG_START(welltris_state::welltris)
-
+void welltris_state::welltris(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", welltris_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 20000000/2);	/* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &welltris_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(welltris_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port_map) /* IRQs are triggered by the YM2610 */
+	Z80(config, m_audiocpu, 8000000/2);		/* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &welltris_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &welltris_state::sound_port_map); /* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(15, 367-1, 8, 248-1)
-	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(15, 367-1, 8, 248-1);
+	m_screen->set_screen_update(FUNC(welltris_state::screen_update));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_welltris);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048);
@@ -708,23 +708,22 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(welltris_state::quiz18k)
+void welltris_state::quiz18k(machine_config &config)
+{
 	welltris(config);
 
 	/* basic machine hardware */
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(15, 335-1, 0, 224-1)
+	m_screen->set_visarea(15, 335-1, 0, 224-1);
 
 	m_spr_old->set_offsets(6, 1);
-MACHINE_CONFIG_END
+}
 
 
 

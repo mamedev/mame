@@ -435,15 +435,15 @@ void warriorb_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-MACHINE_CONFIG_START(warriorb_state::darius2d)
-
+void warriorb_state::darius2d(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
-	MCFG_DEVICE_PROGRAM_MAP(darius2d_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 12000000);	/* 12 MHz ??? (Might well be 16!) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::darius2d_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));	/* 4 MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -454,19 +454,19 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_ADD("palette2", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_warriorb);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(40*8, 32*8);
+	lscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
+	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
@@ -477,13 +477,13 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 
 	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(40*8, 32*8);
+	rscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
+	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));
+	rscreen.set_palette("palette2");
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_gfx_region(2);
@@ -499,14 +499,14 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "2610.1.l", 1.0);
+	ymsnd.add_route(1, "2610.1.r", 1.0);
+	ymsnd.add_route(2, "2610.2.l", 1.0);
+	ymsnd.add_route(2, "2610.2.r", 1.0);
 
 	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -516,18 +516,17 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(warriorb_state::warriorb)
-
+void warriorb_state::warriorb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(warriorb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 16000000);	/* 16 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::warriorb_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));	/* 4 MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -538,19 +537,19 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_ADD("palette2", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_warriorb);
+	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, "palette2").set_entries(4096);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(40*8, 32*8);
+	lscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
@@ -561,13 +560,13 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 
 	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(40*8, 32*8);
+	rscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));
+	rscreen.set_palette("palette2");
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_gfx_region(2);
@@ -584,14 +583,14 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "2610.1.l", 1.0);
+	ymsnd.add_route(1, "2610.1.r", 1.0);
+	ymsnd.add_route(2, "2610.2.l", 1.0);
+	ymsnd.add_route(2, "2610.2.r", 1.0);
 
 	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -601,7 +600,7 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->set_master_tag(m_maincpu);
 	m_tc0140syt->set_slave_tag("audiocpu");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

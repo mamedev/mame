@@ -649,15 +649,15 @@ static GFXDECODE_START( gfx_twincobr )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(twincobr_state::twincobr)
-
+void twincobr_state::twincobr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/4)       /* 7MHz - Main board Crystal is 28MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
+	M68000(config, m_maincpu, XTAL(28'000'000) / 4);	/* 7MHz - Main board Crystal is 28MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &twincobr_state::main_program_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)         /* 3.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'000'000)/8));	/* 3.5MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &twincobr_state::sound_program_map);
+	audiocpu.set_addrmap(AS_IO, &twincobr_state::sound_io_map);
 
 	TMS32010(config, m_dsp, XTAL(28'000'000)/2);         /* 14MHz CLKin */
 	m_dsp->set_addrmap(AS_PROGRAM, &twincobr_state::dsp_program_map);
@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	m_dsp->set_addrmap(AS_IO, &twincobr_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(twincobr_state::twincobr_bio_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
 
@@ -709,16 +709,16 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(28'000'000) / 8));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(twincobr_state::twincobrw)
+void twincobr_state::twincobrw(machine_config &config)
+{
 	twincobr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(10'000'000)) /* The export versions have a dedicated OSC for the M68000 on the top right of the board */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(10'000'000)); /* The export versions have a dedicated OSC for the M68000 on the top right of the board */
+}
 
 void twincobr_state::fshark(machine_config &config)
 {
@@ -729,7 +729,6 @@ void twincobr_state::fshark(machine_config &config)
 	m_spritegen->set_xoffsets(32, 14);
 }
 
-
 void twincobr_state::fsharkbt(machine_config &config)
 {
 	fshark(config);
@@ -737,8 +736,6 @@ void twincobr_state::fsharkbt(machine_config &config)
 	I8741(config, "mcu", XTAL(28'000'000)/16).set_disable();  /* Internal program code is not dumped */
 	/* Program Map is internal to the CPU */
 }
-
-
 
 
 /***************************************************************************
