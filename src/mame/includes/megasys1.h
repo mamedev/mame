@@ -38,6 +38,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch_z(*this, "soundlatch_z"),
+		m_scantimer(*this, "scantimer"),
 		m_rom_maincpu(*this, "maincpu"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_p1(*this, "P1"),
@@ -100,6 +101,7 @@ private:
 	optional_device<generic_latch_16_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch2;
 	optional_device<generic_latch_8_device> m_soundlatch_z;
+	optional_device<timer_device> m_scantimer;
 	required_region_ptr<uint16_t> m_rom_maincpu;
 	required_ioport m_io_system;
 	required_ioport m_io_p1;

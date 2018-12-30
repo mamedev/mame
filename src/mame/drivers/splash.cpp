@@ -485,16 +485,16 @@ MACHINE_RESET_MEMBER(splash_state,splash)
 	m_ret = 0x100;
 }
 
-MACHINE_CONFIG_START(splash_state::splash)
-
+void splash_state::splash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12MHz (24/2) */
-	MCFG_DEVICE_PROGRAM_MAP(splash_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);       /* 12MHz (24/2) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &splash_state::splash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(splash_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(30'000'000)/8)     /* 3.75MHz (30/8) */
-	MCFG_DEVICE_PROGRAM_MAP(splash_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(splash_state, nmi_line_pulse, 60*64)   /* needed for the msm5205 to play the samples */
+	Z80(config, m_audiocpu, XTAL(30'000'000)/8);     /* 3.75MHz (30/8) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &splash_state::splash_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(splash_state::nmi_line_pulse), attotime::from_hz(60*64));   /* needed for the msm5205 to play the samples */
 
 	LS259(config, m_outlatch); // A8
 	m_outlatch->q_out_cb<0>().set(FUNC(splash_state::coin1_lockout_w));
@@ -503,15 +503,15 @@ MACHINE_CONFIG_START(splash_state::splash)
 	m_outlatch->q_out_cb<3>().set(FUNC(splash_state::coin2_counter_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(2*8, 48*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(splash_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_splash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_splash);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_MACHINE_START_OVERRIDE(splash_state, splash )
@@ -523,14 +523,13 @@ MACHINE_CONFIG_START(splash_state::splash)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(30'000'000)/8)       /* 3.75MHz (30/8) */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM3812(config, "ymsnd", XTAL(30'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.80);	/* 3.75MHz (30/8) */
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, splash_state, splash_msm5205_int)) /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz */     /* Sample rate = 384kHz/48 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(splash_state::splash_msm5205_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */     /* Sample rate = 384kHz/48 */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 MACHINE_START_MEMBER(splash_state, roldfrog)
@@ -546,17 +545,17 @@ INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
 	roldfrog_update_irq();
 }
 
-MACHINE_CONFIG_START(splash_state::roldfrog)
-
+void splash_state::roldfrog(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz - verified */
-	MCFG_DEVICE_PROGRAM_MAP(roldfrog_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);       /* 12 MHz - verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &splash_state::roldfrog_map);
+	m_maincpu->set_vblank_int("screen", FUNC(splash_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8)     /* 3 MHz - verified */
-	MCFG_DEVICE_PROGRAM_MAP(roldfrog_sound_map)
-	MCFG_DEVICE_IO_MAP(roldfrog_sound_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
+	Z80(config, m_audiocpu, XTAL(24'000'000)/8);     /* 3 MHz - verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &splash_state::roldfrog_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &splash_state::roldfrog_sound_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(splash_state::roldfrog_interrupt));
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<1>().set(FUNC(splash_state::coin1_lockout_w));
@@ -565,15 +564,15 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	m_outlatch->q_out_cb<3>().set(FUNC(splash_state::coin2_counter_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(2*8, 48*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(splash_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_splash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_splash);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	MCFG_MACHINE_START_OVERRIDE(splash_state, roldfrog )
@@ -586,13 +585,13 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, splash_state, ym_irq))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(24'000'000) / 8));
+	ymsnd.irq_handler().set(FUNC(splash_state::ym_irq));
+	ymsnd.add_route(0, "mono", 0.20);
+	ymsnd.add_route(1, "mono", 0.20);
+	ymsnd.add_route(2, "mono", 0.20);
+	ymsnd.add_route(3, "mono", 1.0);
+}
 
 WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 {
@@ -639,29 +638,29 @@ void funystrp_state::machine_start()
 	save_item(NAME(m_snd_interrupt_enable2));
 }
 
-MACHINE_CONFIG_START(funystrp_state::funystrp)
-
+void funystrp_state::funystrp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz (24/2) */
-	MCFG_DEVICE_PROGRAM_MAP(funystrp_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funystrp_state, irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);	/* 12 MHz (24/2) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &funystrp_state::funystrp_map);
+	m_maincpu->set_vblank_int("screen", FUNC(funystrp_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4)     /* 6MHz (24/4) */
-	MCFG_DEVICE_PROGRAM_MAP(funystrp_sound_map)
-	MCFG_DEVICE_IO_MAP(funystrp_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(24'000'000)/4);	/* 6MHz (24/4) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &funystrp_state::funystrp_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &funystrp_state::funystrp_sound_io_map);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(funystrp_state, screen_update_funystrp)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(funystrp_state::screen_update_funystrp));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_splash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_splash);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	/* sound hardware */
@@ -670,16 +669,16 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, funystrp_state, adpcm_int1))         /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 1 / 48 */       /* Sample rate = 400kHz/64 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MSM5205(config, m_msm1, XTAL(400'000));
+	m_msm1->vck_legacy_callback().set(FUNC(funystrp_state::adpcm_int1));	/* interrupt function */
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);  /* 1 / 48 */       /* Sample rate = 400kHz/64 */
+	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, funystrp_state, adpcm_int2))         /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 */       /* Sample rate = 400kHz/96 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm2, XTAL(400'000));
+	m_msm2->vck_legacy_callback().set(FUNC(funystrp_state::adpcm_int2));	/* interrupt function */
+	m_msm2->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 */       /* Sample rate = 400kHz/96 */
+	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 /***************************************************************************
