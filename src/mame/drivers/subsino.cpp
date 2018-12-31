@@ -3166,8 +3166,8 @@ ROM_START( crsbingo )
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x155 * 2, "plds", 0 )
-	ROM_LOAD( "18cv8.u22", 0x000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
-	ROM_LOAD( "18cv8.u29", 0x155, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
+	ROM_LOAD( "18cv8.u22", 0x000, 0x155, NO_DUMP )
+	ROM_LOAD( "18cv8.u29", 0x155, 0x155, NO_DUMP )
 ROM_END
 
 /***************************************************************************
