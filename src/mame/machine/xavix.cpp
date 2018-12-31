@@ -128,6 +128,19 @@ WRITE8_MEMBER(xavix_state::irq_vector_hi_w)
 	m_irq_vector_hi_data = data;
 }
 
+READ8_MEMBER(xavix_state::irq_vector_lo_r)
+{
+	LOG("%s: irq_vector_lo_r\n", machine().describe_context());
+	return m_irq_vector_lo_data;
+}
+
+READ8_MEMBER(xavix_state::irq_vector_hi_r)
+{
+	LOG("%s: irq_vector_hi_r\n", machine().describe_context());
+	return m_irq_vector_hi_data;
+}
+
+
 // this is external bus control (access to ROM etc.)
 
 READ8_MEMBER(xavix_state::extintrf_790x_r)
@@ -883,9 +896,15 @@ WRITE8_MEMBER(xavix_state::irq_source_w)
 
 void xavix_state::machine_start()
 {
+	// at least some of the internal CPU RAM can be backed up, not sure how much
+	int nvram_size = 0x1000;
+
+	if (!m_nvram)
+		nvram_size = 0;
+
 	// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
 	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
-	std::fill_n(&m_mainram[0], 0x3e00, 0xff);
+	std::fill_n(&m_mainram[0], 0x4000 - nvram_size, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
@@ -896,9 +915,8 @@ void xavix_state::machine_start()
 		m_sound_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::sound_timer_done), this));
 	}
 
-	// at least some of the internal CPU RAM is backed up, not sure how much
 	if (m_nvram)
-		m_nvram->set_base(&m_mainram[0x3e00], 0x200);
+		m_nvram->set_base(&m_mainram[0x4000 - nvram_size], nvram_size);
 
 
 	save_item(NAME(m_extbusctrl));
