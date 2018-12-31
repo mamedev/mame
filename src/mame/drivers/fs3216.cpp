@@ -237,6 +237,9 @@ void fs3216_state::clb_map(address_map &map)
 	map(0x3a4001, 0x3a4001).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3a4003, 0x3a4003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x3a8000, 0x3a8fff).ram().share("videoram"); // 2x M58725P
+	map(0x3b0000, 0x3b1fff).rom().region("comm_a", 0);
+	map(0x3c0000, 0x3c1fff).rom().region("comm_b", 0);
+	map(0x3e0000, 0x3e1fff).rom().region("wd1001_clb", 0);
 	map(0x3f5000, 0x3f5001).w(FUNC(fs3216_state::mmu_init_w));
 	map(0x3f6000, 0x3f6001).w(FUNC(fs3216_state::fdc_reset_w));
 	map(0x3f6800, 0x3f6fff).rw(FUNC(fs3216_state::fdc_ram_r), FUNC(fs3216_state::fdc_ram_w)).umask16(0x00ff);
