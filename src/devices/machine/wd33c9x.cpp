@@ -450,7 +450,7 @@ READ8_MEMBER(wd33c9x_base_device::indir_r)
 	case 1:
 		return indir_reg_r(space, 0, mem_mask);
 	default:
-		LOGMASKED(LOG_READS | LOG_ERRORS, "%s: Read from invalid offset %d\n", name(), offset);
+		LOGMASKED(LOG_READS | LOG_ERRORS, "%s: Read from invalid offset %d\n", shortname(), offset);
 		break;
 	}
 	return 0;
@@ -471,7 +471,7 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_w)
 		indir_reg_w(space, 0, data, mem_mask);
 		break;
 	default:
-		LOGMASKED(LOG_WRITES | LOG_ERRORS, "%s: Write to invalid offset %d (data=%02x)\n", name(), offset, data);
+		LOGMASKED(LOG_WRITES | LOG_ERRORS, "%s: Write to invalid offset %d (data=%02x)\n", shortname(), offset, data);
 		break;
 	}
 }
@@ -484,7 +484,7 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_w)
 READ8_MEMBER(wd33c9x_base_device::indir_addr_r)
 {
 	if (offset != 0) {
-		fatalerror("%s: Read from invalid address offset %d\n", name(), offset);
+		fatalerror("%s: Read from invalid address offset %d\n", shortname(), offset);
 	}
 	step(false);
 	return m_regs[AUXILIARY_STATUS];
@@ -498,7 +498,7 @@ READ8_MEMBER(wd33c9x_base_device::indir_addr_r)
 WRITE8_MEMBER(wd33c9x_base_device::indir_addr_w)
 {
 	if (offset != 0) {
-		fatalerror("%s: Write to invalid address offset %d (data=%02x)\n", name(), offset, data);
+		fatalerror("%s: Write to invalid address offset %d (data=%02x)\n", shortname(), offset, data);
 	}
 	m_addr = data & REGS_MASK;
 }
@@ -511,7 +511,7 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_addr_w)
 READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 {
 	if (offset != 0) {
-		fatalerror("%s: Read from invalid indirect register offset %d\n", name(), offset);
+		fatalerror("%s: Read from invalid indirect register offset %d\n", shortname(), offset);
 	}
 
 	uint8_t ret;
@@ -525,7 +525,7 @@ READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 			// in advanced mode; the processor must retrieve
 			// the Identify message from the target by reading the
 			// Data Register.
-			fatalerror("%s: The host should never access the data register without DBR set.\n", name());
+			fatalerror("%s: The host should never access the data register without DBR set.\n", shortname());
 		}
 		ret = data_fifo_pop();
 		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_DBR;
@@ -562,7 +562,7 @@ READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 {
 	if (offset != 0) {
-		fatalerror("%s: Write to invalid indirect register offset %d (data=%02x)\n", name(), offset, data);
+		fatalerror("%s: Write to invalid indirect register offset %d (data=%02x)\n", shortname(), offset, data);
 	}
 
 	switch (m_addr) {
@@ -573,12 +573,12 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 	case INVALID_1D:
 	case INVALID_1E:
 	case AUXILIARY_STATUS:
-		LOGMASKED(LOG_WRITES | LOG_ERRORS, "%s: Write to read-only register address %d (data=%02x)\n", name(), m_addr, data);
+		LOGMASKED(LOG_WRITES | LOG_ERRORS, "%s: Write to read-only register address %d (data=%02x)\n", shortname(), m_addr, data);
 		break;
 
 	case COMMAND: {
 		if (m_regs[AUXILIARY_STATUS] & (AUXILIARY_STATUS_INT | AUXILIARY_STATUS_CIP)) {
-			fatalerror("%s: The host should never write to the command register when INT or CIP are set.\n", name());
+			fatalerror("%s: The host should never write to the command register when INT or CIP are set.\n", shortname());
 		}
 
 		const uint8_t cc = (data & COMMAND_CC);
@@ -588,7 +588,7 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 		}
 
 		if (cc > COMMAND_CC_DISCONNECT && (m_regs[AUXILIARY_STATUS] & AUXILIARY_STATUS_BSY)) {
-			fatalerror("%s: The host should never issue a Level II command when BSY is set.\n", name());
+			fatalerror("%s: The host should never issue a Level II command when BSY is set.\n", shortname());
 		}
 
 		m_regs[COMMAND] = data;
@@ -597,7 +597,7 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 
 	case DATA:
 		if (!(m_regs[AUXILIARY_STATUS] & AUXILIARY_STATUS_DBR)) {
-			fatalerror("%s: The host should never write the data register without DBR set.\n", name());
+			fatalerror("%s: The host should never write the data register without DBR set.\n", shortname());
 		}
 		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_DBR;
 		data_fifo_push(data);
@@ -625,7 +625,7 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 WRITE_LINE_MEMBER(wd33c9x_base_device::reset)
 {
 	if (state) {
-		LOGMASKED(LOG_LINES, "%s: Reset via MR line\n");
+		LOGMASKED(LOG_LINES, "%s: Reset via MR line\n", shortname());
 		device_reset();
 	}
 }
@@ -683,7 +683,7 @@ void wd33c9x_base_device::start_command()
 
 	switch (cc) {
 	case COMMAND_CC_RESET:
-		LOGMASKED(LOG_COMMANDS, "%s: Reset Command\n");
+		LOGMASKED(LOG_COMMANDS, "%s: Reset Command\n", shortname());
 		set_scsi_state(FINISHED);
 		m_regs[OWN_ID] = m_command_length;
 		scsi_id = (m_regs[OWN_ID] & OWN_ID_SCSI_ID);
@@ -697,20 +697,20 @@ void wd33c9x_base_device::start_command()
 		break;
 
 	case COMMAND_CC_ABORT:
-		LOGMASKED(LOG_COMMANDS, "%s: Abort Command\n");
+		LOGMASKED(LOG_COMMANDS, "%s: Abort Command\n", shortname());
 		set_scsi_state(FINISHED);
 		break;
 
 	case COMMAND_CC_ASSERT_ATN:
-		LOGMASKED(LOG_COMMANDS, "%s: Assert ATN Command\n");
+		LOGMASKED(LOG_COMMANDS, "%s: Assert ATN Command\n", shortname());
 		if (m_mode != MODE_I) {
-			fatalerror("ASSERT_ATN command only valid in the Initiator state.");
+			fatalerror("%s: ASSERT_ATN command only valid in the Initiator state.", shortname());
 		}
 		scsi_bus->ctrl_w(scsi_refid, S_ATN, S_ATN);
 		return;
 
 	case COMMAND_CC_NEGATE_ACK:
-		LOGMASKED(LOG_COMMANDS, "%s: Negate ACK Command\n");
+		LOGMASKED(LOG_COMMANDS, "%s: Negate ACK Command\n", shortname());
 		// FIXME - This is causing problems, so ignore for now.
 		//if (m_mode != MODE_I) {
 		//  fatalerror("NEGATE_ACK command only valid in the Initiator state.");
@@ -719,7 +719,7 @@ void wd33c9x_base_device::start_command()
 		return;
 
 	case COMMAND_CC_DISCONNECT:
-		LOGMASKED(LOG_COMMANDS, "%s: Disconnect Command\n");
+		LOGMASKED(LOG_COMMANDS, "%s: Disconnect Command\n", shortname());
 		m_mode = MODE_D;
 		set_scsi_state(FINISHED);
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
@@ -728,7 +728,7 @@ void wd33c9x_base_device::start_command()
 
 	case COMMAND_CC_SELECT:
 	case COMMAND_CC_SELECT_ATN:
-		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", select_strings[cc - COMMAND_CC_SELECT_ATN]);
+		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", select_strings[cc - COMMAND_CC_SELECT_ATN], shortname());
 		if (m_mode != MODE_D) {
 			fatalerror("Select commands only valid in the Disconnected state.");
 		}
@@ -737,7 +737,7 @@ void wd33c9x_base_device::start_command()
 
 	case COMMAND_CC_SELECT_TRANSFER:
 	case COMMAND_CC_SELECT_ATN_TRANSFER:
-		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", select_strings[cc - COMMAND_CC_SELECT_ATN]);
+		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", select_strings[cc - COMMAND_CC_SELECT_ATN], shortname());
 		if (m_mode == MODE_I) {
 			set_scsi_state(INIT_XFR);
 		}
@@ -746,16 +746,16 @@ void wd33c9x_base_device::start_command()
 			set_scsi_state((ARB_WAIT_BUS_FREE << SUB_SHIFT) | DISC_SEL_ARBITRATION);
 		}
 		else {
-			fatalerror("Select-and-Transfer commands only valid in the Disconnected and Initiator states.");
+			fatalerror("%s: Select-and-Transfer commands only valid in the Disconnected and Initiator states.", shortname());
 		}
 		set_command_length(cc);
 		load_transfer_count();
 		break;
 
 	case COMMAND_CC_TRANSFER_INFO:
-		LOGMASKED(LOG_COMMANDS, "%s: Transfer Info Command\n");
+		LOGMASKED(LOG_COMMANDS, "%s: Transfer Info Command\n", shortname());
 		if (m_mode != MODE_I) {
-			fatalerror("TRANSFER_INFO command only valid in the Initiator state.");
+			fatalerror("%s: TRANSFER_INFO command only valid in the Initiator state.", shortname());
 		}
 		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_DBR;
 		set_scsi_state(INIT_XFR);
@@ -766,7 +766,7 @@ void wd33c9x_base_device::start_command()
 		return;
 
 	default:
-		fatalerror("Unimplemented command: 0x%02x", cc);
+		fatalerror("%s: Unimplemented command: 0x%02x", shortname(), cc);
 		break;
 	}
 
@@ -807,6 +807,7 @@ void wd33c9x_base_device::step(bool timeout)
 
 		LOGMASKED(LOG_STATE,
 			"%s: step - PHASE:%s BSY:%x SEL:%x REQ:%x ACK:%x ATN:%x RST:%x DATA:%x (%d.%d) %s\n",
+			shortname(),
 			phase_strings[ctrl & S_PHASE_MASK],
 			(ctrl & S_BSY) ? 1 : 0,
 			(ctrl & S_SEL) ? 1 : 0,
@@ -820,7 +821,7 @@ void wd33c9x_base_device::step(bool timeout)
 		);
 
 		if (m_mode == MODE_I && !(ctrl & S_BSY)) {
-			LOGMASKED(LOG_STATE, "%s: Target disconnected\n");
+			LOGMASKED(LOG_STATE, "%s: Target disconnected\n", shortname());
 			m_mode = MODE_D;
 			set_scsi_state(FINISHED);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
@@ -1063,7 +1064,7 @@ void wd33c9x_base_device::step(bool timeout)
 					}
 					break;
 				default:
-					fatalerror("%s: Unexpected phase in RECV_WAIT_SETTLE.\n");
+					fatalerror("%s: Unexpected phase in RECV_WAIT_SETTLE.\n", shortname());
 					break;
 				}
 				set_scsi_state_sub(RECV_WAIT_REQ_0);
@@ -1110,7 +1111,7 @@ void wd33c9x_base_device::step(bool timeout)
 					if ((cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER) &&
 						m_regs[COMMAND_PHASE] < COMMAND_PHASE_CP_BYTES_0) {
 						m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_0;
-						LOGMASKED(LOG_COMMANDS, "%s: Sending Command:");
+						LOGMASKED(LOG_COMMANDS, "%s: Sending Command:", shortname());
 						for (uint8_t i = 0; i < m_command_length; ++i) {
 							const uint8_t command_byte = m_regs[CDB_1 + i];
 							LOGMASKED(LOG_COMMANDS, " %02x", command_byte);
@@ -1171,7 +1172,7 @@ void wd33c9x_base_device::step(bool timeout)
 					break;
 
 				default:
-					fatalerror("%s: Invalid phase during INIT_XFR.\n");
+					fatalerror("%s: Invalid phase during INIT_XFR.\n", shortname());
 					break;
 				}
 			}
@@ -1205,7 +1206,7 @@ void wd33c9x_base_device::step(bool timeout)
 							next_state = FINISHED;
 							break;
 						default:
-							fatalerror("%s: Unhandled command when transitioning from S_PHASE_MSG_OUT -> S_PHASE_COMMAND.\n");
+							fatalerror("%s: Unhandled command when transitioning from S_PHASE_MSG_OUT -> S_PHASE_COMMAND.\n", shortname());
 							next_state = FINISHED;
 							break;
 						}
@@ -1217,7 +1218,7 @@ void wd33c9x_base_device::step(bool timeout)
 				case ((S_PHASE_DATA_IN << 3) | S_PHASE_STATUS):
 				case ((S_PHASE_DATA_OUT << 3) | S_PHASE_STATUS):
 					if (!data_fifo_empty()) {
-						fatalerror("%s: Data FIFO is not empty on phase transition.\n");
+						fatalerror("%s: Data FIFO is not empty on phase transition.\n", shortname());
 					}
 					// Fall through
 				case ((S_PHASE_STATUS  << 3) | S_PHASE_MSG_IN):
@@ -1229,13 +1230,13 @@ void wd33c9x_base_device::step(bool timeout)
 						next_state = FINISHED;
 						break;
 					default:
-						fatalerror("%s: Unhandled command when transitioning from S_PHASE_STATUS -> S_PHASE_MSG_IN.\n");
+						fatalerror("%s: Unhandled command when transitioning from S_PHASE_STATUS -> S_PHASE_MSG_IN.\n", shortname());
 						next_state = FINISHED;
 						break;
 					}
 					break;
 				default:
-					fatalerror("%s: Unhandled phase transition in INIT_XFR_WAIT_REQ.\n");
+					fatalerror("%s: Unhandled phase transition in INIT_XFR_WAIT_REQ.\n", shortname());
 					next_state = FINISHED;
 					break;
 				}
@@ -1259,7 +1260,7 @@ void wd33c9x_base_device::step(bool timeout)
 			break;
 
 		default:
-			fatalerror("%s: Unhandled state in step.\n");
+			fatalerror("%s: Unhandled state in step.\n", shortname());
 			break;
 		}
 
@@ -1292,7 +1293,7 @@ void wd33c9x_base_device::load_transfer_count()
 			m_transfer_count = 1;
 		}
 	}
-	LOGMASKED(LOG_COMMANDS, "%s: Transfer Count %d bytes\n", m_transfer_count);
+	LOGMASKED(LOG_COMMANDS, "%s: Transfer Count %d bytes\n", shortname(), m_transfer_count);
 }
 
 
@@ -1326,7 +1327,7 @@ bool wd33c9x_base_device::decrement_transfer_count()
 uint8_t wd33c9x_base_device::data_fifo_pop()
 {
 	if (data_fifo_empty()) {
-		fatalerror("%s: Data FIFO underflow.\n");
+		fatalerror("%s: Data FIFO underflow.\n", shortname());
 	}
 	--m_data_fifo_size;
 	uint8_t ret = m_data_fifo[m_data_fifo_pos];
@@ -1342,7 +1343,7 @@ uint8_t wd33c9x_base_device::data_fifo_pop()
 void wd33c9x_base_device::data_fifo_push(const uint8_t data)
 {
 	if (data_fifo_full()) {
-		fatalerror("%s: Data FIFO overflow.\n");
+		fatalerror("%s: Data FIFO overflow.\n", shortname());
 	}
 	m_data_fifo[(m_data_fifo_pos + m_data_fifo_size) % DATA_FIFO_SIZE] = data;
 	++m_data_fifo_size;
@@ -1411,7 +1412,7 @@ void wd33c9x_base_device::recv_byte()
 
 void wd33c9x_base_device::set_scsi_state(uint16_t state)
 {
-	LOGMASKED(LOG_STATE, "%s: SCSI state change: %x to %x\n", m_scsi_state, state);
+	LOGMASKED(LOG_STATE, "%s: SCSI state change: %x to %x\n", shortname(), m_scsi_state, state);
 	m_scsi_state = state;
 }
 
@@ -1432,7 +1433,7 @@ void wd33c9x_base_device::set_scsi_state_sub(uint8_t sub)
 uint8_t wd33c9x_base_device::irq_fifo_pop()
 {
 	if (irq_fifo_empty()) {
-		fatalerror("%s: IRQ FIFO underflow.\n");
+		fatalerror("%s: IRQ FIFO underflow.\n", shortname());
 	}
 	--m_irq_fifo_size;
 	uint8_t ret = m_irq_fifo[m_irq_fifo_pos];
@@ -1448,7 +1449,7 @@ uint8_t wd33c9x_base_device::irq_fifo_pop()
 void wd33c9x_base_device::irq_fifo_push(const uint8_t status)
 {
 	if (irq_fifo_full()) {
-		fatalerror("%s: IRQ FIFO overflow.\n");
+		fatalerror("%s: IRQ FIFO overflow.\n", shortname());
 	}
 	m_irq_fifo[(m_irq_fifo_pos + m_irq_fifo_size) % IRQ_FIFO_SIZE] = status;
 	++m_irq_fifo_size;
@@ -1494,13 +1495,13 @@ void wd33c9x_base_device::irq_fifo_reset()
 void wd33c9x_base_device::update_irq()
 {
 	if (m_regs[AUXILIARY_STATUS] & AUXILIARY_STATUS_INT) {
-		LOGMASKED(LOG_LINES, "%s: Clearing IRQ\n");
+		LOGMASKED(LOG_LINES, "%s: Clearing IRQ\n", shortname());
 		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_INT;
 		m_irq_cb(CLEAR_LINE);
 	}
 	if (!irq_fifo_empty()) {
 		m_regs[SCSI_STATUS] = irq_fifo_pop();
-		LOGMASKED(LOG_LINES, "%s: Asserting IRQ - SCSI Status (%02x)\n", m_regs[SCSI_STATUS]);
+		LOGMASKED(LOG_LINES, "%s: Asserting IRQ - SCSI Status (%02x)\n", shortname(), m_regs[SCSI_STATUS]);
 		m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_INT;
 		m_irq_cb(ASSERT_LINE);
 	}
@@ -1514,7 +1515,7 @@ void wd33c9x_base_device::update_irq()
 void wd33c9x_base_device::set_drq()
 {
 	if (!m_drq_state) {
-		LOGMASKED(LOG_LINES, "%s: Asserting DRQ\n");
+		LOGMASKED(LOG_LINES, "%s: Asserting DRQ\n", shortname());
 		m_drq_state = true;
 		m_drq_cb(ASSERT_LINE);
 	}
@@ -1528,7 +1529,7 @@ void wd33c9x_base_device::set_drq()
 void wd33c9x_base_device::clear_drq()
 {
 	if (m_drq_state) {
-		LOGMASKED(LOG_LINES, "%s: Clearing DRQ\n");
+		LOGMASKED(LOG_LINES, "%s: Clearing DRQ\n", shortname());
 		m_drq_state = false;
 		m_drq_cb(CLEAR_LINE);
 	}
@@ -1584,7 +1585,7 @@ bool wd33c9x_base_device::set_command_length(const uint8_t cc)
 		}
 		ret = true;
 	}
-	LOGMASKED(LOG_COMMANDS, "%s: SCSI Command Length %d bytes\n", m_command_length);
+	LOGMASKED(LOG_COMMANDS, "%s: SCSI Command Length %d bytes\n", shortname(), m_command_length);
 	return ret;
 }
 
