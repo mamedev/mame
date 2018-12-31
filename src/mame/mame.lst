@@ -13097,7 +13097,6 @@ skylancre                       // (c) 1983 Orca + Esco Trading Co license
 @source:funkyjet.cpp
 funkyjet                        // MAT (c) 1992 Data East (Mitchell license) (World, Rev 1)
 funkyjeta                       // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified
-funkyjetb                       // bootleg
 funkyjetj                       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 sotsugyo                        // (c) 1995 Mitchell (Atlus license)
 
@@ -38014,6 +38013,7 @@ cookbib                         // (c) 1995 SemiCom
 cookbiba                        //
 dquizgo                         // (c) 1998 SemiCom
 fncywld                         // (c) 1996 Unico
+funkyjetb                       // bootleg
 magipur                         // (c) 1996 Unico
 htchctch                        // (c) 1995 SemiCom
 jumpkids                        // (c) 1993 Comad
@@ -39671,6 +39671,7 @@ rad_box                         //
 rad_boxp                        //
 rad_crdn                        //
 rad_crdnp                       //
+rad_opus                        //
 rad_bass                        //
 rad_bassp                       //
 rad_snow                        //
@@ -39681,6 +39682,7 @@ epo_efdx                        //
 rad_rh                          //
 has_wamg                        //
 ekara                           //
+ekaraa                          //
 ekaraj                          //
 ddrfammt                        //
 popira                          //

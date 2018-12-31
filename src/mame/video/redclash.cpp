@@ -94,7 +94,7 @@ void redclash_state::redclash_palette(palette_device &palette) const
 
 	// stars
 	for (int i = 0; i < 0x20; i++)
-		palette.set_pen_indirect(i + 60, i + 0x20);
+		palette.set_pen_indirect(i + 0x60, i + 0x20);
 }
 
 

@@ -2175,9 +2175,9 @@ ROM_START( polepos2bi )
 	ROM_LOAD( "20.bin",       0x0000, 0x2000, CRC(1771fe1b) SHA1(da74ca85dfd4f5ad5a9dbfe6f7668d93105e3575) )
 
 	ROM_REGION( 0x2000, "pals", 0 )
-	ROM_LOAD( "pal12l6-a.bin.bad.dump",     0x0000, 0x34, BAD_DUMP CRC(56c2e02f) SHA1(33545f83d63b476d9164472b439aa7002506b33d) )
-	ROM_LOAD( "pal12l6-b.bin.bad.dump",     0x0000, 0x34, BAD_DUMP CRC(56c2e02f) SHA1(33545f83d63b476d9164472b439aa7002506b33d) )
-	ROM_LOAD( "pal16l8.bin.bad.dump",       0x0000,0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal12l6-a.bin", 0x0000, 0x34, NO_DUMP )
+	ROM_LOAD( "pal12l6-b.bin", 0x0000, 0x34, NO_DUMP )
+	ROM_LOAD( "pal16l8.bin",   0x0000,0x104, NO_DUMP )
 ROM_END
 
 

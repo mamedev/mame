@@ -816,40 +816,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE); // does RAM to sprite buffer copy here
 }
 
-MACHINE_CONFIG_START(suna16_state::bssoccer)
-
+void suna16_state::bssoccer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/4)    /* 8MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bssoccer_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(32'000'000)/4);    /* 8MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna16_state::bssoccer_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(suna16_state::bssoccer_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* Z80B at 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bssoccer_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4)); /* Z80B at 3.579545MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &suna16_state::bssoccer_sound_map);
 
-	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bssoccer_pcm_1_map)
-	MCFG_DEVICE_IO_MAP(bssoccer_pcm_1_io_map)
+	Z80(config, m_pcm1, XTAL(32'000'000)/6);      /* Z80B at 5.333MHz */
+	m_pcm1->set_addrmap(AS_PROGRAM, &suna16_state::bssoccer_pcm_1_map);
+	m_pcm1->set_addrmap(AS_IO, &suna16_state::bssoccer_pcm_1_io_map);
 
-	MCFG_DEVICE_ADD("pcm2", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bssoccer_pcm_2_map)
-	MCFG_DEVICE_IO_MAP(bssoccer_pcm_2_io_map)
+	Z80(config, m_pcm2, XTAL(32'000'000)/6);      /* Z80B at 5.333MHz */
+	m_pcm2->set_addrmap(AS_PROGRAM, &suna16_state::bssoccer_pcm_2_map);
+	m_pcm2->set_addrmap(AS_IO, &suna16_state::bssoccer_pcm_2_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna16_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
-	MCFG_PALETTE_ADD("palette", 512)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna16);
+	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -863,56 +862,59 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 	ymsnd.add_route(0, "lspeaker", 0.2);
 	ymsnd.add_route(1, "rspeaker", 0.2);
 
-	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
-
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /***************************************************************************
                                 Ultra Balloon
 ***************************************************************************/
 
-MACHINE_CONFIG_START(suna16_state::uballoon)
-
+void suna16_state::uballoon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/4)   /* 8MHz */
-	MCFG_DEVICE_PROGRAM_MAP(uballoon_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(32'000'000)/4);   /* 8MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna16_state::uballoon_map);
+	m_maincpu->set_vblank_int("screen", FUNC(suna16_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(uballoon_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4));   /* Z80B at 3.579545MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &suna16_state::uballoon_sound_map);
 
-	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(32'000'000)/6) /* Z80B at 5.333MHz */
-	MCFG_DEVICE_PROGRAM_MAP(uballoon_pcm_1_map)
-	MCFG_DEVICE_IO_MAP(uballoon_pcm_1_io_map)
+	Z80(config, m_pcm1, XTAL(32'000'000)/6); /* Z80B at 5.333MHz */
+	m_pcm1->set_addrmap(AS_PROGRAM, &suna16_state::uballoon_pcm_1_map);
+	m_pcm1->set_addrmap(AS_IO, &suna16_state::uballoon_pcm_1_io_map);
 
 	/* 2nd PCM Z80 missing */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna16_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
-	MCFG_PALETTE_ADD("palette", 512)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna16);
+	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -925,51 +927,53 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
 
 /***************************************************************************
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-MACHINE_CONFIG_START(suna16_state::sunaq)
-
+void suna16_state::sunaq(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sunaq_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/4);   /* 6MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna16_state::sunaq_map);
+	m_maincpu->set_vblank_int("screen", FUNC(suna16_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sunaq_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4));   /* Z80B at 3.579545MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &suna16_state::sunaq_sound_map);
 
-	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* Z80B at 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bssoccer_pcm_1_map)
-	MCFG_DEVICE_IO_MAP(bssoccer_pcm_1_io_map)
+	Z80(config, m_pcm1, XTAL(24'000'000)/4); /* Z80B at 6MHz */
+	m_pcm1->set_addrmap(AS_PROGRAM, &suna16_state::bssoccer_pcm_1_map);
+	m_pcm1->set_addrmap(AS_IO, &suna16_state::bssoccer_pcm_1_io_map);
 
 	/* 2nd PCM Z80 missing */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
 
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna16_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
-	MCFG_PALETTE_ADD("palette", 512)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna16);
+	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -982,12 +986,16 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 	ymsnd.add_route(0, "lspeaker", 0.50);
 	ymsnd.add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
 
 /***************************************************************************
                             Best Of Best
@@ -998,38 +1006,37 @@ WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 	// ?
 }
 
-MACHINE_CONFIG_START(suna16_state::bestbest)
-
+void suna16_state::bestbest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bestbest_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(24'000'000)/4); /* 6MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna16_state::bestbest_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(suna16_state::bssoccer_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bestbest_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/4)); /* 6MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &suna16_state::bestbest_sound_map);
 
-	MCFG_DEVICE_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bestbest_pcm_1_map)
-	MCFG_DEVICE_IO_MAP(bestbest_pcm_1_iomap)
+	Z80(config, m_pcm1, XTAL(24'000'000)/4); /* 6MHz */
+	m_pcm1->set_addrmap(AS_PROGRAM, &suna16_state::bestbest_pcm_1_map);
+	m_pcm1->set_addrmap(AS_IO, &suna16_state::bestbest_pcm_1_iomap);
 
 	/* 2nd PCM Z80 missing */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(suna16_state, bestbest)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.1734)    // measured on pcb (15.6218kHz HSync)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.1734);    // measured on pcb (15.6218kHz HSync)
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna16_state::screen_update_bestbest));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestbest)
-	MCFG_PALETTE_ADD("palette", 256*8)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bestbest);
+	PALETTE(config, m_palette).set_entries(256*8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1043,21 +1050,26 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 	aysnd.add_route(0, "lspeaker", 1.0);
 	aysnd.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(24'000'000)/8)   /* 3MHz */
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", XTAL(24'000'000)/8));   /* 3MHz */
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.2); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.2); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 /***************************************************************************
 

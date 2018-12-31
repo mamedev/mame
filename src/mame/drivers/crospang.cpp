@@ -422,29 +422,28 @@ void crospang_state::machine_reset()
 	m_bestri_tilebankselect = 0;
 }
 
-MACHINE_CONFIG_START(crospang_state::crospang)
-
+void crospang_state::crospang(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(14'318'181)/2) /* 68000P10 @ 7.15909MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crospang_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(14'318'181)/2); /* 68000P10 @ 7.15909MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::crospang_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crospang_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crospang_sound_map)
-	MCFG_DEVICE_IO_MAP(crospang_sound_io_map)
-
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4)); /* 3.579545MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &crospang_state::crospang_sound_map);
+	audiocpu.set_addrmap(AS_IO, &crospang_state::crospang_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(crospang_state, screen_update_crospang)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0, 40*8-1, 0, 30*8-1);
+	screen.set_screen_update(FUNC(crospang_state::screen_update_crospang));
+	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crospang)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_crospang);
 
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(0);
@@ -452,48 +451,47 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 	m_sprgen->set_offsets(5, 7);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545MHz */
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH)); // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(crospang_state::bestri)
+void crospang_state::bestri(machine_config &config)
+{
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bestri_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::bestri_map);
+}
 
-MACHINE_CONFIG_START(crospang_state::bestria)
+void crospang_state::bestria(machine_config &config)
+{
 	crospang(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bestria_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::bestria_map);
+}
 
-MACHINE_CONFIG_START(crospang_state::pitapat)
+void crospang_state::pitapat(machine_config &config)
+{
 	crospang(config);
 
 	// can't be 14'318'181 / 2 as the inputs barely respond and the background graphics glitch badly when the screen fills, doesn't appear to be a vblank bit anywhere to negate this either, P12 reated part
-	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(14'318'181))
-	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crospang_state,  irq6_line_hold)
+	M68000(config.replace(), m_maincpu, XTAL(14'318'181));
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::pitapat_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crospang_state::irq6_line_hold));
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pitapat_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospang_state::pitapat_map);
+}
 
 ROM_START( crospang ) /* Developed April 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */

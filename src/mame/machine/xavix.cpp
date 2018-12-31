@@ -94,10 +94,20 @@ WRITE8_MEMBER(xavix_state::vector_enable_w)
 	m_vectorenable = data;
 }
 
+READ8_MEMBER(xavix_state::nmi_vector_lo_r)
+{
+	return m_nmi_vector_lo_data;
+}
+
 WRITE8_MEMBER(xavix_state::nmi_vector_lo_w)
 {
 	LOG("%s: nmi_vector_lo_w %02x\n", machine().describe_context(), data);
 	m_nmi_vector_lo_data = data;
+}
+
+READ8_MEMBER(xavix_state::nmi_vector_hi_r)
+{
+	return m_nmi_vector_hi_data;
 }
 
 WRITE8_MEMBER(xavix_state::nmi_vector_hi_w)
@@ -118,21 +128,35 @@ WRITE8_MEMBER(xavix_state::irq_vector_hi_w)
 	m_irq_vector_hi_data = data;
 }
 
-
-WRITE8_MEMBER(xavix_state::extintrf_7900_w)
+READ8_MEMBER(xavix_state::irq_vector_lo_r)
 {
-	LOG("%s: extintrf_7900_w %02x (---FIRST WRITE ON STARTUP---)\n", machine().describe_context(), data);
+	LOG("%s: irq_vector_lo_r\n", machine().describe_context());
+	return m_irq_vector_lo_data;
 }
 
-WRITE8_MEMBER(xavix_state::extintrf_7901_w)
+READ8_MEMBER(xavix_state::irq_vector_hi_r)
 {
-	LOG("%s: extintrf_7901_w %02x\n", machine().describe_context(), data);
+	LOG("%s: irq_vector_hi_r\n", machine().describe_context());
+	return m_irq_vector_hi_data;
 }
 
-WRITE8_MEMBER(xavix_state::extintrf_7902_w)
+
+// this is external bus control (access to ROM etc.)
+
+READ8_MEMBER(xavix_state::extintrf_790x_r)
 {
-	LOG("%s: extintrf_7902_w %02x\n", machine().describe_context(), data);
+	LOG("%s: extintrf_790x_r %02x\n", machine().describe_context(), offset);
+	return m_extbusctrl[offset];
 }
+
+WRITE8_MEMBER(xavix_state::extintrf_790x_w)
+{
+	// Popira, Taiko De Popira etc. games with SEEPROM cartridges uses this to swap between ROM and other peripherals in the cart for data bus access?
+	LOG("%s: extintrf_790x_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_extbusctrl[offset] = data;
+}
+
+
 
 
 
@@ -231,11 +255,12 @@ WRITE8_MEMBER(xavix_state::adc_7b00_w)
 READ8_MEMBER(xavix_state::adc_7b80_r)
 {
 	LOG("%s: adc_7b80_r\n", machine().describe_context());
-	return 0x00;//0xff;
+	return m_adc_inlatch;
 }
 
 WRITE8_MEMBER(xavix_state::adc_7b80_w)
 {
+	// is the latch writeable?
 	LOG("%s: adc_7b80_w %02x\n", machine().describe_context(), data);
 }
 
@@ -247,8 +272,23 @@ WRITE8_MEMBER(xavix_state::adc_7b81_w)
 	LOG("%s: adc_7b81_w %02x\n", machine().describe_context(), data);
 	m_adc_control = data;
 
-//  m_adc_timer->adjust(attotime::from_usec(200));
+	// bit 0x40 = run? or IRQ? (doesn't seem to be any obvious way to clear IRQs tho, ADC handling is usually done in timer IRQ?)
+	// should probably set latch after a timer has expired not instantly?
+	// bits 0x0c are not port select?
+	// bit 0x80 is some kind of ack? / done flag?
+	switch (m_adc_control & 0x13)
+	{
+	case 0x00: m_adc_inlatch = m_an_in[0]->read(); break;
+	case 0x01: m_adc_inlatch = m_an_in[1]->read(); break;
+	case 0x02: m_adc_inlatch = m_an_in[2]->read(); break;
+	case 0x03: m_adc_inlatch = m_an_in[3]->read(); break;
+	case 0x10: m_adc_inlatch = m_an_in[4]->read(); break;
+	case 0x11: m_adc_inlatch = m_an_in[5]->read(); break;
+	case 0x12: m_adc_inlatch = m_an_in[6]->read(); break;
+	case 0x13: m_adc_inlatch = m_an_in[7]->read(); break;
+	}
 
+//  m_adc_timer->adjust(attotime::from_usec(200));
 }
 
 READ8_MEMBER(xavix_state::adc_7b81_r)
@@ -427,6 +467,34 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 		m_i2cmem->write_scl((data & 0x10) >> 4);
 	}
 }
+
+// for taikodp
+uint8_t xavix_i2c_cart_state::read_io1(uint8_t direction)
+{
+	uint8_t ret = m_in1->read();
+
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
+
+	return ret;
+}
+
+void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}
+}
+
 
 uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
 {
@@ -828,9 +896,15 @@ WRITE8_MEMBER(xavix_state::irq_source_w)
 
 void xavix_state::machine_start()
 {
+	// at least some of the internal CPU RAM can be backed up, not sure how much
+	int nvram_size = 0x1000;
+
+	if (!m_nvram)
+		nvram_size = 0;
+
 	// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
 	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
-	std::fill_n(&m_mainram[0], 0x3e00, 0xff);
+	std::fill_n(&m_mainram[0], 0x4000 - nvram_size, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
@@ -841,8 +915,49 @@ void xavix_state::machine_start()
 		m_sound_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::sound_timer_done), this));
 	}
 
-	// at least some of the internal CPU RAM is backed up, not sure how much
-	m_nvram->set_base(&m_mainram[0x3e00], 0x200);
+	if (m_nvram)
+		m_nvram->set_base(&m_mainram[0x4000 - nvram_size], nvram_size);
+
+
+	save_item(NAME(m_extbusctrl));
+	save_item(NAME(m_ioevent_enable));
+	save_item(NAME(m_ioevent_active));
+	save_item(NAME(m_io0_data));
+	save_item(NAME(m_io1_data));
+	save_item(NAME(m_io0_direction));
+	save_item(NAME(m_io1_direction));
+	save_item(NAME(m_adc_control));
+	save_item(NAME(m_sound_irqstatus));
+	save_item(NAME(m_soundreg16_0));
+	save_item(NAME(m_soundreg16_1));
+	save_item(NAME(m_sound_regbase));
+	save_item(NAME(m_timer_control));
+	save_item(NAME(m_timer_freq));
+	save_item(NAME(m_txarray));
+	save_item(NAME(m_irqsource));
+	save_item(NAME(m_vectorenable));
+	save_item(NAME(m_nmi_vector_lo_data));
+	save_item(NAME(m_nmi_vector_hi_data));
+	save_item(NAME(m_irq_vector_lo_data));
+	save_item(NAME(m_irq_vector_hi_data));
+	save_item(NAME(m_multparams));
+	save_item(NAME(m_multresults));
+	save_item(NAME(m_spritefragment_dmaparam1));
+	save_item(NAME(m_spritefragment_dmaparam2));
+	save_item(NAME(m_tmap1_regs));
+	save_item(NAME(m_tmap2_regs));
+	save_item(NAME(m_arena_start));
+	save_item(NAME(m_arena_end));
+	save_item(NAME(m_arena_control));
+	save_item(NAME(m_6ff0));
+	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_mastervol));
+	save_item(NAME(m_unk_snd75f8));
+	save_item(NAME(m_unk_snd75f9));
+	save_item(NAME(m_unk_snd75ff));
+	save_item(NAME(m_sndtimer));
+	save_item(NAME(m_timer_baseval));
+	save_item(NAME(m_spritereg));
 }
 
 void xavix_state::machine_reset()
@@ -873,8 +988,8 @@ void xavix_state::machine_reset()
 
 	m_mastervol = 0x00;
 	m_unk_snd75f8 = 0x00;
-	m_unksnd75f9 = 0x00;
-	m_unksnd75ff = 0x00;
+	m_unk_snd75f9 = 0x00;
+	m_unk_snd75ff = 0x00;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -911,6 +1026,13 @@ void xavix_state::machine_reset()
 	m_adc_control = 0x00;
 
 	m_sprite_xhigh_ignore_hack = true;
+
+	m_cpuspace = &m_maincpu->space(AS_PROGRAM);
+
+	m_extbusctrl[0] = 0x00;
+	m_extbusctrl[1] = 0x00;
+	m_extbusctrl[2] = 0x00;
+
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

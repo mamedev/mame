@@ -93,7 +93,6 @@ Notes:
 #include "includes/funkyjet.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
@@ -139,24 +138,6 @@ void funkyjet_state::funkyjet_map(address_map &map)
 	map(0x180000, 0x183fff).rw(FUNC(funkyjet_state::funkyjet_protection_region_0_146_r), FUNC(funkyjet_state::funkyjet_protection_region_0_146_w)).share("prot16ram"); /* Protection device */ // unlikely to be cs0 region
 	map(0x184000, 0x184001).nopw();
 	map(0x188000, 0x188001).nopw();
-	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x340000, 0x340bff).ram().share("pf1_rowscroll");
-	map(0x342000, 0x342bff).ram().share("pf2_rowscroll");
-}
-
-void funkyjet_state::funkyjetb_map(address_map &map)
-{
-	map(0x000000, 0x07ffff).rom();
-	map(0x120000, 0x1207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x140000, 0x143fff).ram();
-	map(0x160000, 0x1607ff).ram().share("spriteram");
-	map(0x184000, 0x184001).nopw();
-	map(0x188000, 0x188001).nopw();
-	map(0x1d0382, 0x1d0383).portr("DSW");
-	map(0x242102, 0x242103).portr("SYSTEM");
-	map(0x200000, 0x2007ff).ram(); // writes 0x180
 	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
 	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
@@ -384,21 +365,6 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-void funkyjet_state::funkyjetb(machine_config &config)
-{
-	funkyjet(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &funkyjet_state::funkyjetb_map);
-
-	config.device_remove("audiocpu");
-
-	config.device_remove("ioprot");
-
-	config.device_remove("ymsnd");
-
-	// add PIC if/when decapped
-}
-
 /******************************************************************************/
 
 ROM_START( funkyjet )
@@ -458,40 +424,6 @@ ROM_START( funkyjetj )
 	ROM_LOAD( "jh03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) ) /* same as jk03.15h from world set */
 ROM_END
 
-ROM_START( funkyjetb )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "4-27c020.bin", 0x00000, 0x40000, CRC(4e5bfda3) SHA1(b1bcc4ad1343d379de9a143a72a84db9830c8fa0) )
-	ROM_LOAD16_BYTE( "3-27c020.bin", 0x00001, 0x40000, CRC(e253e20c) SHA1(6fe1704872bf807ed24f500c997f62c880f6c5c1) )
-
-	ROM_REGION( 0x2000, "pic", 0 )    /* Sound CPU */
-	ROM_LOAD( "1-pic16c57-xt.bin",   0x00000, 0x2000, NO_DUMP ) // protected
-
-	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "5-27c020.bin", 0x000000, 0x40000, CRC(f75ff923) SHA1(4177e94ba1e3a82861d0277ba5d0abc24482ffe2) )
-	ROM_LOAD16_BYTE( "6-27c020.bin", 0x000001, 0x40000, CRC(91a2bcb5) SHA1(c659b5deff2a4b2b69bddb956a3df1ed79a50ab0) )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "8-27c020.bin",  0x000000, 0x40000, CRC(49aab1d6) SHA1(2c215df271af1d49eeff472298e7aa00879c1799) ) /* sprites */
-	ROM_LOAD16_BYTE( "7-27c020.bin",  0x000001, 0x40000, CRC(f6e362bf) SHA1(8e5c82eb19b8948f064360215107311efa9ea12f) )
-	ROM_LOAD16_BYTE( "10-27c020.bin", 0x080000, 0x40000, CRC(ffe70cc2) SHA1(e81720c86ea0df7554af060dae66901bf612b4db) )
-	ROM_LOAD16_BYTE( "9-27c020.bin",  0x080001, 0x40000, CRC(d13437a6) SHA1(cc848e5e8cc91f6fb5c1de219cc1db57b84337a9) )
-
-	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "2-27c4001.bin",    0x00000, 0x80000, CRC(7dbc988b) SHA1(0bf89e651a992672ee4041addc9c4614b475c48a) )
-
-	ROM_REGION( 0x1600, "plds", ROMREGION_ERASE00 )
-	ROM_LOAD( "p1-palce16v8h-25pc.bin",  0x0000, 0x0117, CRC(bb8f5dd6) SHA1(b09f36293f7b4ae30b8bebebcca6457a64b87d0f) )
-	ROM_LOAD( "p2-palce22v10h-25pc.bin", 0x0200, 0x02dd, CRC(d53c01da) SHA1(e90eaa95a8b429643cfb0bce7dff86e850ec01d8) )
-	ROM_LOAD( "p3-palce22v10h-25pc.bin", 0x0500, 0x02dd, CRC(5c0b43af) SHA1(ef5cfabde32063707c97a9aed63f8bf1bde2cb6d) )
-	ROM_LOAD( "p4-palce16v8h-25pc.bin",  0x0800, 0x0117, CRC(36749fe3) SHA1(d2a88d5c2d3d32aeade59d5c4e4474982d19447e) )
-	ROM_LOAD( "p5-palce20v8h-25pc.bin",  0x0a00, 0x0157, CRC(1c9b6557) SHA1(ceb78bf78e511251143984626f6b8421e5d627d5) )
-	ROM_LOAD( "p6-palce16v8h-25pc.bin",  0x0c00, 0x0117, CRC(76b06a9a) SHA1(32a5d5d6ce4819ae5cceb6499f5f95b77e6b4f33) )
-	ROM_LOAD( "p7-palce16v8h-25pc.bin",  0x0e00, 0x0117, CRC(070f48ec) SHA1(51fed4c1072762f4a4d2c0706d6a6cab4c769376) )
-	ROM_LOAD( "p8-palce16v8h-25pc.bin",  0x1000, 0x0117, CRC(747270a6) SHA1(7ec39a172400e536bd4136250f8ec391c6b1320f) )
-	ROM_LOAD( "p9-palce16v8h-25pc.bin",  0x1000, 0x0117, CRC(954b7413) SHA1(207972f0021f26b5b99f6b96eb650cc3213ae490) )
-	ROM_LOAD( "p10-hy18cv8s-25.bin",     0x1400, 0x0155, CRC(6dc83459) SHA1(1121aaedf1f913cccae81dcc1f95e20c24d263fb) )
-ROM_END
-
 ROM_START( sotsugyo )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "03.12f", 0x00000, 0x40000, CRC(d175dfd1) SHA1(61c91d5e20b0492e6ac3b19fe9639eb4f169ae77) )
@@ -516,21 +448,9 @@ void funkyjet_state::init_funkyjet()
 	deco74_decrypt_gfx(machine(), "gfx1");
 }
 
-void funkyjet_state::init_funkyjetb()
-{
-	// prearrange chars in the expected format
-	uint8_t* gfx1 = memregion("gfx1")->base();
-	uint8_t buf[0x80000];
-	memcpy(buf, gfx1, 0x80000);
-
-	for (int i = 0; i < 0x80000; i++)
-		gfx1[i] = buf[i^0x20];
-}
-
 /******************************************************************************/
 
-GAME( 1992, funkyjet,   0,        funkyjet,   funkyjet,  funkyjet_state, init_funkyjet,   ROT0, "Mitchell", "Funky Jet (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, funkyjeta,  funkyjet, funkyjet,   funkyjet,  funkyjet_state, init_funkyjet,   ROT0, "Mitchell", "Funky Jet (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, funkyjetj,  funkyjet, funkyjet,   funkyjetj, funkyjet_state, init_funkyjet,   ROT0, "Mitchell (Data East Corporation license)", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, funkyjetb,  funkyjet, funkyjetb,  funkyjetj, funkyjet_state, init_funkyjetb,  ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // no backgrounds, inputs not working, undumped PIC driving an OKI
-GAME( 1995, sotsugyo,   0,        funkyjet,   sotsugyo,  funkyjet_state, init_funkyjet,   ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjet,  0,        funkyjet, funkyjet,  funkyjet_state, init_funkyjet, ROT0, "Mitchell", "Funky Jet (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjeta, funkyjet, funkyjet, funkyjet,  funkyjet_state, init_funkyjet, ROT0, "Mitchell", "Funky Jet (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjetj, funkyjet, funkyjet, funkyjetj, funkyjet_state, init_funkyjet, ROT0, "Mitchell (Data East Corporation license)", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sotsugyo,  0,        funkyjet, sotsugyo,  funkyjet_state, init_funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", MACHINE_SUPPORTS_SAVE )

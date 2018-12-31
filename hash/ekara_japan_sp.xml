@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ekara_japan_sp" description="Takara e-kara SP-xx series cartridges">
+<softwarelist name="ekara_japan_sp" description="Takara e-kara (Japan) SP-xx series cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 	     some cartridges also contain an SEEPROM
 
 	***********************************************************************************
 
 	Japanese cart listing (by SP code)  * = dumped
+	
+	These don't seem to have a secondary numbering scheme (eg SPxxxx-xxx)
 
 	These are for use with 5 different units
 	1. e-Kara
@@ -22,20 +24,26 @@
 	gives 'memory error' if plugged into Popira (needs cartridge SEEPROM emulating)
 	gives 'eep-rom error' if plugged into Taiko de Popira (same reason)
 	
-	 SP-1  (unknown)
-	*SP-2  (unknown)
+	 SP-01  (unknown)
+	*SP-02  'Super Cartridge' SP-2
+	 SP-03  (unknown)
+	 SP-04  (unknown)
+	 SP-05
+	 SP-06  (seen)
+	 SP-07  (seen)
 
 	(more? what's the SP highest number?)
 
 	-->
 
 	<software name="sp02"> <!-- also has SEEPROM inside -->
-		<description>SP-02</description>
+		<description>SP-02 Super Cartridge (Japan)</description>
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
 			<dataarea name="rom" size="0x200000">
-				<rom name="ekarasp02.bin" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee" offset="0" />
+				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee" offset="0" />
 			</dataarea>
 		</part>
 	</software>	

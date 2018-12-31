@@ -255,6 +255,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 		case 0xda:
 //          printf("ENCWRT off\n");
+			m_charwrt = false;
 			break;
 
 		case 0xdb:
@@ -263,7 +264,6 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			break;
 
 		case 0xdc:
-			m_charwrt = false;
 //          printf("ENCSEL off\n");
 			break;
 
@@ -435,6 +435,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 
 		case 0xda:
 //          printf("ENCWRT off\n");
+			m_charwrt = false;
 			break;
 
 		case 0xdb:
@@ -443,7 +444,6 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			break;
 
 		case 0xdc:
-			m_charwrt = false;
 //          printf("ENCSEL off\n");
 			break;
 

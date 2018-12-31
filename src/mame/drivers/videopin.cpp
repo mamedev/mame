@@ -156,7 +156,7 @@ WRITE8_MEMBER(videopin_state::led_w)
 	int a = m_screen->vpos() >> 5 & 7;
 
 	for (int c = 0; c < 4; c++)
-		m_leds[matrix[a][c]] = BIT(data, c);
+		m_leds[matrix[a][c] - 1] = BIT(data, c);
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -200,8 +200,8 @@ WRITE8_MEMBER(videopin_state::out2_w)
 
 	m_discrete->write(VIDEOPIN_BELL_EN, data & 0x40); // Bell
 	m_discrete->write(VIDEOPIN_BONG_EN, data & 0x20); // Bong
-	m_discrete->write(VIDEOPIN_ATTRACT_EN, data & 0x80);  // Attract
-	m_discrete->write(VIDEOPIN_VOL_DATA, data & 0x07);        // Vol0,1,2
+	m_discrete->write(VIDEOPIN_ATTRACT_EN, data & 0x80); // Attract
+	m_discrete->write(VIDEOPIN_VOL_DATA, data & 0x07); // Vol0,1,2
 }
 
 
@@ -231,7 +231,7 @@ void videopin_state::main_map(address_map &map)
 	map(0x1000, 0x1000).portr("IN0");
 	map(0x1800, 0x1800).portr("DSW");
 	map(0x2000, 0x3fff).rom();
-	map(0xe000, 0xffff).rom();   /* mirror for 6502 vectors */
+	map(0xe000, 0xffff).rom(); // mirror for 6502 vectors
 }
 
 

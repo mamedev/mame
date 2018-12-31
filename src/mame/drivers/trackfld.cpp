@@ -933,6 +933,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
 	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
+	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

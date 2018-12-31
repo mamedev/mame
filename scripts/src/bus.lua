@@ -784,6 +784,19 @@ if (BUSES["ECONET"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/ekara/slot.h,BUSES["EKARA"] = true
+---------------------------------------------------
+
+if (BUSES["EKARA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ekara/slot.cpp",
+		MAME_DIR .. "src/devices/bus/ekara/slot.h",
+		MAME_DIR .. "src/devices/bus/ekara/rom.cpp",
+		MAME_DIR .. "src/devices/bus/ekara/rom.h",
+	}
+end
 
 ---------------------------------------------------
 --

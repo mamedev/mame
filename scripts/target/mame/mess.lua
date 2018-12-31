@@ -678,6 +678,7 @@ MACHINES["IOPSIO2"] = true
 MACHINES["IOPTIMER"] = true
 MACHINES["Z8038"] = true
 MACHINES["AIC6250"] = true
+MACHINES["DC7085"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -725,6 +726,7 @@ BUSES["CRVISION"] = true
 BUSES["DMV"] = true
 BUSES["ECBBUS"] = true
 BUSES["ECONET"] = true
+BUSES["EKARA"] = true
 BUSES["EINSTEIN_USERPORT"] = true
 BUSES["ELECTRON"] = true
 BUSES["ELECTRON_CART"] = true
