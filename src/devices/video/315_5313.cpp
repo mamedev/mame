@@ -225,6 +225,8 @@ void sega315_5313_device::device_add_mconfig(machine_config &config)
 {
 	sega315_5313_mode4_device::device_add_mconfig(config);
 
+	m_palette->set_entries(0x200); // more entries for 32X - not really the cleanest way to do this
+
 	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 15)).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
 }
 
