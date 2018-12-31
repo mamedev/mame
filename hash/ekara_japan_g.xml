@@ -88,14 +88,23 @@
 		</part>
 	</software>
 	
-	<!-- G10 has a 24LC02, but no 74HC125, and pin 2 isn't connected.
-		     So I guess that one has a different method of talking to the SEEPROM -->
+	<!-- Notes from Sean
+ 
+	    G10 has a 24LC02, but no 74HC125, and pin 2 isn't connected.
+
+		G10 is very odd; the SEEPROM's SDA is tied high with a 4.7K resistor and connected to pin 4 through a 220 ohm resistor.
+		Pin 4 on the other carts I've looked at is VCC, also connected to pins 21 and 35, but on this one, it isn't.
+		Likewise, SCL is tied low with a 47K resistor and connected to pin 32, which on all the other carts is connected to pins 1 and 44, which are ground.
+	
+		e-Kara units, Popira, Taiko de Popira and DDR all of them have pin 4 of the cart connector going to VCC and pin 32 going to ground.  So none of them can communicate with the SEEPROM in G10
+
+		Unless Popira 2 is different (unlikely) it doesn't look like the SEEPROM in this cartridge can be used (unfinished design?) -->
 	<software name="gc0010">
 		<description>BAT Volume 4 (Japan) (GC0010-BAT)</description>
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- no 74HC125  TODO: different hookup, see note above -->
+			<feature name="slot" value="rom_24lc02"/> <!-- no 74HC125, doesn't seem possible that this SEEPROM is actually used, see note above -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee" offset="0" />
 			</dataarea>

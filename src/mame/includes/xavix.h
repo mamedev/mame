@@ -101,6 +101,7 @@ public:
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
+	void xavix_nv(machine_config &config);
 
 	void init_xavix();
 
@@ -300,6 +301,8 @@ private:
 
 	DECLARE_READ8_MEMBER(nmi_vector_lo_r);
 	DECLARE_READ8_MEMBER(nmi_vector_hi_r);
+	DECLARE_READ8_MEMBER(irq_vector_lo_r);
+	DECLARE_READ8_MEMBER(irq_vector_hi_r);
 
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
