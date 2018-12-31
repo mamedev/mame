@@ -748,14 +748,15 @@ public:
 	{
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
-#ifdef SDLMAME_EMSCRIPTEN
 		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK))
-#else
-		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC))
-#endif
 		{
 			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
 			return;
+		}
+
+		if (SDL_InitSubSystem(SDL_INIT_HAPTIC))
+		{
+			osd_printf_verbose("Could not initialize SDL Haptic subsystem: %s.\n", SDL_GetError());
 		}
 
 		sdl_input_module::input_init(machine);
