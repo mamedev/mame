@@ -37254,9 +37254,10 @@ rockna                          // (c) 1999 Jaleco
 rocknms                         // (c) 1999 Jaleco
 step3                           // (c) 1999 Jaleco
 stepstag                        // (c) 1999 Jaleco
-tetrisp2                        // (c) 1997 Jaleco
-tetrisp2j                       // (c) 1997 Jaleco
-tetrisp2ja                      // (c) 1997 Jaleco
+tetrisp2                        // (c) 1997 Jaleco (World v2.8)
+tetrisp2a                       // (c) 1997 Jaleco (World v2.7)
+tetrisp2j                       // (c) 1997 Jaleco (Japan v2.2)
+tetrisp2ja                      // (c) 1997 Jaleco (Japan v2.1)
 vjdash                          // (c) 1999 Jaleco
 
 @source:textelcomp.cpp
