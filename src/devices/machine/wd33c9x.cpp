@@ -312,18 +312,18 @@ wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_t
 	, m_addr{ 0 }
 	, m_regs{ 0 }
 	, m_command_length{ 0 }
-	, m_mode{ MODE_D }
 	, m_scsi_state{ IDLE }
+	, m_mode{ MODE_D }
 	, m_xfr_phase{ 0 }
 	, m_step_count{ 0 }
 	, m_transfer_count{ 0 }
 	, m_data_fifo{ 0 }
 	, m_data_fifo_pos{ 0 }
 	, m_data_fifo_size{ 0 }
-	, m_irq_cb{ *this }
+	, m_irq_fifo{ 0 }
 	, m_irq_fifo_pos{ 0 }
 	, m_irq_fifo_size{ 0 }
-	, m_irq_fifo{ 0 }
+	, m_irq_cb{ *this }
 	, m_drq_cb{ *this }
 	, m_drq_state{ false }
 	, m_timer{ nullptr }
