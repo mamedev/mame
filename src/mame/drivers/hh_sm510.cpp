@@ -1671,6 +1671,82 @@ void gnw_mario_state::gnw_mario(machine_config &config)
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Black Jack (model BJ-60)
+  * PCB label BJ-60
+  * Sharp SM512 label BJ-60 564D (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_bjack_state : public hh_sm510_state
+{
+public:
+	gnw_bjack_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_bjack(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_bjack )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Double Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Bet x10 / Hit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)  PORT_NAME("Bet x1 / Stand")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Enter")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+INPUT_PORTS_END
+
+void gnw_bjack_state::gnw_bjack(machine_config &config)
+{
+	/* basic machine hardware */
+	SM512(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1290/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1290/2-1);
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1297/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1297/2-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Squish (model MG-61)
   * PCB label MG-61
   * Sharp SM510 label MG-61 8841B (no decap)
@@ -7205,6 +7281,21 @@ ROM_START( gnw_mario )
 ROM_END
 
 
+ROM_START( gnw_bjack )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bj-60.program", 0x0000, 0x1000, CRC(8e74f633) SHA1(54b0f65ee716d2820a9ed9c743755d2a2d99ce4d) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bj-60.melody", 0x000, 0x100, BAD_DUMP CRC(2619224e) SHA1(b65dc590b6eb1de793e980af236ccf8360b3cfee) )
+
+	ROM_REGION( 75217, "svg_top", 0)
+	ROM_LOAD( "gnw_bjack_top.svg", 0, 75217, CRC(f8b8c9a3) SHA1(fdd99cf58f7c5dce3a8d5ef444845a928cd6b480) )
+
+	ROM_REGION( 112450, "svg_bottom", 0)
+	ROM_LOAD( "gnw_bjack_bottom.svg", 0, 112450, CRC(ff78620f) SHA1(4923866fe215177bf08003c1a9204f2654a5b1da) )
+ROM_END
+
+
 ROM_START( gnw_squish )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mg-61", 0x0000, 0x1000, CRC(79cd509c) SHA1(969e5425984ba9e5183c68b38b3588f53d1e8e5d) )
@@ -7780,6 +7871,7 @@ CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_st
 CONS( 1982, gnw_ghouse,  0,          0, gnw_ghouse,  gnw_ghouse,  gnw_ghouse_state,  empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
+CONS( 1985, gnw_bjack,   0,          0, gnw_bjack,   gnw_bjack,   gnw_bjack_state,   empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE)
 CONS( 1986, gnw_squish,  0,          0, gnw_squish,  gnw_squish,  gnw_squish_state,  empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE )
 
 // Nintendo G&W: new wide screen
