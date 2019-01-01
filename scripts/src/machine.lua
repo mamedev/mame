@@ -2949,6 +2949,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/wd33c9x.h,MACHINES["WD33C9X"] = true
+---------------------------------------------------
+
+if (MACHINES["WD33C9X"]~=null) then
+	MACHINES["SCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/wd33c9x.cpp",
+		MAME_DIR .. "src/devices/machine/wd33c9x.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd7600.h,MACHINES["WD7600"] = true
 ---------------------------------------------------
 
