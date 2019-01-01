@@ -3396,8 +3396,7 @@ void taitof2_state::qzchikyu(machine_config &config)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,qzchikyu)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed_qzchikyu))
+	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed_qzchikyu));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
