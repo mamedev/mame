@@ -730,10 +730,12 @@ class sdl_joystick_module : public sdl_input_module
 {
 private:
 	device_map_t   m_joy_map;
+	bool           m_initialized_joystick;
+	bool           m_initialized_haptic;
 	bool           m_sixaxis_mode;
 public:
 	sdl_joystick_module()
-		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER), m_sixaxis_mode(false)
+		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER), m_initialized_joystick(false), m_initialized_haptic(false), m_sixaxis_mode(false)
 	{
 	}
 
@@ -741,20 +743,30 @@ public:
 	{
 		sdl_input_module::exit();
 
-		SDL_QuitSubSystem(SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC);
+		if (m_initialized_joystick)
+		{
+			SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+		}
+
+		if (m_initialized_haptic)
+		{
+			SDL_QuitSubSystem(SDL_INIT_HAPTIC);
+		}
 	}
 
 	virtual void input_init(running_machine &machine) override
 	{
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
-		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK))
+		m_initialized_joystick = !SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+		if (!m_initialized_joystick)
 		{
 			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
 			return;
 		}
 
-		if (SDL_InitSubSystem(SDL_INIT_HAPTIC))
+		m_initialized_haptic = !SDL_InitSubSystem(SDL_INIT_HAPTIC);
+		if (!m_initialized_haptic)
 		{
 			osd_printf_verbose("Could not initialize SDL Haptic subsystem: %s.\n", SDL_GetError());
 		}
