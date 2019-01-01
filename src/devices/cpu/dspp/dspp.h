@@ -388,23 +388,6 @@ public: // TODO
 #define DSPPDRC_COMPATIBLE_OPTIONS (DSPPDRC_STRICT_VERIFY | DSPPDRC_FLUSH_PC)
 #define DSPPDRC_FASTEST_OPTIONS    (0)
 
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DSPP_INT_HANDLER(_devcb) \
-	devcb = &dspp_device::set_int_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DSPP_DMA_READ_HANDLER(_devcb) \
-	devcb = &dspp_device::set_dma_read_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DSPP_DMA_WRITE_HANDLER(_devcb) \
-	devcb = &dspp_device::set_dma_write_handler(*device, DEVCB_##_devcb);
-
-
-
 // device type definition
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);
 

@@ -8000,7 +8000,7 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-#define MACHINE_FLAGS MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS
+#define MACHINE_FLAGS MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_TIMING
 
 //     YEAR  NAME         PARENT    MACHINE             INPUT         CLASS           INIT           ROT   COMPANY       FULLNAME                                                FLAGS
 GAMEL( 1995, aristmk5,    0,        aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "MKV Set/Clear Chips (USA)",                            MACHINE_FLAGS|MACHINE_IS_BIOS_ROOT, layout_aristmk5_us )

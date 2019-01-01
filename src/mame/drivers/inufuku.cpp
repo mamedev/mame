@@ -364,7 +364,7 @@ void inufuku_state::inufuku(machine_config &config)
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_inufuku);
-	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 4096);
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

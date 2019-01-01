@@ -622,6 +622,7 @@ MACHINES["WD_FDC"] = true
 MACHINES["WD11C00_17"] = true
 MACHINES["WD2010"] = true
 MACHINES["WD33C93"] = true
+MACHINES["WD33C9X"] = true
 MACHINES["WD7600"] = true
 MACHINES["X2201"] = true
 MACHINES["X2212"] = true
@@ -678,6 +679,7 @@ MACHINES["IOPSIO2"] = true
 MACHINES["IOPTIMER"] = true
 MACHINES["Z8038"] = true
 MACHINES["AIC6250"] = true
+MACHINES["DC7085"] = true
 
 --------------------------------------------------
 -- specify available bus cores

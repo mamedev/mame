@@ -596,22 +596,22 @@ void shocking_state::machine_reset()
                                 Magic Bubble
 ***************************************************************************/
 
-MACHINE_CONFIG_START(magicbub_state::magicbub)
-
+void magicbub_state::magicbub(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magicbub_state,  irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &magicbub_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(magicbub_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000) / 4));
+	audiocpu.set_addrmap(AS_PROGRAM, &magicbub_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &magicbub_state::sound_port_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0) /* TODO: completely inaccurate */
-	MCFG_SCREEN_UPDATE_DRIVER(magicbub_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0); /* TODO: completely inaccurate */
+	m_screen->set_screen_update(FUNC(magicbub_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsun16);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
@@ -622,33 +622,33 @@ MACHINE_CONFIG_START(magicbub_state::magicbub)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(16'000'000) / 4));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
 /***************************************************************************
                                 Shocking
 ***************************************************************************/
 
-MACHINE_CONFIG_START(shocking_state::shocking)
-
+void shocking_state::shocking(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shocking_state,  irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &shocking_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shocking_state::irq2_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0) /* TODO: completely inaccurate */
-	MCFG_SCREEN_UPDATE_DRIVER(shocking_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0); /* TODO: completely inaccurate */
+	m_screen->set_screen_update(FUNC(shocking_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsun16);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
@@ -657,12 +657,11 @@ MACHINE_CONFIG_START(shocking_state::shocking)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
-
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.set_addrmap(0, &shocking_state::oki_map);
+}
 
 
 /***************************************************************************

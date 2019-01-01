@@ -13097,7 +13097,6 @@ skylancre                       // (c) 1983 Orca + Esco Trading Co license
 @source:funkyjet.cpp
 funkyjet                        // MAT (c) 1992 Data East (Mitchell license) (World, Rev 1)
 funkyjeta                       // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified
-funkyjetb                       // bootleg
 funkyjetj                       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 sotsugyo                        // (c) 1995 Mitchell (Atlus license)
 
@@ -30437,6 +30436,7 @@ bjtwinpa
 blkheart                        // UPL-91069
 blkheartj                       // UPL-91069
 bubl2000                        // (c) 1998 Tuning
+bubl2000a                       // (c) 1998 Tuning
 cactus                          // bootleg
 dolmen                          // (c) 1995
 firehawk                        // (c) 2001 ESD
@@ -31035,27 +31035,31 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
+comport							// Compaq Portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
+eaglespirit						// Eagle PC Spirit
 epc                             // 1984 Ericsson PC
 eppc                            // 1985 Ericsson Portable PC
 ibm5550                         //
 iskr3104                        //
-kaypro16                        //
+ittxtra							// 1984 ITT XTRA
+kaypro16                        // Kaypro 16
+laser_turbo_xt                  // 1988 VTech Laser Turbo XT
+laser_xt3                       // 1989 VTech Laser XT/3
 mbc16                           // Sanyo MBC-16
+mpc1600							// Columbia Data Products MPC 1600
 mc1702                          //
 mk88                            //
-olivm15                         //
+ncrpc4i                         // NCR PC4i
+olivm15                         // Olivetti M15
+olytext30                       // AEG Olympia Olytext 30
 pc7000                          // 1985 Sharp PC-7000
 poisk2                          //
-sicpc1605                       //
+sicpc1605                       // Siemens Sicomp PC16-05
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
-ncrpc4i                         // NCR PC4i
-laser_turbo_xt                  // 1988 VTech Laser Turbo XT
-laser_xt3                       // 1989 VTech Laser XT/3
-olytext30                       // AEG Olympia Olytext 30
 
 @source:pc100.cpp
 pc100                           //
@@ -38014,6 +38018,7 @@ cookbib                         // (c) 1995 SemiCom
 cookbiba                        //
 dquizgo                         // (c) 1998 SemiCom
 fncywld                         // (c) 1996 Unico
+funkyjetb                       // bootleg
 magipur                         // (c) 1996 Unico
 htchctch                        // (c) 1995 SemiCom
 jumpkids                        // (c) 1993 Comad
@@ -39671,6 +39676,7 @@ rad_box                         //
 rad_boxp                        //
 rad_crdn                        //
 rad_crdnp                       //
+rad_opus                        //
 rad_bass                        //
 rad_bassp                       //
 rad_snow                        //

@@ -245,6 +245,8 @@ void nscsi_full_device::device_reset()
 	scsi_state = scsi_substate = IDLE;
 	buf_control_rpos = buf_control_wpos = 0;
 	scsi_identify = 0;
+	data_buffer_size = 0;
+	data_buffer_pos = 0;
 	scsi_bus->data_w(scsi_refid, 0);
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
@@ -365,8 +367,13 @@ void nscsi_full_device::step(bool timeout)
 			data_buffer_id = ctl->param1;
 			data_buffer_size = ctl->param2;
 			data_buffer_pos = 0;
-			scsi_state = TARGET_WAIT_DATA_IN_BYTE;
-			target_send_buffer_byte();
+			if (data_buffer_size > 0) {
+				scsi_state = TARGET_WAIT_DATA_IN_BYTE;
+			}
+			else {
+				scsi_state = TARGET_NEXT_CONTROL;
+			}
+			step(false);
 			break;
 
 		case BC_DATA_OUT:
@@ -374,8 +381,13 @@ void nscsi_full_device::step(bool timeout)
 			data_buffer_id = ctl->param1;
 			data_buffer_size = ctl->param2;
 			data_buffer_pos = 0;
-			scsi_state = TARGET_WAIT_DATA_OUT_BYTE;
-			target_recv_byte();
+			if (data_buffer_size > 0) {
+				scsi_state = TARGET_WAIT_DATA_OUT_BYTE;
+			}
+			else {
+				scsi_state = TARGET_NEXT_CONTROL;
+			}
+			step(false);
 			break;
 
 		case BC_MESSAGE_1:

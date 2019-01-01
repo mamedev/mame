@@ -430,23 +430,23 @@ void tbowl_state::machine_reset()
 	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
-MACHINE_CONFIG_START(tbowl_state::tbowl)
-
+void tbowl_state::tbowl(machine_config &config)
+{
 	/* CPU on Board '6206B' */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_DEVICE_PROGRAM_MAP(_6206B_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000); /* NEC D70008AC-8 (Z80 Clone) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206B_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(tbowl_state::irq0_line_hold));
 
 	/* CPU on Board '6206C' */
-	MCFG_DEVICE_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_DEVICE_PROGRAM_MAP(_6206C_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	z80_device &sub(Z80(config, "sub", 8000000)); /* NEC D70008AC-8 (Z80 Clone) */
+	sub.set_addrmap(AS_PROGRAM, &tbowl_state::_6206C_map);
+	sub.set_vblank_int("lscreen", FUNC(tbowl_state::irq0_line_hold));
 
 	/* CPU on Board '6206A' */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
-	MCFG_DEVICE_PROGRAM_MAP(_6206A_map)
+	Z80(config, m_audiocpu, 4000000); /* Actual Z80 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206A_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tbowl);
@@ -455,22 +455,21 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_left)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(32*8, 32*8);
+	lscreen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	lscreen.set_screen_update(FUNC(tbowl_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_right)
-	MCFG_SCREEN_PALETTE(m_palette)
-
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(32*8, 32*8);
+	rscreen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	rscreen.set_screen_update(FUNC(tbowl_state::screen_update_right));
+	rscreen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -479,24 +478,24 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ym1", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym3812_device &ym1(YM3812(config, "ym1", 4000000));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym3812_device &ym2(YM3812(config, "ym2", 4000000));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* something for the samples? */
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_1))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MSM5205(config, m_msm1, 384000);
+	m_msm1->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int_1));    /* interrupt function */
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_2))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm2, 384000);
+	m_msm2->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int_2));    /* interrupt function */
+	m_msm2->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /* Board Layout from readme.txt

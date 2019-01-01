@@ -1149,7 +1149,7 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wbeachvl);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,wbeachvl)
 

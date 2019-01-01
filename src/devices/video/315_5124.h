@@ -52,7 +52,6 @@ public:
 
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
@@ -85,6 +84,7 @@ protected:
 	static constexpr unsigned SEGA315_5377_CRAM_SIZE        = 0x40; /* 32 colors x 2 bytes per color = 64 bytes */
 	static constexpr unsigned SEGA315_5124_CRAM_SIZE        = 0x20; /* 32 colors x 1 bytes per color = 32 bytes */
 
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -202,9 +202,10 @@ class sega315_5246_device : public sega315_5124_device
 {
 public:
 	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 protected:
+	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
+
 	virtual uint16_t name_table_row_mode4(int row) override;
 	virtual uint16_t sprite_attributes_addr_mode4(uint16_t base) override;
 	virtual uint8_t sprite_tile_mask_mode4(uint8_t tile_number) override;
@@ -216,11 +217,12 @@ class sega315_5377_device : public sega315_5246_device
 {
 public:
 	sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) override;
 
 protected:
+	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
+
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -237,11 +239,11 @@ private:
 class sega315_5313_mode4_device : public sega315_5246_device
 {
 public:
-	sega315_5313_mode4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 	void stop_timers();
 
 protected:
+	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
+
 	virtual void write_memory(uint8_t data) override;
 	virtual void load_vram_addr(uint8_t data) override;
 	virtual void select_sprites(int line) override;

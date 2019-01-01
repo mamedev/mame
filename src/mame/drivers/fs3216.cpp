@@ -33,6 +33,8 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
 		, m_earom(*this, "earom")
+		, m_videoram(*this, "videoram")
+		, m_chargen(*this, "chargen")
 	{
 	}
 
@@ -43,7 +45,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	MC6845_UPDATE_ROW(update_row);
+	MC6845_UPDATE_ROW(crt_update_row);
 
 	DECLARE_READ16_MEMBER(mmu_read);
 	DECLARE_WRITE16_MEMBER(mmu_write);
@@ -71,6 +73,9 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<x2212_device> m_earom;
 
+	required_shared_ptr<u16> m_videoram;
+	required_region_ptr<u8> m_chargen;
+
 	std::unique_ptr<u8[]> m_fdc_ram;
 
 	bool m_in_reset;
@@ -97,8 +102,20 @@ void fs3216_state::machine_reset()
 }
 
 
-MC6845_UPDATE_ROW(fs3216_state::update_row)
+MC6845_UPDATE_ROW(fs3216_state::crt_update_row)
 {
+	u32 *px = &bitmap.pix32(y);
+
+	for (int i = 0; i < x_count; i++)
+	{
+		u16 chr = m_videoram[(ma + i) & 0x7ff];
+		rgb_t fg = rgb_t::white();
+		rgb_t bg = rgb_t::black();
+
+		u16 dots = m_chargen[(chr & 0xff) << 4 | ra] << 1;
+		for (int n = 9; n > 0; n--, dots <<= 1)
+			*px++ = BIT(dots, 8) ? fg : bg;
+	}
 }
 
 
@@ -216,11 +233,18 @@ void fs3216_state::clb_map(address_map &map)
 	map(0x394709, 0x394709).rw("dart", FUNC(z80dart_device::ca_r), FUNC(z80dart_device::ca_w));
 	map(0x394711, 0x394711).rw("dart", FUNC(z80dart_device::db_r), FUNC(z80dart_device::db_w));
 	map(0x394719, 0x394719).rw("dart", FUNC(z80dart_device::cb_r), FUNC(z80dart_device::cb_w));
+	map(0x3a0000, 0x3a1fff).rom().region("video", 0);
+	map(0x3a4001, 0x3a4001).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3a4003, 0x3a4003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3a8000, 0x3a8fff).ram().share("videoram"); // 2x M58725P
+	map(0x3b0000, 0x3b1fff).rom().region("comm_a", 0);
+	map(0x3c0000, 0x3c1fff).rom().region("comm_b", 0);
+	map(0x3e0000, 0x3e1fff).rom().region("wd1001_clb", 0);
 	map(0x3f5000, 0x3f5001).w(FUNC(fs3216_state::mmu_init_w));
 	map(0x3f6000, 0x3f6001).w(FUNC(fs3216_state::fdc_reset_w));
 	map(0x3f6800, 0x3f6fff).rw(FUNC(fs3216_state::fdc_ram_r), FUNC(fs3216_state::fdc_ram_w)).umask16(0x00ff);
-	map(0x3f7000, 0x3f7001).r(FUNC(fs3216_state::earom_recall_r));
-	map(0x3f7200, 0x3f7201).r(FUNC(fs3216_state::earom_store_r));
+	map(0x3f7000, 0x3f7001).r(FUNC(fs3216_state::earom_store_r));
+	map(0x3f7200, 0x3f7201).r(FUNC(fs3216_state::earom_recall_r));
 	map(0x3f7400, 0x3f75ff).rw(m_earom, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 }
 
@@ -260,13 +284,13 @@ void fs3216_state::fs3216(machine_config &config)
 
 	X2212(config, m_earom);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 14.58_MHz_XTAL / 10)); // HD46505RP; clock unknown
-	crtc.set_char_width(10); // unknown
+	mc6845_device &crtc(MC6845(config, "crtc", 14.58_MHz_XTAL / 9)); // HD46505RP
+	crtc.set_char_width(9);
 	crtc.set_show_border_area(false);
-	crtc.set_update_row_callback(FUNC(fs3216_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(fs3216_state::crt_update_row), this);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(14.58_MHz_XTAL, 900, 0, 800, 270, 0, 250); // parameters guessed
+	screen.set_raw(14.58_MHz_XTAL, 900, 0, 720, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	n8x300_cpu_device &wdcpu(N8X300(config, "wdcpu", 20_MHz_XTAL / 2)); // N8X305I
@@ -288,6 +312,9 @@ ROM_START(fs3216)
 	ROM_REGION16_BE(0x4000, "momrom", 0)
 	ROM_LOAD16_BYTE("17k_1260-02_h.bin", 0x0000, 0x2000, CRC(75ed6de8) SHA1(0360548493b778995ae436da475b6356945e1872))
 	ROM_LOAD16_BYTE("15k_1260-01_l.bin", 0x0001, 0x2000, CRC(82695233) SHA1(0d69309f41306298bf6a4ba6928c53f908bb3f2c))
+
+	ROM_REGION(0x100, "earom", 0)
+	ROM_LOAD("sn1000044-08_x2212.bin", 0x000, 0x100, CRC(2bf1fec8) SHA1(e1bdda558364415131e68443013c608bb9c01451))
 
 	ROM_REGION16_BE(0x2000, "comm_a", 0)
 	ROM_LOAD16_BYTE("1896-01_c90c3cb92588a2b4bb28bcf4bb8e2023.bin", 0x0000, 0x1000, CRC(ac4cdbd2) SHA1(e448a01a9809cccfb526ac1d4e97d9be3af1e5eb))

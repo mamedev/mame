@@ -421,7 +421,7 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[index][0] = m_cpr[0][COP0_EntryHi];
 			m_tlb[index][1] = m_cpr[0][COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlbwi %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+			LOGMASKED(LOG_TLB, "tlb write index %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
 				index, (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, m_cpr[0][COP0_EntryHi] & EH_VPN, m_cpr[0][COP0_EntryLo] & EL_PFN,
 				m_cpr[0][COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cpr[0][COP0_EntryLo] & EL_D ? 'D' : '-',
@@ -438,7 +438,7 @@ void mips1_device_base::handle_cop0(u32 const op)
 			m_tlb[random][0] = m_cpr[0][COP0_EntryHi];
 			m_tlb[random][1] = m_cpr[0][COP0_EntryLo];
 
-			LOGMASKED(LOG_TLB, "tlbwr %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
+			LOGMASKED(LOG_TLB, "tlb write random %d asid %d vpn 0x%08x pfn 0x%08x %c%c%c%c (%s)\n",
 				random, (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6, m_cpr[0][COP0_EntryHi] & EH_VPN, m_cpr[0][COP0_EntryLo] & EL_PFN,
 				m_cpr[0][COP0_EntryLo] & EL_N ? 'N' : '-',
 				m_cpr[0][COP0_EntryLo] & EL_D ? 'D' : '-',
@@ -992,7 +992,7 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 
 	// key is a combination of VPN and ASID
 	u32 const key = (address & EH_VPN) | (m_cpr[0][COP0_EntryHi] & EH_ASID);
-	bool refill = !BIT(m_cpr[0][COP0_BadVAddr], 31);
+	bool refill = !BIT(address, 31);
 	bool dirty = false;
 
 	for (u32 const *entry : m_tlb)

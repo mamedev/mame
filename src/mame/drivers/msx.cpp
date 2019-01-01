@@ -530,6 +530,7 @@ PCB Layouts missing
 #include "includes/msx.h"
 #include "formats/dsk_dsk.h"
 #include "formats/dmk_dsk.h"
+#include "machine/input_merger.h"
 #include "machine/msx_matsushita.h"
 #include "machine/msx_s1985.h"
 #include "machine/msx_systemflags.h"
@@ -1350,6 +1351,8 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
 	i8255_device &ppi(I8255(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(msx_state::msx_ppi_port_a_w));
 	ppi.in_pb_callback().set(FUNC(msx_state::msx_ppi_port_b_r));
@@ -1400,7 +1403,7 @@ void msx_state::msx1(VDPType &vdp_type, machine_config &config)
 	tms9928a_device &vdp(vdp_type(config, "tms9928a", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(msx_state::msx_irq_source0));
+	vdp.int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 }
 
 
@@ -1411,6 +1414,8 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	MCFG_DEVICE_IO_MAP(msx2_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
 	i8255_device &ppi(I8255(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(msx2_state::msx_ppi_port_a_w));
 	ppi.in_pb_callback().set(FUNC(msx2_state::msx_ppi_port_b_r));
@@ -1420,7 +1425,7 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	V9938(config, m_v9938, 21.477272_MHz_XTAL);
 	m_v9938->set_screen_ntsc("screen");
 	m_v9938->set_vram_size(0x20000);
-	m_v9938->int_cb().set(FUNC(msx2_state::msx_irq_source0));
+	m_v9938->int_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
@@ -1470,6 +1475,8 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	MCFG_DEVICE_IO_MAP(msx2p_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
 	i8255_device &ppi(I8255(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(msx2_state::msx_ppi_port_a_w));
 	ppi.in_pb_callback().set(FUNC(msx2_state::msx_ppi_port_b_r));
@@ -1479,7 +1486,7 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	V9958(config, m_v9958, 21.477272_MHz_XTAL);
 	m_v9958->set_screen_ntsc("screen");
 	m_v9958->set_vram_size(0x20000);
-	m_v9958->int_cb().set(FUNC(msx2_state::msx_irq_source0));
+	m_v9958->int_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
