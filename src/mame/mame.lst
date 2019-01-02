@@ -29289,6 +29289,9 @@ tenkomorja                      // 1998.12 Tenkomori Shooting (Japan, TKM1/VER.A
 toukon3                         // 1997.12 Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)
 truckk                          // 2000.06 Truck Kyousoukyoku (Metro) (Japan, TKK2/VER.A)
 
+@source:namcos1b.cpp
+tankfrceb                       // bootleg
+
 @source:namcos2.cpp
 assault                         // (c) 1988
 assaultj                        // (c) 1988 (Japan)
@@ -31037,20 +31040,20 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
-comport							// Compaq Portable
+comport                         // Compaq Portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
-eaglespirit						// Eagle PC Spirit
+eaglespirit                     // Eagle PC Spirit
 epc                             // 1984 Ericsson PC
 eppc                            // 1985 Ericsson Portable PC
 ibm5550                         //
 iskr3104                        //
-ittxtra							// 1984 ITT XTRA
+ittxtra                         // 1984 ITT XTRA
 kaypro16                        // Kaypro 16
 laser_turbo_xt                  // 1988 VTech Laser Turbo XT
 laser_xt3                       // 1989 VTech Laser XT/3
 mbc16                           // Sanyo MBC-16
-mpc1600							// Columbia Data Products MPC 1600
+mpc1600                         // Columbia Data Products MPC 1600
 mc1702                          //
 mk88                            //
 ncrpc4i                         // NCR PC4i
